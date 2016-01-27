@@ -31,7 +31,7 @@ public class DatabaseControllerTest
 	}
 
 	@Test(expected=NoDatabaseConnectionException.class)
-	public final void testFailInitialization() throws ClassNotFoundException, NoDatabaseConnectionException
+	public final void testFailInitialization() throws NoDatabaseConnectionException
 	{
 		DatabaseController.initializeDatabase();
 	}

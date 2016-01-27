@@ -35,6 +35,22 @@ public class DatabaseController
 	private static JdbcConnectionPool connectionPool;
 
 	/**
+	 * Checks if the database file exists.
+	 *
+	 * @return <code>true</code> if the database file exists
+	 */
+	private static boolean databaseExists()
+	{
+		final File db = new File(DB_FILEPATH);
+		return (db.exists() && !db.isDirectory());
+	}
+
+
+	/*
+	 * PUBLIC DATABASE METHODS
+	 */
+
+	/**
 	 * Creates the connection to the database.
 	 * Use {@link #shutdown()} to close the connection.
 	 *
@@ -144,14 +160,13 @@ public class DatabaseController
 		return connectionPool != null;
 	}
 
-	/**
-	 * Checks if the database file exists.
-	 *
-	 * @return <code>true</code> if the database file exists
+	/*
+	 * PUBLIC DATABASE MANIPULATION METHODS
 	 */
-	private static boolean databaseExists()
+
+	public static boolean addUser(String userID, String userFirstName, String userLastName, Object userRole)
 	{
-		final File db = new File(DB_FILEPATH);
-		return (db.exists() && !db.isDirectory());
+		// TODO Auto-generated method stub
+		return true;
 	}
 }
