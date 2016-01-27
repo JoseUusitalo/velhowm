@@ -35,7 +35,7 @@ public class AddUserController
 	{
 		if (DatabaseController.addUser(userID, userFirstName, userLastName, userRole)){
 
-			PopupController.info("User created.");
+			PopupController.info(view.getStage(), "user added");
 		}
 		else {
 			PopupController.warning("Warning!");

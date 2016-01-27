@@ -33,6 +33,7 @@ public class AddUserView extends Application
 	 * The user interface border panel.
 	 */
 	private BorderPane rootBorderPane;
+	private Stage primaryStage;
 	// private GridPane rootGridPane;
 
 	public static void main(String[] args)
@@ -44,6 +45,7 @@ public class AddUserView extends Application
 	public void start(final Stage primaryStage)
 	{
 
+		this.primaryStage = primaryStage;
 		controller = new AddUserController(this);
 		// setUserAgentStylesheet(STYLESHEET_MODENA);
 		rootBorderPane = new BorderPane();
@@ -103,5 +105,9 @@ public class AddUserView extends Application
 
 		primaryStage.show();
 
+	}
+	
+	public Stage getStage(){
+		return primaryStage;
 	}
 }
