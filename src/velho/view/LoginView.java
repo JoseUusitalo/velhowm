@@ -1,52 +1,34 @@
 package velho.view;
 
 import javafx.application.Application;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
-import javafx.collections.ObservableList;
-import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
-import javafx.stage.Stage;
-import velho.controller.DebugController;
-import javafx.scene.Group;
-import javafx.scene.Scene;
-import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.GridPane;
-import javafx.scene.layout.HBox;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
-import javafx.geometry.Pos;
+import javafx.scene.Group;
 import javafx.scene.Scene;
-import javafx.scene.layout.StackPane;
-import javafx.scene.text.Font;
-import javafx.scene.text.FontWeight;
-import javafx.scene.text.Text;
+import javafx.scene.control.Button;
+import javafx.scene.control.ComboBox;
+import javafx.scene.control.Label;
+import javafx.scene.control.TextField;
+import javafx.scene.layout.GridPane;
+import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
-import javafx.scene.control.*;
+import velho.controller.LoginController;
 
 /**
- * Class made to debug the log ins and outs.
+ * Views the log ins to the applications.
  * @author Edward
  *
  */
-public class DebugWindow extends Application
+public class LoginView extends Application
 {
-	/**
-	 * Button has been tagged logInButton and named as "Log In" on the scene.
-	 */
+
 	public Button logInButton = new Button("Log In");
-	/**
-	 * Button has been tagged logOutButton and named as "Log Out" on the scene
-	 */
 	public Button logOutButton = new Button("Log Out");
-	/**
-	 * The DebugController has been tagged as controller.
-	 */
-	private DebugController controller;
+	private LoginController controller;
 
 	/**
-	 * Sets the value as either true or false to show in the scene.
+	 * Changes the visibility of the button "Log In".
 	 *
 	 * @param visibility show log in button?
 	 */
@@ -56,7 +38,7 @@ public class DebugWindow extends Application
 	}
 
 	/**
-	 * sets the value as either true or false to show in the scene.
+	 * Changes the visibility of the button "Log Out".
 	 *
 	 * @param visibility show log in button?
 	 */
@@ -70,22 +52,26 @@ public class DebugWindow extends Application
 		stage.setTitle("VELHO WM DEBUG");
 		Scene scene = new Scene(new Group(), 300, 150);
 
-		controller = new DebugController(this);
+		controller = new LoginController(this);
 
-		final ComboBox taskComboBox = new ComboBox();
-
-		taskComboBox.setValue("");
+		Label labels = new Label("Badge ID or Password:");
+		TextField textField = new TextField();
+		VBox vb = new VBox();
+		vb.getChildren().addAll(labels, textField);
+		vb.setSpacing(10);
 
 		GridPane grid = new GridPane();
 		grid.setVgap(4);
-		grid.setHgap(10);
+		grid.setHgap(0);
 		grid.setPadding(new Insets(5, 5, 5, 5));
-		grid.add(new Label("User :"), 0, 0);
-		grid.add(taskComboBox, 1, 0);
+		//		grid.add(new Label("User :"), 0, 0);
+		//		grid.add(taskComboBox, 1, 0);
+		grid.add(labels, 0, 1, 1, 1);
+		grid.add(textField, 0, 2, 2, 1);
 
 		logOutButton.setVisible(false);
 
-		grid.add(logInButton, 2, 0);
+		grid.add(logInButton, 0, 3);
 
 		grid.add(logOutButton, 3, 0);
 
@@ -96,7 +82,7 @@ public class DebugWindow extends Application
 		{
 			@Override public void handle(ActionEvent event)
 			{
-				controller.login();
+				controller.login(textField.getText());
 			}
 
 		});
