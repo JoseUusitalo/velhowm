@@ -12,7 +12,7 @@ import velho.model.exceptions.NoDatabaseConnectionException;
  *
  * @author Jose Uusitalo
  */
-public class Database
+public class DatabaseController
 {
 	/**
 	 * The database URI on the local machine.

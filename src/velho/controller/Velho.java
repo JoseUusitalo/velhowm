@@ -20,7 +20,7 @@ public class Velho
 
 		try
 		{
-			Database.connect();
+			DatabaseController.connect();
 		}
 		catch (ClassNotFoundException e)
 		{
@@ -29,7 +29,7 @@ public class Velho
 
 		try
 		{
-			Database.initializeDatabase();
+			DatabaseController.initializeDatabase();
 		}
 		catch (NoDatabaseConnectionException e)
 		{
@@ -37,8 +37,8 @@ public class Velho
 			e.printStackTrace();
 		}
 
-		if (Database.isConnected())
-			Database.shutdown();
+		if (DatabaseController.isConnected())
+			DatabaseController.shutdown();
 
 		System.out.println("Done!");
 	}

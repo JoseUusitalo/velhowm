@@ -4,7 +4,7 @@ import static org.junit.Assert.*;
 
 import org.junit.Test;
 
-import velho.controller.Database;
+import velho.controller.DatabaseController;
 import velho.model.exceptions.NoDatabaseConnectionException;
 
 /**
@@ -13,26 +13,26 @@ import velho.model.exceptions.NoDatabaseConnectionException;
  * @author Jose Uusitalo
  */
 @SuppressWarnings("static-method")
-public class DatabaseTest
+public class DatabaseControllerTest
 {
 	@Test
 	public final void testDatabaseConnect() throws ClassNotFoundException
 	{
-		assertEquals(true, Database.connect());
-		Database.shutdown();
+		assertEquals(true, DatabaseController.connect());
+		DatabaseController.shutdown();
 	}
 
 	@Test
 	public final void testDatabaseConnection() throws ClassNotFoundException
 	{
-		Database.connect();
-		assertEquals(true, Database.isConnected());
-		Database.shutdown();
+		DatabaseController.connect();
+		assertEquals(true, DatabaseController.isConnected());
+		DatabaseController.shutdown();
 	}
 
 	@Test(expected=NoDatabaseConnectionException.class)
 	public final void testFailInitialization() throws ClassNotFoundException, NoDatabaseConnectionException
 	{
-		Database.initializeDatabase();
+		DatabaseController.initializeDatabase();
 	}
 }
