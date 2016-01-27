@@ -1,4 +1,7 @@
 package velho.controller;
+
+import velho.model.exceptions.NoDatabaseConnectionException;
+
 /**
  * The main controller for the VELHO Warehouse Management software.
  *
@@ -14,7 +17,29 @@ public class Velho
 	public static void main(String[] args)
 	{
 		System.out.println("Running VELHO Warehouse Management.");
-		// Do stuff.
+
+		try
+		{
+			DatabaseController.connect();
+		}
+		catch (ClassNotFoundException e)
+		{
+			e.printStackTrace();
+		}
+
+		try
+		{
+			DatabaseController.initializeDatabase();
+		}
+		catch (NoDatabaseConnectionException e)
+		{
+			System.out.println("ERROR: Unable to initialize database. No database connection established.");
+			e.printStackTrace();
+		}
+
+		if (DatabaseController.isConnected())
+			DatabaseController.shutdown();
+
 		System.out.println("Done!");
 	}
 }
