@@ -9,7 +9,7 @@ import javafx.stage.Modality;
 import javafx.stage.Stage;
 import velho.view.AddUserView;
 
-/**The class that controls popup notices.
+/**A controller for popup alerts.
  * 
  * @author Joona
  *
