@@ -12,16 +12,26 @@ import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
-import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
-import javafx.scene.text.Text;
 import javafx.stage.Stage;
 import velho.controller.AddUserController;
 
+/**
+ * The add user view class.
+ * 
+ * @author Joona
+ *
+ */
 public class AddUserView extends Application
 {
+	/**
+	 * The add user controller.
+	 */
 	private AddUserController controller;
+	/**
+	 * The user interface border panel.
+	 */
 	private BorderPane rootBorderPane;
 	//private GridPane rootGridPane;
 
