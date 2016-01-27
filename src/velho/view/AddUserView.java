@@ -33,13 +33,14 @@ public class AddUserView extends Application
 	 * The user interface border panel.
 	 */
 	private BorderPane rootBorderPane;
-	//private GridPane rootGridPane;
+	// private GridPane rootGridPane;
 
 	public static void main(String[] args)
 	{
 		launch(args);
 	}
 
+	@Override
 	public void start(final Stage primaryStage)
 	{
 
@@ -88,9 +89,10 @@ public class AddUserView extends Application
 		createButton.setOnAction(new EventHandler<ActionEvent>()
 		{
 
-			@Override public void handle(ActionEvent e)
+			@Override
+			public void handle(ActionEvent e)
 			{
-				controller.addUser(userIDField.getText(), userFnameField.getText(), userLNameField.getText(), userRole.getValue() );
+				controller.addUser(userIDField.getText(), userFnameField.getText(), userLNameField.getText(), userRole.getValue());
 			}
 		});
 

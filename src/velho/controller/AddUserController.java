@@ -1,6 +1,5 @@
 package velho.controller;
 
-import velho.model.Database;
 import velho.view.AddUserView;
 /**
  * Is a controller for {@link AddUserView} view.
@@ -14,13 +13,14 @@ public class AddUserController
 	 * The add user view.
 	 */
 	private AddUserView view;
+
 	
 	/**
 	 * @param viewi
 	 */
 	public AddUserController (final AddUserView viewi)
 	{
-		view = viewi; 
+		view = viewi;
 	}
 
 	/**
@@ -33,9 +33,9 @@ public class AddUserController
 	 */
 	public void addUser(String userID, String userFirstName, String userLastName, Object userRole)
 	{
-		if (Database.addUser(userID, userFirstName, userLastName, userRole)){
-			
-			PopupController.info("User created.");		
+		if (DatabaseController.addUser(userID, userFirstName, userLastName, userRole)){
+
+			PopupController.info("User created.");
 		}
 		else {
 			PopupController.warning("Warning!");
