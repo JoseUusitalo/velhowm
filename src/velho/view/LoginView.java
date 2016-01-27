@@ -12,6 +12,7 @@ import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.VBox;
+import javafx.scene.text.Text;
 import javafx.stage.Stage;
 import velho.controller.LoginController;
 
@@ -22,29 +23,20 @@ import velho.controller.LoginController;
  */
 public class LoginView extends Application
 {
-
+	private TextField textField = new TextField();
 	public Button logInButton = new Button("Log In");
-	public Button logOutButton = new Button("Log Out");
 	private LoginController controller;
+
 
 	/**
 	 * Changes the visibility of the button "Log In".
 	 *
-	 * @param visibility show log in button?
+	 * @param visibility
+	 *            show log in button?
 	 */
 	public void setLogInButton(boolean visibility)
 	{
 		logInButton.setVisible(visibility);
-	}
-
-	/**
-	 * Changes the visibility of the button "Log Out".
-	 *
-	 * @param visibility show log in button?
-	 */
-	public void setLogOutButton(boolean visibility)
-	{
-		logOutButton.setVisible(visibility);
 	}
 
 	@Override public void start(Stage stage)
@@ -54,8 +46,7 @@ public class LoginView extends Application
 
 		controller = new LoginController(this);
 
-		Label labels = new Label("Badge ID or Password:");
-		TextField textField = new TextField();
+		Label labels = new Label("Scan badge or write password");
 		VBox vb = new VBox();
 		vb.getChildren().addAll(labels, textField);
 		vb.setSpacing(10);
@@ -69,11 +60,7 @@ public class LoginView extends Application
 		grid.add(labels, 0, 1, 1, 1);
 		grid.add(textField, 0, 2, 2, 1);
 
-		logOutButton.setVisible(false);
-
 		grid.add(logInButton, 0, 3);
-
-		grid.add(logOutButton, 3, 0);
 
 		Group root = (Group) scene.getRoot();
 		root.getChildren().add(grid);
@@ -86,15 +73,6 @@ public class LoginView extends Application
 			}
 
 		});
-
-		logOutButton.setOnAction(new EventHandler<ActionEvent>()
-		{
-			@Override public void handle(ActionEvent event)
-			{
-				controller.logout();
-			}
-		});
-
 		stage.setScene(scene);
 		stage.show();
 	}
