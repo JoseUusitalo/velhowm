@@ -17,16 +17,19 @@ public class LoginController
 	}
 
 	/**
-	 * User Logs in via this command & it prints out user inputed text.
-	 * @param string to print out what is inside the string.
+	 * This will "identify" the user and allow access to the system.
+	 *
+	 * @param authentication
+	 *            is set at LoginView for authentication
+	 * @return as true
 	 */
-	public void login(String string)
+	public void login(String authenticationString)
 	{
-		System.out.println(string);
-		view.setLogInButton(true);
-		view.setLogOutButton(false);
-		// TODO Auto-generated method stub
-
+		Object currentUser = DatabaseController.authenticate(authenticationString);
+		System.out.println(authenticationString);
+		if (currentUser == null){
+			PopupController.warning("INVALID BADGE ID OR PASSWORD!");
+		}
 	}
 
 	/**
@@ -35,27 +38,6 @@ public class LoginController
 	public void logout()
 	{
 		System.out.println("Logged out.");
-		view.setLogInButton(false);
-		view.setLogOutButton(false);
 	}
 
-	/**
-	 * The parameter for LogInButton is either false or true.
-	 *
-	 * @param visibility show log in button?
-	 */
-	public void setLogInButton(boolean visibility)
-	{
-		view.setLogInButton(visibility);
-	}
-
-	/**
-	 * The parameter for LogOutButton is either false or true.
-	 *
-	 * @param visibility show log in button?
-	 */
-	public void setLogOutButton(boolean visibility)
-	{
-		view.setLogOutButton(visibility);
-	}
 }

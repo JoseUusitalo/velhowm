@@ -169,4 +169,11 @@ public class DatabaseController
 		// TODO Auto-generated method stub
 		return true;
 	}
+
+
+	public static Object authenticate(String authenticationString)
+	{
+		// TODO Auto-generated method stub
+		return null;
+	}
 }
