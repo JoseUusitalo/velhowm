@@ -1,5 +1,6 @@
 package velho.controller;
 
+import javafx.scene.Node;
 import velho.view.AddUserView;
 /**
  * Is a controller for {@link AddUserView} view.
@@ -18,9 +19,9 @@ public class AddUserController
 	/**
 	 * @param viewi
 	 */
-	public AddUserController (final AddUserView viewi)
+	public AddUserController ()
 	{
-		view = viewi;
+		view = new AddUserView(this);
 	}
 
 	/**
@@ -41,5 +42,10 @@ public class AddUserController
 			PopupController.warning("Warning!");
 		}
 		System.out.println(userID +  " "  + userFirstName + " " + userLastName + " " +userRole);
+	}
+
+	public Node getView()
+	{
+		return view.getAddUserView();
 	}
 }
