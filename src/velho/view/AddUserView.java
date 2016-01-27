@@ -12,10 +12,8 @@ import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
-import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
-import javafx.scene.text.Text;
 import javafx.stage.Stage;
 import velho.controller.AddUserController;
 
@@ -23,13 +21,14 @@ public class AddUserView extends Application
 {
 	private AddUserController controller;
 	private BorderPane rootBorderPane;
-	//private GridPane rootGridPane;
+	// private GridPane rootGridPane;
 
 	public static void main(String[] args)
 	{
 		launch(args);
 	}
 
+	@Override
 	public void start(final Stage primaryStage)
 	{
 
@@ -78,9 +77,10 @@ public class AddUserView extends Application
 		createButton.setOnAction(new EventHandler<ActionEvent>()
 		{
 
-			@Override public void handle(ActionEvent e)
+			@Override
+			public void handle(ActionEvent e)
 			{
-				controller.addUser(userIDField.getText(), userFnameField.getText(), userLNameField.getText(), userRole.getValue() );
+				controller.addUser(userIDField.getText(), userFnameField.getText(), userLNameField.getText(), userRole.getValue());
 			}
 		});
 
