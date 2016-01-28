@@ -311,4 +311,11 @@ public class DatabaseController
 	{
 		return new LinkedHashSet<String>();
 	}
+
+
+	public static Object authenticate(String authenticationString)
+	{
+		// TODO Auto-generated method stub
+		return null;
+	}
 }

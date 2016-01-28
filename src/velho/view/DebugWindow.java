@@ -11,18 +11,41 @@ import javafx.scene.layout.GridPane;
 import javafx.geometry.Insets;
 import javafx.scene.control.*;
 
+/**
+ * Class made to debug the log ins and outs.
+ * @author Edward
+ *
+ */
 public class DebugWindow extends Application
 {
-
+	/**
+	 * Button has been tagged logInButton and named as "Log In" on the scene.
+	 */
 	public Button logInButton = new Button("Log In");
+	/**
+	 * Button has been tagged logOutButton and named as "Log Out" on the scene
+	 */
 	public Button logOutButton = new Button("Log Out");
+	/**
+	 * The DebugController has been tagged as controller.
+	 */
 	private DebugController controller;
 
+	/**
+	 * Sets the value as either true or false to show in the scene.
+	 *
+	 * @param visibility show log in button?
+	 */
 	public void setLogInButton(boolean visibility)
 	{
 		logInButton.setVisible(visibility);
 	}
 
+	/**
+	 * sets the value as either true or false to show in the scene.
+	 *
+	 * @param visibility show log in button?
+	 */
 	public void setLogOutButton(boolean visibility)
 	{
 		logOutButton.setVisible(visibility);
