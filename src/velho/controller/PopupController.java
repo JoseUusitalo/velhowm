@@ -1,16 +1,11 @@
 package velho.controller;
 
-import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
-import javafx.scene.layout.VBox;
-import javafx.scene.text.Text;
-import javafx.stage.Modality;
-import javafx.stage.Stage;
-import velho.view.AddUserView;
 
-/**A controller for popup alerts.
- * 
+/**
+ * A controller for popup alerts.
+ *
  * @author Joona
  *
  */
@@ -18,7 +13,7 @@ public class PopupController
 {
 	/**
 	 * Displays a popup alert with the given message.
-	 * 
+	 *
 	 * @param stage the message to show
 	 */
 	public static void info(final String string)
@@ -28,11 +23,12 @@ public class PopupController
 		alert.setHeaderText(null);
 		alert.setContentText(string);
 
-		alert.showAndWait();	
+		alert.showAndWait();
 	}
+
 	/**
 	 * Displays a popup alert with the given message.
-	 * 
+	 *
 	 * @param msg the message to show
 	 */
 	public static void warning(String msg)
@@ -41,12 +37,13 @@ public class PopupController
 		alert.setTitle("Warning");
 		alert.setHeaderText(null);
 		alert.setContentText(msg);
-		
+
 		alert.showAndWait();
 	}
+
 	/**
 	 * Displays a popup alert with the given message.
-	 * 
+	 *
 	 * @param msg
 	 */
 	public static void error(String msg)
@@ -58,5 +55,5 @@ public class PopupController
 
 		alert.showAndWait();
 	}
-	
+
 }

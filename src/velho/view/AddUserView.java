@@ -4,27 +4,21 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import javafx.application.Application;
-import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
-import javafx.geometry.Insets;
 import javafx.geometry.Pos;
-import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
-import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
-import javafx.stage.Stage;
 import velho.controller.UserController;
 
 /**
  * The add user view class.
- * 
+ *
  * @author Joona
  *
  */
@@ -81,13 +75,15 @@ public class AddUserView
 			Label userID = new Label("User ID:");
 			grid.add(userID, 0, 3);
 
-			TextField userIDField = new TextField();
-			grid.add(userIDField, 1, 3);
+			TextField pinField = new TextField();
+
+			TextField badgeIDField = new TextField();
+			grid.add(badgeIDField, 1, 3);
 
 			Label userInfo = new Label("User role:");
 			grid.add(userInfo, 0, 4);
 
-			final ComboBox listbox = new ComboBox();
+			final ComboBox<String> listbox = new ComboBox<String>();
 			listbox.getItems().addAll(list);
 			listbox.getSelectionModel().selectFirst();
 			grid.add(listbox, 1, 4);
@@ -97,11 +93,9 @@ public class AddUserView
 
 			createButton.setOnAction(new EventHandler<ActionEvent>()
 			{
-
 				@Override public void handle(ActionEvent e)
 				{
-					controller.addUser(userIDField.getText(), userFnameField.getText(), userLNameField.getText(), listbox.getValue());
-					listbox.setEditable(true);
+					controller.addUser(badgeIDField.getText(), pinField.getText(), userFnameField.getText(), userLNameField.getText(), listbox.getValue());
 				}
 			});
 		}
