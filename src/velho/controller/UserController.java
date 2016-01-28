@@ -1,5 +1,7 @@
 package velho.controller;
 
+import java.util.List;
+
 import javafx.scene.Node;
 import velho.view.AddUserView;
 /**
@@ -8,7 +10,7 @@ import velho.view.AddUserView;
  * @author Joona
  *
  */
-public class AddUserController
+public class UserController
 {
 	/**
 	 * The add user view.
@@ -19,9 +21,11 @@ public class AddUserController
 	/**
 	 * @param viewi
 	 */
-	public AddUserController ()
+	public UserController ()
 	{
-		view = new AddUserView(this);
+		List<String> rolelist = DatabaseController.getUserRoles();
+		view = new AddUserView(this, rolelist);
+		
 	}
 
 	/**

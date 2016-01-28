@@ -2,6 +2,7 @@ package velho.controller;
 
 import java.io.File;
 import java.sql.*;
+import java.util.List;
 
 import org.h2.jdbcx.JdbcConnectionPool;
 
@@ -45,14 +46,13 @@ public class DatabaseController
 		return (db.exists() && !db.isDirectory());
 	}
 
-
 	/*
 	 * PUBLIC DATABASE METHODS
 	 */
 
 	/**
-	 * Creates the connection to the database.
-	 * Use {@link #shutdown()} to close the connection.
+	 * Creates the connection to the database. Use {@link #shutdown()} to close
+	 * the connection.
 	 *
 	 * @return <code>true</code> if connection was created successfully
 	 */
@@ -94,8 +94,8 @@ public class DatabaseController
 	}
 
 	/**
-	 * Shuts down the connection to the database.
-	 * Use {@link #connect()} to connec to the database again.
+	 * Shuts down the connection to the database. Use {@link #connect()} to
+	 * connec to the database again.
 	 */
 	public static void shutdown()
 	{
@@ -108,8 +108,7 @@ public class DatabaseController
 	 *
 	 * @throws NoDatabaseConnectionException
 	 */
-	@SuppressWarnings("resource")
-	public static void initializeDatabase() throws NoDatabaseConnectionException
+	@SuppressWarnings("resource") public static void initializeDatabase() throws NoDatabaseConnectionException
 	{
 		System.out.println("Initializing database...");
 
@@ -136,12 +135,10 @@ public class DatabaseController
 			// Close all resources.
 			statement.close();
 			connection.close();
-		}
-		catch (SQLException e)
+		} catch (SQLException e)
 		{
 			e.printStackTrace();
-		}
-		catch (IllegalStateException e)
+		} catch (IllegalStateException e)
 		{
 			// Connection pool has been disposed = no database connection.
 			throw new NoDatabaseConnectionException();
@@ -170,8 +167,14 @@ public class DatabaseController
 		return true;
 	}
 
-
 	public static Object authenticate(String authenticationString)
+	{
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public static List<String> getUserRoles()
+
 	{
 		// TODO Auto-generated method stub
 		return null;
