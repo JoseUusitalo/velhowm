@@ -127,6 +127,7 @@ public class DatabaseController
 	public static void unlink()
 	{
 		connectionPool.dispose();
+		connectionPool = null;
 		System.out.println("Database unlinked.");
 	}
 
@@ -164,7 +165,7 @@ public class DatabaseController
 	public static void initializeDatabase() throws NoDatabaseLinkException
 	{
 		System.out.println("Initializing database...");
-
+		
 		Connection connection = getConnection();
 		Statement statement = null;
 

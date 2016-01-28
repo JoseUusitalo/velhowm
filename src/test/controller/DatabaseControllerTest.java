@@ -25,6 +25,7 @@ public class DatabaseControllerTest
 	@Test
 	public final void testDatabaseConnection() throws ClassNotFoundException
 	{
+		assertEquals(false, DatabaseController.isLinked());
 		DatabaseController.link();
 		assertEquals(true, DatabaseController.isLinked());
 		DatabaseController.unlink();
@@ -33,6 +34,16 @@ public class DatabaseControllerTest
 	@Test(expected=NoDatabaseLinkException.class)
 	public final void testFailInitialization() throws NoDatabaseLinkException
 	{
+		assertEquals(false, DatabaseController.isLinked());
 		DatabaseController.initializeDatabase();
+	}
+
+	@Test
+	public final void testInitialization() throws NoDatabaseLinkException, ClassNotFoundException
+	{
+		DatabaseController.link();
+		DatabaseController.initializeDatabase();
+		assertNotEquals(-1, DatabaseController.isValidRole("Manager"));
+		DatabaseController.unlink();
 	}
 }
