@@ -58,7 +58,7 @@ public class DebugWindow extends Application
 
 		controller = new DebugController(this);
 
-		final ComboBox taskComboBox = new ComboBox();
+		final ComboBox<String> taskComboBox = new ComboBox<String>();
 
 		taskComboBox.setValue("");
 

@@ -1,113 +1,104 @@
 package velho.view;
 
-import javafx.application.Application;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
-import javafx.geometry.Insets;
 import javafx.geometry.Pos;
-import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
-import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
-import javafx.stage.Stage;
-import velho.controller.AddUserController;
+import velho.controller.UserController;
 
 /**
  * The add user view class.
- * 
+ *
  * @author Joona
  *
  */
-public class AddUserView extends Application
+public class AddUserView
 {
 	/**
 	 * The add user controller.
 	 */
-	private AddUserController controller;
+	private UserController controller;
 	/**
-	 * The user interface border panel.
+	 * The grid panel.
 	 */
-	private BorderPane rootBorderPane;
-	private Stage primaryStage;
-	// private GridPane rootGridPane;
+	private GridPane grid;
+	private List<String> list;
 
-	public static void main(String[] args)
+	public AddUserView(UserController mcontroller, List<String> rolelist)
 	{
-		launch(args);
+		list = rolelist;
+		list = new ArrayList<String>(Arrays.asList("testi1", "testi2", "testi3"));
+		controller = mcontroller;
+		grid = null;
 	}
 
-	@Override
-	public void start(final Stage primaryStage)
+	/**
+	 * Creates a grid for adding a new user.
+	 * @return
+	 */
+	public GridPane getAddUserView()
 	{
-
-		this.primaryStage = primaryStage;
-		controller = new AddUserController(this);
-		// setUserAgentStylesheet(STYLESHEET_MODENA);
-		rootBorderPane = new BorderPane();
-		rootBorderPane.setPadding(new Insets(10, 10, 10, 10));
-
-		GridPane grid = new GridPane();
-
-		grid.setAlignment(Pos.CENTER);
-		grid.setHgap(10);
-		grid.setVgap(10);
-
-		Label scenetitle = new Label("Add user info");
-		scenetitle.setFont(Font.font("Tahoma", FontWeight.NORMAL, 20));
-		grid.add(scenetitle, 0, 0, 2, 1);
-
-		Label userFirstName = new Label("First name:");
-		grid.add(userFirstName, 0, 1);
-
-		TextField userFnameField = new TextField();
-		grid.add(userFnameField, 1, 1);
-
-		Label userLastName = new Label("Last name:");
-		grid.add(userLastName, 0, 2);
-
-		TextField userLNameField = new TextField();
-		grid.add(userLNameField, 1, 2);
-
-		Label userID = new Label("User ID:");
-		grid.add(userID, 0, 3);
-
-		TextField userIDField = new TextField();
-		grid.add(userIDField, 1, 3);
-
-		Label userInfo = new Label("User role:");
-		grid.add(userInfo, 0, 4);
-
-		ComboBox userRole = new ComboBox();
-		grid.add(userRole, 1, 4);
-
-		Button createButton = new Button("Create user");
-		grid.add(createButton, 0, 5);
-
-		createButton.setOnAction(new EventHandler<ActionEvent>()
+		if (grid == null)
 		{
+			grid = new GridPane();
 
-			@Override
-			public void handle(ActionEvent e)
+			grid.setAlignment(Pos.CENTER);
+			grid.setHgap(10);
+			grid.setVgap(10);
+
+			Label scenetitle = new Label("Add user info");
+			scenetitle.setFont(Font.font("Tahoma", FontWeight.NORMAL, 20));
+			grid.add(scenetitle, 0, 0, 2, 1);
+
+			Label userFirstName = new Label("First name:");
+			grid.add(userFirstName, 0, 1);
+
+			TextField userFnameField = new TextField();
+			grid.add(userFnameField, 1, 1);
+
+			Label userLastName = new Label("Last name:");
+			grid.add(userLastName, 0, 2);
+
+			TextField userLNameField = new TextField();
+			grid.add(userLNameField, 1, 2);
+
+			Label userID = new Label("User ID:");
+			grid.add(userID, 0, 3);
+
+			TextField pinField = new TextField();
+
+			TextField badgeIDField = new TextField();
+			grid.add(badgeIDField, 1, 3);
+
+			Label userInfo = new Label("User role:");
+			grid.add(userInfo, 0, 4);
+
+			final ComboBox<String> listbox = new ComboBox<String>();
+			listbox.getItems().addAll(list);
+			listbox.getSelectionModel().selectFirst();
+			grid.add(listbox, 1, 4);
+
+			Button createButton = new Button("Create user");
+			grid.add(createButton, 0, 5);
+
+			createButton.setOnAction(new EventHandler<ActionEvent>()
 			{
-				controller.addUser(userIDField.getText(), userFnameField.getText(), userLNameField.getText(), userRole.getValue());
-			}
-		});
-
-		rootBorderPane.setCenter(grid);
-
-		primaryStage.setScene(new Scene(rootBorderPane, 1024, 600));
-		primaryStage.setTitle("Add User");
-
-		primaryStage.show();
-
-	}
-	
-	public Stage getStage(){
-		return primaryStage;
+				@Override public void handle(ActionEvent e)
+				{
+					controller.addUser(badgeIDField.getText(), pinField.getText(), userFnameField.getText(), userLNameField.getText(), listbox.getValue());
+				}
+			});
+		}
+		return grid;
 	}
 }

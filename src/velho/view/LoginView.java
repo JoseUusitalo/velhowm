@@ -7,12 +7,10 @@ import javafx.geometry.Insets;
 import javafx.scene.Group;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
-import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.VBox;
-import javafx.scene.text.Text;
 import javafx.stage.Stage;
 import velho.controller.LoginController;
 
@@ -27,19 +25,19 @@ public class LoginView extends Application
 	public Button logInButton = new Button("Log In");
 	private LoginController controller;
 
-
 	/**
 	 * Changes the visibility of the button "Log In".
 	 *
 	 * @param visibility
-	 *            show log in button?
+	 * show log in button?
 	 */
 	public void setLogInButton(boolean visibility)
 	{
 		logInButton.setVisible(visibility);
 	}
 
-	@Override public void start(Stage stage)
+	@Override
+	public void start(Stage stage)
 	{
 		stage.setTitle("VELHO WM DEBUG");
 		Scene scene = new Scene(new Group(), 300, 150);
@@ -55,8 +53,8 @@ public class LoginView extends Application
 		grid.setVgap(4);
 		grid.setHgap(0);
 		grid.setPadding(new Insets(5, 5, 5, 5));
-		//		grid.add(new Label("User :"), 0, 0);
-		//		grid.add(taskComboBox, 1, 0);
+		// grid.add(new Label("User :"), 0, 0);
+		// grid.add(taskComboBox, 1, 0);
 		grid.add(labels, 0, 1, 1, 1);
 		grid.add(textField, 0, 2, 2, 1);
 
@@ -67,7 +65,8 @@ public class LoginView extends Application
 
 		logInButton.setOnAction(new EventHandler<ActionEvent>()
 		{
-			@Override public void handle(ActionEvent event)
+			@Override
+			public void handle(ActionEvent event)
 			{
 				controller.login(textField.getText());
 			}

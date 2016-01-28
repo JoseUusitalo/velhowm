@@ -8,5 +8,4 @@ public interface UserRole
 	 * @return getName returns name
 	 */
 	public String getName();
-
 }
