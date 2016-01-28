@@ -15,7 +15,7 @@ import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.stage.Stage;
-import velho.controller.AddUserController;
+import velho.controller.UserController;
 
 /**
  * The main window view class.
@@ -25,11 +25,11 @@ import velho.controller.AddUserController;
 
 public class MainWindow extends Application {
 
-	AddUserController addUserController;
+	UserController userController;
 	
 	public MainWindow()
 	{
-		addUserController = new AddUserController();
+		userController = new UserController();
 	}
 	
 	public static void main(String[] args) 
@@ -73,7 +73,7 @@ public class MainWindow extends Application {
             
             Tab tab2 = new Tab();
             tab2.setText("Add user");
-            tab2.setContent(addUserController.getView());
+            tab2.setContent(userController.getView());
             tabPane.getTabs().add(tab2);
         
         // bind to take available space

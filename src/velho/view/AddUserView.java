@@ -1,6 +1,11 @@
 package velho.view;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
 import javafx.application.Application;
+import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
@@ -15,7 +20,7 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.stage.Stage;
-import velho.controller.AddUserController;
+import velho.controller.UserController;
 
 /**
  * The add user view class.
@@ -28,14 +33,17 @@ public class AddUserView
 	/**
 	 * The add user controller.
 	 */
-	private AddUserController controller;
+	private UserController controller;
 	/**
 	 * The grid panel.
 	 */
 	private GridPane grid;
+	private List<String> list;
 
-	public AddUserView(AddUserController mcontroller)
+	public AddUserView(UserController mcontroller, List<String> rolelist)
 	{
+		list = rolelist;
+		list = new ArrayList<String>(Arrays.asList("testi1", "testi2", "testi3"));
 		controller = mcontroller;
 		grid = null;
 	}
@@ -79,8 +87,10 @@ public class AddUserView
 			Label userInfo = new Label("User role:");
 			grid.add(userInfo, 0, 4);
 
-			ComboBox userRole = new ComboBox();
-			grid.add(userRole, 1, 4);
+			final ComboBox listbox = new ComboBox();
+			listbox.getItems().addAll(list);
+			listbox.getSelectionModel().selectFirst();
+			grid.add(listbox, 1, 4);
 
 			Button createButton = new Button("Create user");
 			grid.add(createButton, 0, 5);
@@ -90,7 +100,8 @@ public class AddUserView
 
 				@Override public void handle(ActionEvent e)
 				{
-					controller.addUser(userIDField.getText(), userFnameField.getText(), userLNameField.getText(), userRole.getValue());
+					controller.addUser(userIDField.getText(), userFnameField.getText(), userLNameField.getText(), listbox.getValue());
+					listbox.setEditable(true);
 				}
 			});
 		}

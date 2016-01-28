@@ -2,6 +2,7 @@ package velho.controller;
 
 import java.io.File;
 import java.sql.*;
+import java.util.List;
 
 import org.h2.jdbcx.JdbcConnectionPool;
 
@@ -168,5 +169,12 @@ public class DatabaseController
 	{
 		// TODO Auto-generated method stub
 		return true;
+	}
+
+
+	public static List<String> getUserRoles()
+	{
+		// TODO Auto-generated method stub
+		return null;
 	}
 }
