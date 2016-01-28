@@ -17,9 +17,21 @@ import javafx.scene.text.FontWeight;
 import javafx.stage.Stage;
 import velho.controller.UserController;
 
+/**
+ * The add user view class.
+ *
+ * @author Joona
+ *
+ */
 public class AddUserView extends Application
 {
+	/**
+	 * The add user controller.
+	 */
 	private UserController controller;
+	/**
+	 * The user interface border panel.
+	 */
 	private BorderPane rootBorderPane;
 	// private GridPane rootGridPane;
 
