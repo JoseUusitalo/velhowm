@@ -2,6 +2,7 @@ package velho.controller;
 
 import java.io.File;
 import java.sql.*;
+import java.util.List;
 
 import org.h2.jdbcx.JdbcConnectionPool;
 
@@ -172,6 +173,13 @@ public class DatabaseController
 
 
 	public static Object authenticate(String authenticationString)
+	{
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+
+	public static List<Integer> getProductCodeList(int i)
 	{
 		// TODO Auto-generated method stub
 		return null;
