@@ -11,6 +11,7 @@ import org.junit.Test;
 
 import velho.controller.DatabaseController;
 import velho.model.User;
+import velho.model.exceptions.ExistingDatabaseLinkException;
 import velho.model.exceptions.NoDatabaseLinkException;
 
 /**
@@ -37,14 +38,14 @@ public class UserTest
 	private final String INVALID_ROLE_NAME = "Worker";
 
 	@Before
-	public final void linkDatabase() throws ClassNotFoundException, NoDatabaseLinkException
+	public final void linkDatabase() throws ClassNotFoundException, NoDatabaseLinkException, ExistingDatabaseLinkException
 	{
 		DatabaseController.link();
 		DatabaseController.initializeDatabase();
 	}
 
 	@After
-	public final void unlinkDatabase()
+	public final void unlinkDatabase() throws NoDatabaseLinkException
 	{
 		DatabaseController.unlink();
 	}

@@ -37,7 +37,7 @@ public class UserController
 	 * @param userRole user's role in the company
 	 */
 
-	public void addUser(String badgeID, String userPIN, String userFirstName, String userLastName, String userRoleName)
+	public boolean addUser(String badgeID, String userPIN, String userFirstName, String userLastName, String userRoleName)
 	{
 		// Validate user data.
 		try
@@ -51,6 +51,7 @@ public class UserController
 					DatabaseController.addUser(badgeID, userPIN, userFirstName, userLastName, roleID);
 
 					PopupController.info("User added.");
+					return true;
 				}
 				catch (NoDatabaseLinkException e)
 				{
@@ -72,7 +73,8 @@ public class UserController
 		{
 			e.printStackTrace();
 		}
-		System.out.println(badgeID + " " + userFirstName + " " + userLastName + " " + userRoleName);
+
+		return false;
 	}
 
 	public Node getView()

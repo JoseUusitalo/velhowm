@@ -1,5 +1,6 @@
 package velho.controller;
 
+import velho.model.exceptions.ExistingDatabaseLinkException;
 import velho.model.exceptions.NoDatabaseLinkException;
 
 /**
@@ -26,6 +27,11 @@ public class Velho
 		{
 			e.printStackTrace();
 		}
+		catch (ExistingDatabaseLinkException e)
+		{
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 
 		try
 		{
@@ -38,7 +44,17 @@ public class Velho
 		}
 
 		if (DatabaseController.isLinked())
-			DatabaseController.unlink();
+		{
+			try
+			{
+				DatabaseController.unlink();
+			}
+			catch (NoDatabaseLinkException e)
+			{
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
 
 		System.out.println("Done!");
 	}

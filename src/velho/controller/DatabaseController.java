@@ -8,6 +8,7 @@ import java.util.Set;
 import org.h2.jdbcx.JdbcConnectionPool;
 
 import velho.model.enums.DatabaseTable;
+import velho.model.exceptions.ExistingDatabaseLinkException;
 import velho.model.exceptions.NoDatabaseLinkException;
 
 /**
@@ -82,9 +83,14 @@ public class DatabaseController
 	 * Use {@link #unlink()} to close the connection.
 	 *
 	 * @return <code>true</code> if the link was created successfully
+	 * @throws ClassNotFoundException when the H2 driver was unable to load
+	 * @throws ExistingDatabaseLinkException when a database link already exists
 	 */
-	public static boolean link() throws ClassNotFoundException
+	public static boolean link() throws ClassNotFoundException, ExistingDatabaseLinkException
 	{
+		if (connectionPool != null)
+			throw new ExistingDatabaseLinkException();
+
 		// Load the driver.
 		Class.forName("org.h2.Driver");
 
@@ -123,9 +129,14 @@ public class DatabaseController
 	/**
 	 * Shuts down the connection to the database.
 	 * Use {@link #link()} to connect to the database again.
+	 *
+	 * @throws NoDatabaseLinkException when attempting unlink a database when no database link exists
 	 */
-	public static void unlink()
+	public static void unlink() throws NoDatabaseLinkException
 	{
+		if (connectionPool == null)
+			throw new NoDatabaseLinkException();
+
 		connectionPool.dispose();
 		connectionPool = null;
 		System.out.println("Database unlinked.");
@@ -165,7 +176,7 @@ public class DatabaseController
 	public static void initializeDatabase() throws NoDatabaseLinkException
 	{
 		System.out.println("Initializing database...");
-		
+
 		Connection connection = getConnection();
 		Statement statement = null;
 
@@ -312,7 +323,6 @@ public class DatabaseController
 	{
 		return new LinkedHashSet<String>();
 	}
-
 
 	public static Object authenticate(String authenticationString)
 	{
