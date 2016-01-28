@@ -16,7 +16,7 @@ import javafx.scene.control.*;
  * @author Edward
  *
  */
-public class DebugWindow extends Application
+public class DebugWindow
 {
 	/**
 	 * Button has been tagged logInButton and named as "Log In" on the scene.
@@ -31,10 +31,16 @@ public class DebugWindow extends Application
 	 */
 	private DebugController controller;
 
+	public DebugWindow(DebugController debugController)
+	{
+		controller = debugController;
+	}
+	
 	/**
 	 * Sets the value as either true or false to show in the scene.
 	 *
-	 * @param visibility show log in button?
+	 * @param visibility
+	 *            show log in button?
 	 */
 	public void setLogInButton(boolean visibility)
 	{
@@ -44,20 +50,20 @@ public class DebugWindow extends Application
 	/**
 	 * sets the value as either true or false to show in the scene.
 	 *
-	 * @param visibility show log in button?
+	 * @param visibility
+	 *            show log in button?
 	 */
 	public void setLogOutButton(boolean visibility)
 	{
 		logOutButton.setVisible(visibility);
 	}
 
-	@Override public void start(Stage stage)
+	public void start(Stage primaryStage)
 	{
-		stage.setTitle("VELHO WM DEBUG");
+		primaryStage.setTitle("VELHO WM DEBUG");
 		Scene scene = new Scene(new Group(), 300, 150);
-
-		controller = new DebugController(this);
-
+		
+		
 		final ComboBox<String> taskComboBox = new ComboBox<String>();
 
 		taskComboBox.setValue("");
@@ -95,12 +101,7 @@ public class DebugWindow extends Application
 			}
 		});
 
-		stage.setScene(scene);
-		stage.show();
-	}
-
-	public static void main(String[] args)
-	{
-		launch(args);
+		primaryStage.setScene(scene);
+		primaryStage.show();
 	}
 }
