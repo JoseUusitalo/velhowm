@@ -2,10 +2,13 @@ package velho.controller;
 
 import java.io.File;
 import java.sql.*;
+import java.util.LinkedHashSet;
+import java.util.Set;
 
 import org.h2.jdbcx.JdbcConnectionPool;
 
-import velho.model.exceptions.NoDatabaseConnectionException;
+import velho.model.enums.DatabaseTable;
+import velho.model.exceptions.NoDatabaseLinkException;
 
 /**
  * The H2 database controller.
@@ -34,6 +37,10 @@ public class DatabaseController
 	 */
 	private static JdbcConnectionPool connectionPool;
 
+	/*
+	 * PRIVATE DATABASE METHODS
+	 */
+
 	/**
 	 * Checks if the database file exists.
 	 *
@@ -45,18 +52,38 @@ public class DatabaseController
 		return (db.exists() && !db.isDirectory());
 	}
 
+	/**
+	 * Checks for a database link and gets a new connection to the database for running statements.
+	 *
+	 * @return a database connection
+	 */
+	private static Connection getConnection() throws NoDatabaseLinkException
+	{
+		checkLink();
+
+		Connection connection = null;
+		try
+		{
+			connection = connectionPool.getConnection();
+		}
+		catch (SQLException e)
+		{
+			e.printStackTrace();
+		}
+		return connection;
+	}
 
 	/*
 	 * PUBLIC DATABASE METHODS
 	 */
 
 	/**
-	 * Creates the connection to the database.
-	 * Use {@link #shutdown()} to close the connection.
+	 * Creates the link to the database.
+	 * Use {@link #unlink()} to close the connection.
 	 *
-	 * @return <code>true</code> if connection was created successfully
+	 * @return <code>true</code> if the link was created successfully
 	 */
-	public static boolean connect() throws ClassNotFoundException
+	public static boolean link() throws ClassNotFoundException
 	{
 		// Load the driver.
 		Class.forName("org.h2.Driver");
@@ -79,13 +106,13 @@ public class DatabaseController
 
 		if (databaseExists())
 		{
-			if (isConnected())
+			if (isLinked())
 			{
-				System.out.println("Database connection created.");
+				System.out.println("Database linked.");
 				return true;
 			}
 
-			System.out.println("Database connection failed.");
+			System.out.println("Database linking failed.");
 			return false;
 		}
 
@@ -95,13 +122,38 @@ public class DatabaseController
 
 	/**
 	 * Shuts down the connection to the database.
-	 * Use {@link #connect()} to connec to the database again.
+	 * Use {@link #link()} to connect to the database again.
 	 */
-	public static void shutdown()
+	public static void unlink()
 	{
 		connectionPool.dispose();
-		System.out.println("Database shut down.");
+		System.out.println("Database unlinked.");
 	}
+
+	/**
+	 * Checks if a database link exists.
+	 *
+	 * @return <code>true</code> if a database link exists
+	 */
+	public static boolean isLinked()
+	{
+		return connectionPool != null;
+	}
+
+	/**
+	 * Checks if a database link exists and throws a {@link NoDatabaseConnectionException} exception if it
+	 * doesn't.
+	 * To be used when a database link must exist.
+	 */
+	public static void checkLink() throws NoDatabaseLinkException
+	{
+		if (connectionPool == null)
+			throw new NoDatabaseLinkException();
+	}
+
+	/*
+	 * PUBLIC DATABASE MANIPULATION METHODS
+	 */
 
 	/**
 	 * Initializes the database.
@@ -109,24 +161,15 @@ public class DatabaseController
 	 * @throws NoDatabaseConnectionException
 	 */
 	@SuppressWarnings("resource")
-	public static void initializeDatabase() throws NoDatabaseConnectionException
+	public static void initializeDatabase() throws NoDatabaseLinkException
 	{
 		System.out.println("Initializing database...");
 
-		// Check for connection.
-		if (!isConnected())
-		{
-			throw new NoDatabaseConnectionException();
-		}
-
-		Connection connection = null;
+		Connection connection = getConnection();
 		Statement statement = null;
 
 		try
 		{
-			// Get a new connection.
-			connection = connectionPool.getConnection();
-
 			// Initialize a statement.
 			statement = connection.createStatement();
 
@@ -144,29 +187,128 @@ public class DatabaseController
 		catch (IllegalStateException e)
 		{
 			// Connection pool has been disposed = no database connection.
-			throw new NoDatabaseConnectionException();
+			throw new NoDatabaseLinkException();
 		}
 
 		System.out.println("Database initialized.");
 	}
 
 	/**
-	 * Checks if a database connection exists.
+	 * <p>Adds a new user to the database.</p>
+	 * <p>Warning: Assumes that given data is valid.</p>
 	 *
-	 * @return <code>true</code> if a database connection exists
+	 * @param userID
+	 * @param userFirstName
+	 * @param userLastName
+	 * @param userRole
+	 * @throws SQLException when given data was invalid
+	 * @throws NoDatabaseLinkException when database link was lost
+	 *
 	 */
-	public static boolean isConnected()
+	@SuppressWarnings("resource")
+	public static void addUser(final String badgeID, final String pin, final String firstName, final String lastName, final int roleID)
+			throws NoDatabaseLinkException, SQLException
 	{
-		return connectionPool != null;
+		Connection connection = getConnection();
+		Statement statement = null;
+
+		try
+		{
+			// Initialize a statement.
+			statement = connection.createStatement();
+
+			// If no pin is defined, add badge id.
+			if (pin == null || pin.isEmpty())
+				statement.execute("INSERT INTO `" + DatabaseTable.USERS + "`(`badge_id`, `first_name`, `last_name`, `role`)" + "VALUES(" + badgeID + ",'"
+						+ firstName + "','" + lastName + "'," + roleID + ");");
+			else
+				statement.execute("INSERT INTO `" + DatabaseTable.USERS + "`(`pin`, `first_name`, `last_name`, `role`)" + "VALUES(" + pin + ",'" + firstName
+						+ "','" + lastName + "'," + roleID + ");");
+
+			// Close all resources.
+			statement.close();
+			connection.close();
+		}
+		catch (IllegalStateException e)
+		{
+			// Connection pool has been disposed = no database connection.
+			throw new NoDatabaseLinkException();
+		}
+
+		System.out.println("User '" + firstName + " " + lastName + "' added.");
 	}
 
-	/*
-	 * PUBLIC DATABASE MANIPULATION METHODS
+	/**
+	 * Checks if the given role name is valid.
+	 *
+	 * @param roleName the name of the role
+	 * @return the database ID of the given role (a value greater than 0) or <code>-1</code> if the role does not exist
+	 * in the database
 	 */
-
-	public static boolean addUser(String userID, String userFirstName, String userLastName, Object userRole)
+	public static int isValidRole(final String roleName) throws NoDatabaseLinkException
 	{
-		// TODO Auto-generated method stub
-		return true;
+		Connection connection = getConnection();
+		Statement statement = null;
+		int id = -1;
+
+		try
+		{
+			// Initialize a statement.
+			statement = connection.createStatement();
+
+			// Run the initialization script.
+			statement.execute("SELECT id FROM " + DatabaseTable.ROLES + " WHERE name = '" + roleName + "'");
+
+			ResultSet result = statement.getResultSet();
+			result.next();
+
+			// Will only return one row because the name value is UNIQUE.
+			id = result.getInt("id");
+
+			// Close all resources.
+			result.close();
+			statement.close();
+			connection.close();
+
+			// Found something.
+			if (id != 0)
+				return id;
+
+		}
+		catch (SQLException e)
+		{
+			e.printStackTrace();
+		}
+		catch (IllegalStateException e)
+		{
+			try
+			{
+				connection.close();
+			}
+			catch (SQLException e1)
+			{
+				e1.printStackTrace();
+			}
+
+			// Connection pool has been disposed = no database connection.
+			throw new NoDatabaseLinkException();
+		}
+
+		try
+		{
+			connection.close();
+		}
+		catch (SQLException e)
+		{
+			e.printStackTrace();
+		}
+
+		// Didn't find anything.
+		return -1;
+	}
+
+	public static Set<String> getUserRoleNames()
+	{
+		return new LinkedHashSet<String>();
 	}
 }

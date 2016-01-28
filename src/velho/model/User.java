@@ -1,6 +1,7 @@
 package velho.model;
 
 import velho.controller.DatabaseController;
+import velho.model.exceptions.NoDatabaseLinkException;
 import velho.model.interfaces.UserRole;
 
 /**
@@ -72,7 +73,9 @@ public class User
 	 * @param role the name of the role of the user
 	 * @return <code>true</code> if given information is valid
 	 */
-	public static boolean validateUserData(final String badgeID, final String pin, final String firstName, final String lastName, final String role)
+	@SuppressWarnings("null")
+	public static boolean validateUserData(final String badgeID, final String pin, final String firstName, final String lastName, final String roleName)
+			throws NoDatabaseLinkException
 	{
 		boolean hasBadgeID = (badgeID != null);
 
@@ -108,7 +111,7 @@ public class User
 		if (lastName.length() > MAX_NAME_LENGTH)
 			return false;
 
-		if (DatabaseController.getUserRoleNames().contains(role))
+		if (DatabaseController.isValidRole(roleName) == -1)
 			return false;
 
 		return true;

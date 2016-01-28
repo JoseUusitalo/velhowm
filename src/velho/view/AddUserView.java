@@ -15,11 +15,11 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.stage.Stage;
-import velho.controller.AddUserController;
+import velho.controller.UserController;
 
 public class AddUserView extends Application
 {
-	private AddUserController controller;
+	private UserController controller;
 	private BorderPane rootBorderPane;
 	// private GridPane rootGridPane;
 
@@ -32,7 +32,7 @@ public class AddUserView extends Application
 	public void start(final Stage primaryStage)
 	{
 
-		controller = new AddUserController(this);
+		controller = new UserController(this);
 		// setUserAgentStylesheet(STYLESHEET_MODENA);
 		rootBorderPane = new BorderPane();
 		rootBorderPane.setPadding(new Insets(10, 10, 10, 10));
@@ -59,16 +59,18 @@ public class AddUserView extends Application
 		TextField userLNameField = new TextField();
 		grid.add(userLNameField, 1, 2);
 
-		Label userID = new Label("User ID:");
+		Label userID = new Label("Badge ID:");
 		grid.add(userID, 0, 3);
 
-		TextField userIDField = new TextField();
-		grid.add(userIDField, 1, 3);
+		TextField badgeIDField = new TextField();
+		grid.add(badgeIDField, 1, 3);
+
+		TextField pinField = new TextField();
 
 		Label userInfo = new Label("User role:");
 		grid.add(userInfo, 0, 4);
 
-		ComboBox userRole = new ComboBox();
+		ComboBox<String> userRole = new ComboBox<String>();
 		grid.add(userRole, 1, 4);
 
 		Button createButton = new Button("Create user");
@@ -80,7 +82,7 @@ public class AddUserView extends Application
 			@Override
 			public void handle(ActionEvent e)
 			{
-				controller.addUser(userIDField.getText(), userFnameField.getText(), userLNameField.getText(), userRole.getValue());
+				controller.addUser(badgeIDField.getText(), pinField.getText(), userFnameField.getText(), userLNameField.getText(), userRole.getValue());
 			}
 		});
 
