@@ -5,9 +5,9 @@ import velho.model.exceptions.NoDatabaseLinkException;
 import velho.view.DebugWindow;
 
 /**
- * Controlls logins and log outs.
- * @author Edward
- *
+ * Various debugging features.
+ * 
+ * @author Edward &amp; Jose Uusitalo
  */
 public class DebugController
 {
@@ -16,11 +16,12 @@ public class DebugController
 	 */
 	private DebugWindow view;
 	private LoginController loginController;
-/**
- * @param loginController
- * @param debugView
- * @throws NoDatabaseLinkException
- */
+
+	/**
+	 * @param loginController
+	 * @param debugView
+	 * @throws NoDatabaseLinkException
+	 */
 	public DebugController(LoginController loginController) throws NoDatabaseLinkException
 	{
 		this.loginController = loginController;
@@ -38,12 +39,27 @@ public class DebugController
 	 */
 	public void login(String userRoleName)
 	{
-		loginController.debuglogin(userRoleName);
-		System.out.println("Logged in.");
+		try
+		{
+			loginController.debuglogin(userRoleName);
+			System.out.println("Logged in as " + userRoleName + ". (DEBUG)");
+			view.setLogInButton(false);
+			view.setLogOutButton(true);
+		}
+		catch (NoDatabaseLinkException e)
+		{
+			PopupController.error("Login failed, no database connection.");
+			e.printStackTrace();
+		}
+	}
+
+	/**
+	 * Visually toggles the login/logout buttons in the debug window.
+	 */
+	public void login()
+	{
 		view.setLogInButton(false);
 		view.setLogOutButton(true);
-		// TODO Auto-generated method stub
-
 	}
 
 	/**
@@ -51,7 +67,9 @@ public class DebugController
 	 */
 	public void logout()
 	{
-		System.out.println("Logged out.");
+		// Only log out if a user is logged in, otherwise just visually toggle the buttons.
+		if (loginController.isLoggedIn())
+			loginController.logout();
 		view.setLogInButton(true);
 		view.setLogOutButton(false);
 	}

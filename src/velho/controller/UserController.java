@@ -4,8 +4,12 @@ import javafx.scene.Node;
 import velho.view.AddUserView;
 import java.sql.SQLException;
 
+import velho.model.Administrator;
+import velho.model.Logistician;
+import velho.model.Manager;
 import velho.model.User;
 import velho.model.exceptions.NoDatabaseLinkException;
+import velho.model.interfaces.UserRole;
 
 /**
  * Is a controller for {@link AddUserView} view.
@@ -80,5 +84,26 @@ public class UserController
 	public Node getView()
 	{
 		return view.getAddUserView();
+	}
+
+	public static User getDebugUser(String userRoleName)
+	{
+		return new User(0, "Debug", "Account", stringToRole(userRoleName));
+	}
+
+	public static UserRole stringToRole(final String userRoleName)
+	{
+		switch (userRoleName)
+		{
+			case "Administrator":
+				return new Administrator();
+			case "Manager":
+				return new Manager();
+			case "Logistician":
+				return new Logistician();
+			default:
+				System.out.println("ERROR: Unknown role '" + userRoleName + "'.");
+				return null;
+		}
 	}
 }

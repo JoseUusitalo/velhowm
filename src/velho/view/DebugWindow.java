@@ -30,7 +30,7 @@ public class DebugWindow
 	/**
 	 * The DebugController has been tagged as controller.
 	 */
-	private DebugController degController;
+	private DebugController debugController;
 	/**
 	 * The grid panel.
 	 */
@@ -45,10 +45,10 @@ public class DebugWindow
 	 * @param debugController
 	 * @param rolelist
 	 */
-	public DebugWindow(DebugController debugController, Set<String> rolelist)
+	public DebugWindow(final DebugController debugController, final Set<String> rolelist)
 	{
 		rolenameSet = rolelist;
-		degController = debugController;
+		this.debugController = debugController;
 		grid = null;
 	}
 
@@ -79,8 +79,6 @@ public class DebugWindow
 		Scene scene = new Scene(new Group(), 300, 150);
 		final ComboBox<String> taskListBox = new ComboBox<String>();
 
-		taskListBox.setValue("");
-
 		grid = new GridPane();
 		grid.setVgap(4);
 		grid.setHgap(10);
@@ -105,8 +103,7 @@ public class DebugWindow
 			@Override
 			public void handle(ActionEvent event)
 			{
-				taskListBox.getValue();
-				degController.login(taskListBox.getValue());
+				debugController.login(taskListBox.getValue());
 			}
 
 		});
@@ -116,7 +113,7 @@ public class DebugWindow
 			@Override
 			public void handle(ActionEvent event)
 			{
-				degController.logout();
+				debugController.logout();
 			}
 		});
 

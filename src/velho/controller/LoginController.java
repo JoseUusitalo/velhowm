@@ -15,11 +15,22 @@ public class LoginController
 	private User currentUser;
 	private LoginView view;
 	private UIController uiController;
+	private DebugController debugController;
 
 	public LoginController(final UIController uiController)
 	{
 		view = new LoginView(this);
 		this.uiController = uiController;
+	}
+	
+	/**
+	 * Attaches the debug controller to this class.
+	 * 
+	 * @param debugController the {@link DebugController}
+	 */
+	public void setDebugController(final DebugController debugController)
+	{
+		this.debugController = debugController;
 	}
 
 	/**
@@ -47,8 +58,9 @@ public class LoginController
 		}
 		else
 		{
-			PopupController.info("Welcome " + currentUser.toString() + "!");
+			System.out.println(currentUser.toString() + " logged in.");
 			uiController.showMainMenu();
+			debugController.login();
 		}
 	}
 
@@ -62,10 +74,14 @@ public class LoginController
 		checkLogin();
 	}
 
-	public void debuglogin(String userRoleName)
+	public boolean debuglogin(String userRoleName) throws NoDatabaseLinkException
 	{
-		System.out.println("debug " + userRoleName);
-
+		if (DatabaseController.getRoleID(userRoleName) == -1)
+			return false;
+		
+		currentUser = UserController.getDebugUser(userRoleName);
+		uiController.showMainMenu();
+		return true;
 	}
 
 	/**

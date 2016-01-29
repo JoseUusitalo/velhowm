@@ -1,14 +1,27 @@
 package velho.view;
 
 import javafx.application.Application;
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
+import javafx.geometry.Insets;
+import javafx.geometry.Pos;
 import javafx.scene.Group;
 import javafx.scene.Node;
 import javafx.scene.Scene;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
 import javafx.scene.control.TabPane.TabClosingPolicy;
+import javafx.scene.layout.Background;
+import javafx.scene.layout.BackgroundFill;
+import javafx.scene.layout.Border;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.BorderStroke;
+import javafx.scene.layout.BorderStrokeStyle;
+import javafx.scene.layout.HBox;
 import javafx.scene.paint.Color;
+import javafx.scene.paint.Paint;
 import javafx.stage.Stage;
 import velho.controller.DatabaseController;
 import velho.controller.DebugController;
@@ -28,12 +41,13 @@ public class MainWindow extends Application
 {
 	private static DebugController debugController;
 	private UserController userController;
-	private BorderPane borderPane;
-	private Scene scene;
-
 	private static UIController uiController;
 	private static LoginController loginController;
 	private static ListViewController listController;
+
+	private BorderPane rootBorderPane;
+	private TabPane mainTabPane;
+	private Scene scene;
 
 	public MainWindow()
 	{
@@ -54,16 +68,17 @@ public class MainWindow extends Application
 		{
 			uiController = new UIController(this);
 			loginController = new LoginController(uiController);
+			listController = new ListViewController();
 			try
 			{
 				debugController = new DebugController(loginController);
+				loginController.setDebugController(debugController);
 			}
 			catch (NoDatabaseLinkException e)
 			{
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-			listController = new ListViewController();
 		}
 	}
 
@@ -74,7 +89,7 @@ public class MainWindow extends Application
 
 	public void setView(final Node view)
 	{
-		borderPane.setCenter(view);
+		rootBorderPane.setCenter(view);
 	}
 
 	/**
@@ -82,24 +97,55 @@ public class MainWindow extends Application
 	 */
 	public void showMainMenu()
 	{
-		TabPane tabPane = new TabPane();
-		tabPane.setTabClosingPolicy(TabClosingPolicy.UNAVAILABLE);
-		
-		Tab tab2 = new Tab();
-		tab2.setText("Add User");
-		tab2.setContent(userController.getView());
-		tabPane.getTabs().add(tab2);
-		
-		Tab tab3 = new Tab();
-		System.out.println(tab3);
-		System.out.println(listController.getView());
-		tab3.setText("User List");
-		tab3.setContent(listController.getView());
-		tabPane.getTabs().add(tab3);
-		
-		
+		if (mainTabPane == null)
+		{
+			mainTabPane = new TabPane();
+			mainTabPane.setTabClosingPolicy(TabClosingPolicy.UNAVAILABLE);
 
-		borderPane.setCenter(tabPane);
+			Tab tab2 = new Tab();
+			tab2.setText("Add User");
+			tab2.setContent(userController.getView());
+			mainTabPane.getTabs().add(tab2);
+
+			Tab tab3 = new Tab();
+			tab3.setText("User List");
+			tab3.setContent(listController.getView());
+			mainTabPane.getTabs().add(tab3);
+		}
+
+		// Force log in to see main menu.
+		if (loginController.checkLogin())
+		{
+			HBox statusBar = new HBox();
+			statusBar.setAlignment(Pos.CENTER_RIGHT);
+			statusBar.setPadding(new Insets(4.0));
+			
+			// TODO: Use CSS.
+			statusBar.setBackground(new Background(new BackgroundFill(Paint.valueOf(Color.LIGHTGRAY.toString()), null, null)));
+			statusBar.setBorder(new Border(new BorderStroke(Paint.valueOf("b5b5b5"), Paint.valueOf(Color.TRANSPARENT.toString()), Paint.valueOf(Color.TRANSPARENT.toString()), Paint.valueOf(Color.TRANSPARENT.toString()), BorderStrokeStyle.SOLID, null, null, null, null, null, null)));
+			
+			HBox userBar = new HBox(10);
+
+			Label userName = new Label("Hello, " + loginController.getCurrentUser().toString());
+			Button logoutButton = new Button("Log Out");
+			
+			logoutButton.setOnAction(new EventHandler<ActionEvent>()
+			{
+				@Override
+				public void handle(ActionEvent event)
+				{
+					loginController.logout();
+					debugController.logout();
+				}
+			});
+			
+			userBar.getChildren().addAll(userName, logoutButton);
+			userBar.setAlignment(Pos.CENTER_RIGHT);
+			
+			statusBar.getChildren().add(userBar);
+			rootBorderPane.setBottom(statusBar);
+		}
+		rootBorderPane.setCenter(mainTabPane);
 	}
 
 	@Override
@@ -108,11 +154,11 @@ public class MainWindow extends Application
 		primaryStage.setTitle("Velho Warehouse Management");
 		Group root = new Group();
 		scene = new Scene(root, 1024, 700, Color.WHITE);
-		borderPane = new BorderPane();
-		borderPane.prefHeightProperty().bind(scene.heightProperty());
-		borderPane.prefWidthProperty().bind(scene.widthProperty());
+		rootBorderPane = new BorderPane();
+		rootBorderPane.prefHeightProperty().bind(scene.heightProperty());
+		rootBorderPane.prefWidthProperty().bind(scene.widthProperty());
 
-		root.getChildren().add(borderPane);
+		root.getChildren().add(rootBorderPane);
 
 		loginController.checkLogin();
 

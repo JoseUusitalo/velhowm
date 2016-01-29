@@ -405,7 +405,7 @@ public class DatabaseController
 	}
 
 	/**
-	 * Authenticas a user with the given authentication string.
+	 * Authenticates a user with the given authentication string.
 	 *
 	 * @param authenticationString a PIN or a badge id
 	 * @return user object representing the authenticated user or null for invalid credentials
@@ -476,7 +476,8 @@ public class DatabaseController
 	}
 
 	/**
-	 * Gets the a Role object from the given
+	 * Gets the a Role object from the given role id.
+	 * 
 	 * @param roleid
 	 * @return
 	 * @throws NoDatabaseLinkException
@@ -486,7 +487,7 @@ public class DatabaseController
 		Connection connection = getConnection();
 		Statement statement = null;
 		UserRole role = null;
-
+		String name = null;
 		try
 		{
 			// Initialize a statement.
@@ -497,24 +498,10 @@ public class DatabaseController
 			ResultSet result = statement.getResultSet();
 
 			// Only one result.
-			result.next();
-			String name = result.getString("name");
-
-			switch (name)
-			{
-				case "Administrator":
-					role = new Administrator();
-					break;
-				case "Manager":
-					role = new Manager();
-					break;
-				case "Logistician":
-					role = new Logistician();
-					break;
-				default:
-					System.out.println("ERROR: Unknown role '" + name + "'.");
-					break;
-			}
+			if (result.next())
+				name = result.getString("name");
+			role = UserController.stringToRole(name);
+			
 			// Close all resources.
 			statement.close();
 			connection.close();
