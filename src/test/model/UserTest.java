@@ -22,11 +22,11 @@ import velho.model.exceptions.NoDatabaseLinkException;
 @SuppressWarnings("static-method")
 public class UserTest
 {
-	private final String VALID_BADGE_ID = "12345678";
+	private final String VALID_BADGE_ID = "99999999";
 	private final String INVALID_BADGE_ID_SHORT = "12345";
 	private final String INVALID_BADGE_ID_LONG = "123456789";
 
-	private final String VALID_PIN = "123456";
+	private final String VALID_PIN = "999999";
 	private final String INVALID_PIN_SHORT = "12";
 	private final String INVALID_PIN_LONG = "1234567";
 

@@ -1,5 +1,7 @@
 package velho.controller;
 
+import velho.model.User;
+import velho.model.exceptions.NoDatabaseLinkException;
 import velho.view.LoginView;
 
 /**
@@ -9,6 +11,7 @@ import velho.view.LoginView;
  */
 public class LoginController
 {
+	private User currentUser;
 	private LoginView view;
 
 	public LoginController(LoginView loginview)
@@ -25,8 +28,15 @@ public class LoginController
 	 */
 	public void login(String authenticationString)
 	{
-		Object currentUser = DatabaseController.authenticate(authenticationString);
-		System.out.println(authenticationString);
+		try
+		{
+			currentUser = DatabaseController.authenticate(authenticationString);
+		}
+		catch (NoDatabaseLinkException e)
+		{
+			PopupController.error("Database connection lost.");
+			e.printStackTrace();
+		}
 		if (currentUser == null){
 			PopupController.warning("INVALID BADGE ID OR PASSWORD!");
 		}

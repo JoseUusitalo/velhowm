@@ -166,4 +166,9 @@ public class User
 	{
 		return role;
 	}
+
+	public static boolean isValidPIN(final int pin)
+	{
+		return (pin <= (Math.pow(10.0, MAX_PIN_LENGTH)));
+	}
 }

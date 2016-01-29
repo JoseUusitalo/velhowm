@@ -9,6 +9,7 @@ import java.util.Set;
 import org.junit.Test;
 
 import velho.controller.DatabaseController;
+import velho.model.User;
 import velho.model.exceptions.ExistingDatabaseLinkException;
 import velho.model.exceptions.NoDatabaseLinkException;
 
@@ -69,6 +70,17 @@ public class DatabaseControllerTest
 		DatabaseController.link();
 		DatabaseController.initializeDatabase();
 		assertTrue(DatabaseController.getUserRoleNames().containsAll(names));
+		DatabaseController.unlink();
+	}
+
+	@Test
+	public final void testAuthenticate_ValidPin() throws NoDatabaseLinkException, ClassNotFoundException, ExistingDatabaseLinkException
+	{
+		DatabaseController.link();
+		DatabaseController.initializeDatabase();
+		User user = DatabaseController.authenticate("111111");
+		assertEquals("Admin", user.getFirstName());
+		assertEquals("Test", user.getLastName());
 		DatabaseController.unlink();
 	}
 }

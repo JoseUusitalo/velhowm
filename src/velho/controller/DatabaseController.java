@@ -7,10 +7,12 @@ import java.util.LinkedHashSet;
 import java.util.Set;
 import org.h2.jdbcx.JdbcConnectionPool;
 
+import velho.model.Administrator;
 import velho.model.User;
 import velho.model.enums.DatabaseTable;
 import velho.model.exceptions.ExistingDatabaseLinkException;
 import velho.model.exceptions.NoDatabaseLinkException;
+import velho.model.interfaces.UserRole;
 
 /**
  * The H2 database controller.
@@ -269,7 +271,6 @@ public class DatabaseController
 			// Initialize a statement.
 			statement = connection.createStatement();
 
-			// Run the initialization script.
 			statement.execute("SELECT id FROM " + DatabaseTable.ROLES + " WHERE name = '" + roleName + "'");
 
 			ResultSet result = statement.getResultSet();
@@ -330,14 +331,12 @@ public class DatabaseController
 			// Initialize a statement.
 			statement = connection.createStatement();
 
-			// Run the initialization script.
 			statement.execute("SELECT name FROM " + DatabaseTable.ROLES);
 
 			ResultSet result = statement.getResultSet();
 
 			while (result.next())
 			{
-				System.out.println("got" + result.getString("name"));
 				names.add(result.getString("name"));
 			}
 
@@ -376,10 +375,132 @@ public class DatabaseController
 		return names;
 	}
 
-	public static User authenticate(final String authenticationString)
+	public static User authenticate(final String authenticationString) throws NoDatabaseLinkException
 	{
-		// TODO Auto-generated method stub
-		return null;
+		Connection connection = getConnection();
+		Statement statement = null;
+		User loggedInUser = null;
+
+		try
+		{
+			// Initialize a statement.
+			statement = connection.createStatement();
+
+			int authInt = Integer.parseInt(authenticationString);
+
+			if (User.isValidPIN(authInt))
+				statement.execute("SELECT * FROM " + DatabaseTable.USERS + " WHERE pin = " + authInt);
+			else
+				statement.execute("SELECT * FROM " + DatabaseTable.USERS + " WHERE badge_id = " + authInt);
+
+			ResultSet result = statement.getResultSet();
+
+			result.next();
+			loggedInUser = new User(result.getInt("badge_id"), result.getString("first_name"), result.getString("last_name"),
+					getRoleFromID(result.getInt("role")));
+
+			// Close all resources.
+			statement.close();
+			connection.close();
+		}
+		catch (SQLException e)
+		{
+			e.printStackTrace();
+		}
+		catch (IllegalStateException e)
+		{
+			try
+			{
+				connection.close();
+			}
+			catch (SQLException e1)
+			{
+				e1.printStackTrace();
+			}
+
+			// Connection pool has been disposed = no database connection.
+			throw new NoDatabaseLinkException();
+		}
+
+		try
+		{
+			connection.close();
+		}
+		catch (SQLException e)
+		{
+			e.printStackTrace();
+		}
+
+		return loggedInUser;
+	}
+
+	private static UserRole getRoleFromID(final int roleid) throws NoDatabaseLinkException
+	{
+		Connection connection = getConnection();
+		Statement statement = null;
+		UserRole role = null;
+
+		try
+		{
+			// Initialize a statement.
+			statement = connection.createStatement();
+
+			statement.execute("SELECT name FROM " + DatabaseTable.ROLES + " WHERE id = " + roleid);
+
+			ResultSet result = statement.getResultSet();
+
+			// Only one result.
+			result.next();
+			String name = result.getString("name");
+
+			switch (name)
+			{
+				case "Administrator":
+					role = new Administrator(name);
+					break;
+				case "Manager":
+					role = new Administrator(name);
+					break;
+				case "Logistician":
+					role = new Administrator(name);
+					break;
+				default:
+					System.out.println("ERROR: Unknown role '" + name + "'.");
+					break;
+			}
+			// Close all resources.
+			statement.close();
+			connection.close();
+		}
+		catch (SQLException e)
+		{
+			e.printStackTrace();
+		}
+		catch (IllegalStateException e)
+		{
+			try
+			{
+				connection.close();
+			}
+			catch (SQLException e1)
+			{
+				e1.printStackTrace();
+			}
+
+			// Connection pool has been disposed = no database connection.
+			throw new NoDatabaseLinkException();
+		}
+
+		try
+		{
+			connection.close();
+		}
+		catch (SQLException e)
+		{
+			e.printStackTrace();
+		}
+
+		return role;
 	}
 
 	public static List<Integer> getProductCodeList(final int count)
