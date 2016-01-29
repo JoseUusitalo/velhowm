@@ -96,10 +96,14 @@ public class LoginController
 		{
 			System.out.println(false);
 			uiController.setView(view.getLoginView());
-			return true;
+			return false;
 		}
 		System.out.println(true);
-		return false;
+		return true;
 	}
 
+	public User getCurrentUser()
+	{
+		return currentUser;
+	}
 }
