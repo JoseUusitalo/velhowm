@@ -56,16 +56,16 @@ public class AddUserView
 			Label scenetitle = new Label("Add user info");
 			scenetitle.setFont(Font.font("Tahoma", FontWeight.NORMAL, 20));
 			grid.add(scenetitle, 0, 0, 2, 1);
-			
+
 			Label userID = new Label("Badge ID:");
 			grid.add(userID, 0, 1);
 
 			TextField badgeIDField = new TextField();
 			grid.add(badgeIDField, 1, 1);
-			
+
 			Label pinLabel = new Label("PIN:");
 			grid.add(pinLabel, 0, 2);
-			
+
 			TextField pinField = new TextField();
 			grid.add(pinField, 1, 2);
 
@@ -84,7 +84,7 @@ public class AddUserView
 			Label userInfo = new Label("User role:");
 			grid.add(userInfo, 0, 5);
 
-			final ComboBox<String> listbox = new ComboBox<String>();
+			ComboBox<String> listbox = new ComboBox<String>();
 			listbox.getItems().addAll(rolenameSet);
 			listbox.getSelectionModel().selectFirst();
 			grid.add(listbox, 1, 5);

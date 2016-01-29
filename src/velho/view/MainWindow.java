@@ -3,12 +3,11 @@ package velho.view;
 import javafx.application.Application;
 import javafx.geometry.Pos;
 import javafx.scene.Group;
+import javafx.scene.Node;
 import javafx.scene.Scene;
-import javafx.scene.control.Label;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
 import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.HBox;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 import velho.controller.DatabaseController;
@@ -26,14 +25,18 @@ import velho.model.exceptions.NoDatabaseLinkException;
 
 public class MainWindow extends Application
 {
-
 	private static DebugController debugController;
 	private UserController userController;
 	private static UIController uiController;
 	private static LoginController loginController;
+	private BorderPane borderPane;
+	private Scene scene;
 
 	public MainWindow()
 	{
+		System.out.println("Running VELHO Warehouse Management.");
+		DatabaseController.connect();
+
 		try
 		{
 			userController = new UserController();
@@ -43,52 +46,54 @@ public class MainWindow extends Application
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+
+		if (DatabaseController.isLinked())
+		{
+			uiController = new UIController(this);
+			loginController = new LoginController(uiController);
+			debugController = new DebugController(loginController);
+		}
 	}
 
 	public static void main(String[] args)
 	{
-		System.out.println("Running VELHO Warehouse Management.");
-		DatabaseController.connect();
-
-		if (DatabaseController.isLinked())
-		{
-			uiController = new UIController();
-			loginController = new LoginController();
-			debugController = new DebugController(loginController);
-			launch(args);
-		}
+		launch(args);
 	}
 
-	@Override
-	public void start(final Stage primaryStage)
+	public void setView(final Node view)
 	{
-		primaryStage.setTitle("Main Menu");
-		Group root = new Group();
-		Scene scene = new Scene(root, 1024, 700, Color.WHITE);
+		borderPane.setCenter(view);
+	}
 
+	/**
+	 * Creates the main menu.
+	 */
+	public void showMainMenu()
+	{
 		TabPane tabPane = new TabPane();
-
-		BorderPane borderPane = new BorderPane();
-
-		Tab tab = new Tab();
-		tab.setText("Login");
-		HBox hbox = new HBox();
-		hbox.getChildren().add(new Label("Login"));
-		hbox.setAlignment(Pos.CENTER);
-		tab.setContent(hbox);
-		tabPane.getTabs().add(tab);
 
 		Tab tab2 = new Tab();
 		tab2.setText("Add user");
 		tab2.setContent(userController.getView());
 		tabPane.getTabs().add(tab2);
 
-		// bind to take available space
+		borderPane.setCenter(tabPane);
+	}
+
+	@Override
+	public void start(final Stage primaryStage)
+	{
+		primaryStage.setTitle("Velho Warehouse Management");
+		Group root = new Group();
+		scene = new Scene(root, 1024, 700, Color.WHITE);
+		borderPane = new BorderPane();
 		borderPane.prefHeightProperty().bind(scene.heightProperty());
 		borderPane.prefWidthProperty().bind(scene.widthProperty());
 
-		borderPane.setCenter(tabPane);
 		root.getChildren().add(borderPane);
+
+		loginController.checkLogin();
+
 		primaryStage.setScene(scene);
 		primaryStage.show();
 

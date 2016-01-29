@@ -24,4 +24,10 @@ public class Manager implements UserRole
 	{
 		return name;
 	}
+
+	@Override
+	public String toString()
+	{
+		return name;
+	}
 }

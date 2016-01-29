@@ -3,7 +3,6 @@ package velho.controller;
 import javafx.scene.Node;
 import velho.view.AddUserView;
 import java.sql.SQLException;
-import java.util.Set;
 
 import velho.model.User;
 import velho.model.exceptions.NoDatabaseLinkException;
@@ -26,9 +25,7 @@ public class UserController
 	 */
 	public UserController() throws NoDatabaseLinkException
 	{
-		Set<String> rolelist = DatabaseController.getUserRoleNames();
-		view = new AddUserView(this, rolelist);
-
+		view = new AddUserView(this, DatabaseController.getUserRoleNames());
 	}
 
 	/**

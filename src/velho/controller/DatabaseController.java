@@ -404,6 +404,13 @@ public class DatabaseController
 		return names;
 	}
 
+	/**
+	 * Authenticas a user with the given authentication string.
+	 *
+	 * @param authenticationString a PIN or a badge id
+	 * @return user object representing the authenticated user or null for invalid credentials
+	 * @throws NoDatabaseLinkException
+	 */
 	public static User authenticate(final String authenticationString) throws NoDatabaseLinkException
 	{
 		Connection connection = getConnection();
@@ -424,9 +431,9 @@ public class DatabaseController
 
 			ResultSet result = statement.getResultSet();
 
-			result.next();
-			loggedInUser = new User(result.getInt("badge_id"), result.getString("first_name"), result.getString("last_name"),
-					getRoleFromID(result.getInt("role")));
+			if (result.next())
+				loggedInUser = new User(result.getInt("badge_id"), result.getString("first_name"), result.getString("last_name"),
+						getRoleFromID(result.getInt("role")));
 
 			// Close all resources.
 			statement.close();
@@ -449,6 +456,11 @@ public class DatabaseController
 
 			// Connection pool has been disposed = no database connection.
 			throw new NoDatabaseLinkException();
+		}
+		catch (NumberFormatException e)
+		{
+			// Given auth string not a number.
+			return null;
 		}
 
 		try
