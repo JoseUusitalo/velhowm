@@ -49,6 +49,9 @@ public class MainWindow extends Application
 	private TabPane mainTabPane;
 	private Scene scene;
 
+	/**
+	 * The main window constructor.
+	 */
 	public MainWindow()
 	{
 		System.out.println("Running VELHO Warehouse Management.");
@@ -66,9 +69,10 @@ public class MainWindow extends Application
 
 		if (DatabaseController.isLinked())
 		{
-			uiController = new UIController(this);
-			loginController = new LoginController(uiController);
 			listController = new ListViewController();
+			uiController = new UIController(this, listController);
+			uiController.setUserController(userController);
+			loginController = new LoginController(uiController);
 			try
 			{
 				debugController = new DebugController(loginController);
@@ -82,14 +86,31 @@ public class MainWindow extends Application
 		}
 	}
 
+	/**
+	 * The main method of Velho Warehouse Management.
+	 * 
+	 * @param args
+	 */
 	public static void main(String[] args)
 	{
 		launch(args);
 	}
 
-	public void setView(final Node view)
+	/**
+	 * Adds a new tab to the main tab panel.
+	 * 
+	 * @param tabName name of the tab
+	 * @param view view to show in the tab
+	 */
+	public void addTab(final String tabName, final Node view)
 	{
-		rootBorderPane.setCenter(view);
+		if (mainTabPane == null)
+			showMainMenu();
+
+		Tab tab = new Tab();
+		tab.setText(tabName);
+		tab.setContent(view);
+		mainTabPane.getTabs().add(tab);
 	}
 
 	/**
@@ -101,16 +122,6 @@ public class MainWindow extends Application
 		{
 			mainTabPane = new TabPane();
 			mainTabPane.setTabClosingPolicy(TabClosingPolicy.UNAVAILABLE);
-
-			Tab tab2 = new Tab();
-			tab2.setText("Add User");
-			tab2.setContent(userController.getView());
-			mainTabPane.getTabs().add(tab2);
-
-			Tab tab3 = new Tab();
-			tab3.setText("User List");
-			tab3.setContent(listController.getView());
-			mainTabPane.getTabs().add(tab3);
 		}
 
 		// Force log in to see main menu.
@@ -119,16 +130,19 @@ public class MainWindow extends Application
 			HBox statusBar = new HBox();
 			statusBar.setAlignment(Pos.CENTER_RIGHT);
 			statusBar.setPadding(new Insets(4.0));
-			
+
 			// TODO: Use CSS.
 			statusBar.setBackground(new Background(new BackgroundFill(Paint.valueOf(Color.LIGHTGRAY.toString()), null, null)));
-			statusBar.setBorder(new Border(new BorderStroke(Paint.valueOf("b5b5b5"), Paint.valueOf(Color.TRANSPARENT.toString()), Paint.valueOf(Color.TRANSPARENT.toString()), Paint.valueOf(Color.TRANSPARENT.toString()), BorderStrokeStyle.SOLID, null, null, null, null, null, null)));
-			
+			statusBar.setBorder(new Border(
+					new BorderStroke(Paint.valueOf("b5b5b5"), Paint.valueOf(Color.TRANSPARENT.toString()), Paint.valueOf(Color.TRANSPARENT.toString()),
+							Paint.valueOf(Color.TRANSPARENT.toString()), BorderStrokeStyle.SOLID, null, null, null, null, null, null)));
+
 			HBox userBar = new HBox(10);
 
 			Label userName = new Label("Hello, " + loginController.getCurrentUser().toString());
 			Button logoutButton = new Button("Log Out");
-			
+			logoutButton.setPrefHeight(5.0);
+
 			logoutButton.setOnAction(new EventHandler<ActionEvent>()
 			{
 				@Override
@@ -138,10 +152,10 @@ public class MainWindow extends Application
 					debugController.logout();
 				}
 			});
-			
+
 			userBar.getChildren().addAll(userName, logoutButton);
 			userBar.setAlignment(Pos.CENTER_RIGHT);
-			
+
 			statusBar.getChildren().add(userBar);
 			rootBorderPane.setBottom(statusBar);
 		}
@@ -169,4 +183,61 @@ public class MainWindow extends Application
 		debugController.createDebugWindow(secondStage);
 	}
 
+	/**
+	 * Destroys the main tab panel.
+	 */
+	public void resetMainMenu()
+	{
+		mainTabPane = null;
+	}
+
+	/**
+	 * Replaces the top view of the window
+	 * 
+	 * @param view view to set the top of the window
+	 */
+	public void setTopView(final Node view)
+	{
+		rootBorderPane.setTop(view);
+	}
+
+	/**
+	 * Replaces the right side view of the window
+	 * 
+	 * @param view view to set the right of the window
+	 */
+	public void setRightView(final Node view)
+	{
+		rootBorderPane.setRight(view);
+	}
+
+	/**
+	 * Replaces the bottom view of the window
+	 * 
+	 * @param view view to set the bottom of the window
+	 */
+	public void setBottomView(final Node view)
+	{
+		rootBorderPane.setBottom(view);
+	}
+
+	/**
+	 * Replaces the left side view of the window
+	 * 
+	 * @param view view to set the l of the window
+	 */
+	public void setLeftView(final Node view)
+	{
+		rootBorderPane.setLeft(view);
+	}
+
+	/**
+	 * Replaces the center view of the window
+	 * 
+	 * @param view view to set the middle of the window
+	 */
+	public void setCenterView(final Node view)
+	{
+		rootBorderPane.setCenter(view);
+	}
 }

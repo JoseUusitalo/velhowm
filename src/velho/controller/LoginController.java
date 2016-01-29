@@ -2,6 +2,7 @@ package velho.controller;
 
 import javafx.scene.layout.GridPane;
 import velho.model.User;
+import velho.model.enums.Position;
 import velho.model.exceptions.NoDatabaseLinkException;
 import velho.view.LoginView;
 
@@ -22,7 +23,7 @@ public class LoginController
 		view = new LoginView(this);
 		this.uiController = uiController;
 	}
-	
+
 	/**
 	 * Attaches the debug controller to this class.
 	 * 
@@ -59,7 +60,7 @@ public class LoginController
 		else
 		{
 			System.out.println(currentUser.toString() + " logged in.");
-			uiController.showMainMenu();
+			uiController.showMainMenu(currentUser.getRole());
 			debugController.login();
 		}
 	}
@@ -78,9 +79,9 @@ public class LoginController
 	{
 		if (DatabaseController.getRoleID(userRoleName) == -1)
 			return false;
-		
+
 		currentUser = UserController.getDebugUser(userRoleName);
-		uiController.showMainMenu();
+		uiController.showMainMenu(currentUser.getRole());
 		return true;
 	}
 
@@ -94,6 +95,11 @@ public class LoginController
 		return currentUser != null;
 	}
 
+	/**
+	 * Gets the login view.
+	 * 
+	 * @return the login view
+	 */
 	public GridPane getView()
 	{
 		return view.getLoginView();
@@ -111,7 +117,9 @@ public class LoginController
 		if (!isLoggedIn())
 		{
 			System.out.println(false);
-			uiController.setView(view.getLoginView());
+			uiController.setView(Position.CENTER, view.getLoginView());
+			uiController.setView(Position.BOTTOM, null);
+			uiController.resetMainMenu();
 			return false;
 		}
 		System.out.println(true);
