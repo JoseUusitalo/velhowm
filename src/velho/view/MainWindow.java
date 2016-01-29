@@ -6,12 +6,14 @@ import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
+import javafx.scene.control.TabPane.TabClosingPolicy;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 import velho.controller.DatabaseController;
 import velho.controller.DebugController;
 import velho.controller.LoginController;
+import velho.controller.ListViewController;
 import velho.controller.UIController;
 import velho.controller.UserController;
 import velho.model.exceptions.NoDatabaseLinkException;
@@ -26,10 +28,12 @@ public class MainWindow extends Application
 {
 	private static DebugController debugController;
 	private UserController userController;
-	private static UIController uiController;
-	private static LoginController loginController;
 	private BorderPane borderPane;
 	private Scene scene;
+
+	private static UIController uiController;
+	private static LoginController loginController;
+	private static ListViewController listController;
 
 	public MainWindow()
 	{
@@ -59,6 +63,7 @@ public class MainWindow extends Application
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
+			listController = new ListViewController();
 		}
 	}
 
@@ -78,11 +83,21 @@ public class MainWindow extends Application
 	public void showMainMenu()
 	{
 		TabPane tabPane = new TabPane();
-
+		tabPane.setTabClosingPolicy(TabClosingPolicy.UNAVAILABLE);
+		
 		Tab tab2 = new Tab();
-		tab2.setText("Add user");
+		tab2.setText("Add User");
 		tab2.setContent(userController.getView());
 		tabPane.getTabs().add(tab2);
+		
+		Tab tab3 = new Tab();
+		System.out.println(tab3);
+		System.out.println(listController.getView());
+		tab3.setText("User List");
+		tab3.setContent(listController.getView());
+		tabPane.getTabs().add(tab3);
+		
+		
 
 		borderPane.setCenter(tabPane);
 	}
