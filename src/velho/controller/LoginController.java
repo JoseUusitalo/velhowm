@@ -1,6 +1,5 @@
 package velho.controller;
 
-import javafx.geometry.Pos;
 import javafx.scene.layout.GridPane;
 import velho.model.User;
 import velho.model.exceptions.NoDatabaseLinkException;

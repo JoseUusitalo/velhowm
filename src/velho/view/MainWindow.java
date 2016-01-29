@@ -1,7 +1,6 @@
 package velho.view;
 
 import javafx.application.Application;
-import javafx.geometry.Pos;
 import javafx.scene.Group;
 import javafx.scene.Node;
 import javafx.scene.Scene;
@@ -51,7 +50,15 @@ public class MainWindow extends Application
 		{
 			uiController = new UIController(this);
 			loginController = new LoginController(uiController);
-			debugController = new DebugController(loginController);
+			try
+			{
+				debugController = new DebugController(loginController);
+			}
+			catch (NoDatabaseLinkException e)
+			{
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		}
 	}
 
