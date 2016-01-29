@@ -1,6 +1,7 @@
 package velho.model;
 
 import velho.model.interfaces.UserRole;
+
 /**
  * This this is the manager role.
  * @author Edward
@@ -12,15 +13,20 @@ public class Manager implements UserRole
 	 * String is name that is in UserRole.
 	 */
 	private String name;
-	public Manager(String name)
+
+	public Manager()
 	{
-		super();
-		this.name = name;
+		name = "Manager";
 	}
-/**
- *
- */
-	@Override public String getName()
+
+	@Override
+	public String getName()
+	{
+		return name;
+	}
+
+	@Override
+	public String toString()
 	{
 		return name;
 	}

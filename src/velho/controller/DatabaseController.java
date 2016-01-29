@@ -7,7 +7,6 @@ import java.util.LinkedHashSet;
 import java.util.Set;
 import org.h2.jdbcx.JdbcConnectionPool;
 
-import velho.model.Administrator;
 import velho.model.User;
 import velho.model.enums.DatabaseTable;
 import velho.model.exceptions.ExistingDatabaseLinkException;
@@ -107,6 +106,7 @@ public class DatabaseController
 			e.printStackTrace();
 		}
 	}
+
 	/**
 	 * Creates the link to the database.
 	 * Use {@link #unlink()} to close the connection.
@@ -300,10 +300,10 @@ public class DatabaseController
 			statement.execute("SELECT id FROM " + DatabaseTable.ROLES + " WHERE name = '" + roleName + "'");
 
 			ResultSet result = statement.getResultSet();
-			result.next();
 
 			// Will only return one row because the name value is UNIQUE.
-			id = result.getInt("id");
+			if (result.next())
+				id = result.getInt("id");
 
 			// Close all resources.
 			statement.close();
@@ -401,6 +401,13 @@ public class DatabaseController
 		return names;
 	}
 
+	/**
+	 * Authenticates a user with the given authentication string.
+	 *
+	 * @param authenticationString a PIN or a badge id
+	 * @return a {@link User} object representing the authenticated user or null for invalid credentials
+	 * @throws NoDatabaseLinkException
+	 */
 	public static User authenticate(final String authenticationString) throws NoDatabaseLinkException
 	{
 		Connection connection = getConnection();
@@ -421,9 +428,9 @@ public class DatabaseController
 
 			ResultSet result = statement.getResultSet();
 
-			result.next();
-			loggedInUser = new User(result.getInt("badge_id"), result.getString("first_name"), result.getString("last_name"),
-					getRoleFromID(result.getInt("role")));
+			if (result.next())
+				loggedInUser = new User(result.getInt("badge_id"), result.getString("first_name"), result.getString("last_name"),
+						getRoleFromID(result.getInt("role")));
 
 			// Close all resources.
 			statement.close();
@@ -447,6 +454,11 @@ public class DatabaseController
 			// Connection pool has been disposed = no database connection.
 			throw new NoDatabaseLinkException();
 		}
+		catch (NumberFormatException e)
+		{
+			// Given auth string not a number.
+			return null;
+		}
 
 		try
 		{
@@ -460,12 +472,19 @@ public class DatabaseController
 		return loggedInUser;
 	}
 
+	/**
+	 * Gets the a Role object from the given role id.
+	 * 
+	 * @param roleid role database ID
+	 * @return the corresponding {@link UserRole} object
+	 * @throws NoDatabaseLinkException
+	 */
 	private static UserRole getRoleFromID(final int roleid) throws NoDatabaseLinkException
 	{
 		Connection connection = getConnection();
 		Statement statement = null;
 		UserRole role = null;
-
+		String name = null;
 		try
 		{
 			// Initialize a statement.
@@ -476,24 +495,10 @@ public class DatabaseController
 			ResultSet result = statement.getResultSet();
 
 			// Only one result.
-			result.next();
-			String name = result.getString("name");
+			if (result.next())
+				name = result.getString("name");
+			role = UserController.stringToRole(name);
 
-			switch (name)
-			{
-				case "Administrator":
-					role = new Administrator(name);
-					break;
-				case "Manager":
-					role = new Administrator(name);
-					break;
-				case "Logistician":
-					role = new Administrator(name);
-					break;
-				default:
-					System.out.println("ERROR: Unknown role '" + name + "'.");
-					break;
-			}
 			// Close all resources.
 			statement.close();
 			connection.close();
@@ -529,6 +534,12 @@ public class DatabaseController
 		return role;
 	}
 
+	/**
+	 * Gets a list unique product codes in the database.
+	 *
+	 * @param count how many product codes to get
+	 * @return a list of integer product codes
+	 */
 	public static List<Integer> getProductCodeList(final int count)
 	{
 		// TODO Auto-generated method stub

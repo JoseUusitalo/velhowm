@@ -16,12 +16,12 @@ public class PopupController
 	 *
 	 * @param stage the message to show
 	 */
-	public static void info(final String string)
+	public static void info(final String msg)
 	{
 		Alert alert = new Alert(AlertType.INFORMATION);
-		alert.setTitle("User Added");
+		alert.setTitle("Info");
 		alert.setHeaderText(null);
-		alert.setContentText(string);
+		alert.setContentText(msg);
 
 		alert.showAndWait();
 	}
@@ -44,7 +44,7 @@ public class PopupController
 	/**
 	 * Displays a popup alert with the given message.
 	 *
-	 * @param msg
+	 * @param msg the message to show
 	 */
 	public static void error(String msg)
 	{

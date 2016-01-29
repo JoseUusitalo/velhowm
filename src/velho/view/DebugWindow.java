@@ -2,12 +2,10 @@ package velho.view;
 
 import java.util.Set;
 
-import javafx.application.Application;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.stage.Stage;
 import velho.controller.DebugController;
-import velho.controller.UserController;
 import javafx.scene.Group;
 import javafx.scene.Scene;
 import javafx.scene.layout.GridPane;
@@ -15,9 +13,9 @@ import javafx.geometry.Insets;
 import javafx.scene.control.*;
 
 /**
- * Class made to debug the log ins and outs.
+ * A window with various debug features.
+ * 
  * @author Edward
- *
  */
 public class DebugWindow
 {
@@ -25,40 +23,42 @@ public class DebugWindow
 	 * Button has been tagged logInButton and named as "Log In" on the scene.
 	 */
 	public Button logInButton = new Button("Log In");
+
 	/**
 	 * Button has been tagged logOutButton and named as "Log Out" on the scene
 	 */
 	public Button logOutButton = new Button("Log Out");
+
 	/**
 	 * The DebugController has been tagged as controller.
 	 */
-	private DebugController degController;
+	private DebugController debugController;
+
 	/**
 	 * The grid panel.
 	 */
 	private GridPane grid;
+
 	/**
 	 * rolenameSet is a Set for the unique values in the code.
 	 */
 	private Set<String> rolenameSet;
 
 	/**
-	 *
 	 * @param debugController
 	 * @param rolelist
 	 */
-	public DebugWindow(DebugController debugController, Set<String> rolelist)
+	public DebugWindow(final DebugController debugController, final Set<String> rolelist)
 	{
 		rolenameSet = rolelist;
-		degController = debugController;
+		this.debugController = debugController;
 		grid = null;
 	}
 
 	/**
 	 * Sets the value as either true or false to show in the scene.
 	 *
-	 * @param visibility
-	 *            show log in button?
+	 * @param visibility show log in button?
 	 */
 	public void setLogInButton(boolean visibility)
 	{
@@ -69,7 +69,7 @@ public class DebugWindow
 	 * sets the value as either true or false to show in the scene.
 	 *
 	 * @param visibility
-	 *            show log in button?
+	 * show log in button?
 	 */
 	public void setLogOutButton(boolean visibility)
 	{
@@ -80,11 +80,7 @@ public class DebugWindow
 	{
 		primaryStage.setTitle("VELHO WM DEBUG");
 		Scene scene = new Scene(new Group(), 300, 150);
-
-
 		final ComboBox<String> taskListBox = new ComboBox<String>();
-
-		taskListBox.setValue("");
 
 		grid = new GridPane();
 		grid.setVgap(4);
@@ -106,19 +102,20 @@ public class DebugWindow
 
 		logInButton.setOnAction(new EventHandler<ActionEvent>()
 		{
-			@Override public void handle(ActionEvent event)
+			@Override
+			public void handle(ActionEvent event)
 			{
-				taskListBox.getValue();
-				degController.login(taskListBox.getValue());
+				debugController.login(taskListBox.getValue());
 			}
 
 		});
 
 		logOutButton.setOnAction(new EventHandler<ActionEvent>()
 		{
-			@Override public void handle(ActionEvent event)
+			@Override
+			public void handle(ActionEvent event)
 			{
-				degController.logout();
+				debugController.logout();
 			}
 		});
 

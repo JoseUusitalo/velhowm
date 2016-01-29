@@ -26,12 +26,21 @@ public class AddUserView
 	 * The add user controller.
 	 */
 	private UserController controller;
+
 	/**
 	 * The grid panel.
 	 */
 	private GridPane grid;
+
+	/**
+	 * A set of user role names.
+	 */
 	private Set<String> rolenameSet;
 
+	/**
+	 * @param mcontroller
+	 * @param rolelist
+	 */
 	public AddUserView(UserController mcontroller, Set<String> rolelist)
 	{
 		rolenameSet = rolelist;
@@ -56,29 +65,29 @@ public class AddUserView
 			Label scenetitle = new Label("Add user info");
 			scenetitle.setFont(Font.font("Tahoma", FontWeight.NORMAL, 20));
 			grid.add(scenetitle, 0, 0, 2, 1);
-			
+
 			Label userID = new Label("Badge ID:");
 			grid.add(userID, 0, 1);
 
-			TextField badgeIDField = new TextField();
+			final TextField badgeIDField = new TextField();
 			grid.add(badgeIDField, 1, 1);
-			
+
 			Label pinLabel = new Label("PIN:");
 			grid.add(pinLabel, 0, 2);
-			
-			TextField pinField = new TextField();
+
+			final TextField pinField = new TextField();
 			grid.add(pinField, 1, 2);
 
 			Label userFirstName = new Label("First name:");
 			grid.add(userFirstName, 0, 3);
 
-			TextField userFnameField = new TextField();
+			final TextField userFnameField = new TextField();
 			grid.add(userFnameField, 1, 3);
 
 			Label userLastName = new Label("Last name:");
 			grid.add(userLastName, 0, 4);
 
-			TextField userLNameField = new TextField();
+			final TextField userLNameField = new TextField();
 			grid.add(userLNameField, 1, 4);
 
 			Label userInfo = new Label("User role:");
@@ -94,7 +103,8 @@ public class AddUserView
 
 			createButton.setOnAction(new EventHandler<ActionEvent>()
 			{
-				@Override public void handle(ActionEvent e)
+				@Override
+				public void handle(ActionEvent e)
 				{
 					controller.addUser(badgeIDField.getText(), pinField.getText(), userFnameField.getText(), userLNameField.getText(), listbox.getValue());
 				}

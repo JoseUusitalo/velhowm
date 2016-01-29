@@ -1,17 +1,12 @@
 package velho.view;
 
-import javafx.application.Application;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
-import javafx.geometry.Insets;
-import javafx.scene.Group;
-import javafx.scene.Scene;
+import javafx.geometry.Pos;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.GridPane;
-import javafx.scene.layout.VBox;
-import javafx.stage.Stage;
 import velho.controller.LoginController;
 
 /**
@@ -19,63 +14,44 @@ import velho.controller.LoginController;
  * @author Edward
  *
  */
-public class LoginView extends Application
+public class LoginView
 {
-	private TextField textField = new TextField();
-	public Button logInButton = new Button("Log In");
 	private LoginController controller;
+	private GridPane grid;
 
-	/**
-	 * Changes the visibility of the button "Log In".
-	 *
-	 * @param visibility
-	 * show log in button?
-	 */
-	public void setLogInButton(boolean visibility)
+	public LoginView(LoginController loginController)
 	{
-		logInButton.setVisible(visibility);
+		controller = loginController;
 	}
 
-	@Override
-	public void start(Stage stage)
+	public GridPane getLoginView()
 	{
-		stage.setTitle("VELHO WM DEBUG");
-		Scene scene = new Scene(new Group(), 300, 150);
-
-		Label labels = new Label("Scan badge or write password");
-		VBox vb = new VBox();
-		vb.getChildren().addAll(labels, textField);
-		vb.setSpacing(10);
-
-		GridPane grid = new GridPane();
-		grid.setVgap(4);
-		grid.setHgap(0);
-		grid.setPadding(new Insets(5, 5, 5, 5));
-		// grid.add(new Label("User :"), 0, 0);
-		// grid.add(taskComboBox, 1, 0);
-		grid.add(labels, 0, 1, 1, 1);
-		grid.add(textField, 0, 2, 2, 1);
-
-		grid.add(logInButton, 0, 3);
-
-		Group root = (Group) scene.getRoot();
-		root.getChildren().add(grid);
-
-		logInButton.setOnAction(new EventHandler<ActionEvent>()
+		if (grid == null)
 		{
-			@Override
-			public void handle(ActionEvent event)
+			grid = new GridPane();
+			grid.setVgap(4);
+			grid.setHgap(0);
+			grid.setAlignment(Pos.CENTER);
+			Label labels = new Label("Scan badge or write password");
+
+			grid.add(labels, 0, 1, 1, 1);
+
+			final TextField textField = new TextField();
+			grid.add(textField, 0, 2, 2, 1);
+
+			Button logInButton = new Button("Log In");
+			grid.add(logInButton, 0, 3, 2, 1);
+
+			logInButton.setOnAction(new EventHandler<ActionEvent>()
 			{
-				controller.login(textField.getText());
-			}
+				@Override
+				public void handle(ActionEvent event)
+				{
+					controller.login(textField.getText());
+				}
+			});
+		}
 
-		});
-		stage.setScene(scene);
-		stage.show();
-	}
-
-	public static void main(String[] args)
-	{
-		launch(args);
+		return grid;
 	}
 }
