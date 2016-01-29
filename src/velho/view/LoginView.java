@@ -25,23 +25,19 @@ public class LoginView extends Application
 	public Button logInButton = new Button("Log In");
 	private LoginController controller;
 
-	public LoginView(LoginController loginController)
-	{
-		controller = loginController;
-	}
-
 	/**
 	 * Changes the visibility of the button "Log In".
 	 *
 	 * @param visibility
-	 *            show log in button?
+	 * show log in button?
 	 */
 	public void setLogInButton(boolean visibility)
 	{
 		logInButton.setVisible(visibility);
 	}
 
-	@Override public void start(Stage stage)
+	@Override
+	public void start(Stage stage)
 	{
 		stage.setTitle("VELHO WM DEBUG");
 		Scene scene = new Scene(new Group(), 300, 150);
@@ -67,7 +63,8 @@ public class LoginView extends Application
 
 		logInButton.setOnAction(new EventHandler<ActionEvent>()
 		{
-			@Override public void handle(ActionEvent event)
+			@Override
+			public void handle(ActionEvent event)
 			{
 				controller.login(textField.getText());
 			}

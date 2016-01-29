@@ -32,7 +32,7 @@ public class MainWindow extends Application
 	private UserController userController;
 	private static UIController uiController;
 	private static LoginController loginController;
-	
+
 	public MainWindow()
 	{
 		try
@@ -50,12 +50,19 @@ public class MainWindow extends Application
 	{
 		System.out.println("Running VELHO Warehouse Management.");
 		DatabaseController.connect();
-		
+
 		if (DatabaseController.isLinked())
 		{
 			uiController = new UIController();
 			loginController = new LoginController();
-			debugController = new DebugController(loginController);
+			try
+			{
+				debugController = new DebugController(loginController);
+			} catch (NoDatabaseLinkException e)
+			{
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 			launch(args);
 		}
 	}
@@ -92,7 +99,7 @@ public class MainWindow extends Application
 		root.getChildren().add(borderPane);
 		primaryStage.setScene(scene);
 		primaryStage.show();
-		
+
 		Stage secondStage = new Stage();
 		debugController.createDebugWindow(secondStage);
 	}

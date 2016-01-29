@@ -1,10 +1,13 @@
 package velho.view;
 
+import java.util.Set;
+
 import javafx.application.Application;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.stage.Stage;
 import velho.controller.DebugController;
+import velho.controller.UserController;
 import javafx.scene.Group;
 import javafx.scene.Scene;
 import javafx.scene.layout.GridPane;
@@ -29,13 +32,20 @@ public class DebugWindow
 	/**
 	 * The DebugController has been tagged as controller.
 	 */
-	private DebugController controller;
+	private DebugController degController;
+	/**
+	 * The grid panel.
+	 */
+	private GridPane grid;
+	private Set<String> rolenameSet;
 
-	public DebugWindow(DebugController debugController)
+	public DebugWindow(DebugController debugController, Set<String> rolelist)
 	{
-		controller = debugController;
+		rolenameSet = rolelist;
+		degController = debugController;
+		grid = null;
 	}
-	
+
 	/**
 	 * Sets the value as either true or false to show in the scene.
 	 *
@@ -62,19 +72,21 @@ public class DebugWindow
 	{
 		primaryStage.setTitle("VELHO WM DEBUG");
 		Scene scene = new Scene(new Group(), 300, 150);
-		
-		
-		final ComboBox<String> taskComboBox = new ComboBox<String>();
 
-		taskComboBox.setValue("");
 
-		GridPane grid = new GridPane();
+		final ComboBox<String> taskListBox = new ComboBox<String>();
+
+		taskListBox.setValue("");
+
+		grid = new GridPane();
 		grid.setVgap(4);
 		grid.setHgap(10);
 		grid.setPadding(new Insets(5, 5, 5, 5));
 		grid.add(new Label("User :"), 0, 0);
-		grid.add(taskComboBox, 1, 0);
+		taskListBox.getItems().addAll(rolenameSet);
+		taskListBox.getSelectionModel().selectFirst();
 
+		grid.add(taskListBox, 1, 0);
 		logOutButton.setVisible(false);
 
 		grid.add(logInButton, 2, 0);
@@ -88,8 +100,8 @@ public class DebugWindow
 		{
 			@Override public void handle(ActionEvent event)
 			{
-				taskComboBox.getValue();
-				controller.login(taskComboBox.getValue());
+				taskListBox.getValue();
+				degController.login(taskListBox.getValue());
 			}
 
 		});
@@ -98,7 +110,7 @@ public class DebugWindow
 		{
 			@Override public void handle(ActionEvent event)
 			{
-				controller.logout();
+				degController.logout();
 			}
 		});
 
