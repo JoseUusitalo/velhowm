@@ -8,5 +8,5 @@ import org.junit.runners.Suite.SuiteClasses;
 @SuiteClasses({ DatabaseControllerTest.class, UserControllerTest.class })
 public class AllControllerTests
 {
-
+	// Class for running all controller tests in the project.
 }
