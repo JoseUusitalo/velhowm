@@ -12,9 +12,13 @@ import velho.view.DebugWindow;
 public class DebugController
 {
 	/**
-	 * The view is debugViewn.
+	 * The {@link DebugWindow}.
 	 */
 	private DebugWindow view;
+
+	/**
+	 * The {@link LoginController}.
+	 */
 	private LoginController loginController;
 
 	/**
@@ -22,26 +26,32 @@ public class DebugController
 	 * @param debugView
 	 * @throws NoDatabaseLinkException
 	 */
-	public DebugController(LoginController loginController) throws NoDatabaseLinkException
+	public DebugController(final LoginController loginController) throws NoDatabaseLinkException
 	{
 		this.loginController = loginController;
 		view = new DebugWindow(this, DatabaseController.getUserRoleNames());
 	}
 
-	public void createDebugWindow(Stage stage)
+	/**
+	 * Creates and shows the debug window.
+	 * 
+	 * @param stage the stage to run the window in
+	 */
+	public void createDebugWindow(final Stage stage)
 	{
 		view.start(stage);
 	}
 
 	/**
 	 * Here the login sets value to the buttons.
+	 * 
 	 * @param userRoleName
 	 */
-	public void login(String userRoleName)
+	public void login(final String userRoleName)
 	{
 		try
 		{
-			loginController.debuglogin(userRoleName);
+			loginController.debugLogin(userRoleName);
 			System.out.println("Logged in as " + userRoleName + ". (DEBUG)");
 			view.setLogInButton(false);
 			view.setLogOutButton(true);
@@ -86,6 +96,7 @@ public class DebugController
 
 	/**
 	 * The parameter for LogInButton is either false or true.
+	 * 
 	 * @param visibility show log in button?
 	 */
 	public void setLogOutButton(boolean visibility)

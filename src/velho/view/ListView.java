@@ -10,18 +10,21 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.BorderPane;
-import velho.controller.ListViewController;
+import velho.controller.ListController;
 import velho.model.Manager;
 import velho.model.User;
 
+/**
+ * @author Joona
+ */
 public class ListView
 {
-	private ListViewController listController;
+	private ListController listController;
 	private BorderPane pane;
 	private ObservableList<User> datalist;
 	private List<String> columnNames;
 
-	public ListView(ListViewController listController, ObservableList<User> list)
+	public ListView(ListController listController, ObservableList<User> list)
 	{
 		columnNames = new ArrayList<String>(Arrays.asList("First name", "Last name"));
 		this.datalist = list;

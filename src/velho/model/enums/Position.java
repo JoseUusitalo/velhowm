@@ -3,7 +3,7 @@ package velho.model.enums;
 /**
  * Valid window positions.
  * 
- * @author Demian Wright
+ * @author Jose Uusitalo
  */
 public enum Position
 {

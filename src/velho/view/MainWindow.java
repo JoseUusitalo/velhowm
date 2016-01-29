@@ -26,27 +26,55 @@ import javafx.stage.Stage;
 import velho.controller.DatabaseController;
 import velho.controller.DebugController;
 import velho.controller.LoginController;
-import velho.controller.ListViewController;
+import velho.controller.ListController;
 import velho.controller.UIController;
 import velho.controller.UserController;
 import velho.model.exceptions.NoDatabaseLinkException;
 
 /**
- * The main window view class.
- * @author Joona
- *
+ * The main window and class for Velho Warehouse Management.
+ * @author Jose Uusitalo &amp; Joona
  */
-
 public class MainWindow extends Application
 {
+	/**
+	 * The {@link DebugController}.
+	 */
 	private static DebugController debugController;
+	
+	/**
+	 * The {@link UserController}.
+	 */
 	private UserController userController;
+	
+	/**
+	 * The {@link UIController}.
+	 */
 	private static UIController uiController;
+	
+	/**
+	 * The {@link LoginController}.
+	 */
 	private static LoginController loginController;
-	private static ListViewController listController;
+	
+	/**
+	 * The {@link ListController}.
+	 */
+	private static ListController listController;
 
+	/**
+	 * The root layout of the main window.
+	 */
 	private BorderPane rootBorderPane;
+	
+	/**
+	 * The main menu tab panel.
+	 */
 	private TabPane mainTabPane;
+	
+	/**
+	 * The main scene.
+	 */
 	private Scene scene;
 
 	/**
@@ -69,7 +97,7 @@ public class MainWindow extends Application
 
 		if (DatabaseController.isLinked())
 		{
-			listController = new ListViewController();
+			listController = new ListController();
 			uiController = new UIController(this, listController);
 			uiController.setUserController(userController);
 			loginController = new LoginController(uiController);

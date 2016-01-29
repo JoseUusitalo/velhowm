@@ -5,23 +5,44 @@ import velho.model.enums.Position;
 import velho.model.interfaces.UserRole;
 import velho.view.MainWindow;
 
+/**
+ * The controller for the {@link MainWindow}.
+ * 
+ * @author Jose Uusitalo
+ */
 public class UIController
 {
+	/**
+	 * The {@link MainWindow}.
+	 */
 	private MainWindow mainView;
+
+	/**
+	 * The {@link UserController}.
+	 */
 	private UserController userController;
-	private ListViewController listController;
 
-	public UIController()
-	{
+	/**
+	 * The {@link ListController}.
+	 */
+	private ListController listController;
 
-	}
-
-	public UIController(final MainWindow mainWindow, final ListViewController listController)
+	/**
+	 * @param mainWindow
+	 * @param listController
+	 */
+	public UIController(final MainWindow mainWindow, final ListController listController)
 	{
 		mainView = mainWindow;
 		this.listController = listController;
 	}
 
+	/**
+	 * Shows a view in the main window.
+	 * 
+	 * @param position {@link Position} to show the view in
+	 * @param view view to show
+	 */
 	public void setView(final Position position, final Node view)
 	{
 		switch (position)
@@ -46,10 +67,15 @@ public class UIController
 		}
 	}
 
+	/**
+	 * Shows the main menu as seen by the specified role.
+	 * 
+	 * @param currentUserRole {@link UserRole} viewing the main menu
+	 */
 	public void showMainMenu(final UserRole currentUserRole)
 	{
 		mainView.showMainMenu();
-		
+
 		switch (currentUserRole.getName())
 		{
 			case "Administrator":
@@ -64,11 +90,18 @@ public class UIController
 		}
 	}
 
+	/**
+	 * Attaches the {@link UserController} to this controller.
+	 * @param userController
+	 */
 	public void setUserController(final UserController userController)
 	{
 		this.userController = userController;
 	}
 
+	/**
+	 * Resets the main menu to it's initial state.
+	 */
 	public void resetMainMenu()
 	{
 		mainView.resetMainMenu();

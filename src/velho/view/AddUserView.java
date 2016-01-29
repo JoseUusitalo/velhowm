@@ -26,12 +26,21 @@ public class AddUserView
 	 * The add user controller.
 	 */
 	private UserController controller;
+
 	/**
 	 * The grid panel.
 	 */
 	private GridPane grid;
+
+	/**
+	 * A set of user role names.
+	 */
 	private Set<String> rolenameSet;
 
+	/**
+	 * @param mcontroller
+	 * @param rolelist
+	 */
 	public AddUserView(UserController mcontroller, Set<String> rolelist)
 	{
 		rolenameSet = rolelist;
@@ -94,7 +103,8 @@ public class AddUserView
 
 			createButton.setOnAction(new EventHandler<ActionEvent>()
 			{
-				@Override public void handle(ActionEvent e)
+				@Override
+				public void handle(ActionEvent e)
 				{
 					controller.addUser(badgeIDField.getText(), pinField.getText(), userFnameField.getText(), userLNameField.getText(), listbox.getValue());
 				}

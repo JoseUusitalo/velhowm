@@ -7,17 +7,35 @@ import velho.model.exceptions.NoDatabaseLinkException;
 import velho.view.LoginView;
 
 /**
- * Controlls the viewing of the log ins to the Application.
- * @author Edward
- *
+ * Controls logging users in and out.
+ * 
+ * @author Edward &amp; Jose Uusitalo
  */
 public class LoginController
 {
+	/**
+	 * User currently logged in.
+	 */
 	private User currentUser;
+
+	/**
+	 * The {@link LoginView}.
+	 */
 	private LoginView view;
+
+	/**
+	 * The {@link UIController}.
+	 */
 	private UIController uiController;
+
+	/**
+	 * The {@link DebugController}.
+	 */
 	private DebugController debugController;
 
+	/**
+	 * @param uiController
+	 */
 	public LoginController(final UIController uiController)
 	{
 		view = new LoginView(this);
@@ -25,7 +43,7 @@ public class LoginController
 	}
 
 	/**
-	 * Attaches the debug controller to this class.
+	 * Attaches the debug controller to this controller.
 	 * 
 	 * @param debugController the {@link DebugController}
 	 */
@@ -75,7 +93,14 @@ public class LoginController
 		checkLogin();
 	}
 
-	public boolean debuglogin(String userRoleName) throws NoDatabaseLinkException
+	/**
+	 * Forcibly logs a user in with the specified role.
+	 * 
+	 * @param userRoleName name of the role
+	 * @return <code>true</code> if login was successful, or <code>false</code> if role name was invalid
+	 * @throws NoDatabaseLinkException
+	 */
+	public boolean debugLogin(final String userRoleName) throws NoDatabaseLinkException
 	{
 		if (DatabaseController.getRoleID(userRoleName) == -1)
 			return false;
@@ -126,6 +151,11 @@ public class LoginController
 		return true;
 	}
 
+	/**
+	 * Gets the current logged in user.
+	 * 
+	 * @return the user currently logged in
+	 */
 	public User getCurrentUser()
 	{
 		return currentUser;

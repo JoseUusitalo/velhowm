@@ -13,9 +13,9 @@ import javafx.geometry.Insets;
 import javafx.scene.control.*;
 
 /**
- * Class made to debug the log ins and outs.
+ * A window with various debug features.
+ * 
  * @author Edward
- *
  */
 public class DebugWindow
 {
@@ -23,25 +23,28 @@ public class DebugWindow
 	 * Button has been tagged logInButton and named as "Log In" on the scene.
 	 */
 	public Button logInButton = new Button("Log In");
+
 	/**
 	 * Button has been tagged logOutButton and named as "Log Out" on the scene
 	 */
 	public Button logOutButton = new Button("Log Out");
+
 	/**
 	 * The DebugController has been tagged as controller.
 	 */
 	private DebugController debugController;
+
 	/**
 	 * The grid panel.
 	 */
 	private GridPane grid;
+
 	/**
 	 * rolenameSet is a Set for the unique values in the code.
 	 */
 	private Set<String> rolenameSet;
 
 	/**
-	 *
 	 * @param debugController
 	 * @param rolelist
 	 */
@@ -93,7 +96,6 @@ public class DebugWindow
 		grid.add(logInButton, 2, 0);
 
 		grid.add(logOutButton, 3, 0);
-
 
 		Group root = (Group) scene.getRoot();
 		root.getChildren().add(grid);

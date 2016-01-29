@@ -7,9 +7,6 @@ import java.util.LinkedHashSet;
 import java.util.Set;
 import org.h2.jdbcx.JdbcConnectionPool;
 
-import velho.model.Administrator;
-import velho.model.Logistician;
-import velho.model.Manager;
 import velho.model.User;
 import velho.model.enums.DatabaseTable;
 import velho.model.exceptions.ExistingDatabaseLinkException;
@@ -408,7 +405,7 @@ public class DatabaseController
 	 * Authenticates a user with the given authentication string.
 	 *
 	 * @param authenticationString a PIN or a badge id
-	 * @return user object representing the authenticated user or null for invalid credentials
+	 * @return a {@link User} object representing the authenticated user or null for invalid credentials
 	 * @throws NoDatabaseLinkException
 	 */
 	public static User authenticate(final String authenticationString) throws NoDatabaseLinkException
@@ -478,8 +475,8 @@ public class DatabaseController
 	/**
 	 * Gets the a Role object from the given role id.
 	 * 
-	 * @param roleid
-	 * @return
+	 * @param roleid role database ID
+	 * @return the corresponding {@link UserRole} object
 	 * @throws NoDatabaseLinkException
 	 */
 	private static UserRole getRoleFromID(final int roleid) throws NoDatabaseLinkException
@@ -501,7 +498,7 @@ public class DatabaseController
 			if (result.next())
 				name = result.getString("name");
 			role = UserController.stringToRole(name);
-			
+
 			// Close all resources.
 			statement.close();
 			connection.close();

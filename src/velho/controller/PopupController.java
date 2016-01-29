@@ -44,7 +44,7 @@ public class PopupController
 	/**
 	 * Displays a popup alert with the given message.
 	 *
-	 * @param msg
+	 * @param msg the message to show
 	 */
 	public static void error(String msg)
 	{

@@ -81,16 +81,33 @@ public class UserController
 		return false;
 	}
 
+	/**
+	 * Gets the view for adding users.
+	 * 
+	 * @return the {@link AddUserView}
+	 */
 	public Node getView()
 	{
 		return view.getAddUserView();
 	}
 
+	/**
+	 * Creates the temporary debug user for logging in through the debug window.
+	 * 
+	 * @param userRoleName role to create the user as
+	 * @return a {@link User} object
+	 */
 	public static User getDebugUser(String userRoleName)
 	{
 		return new User(0, "Debug", "Account", stringToRole(userRoleName));
 	}
 
+	/**
+	 * Converts the given string to an object.
+	 * 
+	 * @param userRoleName name of the user role to convert to an object
+	 * @return a {@link UserRole} object
+	 */
 	public static UserRole stringToRole(final String userRoleName)
 	{
 		switch (userRoleName)
