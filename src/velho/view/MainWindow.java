@@ -14,6 +14,7 @@ import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 import velho.controller.DatabaseController;
 import velho.controller.DebugController;
+import velho.controller.LoginController;
 import velho.controller.UIController;
 import velho.controller.UserController;
 import velho.model.exceptions.NoDatabaseLinkException;
@@ -30,6 +31,7 @@ public class MainWindow extends Application
 	private static DebugController debugController;
 	private UserController userController;
 	private static UIController uiController;
+	private static LoginController loginController;
 	
 	public MainWindow()
 	{
@@ -52,7 +54,8 @@ public class MainWindow extends Application
 		if (DatabaseController.isLinked())
 		{
 			uiController = new UIController();
-			debugController = new DebugController();
+			loginController = new LoginController();
+			debugController = new DebugController(loginController);
 			launch(args);
 		}
 	}
