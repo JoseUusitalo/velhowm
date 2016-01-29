@@ -37,8 +37,16 @@ public class DebugWindow
 	 * The grid panel.
 	 */
 	private GridPane grid;
+	/**
+	 * rolenameSet is a Set for the unique values in the code.
+	 */
 	private Set<String> rolenameSet;
 
+	/**
+	 *
+	 * @param debugController
+	 * @param rolelist
+	 */
 	public DebugWindow(DebugController debugController, Set<String> rolelist)
 	{
 		rolenameSet = rolelist;
