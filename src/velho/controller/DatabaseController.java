@@ -303,10 +303,10 @@ public class DatabaseController
 			statement.execute("SELECT id FROM " + DatabaseTable.ROLES + " WHERE name = '" + roleName + "'");
 
 			ResultSet result = statement.getResultSet();
-			result.next();
 
 			// Will only return one row because the name value is UNIQUE.
-			id = result.getInt("id");
+			if (result.next())
+				id = result.getInt("id");
 
 			// Close all resources.
 			statement.close();
