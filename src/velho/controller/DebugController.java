@@ -14,11 +14,14 @@ public class DebugController
 	 * The view is debugViewn.
 	 */
 	private DebugWindow view;
+	private LoginController loginController;
 /**
+ * @param loginController 
  * @param debugView
  */
-	public DebugController()
+	public DebugController(LoginController loginController)
 	{
+		this.loginController = loginController;
 		view = new DebugWindow(this);
 	}
 	
@@ -29,9 +32,11 @@ public class DebugController
 
 	/**
 	 * Here the login sets value to the buttons.
+	 * @param userRoleName 
 	 */
-	public void login()
+	public void login(String userRoleName)
 	{
+		loginController.debuglogin(userRoleName);
 		System.out.println("Logged in.");
 		view.setLogInButton(false);
 		view.setLogOutButton(true);

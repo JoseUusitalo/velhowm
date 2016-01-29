@@ -87,7 +87,8 @@ public class DebugWindow
 		{
 			@Override public void handle(ActionEvent event)
 			{
-				controller.login();
+				taskComboBox.getValue();
+				controller.login(taskComboBox.getValue());
 			}
 
 		});

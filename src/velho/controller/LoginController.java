@@ -14,9 +14,9 @@ public class LoginController
 	private User currentUser;
 	private LoginView view;
 
-	public LoginController(LoginView loginview)
+	public LoginController()
 	{
-		view = loginview;
+		view = new LoginView(this);
 	}
 
 	/**
@@ -48,6 +48,12 @@ public class LoginController
 	public void logout()
 	{
 		System.out.println("Logged out.");
+	}
+
+	public void debuglogin(String userRoleName)
+	{
+		System.out.println(userRoleName);
+		
 	}
 
 }
