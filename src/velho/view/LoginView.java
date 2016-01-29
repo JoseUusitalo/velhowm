@@ -36,7 +36,7 @@ public class LoginView
 
 			grid.add(labels, 0, 1, 1, 1);
 
-			TextField textField = new TextField();
+			final TextField textField = new TextField();
 			grid.add(textField, 0, 2, 2, 1);
 
 			Button logInButton = new Button("Log In");

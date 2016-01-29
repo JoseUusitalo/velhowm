@@ -1,6 +1,5 @@
 package velho.controller;
 
-import javafx.geometry.Pos;
 import javafx.scene.Node;
 import velho.view.MainWindow;
 

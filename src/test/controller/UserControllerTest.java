@@ -5,6 +5,7 @@ import static org.junit.Assert.*;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import velho.controller.DatabaseController;
 import velho.controller.UserController;
 import velho.model.exceptions.NoDatabaseLinkException;
 
@@ -36,13 +37,8 @@ public class UserControllerTest
 	@BeforeClass
 	public static final void createController() throws NoDatabaseLinkException
 	{
+		DatabaseController.connect();
 		controller = new UserController();
-	}
-
-	@Test
-	public final void testAddUserNoConnection()
-	{
-		assertFalse(controller.addUser(VALID_BADGE_ID, null, VALID_NAME, VALID_NAME, VALID_ROLE_NAME));
 	}
 
 	@Test
