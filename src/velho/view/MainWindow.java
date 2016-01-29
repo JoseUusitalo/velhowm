@@ -3,7 +3,6 @@ package velho.view;
 import javafx.application.Application;
 import javafx.geometry.Pos;
 import javafx.scene.Group;
-import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Label;
 import javafx.scene.control.Tab;
@@ -30,7 +29,7 @@ public class MainWindow extends Application
 	private static DebugController debugController;
 	private UserController userController;
 	private static UIController uiController;
-	
+
 	public MainWindow()
 	{
 		try
@@ -48,7 +47,7 @@ public class MainWindow extends Application
 	{
 		System.out.println("Running VELHO Warehouse Management.");
 		DatabaseController.connect();
-		
+
 		if (DatabaseController.isLinked())
 		{
 			uiController = new UIController();
@@ -89,7 +88,7 @@ public class MainWindow extends Application
 		root.getChildren().add(borderPane);
 		primaryStage.setScene(scene);
 		primaryStage.show();
-		
+
 		Stage secondStage = new Stage();
 		debugController.createDebugWindow(secondStage);
 	}

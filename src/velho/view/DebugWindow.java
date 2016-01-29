@@ -1,6 +1,5 @@
 package velho.view;
 
-import javafx.application.Application;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.stage.Stage;
@@ -35,7 +34,7 @@ public class DebugWindow
 	{
 		controller = debugController;
 	}
-	
+
 	/**
 	 * Sets the value as either true or false to show in the scene.
 	 *
@@ -62,8 +61,8 @@ public class DebugWindow
 	{
 		primaryStage.setTitle("VELHO WM DEBUG");
 		Scene scene = new Scene(new Group(), 300, 150);
-		
-		
+
+
 		final ComboBox<String> taskComboBox = new ComboBox<String>();
 
 		taskComboBox.setValue("");
