@@ -1,5 +1,8 @@
 package velho.model.interfaces;
 
+/**
+ * @author Edward
+ */
 public interface UserRole
 {
 	/**

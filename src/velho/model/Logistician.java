@@ -14,7 +14,7 @@ public class Logistician implements UserRole
 	 */
 	private String name;
 
-	public Logistician(String name)
+	public Logistician()
 	{
 		name = "Logistician";
 	}

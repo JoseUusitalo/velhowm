@@ -8,6 +8,8 @@ import java.util.Set;
 import org.h2.jdbcx.JdbcConnectionPool;
 
 import velho.model.Administrator;
+import velho.model.Logistician;
+import velho.model.Manager;
 import velho.model.User;
 import velho.model.enums.DatabaseTable;
 import velho.model.exceptions.ExistingDatabaseLinkException;
@@ -107,6 +109,7 @@ public class DatabaseController
 			e.printStackTrace();
 		}
 	}
+
 	/**
 	 * Creates the link to the database.
 	 * Use {@link #unlink()} to close the connection.
@@ -460,6 +463,12 @@ public class DatabaseController
 		return loggedInUser;
 	}
 
+	/**
+	 * Gets the a Role object from the given
+	 * @param roleid
+	 * @return
+	 * @throws NoDatabaseLinkException
+	 */
 	private static UserRole getRoleFromID(final int roleid) throws NoDatabaseLinkException
 	{
 		Connection connection = getConnection();
@@ -482,13 +491,13 @@ public class DatabaseController
 			switch (name)
 			{
 				case "Administrator":
-					role = new Administrator(name);
+					role = new Administrator();
 					break;
 				case "Manager":
-					role = new Administrator(name);
+					role = new Manager();
 					break;
 				case "Logistician":
-					role = new Administrator(name);
+					role = new Logistician();
 					break;
 				default:
 					System.out.println("ERROR: Unknown role '" + name + "'.");
@@ -529,6 +538,12 @@ public class DatabaseController
 		return role;
 	}
 
+	/**
+	 * Gets a list unique product codes in the database.
+	 *
+	 * @param count how many product codes to get
+	 * @return a list of integer product codes
+	 */
 	public static List<Integer> getProductCodeList(final int count)
 	{
 		// TODO Auto-generated method stub
