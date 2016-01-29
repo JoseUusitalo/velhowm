@@ -1,11 +1,8 @@
 package velho.controller;
 
+import javafx.scene.Node;
+
 public class UIController
 {
 
-	public UIController()
-	{
-		// TODO Auto-generated constructor stub
-	}
-	
 }

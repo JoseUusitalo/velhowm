@@ -8,12 +8,14 @@ import javafx.scene.Scene;
 import javafx.scene.control.Label;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
+import javafx.scene.control.TabPane.TabClosingPolicy;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 import velho.controller.DatabaseController;
 import velho.controller.DebugController;
+import velho.controller.ListViewController;
 import velho.controller.UIController;
 import velho.controller.UserController;
 
@@ -29,6 +31,7 @@ public class MainWindow extends Application
 	private static DebugController debugController;
 	private UserController userController;
 	private static UIController uiController;
+	private static ListViewController listController;
 	
 	public MainWindow()
 	{
@@ -44,6 +47,7 @@ public class MainWindow extends Application
 		{
 			uiController = new UIController();
 			debugController = new DebugController();
+			listController = new ListViewController();
 			launch(args);
 		}
 	}
@@ -56,7 +60,8 @@ public class MainWindow extends Application
 		Scene scene = new Scene(root, 1024, 700, Color.WHITE);
 
 		TabPane tabPane = new TabPane();
-
+		tabPane.setTabClosingPolicy(TabClosingPolicy.UNAVAILABLE);
+		
 		BorderPane borderPane = new BorderPane();
 
 		Tab tab = new Tab();
@@ -66,11 +71,21 @@ public class MainWindow extends Application
 		hbox.setAlignment(Pos.CENTER);
 		tab.setContent(hbox);
 		tabPane.getTabs().add(tab);
+		
 
 		Tab tab2 = new Tab();
-		tab2.setText("Add user");
+		tab2.setText("Add User");
 		tab2.setContent(userController.getView());
 		tabPane.getTabs().add(tab2);
+		
+		Tab tab3 = new Tab();
+		System.out.println(tab3);
+		System.out.println(listController.getView());
+		tab3.setText("User List");
+		tab3.setContent(listController.getView());
+		tabPane.getTabs().add(tab3);
+		
+		
 
 		// bind to take available space
 		borderPane.prefHeightProperty().bind(scene.heightProperty());
