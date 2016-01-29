@@ -6,6 +6,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 import velho.controller.UserController;
+import velho.model.exceptions.NoDatabaseLinkException;
 
 /**
  * Test for the {@link velho.controller.UserController} class.
@@ -33,7 +34,7 @@ public class UserControllerTest
 	private final String INVALID_ROLE_NAME = "Worker";
 
 	@BeforeClass
-	public static final void createController()
+	public static final void createController() throws NoDatabaseLinkException
 	{
 		controller = new UserController();
 	}

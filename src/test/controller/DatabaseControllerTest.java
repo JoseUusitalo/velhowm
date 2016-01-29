@@ -2,6 +2,10 @@ package test.controller;
 
 import static org.junit.Assert.*;
 
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
+
 import org.junit.Test;
 
 import velho.controller.DatabaseController;
@@ -44,7 +48,27 @@ public class DatabaseControllerTest
 	{
 		DatabaseController.link();
 		DatabaseController.initializeDatabase();
-		assertNotEquals(-1, DatabaseController.isValidRole("Manager"));
+		assertNotEquals(-1, DatabaseController.getRoleID("Manager"));
+		DatabaseController.unlink();
+	}
+
+	@Test
+	public final void testGetUserRoleID() throws NoDatabaseLinkException, ClassNotFoundException, ExistingDatabaseLinkException
+	{
+		DatabaseController.link();
+		DatabaseController.initializeDatabase();
+		assertNotEquals(-1, DatabaseController.getRoleID("Logistician"));
+		DatabaseController.unlink();
+	}
+
+	@Test
+	public final void testGetUserRoleNames() throws NoDatabaseLinkException, ClassNotFoundException, ExistingDatabaseLinkException
+	{
+		Set<String> names = new HashSet<String>(Arrays.asList("Manager","Logistician","Administrator"));
+
+		DatabaseController.link();
+		DatabaseController.initializeDatabase();
+		assertTrue(DatabaseController.getUserRoleNames().containsAll(names));
 		DatabaseController.unlink();
 	}
 }

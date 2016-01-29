@@ -12,6 +12,7 @@ import javafx.scene.layout.HBox;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 import velho.controller.UserController;
+import velho.model.exceptions.NoDatabaseLinkException;
 
 /**
  * The main window view class.
@@ -26,7 +27,15 @@ public class MainWindow extends Application
 
 	public MainWindow()
 	{
-		userController = new UserController();
+		try
+		{
+			userController = new UserController();
+		}
+		catch (NoDatabaseLinkException e)
+		{
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 
 	public static void main(String[] args)

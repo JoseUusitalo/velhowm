@@ -111,7 +111,7 @@ public class User
 		if (lastName.length() > MAX_NAME_LENGTH)
 			return false;
 
-		if (DatabaseController.isValidRole(roleName) == -1)
+		if (DatabaseController.getRoleID(roleName) == -1)
 			return false;
 
 		return true;

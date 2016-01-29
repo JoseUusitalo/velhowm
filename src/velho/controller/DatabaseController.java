@@ -7,6 +7,7 @@ import java.util.LinkedHashSet;
 import java.util.Set;
 import org.h2.jdbcx.JdbcConnectionPool;
 
+import velho.model.User;
 import velho.model.enums.DatabaseTable;
 import velho.model.exceptions.ExistingDatabaseLinkException;
 import velho.model.exceptions.NoDatabaseLinkException;
@@ -251,13 +252,13 @@ public class DatabaseController
 	}
 
 	/**
-	 * Checks if the given role name is valid.
+	 * Gets the database ID of the given user role name.
 	 *
 	 * @param roleName the name of the role
 	 * @return the database ID of the given role (a value greater than 0) or <code>-1</code> if the role does not exist
 	 * in the database
 	 */
-	public static int isValidRole(final String roleName) throws NoDatabaseLinkException
+	public static int getRoleID(final String roleName) throws NoDatabaseLinkException
 	{
 		Connection connection = getConnection();
 		Statement statement = null;
@@ -278,7 +279,6 @@ public class DatabaseController
 			id = result.getInt("id");
 
 			// Close all resources.
-			result.close();
 			statement.close();
 			connection.close();
 
@@ -319,25 +319,70 @@ public class DatabaseController
 		return -1;
 	}
 
-	public static Set<String> getUserRoleNames()
+	public static Set<String> getUserRoleNames() throws NoDatabaseLinkException
 	{
-		return new LinkedHashSet<String>();
+		Connection connection = getConnection();
+		Statement statement = null;
+		LinkedHashSet<String> names = new LinkedHashSet<String>();
+
+		try
+		{
+			// Initialize a statement.
+			statement = connection.createStatement();
+
+			// Run the initialization script.
+			statement.execute("SELECT name FROM " + DatabaseTable.ROLES);
+
+			ResultSet result = statement.getResultSet();
+
+			while (result.next())
+			{
+				System.out.println("got" + result.getString("name"));
+				names.add(result.getString("name"));
+			}
+
+			// Close all resources.
+			statement.close();
+			connection.close();
+		}
+		catch (SQLException e)
+		{
+			e.printStackTrace();
+		}
+		catch (IllegalStateException e)
+		{
+			try
+			{
+				connection.close();
+			}
+			catch (SQLException e1)
+			{
+				e1.printStackTrace();
+			}
+
+			// Connection pool has been disposed = no database connection.
+			throw new NoDatabaseLinkException();
+		}
+
+		try
+		{
+			connection.close();
+		}
+		catch (SQLException e)
+		{
+			e.printStackTrace();
+		}
+
+		return names;
 	}
 
-	public static Object authenticate(String authenticationString)
+	public static User authenticate(final String authenticationString)
 	{
 		// TODO Auto-generated method stub
 		return null;
 	}
 
-	public static List<Integer> getProductCodeList(int i)
-	{
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	public static List<String> getUserRoles()
-
+	public static List<Integer> getProductCodeList(final int count)
 	{
 		// TODO Auto-generated method stub
 		return null;

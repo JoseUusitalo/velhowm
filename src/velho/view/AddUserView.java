@@ -1,8 +1,6 @@
 package velho.view;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.Set;
 
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
@@ -32,12 +30,11 @@ public class AddUserView
 	 * The grid panel.
 	 */
 	private GridPane grid;
-	private List<String> list;
+	private Set<String> rolenameSet;
 
-	public AddUserView(UserController mcontroller, List<String> rolelist)
+	public AddUserView(UserController mcontroller, Set<String> rolelist)
 	{
-		list = rolelist;
-		list = new ArrayList<String>(Arrays.asList("testi1", "testi2", "testi3"));
+		rolenameSet = rolelist;
 		controller = mcontroller;
 		grid = null;
 	}
@@ -84,7 +81,7 @@ public class AddUserView
 			grid.add(userInfo, 0, 4);
 
 			final ComboBox<String> listbox = new ComboBox<String>();
-			listbox.getItems().addAll(list);
+			listbox.getItems().addAll(rolenameSet);
 			listbox.getSelectionModel().selectFirst();
 			grid.add(listbox, 1, 4);
 
