@@ -3,12 +3,8 @@ package velho.controller;
 import java.io.File;
 import java.sql.*;
 import java.util.List;
-<<<<<<< HEAD
-=======
 import java.util.LinkedHashSet;
 import java.util.Set;
->>>>>>> branch 'develop' of https://gitlab.com/joseu/velho.git
-
 import org.h2.jdbcx.JdbcConnectionPool;
 
 import velho.model.enums.DatabaseTable;
@@ -360,11 +356,12 @@ public class DatabaseController
 		return null;
 	}
 
-
-	public static List<Integer> getProductCodeList(int i){
+	public static List<Integer> getProductCodeList(int i)
+	{
 		// TODO Auto-generated method stub
 		return null;
 	}
+
 	public static List<String> getUserRoles()
 
 	{

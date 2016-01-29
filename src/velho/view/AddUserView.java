@@ -59,37 +59,41 @@ public class AddUserView
 			Label scenetitle = new Label("Add user info");
 			scenetitle.setFont(Font.font("Tahoma", FontWeight.NORMAL, 20));
 			grid.add(scenetitle, 0, 0, 2, 1);
-
-			Label userFirstName = new Label("First name:");
-			grid.add(userFirstName, 0, 1);
-
-			TextField userFnameField = new TextField();
-			grid.add(userFnameField, 1, 1);
-
-			Label userLastName = new Label("Last name:");
-			grid.add(userLastName, 0, 2);
-
-			TextField userLNameField = new TextField();
-			grid.add(userLNameField, 1, 2);
-
-			Label userID = new Label("User ID:");
-			grid.add(userID, 0, 3);
-
-			TextField pinField = new TextField();
+			
+			Label userID = new Label("Badge ID:");
+			grid.add(userID, 0, 1);
 
 			TextField badgeIDField = new TextField();
-			grid.add(badgeIDField, 1, 3);
+			grid.add(badgeIDField, 1, 1);
+			
+			Label pinLabel = new Label("PIN:");
+			grid.add(pinLabel, 0, 2);
+			
+			TextField pinField = new TextField();
+			grid.add(pinField, 1, 2);
+
+			Label userFirstName = new Label("First name:");
+			grid.add(userFirstName, 0, 3);
+
+			TextField userFnameField = new TextField();
+			grid.add(userFnameField, 1, 3);
+
+			Label userLastName = new Label("Last name:");
+			grid.add(userLastName, 0, 4);
+
+			TextField userLNameField = new TextField();
+			grid.add(userLNameField, 1, 4);
 
 			Label userInfo = new Label("User role:");
-			grid.add(userInfo, 0, 4);
+			grid.add(userInfo, 0, 5);
 
 			final ComboBox<String> listbox = new ComboBox<String>();
 			listbox.getItems().addAll(list);
 			listbox.getSelectionModel().selectFirst();
-			grid.add(listbox, 1, 4);
+			grid.add(listbox, 1, 5);
 
 			Button createButton = new Button("Create user");
-			grid.add(createButton, 0, 5);
+			grid.add(createButton, 0, 6);
 
 			createButton.setOnAction(new EventHandler<ActionEvent>()
 			{
