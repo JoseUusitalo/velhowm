@@ -81,6 +81,32 @@ public class DatabaseController
 	 * PUBLIC DATABASE METHODS
 	 */
 
+	public static void connect()
+	{
+		try
+		{
+			DatabaseController.link();
+		}
+		catch (ClassNotFoundException e)
+		{
+			e.printStackTrace();
+		}
+		catch (ExistingDatabaseLinkException e)
+		{
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+		try
+		{
+			DatabaseController.initializeDatabase();
+		}
+		catch (NoDatabaseLinkException e)
+		{
+			System.out.println("ERROR: Unable to initialize database. No database connection established.");
+			e.printStackTrace();
+		}
+	}
 	/**
 	 * Creates the link to the database.
 	 * Use {@link #unlink()} to close the connection.
@@ -189,7 +215,7 @@ public class DatabaseController
 			statement = connection.createStatement();
 
 			// Run the initialization script.
-			statement.execute("RUNSCRIPT FROM 'C:/git/velho/data/init.sql'");
+			statement.execute("RUNSCRIPT FROM './data/init.sql'");
 
 			// Close all resources.
 			statement.close();

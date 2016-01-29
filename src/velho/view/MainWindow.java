@@ -3,6 +3,7 @@ package velho.view;
 import javafx.application.Application;
 import javafx.geometry.Pos;
 import javafx.scene.Group;
+import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Label;
 import javafx.scene.control.Tab;
@@ -11,6 +12,9 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
+import velho.controller.DatabaseController;
+import velho.controller.DebugController;
+import velho.controller.UIController;
 import velho.controller.UserController;
 import velho.model.exceptions.NoDatabaseLinkException;
 
@@ -23,8 +27,10 @@ import velho.model.exceptions.NoDatabaseLinkException;
 public class MainWindow extends Application
 {
 
-	UserController userController;
-
+	private static DebugController debugController;
+	private UserController userController;
+	private static UIController uiController;
+	
 	public MainWindow()
 	{
 		try
@@ -40,28 +46,20 @@ public class MainWindow extends Application
 
 	public static void main(String[] args)
 	{
-		launch(args);
+		System.out.println("Running VELHO Warehouse Management.");
+		DatabaseController.connect();
+		
+		if (DatabaseController.isLinked())
+		{
+			uiController = new UIController();
+			debugController = new DebugController();
+			launch(args);
+		}
 	}
 
 	@Override
 	public void start(final Stage primaryStage)
 	{
-
-		/*
-		 * controller = new MainWindowController(this);
-		 * rootBorderPane = new BorderPane();
-		 * rootBorderPane.setPadding(new Insets(10, 10, 10, 10));
-		 *
-		 * GridPane grid = new GridPane();
-		 *
-		 * grid.setAlignment(Pos.CENTER);
-		 * grid.setHgap(10);
-		 * grid.setVgap(10);
-		 *
-		 * Label scenetitle = new Label("Main Menu");
-		 * scenetitle.setFont(Font.font("Tahoma", FontWeight.NORMAL, 20));
-		 * grid.add(scenetitle, 0, 0, 2, 1);
-		 */
 		primaryStage.setTitle("Main Menu");
 		Group root = new Group();
 		Scene scene = new Scene(root, 1024, 700, Color.WHITE);
@@ -91,6 +89,9 @@ public class MainWindow extends Application
 		root.getChildren().add(borderPane);
 		primaryStage.setScene(scene);
 		primaryStage.show();
+		
+		Stage secondStage = new Stage();
+		debugController.createDebugWindow(secondStage);
 	}
 
 }

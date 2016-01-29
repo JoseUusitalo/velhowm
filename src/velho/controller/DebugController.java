@@ -1,5 +1,6 @@
 package velho.controller;
 
+import javafx.stage.Stage;
 import velho.view.DebugWindow;
 
 /**
@@ -16,9 +17,14 @@ public class DebugController
 /**
  * @param debugView
  */
-	public DebugController(DebugWindow debugView)
+	public DebugController()
 	{
-		view = debugView;
+		view = new DebugWindow(this);
+	}
+	
+	public void createDebugWindow(Stage stage)
+	{
+		view.start(stage);
 	}
 
 	/**
