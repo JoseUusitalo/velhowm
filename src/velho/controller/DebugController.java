@@ -1,6 +1,7 @@
 package velho.controller;
 
 import javafx.stage.Stage;
+import velho.model.exceptions.NoDatabaseLinkException;
 import velho.view.DebugWindow;
 
 /**
@@ -16,15 +17,16 @@ public class DebugController
 	private DebugWindow view;
 	private LoginController loginController;
 /**
- * @param loginController 
+ * @param loginController
  * @param debugView
+ * @throws NoDatabaseLinkException
  */
-	public DebugController(LoginController loginController)
+	public DebugController(LoginController loginController) throws NoDatabaseLinkException
 	{
 		this.loginController = loginController;
-		view = new DebugWindow(this);
+		view = new DebugWindow(this, DatabaseController.getUserRoleNames());
 	}
-	
+
 	public void createDebugWindow(Stage stage)
 	{
 		view.start(stage);
@@ -32,7 +34,7 @@ public class DebugController
 
 	/**
 	 * Here the login sets value to the buttons.
-	 * @param userRoleName 
+	 * @param userRoleName
 	 */
 	public void login(String userRoleName)
 	{

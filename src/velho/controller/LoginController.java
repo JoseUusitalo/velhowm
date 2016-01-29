@@ -16,7 +16,7 @@ public class LoginController
 
 	public LoginController()
 	{
-		view = new LoginView(this);
+		view = new LoginView();
 	}
 
 	/**
