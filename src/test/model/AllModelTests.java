@@ -8,5 +8,5 @@ import org.junit.runners.Suite.SuiteClasses;
 @SuiteClasses({ BarcodeScannerTest.class, UserTest.class })
 public class AllModelTests
 {
-
+	// Class for running all model tests in the project.
 }
