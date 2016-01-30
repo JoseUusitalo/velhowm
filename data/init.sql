@@ -23,5 +23,5 @@ INSERT INTO `roles` VALUES (2,'Manager');
 INSERT INTO `roles` VALUES (3,'Logistician');
 
 INSERT INTO `users`(`pin`,`first_name`,`last_name`,`role`) VALUES (111111,'Admin','Test',1);
-INSERT INTO `users`(`pin`,`first_name`,`last_name`,`role`) VALUES (222222,'Boss','Test',1);
-INSERT INTO `users`(`pin`,`first_name`,`last_name`,`role`) VALUES (333333,'Worker','Test',1);
+INSERT INTO `users`(`pin`,`first_name`,`last_name`,`role`) VALUES (222222,'Boss','Test',2);
+INSERT INTO `users`(`pin`,`first_name`,`last_name`,`role`) VALUES (333333,'Worker','Test',3);
