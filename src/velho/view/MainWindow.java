@@ -77,7 +77,7 @@ public class MainWindow extends Application
 	public MainWindow()
 	{
 		System.out.println("Running VELHO Warehouse Management.");
-		DatabaseController.connect();
+		DatabaseController.connectAndInitialize();
 
 		try
 		{

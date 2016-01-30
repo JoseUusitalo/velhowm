@@ -32,7 +32,7 @@ public class LoginView
 			grid.setVgap(4);
 			grid.setHgap(0);
 			grid.setAlignment(Pos.CENTER);
-			Label labels = new Label("Scan badge or write password");
+			Label labels = new Label("Scan Badge or Write PIN");
 
 			grid.add(labels, 0, 1, 1, 1);
 

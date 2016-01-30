@@ -12,21 +12,43 @@ import javafx.scene.layout.BorderPane;
 import velho.model.User;
 
 /**
+ * A class for creating lists and tables of data.
+ * 
  * @author Jose Uusitalo &amp; Joona
  */
 public class ListView
 {
+	/**
+	 * The root border pane.
+	 */
 	private BorderPane pane;
+
+	/**
+	 * The list of data to show.
+	 */
 	private ObservableList<User> datalist;
+
+	/**
+	 * Data columns.
+	 */
 	private Map<String, String> columnNames;
 
+	/**
+	 * @param columnMap
+	 * @param datalist
+	 */
 	public ListView(final Map<String, String> columnMap, final ObservableList<User> datalist)
 	{
 		columnNames = columnMap;
 		this.datalist = datalist;
 	}
 
-	public BorderPane getListView()
+	/**
+	 * Gets the table view.
+	 * 
+	 * @return a table view of data
+	 */
+	public BorderPane getTableView()
 	{
 		if (pane == null)
 		{
@@ -50,5 +72,4 @@ public class ListView
 		}
 		return pane;
 	}
-
 }

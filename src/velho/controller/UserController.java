@@ -24,9 +24,6 @@ public class UserController
 	 */
 	private AddUserView view;
 
-	/**
-	 * @param viewi
-	 */
 	public UserController() throws NoDatabaseLinkException
 	{
 		view = new AddUserView(this, DatabaseController.getUserRoleNames());
@@ -40,7 +37,6 @@ public class UserController
 	 * @param userLastName user's last name
 	 * @param userRole user's role in the company
 	 */
-
 	public boolean addUser(final String badgeID, final String userPIN, final String userFirstName, final String userLastName, final String userRoleName)
 	{
 		// Validate user data.

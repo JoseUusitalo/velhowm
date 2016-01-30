@@ -89,7 +89,10 @@ public class DatabaseController
 	 * PUBLIC DATABASE METHODS
 	 */
 
-	public static void connect()
+	/**
+	 * Links and initializes the database.
+	 */
+	public static void connectAndInitialize()
 	{
 		try
 		{
@@ -357,6 +360,12 @@ public class DatabaseController
 		return -1;
 	}
 
+	/**
+	 * Gets a set of user role names in the database.
+	 * 
+	 * @return a set of user role names
+	 * @throws NoDatabaseLinkException
+	 */
 	public static Set<String> getUserRoleNames() throws NoDatabaseLinkException
 	{
 		Connection connection = getConnection();
@@ -556,6 +565,12 @@ public class DatabaseController
 		return null;
 	}
 
+	/**
+	 * Gets an {@link ObservableList} of user names and roles.
+	 * 
+	 * @return a list of usersr
+	 * @throws NoDatabaseLinkException
+	 */
 	public static ObservableList<User> getPublicUserDataList() throws NoDatabaseLinkException
 	{
 		Connection connection = getConnection();
@@ -571,7 +586,7 @@ public class DatabaseController
 			ResultSet result = statement.getResultSet();
 
 			userViewList.clear();
-			
+
 			while (result.next())
 			{
 				userViewList.add(new User(result.getString("first_name"), result.getString("last_name"), getRoleFromID(result.getInt("role"))));
@@ -614,6 +629,11 @@ public class DatabaseController
 		return userViewList;
 	}
 
+	/**
+	 * Gets a map of columns and column names for displaying {@link #getPublicUserDataList()} data in a table.
+	 * 
+	 * @return a map where the key is the column value and value is the column name
+	 */
 	public static Map<String, String> getPublicUserDataColumns()
 	{
 		LinkedHashMap<String, String> cols = new LinkedHashMap<String, String>();

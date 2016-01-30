@@ -85,6 +85,11 @@ public class UIController
 		}
 	}
 
+	/**
+	 * Creates the user list view.
+	 * 
+	 * @return the user list view
+	 */
 	private Node getUserListView()
 	{
 		try
@@ -101,6 +106,7 @@ public class UIController
 
 	/**
 	 * Attaches the {@link UserController} to this controller.
+	 * 
 	 * @param userController
 	 */
 	public void setUserController(final UserController userController)

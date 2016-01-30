@@ -37,7 +37,7 @@ public class UserControllerTest
 	@BeforeClass
 	public static final void createController() throws NoDatabaseLinkException
 	{
-		DatabaseController.connect();
+		DatabaseController.connectAndInitialize();
 		controller = new UserController();
 	}
 
