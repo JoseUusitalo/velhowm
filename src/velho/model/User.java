@@ -22,6 +22,11 @@ public class User
 	private static final int MAX_PIN_LENGTH = 6;
 
 	/**
+	 * The minimum value for a badge ID code.
+	 */
+	private static final int MIN_BADGE_ID_VALUE = 10000000;
+
+	/**
 	 * The maximum value for a badge ID code.
 	 */
 	private static final int MAX_BADGE_ID_VALUE = 99999999;
@@ -93,7 +98,7 @@ public class User
 		{
 			if (hasPIN)
 				return false;
-			else if (Integer.parseInt(badgeID) > MAX_BADGE_ID_VALUE) // Badge ID must be valid.
+			else if (Integer.parseInt(badgeID) > MAX_BADGE_ID_VALUE || Integer.parseInt(badgeID) < MIN_BADGE_ID_VALUE) // Badge ID must be valid.
 				return false;
 		}
 		else
