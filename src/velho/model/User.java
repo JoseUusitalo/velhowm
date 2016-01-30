@@ -32,11 +32,6 @@ public class User
 	private static final int MAX_BADGE_ID_VALUE = 99999999;
 
 	/**
-	 * The unique identifier of a RFID badge.
-	 */
-	private int badgeID;
-
-	/**
 	 * The first name of this user.
 	 */
 	private String firstName;
@@ -57,13 +52,16 @@ public class User
 	 * @param lastName
 	 * @param role
 	 */
-	public User(final int badgeID, final String firstName, final String lastName, final UserRole role)
+	public User(final String firstName, final String lastName, final UserRole role)
 	{
-		this.badgeID = badgeID;
 		this.firstName = firstName;
 		this.lastName = lastName;
 		this.role = role;
 	}
+
+	/*
+	 * STATIC METHODS
+	 */
 
 	/**
 	 * Validates the user data against the database requirements.
@@ -94,26 +92,34 @@ public class User
 		if (hasPIN)
 			hasPIN = !pin.isEmpty();
 
-		if (hasBadgeID)
+		try
 		{
-			if (hasPIN)
-				return false;
-			else if (Integer.parseInt(badgeID) > MAX_BADGE_ID_VALUE || Integer.parseInt(badgeID) < MIN_BADGE_ID_VALUE) // Badge ID must be valid.
-				return false;
+			if (hasBadgeID)
+			{
+				if (hasPIN)
+					return false;
+				// Badge ID must be valid
+				else if (Integer.parseInt(badgeID) > MAX_BADGE_ID_VALUE || Integer.parseInt(badgeID) < MIN_BADGE_ID_VALUE)
+					return false;
+			}
+			else
+			{
+				// hasBadgeID == false
+				if (!hasPIN)
+					return false;
+				else if (Integer.parseInt(pin) > (Math.pow(10.0, MAX_PIN_LENGTH))) // PIN must be valid.
+					return false;
+			}
 		}
-		else
+		catch (NumberFormatException e)
 		{
-			// hasBadgeID == false
-			if (!hasPIN)
-				return false;
-			else if (Integer.parseInt(pin) > (Math.pow(10.0, MAX_PIN_LENGTH))) // PIN must be valid.
-				return false;
+			return false;
 		}
 
-		if (firstName.length() > MAX_NAME_LENGTH)
+		if (firstName.length() > MAX_NAME_LENGTH || firstName.isEmpty())
 			return false;
 
-		if (lastName.length() > MAX_NAME_LENGTH)
+		if (lastName.length() > MAX_NAME_LENGTH || lastName.isEmpty())
 			return false;
 
 		if (DatabaseController.getRoleID(roleName) == -1)
@@ -123,6 +129,21 @@ public class User
 	}
 
 	/**
+	 * Checks if the given PIN is valid.
+	 * 
+	 * @param pin PIN to check
+	 * @return <code>true</code> if the pin is valid
+	 */
+	public static boolean isValidPIN(final int pin)
+	{
+		return (pin <= (Math.pow(10.0, MAX_PIN_LENGTH)));
+	}
+
+	/*
+	 * INSTANCE METHODS
+	 */
+
+	/**
 	 * Returns the user data in the following format:
 	 * <code>firstname lastname (rolename)</code>
 	 */
@@ -130,16 +151,6 @@ public class User
 	public String toString()
 	{
 		return firstName + " " + lastName + " (" + role.toString() + ")";
-	}
-
-	/**
-	 * Gets the unique RFID badge number that this user has.
-	 *
-	 * @return the badge number of this user
-	 */
-	public int getBadgeID()
-	{
-		return badgeID;
 	}
 
 	/**
@@ -172,8 +183,13 @@ public class User
 		return role;
 	}
 
-	public static boolean isValidPIN(final int pin)
+	/**
+	 * Gets the name of the role of this user.
+	 *
+	 * @return the role name of this user
+	 */
+	public String getRoleName()
 	{
-		return (pin <= (Math.pow(10.0, MAX_PIN_LENGTH)));
+		return role.getName();
 	}
 }

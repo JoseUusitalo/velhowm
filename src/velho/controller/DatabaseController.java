@@ -3,10 +3,14 @@ package velho.controller;
 import java.io.File;
 import java.sql.*;
 import java.util.List;
+import java.util.Map;
+import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.Set;
 import org.h2.jdbcx.JdbcConnectionPool;
 
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import velho.model.User;
 import velho.model.enums.DatabaseTable;
 import velho.model.exceptions.ExistingDatabaseLinkException;
@@ -39,6 +43,11 @@ public class DatabaseController
 	 * A pool where database connections are acquired from.
 	 */
 	private static JdbcConnectionPool connectionPool;
+
+	/**
+	 * An observable list of users for display in the user interface.
+	 */
+	private static ObservableList<User> userViewList = FXCollections.observableArrayList();
 
 	/*
 	 * PRIVATE DATABASE METHODS
@@ -215,7 +224,7 @@ public class DatabaseController
 			statement = connection.createStatement();
 
 			// Run the initialization script.
-			statement.execute("RUNSCRIPT FROM './data/init.sql'");
+			statement.execute("RUNSCRIPT FROM './data/init.sql';");
 
 			// Close all resources.
 			statement.close();
@@ -244,7 +253,6 @@ public class DatabaseController
 	 * @param userRole
 	 * @throws SQLException when given data was invalid
 	 * @throws NoDatabaseLinkException when database link was lost
-	 *
 	 */
 	@SuppressWarnings("resource")
 	public static void addUser(final String badgeID, final String pin, final String firstName, final String lastName, final int roleID)
@@ -277,6 +285,9 @@ public class DatabaseController
 		}
 
 		System.out.println("User '" + firstName + " " + lastName + "' added.");
+
+		// Update the user list displayed in the UI after adding a new user.
+		getPublicUserDataList();
 	}
 
 	/**
@@ -297,7 +308,7 @@ public class DatabaseController
 			// Initialize a statement.
 			statement = connection.createStatement();
 
-			statement.execute("SELECT id FROM " + DatabaseTable.ROLES + " WHERE name = '" + roleName + "'");
+			statement.execute("SELECT id FROM " + DatabaseTable.ROLES + " WHERE name = '" + roleName + "';");
 
 			ResultSet result = statement.getResultSet();
 
@@ -422,15 +433,14 @@ public class DatabaseController
 			int authInt = Integer.parseInt(authenticationString);
 
 			if (User.isValidPIN(authInt))
-				statement.execute("SELECT * FROM " + DatabaseTable.USERS + " WHERE pin = " + authInt);
+				statement.execute("SELECT * FROM " + DatabaseTable.USERS + " WHERE pin = " + authInt + ";");
 			else
-				statement.execute("SELECT * FROM " + DatabaseTable.USERS + " WHERE badge_id = " + authInt);
+				statement.execute("SELECT * FROM " + DatabaseTable.USERS + " WHERE badge_id = " + authInt + ";");
 
 			ResultSet result = statement.getResultSet();
 
 			if (result.next())
-				loggedInUser = new User(result.getInt("badge_id"), result.getString("first_name"), result.getString("last_name"),
-						getRoleFromID(result.getInt("role")));
+				loggedInUser = new User(result.getString("first_name"), result.getString("last_name"), getRoleFromID(result.getInt("role")));
 
 			// Close all resources.
 			statement.close();
@@ -544,5 +554,72 @@ public class DatabaseController
 	{
 		// TODO Auto-generated method stub
 		return null;
+	}
+
+	public static ObservableList<User> getPublicUserDataList() throws NoDatabaseLinkException
+	{
+		Connection connection = getConnection();
+		Statement statement = null;
+
+		try
+		{
+			// Initialize a statement.
+			statement = connection.createStatement();
+
+			statement.execute("SELECT first_name, last_name, role FROM " + DatabaseTable.USERS + ";");
+
+			ResultSet result = statement.getResultSet();
+
+			userViewList.clear();
+			
+			while (result.next())
+			{
+				userViewList.add(new User(result.getString("first_name"), result.getString("last_name"), getRoleFromID(result.getInt("role"))));
+			}
+
+			// Close all resources.
+			result.close();
+			statement.close();
+			connection.close();
+		}
+		catch (SQLException e)
+		{
+			e.printStackTrace();
+		}
+		catch (IllegalStateException e)
+		{
+			try
+			{
+				connection.close();
+			}
+			catch (SQLException e1)
+			{
+				e1.printStackTrace();
+			}
+
+			// Connection pool has been disposed = no database connection.
+			throw new NoDatabaseLinkException();
+		}
+
+		try
+		{
+			connection.close();
+		}
+		catch (SQLException e)
+		{
+			e.printStackTrace();
+		}
+
+		System.out.println("User list updated.");
+		return userViewList;
+	}
+
+	public static Map<String, String> getPublicUserDataColumns()
+	{
+		LinkedHashMap<String, String> cols = new LinkedHashMap<String, String>();
+		cols.put("firstName", "First Name");
+		cols.put("lastName", "Last Name");
+		cols.put("roleName", "Role");
+		return cols;
 	}
 }

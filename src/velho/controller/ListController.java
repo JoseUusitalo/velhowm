@@ -1,20 +1,17 @@
 package velho.controller;
 
+import java.util.Map;
+
+import javafx.collections.ObservableList;
 import javafx.scene.Node;
+import velho.model.User;
 import velho.view.ListView;
 
 public class ListController
 {
-	private ListView view;
-
-	public ListController()
+	public static Node getView(final Map<String, String> columnMap, final ObservableList<User> datalist)
 	{
-		view = new ListView(this, null);
-
-	}
-	
-	public Node getView()
-	{
-		return view.getListView();
+		ListView list = new ListView(columnMap, datalist);
+		return list.getListView();
 	}
 }

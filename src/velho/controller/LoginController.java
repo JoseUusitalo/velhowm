@@ -61,6 +61,7 @@ public class LoginController
 	 */
 	public void login(String authenticationString)
 	{
+		System.out.println("Attempting to log in with '" + authenticationString + "'");
 		try
 		{
 			currentUser = DatabaseController.authenticate(authenticationString);
@@ -90,6 +91,7 @@ public class LoginController
 	{
 		System.out.println("Logged out.");
 		currentUser = null;
+		uiController.destroyViews();
 		checkLogin();
 	}
 
@@ -138,7 +140,7 @@ public class LoginController
 	 */
 	public boolean checkLogin()
 	{
-		System.out.print("User is logged in: ");
+		System.out.print("Login check: ");
 		if (!isLoggedIn())
 		{
 			System.out.println(false);

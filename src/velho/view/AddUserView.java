@@ -112,4 +112,12 @@ public class AddUserView
 		}
 		return grid;
 	}
+
+	/**
+	 * Destroys the view.
+	 */
+	public void destroy()
+	{
+		grid = null;
+	}
 }

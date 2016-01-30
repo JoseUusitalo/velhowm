@@ -41,7 +41,7 @@ public class UserController
 	 * @param userRole user's role in the company
 	 */
 
-	public boolean addUser(String badgeID, String userPIN, String userFirstName, String userLastName, String userRoleName)
+	public boolean addUser(final String badgeID, final String userPIN, final String userFirstName, final String userLastName, final String userRoleName)
 	{
 		// Validate user data.
 		try
@@ -50,8 +50,10 @@ public class UserController
 			{
 				try
 				{
-					System.out.println(badgeID + " " + userFirstName + " " + userLastName + " " + userRoleName);
+					System.out.println("Badge: " + badgeID + " PIN: " + userPIN + " First Name: " + userFirstName + " Last Name: " + userLastName + " Role: "
+							+ userRoleName);
 					int roleID = DatabaseController.getRoleID(userRoleName);
+
 					DatabaseController.addUser(badgeID, userPIN, userFirstName, userLastName, roleID);
 
 					PopupController.info("User added.");
@@ -92,6 +94,14 @@ public class UserController
 	}
 
 	/**
+	 * Destroys the add user view.
+	 */
+	public void destroyView()
+	{
+		view.destroy();
+	}
+
+	/**
 	 * Creates the temporary debug user for logging in through the debug window.
 	 * 
 	 * @param userRoleName role to create the user as
@@ -99,7 +109,7 @@ public class UserController
 	 */
 	public static User getDebugUser(String userRoleName)
 	{
-		return new User(0, "Debug", "Account", stringToRole(userRoleName));
+		return new User("Debug", "Account", stringToRole(userRoleName));
 	}
 
 	/**

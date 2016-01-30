@@ -26,7 +26,6 @@ import javafx.stage.Stage;
 import velho.controller.DatabaseController;
 import velho.controller.DebugController;
 import velho.controller.LoginController;
-import velho.controller.ListController;
 import velho.controller.UIController;
 import velho.controller.UserController;
 import velho.model.exceptions.NoDatabaseLinkException;
@@ -57,11 +56,6 @@ public class MainWindow extends Application
 	 */
 	private static LoginController loginController;
 	
-	/**
-	 * The {@link ListController}.
-	 */
-	private static ListController listController;
-
 	/**
 	 * The root layout of the main window.
 	 */
@@ -97,8 +91,7 @@ public class MainWindow extends Application
 
 		if (DatabaseController.isLinked())
 		{
-			listController = new ListController();
-			uiController = new UIController(this, listController);
+			uiController = new UIController(this);
 			uiController.setUserController(userController);
 			loginController = new LoginController(uiController);
 			try
@@ -212,14 +205,6 @@ public class MainWindow extends Application
 	}
 
 	/**
-	 * Destroys the main tab panel.
-	 */
-	public void resetMainMenu()
-	{
-		mainTabPane = null;
-	}
-
-	/**
 	 * Replaces the top view of the window
 	 * 
 	 * @param view view to set the top of the window
@@ -267,5 +252,13 @@ public class MainWindow extends Application
 	public void setCenterView(final Node view)
 	{
 		rootBorderPane.setCenter(view);
+	}
+
+	/**
+	 * Destroys the main tab panel.
+	 */
+	public void destroy()
+	{
+		mainTabPane = null;
 	}
 }
