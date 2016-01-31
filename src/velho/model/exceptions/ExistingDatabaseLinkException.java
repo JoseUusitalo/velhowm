@@ -7,7 +7,7 @@ package velho.model.exceptions;
  */
 public class ExistingDatabaseLinkException extends Exception
 {
-	private static final long serialVersionUID = 6359886222994365231L;
+	private static final long serialVersionUID = -4565604560163471928L;
 
 	public ExistingDatabaseLinkException()
 	{

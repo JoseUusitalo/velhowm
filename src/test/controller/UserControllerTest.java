@@ -2,11 +2,13 @@ package test.controller;
 
 import static org.junit.Assert.*;
 
+import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
 import velho.controller.DatabaseController;
 import velho.controller.UserController;
+import velho.model.exceptions.ExistingDatabaseLinkException;
 import velho.model.exceptions.NoDatabaseLinkException;
 
 /**
@@ -35,10 +37,16 @@ public class UserControllerTest
 	private final String INVALID_ROLE_NAME = "Worker";
 
 	@BeforeClass
-	public static final void createController() throws NoDatabaseLinkException
+	public static final void createController() throws NoDatabaseLinkException, ClassNotFoundException, ExistingDatabaseLinkException
 	{
-		DatabaseController.connect();
+		DatabaseController.connectAndInitialize();
 		controller = new UserController();
+	}
+
+	@AfterClass
+	public static final void closeDatabase() throws NoDatabaseLinkException, ClassNotFoundException, ExistingDatabaseLinkException
+	{
+		DatabaseController.unlink();
 	}
 
 	@Test

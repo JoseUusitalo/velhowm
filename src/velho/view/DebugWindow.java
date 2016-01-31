@@ -76,6 +76,11 @@ public class DebugWindow
 		logOutButton.setVisible(visibility);
 	}
 
+	/**
+	 * Shows the debug window.
+	 * 
+	 * @param primaryStage stage to show the window in
+	 */
 	public void start(Stage primaryStage)
 	{
 		primaryStage.setTitle("VELHO WM DEBUG");

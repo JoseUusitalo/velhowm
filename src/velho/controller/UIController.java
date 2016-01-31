@@ -2,6 +2,7 @@ package velho.controller;
 
 import javafx.scene.Node;
 import velho.model.enums.Position;
+import velho.model.exceptions.NoDatabaseLinkException;
 import velho.model.interfaces.UserRole;
 import velho.view.MainWindow;
 
@@ -23,18 +24,12 @@ public class UIController
 	private UserController userController;
 
 	/**
-	 * The {@link ListController}.
-	 */
-	private ListController listController;
-
-	/**
 	 * @param mainWindow
 	 * @param listController
 	 */
-	public UIController(final MainWindow mainWindow, final ListController listController)
+	public UIController(final MainWindow mainWindow)
 	{
 		mainView = mainWindow;
-		this.listController = listController;
 	}
 
 	/**
@@ -83,7 +78,7 @@ public class UIController
 				mainView.addTab("Add User", userController.getView());
 				//$FALL-THROUGH$
 			case "Logistician":
-				mainView.addTab("User List", listController.getView());
+				mainView.addTab("User List", getUserListView());
 				break;
 			default:
 				System.out.println("Unknown user role.");
@@ -91,7 +86,27 @@ public class UIController
 	}
 
 	/**
+	 * Creates the user list view.
+	 * 
+	 * @return the user list view
+	 */
+	private Node getUserListView()
+	{
+		try
+		{
+			return ListController.getView(DatabaseController.getPublicUserDataColumns(), DatabaseController.getPublicUserDataList());
+		}
+		catch (NoDatabaseLinkException e)
+		{
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return null;
+	}
+
+	/**
 	 * Attaches the {@link UserController} to this controller.
+	 * 
 	 * @param userController
 	 */
 	public void setUserController(final UserController userController)
@@ -104,6 +119,15 @@ public class UIController
 	 */
 	public void resetMainMenu()
 	{
-		mainView.resetMainMenu();
+		mainView.destroy();
+	}
+
+	/**
+	 * Resets all views to their initial state.
+	 */
+	public void destroyViews()
+	{
+		mainView.destroy();
+		userController.destroyView();
 	}
 }
