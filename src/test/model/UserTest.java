@@ -5,8 +5,8 @@ package test.model;
 
 import static org.junit.Assert.*;
 
-import org.junit.After;
-import org.junit.Before;
+import org.junit.AfterClass;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 import velho.controller.DatabaseController;
@@ -19,7 +19,6 @@ import velho.model.exceptions.NoDatabaseLinkException;
  *
  * @author Jose Uusitalo
  */
-@SuppressWarnings("static-method")
 public class UserTest
 {
 	private final String VALID_BADGE_ID = "99999999";
@@ -37,15 +36,15 @@ public class UserTest
 	private final String VALID_ROLE_NAME = "Manager";
 	private final String INVALID_ROLE_NAME = "Worker";
 
-	@Before
-	public final void linkDatabase() throws ClassNotFoundException, NoDatabaseLinkException, ExistingDatabaseLinkException
+	@BeforeClass
+	public final static void linkDatabase() throws ClassNotFoundException, NoDatabaseLinkException, ExistingDatabaseLinkException
 	{
 		DatabaseController.link();
 		DatabaseController.initializeDatabase();
 	}
 
-	@After
-	public final void unlinkDatabase() throws NoDatabaseLinkException
+	@AfterClass
+	public final static void unlinkDatabase() throws NoDatabaseLinkException
 	{
 		DatabaseController.unlink();
 	}

@@ -28,6 +28,7 @@ import velho.controller.DebugController;
 import velho.controller.LoginController;
 import velho.controller.UIController;
 import velho.controller.UserController;
+import velho.model.exceptions.ExistingDatabaseLinkException;
 import velho.model.exceptions.NoDatabaseLinkException;
 
 /**
@@ -77,7 +78,15 @@ public class MainWindow extends Application
 	public MainWindow()
 	{
 		System.out.println("Running VELHO Warehouse Management.");
-		DatabaseController.connectAndInitialize();
+		try
+		{
+			DatabaseController.connectAndInitialize();
+		}
+		catch (ClassNotFoundException | ExistingDatabaseLinkException | NoDatabaseLinkException e1)
+		{
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
 
 		try
 		{

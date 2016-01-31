@@ -90,33 +90,24 @@ public class DatabaseController
 	 */
 
 	/**
-	 * Links and initializes the database.
+	 * Checks if a database link exists.
+	 *
+	 * @return <code>true</code> if a database link exists
 	 */
-	public static void connectAndInitialize()
+	public static boolean isLinked()
 	{
-		try
-		{
-			DatabaseController.link();
-		}
-		catch (ClassNotFoundException e)
-		{
-			e.printStackTrace();
-		}
-		catch (ExistingDatabaseLinkException e)
-		{
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		return connectionPool != null;
+	}
 
-		try
-		{
-			DatabaseController.initializeDatabase();
-		}
-		catch (NoDatabaseLinkException e)
-		{
-			System.out.println("ERROR: Unable to initialize database. No database connection established.");
-			e.printStackTrace();
-		}
+	/**
+	 * Checks if a database link exists and throws a {@link NoDatabaseConnectionException} exception if it
+	 * doesn't.
+	 * To be used when a database link must exist.
+	 */
+	public static void checkLink() throws NoDatabaseLinkException
+	{
+		if (connectionPool == null)
+			throw new NoDatabaseLinkException();
 	}
 
 	/**
@@ -184,114 +175,17 @@ public class DatabaseController
 	}
 
 	/**
-	 * Checks if a database link exists.
-	 *
-	 * @return <code>true</code> if a database link exists
+	 * Links and initializes the database.
 	 */
-	public static boolean isLinked()
+	public static void connectAndInitialize() throws ClassNotFoundException, ExistingDatabaseLinkException, NoDatabaseLinkException
 	{
-		return connectionPool != null;
-	}
-
-	/**
-	 * Checks if a database link exists and throws a {@link NoDatabaseConnectionException} exception if it
-	 * doesn't.
-	 * To be used when a database link must exist.
-	 */
-	public static void checkLink() throws NoDatabaseLinkException
-	{
-		if (connectionPool == null)
-			throw new NoDatabaseLinkException();
+		DatabaseController.link();
+		DatabaseController.initializeDatabase();
 	}
 
 	/*
-	 * PUBLIC DATABASE MANIPULATION METHODS
+	 * PUBLIC DATABASE GETTER METHODS
 	 */
-
-	/**
-	 * Initializes the database.
-	 *
-	 * @throws NoDatabaseConnectionException
-	 */
-	@SuppressWarnings("resource")
-	public static void initializeDatabase() throws NoDatabaseLinkException
-	{
-		System.out.println("Initializing database...");
-
-		Connection connection = getConnection();
-		Statement statement = null;
-
-		try
-		{
-			// Initialize a statement.
-			statement = connection.createStatement();
-
-			// Run the initialization script.
-			statement.execute("RUNSCRIPT FROM './data/init.sql';");
-
-			// Close all resources.
-			statement.close();
-			connection.close();
-		}
-		catch (SQLException e)
-		{
-			e.printStackTrace();
-		}
-		catch (IllegalStateException e)
-		{
-			// Connection pool has been disposed = no database connection.
-			throw new NoDatabaseLinkException();
-		}
-
-		System.out.println("Database initialized.");
-	}
-
-	/**
-	 * <p>Adds a new user to the database.</p>
-	 * <p>Warning: Assumes that given data is valid.</p>
-	 *
-	 * @param userID
-	 * @param userFirstName
-	 * @param userLastName
-	 * @param userRole
-	 * @throws SQLException when given data was invalid
-	 * @throws NoDatabaseLinkException when database link was lost
-	 */
-	@SuppressWarnings("resource")
-	public static void addUser(final String badgeID, final String pin, final String firstName, final String lastName, final int roleID)
-			throws NoDatabaseLinkException, SQLException
-	{
-		Connection connection = getConnection();
-		Statement statement = null;
-
-		try
-		{
-			// Initialize a statement.
-			statement = connection.createStatement();
-
-			// If no pin is defined, add badge id.
-			if (pin == null || pin.isEmpty())
-				statement.execute("INSERT INTO `" + DatabaseTable.USERS + "`(`badge_id`, `first_name`, `last_name`, `role`)" + "VALUES(" + badgeID + ",'"
-						+ firstName + "','" + lastName + "'," + roleID + ");");
-			else
-				statement.execute("INSERT INTO `" + DatabaseTable.USERS + "`(`pin`, `first_name`, `last_name`, `role`)" + "VALUES(" + pin + ",'" + firstName
-						+ "','" + lastName + "'," + roleID + ");");
-
-			// Close all resources.
-			statement.close();
-			connection.close();
-		}
-		catch (IllegalStateException e)
-		{
-			// Connection pool has been disposed = no database connection.
-			throw new NoDatabaseLinkException();
-		}
-
-		System.out.println("User '" + firstName + " " + lastName + "' added.");
-
-		// Update the user list displayed in the UI after adding a new user.
-		getPublicUserDataList();
-	}
 
 	/**
 	 * Gets the database ID of the given user role name.
@@ -509,7 +403,7 @@ public class DatabaseController
 			// Initialize a statement.
 			statement = connection.createStatement();
 
-			statement.execute("SELECT name FROM " + DatabaseTable.ROLES + " WHERE id = " + roleid);
+			statement.execute("SELECT name FROM " + DatabaseTable.ROLES + " WHERE id = " + roleid + ";");
 
 			ResultSet result = statement.getResultSet();
 
@@ -641,5 +535,190 @@ public class DatabaseController
 		cols.put("lastName", "Last Name");
 		cols.put("roleName", "Role");
 		return cols;
+	}
+
+	/**
+	 * Gets user data by their database id.
+	 * 
+	 * @param id database id of the user
+	 * @return a {@link User} object
+	 */
+	public static User getUserByID(final int id) throws NoDatabaseLinkException
+	{
+		Connection connection = getConnection();
+		Statement statement = null;
+		User user = null;
+
+		try
+		{
+			// Initialize a statement.
+			statement = connection.createStatement();
+
+			statement.execute("SELECT first_name, last_name, role FROM " + DatabaseTable.USERS + " WHERE id = " + id + ";");
+
+			ResultSet result = statement.getResultSet();
+
+			// Only one result.
+			if (result.next())
+				user = new User(result.getString("first_name"), result.getString("last_name"), getRoleFromID(result.getInt("role")));
+
+			// Close all resources.
+			statement.close();
+			connection.close();
+		}
+		catch (SQLException e)
+		{
+			e.printStackTrace();
+		}
+		catch (IllegalStateException e)
+		{
+			try
+			{
+				connection.close();
+			}
+			catch (SQLException e1)
+			{
+				e1.printStackTrace();
+			}
+
+			// Connection pool has been disposed = no database connection.
+			throw new NoDatabaseLinkException();
+		}
+
+		try
+		{
+			connection.close();
+		}
+		catch (SQLException e)
+		{
+			e.printStackTrace();
+		}
+
+		return user;
+	}
+
+	/*
+	 * PUBLIC DATABASE SETTER METHODS
+	 */
+
+	/**
+	 * Initializes the database.
+	 *
+	 * @throws NoDatabaseConnectionException
+	 */
+	@SuppressWarnings("resource")
+	public static void initializeDatabase() throws NoDatabaseLinkException
+	{
+		System.out.println("Initializing database...");
+
+		Connection connection = getConnection();
+		Statement statement = null;
+
+		try
+		{
+			// Initialize a statement.
+			statement = connection.createStatement();
+
+			// Run the initialization script.
+			statement.execute("RUNSCRIPT FROM './data/init.sql';");
+
+			// Close all resources.
+			statement.close();
+			connection.close();
+		}
+		catch (SQLException e)
+		{
+			e.printStackTrace();
+		}
+		catch (IllegalStateException e)
+		{
+			// Connection pool has been disposed = no database connection.
+			throw new NoDatabaseLinkException();
+		}
+
+		System.out.println("Database initialized.");
+	}
+
+	/**
+	 * <p>Adds a new user to the database.</p>
+	 * <p>Warning: Assumes that given data is valid.</p>
+	 *
+	 * @param badgeID badge ID of the user
+	 * @param pin PIN of the user
+	 * @param firstName first name of the user
+	 * @param lastName last name of the user
+	 * @param roleID the ID of the role of the user
+	 * @throws SQLException when given data was technically invalid
+	 * @throws NoDatabaseLinkException when database link was lost
+	 */
+	public static void addUser(final String badgeID, final String pin, final String firstName, final String lastName, final int roleID)
+			throws NoDatabaseLinkException, SQLException
+	{
+		Connection connection = getConnection();
+		Statement statement = null;
+
+		try
+		{
+			// Initialize a statement.
+			statement = connection.createStatement();
+
+			// If no pin is defined, add badge id.
+			if (pin == null || pin.isEmpty())
+				statement.execute("INSERT INTO `" + DatabaseTable.USERS + "`(`badge_id`, `first_name`, `last_name`, `role`)" + "VALUES(" + badgeID + ",'"
+						+ firstName + "','" + lastName + "'," + roleID + ");");
+			else
+				statement.execute("INSERT INTO `" + DatabaseTable.USERS + "`(`pin`, `first_name`, `last_name`, `role`)" + "VALUES(" + pin + ",'" + firstName
+						+ "','" + lastName + "'," + roleID + ");");
+
+			// Close all resources.
+			statement.close();
+			connection.close();
+		}
+		catch (IllegalStateException e)
+		{
+			// Connection pool has been disposed = no database connection.
+			throw new NoDatabaseLinkException();
+		}
+
+		System.out.println("User '" + firstName + " " + lastName + "' added.");
+
+		// Update the user list displayed in the UI after adding a new user.
+		getPublicUserDataList();
+	}
+
+	/**
+	 * Deletes a user with the specified database row ID.
+	 * 
+	 * @param databaseID the database ID of the user to delete
+	 * @throws NoDatabaseLinkException
+	 * @throws SQLException
+	 */
+	public static void deleteUser(final int databaseID) throws NoDatabaseLinkException, SQLException
+	{
+		Connection connection = getConnection();
+		Statement statement = null;
+
+		try
+		{
+			// Initialize a statement.
+			statement = connection.createStatement();
+
+			// If no pin is defined, add badge id.
+			statement.execute("DELETE FROM `" + DatabaseTable.USERS + "` WHERE id = " + databaseID + ";");
+
+			// Close all resources.
+			statement.close();
+			connection.close();
+		}
+		catch (IllegalStateException e)
+		{
+			// Connection pool has been disposed = no database connection.
+			throw new NoDatabaseLinkException();
+		}
+
+		System.out.println("User ID " + databaseID + " deleted.");
+
+		// Update the user list displayed in the UI after adding a new user.
+		getPublicUserDataList();
 	}
 }
