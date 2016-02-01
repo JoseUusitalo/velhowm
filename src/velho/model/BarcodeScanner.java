@@ -45,4 +45,11 @@ public class BarcodeScanner
 		return numbers.get(maximSize);
 	}
 
+	public static void getProductCode()
+	{
+		// TODO Auto-generated method stub
+		DatabaseController.getProductCode();
+		return;
+	}
+
 }

@@ -6,7 +6,7 @@ import velho.view.DebugWindow;
 
 /**
  * Various debugging features.
- * 
+ *
  * @author Edward &amp; Jose Uusitalo
  */
 public class DebugController
@@ -34,7 +34,7 @@ public class DebugController
 
 	/**
 	 * Creates and shows the debug window.
-	 * 
+	 *
 	 * @param stage the stage to run the window in
 	 */
 	public void createDebugWindow(final Stage stage)
@@ -44,7 +44,7 @@ public class DebugController
 
 	/**
 	 * Here the login sets value to the buttons.
-	 * 
+	 *
 	 * @param userRoleName
 	 */
 	public void login(final String userRoleName)
@@ -96,11 +96,22 @@ public class DebugController
 
 	/**
 	 * The parameter for LogInButton is either false or true.
-	 * 
+	 *
 	 * @param visibility show log in button?
 	 */
 	public void setLogOutButton(boolean visibility)
 	{
 		view.setLogOutButton(visibility);
+	}
+
+	public void getScannerData1()
+	{
+		ExternalSystemsController.getScannerData();
+	}
+
+	public void getScannerData()
+	{
+		// TODO Auto-generated method stub
+		return;
 	}
 }

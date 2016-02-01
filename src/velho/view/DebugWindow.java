@@ -14,20 +14,21 @@ import javafx.scene.control.*;
 
 /**
  * A window with various debug features.
- * 
+ *
  * @author Edward
  */
 public class DebugWindow
 {
+	private Button getScannerData = new Button("Get Scanner Data");
 	/**
 	 * Button has been tagged logInButton and named as "Log In" on the scene.
 	 */
-	public Button logInButton = new Button("Log In");
+	private Button logInButton = new Button("Log In");
 
 	/**
 	 * Button has been tagged logOutButton and named as "Log Out" on the scene
 	 */
-	public Button logOutButton = new Button("Log Out");
+	private Button logOutButton = new Button("Log Out");
 
 	/**
 	 * The DebugController has been tagged as controller.
@@ -78,7 +79,7 @@ public class DebugWindow
 
 	/**
 	 * Shows the debug window.
-	 * 
+	 *
 	 * @param primaryStage stage to show the window in
 	 */
 	public void start(Stage primaryStage)
@@ -98,12 +99,24 @@ public class DebugWindow
 		grid.add(taskListBox, 1, 0);
 		logOutButton.setVisible(false);
 
+		grid.add(getScannerData, 4, 0);
+
 		grid.add(logInButton, 2, 0);
 
 		grid.add(logOutButton, 3, 0);
 
 		Group root = (Group) scene.getRoot();
 		root.getChildren().add(grid);
+
+		getScannerData.setOnAction(new EventHandler<ActionEvent>()
+		{
+			@Override
+			public void handle(ActionEvent event)
+			{
+				debugController.getScannerData();
+			}
+
+		});
 
 		logInButton.setOnAction(new EventHandler<ActionEvent>()
 		{

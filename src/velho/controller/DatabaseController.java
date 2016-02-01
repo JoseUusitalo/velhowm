@@ -256,7 +256,7 @@ public class DatabaseController
 
 	/**
 	 * Gets a set of user role names in the database.
-	 * 
+	 *
 	 * @return a set of user role names
 	 * @throws NoDatabaseLinkException
 	 */
@@ -387,7 +387,7 @@ public class DatabaseController
 
 	/**
 	 * Gets the a Role object from the given role id.
-	 * 
+	 *
 	 * @param roleid role database ID
 	 * @return the corresponding {@link UserRole} object
 	 * @throws NoDatabaseLinkException
@@ -461,7 +461,7 @@ public class DatabaseController
 
 	/**
 	 * Gets an {@link ObservableList} of user names and roles.
-	 * 
+	 *
 	 * @return a list of usersr
 	 * @throws NoDatabaseLinkException
 	 */
@@ -525,7 +525,7 @@ public class DatabaseController
 
 	/**
 	 * Gets a map of columns and column names for displaying {@link #getPublicUserDataList()} data in a table.
-	 * 
+	 *
 	 * @return a map where the key is the column value and value is the column name
 	 */
 	public static Map<String, String> getPublicUserDataColumns()
@@ -539,7 +539,7 @@ public class DatabaseController
 
 	/**
 	 * Gets user data by their database id.
-	 * 
+	 *
 	 * @param id database id of the user
 	 * @return a {@link User} object
 	 */
@@ -688,7 +688,7 @@ public class DatabaseController
 
 	/**
 	 * Deletes a user with the specified database row ID.
-	 * 
+	 *
 	 * @param databaseID the database ID of the user to delete
 	 * @throws NoDatabaseLinkException
 	 * @throws SQLException
@@ -720,5 +720,12 @@ public class DatabaseController
 
 		// Update the user list displayed in the UI after adding a new user.
 		getPublicUserDataList();
+	}
+
+	public static void getProductCode()
+	{
+		// TODO Auto-generated method stub
+		System.out.println("Maito Kahvi Sämpylä Muffinsi");
+		return;
 	}
 }
