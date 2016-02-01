@@ -38,35 +38,40 @@ import velho.model.exceptions.NoDatabaseLinkException;
 public class MainWindow extends Application
 {
 	/**
+	 * Enable or disable debug features.
+	 */
+	public static final boolean DEBUG_MODE = false;
+
+	/**
 	 * The {@link DebugController}.
 	 */
 	private static DebugController debugController;
-	
+
 	/**
 	 * The {@link UserController}.
 	 */
 	private UserController userController;
-	
+
 	/**
 	 * The {@link UIController}.
 	 */
 	private static UIController uiController;
-	
+
 	/**
 	 * The {@link LoginController}.
 	 */
 	private static LoginController loginController;
-	
+
 	/**
 	 * The root layout of the main window.
 	 */
 	private BorderPane rootBorderPane;
-	
+
 	/**
 	 * The main menu tab panel.
 	 */
 	private TabPane mainTabPane;
-	
+
 	/**
 	 * The main scene.
 	 */
@@ -118,7 +123,7 @@ public class MainWindow extends Application
 
 	/**
 	 * The main method of Velho Warehouse Management.
-	 * 
+	 *
 	 * @param args
 	 */
 	public static void main(String[] args)
@@ -128,7 +133,7 @@ public class MainWindow extends Application
 
 	/**
 	 * Adds a new tab to the main tab panel.
-	 * 
+	 *
 	 * @param tabName name of the tab
 	 * @param view view to show in the tab
 	 */
@@ -209,13 +214,16 @@ public class MainWindow extends Application
 		primaryStage.setScene(scene);
 		primaryStage.show();
 
-		Stage secondStage = new Stage();
-		debugController.createDebugWindow(secondStage);
+		if (MainWindow.DEBUG_MODE)
+		{
+			Stage secondStage = new Stage();
+			debugController.createDebugWindow(secondStage);
+		}
 	}
 
 	/**
 	 * Replaces the top view of the window
-	 * 
+	 *
 	 * @param view view to set the top of the window
 	 */
 	public void setTopView(final Node view)
@@ -225,7 +233,7 @@ public class MainWindow extends Application
 
 	/**
 	 * Replaces the right side view of the window
-	 * 
+	 *
 	 * @param view view to set the right of the window
 	 */
 	public void setRightView(final Node view)
@@ -235,7 +243,7 @@ public class MainWindow extends Application
 
 	/**
 	 * Replaces the bottom view of the window
-	 * 
+	 *
 	 * @param view view to set the bottom of the window
 	 */
 	public void setBottomView(final Node view)
@@ -245,7 +253,7 @@ public class MainWindow extends Application
 
 	/**
 	 * Replaces the left side view of the window
-	 * 
+	 *
 	 * @param view view to set the l of the window
 	 */
 	public void setLeftView(final Node view)
@@ -255,7 +263,7 @@ public class MainWindow extends Application
 
 	/**
 	 * Replaces the center view of the window
-	 * 
+	 *
 	 * @param view view to set the middle of the window
 	 */
 	public void setCenterView(final Node view)

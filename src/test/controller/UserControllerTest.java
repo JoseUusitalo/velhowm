@@ -44,7 +44,7 @@ public class UserControllerTest
 	}
 
 	@AfterClass
-	public static final void closeDatabase() throws NoDatabaseLinkException, ClassNotFoundException, ExistingDatabaseLinkException
+	public static final void closeDatabase() throws NoDatabaseLinkException
 	{
 		DatabaseController.unlink();
 	}

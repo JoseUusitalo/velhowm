@@ -8,7 +8,7 @@ import velho.view.MainWindow;
 
 /**
  * The controller for the {@link MainWindow}.
- * 
+ *
  * @author Jose Uusitalo
  */
 public class UIController
@@ -34,7 +34,7 @@ public class UIController
 
 	/**
 	 * Shows a view in the main window.
-	 * 
+	 *
 	 * @param position {@link Position} to show the view in
 	 * @param view view to show
 	 */
@@ -64,7 +64,7 @@ public class UIController
 
 	/**
 	 * Shows the main menu as seen by the specified role.
-	 * 
+	 *
 	 * @param currentUserRole {@link UserRole} viewing the main menu
 	 */
 	public void showMainMenu(final UserRole currentUserRole)
@@ -87,7 +87,7 @@ public class UIController
 
 	/**
 	 * Creates the user list view.
-	 * 
+	 *
 	 * @return the user list view
 	 */
 	private Node getUserListView()
@@ -106,7 +106,7 @@ public class UIController
 
 	/**
 	 * Attaches the {@link UserController} to this controller.
-	 * 
+	 *
 	 * @param userController
 	 */
 	public void setUserController(final UserController userController)

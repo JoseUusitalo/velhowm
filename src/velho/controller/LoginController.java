@@ -5,10 +5,11 @@ import velho.model.User;
 import velho.model.enums.Position;
 import velho.model.exceptions.NoDatabaseLinkException;
 import velho.view.LoginView;
+import velho.view.MainWindow;
 
 /**
  * Controls logging users in and out.
- * 
+ *
  * @author Edward &amp; Jose Uusitalo
  */
 public class LoginController
@@ -44,7 +45,7 @@ public class LoginController
 
 	/**
 	 * Attaches the debug controller to this controller.
-	 * 
+	 *
 	 * @param debugController the {@link DebugController}
 	 */
 	public void setDebugController(final DebugController debugController)
@@ -74,13 +75,15 @@ public class LoginController
 
 		if (currentUser == null)
 		{
-			PopupController.warning("INVALID BADGE ID OR PASSWORD!");
+			PopupController.warning("Invalid Badge ID or PIN.");
 		}
 		else
 		{
 			System.out.println(currentUser.toString() + " logged in.");
 			uiController.showMainMenu(currentUser.getRole());
-			debugController.login();
+
+			if (MainWindow.DEBUG_MODE)
+				debugController.login();
 		}
 	}
 
@@ -97,19 +100,25 @@ public class LoginController
 
 	/**
 	 * Forcibly logs a user in with the specified role.
-	 * 
+	 * Does nothing if {@link MainWindow#DEBUG_MODE} is <code>false</code>.
+	 *
 	 * @param userRoleName name of the role
 	 * @return <code>true</code> if login was successful, or <code>false</code> if role name was invalid
 	 * @throws NoDatabaseLinkException
 	 */
 	public boolean debugLogin(final String userRoleName) throws NoDatabaseLinkException
 	{
-		if (DatabaseController.getRoleID(userRoleName) == -1)
-			return false;
+		if (MainWindow.DEBUG_MODE)
+		{
+			if (DatabaseController.getRoleID(userRoleName) == -1)
+				return false;
 
-		currentUser = UserController.getDebugUser(userRoleName);
-		uiController.showMainMenu(currentUser.getRole());
-		return true;
+			currentUser = UserController.getDebugUser(userRoleName);
+			uiController.showMainMenu(currentUser.getRole());
+			return true;
+		}
+
+		return false;
 	}
 
 	/**
@@ -124,7 +133,7 @@ public class LoginController
 
 	/**
 	 * Gets the login view.
-	 * 
+	 *
 	 * @return the login view
 	 */
 	public GridPane getView()
@@ -155,7 +164,7 @@ public class LoginController
 
 	/**
 	 * Gets the current logged in user.
-	 * 
+	 *
 	 * @return the user currently logged in
 	 */
 	public User getCurrentUser()

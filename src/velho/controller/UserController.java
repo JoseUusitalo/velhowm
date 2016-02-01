@@ -2,6 +2,8 @@ package velho.controller;
 
 import javafx.scene.Node;
 import velho.view.AddUserView;
+import velho.view.MainWindow;
+
 import java.sql.SQLException;
 
 import velho.model.Administrator;
@@ -52,7 +54,7 @@ public class UserController
 
 					DatabaseController.addUser(badgeID, userPIN, userFirstName, userLastName, roleID);
 
-					PopupController.info("User added.");
+					PopupController.info("User created.");
 					return true;
 				}
 				catch (NoDatabaseLinkException e)
@@ -61,14 +63,14 @@ public class UserController
 				}
 				catch (SQLException e)
 				{
-					PopupController.warning("Invalid user data.");
+					PopupController.error("Invalid user data even after verification, please contact an administrator.");
 					e.printStackTrace();
 				}
 				PopupController.info("User created.");
 			}
 			else
 			{
-				PopupController.info("Warning!");
+				PopupController.warning("Invalid user data.");
 			}
 		}
 		catch (NoDatabaseLinkException e)
@@ -81,7 +83,7 @@ public class UserController
 
 	/**
 	 * Gets the view for adding users.
-	 * 
+	 *
 	 * @return the {@link AddUserView}
 	 */
 	public Node getView()
@@ -99,18 +101,23 @@ public class UserController
 
 	/**
 	 * Creates the temporary debug user for logging in through the debug window.
-	 * 
+	 *
 	 * @param userRoleName role to create the user as
-	 * @return a {@link User} object
+	 * @return a {@link User} object or <code>null</code> if {@link MainWindow#DEBUG_MODE} is <code>false</code>
 	 */
 	public static User getDebugUser(String userRoleName)
 	{
-		return new User("Debug", "Account", stringToRole(userRoleName));
+		if (MainWindow.DEBUG_MODE)
+		{
+			return new User("Debug", "Account", stringToRole(userRoleName));
+		}
+
+		return null;
 	}
 
 	/**
 	 * Converts the given string to an object.
-	 * 
+	 *
 	 * @param userRoleName name of the user role to convert to an object
 	 * @return a {@link UserRole} object
 	 */
