@@ -126,7 +126,7 @@ public class DatabaseController
 
 		sb.append(";");
 
-		System.out.println("[SQLBUILDER] " + sb.toString());
+		//System.out.println("[SQLBUILDER] " + sb.toString());
 		return sb.toString();
 	}
 

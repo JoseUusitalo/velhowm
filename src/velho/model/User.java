@@ -152,7 +152,7 @@ public class User
 
 	/**
 	 * Returns the user data in the following format:
-	 * <code>firstname lastname (rolename)</code>
+	 * <code>firstname lastname [rolename | databaseid]</code>
 	 */
 	@Override
 	public String toString()
@@ -188,6 +188,15 @@ public class User
 	public String getFullName()
 	{
 		return firstName + " " + lastName;
+	}
+
+	/**
+	 * Returns the user data in the following format:
+	 * <code>firstname lastname (rolename)</code>
+	 */
+	public String getFullDetails()
+	{
+		return firstName + " " + lastName + " (" + role.toString() + ")";
 	}
 
 	/**

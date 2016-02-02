@@ -94,7 +94,7 @@ public class UserController
 					if (DatabaseController.removeUser(user.getDatabaseID()))
 					{
 						LoginController.logout();
-						PopupController.info("User removed: " + user.toString());
+						PopupController.info("User removed: " + user.getFullDetails());
 						return true;
 					}
 
@@ -107,7 +107,7 @@ public class UserController
 			}
 
 			DatabaseController.removeUser(user.getDatabaseID());
-			PopupController.info("User removed: " + user.toString());
+			PopupController.info("User removed: " + user.getFullDetails());
 			return true;
 		}
 		catch (NoDatabaseLinkException e)
