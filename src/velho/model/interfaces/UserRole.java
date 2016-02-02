@@ -3,7 +3,7 @@ package velho.model.interfaces;
 /**
  * @author Edward
  */
-public interface UserRole
+public interface UserRole extends Comparable<UserRole>
 {
 	/**
 	 * This method share's role names.
@@ -11,4 +11,7 @@ public interface UserRole
 	 * @return getName returns name
 	 */
 	public String getName();
+
+	@Override
+	public int compareTo(UserRole role);
 }

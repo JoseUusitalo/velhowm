@@ -16,8 +16,10 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.text.Font;
 import javafx.util.Callback;
 import velho.controller.ListController;
+import velho.controller.LoginController;
 import velho.model.User;
 
 /**
@@ -94,7 +96,7 @@ public class ListView
 						}
 					});
 
-					// Adding the Button to the cell
+					// Adding the button to the cell
 					col.setCellFactory(new Callback<TableColumn<User, String>, TableCell<User, String>>()
 					{
 						@Override
@@ -131,6 +133,7 @@ public class ListView
 		private TableCellButton(final String text)
 		{
 			button = new Button(text);
+			button.setFont(new Font(12));
 
 			// When the button is pressed
 			button.setOnAction(new EventHandler<ActionEvent>()
@@ -150,7 +153,14 @@ public class ListView
 		{
 			super.updateItem(string, empty);
 			if (!empty)
-				setGraphic(button);
+			{
+				User rowUser = TableCellButton.this.getTableView().getItems().get(TableCellButton.this.getIndex());
+
+				System.out.println(rowUser.getRole() + " " + LoginController.getCurrentUser().getRole().compareTo(rowUser.getRole()) + " "
+						+ LoginController.getCurrentUser().getRole());
+				if (LoginController.getCurrentUser().getRole().compareTo(rowUser.getRole()) <= 0)
+					setGraphic(button);
+			}
 			else
 				setGraphic(null);
 		}
