@@ -32,6 +32,11 @@ public class User
 	private static final int MAX_BADGE_ID_VALUE = 99999999;
 
 	/**
+	 * The database row ID of this user.
+	 */
+	private int databaseID;
+
+	/**
 	 * The first name of this user.
 	 */
 	private String firstName;
@@ -47,13 +52,15 @@ public class User
 	private UserRole role;
 
 	/**
+	 * @param databaseID
 	 * @param badgeID
 	 * @param firstName
 	 * @param lastName
 	 * @param role
 	 */
-	public User(final String firstName, final String lastName, final UserRole role)
+	public User(final int databaseID, final String firstName, final String lastName, final UserRole role)
 	{
+		this.databaseID = databaseID;
 		this.firstName = firstName;
 		this.lastName = lastName;
 		this.role = role;
@@ -130,7 +137,7 @@ public class User
 
 	/**
 	 * Checks if the given PIN is valid.
-	 * 
+	 *
 	 * @param pin PIN to check
 	 * @return <code>true</code> if the pin is valid
 	 */
@@ -150,7 +157,7 @@ public class User
 	@Override
 	public String toString()
 	{
-		return firstName + " " + lastName + " (" + role.toString() + ")";
+		return firstName + " " + lastName + " [" + role.toString() + " | " + databaseID + "]";
 	}
 
 	/**
@@ -174,6 +181,16 @@ public class User
 	}
 
 	/**
+	 * Gets the first and last name of this user.
+	 *
+	 * @return the full name of this user
+	 */
+	public String getFullName()
+	{
+		return firstName + " " + lastName;
+	}
+
+	/**
 	 * Gets the role of this user.
 	 *
 	 * @return the role of this user
@@ -191,5 +208,15 @@ public class User
 	public String getRoleName()
 	{
 		return role.getName();
+	}
+
+	/**
+	 * Gets the database row ID of this user.
+	 *
+	 * @return the database ID of this user
+	 */
+	public int getDatabaseID()
+	{
+		return databaseID;
 	}
 }

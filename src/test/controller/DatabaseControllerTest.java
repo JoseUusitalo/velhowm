@@ -150,7 +150,9 @@ public class DatabaseControllerTest
 	@Test
 	public final void testGetPublicUserDataColumns()
 	{
-		assertTrue(DatabaseController.getPublicUserDataColumns().values().contains("First Name"));
+		assertTrue(DatabaseController.getPublicUserDataColumns(false).values().contains("First Name"));
+		assertTrue(DatabaseController.getPublicUserDataColumns(true).values().contains("ID"));
+		assertFalse(DatabaseController.getPublicUserDataColumns(false).values().contains("Delete"));
 	}
 
 	@Test
@@ -161,7 +163,7 @@ public class DatabaseControllerTest
 		DatabaseController.addUser("", "0", "My PIN Is Practically Invalid", "But Technically Valid", 1);
 		assertTrue(DatabaseController.getUserByID(5).getFirstName().equals("My PIN Is Practically Invalid"));
 		assertNotEquals(null, DatabaseController.getUserByID(5));
-		DatabaseController.deleteUser(5);
+		DatabaseController.removeUser(5);
 		assertEquals(null, DatabaseController.getUserByID(5));
 		DatabaseController.unlink();
 	}

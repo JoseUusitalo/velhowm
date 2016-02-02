@@ -109,7 +109,7 @@ public class UserController
 	{
 		if (MainWindow.DEBUG_MODE)
 		{
-			return new User("Debug", "Account", stringToRole(userRoleName));
+			return new User(-1, "Debug", "Account", stringToRole(userRoleName));
 		}
 
 		return null;
@@ -134,6 +134,41 @@ public class UserController
 			default:
 				System.out.println("ERROR: Unknown role '" + userRoleName + "'.");
 				return null;
+		}
+	}
+
+	public void removeUser(final User user)
+	{
+		System.out.println("Attempting to remove: " + user.toString());
+		try
+		{
+			if (LoginController.getCurrentUser().getDatabaseID() == user.getDatabaseID())
+			{
+				if (PopupController.confirmation(
+						"Are you sure you wish the delete your own user account? You will be logged out and be unable to log in again as a result of this action."))
+				{
+					LoginController.logout();
+					DatabaseController.removeUser(user.getDatabaseID());
+					PopupController.info("User removed.");
+				}
+				else
+					System.out.println("Not removed.");
+			}
+			else
+			{
+				DatabaseController.removeUser(user.getDatabaseID());
+				PopupController.info("User removed.");
+			}
+
+		}
+		catch (NoDatabaseLinkException e)
+		{
+			e.printStackTrace();
+		}
+		catch (SQLException e)
+		{
+			PopupController.error("Attempted to remove an invalid user from database.");
+			e.printStackTrace();
 		}
 	}
 }

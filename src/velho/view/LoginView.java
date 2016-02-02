@@ -16,13 +16,7 @@ import velho.controller.LoginController;
  */
 public class LoginView
 {
-	private LoginController controller;
 	private GridPane grid;
-
-	public LoginView(LoginController loginController)
-	{
-		controller = loginController;
-	}
 
 	public GridPane getLoginView()
 	{
@@ -47,7 +41,7 @@ public class LoginView
 				@Override
 				public void handle(ActionEvent event)
 				{
-					controller.login(textField.getText());
+					LoginController.login(textField.getText());
 				}
 			});
 		}

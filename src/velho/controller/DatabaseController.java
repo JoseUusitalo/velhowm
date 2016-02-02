@@ -205,13 +205,13 @@ public class DatabaseController
 			// Initialize a statement.
 			statement = connection.createStatement();
 
-			statement.execute("SELECT id FROM " + DatabaseTable.ROLES + " WHERE name = '" + roleName + "';");
+			statement.execute("SELECT role_id FROM " + DatabaseTable.ROLES + " WHERE name = '" + roleName + "';");
 
 			ResultSet result = statement.getResultSet();
 
 			// Will only return one row because the name value is UNIQUE.
 			if (result.next())
-				id = result.getInt("id");
+				id = result.getRow();
 
 			// Close all resources.
 			statement.close();
@@ -256,7 +256,7 @@ public class DatabaseController
 
 	/**
 	 * Gets a set of user role names in the database.
-	 * 
+	 *
 	 * @return a set of user role names
 	 * @throws NoDatabaseLinkException
 	 */
@@ -343,7 +343,8 @@ public class DatabaseController
 			ResultSet result = statement.getResultSet();
 
 			if (result.next())
-				loggedInUser = new User(result.getString("first_name"), result.getString("last_name"), getRoleFromID(result.getInt("role")));
+				loggedInUser = new User(result.getInt("user_id"), result.getString("first_name"), result.getString("last_name"),
+						getRoleFromID(result.getInt("role")));
 
 			// Close all resources.
 			statement.close();
@@ -387,7 +388,7 @@ public class DatabaseController
 
 	/**
 	 * Gets the a Role object from the given role id.
-	 * 
+	 *
 	 * @param roleid role database ID
 	 * @return the corresponding {@link UserRole} object
 	 * @throws NoDatabaseLinkException
@@ -403,7 +404,7 @@ public class DatabaseController
 			// Initialize a statement.
 			statement = connection.createStatement();
 
-			statement.execute("SELECT name FROM " + DatabaseTable.ROLES + " WHERE id = " + roleid + ";");
+			statement.execute("SELECT name FROM " + DatabaseTable.ROLES + " WHERE role_id = " + roleid + ";");
 
 			ResultSet result = statement.getResultSet();
 
@@ -461,7 +462,7 @@ public class DatabaseController
 
 	/**
 	 * Gets an {@link ObservableList} of user names and roles.
-	 * 
+	 *
 	 * @return a list of usersr
 	 * @throws NoDatabaseLinkException
 	 */
@@ -483,7 +484,8 @@ public class DatabaseController
 
 			while (result.next())
 			{
-				userViewList.add(new User(result.getString("first_name"), result.getString("last_name"), getRoleFromID(result.getInt("role"))));
+				userViewList
+						.add(new User(result.getRow(), result.getString("first_name"), result.getString("last_name"), getRoleFromID(result.getInt("role"))));
 			}
 
 			// Close all resources.
@@ -525,21 +527,25 @@ public class DatabaseController
 
 	/**
 	 * Gets a map of columns and column names for displaying {@link #getPublicUserDataList()} data in a table.
-	 * 
+	 *
 	 * @return a map where the key is the column value and value is the column name
 	 */
-	public static Map<String, String> getPublicUserDataColumns()
+	public static Map<String, String> getPublicUserDataColumns(final boolean withDeleteColumn)
 	{
 		LinkedHashMap<String, String> cols = new LinkedHashMap<String, String>();
 		cols.put("firstName", "First Name");
 		cols.put("lastName", "Last Name");
 		cols.put("roleName", "Role");
+
+		if (withDeleteColumn)
+			cols.put("deleteButton", "Delete");
+
 		return cols;
 	}
 
 	/**
 	 * Gets user data by their database id.
-	 * 
+	 *
 	 * @param id database id of the user
 	 * @return a {@link User} object
 	 */
@@ -554,13 +560,13 @@ public class DatabaseController
 			// Initialize a statement.
 			statement = connection.createStatement();
 
-			statement.execute("SELECT first_name, last_name, role FROM " + DatabaseTable.USERS + " WHERE id = " + id + ";");
+			statement.execute("SELECT first_name, last_name, role FROM " + DatabaseTable.USERS + " WHERE user_id = " + id + ";");
 
 			ResultSet result = statement.getResultSet();
 
 			// Only one result.
 			if (result.next())
-				user = new User(result.getString("first_name"), result.getString("last_name"), getRoleFromID(result.getInt("role")));
+				user = new User(result.getRow(), result.getString("first_name"), result.getString("last_name"), getRoleFromID(result.getInt("role")));
 
 			// Close all resources.
 			statement.close();
@@ -687,13 +693,13 @@ public class DatabaseController
 	}
 
 	/**
-	 * Deletes a user with the specified database row ID.
-	 * 
+	 * Removes a user with the specified database row ID.
+	 *
 	 * @param databaseID the database ID of the user to delete
 	 * @throws NoDatabaseLinkException
 	 * @throws SQLException
 	 */
-	public static void deleteUser(final int databaseID) throws NoDatabaseLinkException, SQLException
+	public static void removeUser(final int databaseID) throws NoDatabaseLinkException, SQLException
 	{
 		Connection connection = getConnection();
 		Statement statement = null;
@@ -704,7 +710,7 @@ public class DatabaseController
 			statement = connection.createStatement();
 
 			// If no pin is defined, add badge id.
-			statement.execute("DELETE FROM `" + DatabaseTable.USERS + "` WHERE id = " + databaseID + ";");
+			statement.execute("DELETE FROM `" + DatabaseTable.USERS + "` WHERE user_id = " + databaseID + ";");
 
 			// Close all resources.
 			statement.close();
@@ -718,7 +724,7 @@ public class DatabaseController
 
 		System.out.println("User ID " + databaseID + " deleted.");
 
-		// Update the user list displayed in the UI after adding a new user.
+		// Update the user list displayed in the UI after removing a user.
 		getPublicUserDataList();
 	}
 }

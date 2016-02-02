@@ -17,40 +17,34 @@ public class LoginController
 	/**
 	 * User currently logged in.
 	 */
-	private User currentUser;
+	private static User currentUser;
 
 	/**
 	 * The {@link LoginView}.
 	 */
-	private LoginView view;
+	private static LoginView view;
 
 	/**
 	 * The {@link UIController}.
 	 */
-	private UIController uiController;
+	private static UIController uiController;
 
 	/**
 	 * The {@link DebugController}.
 	 */
-	private DebugController debugController;
+	private static DebugController debugController;
 
 	/**
-	 * @param uiController
-	 */
-	public LoginController(final UIController uiController)
-	{
-		view = new LoginView(this);
-		this.uiController = uiController;
-	}
-
-	/**
-	 * Attaches the debug controller to this controller.
+	 * Attaches the controllers that the login controller uses.
 	 *
+	 * @param uiController the {@link UIController}
 	 * @param debugController the {@link DebugController}
 	 */
-	public void setDebugController(final DebugController debugController)
+	public static void setControllers(final UIController uiController, DebugController debugController)
 	{
-		this.debugController = debugController;
+		LoginController.uiController = uiController;
+		LoginController.debugController = debugController;
+		view = new LoginView();
 	}
 
 	/**
@@ -60,7 +54,7 @@ public class LoginController
 	 * is set at LoginView for authentication
 	 * @return as true
 	 */
-	public void login(String authenticationString)
+	public static void login(String authenticationString)
 	{
 		System.out.println("Attempting to log in with '" + authenticationString + "'");
 		try
@@ -83,16 +77,24 @@ public class LoginController
 			uiController.showMainMenu(currentUser.getRole());
 
 			if (MainWindow.DEBUG_MODE)
-				debugController.login();
+			{
+				debugController.setLogInButton(false);
+				debugController.setLogOutButton(true);
+			}
 		}
 	}
 
 	/**
 	 * Logs out the current user.
 	 */
-	public void logout()
+	public static void logout()
 	{
-		System.out.println("Logged out.");
+		if (MainWindow.DEBUG_MODE)
+		{
+			debugController.setLogInButton(true);
+			debugController.setLogOutButton(false);
+		}
+		System.out.println(currentUser.toString() + " logged out.");
 		currentUser = null;
 		uiController.destroyViews();
 		checkLogin();
@@ -106,15 +108,15 @@ public class LoginController
 	 * @return <code>true</code> if login was successful, or <code>false</code> if role name was invalid
 	 * @throws NoDatabaseLinkException
 	 */
-	public boolean debugLogin(final String userRoleName) throws NoDatabaseLinkException
+	public static boolean debugLogin(final String userRoleName) throws NoDatabaseLinkException
 	{
 		if (MainWindow.DEBUG_MODE)
 		{
 			if (DatabaseController.getRoleID(userRoleName) == -1)
 				return false;
-
 			currentUser = UserController.getDebugUser(userRoleName);
 			uiController.showMainMenu(currentUser.getRole());
+			System.out.println(currentUser.toString() + " logged in.");
 			return true;
 		}
 
@@ -126,7 +128,7 @@ public class LoginController
 	 *
 	 * @return <code>true</code> if a user is logged in
 	 */
-	public boolean isLoggedIn()
+	public static boolean isLoggedIn()
 	{
 		return currentUser != null;
 	}
@@ -136,7 +138,7 @@ public class LoginController
 	 *
 	 * @return the login view
 	 */
-	public GridPane getView()
+	public static GridPane getView()
 	{
 		return view.getLoginView();
 	}
@@ -147,18 +149,17 @@ public class LoginController
 	 *
 	 * @return <code>true</code> if the user is logged in
 	 */
-	public boolean checkLogin()
+	public static boolean checkLogin()
 	{
-		System.out.print("Login check: ");
 		if (!isLoggedIn())
 		{
-			System.out.println(false);
 			uiController.setView(Position.CENTER, view.getLoginView());
 			uiController.setView(Position.BOTTOM, null);
 			uiController.resetMainMenu();
+			System.out.println("Login check failed.");
 			return false;
 		}
-		System.out.println(true);
+		System.out.println("Login check passed.");
 		return true;
 	}
 
@@ -167,7 +168,7 @@ public class LoginController
 	 *
 	 * @return the user currently logged in
 	 */
-	public User getCurrentUser()
+	public static User getCurrentUser()
 	{
 		return currentUser;
 	}
