@@ -33,16 +33,16 @@ public class Manager implements UserRole
 	}
 
 	@Override
-	public int compareTo(UserRole role)
+	public int compareTo(final UserRole role)
 	{
 		switch (role.getName())
 		{
 			case "Administrator":
-				return 1;
+				return -1;
 			case "Manager":
 				return 0;
 			case "Logistician":
-				return -1;
+				return 1;
 			default:
 				return 0;
 		}

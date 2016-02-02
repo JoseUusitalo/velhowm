@@ -102,7 +102,7 @@ public class ListView
 						@Override
 						public TableCell<User, String> call(TableColumn<User, String> p)
 						{
-							TableCellButton button = new TableCellButton("Delete");
+							TableCellDeleteButton button = new TableCellDeleteButton("Delete");
 							button.setAlignment(Pos.CENTER);
 							return button;
 						}
@@ -123,14 +123,14 @@ public class ListView
 	 *
 	 * @author Jose Uusitalo
 	 */
-	private class TableCellButton extends TableCell<User, String>
+	private class TableCellDeleteButton extends TableCell<User, String>
 	{
 		/**
 		 * The button itself.
 		 */
 		private Button button;
 
-		private TableCellButton(final String text)
+		private TableCellDeleteButton(final String text)
 		{
 			button = new Button(text);
 			button.setFont(new Font(12));
@@ -142,7 +142,7 @@ public class ListView
 				public void handle(ActionEvent t)
 				{
 					// Get selected User object and Send information to list controller.
-					listController.removeUser(TableCellButton.this.getTableView().getItems().get(TableCellButton.this.getIndex()));
+					listController.removeUser(TableCellDeleteButton.this.getTableView().getItems().get(TableCellDeleteButton.this.getIndex()));
 				}
 			});
 		}
@@ -154,11 +154,10 @@ public class ListView
 			super.updateItem(string, empty);
 			if (!empty)
 			{
-				User rowUser = TableCellButton.this.getTableView().getItems().get(TableCellButton.this.getIndex());
+				// Permission check.
+				User rowUser = TableCellDeleteButton.this.getTableView().getItems().get(TableCellDeleteButton.this.getIndex());
 
-				System.out.println(rowUser.getRole() + " " + LoginController.getCurrentUser().getRole().compareTo(rowUser.getRole()) + " "
-						+ LoginController.getCurrentUser().getRole());
-				if (LoginController.getCurrentUser().getRole().compareTo(rowUser.getRole()) <= 0)
+				if (rowUser.getRole().compareTo(LoginController.getCurrentUser().getRole()) <= 0)
 					setGraphic(button);
 			}
 			else
