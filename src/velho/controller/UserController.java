@@ -4,8 +4,6 @@ import javafx.scene.Node;
 import velho.view.AddUserView;
 import velho.view.MainWindow;
 
-import java.sql.SQLException;
-
 import velho.model.Administrator;
 import velho.model.Logistician;
 import velho.model.Manager;
@@ -14,11 +12,11 @@ import velho.model.exceptions.NoDatabaseLinkException;
 import velho.model.interfaces.UserRole;
 
 /**
- * Is a controller for {@link AddUserView} view.
+ * A controller for managing users.
  *
- * @author Joona
- *
+ * @author Jose Uusitalo &amp; Joona
  */
+@SuppressWarnings("static-method")
 public class UserController
 {
 	/**
@@ -61,17 +59,56 @@ public class UserController
 				{
 					e.printStackTrace();
 				}
-				catch (SQLException e)
-				{
-					PopupController.error("Invalid user data even after verification, please contact an administrator.");
-					e.printStackTrace();
-				}
+
 				PopupController.info("User created.");
 			}
 			else
 			{
 				PopupController.warning("Invalid user data.");
 			}
+		}
+		catch (NoDatabaseLinkException e)
+		{
+			e.printStackTrace();
+		}
+
+		return false;
+	}
+
+	/**
+	 * Attempts to remove the specified user from the database.
+	 *
+	 * @param user user to remove
+	 */
+	public boolean removeUser(final User user)
+	{
+		System.out.println("Attempting to remove: " + user.toString());
+
+		try
+		{
+			if (LoginController.getCurrentUser().getDatabaseID() == user.getDatabaseID())
+			{
+				if (PopupController.confirmation(
+						"Are you sure you wish the delete your own user account? You will be logged out and be unable to log in again as a result of this action."))
+				{
+					if (DatabaseController.removeUser(user.getDatabaseID()))
+					{
+						LoginController.logout();
+						PopupController.info("User removed: " + user.toString());
+						return true;
+					}
+
+					PopupController.warning("User does not exist in the database.");
+					System.out.println("Non-existent user: " + user.toString());
+				}
+
+				System.out.println("Not removed.");
+				return false;
+			}
+
+			DatabaseController.removeUser(user.getDatabaseID());
+			PopupController.info("User removed: " + user.toString());
+			return true;
 		}
 		catch (NoDatabaseLinkException e)
 		{
@@ -134,41 +171,6 @@ public class UserController
 			default:
 				System.out.println("ERROR: Unknown role '" + userRoleName + "'.");
 				return null;
-		}
-	}
-
-	public void removeUser(final User user)
-	{
-		System.out.println("Attempting to remove: " + user.toString());
-		try
-		{
-			if (LoginController.getCurrentUser().getDatabaseID() == user.getDatabaseID())
-			{
-				if (PopupController.confirmation(
-						"Are you sure you wish the delete your own user account? You will be logged out and be unable to log in again as a result of this action."))
-				{
-					LoginController.logout();
-					DatabaseController.removeUser(user.getDatabaseID());
-					PopupController.info("User removed.");
-				}
-				else
-					System.out.println("Not removed.");
-			}
-			else
-			{
-				DatabaseController.removeUser(user.getDatabaseID());
-				PopupController.info("User removed.");
-			}
-
-		}
-		catch (NoDatabaseLinkException e)
-		{
-			e.printStackTrace();
-		}
-		catch (SQLException e)
-		{
-			PopupController.error("Attempted to remove an invalid user from database.");
-			e.printStackTrace();
 		}
 	}
 }
