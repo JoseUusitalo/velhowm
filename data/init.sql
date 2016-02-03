@@ -9,19 +9,22 @@ DROP TABLE IF EXISTS `users`;
 CREATE TABLE IF NOT EXISTS `users`
 (
 	`user_id` INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
-	`badge_id` CHAR(8) UNSIGNED UNIQUE,
-	`pin` CHAR(6) UNSIGNED,
+	`badge_id` CHAR(8) NULL UNIQUE,
+	`pin` CHAR(6) NULL,
 	`first_name` VARCHAR(128) NOT NULL,
 	`last_name` VARCHAR(128) NOT NULL,
-	`role` INT UNSIGNED,
+	`role` INT UNSIGNED NOT NULL,
 	
 	FOREIGN KEY (`role`) REFERENCES roles(`role_id`),
-	CONSTRAINT `C_unique_login_details` UNIQUE (`badge_id`,`pin`,`first_name`,`last_name`)
+	CONSTRAINT `CONST_unique_pin_login` UNIQUE (`pin`,`first_name`,`last_name`),
+	CONSTRAINT `CONST_unique_badge_login` UNIQUE (`badge_id`,`first_name`,`last_name`),
+	CONSTRAINT `CONST_name_role` UNIQUE (`first_name`,`last_name`,`role`)
 ) DEFAULT CHARSET=utf8;
 
-INSERT INTO `roles` VALUES (1,'Administrator');
-INSERT INTO `roles` VALUES (2,'Manager');
-INSERT INTO `roles` VALUES (3,'Logistician');
+
+INSERT INTO `roles` SET `name`='Administrator';
+INSERT INTO `roles` SET `name`='Manager';
+INSERT INTO `roles` SET `name`='Logistician';
 
 INSERT INTO `users`(`pin`,`first_name`,`last_name`,`role`) VALUES ('111111','Admin','Test',1);
 INSERT INTO `users`(`pin`,`first_name`,`last_name`,`role`) VALUES ('222222','Boss','Test',2);
