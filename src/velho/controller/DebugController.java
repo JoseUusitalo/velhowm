@@ -6,7 +6,7 @@ import velho.view.DebugWindow;
 
 /**
  * Various debugging features.
- * 
+ *
  * @author Edward &amp; Jose Uusitalo
  */
 public class DebugController
@@ -17,24 +17,18 @@ public class DebugController
 	private DebugWindow view;
 
 	/**
-	 * The {@link LoginController}.
-	 */
-	private LoginController loginController;
-
-	/**
 	 * @param loginController
 	 * @param debugView
 	 * @throws NoDatabaseLinkException
 	 */
-	public DebugController(final LoginController loginController) throws NoDatabaseLinkException
+	public DebugController() throws NoDatabaseLinkException
 	{
-		this.loginController = loginController;
 		view = new DebugWindow(this, DatabaseController.getUserRoleNames());
 	}
 
 	/**
 	 * Creates and shows the debug window.
-	 * 
+	 *
 	 * @param stage the stage to run the window in
 	 */
 	public void createDebugWindow(final Stage stage)
@@ -44,15 +38,14 @@ public class DebugController
 
 	/**
 	 * Here the login sets value to the buttons.
-	 * 
+	 *
 	 * @param userRoleName
 	 */
 	public void login(final String userRoleName)
 	{
 		try
 		{
-			loginController.debugLogin(userRoleName);
-			System.out.println("Logged in as " + userRoleName + ". (DEBUG)");
+			LoginController.debugLogin(userRoleName);
 			view.setLogInButton(false);
 			view.setLogOutButton(true);
 		}
@@ -64,22 +57,13 @@ public class DebugController
 	}
 
 	/**
-	 * Visually toggles the login/logout buttons in the debug window.
-	 */
-	public void login()
-	{
-		view.setLogInButton(false);
-		view.setLogOutButton(true);
-	}
-
-	/**
 	 * Sets the logout sets value to the buttons.
 	 */
 	public void logout()
 	{
 		// Only log out if a user is logged in, otherwise just visually toggle the buttons.
-		if (loginController.isLoggedIn())
-			loginController.logout();
+		if (LoginController.isLoggedIn())
+			LoginController.logout();
 		view.setLogInButton(true);
 		view.setLogOutButton(false);
 	}
@@ -96,7 +80,7 @@ public class DebugController
 
 	/**
 	 * The parameter for LogInButton is either false or true.
-	 * 
+	 *
 	 * @param visibility show log in button?
 	 */
 	public void setLogOutButton(boolean visibility)

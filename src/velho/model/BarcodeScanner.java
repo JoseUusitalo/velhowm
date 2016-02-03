@@ -34,7 +34,7 @@ public class BarcodeScanner
 	public static int generateProductList()
 	{
 
-		List<Integer> numbers = DatabaseController.getProductCodeList(1 - 20);
+		List<Integer> numbers = DatabaseController.getProductCodeList();
 		int maximSize = (int) (Math.random() * (numbers.size() + 1));
 
 		for (int i = 0; i < maximSize; i++)

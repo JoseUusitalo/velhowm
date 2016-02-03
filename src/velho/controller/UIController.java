@@ -24,12 +24,19 @@ public class UIController
 	private UserController userController;
 
 	/**
+	 * The {@link ListController}.
+	 */
+	private ListController listController;
+
+	/**
 	 * @param mainWindow
 	 * @param listController
 	 */
-	public UIController(final MainWindow mainWindow)
+	public UIController(final MainWindow mainWindow, final ListController listController, final UserController userController)
 	{
 		mainView = mainWindow;
+		this.listController = listController;
+		this.userController = userController;
 	}
 
 	/**
@@ -71,6 +78,10 @@ public class UIController
 	{
 		mainView.showMainMenu();
 
+		/*
+		 * What is shown in the UI depends on your role.
+		 */
+
 		switch (currentUserRole.getName())
 		{
 			case "Administrator":
@@ -78,7 +89,7 @@ public class UIController
 				mainView.addTab("Add User", userController.getView());
 				//$FALL-THROUGH$
 			case "Logistician":
-				mainView.addTab("User List", getUserListView());
+				mainView.addTab("User List", getUserListView(currentUserRole));
 				break;
 			default:
 				System.out.println("Unknown user role.");
@@ -87,31 +98,36 @@ public class UIController
 
 	/**
 	 * Creates the user list view.
+	 * The list contents change depending on who is logged in.
 	 *
+	 * @param currentUserRole the role of the user who is currently logged in
 	 * @return the user list view
 	 */
-	private Node getUserListView()
+	private Node getUserListView(final UserRole currentUserRole)
 	{
+		/*
+		 * What is shown in the user list depends on your role.
+		 */
 		try
 		{
-			return ListController.getView(DatabaseController.getPublicUserDataColumns(), DatabaseController.getPublicUserDataList());
+			switch (currentUserRole.getName())
+			{
+				case "Administrator":
+				case "Manager":
+					return listController.getView(DatabaseController.getPublicUserDataColumns(true), DatabaseController.getPublicUserDataList());
+				case "Logistician":
+					return listController.getView(DatabaseController.getPublicUserDataColumns(false), DatabaseController.getPublicUserDataList());
+				default:
+					System.out.println("Unknown user role.");
+			}
 		}
 		catch (NoDatabaseLinkException e)
 		{
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		return null;
-	}
 
-	/**
-	 * Attaches the {@link UserController} to this controller.
-	 *
-	 * @param userController
-	 */
-	public void setUserController(final UserController userController)
-	{
-		this.userController = userController;
+		return null;
 	}
 
 	/**

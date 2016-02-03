@@ -25,6 +25,7 @@ import javafx.scene.paint.Paint;
 import javafx.stage.Stage;
 import velho.controller.DatabaseController;
 import velho.controller.DebugController;
+import velho.controller.ListController;
 import velho.controller.LoginController;
 import velho.controller.UIController;
 import velho.controller.UserController;
@@ -40,7 +41,7 @@ public class MainWindow extends Application
 	/**
 	 * Enable or disable debug features.
 	 */
-	public static final boolean DEBUG_MODE = false;
+	public static final boolean DEBUG_MODE = true;
 
 	/**
 	 * The {@link DebugController}.
@@ -58,11 +59,6 @@ public class MainWindow extends Application
 	private static UIController uiController;
 
 	/**
-	 * The {@link LoginController}.
-	 */
-	private static LoginController loginController;
-
-	/**
 	 * The root layout of the main window.
 	 */
 	private BorderPane rootBorderPane;
@@ -78,6 +74,11 @@ public class MainWindow extends Application
 	private Scene scene;
 
 	/**
+	 * The {@link ListController}.
+	 */
+	private ListController listController;
+
+	/**
 	 * The main window constructor.
 	 */
 	public MainWindow()
@@ -86,38 +87,18 @@ public class MainWindow extends Application
 		try
 		{
 			DatabaseController.connectAndInitialize();
+
+			debugController = new DebugController();
+			userController = new UserController();
+
+			listController = new ListController(userController);
+			uiController = new UIController(this, listController, userController);
+
+			LoginController.setControllers(uiController, debugController);
 		}
 		catch (ClassNotFoundException | ExistingDatabaseLinkException | NoDatabaseLinkException e1)
 		{
-			// TODO Auto-generated catch block
 			e1.printStackTrace();
-		}
-
-		try
-		{
-			userController = new UserController();
-		}
-		catch (NoDatabaseLinkException e)
-		{
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-
-		if (DatabaseController.isLinked())
-		{
-			uiController = new UIController(this);
-			uiController.setUserController(userController);
-			loginController = new LoginController(uiController);
-			try
-			{
-				debugController = new DebugController(loginController);
-				loginController.setDebugController(debugController);
-			}
-			catch (NoDatabaseLinkException e)
-			{
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
 		}
 	}
 
@@ -160,7 +141,7 @@ public class MainWindow extends Application
 		}
 
 		// Force log in to see main menu.
-		if (loginController.checkLogin())
+		if (LoginController.checkLogin())
 		{
 			HBox statusBar = new HBox();
 			statusBar.setAlignment(Pos.CENTER_RIGHT);
@@ -174,7 +155,7 @@ public class MainWindow extends Application
 
 			HBox userBar = new HBox(10);
 
-			Label userName = new Label("Hello, " + loginController.getCurrentUser().toString());
+			Label userName = new Label("Hello, " + LoginController.getCurrentUser().getRoleName() + " " + LoginController.getCurrentUser().getFullName());
 			Button logoutButton = new Button("Log Out");
 			logoutButton.setPrefHeight(5.0);
 
@@ -183,8 +164,7 @@ public class MainWindow extends Application
 				@Override
 				public void handle(ActionEvent event)
 				{
-					loginController.logout();
-					debugController.logout();
+					LoginController.logout();
 				}
 			});
 
@@ -209,7 +189,7 @@ public class MainWindow extends Application
 
 		root.getChildren().add(rootBorderPane);
 
-		loginController.checkLogin();
+		LoginController.checkLogin();
 
 		primaryStage.setScene(scene);
 		primaryStage.show();

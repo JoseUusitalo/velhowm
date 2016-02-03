@@ -4,8 +4,9 @@ import velho.model.interfaces.UserRole;
 
 /**
  * This this is the manager role.
- * @author Edward
+ * Note: this class has a natural ordering that is inconsistent with equals.
  *
+ * @author Jose Uusitalo &amp; Edward
  */
 public class Manager implements UserRole
 {
@@ -29,5 +30,21 @@ public class Manager implements UserRole
 	public String toString()
 	{
 		return name;
+	}
+
+	@Override
+	public int compareTo(final UserRole role)
+	{
+		switch (role.getName())
+		{
+			case "Administrator":
+				return -1;
+			case "Manager":
+				return 0;
+			case "Logistician":
+				return 1;
+			default:
+				return 0;
+		}
 	}
 }

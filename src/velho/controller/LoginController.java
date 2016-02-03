@@ -17,40 +17,42 @@ public class LoginController
 	/**
 	 * User currently logged in.
 	 */
-	private User currentUser;
+	private static User currentUser;
 
 	/**
 	 * The {@link LoginView}.
 	 */
-	private LoginView view;
+	private static LoginView view;
 
 	/**
 	 * The {@link UIController}.
 	 */
-	private UIController uiController;
+	private static UIController uiController;
 
 	/**
 	 * The {@link DebugController}.
 	 */
-	private DebugController debugController;
+	private static DebugController debugController;
 
 	/**
-	 * @param uiController
+	 * Destroys the login view.
 	 */
-	public LoginController(final UIController uiController)
+	private static void destroyView()
 	{
-		view = new LoginView(this);
-		this.uiController = uiController;
+		view.destroy();
+		view = null;
 	}
 
 	/**
-	 * Attaches the debug controller to this controller.
+	 * Attaches the controllers that the login controller uses.
 	 *
+	 * @param uiController the {@link UIController}
 	 * @param debugController the {@link DebugController}
 	 */
-	public void setDebugController(final DebugController debugController)
+	public static void setControllers(final UIController uiController, DebugController debugController)
 	{
-		this.debugController = debugController;
+		LoginController.uiController = uiController;
+		LoginController.debugController = debugController;
 	}
 
 	/**
@@ -60,39 +62,95 @@ public class LoginController
 	 * is set at LoginView for authentication
 	 * @return as true
 	 */
-	public void login(String authenticationString)
+	public static void login(final String firstName, final String lastName, final String authenticationString)
 	{
-		System.out.println("Attempting to log in with '" + authenticationString + "'");
-		try
-		{
-			currentUser = DatabaseController.authenticate(authenticationString);
-		}
-		catch (NoDatabaseLinkException e)
-		{
-			PopupController.error("Database connection lost.");
-			e.printStackTrace();
-		}
+		System.out.println("Attempting to log in with: " + firstName + " " + lastName + " " + authenticationString);
 
-		if (currentUser == null)
+		if (firstName.isEmpty() && lastName.isEmpty())
 		{
-			PopupController.warning("Invalid Badge ID or PIN.");
+			if (User.isValidBadgeID(authenticationString))
+			{
+				try
+				{
+					currentUser = DatabaseController.authenticateBadgeID(authenticationString);
+
+					// Valid credentials.
+					if (currentUser != null)
+					{
+						System.out.println(currentUser.toString() + " logged in with a badge.");
+						uiController.showMainMenu(currentUser.getRole());
+						destroyView();
+
+						if (MainWindow.DEBUG_MODE)
+						{
+							debugController.setLogInButton(false);
+							debugController.setLogOutButton(true);
+						}
+					}
+					else
+					{
+						PopupController.warning("Incorrect Badge ID.");
+					}
+				}
+				catch (NoDatabaseLinkException e)
+				{
+					DatabaseController.tryReLink();
+				}
+			}
+			else
+			{
+				PopupController.warning("Invalid Badge ID.");
+			}
 		}
 		else
 		{
-			System.out.println(currentUser.toString() + " logged in.");
-			uiController.showMainMenu(currentUser.getRole());
+			if (User.isValidPIN(authenticationString))
+			{
+				try
+				{
+					currentUser = DatabaseController.authenticatePIN(firstName, lastName, authenticationString);
 
-			if (MainWindow.DEBUG_MODE)
-				debugController.login();
+					// Valid credentials.
+					if (currentUser != null)
+					{
+						System.out.println(currentUser.toString() + " logged in with PIN.");
+						uiController.showMainMenu(currentUser.getRole());
+						destroyView();
+
+						if (MainWindow.DEBUG_MODE)
+						{
+							debugController.setLogInButton(false);
+							debugController.setLogOutButton(true);
+						}
+					}
+					else
+					{
+						PopupController.warning("Incorrect PIN or Names.");
+					}
+				}
+				catch (NoDatabaseLinkException e)
+				{
+					DatabaseController.tryReLink();
+				}
+			}
+			else
+			{
+				PopupController.warning("Invalid PIN.");
+			}
 		}
 	}
 
 	/**
 	 * Logs out the current user.
 	 */
-	public void logout()
+	public static void logout()
 	{
-		System.out.println("Logged out.");
+		if (MainWindow.DEBUG_MODE)
+		{
+			debugController.setLogInButton(true);
+			debugController.setLogOutButton(false);
+		}
+		System.out.println(currentUser.toString() + " logged out.");
 		currentUser = null;
 		uiController.destroyViews();
 		checkLogin();
@@ -106,15 +164,15 @@ public class LoginController
 	 * @return <code>true</code> if login was successful, or <code>false</code> if role name was invalid
 	 * @throws NoDatabaseLinkException
 	 */
-	public boolean debugLogin(final String userRoleName) throws NoDatabaseLinkException
+	public static boolean debugLogin(final String userRoleName) throws NoDatabaseLinkException
 	{
 		if (MainWindow.DEBUG_MODE)
 		{
 			if (DatabaseController.getRoleID(userRoleName) == -1)
 				return false;
-
 			currentUser = UserController.getDebugUser(userRoleName);
 			uiController.showMainMenu(currentUser.getRole());
+			System.out.println(currentUser.toString() + " logged in.");
 			return true;
 		}
 
@@ -126,7 +184,7 @@ public class LoginController
 	 *
 	 * @return <code>true</code> if a user is logged in
 	 */
-	public boolean isLoggedIn()
+	public static boolean isLoggedIn()
 	{
 		return currentUser != null;
 	}
@@ -136,8 +194,10 @@ public class LoginController
 	 *
 	 * @return the login view
 	 */
-	public GridPane getView()
+	public static GridPane getView()
 	{
+		if (view == null)
+			view = new LoginView();
 		return view.getLoginView();
 	}
 
@@ -147,18 +207,17 @@ public class LoginController
 	 *
 	 * @return <code>true</code> if the user is logged in
 	 */
-	public boolean checkLogin()
+	public static boolean checkLogin()
 	{
-		System.out.print("Login check: ");
 		if (!isLoggedIn())
 		{
-			System.out.println(false);
-			uiController.setView(Position.CENTER, view.getLoginView());
+			uiController.setView(Position.CENTER, getView());
 			uiController.setView(Position.BOTTOM, null);
 			uiController.resetMainMenu();
+			System.out.println("Login check failed.");
 			return false;
 		}
-		System.out.println(true);
+		System.out.println("Login check passed.");
 		return true;
 	}
 
@@ -167,7 +226,7 @@ public class LoginController
 	 *
 	 * @return the user currently logged in
 	 */
-	public User getCurrentUser()
+	public static User getCurrentUser()
 	{
 		return currentUser;
 	}

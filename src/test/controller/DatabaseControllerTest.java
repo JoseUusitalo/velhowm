@@ -2,11 +2,12 @@ package test.controller;
 
 import static org.junit.Assert.*;
 
-import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.junit.AfterClass;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 import velho.controller.DatabaseController;
@@ -22,115 +23,113 @@ import velho.model.exceptions.NoDatabaseLinkException;
 @SuppressWarnings("static-method")
 public class DatabaseControllerTest
 {
-	@Test
-	public final void testDatabaseLink() throws ClassNotFoundException, NoDatabaseLinkException, ExistingDatabaseLinkException
+	@BeforeClass
+	public final static void connectAndInitializeDatabase() throws ClassNotFoundException, NoDatabaseLinkException, ExistingDatabaseLinkException
 	{
-		assertEquals(true, DatabaseController.link());
+		assertTrue(DatabaseController.link());
+		assertTrue(DatabaseController.initializeDatabase());
+	}
+
+	@AfterClass
+	public final static void unlink() throws NoDatabaseLinkException
+	{
 		DatabaseController.unlink();
 	}
 
 	@Test
-	public final void testIsLinked() throws ClassNotFoundException, NoDatabaseLinkException, ExistingDatabaseLinkException
+	public final void testIsLinked()
 	{
-		assertEquals(false, DatabaseController.isLinked());
-		DatabaseController.link();
-		assertEquals(true, DatabaseController.isLinked());
-		DatabaseController.unlink();
-	}
-
-	@Test(expected = NoDatabaseLinkException.class)
-	public final void testFailInitialization() throws NoDatabaseLinkException
-	{
-		assertEquals(false, DatabaseController.isLinked());
-		DatabaseController.initializeDatabase();
-		DatabaseController.unlink();
+		assertTrue(DatabaseController.isLinked());
 	}
 
 	@Test
-	public final void testInitialization() throws NoDatabaseLinkException, ClassNotFoundException, ExistingDatabaseLinkException
+	public final void testFailInitialization() throws ClassNotFoundException, ExistingDatabaseLinkException
 	{
-		DatabaseController.connectAndInitialize();
-		assertNotEquals(-1, DatabaseController.getRoleID("Manager"));
-		DatabaseController.unlink();
+		try
+		{
+			DatabaseController.unlink();
+			assertFalse(DatabaseController.isLinked());
+		}
+		catch (NoDatabaseLinkException e)
+		{
+			fail(e.toString());
+		}
+
+		try
+		{
+			assertFalse(DatabaseController.initializeDatabase());
+		}
+		catch (NoDatabaseLinkException e)
+		{
+			try
+			{
+				connectAndInitializeDatabase();
+			}
+			catch (NoDatabaseLinkException e1)
+			{
+				fail(e1.toString());
+			}
+		}
 	}
 
 	@Test
-	public final void testGetRoleID() throws NoDatabaseLinkException, ClassNotFoundException, ExistingDatabaseLinkException
+	public final void testGetRoleID() throws NoDatabaseLinkException
 	{
-		assertFalse(DatabaseController.isLinked());
-		DatabaseController.connectAndInitialize();
 		assertNotEquals(-1, DatabaseController.getRoleID("Logistician"));
-		DatabaseController.unlink();
 	}
 
 	@Test
-	public final void testGetUserRoleNames() throws NoDatabaseLinkException, ClassNotFoundException, ExistingDatabaseLinkException
+	public final void testGetUserRoleNames() throws NoDatabaseLinkException
 	{
 		Set<String> names = new HashSet<String>(Arrays.asList("Manager", "Logistician", "Administrator"));
 
-		DatabaseController.connectAndInitialize();
 		assertTrue(DatabaseController.getUserRoleNames().containsAll(names));
-		DatabaseController.unlink();
 	}
 
 	@Test
-	public final void testAuthenticate_ValidPin() throws NoDatabaseLinkException, ClassNotFoundException, ExistingDatabaseLinkException
+	public final void testAuthenticate_ValidPin() throws NoDatabaseLinkException
 	{
-		DatabaseController.connectAndInitialize();
-		User user = DatabaseController.authenticate("111111");
+		User user = DatabaseController.authenticatePIN("Admin", "Test","111111");
 		assertEquals("Admin", user.getFirstName());
 		assertEquals("Test", user.getLastName());
-		DatabaseController.unlink();
 	}
 
 	@Test
-	public final void testAuthenticate_InvalidPinLong() throws NoDatabaseLinkException, ClassNotFoundException, ExistingDatabaseLinkException
+	public final void testAuthenticate_InvalidPinLong() throws NoDatabaseLinkException
 	{
-		DatabaseController.connectAndInitialize();
-		assertEquals(null, DatabaseController.authenticate("1111112"));
-		DatabaseController.unlink();
+		assertEquals(null, DatabaseController.authenticateBadgeID("1111112"));
 	}
 
 	@Test
-	public final void testAuthenticate_InvalidPinShort() throws NoDatabaseLinkException, ClassNotFoundException, ExistingDatabaseLinkException
+	public final void testAuthenticate_InvalidPinShort() throws NoDatabaseLinkException
 	{
-		DatabaseController.connectAndInitialize();
-		assertEquals(null, DatabaseController.authenticate("0"));
-		DatabaseController.unlink();
+		assertEquals(null, DatabaseController.authenticateBadgeID("0"));
 	}
 
 	@Test
-	public final void testAuthenticate_InvalidString() throws NoDatabaseLinkException, ClassNotFoundException, ExistingDatabaseLinkException
+	public final void testAuthenticate_InvalidString() throws NoDatabaseLinkException
 	{
-		DatabaseController.connectAndInitialize();
-		assertEquals(null, DatabaseController.authenticate("this is NOT a valid pin or badge number"));
-		DatabaseController.unlink();
+		assertEquals(null, DatabaseController.authenticateBadgeID("this is NOT a valid pin or badge number"));
 	}
 
 	@Test
-	public final void testAuthenticate_ValidBadge() throws NoDatabaseLinkException, ClassNotFoundException, ExistingDatabaseLinkException
+	public final void testAuthenticate_ValidBadge() throws NoDatabaseLinkException
 	{
-		DatabaseController.connectAndInitialize();
-		User user = DatabaseController.authenticate("12345678");
+		User user = DatabaseController.authenticateBadgeID("12345678");
 		assertEquals("Badger", user.getFirstName());
 		assertEquals("Testaccount", user.getLastName());
-		DatabaseController.unlink();
 	}
 
 	@Test
-	public final void testAuthenticate_InvalidBadgeLong() throws NoDatabaseLinkException, ClassNotFoundException, ExistingDatabaseLinkException
+	public final void testAuthenticate_InvalidBadgeLong() throws NoDatabaseLinkException
 	{
-		DatabaseController.connectAndInitialize();
-		assertEquals(null, DatabaseController.authenticate("100000000"));
-		DatabaseController.unlink();
+		assertEquals(null, DatabaseController.authenticateBadgeID("100000000"));
 	}
 
 	@Test
-	public final void testAuthenticate_InvalidBadgeShort() throws NoDatabaseLinkException, ClassNotFoundException, ExistingDatabaseLinkException
+	public final void testAuthenticate_InvalidBadgeShort() throws NoDatabaseLinkException
 	{
-		DatabaseController.connectAndInitialize();
-		assertEquals(null, DatabaseController.authenticate("2222222"));
-		DatabaseController.unlink();
+		assertEquals(null, DatabaseController.authenticateBadgeID("2222222"));
 	}
 
 	@Test
@@ -140,29 +139,53 @@ public class DatabaseControllerTest
 	}
 
 	@Test
-	public final void testGetPublicUserDataList() throws NoDatabaseLinkException, ClassNotFoundException, ExistingDatabaseLinkException
+	public final void testGetPublicUserDataList() throws NoDatabaseLinkException
 	{
-		DatabaseController.connectAndInitialize();
 		assertEquals(4, DatabaseController.getPublicUserDataList().size());
-		DatabaseController.unlink();
 	}
 
 	@Test
 	public final void testGetPublicUserDataColumns()
 	{
-		assertTrue(DatabaseController.getPublicUserDataColumns().values().contains("First Name"));
+		assertTrue(DatabaseController.getPublicUserDataColumns(false).values().contains("First Name"));
+		assertFalse(DatabaseController.getPublicUserDataColumns(false).values().contains("Delete"));
+
+		assertTrue(DatabaseController.getPublicUserDataColumns(true).values().contains("Role"));
 	}
 
 	@Test
-	public final void testAddUser_DeleteUser() throws NoDatabaseLinkException, ClassNotFoundException, ExistingDatabaseLinkException, SQLException
+	public final void testAddUser_RemoveUser() throws NoDatabaseLinkException
 	{
-		DatabaseController.connectAndInitialize();
 		// The method does not check for data validity.
-		DatabaseController.addUser("", "0", "My PIN Is Practically Invalid", "But Technically Valid", 1);
+		DatabaseController.addUser("", "000001", "My PIN Is Practically Invalid", "But Technically Valid", 1);
+
 		assertTrue(DatabaseController.getUserByID(5).getFirstName().equals("My PIN Is Practically Invalid"));
 		assertNotEquals(null, DatabaseController.getUserByID(5));
-		DatabaseController.deleteUser(5);
+
+		DatabaseController.removeUser(5);
 		assertEquals(null, DatabaseController.getUserByID(5));
-		DatabaseController.unlink();
+
+		assertTrue(DatabaseController.initializeDatabase());
+	}
+
+	@Test
+	public final void testGetUserByID() throws NoDatabaseLinkException
+	{
+		assertEquals(null, DatabaseController.getUserByID(-128));
+	}
+
+	@Test
+	public final void testRemoveUser_Invalid() throws NoDatabaseLinkException
+	{
+		assertFalse(DatabaseController.removeUser(-123));
+		assertFalse(DatabaseController.removeUser(Integer.MAX_VALUE));
+	}
+
+	@Test
+	public final void testRemoveUser() throws NoDatabaseLinkException
+	{
+		assertTrue(DatabaseController.removeUser(1));
+
+		assertTrue(DatabaseController.initializeDatabase());
 	}
 }
