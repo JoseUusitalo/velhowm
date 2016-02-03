@@ -2,5 +2,5 @@ package velho.model.enums;
 
 public enum DatabaseQueryType
 {
-	UPDATE, SELECT, DELETE
+	UPDATE, SELECT, DELETE, INSERT
 }

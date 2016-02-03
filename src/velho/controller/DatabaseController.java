@@ -66,7 +66,8 @@ public class DatabaseController
 	 * @param where conditions (can be <code>null</code>)
 	 * @return an SQL query string
 	 */
-	private static String sqlBuilder(final DatabaseQueryType type, final DatabaseTable tableName, final String[] columns, final Map<String, Object> where)
+	private static String sqlBuilder(final DatabaseQueryType type, final DatabaseTable tableName, final String[] columns,
+			final Map<String, Object> columnValues, final Map<String, Object> where)
 	{
 		StringBuilder sb = new StringBuilder();
 
@@ -87,9 +88,55 @@ public class DatabaseController
 			sb.append(" ");
 		}
 
-		sb.append("FROM ");
+		switch (type)
+		{
+			case INSERT:
+				sb.append("INTO ");
+				break;
+			default:
+				sb.append("FROM ");
+				break;
+		}
+
+		// Table name.
 		sb.append(tableName.toString().toLowerCase());
 
+		// Insert values.
+		if (columnValues != null)
+		{
+			sb.append(" SET ");
+
+			Iterator<String> it = columnValues.keySet().iterator();
+			String key = null;
+
+			while (it.hasNext())
+			{
+				key = it.next();
+
+				sb.append(key);
+				sb.append("=");
+
+				Object value = columnValues.get(key);
+
+				// If value is not Integer or Double do not add apostrophes.
+				if (value instanceof Integer || value instanceof Double)
+				{
+					sb.append(value);
+				}
+				else
+				{
+					sb.append("'");
+					sb.append(value.toString());
+					sb.append("'");
+
+				}
+
+				if (it.hasNext())
+					sb.append(", ");
+			}
+		}
+
+		// Conditionals.
 		if (where != null)
 		{
 			sb.append(" WHERE ");
@@ -126,7 +173,7 @@ public class DatabaseController
 
 		sb.append(";");
 
-		//System.out.println("[SQLBUILDER] " + sb.toString());
+		System.out.println("[SQLBUILDER] " + sb.toString());
 		return sb.toString();
 	}
 
@@ -145,8 +192,8 @@ public class DatabaseController
 	 *
 	 * @throws NoDatabaseLinkException
 	 */
-	private static Object runQuery(final DatabaseQueryType type, final DatabaseTable tableName, final String[] columns, final Map<String, Object> where)
-			throws NoDatabaseLinkException
+	private static Object runQuery(final DatabaseQueryType type, final DatabaseTable tableName, final String[] columns, final Map<String, Object> columnValues,
+			final Map<String, Object> where) throws NoDatabaseLinkException
 	{
 		Connection connection = getConnection();
 		Statement statement = null;
@@ -162,10 +209,11 @@ public class DatabaseController
 			// Initialize a statement.
 			statement = connection.createStatement();
 
-			statement.execute(sqlBuilder(type, tableName, columns, where));
+			statement.execute(sqlBuilder(type, tableName, columns, columnValues, where));
 
 			switch (type)
 			{
+				case INSERT:
 				case DELETE:
 				case UPDATE:
 					changed = statement.getUpdateCount();
@@ -255,6 +303,7 @@ public class DatabaseController
 
 		switch (type)
 		{
+			case INSERT:
 			case DELETE:
 			case UPDATE:
 				return changed;
@@ -519,7 +568,7 @@ public class DatabaseController
 		where.put("name", roleName);
 
 		@SuppressWarnings("unchecked")
-		Set<Integer> result = (LinkedHashSet<Integer>) (runQuery(DatabaseQueryType.SELECT, DatabaseTable.ROLES, columns, where));
+		Set<Integer> result = (LinkedHashSet<Integer>) (runQuery(DatabaseQueryType.SELECT, DatabaseTable.ROLES, columns, null, where));
 
 		if (result.size() == 0)
 			return -1;
@@ -540,7 +589,7 @@ public class DatabaseController
 		String[] columns = { "name" };
 
 		@SuppressWarnings("unchecked")
-		Set<String> result = (LinkedHashSet<String>) (runQuery(DatabaseQueryType.SELECT, DatabaseTable.ROLES, columns, null));
+		Set<String> result = (LinkedHashSet<String>) (runQuery(DatabaseQueryType.SELECT, DatabaseTable.ROLES, columns, null, null));
 
 		return result;
 	}
@@ -575,7 +624,7 @@ public class DatabaseController
 			where.put("badge_id", authInt);
 
 		@SuppressWarnings("unchecked")
-		Set<User> result = (LinkedHashSet<User>) (runQuery(DatabaseQueryType.SELECT, DatabaseTable.USERS, columns, where));
+		Set<User> result = (LinkedHashSet<User>) (runQuery(DatabaseQueryType.SELECT, DatabaseTable.USERS, columns, null, where));
 
 		if (result.size() == 0)
 			return null;
@@ -598,7 +647,7 @@ public class DatabaseController
 		where.put("role_id", new Integer(roleid));
 
 		@SuppressWarnings("unchecked")
-		Set<String> result = (LinkedHashSet<String>) (runQuery(DatabaseQueryType.SELECT, DatabaseTable.ROLES, columns, where));
+		Set<String> result = (LinkedHashSet<String>) (runQuery(DatabaseQueryType.SELECT, DatabaseTable.ROLES, columns, null, where));
 
 		if (result.size() == 0)
 			return null;
@@ -629,7 +678,7 @@ public class DatabaseController
 		String[] columns = { "user_id", "first_name", "last_name", "role" };
 
 		@SuppressWarnings("unchecked")
-		Set<User> result = (LinkedHashSet<User>) (runQuery(DatabaseQueryType.SELECT, DatabaseTable.USERS, columns, null));
+		Set<User> result = (LinkedHashSet<User>) (runQuery(DatabaseQueryType.SELECT, DatabaseTable.USERS, columns, null, null));
 
 		Iterator<User> it = result.iterator();
 
@@ -654,7 +703,7 @@ public class DatabaseController
 		where.put("user_id", new Integer(id));
 
 		@SuppressWarnings("unchecked")
-		Set<User> result = (LinkedHashSet<User>) (runQuery(DatabaseQueryType.SELECT, DatabaseTable.USERS, columns, where));
+		Set<User> result = (LinkedHashSet<User>) (runQuery(DatabaseQueryType.SELECT, DatabaseTable.USERS, columns, null, where));
 
 		if (result.size() == 0)
 			return null;
@@ -701,17 +750,19 @@ public class DatabaseController
 	public static boolean addUser(final String badgeID, final String pin, final String firstName, final String lastName, final int roleID)
 			throws NoDatabaseLinkException
 	{
-		String sql;
+		Map<String, Object> values = new LinkedHashMap<String, Object>();
 
 		// If no pin is defined, add with badge id.
 		if (pin == null || pin.isEmpty())
-			sql = "INSERT INTO `" + DatabaseTable.USERS + "`(`badge_id`, `first_name`, `last_name`, `role`)" + "VALUES(" + badgeID + ",'" + firstName + "','"
-					+ lastName + "'," + roleID + ");";
+			values.put("badge_id", badgeID);
 		else
-			sql = ("INSERT INTO `" + DatabaseTable.USERS + "`(`pin`, `first_name`, `last_name`, `role`)" + "VALUES(" + pin + ",'" + firstName + "','" + lastName
-					+ "'," + roleID + ");");
+			values.put("pin", pin);
 
-		boolean changed = (0 != (Integer) runQuery(sql));
+		values.put("first_name", firstName);
+		values.put("last_name", lastName);
+		values.put("role", roleID);
+
+		boolean changed = (0 != (Integer) runQuery(DatabaseQueryType.INSERT, DatabaseTable.USERS, null, values, null));
 
 		// Update the user list displayed in the UI after adding a new user.
 		if (changed)
@@ -734,7 +785,7 @@ public class DatabaseController
 		Map<String, Object> where = new LinkedHashMap<String, Object>();
 		where.put("user_id", new Integer(databaseID));
 
-		boolean changed = (0 != (Integer) (runQuery(DatabaseQueryType.DELETE, DatabaseTable.USERS, null, where)));
+		boolean changed = (0 != (Integer) (runQuery(DatabaseQueryType.DELETE, DatabaseTable.USERS, null, null, where)));
 
 		// Update the user list displayed in the UI if database changed.
 		if (changed)
