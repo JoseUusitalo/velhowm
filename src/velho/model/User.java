@@ -66,6 +66,85 @@ public class User
 		this.role = role;
 	}
 
+	/**
+	 * Returns the user data in the following format:
+	 * <code>firstname lastname [rolename | databaseid]</code>
+	 */
+	@Override
+	public String toString()
+	{
+		return firstName + " " + lastName + " [" + role.toString() + " | " + databaseID + "]";
+	}
+
+	/**
+	 * Gets the first name of this user.
+	 *
+	 * @return the first name of this user
+	 */
+	public String getFirstName()
+	{
+		return firstName;
+	}
+
+	/**
+	 * Gets the last name of this user.
+	 *
+	 * @return the last name of this user
+	 */
+	public String getLastName()
+	{
+		return lastName;
+	}
+
+	/**
+	 * Gets the first and last name of this user.
+	 *
+	 * @return the full name of this user
+	 */
+	public String getFullName()
+	{
+		return firstName + " " + lastName;
+	}
+
+	/**
+	 * Returns the user data in the following format:
+	 * <code>firstname lastname (rolename)</code>
+	 */
+	public String getFullDetails()
+	{
+		return firstName + " " + lastName + " (" + role.toString() + ")";
+	}
+
+	/**
+	 * Gets the role of this user.
+	 *
+	 * @return the role of this user
+	 */
+	public UserRole getRole()
+	{
+		return role;
+	}
+
+	/**
+	 * Gets the name of the role of this user.
+	 *
+	 * @return the role name of this user
+	 */
+	public String getRoleName()
+	{
+		return role.getName();
+	}
+
+	/**
+	 * Gets the database row ID of this user.
+	 *
+	 * @return the database ID of this user
+	 */
+	public int getDatabaseID()
+	{
+		return databaseID;
+	}
+
 	/*
 	 * STATIC METHODS
 	 */
@@ -144,88 +223,5 @@ public class User
 	public static boolean isValidPIN(final int pin)
 	{
 		return (pin <= (Math.pow(10.0, MAX_PIN_LENGTH)));
-	}
-
-	/*
-	 * INSTANCE METHODS
-	 */
-
-	/**
-	 * Returns the user data in the following format:
-	 * <code>firstname lastname [rolename | databaseid]</code>
-	 */
-	@Override
-	public String toString()
-	{
-		return firstName + " " + lastName + " [" + role.toString() + " | " + databaseID + "]";
-	}
-
-	/**
-	 * Gets the first name of this user.
-	 *
-	 * @return the first name of this user
-	 */
-	public String getFirstName()
-	{
-		return firstName;
-	}
-
-	/**
-	 * Gets the last name of this user.
-	 *
-	 * @return the last name of this user
-	 */
-	public String getLastName()
-	{
-		return lastName;
-	}
-
-	/**
-	 * Gets the first and last name of this user.
-	 *
-	 * @return the full name of this user
-	 */
-	public String getFullName()
-	{
-		return firstName + " " + lastName;
-	}
-
-	/**
-	 * Returns the user data in the following format:
-	 * <code>firstname lastname (rolename)</code>
-	 */
-	public String getFullDetails()
-	{
-		return firstName + " " + lastName + " (" + role.toString() + ")";
-	}
-
-	/**
-	 * Gets the role of this user.
-	 *
-	 * @return the role of this user
-	 */
-	public UserRole getRole()
-	{
-		return role;
-	}
-
-	/**
-	 * Gets the name of the role of this user.
-	 *
-	 * @return the role name of this user
-	 */
-	public String getRoleName()
-	{
-		return role.getName();
-	}
-
-	/**
-	 * Gets the database row ID of this user.
-	 *
-	 * @return the database ID of this user
-	 */
-	public int getDatabaseID()
-	{
-		return databaseID;
 	}
 }

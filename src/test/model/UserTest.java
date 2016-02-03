@@ -10,6 +10,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 import velho.controller.DatabaseController;
+import velho.model.Manager;
 import velho.model.User;
 import velho.model.exceptions.ExistingDatabaseLinkException;
 import velho.model.exceptions.NoDatabaseLinkException;
@@ -35,6 +36,8 @@ public class UserTest
 
 	private final String VALID_ROLE_NAME = "Manager";
 	private final String INVALID_ROLE_NAME = "Worker";
+
+	private final User user = new User(-1, "f", "l", new Manager());
 
 	@BeforeClass
 	public final static void linkDatabase() throws ClassNotFoundException, NoDatabaseLinkException, ExistingDatabaseLinkException
@@ -107,5 +110,53 @@ public class UserTest
 	public final void testValidation_Role() throws NoDatabaseLinkException
 	{
 		assertFalse(User.validateUserData("", VALID_PIN, VALID_NAME, VALID_NAME, INVALID_ROLE_NAME));
+	}
+
+	@Test
+	public final void testGetFirstName()
+	{
+		assertEquals("f", user.getFirstName());
+	}
+
+	@Test
+	public final void testGetLastName()
+	{
+		assertEquals("l", user.getLastName());
+	}
+
+	@Test
+	public final void testGetFullName()
+	{
+		assertEquals("f l", user.getFullName());
+	}
+
+	@Test
+	public final void testGetFullDetails()
+	{
+		assertEquals("f l (Manager)", user.getFullDetails());
+	}
+
+	@Test
+	public final void testToString()
+	{
+		assertEquals("f l [Manager | -1]", user.toString());
+	}
+
+	@Test
+	public final void testGetRole()
+	{
+		assertEquals("Manager", user.getRole().getName());
+	}
+
+	@Test
+	public final void testGetRoleName()
+	{
+		assertEquals("Manager", user.getRoleName());
+	}
+
+	@Test
+	public final void testGetDatabaseID()
+	{
+		assertEquals(-1, user.getDatabaseID());
 	}
 }
