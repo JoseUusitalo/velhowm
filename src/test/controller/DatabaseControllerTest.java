@@ -89,7 +89,7 @@ public class DatabaseControllerTest
 	@Test
 	public final void testAuthenticate_ValidPin() throws NoDatabaseLinkException
 	{
-		User user = DatabaseController.authenticate("111111");
+		User user = DatabaseController.authenticatePIN("Admin", "Test","111111");
 		assertEquals("Admin", user.getFirstName());
 		assertEquals("Test", user.getLastName());
 	}
@@ -97,25 +97,25 @@ public class DatabaseControllerTest
 	@Test
 	public final void testAuthenticate_InvalidPinLong() throws NoDatabaseLinkException
 	{
-		assertEquals(null, DatabaseController.authenticate("1111112"));
+		assertEquals(null, DatabaseController.authenticateBadgeID("1111112"));
 	}
 
 	@Test
 	public final void testAuthenticate_InvalidPinShort() throws NoDatabaseLinkException
 	{
-		assertEquals(null, DatabaseController.authenticate("0"));
+		assertEquals(null, DatabaseController.authenticateBadgeID("0"));
 	}
 
 	@Test
 	public final void testAuthenticate_InvalidString() throws NoDatabaseLinkException
 	{
-		assertEquals(null, DatabaseController.authenticate("this is NOT a valid pin or badge number"));
+		assertEquals(null, DatabaseController.authenticateBadgeID("this is NOT a valid pin or badge number"));
 	}
 
 	@Test
 	public final void testAuthenticate_ValidBadge() throws NoDatabaseLinkException
 	{
-		User user = DatabaseController.authenticate("12345678");
+		User user = DatabaseController.authenticateBadgeID("12345678");
 		assertEquals("Badger", user.getFirstName());
 		assertEquals("Testaccount", user.getLastName());
 	}
@@ -123,13 +123,13 @@ public class DatabaseControllerTest
 	@Test
 	public final void testAuthenticate_InvalidBadgeLong() throws NoDatabaseLinkException
 	{
-		assertEquals(null, DatabaseController.authenticate("100000000"));
+		assertEquals(null, DatabaseController.authenticateBadgeID("100000000"));
 	}
 
 	@Test
 	public final void testAuthenticate_InvalidBadgeShort() throws NoDatabaseLinkException
 	{
-		assertEquals(null, DatabaseController.authenticate("2222222"));
+		assertEquals(null, DatabaseController.authenticateBadgeID("2222222"));
 	}
 
 	@Test
@@ -157,7 +157,7 @@ public class DatabaseControllerTest
 	public final void testAddUser_RemoveUser() throws NoDatabaseLinkException
 	{
 		// The method does not check for data validity.
-		DatabaseController.addUser("", "0", "My PIN Is Practically Invalid", "But Technically Valid", 1);
+		DatabaseController.addUser("", "000001", "My PIN Is Practically Invalid", "But Technically Valid", 1);
 
 		assertTrue(DatabaseController.getUserByID(5).getFirstName().equals("My PIN Is Practically Invalid"));
 		assertNotEquals(null, DatabaseController.getUserByID(5));

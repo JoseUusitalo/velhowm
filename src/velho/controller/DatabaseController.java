@@ -10,6 +10,7 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.Set;
+
 import org.h2.jdbcx.JdbcConnectionPool;
 
 import javafx.collections.FXCollections;
@@ -20,6 +21,7 @@ import velho.model.enums.DatabaseTable;
 import velho.model.exceptions.ExistingDatabaseLinkException;
 import velho.model.exceptions.NoDatabaseLinkException;
 import velho.model.interfaces.UserRole;
+import velho.view.MainWindow;
 
 /**
  * The H2 database controller.
@@ -167,13 +169,15 @@ public class DatabaseController
 				}
 
 				if (it.hasNext())
-					sb.append(", ");
+					sb.append(" AND ");
 			}
 		}
 
 		sb.append(";");
 
-		System.out.println("[SQLBUILDER] " + sb.toString());
+		if (MainWindow.DEBUG_MODE)
+			System.out.println("[SQLBUILDER] " + sb.toString());
+
 		return sb.toString();
 	}
 
@@ -205,7 +209,6 @@ public class DatabaseController
 
 		try
 		{
-
 			// Initialize a statement.
 			statement = connection.createStatement();
 
@@ -278,7 +281,11 @@ public class DatabaseController
 		}
 		catch (SQLException e)
 		{
-			e.printStackTrace();
+			if (!e.toString().contains("Unique index or primary key violation"))
+				e.printStackTrace();
+
+			// If it was a UNIQUE constraint violation, continue normally as those are handled separately.
+			System.out.println("[DatabaseController] Silently ignored an SQL UNIQUE constraint violation.");
 		}
 
 		// Close all resources.
@@ -376,7 +383,11 @@ public class DatabaseController
 		}
 		catch (SQLException e)
 		{
-			e.printStackTrace();
+			if (!e.toString().contains("Unique index or primary key violation"))
+				e.printStackTrace();
+
+			// If it was a UNIQUE constraint violation, continue normally as those are handled separately.
+			System.out.println("[DatabaseController] Silently ignored an SQL UNIQUE constraint violation with.");
 		}
 
 		// Close all resources.
@@ -457,6 +468,37 @@ public class DatabaseController
 	{
 		if (connectionPool == null)
 			throw new NoDatabaseLinkException();
+	}
+
+	/**
+	 * Attempts to re-link the database.
+	 */
+	public static void tryReLink()
+	{
+		try
+		{
+			// Just in case.
+			unlink();
+		}
+		catch (NoDatabaseLinkException e)
+		{
+			// Do nothing. This is expected.
+		}
+
+		try
+		{
+			link();
+		}
+		catch (ClassNotFoundException e)
+		{
+			e.printStackTrace();
+		}
+		catch (ExistingDatabaseLinkException e)
+		{
+			e.printStackTrace();
+		}
+
+		PopupController.warning("Database connection was temporarily lost. Please try again or restart the application.");
 	}
 
 	/**
@@ -595,33 +637,47 @@ public class DatabaseController
 	}
 
 	/**
-	 * Authenticates a user with the given authentication string.
+	 * <p>Authenticates a user with the given badge ID string.</p>
+	 * <p>Warnign: Assumes that the badge ID is techinically valid.</p>
 	 *
-	 * @param authenticationString a PIN or a badge id
+	 * @param badgeID a badge id string
 	 * @return a {@link User} object representing the authenticated user or <code>null</code> for invalid credentials
 	 *
 	 * @throws NoDatabaseLinkException
+	 * @see {@link User#isValidBadgeID(String)}
 	 */
-	public static User authenticate(final String authenticationString) throws NoDatabaseLinkException
+	public static User authenticateBadgeID(final String badgeID) throws NoDatabaseLinkException
 	{
-		Integer authInt = null;
-
-		try
-		{
-			authInt = Integer.parseInt(authenticationString);
-		}
-		catch (NumberFormatException e)
-		{
-			return null;
-		}
-
 		String[] columns = { "user_id", "first_name", "last_name", "role" };
 		Map<String, Object> where = new LinkedHashMap<String, Object>();
+		where.put("badge_id", badgeID);
 
-		if (User.isValidPIN(authInt))
-			where.put("pin", authInt);
-		else
-			where.put("badge_id", authInt);
+		@SuppressWarnings("unchecked")
+		Set<User> result = (LinkedHashSet<User>) (runQuery(DatabaseQueryType.SELECT, DatabaseTable.USERS, columns, null, where));
+
+		if (result.size() == 0)
+			return null;
+
+		return result.iterator().next();
+	}
+
+	/**
+	 * <p>Authenticates a user with the given PIN string.</p>
+	 * <p>Warnign: Assumes that the PIN is techinically valid.</p>
+	 *
+	 * @param pin a PIN string
+	 * @return a {@link User} object representing the authenticated user or <code>null</code> for invalid credentials
+	 *
+	 * @throws NoDatabaseLinkException
+	 * @see {@link User#isValidPIN(String)}
+	 */
+	public static User authenticatePIN(final String firstName, final String lastName, final String pin) throws NoDatabaseLinkException
+	{
+		String[] columns = { "user_id", "first_name", "last_name", "role" };
+		Map<String, Object> where = new LinkedHashMap<String, Object>();
+		where.put("first_name", firstName);
+		where.put("last_name", lastName);
+		where.put("pin", pin);
 
 		@SuppressWarnings("unchecked")
 		Set<User> result = (LinkedHashSet<User>) (runQuery(DatabaseQueryType.SELECT, DatabaseTable.USERS, columns, null, where));

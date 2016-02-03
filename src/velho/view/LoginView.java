@@ -6,16 +6,20 @@ import javafx.geometry.Pos;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
+import javafx.scene.control.TextField;
 import javafx.scene.layout.GridPane;
 import velho.controller.LoginController;
 
 /**
- * Views the log ins to the applications.
- * @author Edward
+ * Allows the users to log in to the system.
  *
+ * @author Edward
  */
 public class LoginView
 {
+	/**
+	 * The root GridPane for this view.
+	 */
 	private GridPane grid;
 
 	public GridPane getLoginView()
@@ -23,17 +27,30 @@ public class LoginView
 		if (grid == null)
 		{
 			grid = new GridPane();
-			grid.setVgap(4);
-			grid.setHgap(0);
+			grid.setVgap(10);
+			grid.setHgap(10);
 			grid.setAlignment(Pos.CENTER);
-			Label labels = new Label("Scan Badge or Write PIN");
 
-			grid.add(labels, 0, 1, 1, 1);
+			final Label infoText = new Label("Scan badge or log in with your name and PIN");
+			infoText.setMaxWidth(Double.MAX_VALUE);
+			infoText.setAlignment(Pos.CENTER);
+			grid.add(infoText, 0, 0, 2, 1);
 
-			final PasswordField textField = new PasswordField();
-			grid.add(textField, 0, 2, 2, 1);
+			final TextField firstNameField = new TextField();
+			firstNameField.setPromptText("First Name");
+			grid.add(firstNameField, 0, 1, 1, 1);
+
+			final TextField lastNameField = new TextField();
+			firstNameField.setPromptText("Last Name");
+			grid.add(lastNameField, 1, 1, 1, 1);
+
+			final PasswordField authenticationStringField = new PasswordField();
+			authenticationStringField.setPromptText("Scan Badge or Write PIN");
+			grid.add(authenticationStringField, 0, 2, 2, 1);
 
 			Button logInButton = new Button("Log In");
+			logInButton.setMaxWidth(Double.MAX_VALUE);
+			logInButton.setPrefHeight(50.0);
 			grid.add(logInButton, 0, 3, 2, 1);
 
 			logInButton.setOnAction(new EventHandler<ActionEvent>()
@@ -41,11 +58,16 @@ public class LoginView
 				@Override
 				public void handle(ActionEvent event)
 				{
-					LoginController.login(textField.getText());
+					LoginController.login(firstNameField.getText(), lastNameField.getText(), authenticationStringField.getText());
 				}
 			});
 		}
 
 		return grid;
+	}
+
+	public void destroy()
+	{
+		grid = null;
 	}
 }

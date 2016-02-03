@@ -35,6 +35,15 @@ public class LoginController
 	private static DebugController debugController;
 
 	/**
+	 * Destroys the login view.
+	 */
+	private static void destroyView()
+	{
+		view.destroy();
+		view = null;
+	}
+
+	/**
 	 * Attaches the controllers that the login controller uses.
 	 *
 	 * @param uiController the {@link UIController}
@@ -44,7 +53,6 @@ public class LoginController
 	{
 		LoginController.uiController = uiController;
 		LoginController.debugController = debugController;
-		view = new LoginView();
 	}
 
 	/**
@@ -54,32 +62,80 @@ public class LoginController
 	 * is set at LoginView for authentication
 	 * @return as true
 	 */
-	public static void login(String authenticationString)
+	public static void login(final String firstName, final String lastName, final String authenticationString)
 	{
-		System.out.println("Attempting to log in with '" + authenticationString + "'");
-		try
-		{
-			currentUser = DatabaseController.authenticate(authenticationString);
-		}
-		catch (NoDatabaseLinkException e)
-		{
-			PopupController.error("Database connection lost.");
-			e.printStackTrace();
-		}
+		System.out.println("Attempting to log in with: " + firstName + " " + lastName + " " + authenticationString);
 
-		if (currentUser == null)
+		if (firstName.isEmpty() && lastName.isEmpty())
 		{
-			PopupController.warning("Invalid Badge ID or PIN.");
+			if (User.isValidBadgeID(authenticationString))
+			{
+				try
+				{
+					currentUser = DatabaseController.authenticateBadgeID(authenticationString);
+
+					// Valid credentials.
+					if (currentUser != null)
+					{
+						System.out.println(currentUser.toString() + " logged in with a badge.");
+						uiController.showMainMenu(currentUser.getRole());
+						destroyView();
+
+						if (MainWindow.DEBUG_MODE)
+						{
+							debugController.setLogInButton(false);
+							debugController.setLogOutButton(true);
+						}
+					}
+					else
+					{
+						PopupController.warning("Incorrect Badge ID.");
+					}
+				}
+				catch (NoDatabaseLinkException e)
+				{
+					DatabaseController.tryReLink();
+				}
+			}
+			else
+			{
+				PopupController.warning("Invalid Badge ID.");
+			}
 		}
 		else
 		{
-			System.out.println(currentUser.toString() + " logged in.");
-			uiController.showMainMenu(currentUser.getRole());
-
-			if (MainWindow.DEBUG_MODE)
+			if (User.isValidPIN(authenticationString))
 			{
-				debugController.setLogInButton(false);
-				debugController.setLogOutButton(true);
+				try
+				{
+					currentUser = DatabaseController.authenticatePIN(firstName, lastName, authenticationString);
+
+					// Valid credentials.
+					if (currentUser != null)
+					{
+						System.out.println(currentUser.toString() + " logged in with PIN.");
+						uiController.showMainMenu(currentUser.getRole());
+						destroyView();
+
+						if (MainWindow.DEBUG_MODE)
+						{
+							debugController.setLogInButton(false);
+							debugController.setLogOutButton(true);
+						}
+					}
+					else
+					{
+						PopupController.warning("Incorrect PIN or Names.");
+					}
+				}
+				catch (NoDatabaseLinkException e)
+				{
+					DatabaseController.tryReLink();
+				}
+			}
+			else
+			{
+				PopupController.warning("Invalid PIN.");
 			}
 		}
 	}
@@ -140,6 +196,8 @@ public class LoginController
 	 */
 	public static GridPane getView()
 	{
+		if (view == null)
+			view = new LoginView();
 		return view.getLoginView();
 	}
 
@@ -153,7 +211,7 @@ public class LoginController
 	{
 		if (!isLoggedIn())
 		{
-			uiController.setView(Position.CENTER, view.getLoginView());
+			uiController.setView(Position.CENTER, getView());
 			uiController.setView(Position.BOTTOM, null);
 			uiController.resetMainMenu();
 			System.out.println("Login check failed.");

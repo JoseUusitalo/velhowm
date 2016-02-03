@@ -44,32 +44,27 @@ public class UserController
 		{
 			if (User.validateUserData(badgeID, userPIN, userFirstName, userLastName, userRoleName))
 			{
-				try
+				System.out.println(
+						"Badge: " + badgeID + " PIN: " + userPIN + " First Name: " + userFirstName + " Last Name: " + userLastName + " Role: " + userRoleName);
+				int roleID = DatabaseController.getRoleID(userRoleName);
+
+				if (DatabaseController.addUser(badgeID, userPIN, userFirstName, userLastName, roleID))
 				{
-					System.out.println("Badge: " + badgeID + " PIN: " + userPIN + " First Name: " + userFirstName + " Last Name: " + userLastName + " Role: "
-							+ userRoleName);
-					int roleID = DatabaseController.getRoleID(userRoleName);
-
-					DatabaseController.addUser(badgeID, userPIN, userFirstName, userLastName, roleID);
-
 					PopupController.info("User created.");
 					return true;
 				}
-				catch (NoDatabaseLinkException e)
-				{
-					e.printStackTrace();
-				}
 
-				PopupController.info("User created.");
+				PopupController.info("User already exists. Please make sure that the following criteria are met:\n" + "Every Badge ID must be unique.\n"
+						+ "People with the same first and last name are allowed if their roles are different.\n"
+						+ "The combination of the PIN, first name, and last name must be unique.");
+				return false;
 			}
-			else
-			{
-				PopupController.warning("Invalid user data.");
-			}
+
+			PopupController.warning("Invalid user data.");
 		}
 		catch (NoDatabaseLinkException e)
 		{
-			e.printStackTrace();
+			DatabaseController.tryReLink();
 		}
 
 		return false;
