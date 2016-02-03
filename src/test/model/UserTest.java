@@ -22,17 +22,18 @@ import velho.model.exceptions.NoDatabaseLinkException;
  */
 public class UserTest
 {
-	private final String VALID_BADGE_ID = "99999999";
+	private final String VALID_BADGE_ID_MAX = "99999999";
+	private final String VALID_BADGE_ID_MIN = "00000000";
 	private final String INVALID_BADGE_ID_SHORT = "12345";
 	private final String INVALID_BADGE_ID_LONG = "123456789";
 
-	private final String VALID_PIN = "999999";
+	private final String VALID_PIN_MAX = "999999";
+	private final String VALID_PIN_MIN = "000000";
 	private final String INVALID_PIN_SHORT = "12";
 	private final String INVALID_PIN_LONG = "1234567";
 
 	private final String VALID_NAME = "First-Name";
 	private final String INVALID_NAME_LONG = "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa";
-	private final String INVALID_NAME_NULL = null;
 
 	private final String VALID_ROLE_NAME = "Manager";
 	private final String INVALID_ROLE_NAME = "Worker";
@@ -55,61 +56,79 @@ public class UserTest
 	@Test
 	public final void testValidation_PIN_Valid() throws NoDatabaseLinkException
 	{
-		assertTrue(User.validateUserData(null, VALID_PIN, VALID_NAME, VALID_NAME, VALID_ROLE_NAME));
+		assertTrue(User.validateUserData(null, VALID_PIN_MAX, VALID_NAME, VALID_NAME, VALID_ROLE_NAME));
 	}
 
 	@Test
 	public final void testValidation_Badge_Valid() throws NoDatabaseLinkException
 	{
-		assertTrue(User.validateUserData(VALID_BADGE_ID, "", VALID_NAME, VALID_NAME, VALID_ROLE_NAME));
+		assertTrue(User.validateUserData(VALID_BADGE_ID_MAX, "", VALID_NAME, VALID_NAME, VALID_ROLE_NAME));
 	}
 
 	@Test
-	public final void testValidation_Both() throws NoDatabaseLinkException
+	public final void testValidation_PIN_Valid2() throws NoDatabaseLinkException
 	{
-		assertFalse(User.validateUserData(VALID_BADGE_ID, VALID_PIN, VALID_NAME, VALID_NAME, VALID_ROLE_NAME));
+		assertTrue(User.validateUserData(null, VALID_PIN_MIN, VALID_NAME, VALID_NAME, VALID_ROLE_NAME));
 	}
 
 	@Test
-	public final void testValidation_BadgeID_LONG() throws NoDatabaseLinkException
+	public final void testValidation_Badge_Valid2() throws NoDatabaseLinkException
 	{
-		assertFalse(User.validateUserData(INVALID_BADGE_ID_LONG, VALID_PIN, VALID_NAME, VALID_NAME, VALID_ROLE_NAME));
+		assertTrue(User.validateUserData(VALID_BADGE_ID_MIN, "", VALID_NAME, VALID_NAME, VALID_ROLE_NAME));
 	}
 
 	@Test
-	public final void testValidation_BadgeID_SHORT() throws NoDatabaseLinkException
+	public final void testValidation_PinBadge() throws NoDatabaseLinkException
 	{
-		assertFalse(User.validateUserData(INVALID_BADGE_ID_SHORT, VALID_PIN, VALID_NAME, VALID_NAME, VALID_ROLE_NAME));
+		assertFalse(User.validateUserData(VALID_BADGE_ID_MAX, VALID_PIN_MAX, VALID_NAME, VALID_NAME, VALID_ROLE_NAME));
 	}
 
 	@Test
-	public final void testValidation_PIN_LONG() throws NoDatabaseLinkException
+	public final void testValidation_BadgeID_Long() throws NoDatabaseLinkException
 	{
-		assertFalse(User.validateUserData(VALID_BADGE_ID, INVALID_PIN_LONG, VALID_NAME, VALID_NAME, VALID_ROLE_NAME));
+		assertFalse(User.validateUserData(INVALID_BADGE_ID_LONG, null, VALID_NAME, VALID_NAME, VALID_ROLE_NAME));
 	}
 
 	@Test
-	public final void testValidation_PIN_SHORT() throws NoDatabaseLinkException
+	public final void testValidation_BadgeID_Short() throws NoDatabaseLinkException
 	{
-		assertFalse(User.validateUserData(VALID_BADGE_ID, INVALID_PIN_SHORT, VALID_NAME, VALID_NAME, VALID_ROLE_NAME));
+		assertFalse(User.validateUserData(INVALID_BADGE_ID_SHORT, "", VALID_NAME, VALID_NAME, VALID_ROLE_NAME));
+	}
+
+	@Test
+	public final void testValidation_PIN_Long() throws NoDatabaseLinkException
+	{
+		assertFalse(User.validateUserData("", INVALID_PIN_LONG, VALID_NAME, VALID_NAME, VALID_ROLE_NAME));
+	}
+
+	@Test
+	public final void testValidation_PIN_Short() throws NoDatabaseLinkException
+	{
+		assertFalse(User.validateUserData(null, INVALID_PIN_SHORT, VALID_NAME, VALID_NAME, VALID_ROLE_NAME));
 	}
 
 	@Test
 	public final void testValidation_Name_Long() throws NoDatabaseLinkException
 	{
-		assertFalse(User.validateUserData(VALID_BADGE_ID, VALID_PIN, VALID_NAME, INVALID_NAME_LONG, VALID_ROLE_NAME));
+		assertFalse(User.validateUserData(VALID_BADGE_ID_MAX, null, VALID_NAME, INVALID_NAME_LONG, VALID_ROLE_NAME));
 	}
 
 	@Test
 	public final void testValidation_Name_Null() throws NoDatabaseLinkException
 	{
-		assertFalse(User.validateUserData(VALID_BADGE_ID, VALID_PIN, INVALID_NAME_NULL, VALID_NAME, VALID_ROLE_NAME));
+		assertFalse(User.validateUserData("", VALID_PIN_MAX, null, VALID_NAME, VALID_ROLE_NAME));
 	}
 
 	@Test
-	public final void testValidation_Role() throws NoDatabaseLinkException
+	public final void testValidation_Name_Empty() throws NoDatabaseLinkException
 	{
-		assertFalse(User.validateUserData("", VALID_PIN, VALID_NAME, VALID_NAME, INVALID_ROLE_NAME));
+		assertFalse(User.validateUserData(VALID_BADGE_ID_MAX, "", VALID_NAME, "", VALID_ROLE_NAME));
+	}
+
+	@Test
+	public final void testValidation_Role_Invalid() throws NoDatabaseLinkException
+	{
+		assertFalse(User.validateUserData("", VALID_PIN_MAX, VALID_NAME, VALID_NAME, INVALID_ROLE_NAME));
 	}
 
 	@Test
