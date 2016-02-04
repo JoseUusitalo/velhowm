@@ -34,6 +34,7 @@ public abstract class ProductContainer
 		this.maxSize = maxSize;
 		this.boxID = boxID;
 		this.product = product;
+		this.productCount = productCount;
 	}
 
 	/**

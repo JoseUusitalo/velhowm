@@ -64,6 +64,11 @@ public class ProductTest
 		assertEquals(brand, product.getBrand());
 	}
 
+	@Test public void testGetBrandName()
+	{
+		assertEquals("jotain", product.getBrand().getName());
+	}
+
 	@Test public void testGetType()
 	{
 		assertEquals(category, product.getCategory());
