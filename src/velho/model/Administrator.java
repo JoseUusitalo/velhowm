@@ -35,6 +35,9 @@ public class Administrator implements UserRole
 	@Override
 	public int compareTo(final UserRole role)
 	{
+		if (role == null)
+			throw new IllegalArgumentException();
+		
 		switch (role.getName())
 		{
 			case "Administrator":
@@ -43,7 +46,7 @@ public class Administrator implements UserRole
 			case "Logistician":
 				return 1;
 			default:
-				return 0;
+				return -1;
 		}
 	}
 }
