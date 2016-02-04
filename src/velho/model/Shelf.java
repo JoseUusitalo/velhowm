@@ -15,7 +15,7 @@ public class Shelf
 	/**
 	 * The next free shelf ID in the warehouse.
 	 */
-	private static int nextFreeShelfID = 0;
+	private static long nextFreeShelfID = 0;
 
 	/**
 	 * The identifier of a shelf in IDs.
@@ -25,47 +25,12 @@ public class Shelf
 	/**
 	 * The ID of this shelf.
 	 */
-	private int shelfID;
+	private long shelfID;
 
 	/**
 	 * The array of shelf slots for each level of the shelf.
 	 */
 	private ShelfSlot[][] slots;
-
-	/**
-	 * Converts the given slot ID into an array of integers where:
-	 * <ul>
-	 * <li>Index 0: is the shelf ID</li>
-	 * <li>Index 1: is the level in the shelf</li>
-	 * <li>Index 2: is the slot ID in the shelf</li>
-	 * </ul>
-	 * @param slotID
-	 * @return an array of integers or an empty array if the given shelf slot ID is invalid
-	 */
-	public static int[] shelfSlotIDTokenizer(final String shelfSlotID)
-	{
-		if (shelfSlotID.charAt(0) != 'S')
-			return new int[0];
-
-		// Remove the S from front.
-		String[] stringTokens = shelfSlotID.substring(1).split(ShelfSlot.ID_SEPARATOR);
-
-		int[] tokens = new int[3];
-
-		for (int i = 0; i < 3; i++)
-		{
-			try
-			{
-				tokens[i] = Integer.parseInt(stringTokens[i]);
-			}
-			catch (NumberFormatException e)
-			{
-				throw new IllegalArgumentException("Invalid slot ID '" + shelfSlotID + "'.");
-			}
-		}
-
-		return tokens;
-	}
 
 	/**
 	 * Automatically creates the shelf slots for this shelf as well.
@@ -96,6 +61,93 @@ public class Shelf
 				slots[level][index] = slot;
 			}
 		}
+	}
+
+	/**
+	 * Converts the given slot ID into an Object array where:
+	 * <ul>
+	 * <li>Index 0: is the shelf ID String</li>
+	 * <li>Index 1: is the Integer level in the shelf</li>
+	 * <li>Index 2: is the slot ID Integer in the shelf</li>
+	 * </ul>
+	 * @param slotID
+	 * @return an array of integers
+	 */
+	public static Object[] tokenizeShelfSlotID(final String shelfSlotID)
+	{
+		// If the shelf slot ID does not begin with S it is not a shelf slot ID.
+		if (shelfSlotID.charAt(0) != 'S')
+			throw new IllegalArgumentException("Invalid slot ID '" + shelfSlotID + "'.");
+
+		// Remove the S from front so we can parse the values as integers.
+		String[] stringTokens = shelfSlotID.substring(1).split(ShelfSlot.ID_SEPARATOR);
+
+		Object[] tokens = new Object[3];
+
+		try
+		{
+			tokens[0] = Shelf.SHELF_IDENTIFIER + Integer.parseInt(stringTokens[0]);
+		}
+		catch (NumberFormatException e)
+		{
+			throw new IllegalArgumentException("Invalid slot ID '" + shelfSlotID + "'.");
+		}
+
+		try
+		{
+			tokens[1] = Integer.parseInt(stringTokens[1]);
+		}
+		catch (NumberFormatException e)
+		{
+			throw new IllegalArgumentException("Invalid slot ID '" + shelfSlotID + "'.");
+		}
+
+		try
+		{
+			tokens[2] = Integer.parseInt(stringTokens[2]);
+		}
+		catch (NumberFormatException e)
+		{
+			throw new IllegalArgumentException("Invalid slot ID '" + shelfSlotID + "'.");
+		}
+
+		return tokens;
+	}
+
+	/**
+	 * Converts the given slot ID into an array of integers where:
+	 * <ul>
+	 * <li>Index 0: is the shelf ID</li>
+	 * <li>Index 1: is the level in the shelf</li>
+	 * <li>Index 2: is the slot ID in the shelf</li>
+	 * </ul>
+	 * @param slotID
+	 * @return an array of integers
+	 */
+	private static int[] shelfSlotIDTokenizer(final String shelfSlotID)
+	{
+		// If the shelf slot ID does not begin with S it is not a shelf slot ID.
+		if (shelfSlotID.charAt(0) != 'S')
+			throw new IllegalArgumentException("Invalid slot ID '" + shelfSlotID + "'.");
+
+		// Remove the S from front so we can parse the values as integers.
+		String[] stringTokens = shelfSlotID.substring(1).split(ShelfSlot.ID_SEPARATOR);
+
+		int[] tokens = new int[3];
+
+		for (int i = 0; i < 3; i++)
+		{
+			try
+			{
+				tokens[i] = Integer.parseInt(stringTokens[i]);
+			}
+			catch (NumberFormatException e)
+			{
+				throw new IllegalArgumentException("Invalid slot ID '" + shelfSlotID + "'.");
+			}
+		}
+
+		return tokens;
 	}
 
 	/**
@@ -237,9 +289,17 @@ public class Shelf
 	 */
 	public boolean addToSlot(final String shelfSlotID, final ProductBox productBox)
 	{
-		int[] tokens = Shelf.shelfSlotIDTokenizer(shelfSlotID);
+		int[] tokens;
+		try
+		{
+			// Was a shelf slot ID given?
+			tokens = Shelf.shelfSlotIDTokenizer(shelfSlotID);
+		}
+		catch (IllegalArgumentException e)
+		{
+			return false;
+		}
 
-		// Was a shelf slot ID given?
 		if (tokens.length == 0)
 			return false;
 
@@ -360,7 +420,7 @@ public class Shelf
 		 *
 		 * @return the ID of the parent shelf
 		 */
-		public int getShelfID()
+		public long getShelfID()
 		{
 			return shelfID;
 		}

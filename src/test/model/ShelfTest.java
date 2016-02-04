@@ -121,13 +121,13 @@ public class ShelfTest
 	}
 
 	@Test
-	public final void testSlotIDTokenizer()
+	public final void testTokenizeSlotID()
 	{
-		int[] tokens = Shelf.shelfSlotIDTokenizer(SHELF_1_LEVEL_3_SLOT_16);
-		List<Integer> expected = new ArrayList<Integer>(Arrays.asList(1, 3, 16));
-		List<Integer> actual = new ArrayList<Integer>();
+		Object[] tokens = Shelf.tokenizeShelfSlotID(SHELF_1_LEVEL_3_SLOT_16);
+		List<Object> expected = new ArrayList<Object>(Arrays.asList("S1", 3, 16));
+		List<Object> actual = new ArrayList<Object>();
 
-		for (int value : tokens)
+		for (Object value : tokens)
 			actual.add(value);
 
 		assertTrue(actual.containsAll(expected));
@@ -135,13 +135,13 @@ public class ShelfTest
 	}
 
 	@Test
-	public final void testSlotIDTokenizer2()
+	public final void testTokenizeSlotID2()
 	{
-		int[] tokens = Shelf.shelfSlotIDTokenizer(SHELF_0_LEVEL_1_SLOT_1);
-		List<Integer> expected = new ArrayList<Integer>(Arrays.asList(0, 1, 1));
-		List<Integer> actual = new ArrayList<Integer>();
+		Object[] tokens = Shelf.tokenizeShelfSlotID(SHELF_0_LEVEL_1_SLOT_1);
+		List<Object> expected = new ArrayList<Object>(Arrays.asList("S0", 1, 1));
+		List<Object> actual = new ArrayList<Object>();
 
-		for (int value : tokens)
+		for (Object value : tokens)
 			actual.add(value);
 
 		assertTrue(actual.containsAll(expected));
@@ -153,7 +153,6 @@ public class ShelfTest
 	{
 		final String slotid = shelf.getShelfID() + "-1-03";
 		assertTrue(shelf.addToSlot(slotid, BOX_1_EMPTY));
-		System.out.println(shelf.getFreeShelfSlots());
 		assertTrue(shelf.getFreeShelfSlots().contains(slotid));
 	}
 
