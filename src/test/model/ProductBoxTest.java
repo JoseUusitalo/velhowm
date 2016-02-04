@@ -52,23 +52,25 @@ public class ProductBoxTest
 		box = null;
 	}
 
+	@SuppressWarnings("unused")
 	@Test public void testCreateProductBox_RAW()
 	{
 		ProductBox productBox2 = new ProductBox(1, 1, product2, 0);
 	}
-	
-	
 
+	@SuppressWarnings("unused")
 	@Test(expected = IllegalArgumentException.class) public void testCreateProductBox_COLD()
 	{
 		ProductBox productBox3 = new ProductBox(1, 1, product3, 0);
 	}
-	
+
+	@SuppressWarnings("unused")
 	@Test(expected = IllegalArgumentException.class) public void testCreateProductBox_MaxSize_1()
 	{
 		ProductBox productBox4 = new ProductBox(1, maxSize, product3, maxSize+1);
 	}
 
+	@SuppressWarnings("unused")
 	@Test(expected = IllegalArgumentException.class) public void testCreateProductBox_MaxSize_2()
 	{
 		ProductBox productBox5 = new ProductBox(1, maxSize-14, product3, maxSize);

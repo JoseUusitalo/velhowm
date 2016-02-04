@@ -24,17 +24,14 @@ public abstract class ProductContainer
 	 * 
 	 */
 	private int productCount;
-	
+
 	public ProductContainer(int boxID, int maxSize, Product product, int productCount)
 	{
 		if (maxSize < 1 || maxSize < productCount)
 		{
 			throw new IllegalArgumentException();
 		}
-		else
-		{
-			this.maxSize = maxSize;
-		}
+		this.maxSize = maxSize;
 		this.boxID = boxID;
 		this.product = product;
 	}
@@ -91,26 +88,18 @@ public abstract class ProductContainer
 	 * @return true or false.
 	 * 
 	 */
-	public boolean removeProduct(int productCount)
+	public boolean removeProduct(int count)
 	{
 		if (this.productCount > 0)
 		{
-			if ((this.productCount - productCount) >= 0)
+			if ((this.productCount - count) >= 0)
 			{
-				this.productCount = this.productCount - productCount;
+				this.productCount = this.productCount - count;
 				return true;
 			}
-
-			else
-			{
-				return false;
-			}
-		}
-		else
-		{
 			return false;
 		}
-
+		return false;
 	}
 
 	/**
@@ -121,17 +110,14 @@ public abstract class ProductContainer
 	 * @return true or false.
 	 * 
 	 */
-	public boolean addProduct(int productCount)
+	public boolean addProduct(int count)
 	{
-		if ((this.productCount + productCount) > maxSize)
+		if ((this.productCount + count) > maxSize)
 		{
 			return false;
 		}
-		else
-		{
-			this.productCount = this.productCount + productCount;
-			return true;
-		}
+		this.productCount = this.productCount + count;
+		return true;
 	}
 
 	/**
