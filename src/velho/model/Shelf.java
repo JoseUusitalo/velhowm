@@ -13,11 +13,6 @@ import java.util.TreeSet;
 public class Shelf
 {
 	/**
-	 * The next free shelf ID in the warehouse.
-	 */
-	private static int nextFreeShelfID = 0;
-
-	/**
 	 * The identifier of a shelf in IDs.
 	 */
 	private static final String SHELF_IDENTIFIER = "S";
@@ -40,9 +35,9 @@ public class Shelf
 	 * @param slotsPerLevel must be greater than 0
 	 * @param maxBoxesPerSlot must be greater than 0
 	 */
-	public Shelf(final int levels, final int slotsPerLevel, final int maxBoxesPerSlot)
+	public Shelf(final int shelfID, final int levels, final int slotsPerLevel, final int maxBoxesPerSlot)
 	{
-		this.shelfID = nextFreeShelfID++;
+		this.shelfID = shelfID;
 
 		if (levels < 1)
 			throw new IllegalArgumentException("Number of levels on a shelf must be greater than 0.");
@@ -153,6 +148,12 @@ public class Shelf
 		}
 
 		return tokens;
+	}
+
+	@Override
+	public String toString()
+	{
+		return "[" + shelfID + "] Lvl: " + getLevels() + ", Slt/Lvl: " + slots[0].length + ", Box/Slt: " + slots[0][0].maxBoxCount + ", Box: " + getProductBoxCount() + ", Slt: " + getShelfSlotCount() + ", Fr: " + getFreeShelfSlots().size();
 	}
 
 	/**

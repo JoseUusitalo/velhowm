@@ -7,5 +7,5 @@ package velho.model.enums;
  */
 public enum DatabaseTable
 {
-	ROLES, USERS
+	ROLES, USERS, PRODUCTBOXES, SHELVES, SHELF_PRODUCTBOXES
 }

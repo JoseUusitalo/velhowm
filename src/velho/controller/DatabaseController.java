@@ -15,6 +15,7 @@ import org.h2.jdbcx.JdbcConnectionPool;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import velho.model.Shelf;
 import velho.model.User;
 import velho.model.enums.DatabaseQueryType;
 import velho.model.enums.DatabaseTable;
@@ -244,6 +245,11 @@ public class DatabaseController
 									dataSet.add(result.getInt("role_id"));
 							}
 							break;
+						case SHELVES:
+							while (result.next())
+								dataSet.add(new Shelf(result.getInt("shelf_id"), result.getInt("max_levels"), result.getInt("max_shelfslots_per_level"),
+										result.getInt("max_productboxes_per_shelfslot")));
+							break;
 						default:
 							throw new IllegalArgumentException();
 					}
@@ -319,6 +325,7 @@ public class DatabaseController
 				{
 					case USERS:
 					case ROLES:
+					case SHELVES:
 						return dataSet;
 					default:
 						throw new IllegalArgumentException();
@@ -387,7 +394,9 @@ public class DatabaseController
 				e.printStackTrace();
 
 			// If it was a UNIQUE constraint violation, continue normally as those are handled separately.
-			System.out.println("[DatabaseController] Silently ignored an SQL UNIQUE constraint violation with.");
+			System.out.println("[DatabaseController] Silently ignored an SQL UNIQUE constraint violation with: \n");
+			System.out.println(e.getMessage());
+			System.out.println("\n[DatabaseController] End of message.");
 		}
 
 		// Close all resources.
@@ -411,6 +420,36 @@ public class DatabaseController
 		}
 
 		return changed;
+	}
+
+	/**
+	 * Attempts to re-link the database.
+	 */
+	private static void relink()
+	{
+		System.out.println("[DatabaseController] Attempting relink.");
+		try
+		{
+			// Just in case.
+			unlink();
+		}
+		catch (NoDatabaseLinkException e)
+		{
+			// Do nothing. This is expected.
+		}
+
+		try
+		{
+			link();
+		}
+		catch (ClassNotFoundException e)
+		{
+			e.printStackTrace();
+		}
+		catch (ExistingDatabaseLinkException e)
+		{
+			e.printStackTrace();
+		}
 	}
 
 	/**
@@ -440,7 +479,14 @@ public class DatabaseController
 		}
 		catch (SQLException e)
 		{
-			e.printStackTrace();
+			if (!e.getMessage().contains("Database may be already in use"))
+			{
+				relink();
+			}
+			else
+			{
+				e.printStackTrace();
+			}
 		}
 		return connection;
 	}
@@ -848,5 +894,38 @@ public class DatabaseController
 			getPublicUserDataList();
 
 		return changed;
+	}
+
+	/**
+	 * Loads data from database.
+	 */
+	public static void loadData()
+	{
+		System.out.println("[DatabaseController] Loading data from database...");
+
+		try
+		{
+			loadShelves();
+		}
+		catch (NoDatabaseLinkException e)
+		{
+			e.printStackTrace();
+		}
+	}
+
+	private static void loadShelves() throws NoDatabaseLinkException
+	{
+		System.out.println("[DatabaseController] Loading shelves...");
+
+		String[] columns = { "*" };
+		@SuppressWarnings("unchecked")
+		Set<Shelf> result = (Set<Shelf>) runQuery(DatabaseQueryType.SELECT, DatabaseTable.SHELVES, columns, null, null);
+
+		Iterator<Shelf> it = result.iterator();
+
+		while (it.hasNext())
+			System.out.println(it.next().toString());
+
+		System.out.println("[DatabaseController] Shelves loaded.");
 	}
 }

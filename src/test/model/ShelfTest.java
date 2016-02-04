@@ -24,6 +24,8 @@ import velho.model.Shelf;
 @SuppressWarnings("static-method")
 public class ShelfTest
 {
+	private static final int SHELF_ID_0 = 0;
+	private static final int SHELF_ID_1 = 1;
 	private static final int SHELF_LEVELS = 3;
 	private static final int SHELF_SLOTS = 20;
 	private static final int SHELF_BOXES_PER_SLOT = 32;
@@ -58,28 +60,25 @@ public class ShelfTest
 	public final void createShelf()
 	{
 		// Create a new shelf before each test.
-		shelf = new Shelf(SHELF_LEVELS, SHELF_SLOTS, SHELF_BOXES_PER_SLOT);
+		shelf = new Shelf(SHELF_ID_0, SHELF_LEVELS, SHELF_SLOTS, SHELF_BOXES_PER_SLOT);
 	}
 
-	@SuppressWarnings("unused")
 	@Test(expected = IllegalArgumentException.class)
 	public final void testCreateInvalid()
 	{
-		Shelf s = new Shelf(-1, 2, 3);
+		Shelf s = new Shelf(-1, -1, 2, 3);
 	}
 
-	@SuppressWarnings("unused")
 	@Test(expected = IllegalArgumentException.class)
 	public final void testCreateInvalid2()
 	{
-		Shelf s = new Shelf(1, -2, 3);
+		Shelf s = new Shelf(1, 1, -2, 3);
 	}
 
-	@SuppressWarnings("unused")
 	@Test(expected = IllegalArgumentException.class)
 	public final void testCreateInvalid3()
 	{
-		Shelf s = new Shelf(1, 2, -3);
+		Shelf s = new Shelf(0, 1, 2, -3);
 	}
 
 	@Test
@@ -187,7 +186,7 @@ public class ShelfTest
 	@Test(expected = IllegalArgumentException.class)
 	public final void testAddToSlot_Invalid()
 	{
-		assertFalse(shelf.addToSlot(INVALID_SHELF_SLOT_ID, BOX_2));
+		shelf.addToSlot(INVALID_SHELF_SLOT_ID, BOX_2);
 	}
 
 	@Test

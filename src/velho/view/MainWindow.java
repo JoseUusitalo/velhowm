@@ -1,6 +1,7 @@
 package velho.view;
 
 import javafx.application.Application;
+import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
@@ -42,6 +43,11 @@ public class MainWindow extends Application
 	 * Enable or disable debug features.
 	 */
 	public static final boolean DEBUG_MODE = true;
+
+	/**
+	 * Enable or disable showing windows. DEBUG_MODE must be <code>true</code> to make this <code>false</code>.
+	 */
+	public static final boolean SHOW_WINDOWS = false;
 
 	/**
 	 * The {@link DebugController}.
@@ -177,28 +183,39 @@ public class MainWindow extends Application
 		rootBorderPane.setCenter(mainTabPane);
 	}
 
+	@SuppressWarnings("unused")
 	@Override
 	public void start(final Stage primaryStage)
 	{
-		primaryStage.setTitle("Velho Warehouse Management");
-		Group root = new Group();
-		scene = new Scene(root, 1024, 700, Color.WHITE);
-		rootBorderPane = new BorderPane();
-		rootBorderPane.prefHeightProperty().bind(scene.heightProperty());
-		rootBorderPane.prefWidthProperty().bind(scene.widthProperty());
-
-		root.getChildren().add(rootBorderPane);
-
-		LoginController.checkLogin();
-
-		primaryStage.setScene(scene);
-		primaryStage.show();
-
-		if (MainWindow.DEBUG_MODE)
+		if (!SHOW_WINDOWS && DEBUG_MODE)
 		{
-			Stage secondStage = new Stage();
-			debugController.createDebugWindow(secondStage);
+			System.out.println("Windows are disabled.");
 		}
+		else
+		{
+			primaryStage.setTitle("Velho Warehouse Management");
+			Group root = new Group();
+			scene = new Scene(root, 1024, 700, Color.WHITE);
+			rootBorderPane = new BorderPane();
+			rootBorderPane.prefHeightProperty().bind(scene.heightProperty());
+			rootBorderPane.prefWidthProperty().bind(scene.widthProperty());
+
+			root.getChildren().add(rootBorderPane);
+
+			LoginController.checkLogin();
+
+			primaryStage.setScene(scene);
+			primaryStage.show();
+
+			if (DEBUG_MODE)
+			{
+				Stage secondStage = new Stage();
+				debugController.createDebugWindow(secondStage);
+			}
+		}
+
+		DatabaseController.loadData();
+		Platform.exit();
 	}
 
 	/**
