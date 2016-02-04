@@ -20,6 +20,7 @@ import velho.model.exceptions.NoDatabaseLinkException;
  *
  * @author Jose Uusitalo
  */
+@SuppressWarnings("static-method")
 public class UserTest
 {
 	private final String VALID_BADGE_ID_MAX = "99999999";
@@ -78,12 +79,6 @@ public class UserTest
 	}
 
 	@Test
-	public final void testValidation_PinBadge() throws NoDatabaseLinkException
-	{
-		assertFalse(User.validateUserData(VALID_BADGE_ID_MAX, VALID_PIN_MAX, VALID_NAME, VALID_NAME, VALID_ROLE_NAME));
-	}
-
-	@Test
 	public final void testValidation_BadgeID_Long() throws NoDatabaseLinkException
 	{
 		assertFalse(User.validateUserData(INVALID_BADGE_ID_LONG, null, VALID_NAME, VALID_NAME, VALID_ROLE_NAME));
@@ -107,6 +102,24 @@ public class UserTest
 		assertFalse(User.validateUserData(null, INVALID_PIN_SHORT, VALID_NAME, VALID_NAME, VALID_ROLE_NAME));
 	}
 
+	@Test
+	public final void testValidation_PinBadge() throws NoDatabaseLinkException
+	{
+		assertFalse(User.validateUserData(VALID_BADGE_ID_MAX, VALID_PIN_MAX, VALID_NAME, VALID_NAME, VALID_ROLE_NAME));
+	}
+
+	@Test
+	public final void testValidation_PinBadge_Neither() throws NoDatabaseLinkException
+	{
+		assertFalse(User.validateUserData("", "", VALID_NAME, VALID_NAME, VALID_ROLE_NAME));
+	}
+
+	@Test
+	public final void testValidation_PinBadge_Neither2() throws NoDatabaseLinkException
+	{
+		assertFalse(User.validateUserData(null, null, VALID_NAME, VALID_NAME, VALID_ROLE_NAME));
+	}
+	
 	@Test
 	public final void testValidation_Name_Long() throws NoDatabaseLinkException
 	{
@@ -132,6 +145,43 @@ public class UserTest
 	}
 
 	@Test
+	public final void testIsValidPIN_Invalid()
+	{
+		assertFalse(User.isValidPIN("whatev"));
+	}
+
+	
+	@Test
+	public final void testIsValidPIN_Negative()
+	{
+		assertFalse(User.isValidPIN("-12345"));
+	}
+
+	@Test
+	public final void testisValidPIN_Zero()
+	{
+		assertTrue(User.isValidPIN("000000"));
+	}
+
+	@Test
+	public final void testIsValidBadgeID_Invalid()
+	{
+		assertFalse(User.isValidBadgeID("whatever"));
+	}
+
+	@Test
+	public final void testIsValidBadgeID_Negative()
+	{
+		assertFalse(User.isValidBadgeID("-10000000"));
+	}
+
+	@Test
+	public final void testIsValidBadgeID2()
+	{
+		assertTrue(User.isValidBadgeID("99999999"));
+	}
+	
+	@Test
 	public final void testGetFirstName()
 	{
 		assertEquals("f", user.getFirstName());
@@ -142,7 +192,7 @@ public class UserTest
 	{
 		assertEquals("l", user.getLastName());
 	}
-
+	
 	@Test
 	public final void testGetFullName()
 	{
