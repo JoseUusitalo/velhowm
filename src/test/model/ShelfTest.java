@@ -25,10 +25,10 @@ import velho.model.Shelf;
 public class ShelfTest
 {
 	private static final int SHELF_LEVELS = 3;
-	private static final int SHELF_SLOTS = 16;
+	private static final int SHELF_SLOTS = 20;
 	private static final int SHELF_BOXES_PER_SLOT = 32;
-	private static final String SHELF_0_LEVEL_1_SLOT_1 = "0-1-1";
-	private static final String SHELF_1_LEVEL_3_SLOT_16 = "1-3-16";
+	private static final String SHELF_0_LEVEL_1_SLOT_1 = "S0-1-01";
+	private static final String SHELF_1_LEVEL_3_SLOT_16 = "S1-3-16";
 
 	private static final int PRODUCT_1_ID = 10045;
 	private static final String PRODUCT_1_NAME = "A Test Product";
@@ -57,18 +57,21 @@ public class ShelfTest
 		shelf = new Shelf(SHELF_LEVELS, SHELF_SLOTS, SHELF_BOXES_PER_SLOT);
 	}
 
+	@SuppressWarnings("unused")
 	@Test(expected = IllegalArgumentException.class)
 	public final void testCreateInvalid()
 	{
 		Shelf s = new Shelf(-1, 2, 3);
 	}
 
+	@SuppressWarnings("unused")
 	@Test(expected = IllegalArgumentException.class)
 	public final void testCreateInvalid2()
 	{
 		Shelf s = new Shelf(1, -2, 3);
 	}
 
+	@SuppressWarnings("unused")
 	@Test(expected = IllegalArgumentException.class)
 	public final void testCreateInvalid3()
 	{
@@ -78,13 +81,13 @@ public class ShelfTest
 	@Test
 	public final void testGetShelfID_Empty()
 	{
-		assertEquals(4, shelf.getShelfID());
+		assertEquals("S4", shelf.getShelfID());
 	}
 
 	@Test
 	public final void testGetFreeShelfSlots_Empty()
 	{
-		assertEquals(shelf.getShelfSlots().size(), shelf.getFreeShelfSlots().size());
+		assertEquals(shelf.getShelfSlotCount(), shelf.getFreeShelfSlots().size());
 	}
 
 	@Test
@@ -120,7 +123,7 @@ public class ShelfTest
 	@Test
 	public final void testSlotIDTokenizer()
 	{
-		int[] tokens = Shelf.slotIDTokenizer(SHELF_1_LEVEL_3_SLOT_16);
+		int[] tokens = Shelf.shelfSlotIDTokenizer(SHELF_1_LEVEL_3_SLOT_16);
 		List<Integer> expected = new ArrayList<Integer>(Arrays.asList(1, 3, 16));
 		List<Integer> actual = new ArrayList<Integer>();
 
@@ -134,7 +137,7 @@ public class ShelfTest
 	@Test
 	public final void testSlotIDTokenizer2()
 	{
-		int[] tokens = Shelf.slotIDTokenizer(SHELF_0_LEVEL_1_SLOT_1);
+		int[] tokens = Shelf.shelfSlotIDTokenizer(SHELF_0_LEVEL_1_SLOT_1);
 		List<Integer> expected = new ArrayList<Integer>(Arrays.asList(0, 1, 1));
 		List<Integer> actual = new ArrayList<Integer>();
 
@@ -148,8 +151,9 @@ public class ShelfTest
 	@Test
 	public final void testAddToSlot_EmptyBox()
 	{
-		final String slotid = shelf.getShelfID() + "-1-3";
+		final String slotid = shelf.getShelfID() + "-1-03";
 		assertTrue(shelf.addToSlot(slotid, BOX_1_EMPTY));
+		System.out.println(shelf.getFreeShelfSlots());
 		assertTrue(shelf.getFreeShelfSlots().contains(slotid));
 	}
 

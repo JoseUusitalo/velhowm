@@ -2,34 +2,35 @@ package velho.model;
 
 import java.util.HashSet;
 import java.util.Iterator;
-import java.util.Map;
 import java.util.Set;
-import java.util.TreeMap;
 import java.util.TreeSet;
 
 /**
- * A class representing a physical shelf structure in a warehouse.
+ * A class representing a physical shelf structure in the warehouse.
  *
  * @author Jose Uusitalo
  */
 public class Shelf
 {
+	/**
+	 * The next free shelf ID in the warehouse.
+	 */
 	private static int nextFreeShelfID = 0;
 
 	/**
-	 * The ID of thise shelf.
+	 * The identifier of a shelf in IDs.
+	 */
+	private static final String SHELF_IDENTIFIER = "S";
+
+	/**
+	 * The ID of this shelf.
 	 */
 	private int shelfID;
 
 	/**
-	 * The levels of this shelf containing shelf slots.
+	 * The array of shelf slots for each level of the shelf.
 	 */
-	private Map<String, ShelfSlot> slots;
-
-	/**
-	 * The number of levels in this shelf.
-	 */
-	private int levels;
+	private ShelfSlot[][] slots;
 
 	/**
 	 * Converts the given slot ID into an array of integers where:
@@ -39,11 +40,16 @@ public class Shelf
 	 * <li>Index 2: is the slot ID in the shelf</li>
 	 * </ul>
 	 * @param slotID
-	 * @return
+	 * @return an array of integers or an empty array if the given shelf slot ID is invalid
 	 */
-	public static int[] slotIDTokenizer(final String slotID)
+	public static int[] shelfSlotIDTokenizer(final String shelfSlotID)
 	{
-		String[] stringTokens = slotID.split(ShelfSlot.ID_SEPARATOR);
+		if (shelfSlotID.charAt(0) != 'S')
+			return new int[0];
+
+		// Remove the S from front.
+		String[] stringTokens = shelfSlotID.substring(1).split(ShelfSlot.ID_SEPARATOR);
+
 		int[] tokens = new int[3];
 
 		for (int i = 0; i < 3; i++)
@@ -54,7 +60,7 @@ public class Shelf
 			}
 			catch (NumberFormatException e)
 			{
-				throw new IllegalArgumentException("Invalid slot ID '" + slotID + "'.");
+				throw new IllegalArgumentException("Invalid slot ID '" + shelfSlotID + "'.");
 			}
 		}
 
@@ -78,8 +84,7 @@ public class Shelf
 		if (slotsPerLevel < 1)
 			throw new IllegalArgumentException("Number of shelf slots on a shelf level must be greater than 0.");
 
-		this.levels = levels;
-		this.slots = new TreeMap<String, ShelfSlot>();
+		this.slots = new ShelfSlot[levels][slotsPerLevel];
 
 		// For every level.
 		for (int level = 0; level < levels; level++)
@@ -88,7 +93,7 @@ public class Shelf
 			for (int index = 0; index < slotsPerLevel; index++)
 			{
 				ShelfSlot slot = new ShelfSlot(level, index, maxBoxesPerSlot);
-				slots.put(slot.getSlotID(), slot);
+				slots[level][index] = slot;
 			}
 		}
 	}
@@ -98,19 +103,19 @@ public class Shelf
 	 *
 	 * @return the shelf ID
 	 */
-	public int getShelfID()
+	public String getShelfID()
 	{
-		return shelfID;
+		return SHELF_IDENTIFIER + shelfID;
 	}
 
 	/**
-	 * Gets all the shelf slots on this shelf.
+	 * Gets the number of shelf slots on this shelf.
 	 *
-	 * @return the slots of this shelf
+	 * @return the number of slots on this shelf
 	 */
-	public Map<String, ShelfSlot> getShelfSlots()
+	public int getShelfSlotCount()
 	{
-		return slots;
+		return slots.length * slots[0].length;
 	}
 
 	/**
@@ -120,7 +125,7 @@ public class Shelf
 	 */
 	public int getLevels()
 	{
-		return levels;
+		return slots.length;
 	}
 
 	/**
@@ -131,10 +136,18 @@ public class Shelf
 	public TreeSet<String> getFreeShelfSlots()
 	{
 		TreeSet<String> freeSlots = new TreeSet<String>();
+		final int levels = slots.length;
+		final int slotCount = slots[0].length;
 
-		for (final ShelfSlot slot : slots.values())
-			if (slot.hasFreeSpace())
-				freeSlots.add(slot.getSlotID());
+		for (int level = 0; level < levels; level++)
+		{
+			for (int index = 0; index < slotCount; index++)
+			{
+				if (slots[level][index].hasFreeSpace())
+					freeSlots.add(slots[level][index].getSlotID());
+			}
+		}
+
 		return freeSlots;
 	}
 
@@ -146,8 +159,17 @@ public class Shelf
 	public int getProductCount()
 	{
 		int sum = 0;
-		for (final ShelfSlot slot : slots.values())
-			sum += slot.getProductCount();
+		final int levels = slots.length;
+		final int slotCount = slots[0].length;
+
+		for (int level = 0; level < levels; level++)
+		{
+			for (int index = 0; index < slotCount; index++)
+			{
+				sum += slots[level][index].getProductCount();
+			}
+		}
+
 		return sum;
 	}
 
@@ -159,9 +181,17 @@ public class Shelf
 	public int getProductBoxCount()
 	{
 		int sum = 0;
+		final int levels = slots.length;
+		final int slotCount = slots[0].length;
 
-		for (final ShelfSlot slot : slots.values())
-			sum += slot.getProductBoxCount();
+		for (int level = 0; level < levels; level++)
+		{
+			for (int index = 0; index < slotCount; index++)
+			{
+				sum += slots[level][index].getProductBoxCount();
+			}
+		}
+
 		return sum;
 	}
 
@@ -193,39 +223,66 @@ public class Shelf
 	 */
 	public Set<ProductBox> getShelfSlotBoxes(final String shelfSlotID)
 	{
-		return slots.get(shelfSlotID).boxes;
+		int[] tokens = Shelf.shelfSlotIDTokenizer(shelfSlotID);
+		return slots[tokens[1]][tokens[2]].boxes;
 	}
 
 	/**
 	 * Attempts to add the given {@link ProductBox} into the {@link ShelfSlot} specified by the slot ID.
 	 *
-	 * @param slotID shelf slot id
+	 * @param shelfSlotID ID of the shelf slot
 	 * @param box box to add
 	 * @return <code>true</code> if box was added to the slot, <code>false</code> if the slot ID is not in this shelf,
 	 * or the slot did not have enough free space
 	 */
-	public boolean addToSlot(final String slotID, final ProductBox box)
+	public boolean addToSlot(final String shelfSlotID, final ProductBox productBox)
 	{
-		if (!slots.containsKey(slotID))
+		int[] tokens = Shelf.shelfSlotIDTokenizer(shelfSlotID);
+
+		// Was a shelf slot ID given?
+		if (tokens.length == 0)
 			return false;
 
-		return slots.get(slotID).addBox(box);
+		// Correct shelf?
+		if (shelfID != tokens[0])
+			return false;
+
+		// Enough levels?
+		if (slots.length < tokens[1] - 1)
+			return false;
+
+		// Enough slots?
+		if (slots[0].length < tokens[2])
+			return false;
+
+		return slots[tokens[1]][tokens[2]].addBox(productBox);
 	}
 
 	/**
 	 * Attempts to remove the given {@link ProductBox} from the {@link ShelfSlot} specified by the slot ID.
 	 *
-	 * @param slotID shelf slot ID
+	 * @param shelfSlotID ID of the shelf slot
 	 * @param box box to remove
 	 * @return <code>true</code> if box was added to the slot, <code>false</code> if the slot ID is not in this shelf,
 	 * or the slot did not have the specified box
 	 */
-	public boolean removeFromSlot(final String slotID, final ProductBox box)
+	public boolean removeFromSlot(final String shelfSlotID, final ProductBox productBox)
 	{
-		if (!slots.containsKey(slotID))
+		int[] tokens = Shelf.shelfSlotIDTokenizer(shelfSlotID);
+
+		// Correct shelf?
+		if (shelfID != tokens[0])
 			return false;
 
-		return slots.get(slotID).removeBox(box);
+		// Enough levels?
+		if (slots.length < tokens[1] - 1)
+			return false;
+
+		// Enough slots?
+		if (slots[0].length < tokens[2])
+			return false;
+
+		return slots[tokens[1]][tokens[2]].removeBox(productBox);
 	}
 
 	/*
@@ -233,7 +290,7 @@ public class Shelf
 	 */
 
 	/**
-	 * An object representing an area with {@link ProductBox} objects on a {@link Shelf}.
+	 * A Shelf Slot represents an indexed area with {@link ProductBox} objects on a {@link Shelf}.
 	 *
 	 * @author Jose Uusitalo
 	 */
@@ -242,24 +299,9 @@ public class Shelf
 		public static final String ID_SEPARATOR = "-";
 
 		/**
-		 * The index of this shelf slot in a shelf level.
-		 */
-		private int shelfLevelIndex;
-
-		/**
-		 * The shelf level this shelf slot is on.
-		 */
-		private int shelfLevel;
-
-		/**
 		 * The maximum number of product boxes this slot can contain.
 		 */
 		private int maxBoxCount;
-
-		/**
-		 * The ID of parent shelf this slot belongs to.
-		 */
-		private int parentShelfID;
 
 		/**
 		 * The contents of this shelf slot.
@@ -279,17 +321,17 @@ public class Shelf
 		 */
 		private ShelfSlot(final int shelfLevel, final int indexInLevel, final int maxBoxCount)
 		{
-			this.shelfSlotID = shelfID + ID_SEPARATOR + shelfLevel + ID_SEPARATOR + indexInLevel;
-
+			// @formatter:off
+			// Zero pad shelf level and index.
+			this.shelfSlotID = Shelf.SHELF_IDENTIFIER + shelfID + ID_SEPARATOR
+					+ String.format("%0" + String.valueOf(slots.length).length() + "d", shelfLevel) + ID_SEPARATOR
+					+ String.format("%0" + String.valueOf(slots[0].length).length() + "d", indexInLevel);
+			// @formatter:on
 			if (maxBoxCount < 1)
 				throw new IllegalArgumentException("Maxmimum ProductBox count must be greater than 0.");
 
 			this.maxBoxCount = maxBoxCount;
 
-			/*
-			 * TODO: Find a way to implements stacks.
-			 * The stack should go from "front to back" because you can't take out boxes that are behind other boxes.
-			 */
 			boxes = new HashSet<ProductBox>();
 		}
 
