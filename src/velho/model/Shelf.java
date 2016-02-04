@@ -1,10 +1,10 @@
 package velho.model;
 
-import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Iterator;
-import java.util.List;
+import java.util.Map;
 import java.util.Set;
-import java.util.Stack;
+import java.util.TreeMap;
 import java.util.TreeSet;
 
 /**
@@ -14,6 +14,8 @@ import java.util.TreeSet;
  */
 public class Shelf
 {
+	private static int nextFreeShelfID = 0;
+
 	/**
 	 * The ID of thise shelf.
 	 */
@@ -22,7 +24,42 @@ public class Shelf
 	/**
 	 * The levels of this shelf containing shelf slots.
 	 */
-	private List<Set<ShelfSlot>> levels;
+	private Map<String, ShelfSlot> slots;
+
+	/**
+	 * The number of levels in this shelf.
+	 */
+	private int levels;
+
+	/**
+	 * Converts the given slot ID into an array of integers where:
+	 * <ul>
+	 * <li>Index 0: is the shelf ID</li>
+	 * <li>Index 1: is the level in the shelf</li>
+	 * <li>Index 2: is the slot ID in the shelf</li>
+	 * </ul>
+	 * @param slotID
+	 * @return
+	 */
+	public static int[] slotIDTokenizer(final String slotID)
+	{
+		String[] stringTokens = slotID.split(ShelfSlot.ID_SEPARATOR);
+		int[] tokens = new int[3];
+
+		for (int i = 0; i < 3; i++)
+		{
+			try
+			{
+				tokens[i] = Integer.parseInt(stringTokens[i]);
+			}
+			catch (NumberFormatException e)
+			{
+				throw new IllegalArgumentException("Invalid slot ID '" + slotID + "'.");
+			}
+		}
+
+		return tokens;
+	}
 
 	/**
 	 * Automatically creates the shelf slots for this shelf as well.
@@ -32,28 +69,27 @@ public class Shelf
 	 * @param slotsPerLevel must be greater than 0
 	 * @param maxBoxesPerSlot must be greater than 0
 	 */
-	public Shelf(final int shelfID, final int levels, final int slotsPerLevel, final int maxBoxesPerSlot)
+	public Shelf(final int levels, final int slotsPerLevel, final int maxBoxesPerSlot)
 	{
-		this.shelfID = shelfID;
+		this.shelfID = nextFreeShelfID++;
 
 		if (levels < 1)
 			throw new IllegalArgumentException("Number of levels on a shelf must be greater than 0.");
 		if (slotsPerLevel < 1)
 			throw new IllegalArgumentException("Number of shelf slots on a shelf level must be greater than 0.");
 
-		this.levels = new ArrayList<Set<ShelfSlot>>();
+		this.levels = levels;
+		this.slots = new TreeMap<String, ShelfSlot>();
 
-		// Create levels.
+		// For every level.
 		for (int level = 0; level < levels; level++)
 		{
-			// Each level is a TreeSet.
-			Set<ShelfSlot> currentLevel = new TreeSet<ShelfSlot>();
-
-			// On every level create new slots.
+			// Create new slots.
 			for (int index = 0; index < slotsPerLevel; index++)
-				currentLevel.add(new ShelfSlot(this, level + 1, index, maxBoxesPerSlot));
-
-			this.levels.add(currentLevel);
+			{
+				ShelfSlot slot = new ShelfSlot(level, index, maxBoxesPerSlot);
+				slots.put(slot.getSlotID(), slot);
+			}
 		}
 	}
 
@@ -68,13 +104,13 @@ public class Shelf
 	}
 
 	/**
-	 * Gets all the levels of shelf slots on this shelf.
+	 * Gets all the shelf slots on this shelf.
 	 *
-	 * @return the levels of this shelf
+	 * @return the slots of this shelf
 	 */
-	public List<Set<ShelfSlot>> getLevels()
+	public Map<String, ShelfSlot> getShelfSlots()
 	{
-		return levels;
+		return slots;
 	}
 
 	/**
@@ -82,22 +118,9 @@ public class Shelf
 	 *
 	 * @return the number of levels of this shelf
 	 */
-	public int getLevelCount()
+	public int getLevels()
 	{
-		return levels.size();
-	}
-
-	/**
-	 * Counts the number of shelf slots on this shelf.
-	 *
-	 * @return the number of shelf slots of this shelf
-	 */
-	public int getShelfSlotCount()
-	{
-		int sum = 0;
-		for (final Set<ShelfSlot> slots : levels)
-			sum += slots.size();
-		return sum;
+		return levels;
 	}
 
 	/**
@@ -105,14 +128,13 @@ public class Shelf
 	 *
 	 * @return shelf slots with free space of this shelf
 	 */
-	public List<ShelfSlot> getFreeShelfSlots()
+	public TreeSet<String> getFreeShelfSlots()
 	{
-		List<ShelfSlot> freeSlots = new ArrayList<ShelfSlot>();
+		TreeSet<String> freeSlots = new TreeSet<String>();
 
-		for (final Set<ShelfSlot> slots : levels)
-			for (final ShelfSlot slot : slots)
-				if (slot.hasFreeSpace())
-					freeSlots.add(slot);
+		for (final ShelfSlot slot : slots.values())
+			if (slot.hasFreeSpace())
+				freeSlots.add(slot.getSlotID());
 		return freeSlots;
 	}
 
@@ -124,9 +146,8 @@ public class Shelf
 	public int getProductCount()
 	{
 		int sum = 0;
-		for (final Set<ShelfSlot> slots : levels)
-			for (final ShelfSlot slot : slots)
-				sum += slot.getProductCount();
+		for (final ShelfSlot slot : slots.values())
+			sum += slot.getProductCount();
 		return sum;
 	}
 
@@ -139,9 +160,8 @@ public class Shelf
 	{
 		int sum = 0;
 
-		for (final Set<ShelfSlot> slots : levels)
-			for (final ShelfSlot slot : slots)
-				sum += slot.getProductBoxCount();
+		for (final ShelfSlot slot : slots.values())
+			sum += slot.getProductBoxCount();
 		return sum;
 	}
 
@@ -152,7 +172,7 @@ public class Shelf
 	 */
 	public boolean isEmpty()
 	{
-		return getFreeShelfSlots().size() == getShelfSlotCount();
+		return getProductBoxCount() == 0;
 	}
 
 	/**
@@ -163,6 +183,49 @@ public class Shelf
 	public boolean hasFreeSpace()
 	{
 		return getFreeShelfSlots().size() != 0;
+	}
+
+	/**
+	 * Gets the specified {@link ShelfSlot}.
+	 *
+	 * @param shelfSlotID the ID of the shelf slot to get
+	 * @return the wanted shelf slot or <code>null</code> if shelf slow is not in this shelf
+	 */
+	public Set<ProductBox> getShelfSlotBoxes(final String shelfSlotID)
+	{
+		return slots.get(shelfSlotID).boxes;
+	}
+
+	/**
+	 * Attempts to add the given {@link ProductBox} into the {@link ShelfSlot} specified by the slot ID.
+	 *
+	 * @param slotID shelf slot id
+	 * @param box box to add
+	 * @return <code>true</code> if box was added to the slot, <code>false</code> if the slot ID is not in this shelf,
+	 * or the slot did not have enough free space
+	 */
+	public boolean addToSlot(final String slotID, final ProductBox box)
+	{
+		if (!slots.containsKey(slotID))
+			return false;
+
+		return slots.get(slotID).addBox(box);
+	}
+
+	/**
+	 * Attempts to remove the given {@link ProductBox} from the {@link ShelfSlot} specified by the slot ID.
+	 *
+	 * @param slotID shelf slot ID
+	 * @param box box to remove
+	 * @return <code>true</code> if box was added to the slot, <code>false</code> if the slot ID is not in this shelf,
+	 * or the slot did not have the specified box
+	 */
+	public boolean removeFromSlot(final String slotID, final ProductBox box)
+	{
+		if (!slots.containsKey(slotID))
+			return false;
+
+		return slots.get(slotID).removeBox(box);
 	}
 
 	/*
@@ -176,6 +239,8 @@ public class Shelf
 	 */
 	class ShelfSlot implements Comparable<ShelfSlot>
 	{
+		public static final String ID_SEPARATOR = "-";
+
 		/**
 		 * The index of this shelf slot in a shelf level.
 		 */
@@ -192,14 +257,19 @@ public class Shelf
 		private int maxBoxCount;
 
 		/**
-		 * The parent shelf this slot belongs to.
+		 * The ID of parent shelf this slot belongs to.
 		 */
-		private Shelf parent;
+		private int parentShelfID;
 
 		/**
 		 * The contents of this shelf slot.
 		 */
-		private Stack<ProductBox> stack;
+		private Set<ProductBox> boxes;
+
+		/**
+		 * The ID of this shelf slot.
+		 */
+		private String shelfSlotID;
 
 		/**
 		 * @param parent
@@ -207,19 +277,20 @@ public class Shelf
 		 * @param indexInLevel
 		 * @param maxBoxCount must be greater than 0
 		 */
-		private ShelfSlot(final Shelf parent, final int shelfLevel, final int indexInLevel, final int maxBoxCount)
+		private ShelfSlot(final int shelfLevel, final int indexInLevel, final int maxBoxCount)
 		{
-			this.parent = parent;
-			this.shelfLevel = shelfLevel;
-			this.shelfLevelIndex = indexInLevel;
+			this.shelfSlotID = shelfID + ID_SEPARATOR + shelfLevel + ID_SEPARATOR + indexInLevel;
 
 			if (maxBoxCount < 1)
 				throw new IllegalArgumentException("Maxmimum ProductBox count must be greater than 0.");
 
 			this.maxBoxCount = maxBoxCount;
 
-			// The stack goes from "front to back" because you can't take out boxes that are behind other boxes.
-			stack = new Stack<ProductBox>();
+			/*
+			 * TODO: Find a way to implements stacks.
+			 * The stack should go from "front to back" because you can't take out boxes that are behind other boxes.
+			 */
+			boxes = new HashSet<ProductBox>();
 		}
 
 		/**
@@ -239,7 +310,17 @@ public class Shelf
 		 */
 		public String getSlotID()
 		{
-			return parent.shelfID + "-" + shelfLevel + "-" + shelfLevelIndex;
+			return shelfSlotID;
+		}
+
+		/**
+		 * The ID of the shelf this shelf slot is in.
+		 *
+		 * @return the ID of the parent shelf
+		 */
+		public int getShelfID()
+		{
+			return shelfID;
 		}
 
 		/**
@@ -259,7 +340,7 @@ public class Shelf
 		 */
 		public int getProductCount()
 		{
-			Iterator<ProductBox> it = stack.iterator();
+			Iterator<ProductBox> it = boxes.iterator();
 
 			int sum = 0;
 
@@ -274,9 +355,9 @@ public class Shelf
 		 *
 		 * @return the stack of boxes
 		 */
-		public Stack<ProductBox> getStack()
+		public Set<ProductBox> getBoxes()
 		{
-			return stack;
+			return boxes;
 		}
 
 		/**
@@ -286,17 +367,7 @@ public class Shelf
 		 */
 		public int getProductBoxCount()
 		{
-			return stack.size();
-		}
-
-		/**
-		 * Gets the parent {@link Shelf} of this shelf slot.
-		 *
-		 * @return parent shelf
-		 */
-		public Shelf getParentShelf()
-		{
-			return parent;
+			return boxes.size();
 		}
 
 		/**
@@ -306,7 +377,35 @@ public class Shelf
 		 */
 		public boolean hasFreeSpace()
 		{
-			return (stack.size() != maxBoxCount);
+			return (boxes.size() != maxBoxCount);
+		}
+
+		/**
+		 * Attempts to add the given {@link ProductBox} to this shelf slot.
+		 *
+		 * @param box box to add
+		 * @return <code>true</code> if the box was added, <code>false</code> if there wasn't enough space
+		 */
+		public boolean addBox(final ProductBox box)
+		{
+			if (boxes.size() + 1 > maxBoxCount)
+				return false;
+
+			return boxes.add(box);
+		}
+
+		/**
+		 * Attempts to remove the given {@link ProductBox} to this shelf slot.
+		 *
+		 * @param box box to remove
+		 * @return <code>true</code> if the box was removed, <code>false</code> if the box was not present
+		 */
+		public boolean removeBox(final ProductBox box)
+		{
+			if (!boxes.contains(box))
+				return false;
+
+			return boxes.remove(box);
 		}
 	}
 }
