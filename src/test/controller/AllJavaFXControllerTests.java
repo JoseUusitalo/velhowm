@@ -6,7 +6,7 @@ import org.junit.runners.Suite.SuiteClasses;
 
 @RunWith(Suite.class)
 @SuiteClasses({ DatabaseControllerTest.class})
-public class AllControllerTests
+public class AllJavaFXControllerTests
 {
 	// Class for running all non-JavaFX controller tests in the project.
 }
