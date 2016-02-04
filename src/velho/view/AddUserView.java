@@ -24,22 +24,26 @@ public class AddUserView
 {
 	/**
 	 * The add user controller.
+	 * 
 	 */
 	private UserController controller;
 
 	/**
 	 * The grid panel.
+	 * 
 	 */
 	private GridPane grid;
 
 	/**
 	 * A set of user role names.
+	 * 
 	 */
 	private Set<String> rolenameSet;
 
 	/**
 	 * @param mcontroller
 	 * @param rolelist
+	 * 
 	 */
 	public AddUserView(UserController mcontroller, Set<String> rolelist)
 	{
@@ -50,7 +54,9 @@ public class AddUserView
 
 	/**
 	 * Creates a grid for adding a new user.
+	 * 
 	 * @return
+	 * 
 	 */
 	public GridPane getAddUserView()
 	{
@@ -115,6 +121,7 @@ public class AddUserView
 
 	/**
 	 * Destroys the view.
+	 * 
 	 */
 	public void destroy()
 	{
