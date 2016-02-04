@@ -43,7 +43,7 @@ public class ProductTest
 	{
 		assertEquals(name, product.getName());
 	}
-
+	
 	@Test public void testGetPopularity()
 	{
 		assertEquals(0, product.getPopularity());

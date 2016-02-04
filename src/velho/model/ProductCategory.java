@@ -27,8 +27,14 @@ public class ProductCategory
 	 */
 	public ProductCategory(String name, ProductType type)
 	{
+		
 		this.type = type;
 		this.name = name;
+		
+		if (this.type == null)
+		{
+			throw new IllegalArgumentException();
+		}
 	}
 
 	/**
