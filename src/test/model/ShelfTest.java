@@ -37,11 +37,13 @@ public class ShelfTest
 
 	private static final int PRODUCT_1_ID = 10045;
 	private static final String PRODUCT_1_NAME = "A Test Product";
-	private static final Product PRODUCT_1 = new Product(PRODUCT_1_NAME, new Date(0), PRODUCT_1_ID, new ProductBrand("Brand #1"), new ProductCategory("Type #1", ProductType.REGULAR));
+	private static final Product PRODUCT_1 = new Product(PRODUCT_1_NAME, new Date(0), PRODUCT_1_ID, new ProductBrand("Brand #1"),
+			new ProductCategory("Type #1", ProductType.REGULAR));
 
 	private static final int PRODUCT_2_ID = 299;
 	private static final String PRODUCT_2_NAME = "A Test Product 2";
-	private static final Product PRODUCT_2 = new Product(PRODUCT_2_NAME, new Date(0), PRODUCT_2_ID, new ProductBrand("Brand #2"), new ProductCategory("Type #2", ProductType.REGULAR));
+	private static final Product PRODUCT_2 = new Product(PRODUCT_2_NAME, new Date(0), PRODUCT_2_ID, new ProductBrand("Brand #2"),
+			new ProductCategory("Type #2", ProductType.REGULAR));
 
 	private static final int BOX_1_ID = 11;
 	private static final int BOX_1_MAX_SIZE = 10;
@@ -154,6 +156,36 @@ public class ShelfTest
 		assertEquals(3, actual.size());
 	}
 
+	@Test(expected = IllegalArgumentException.class)
+	public final void testTokenizeSlotID_Null()
+	{
+		Shelf.tokenizeShelfSlotID(null);
+	}
+
+	@Test(expected = IllegalArgumentException.class)
+	public final void testTokenizeSlotID_Invalid()
+	{
+		Shelf.tokenizeShelfSlotID("not a shelf slot id");
+	}
+
+	@Test(expected = IllegalArgumentException.class)
+	public final void testTokenizeSlotID_Malformed()
+	{
+		Shelf.tokenizeShelfSlotID("SA-1-1");
+	}
+
+	@Test(expected = IllegalArgumentException.class)
+	public final void testTokenizeSlotID_Malformed2()
+	{
+		Shelf.tokenizeShelfSlotID("S1-B-1");
+	}
+
+	@Test(expected = IllegalArgumentException.class)
+	public final void testTokenizeSlotID_Malformed3()
+	{
+		Shelf.tokenizeShelfSlotID("S1-1-C");
+	}
+
 	@Test
 	public final void testAddToSlot_EmptyBox()
 	{
@@ -174,6 +206,39 @@ public class ShelfTest
 		assertEquals(BOX_2_COUNT, shelf.getProductCount());
 	}
 
+	@Test(expected = IllegalArgumentException.class)
+	public final void testAddToSlot_Invalid2()
+	{
+		shelf.addToSlot("S1-NOPE-2", BOX_2);
+	}
+
+	@Test(expected = IllegalArgumentException.class)
+	public final void testAddToSlot_Invalid()
+	{
+		shelf.addToSlot(INVALID_SHELF_SLOT_ID, BOX_2);
+	}
+
+	@Test(expected = IllegalArgumentException.class)
+	public final void testAddToSlot_Invalid_Shelf()
+	{
+		final String slotid = (shelf.getShelfID()+1) + "-2-12";
+		shelf.addToSlot(slotid, BOX_2);
+	}
+
+	@Test(expected = IllegalArgumentException.class)
+	public final void testAddToSlot_Invalid_Level()
+	{
+		final String slotid = shelf.getShelfID() + "-99999-12";
+		shelf.addToSlot(slotid, BOX_2);
+	}
+
+	@Test(expected = IllegalArgumentException.class)
+	public final void testAddToSlot_Invalid_Slot()
+	{
+		final String slotid = shelf.getShelfID() + "-2-99999999";
+		shelf.addToSlot(slotid, BOX_2);
+	}
+	
 	@Test
 	public final void testRemoveFromSlot()
 	{
@@ -186,26 +251,55 @@ public class ShelfTest
 	}
 
 	@Test(expected = IllegalArgumentException.class)
-	public final void testAddToSlot_Invalid()
+	public final void testRemoveFromSlot_Invalid()
 	{
-		assertFalse(shelf.addToSlot(INVALID_SHELF_SLOT_ID, BOX_2));
+		shelf.removeFromSlot(INVALID_SHELF_SLOT_ID, BOX_2);
 	}
 
-	@Test
-	public final void testAddToSlot_Invalid_Shelf()
+	@Test(expected = IllegalArgumentException.class)
+	public final void testRemoveFromSlot_Invalid_Shelf()
 	{
-		assertFalse(shelf.addToSlot(INVALID_SHELF_SLOT_ID_SHELF, BOX_2));
+		final String slotid = (shelf.getShelfID()+1) + "-2-12";
+		shelf.removeFromSlot(slotid, BOX_2);
 	}
 
-	@Test
-	public final void testAddToSlot_Invalid_Level()
+	@Test(expected = IllegalArgumentException.class)
+	public final void testRemoveFromSlot_Invalid_Level()
 	{
-		assertFalse(shelf.addToSlot(INVALID_SHELF_SLOT_ID_LEVEL, BOX_2));
+		final String slotid = shelf.getShelfID() + "-99999-12";
+		shelf.removeFromSlot(slotid, BOX_2);
 	}
 
-	@Test
-	public final void testAddToSlot_Invalid_Slot()
+	@Test(expected = IllegalArgumentException.class)
+	public final void testRemoveFromSlot_Invalid_Slot()
 	{
-		assertFalse(shelf.addToSlot(INVALID_SHELF_SLOT_ID_SLOT, BOX_2));
+		final String slotid = shelf.getShelfID() + "-2-99999999";
+		shelf.removeFromSlot(slotid, BOX_2);
+	}
+
+	@Test(expected = IllegalArgumentException.class)
+	public final void testGetShelfSlotBoxes_Invalid_Shelf()
+	{
+		shelf.getShelfSlotBoxes("SASD-1-1");
+	}
+
+	@Test(expected = IllegalArgumentException.class)
+	public final void testGetShelfSlotBoxes_Invalid_Slot()
+	{
+		shelf.getShelfSlotBoxes(shelf.getShelfID() + "-1-999999999");
+	}
+
+	@Test(expected = IllegalArgumentException.class)
+	public final void testGetShelfSlotBoxes_Invalid_Slot2()
+	{
+		shelf.getShelfSlotBoxes(shelf.getShelfID() + "-1-qwe");
+	}
+	
+	@Test
+	public final void testHasFreeSpace()
+	{
+		final Shelf fullShelf = new Shelf(1, 1, 1);
+		assertTrue(fullShelf.addToSlot(fullShelf.getShelfID() + "-1-0", BOX_2));
+		assertFalse(fullShelf.hasFreeSpace());
 	}
 }
