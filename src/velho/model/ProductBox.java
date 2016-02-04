@@ -42,6 +42,7 @@ public class ProductBox
 		}
 		this.boxID = boxID;
 		this.product = product;
+		this.productCount = productCount;
 	}
 
 	/**
@@ -115,13 +116,13 @@ public class ProductBox
 	public boolean addProduct(int productCount)
 	{
 		if ((this.productCount + productCount) > maxSize)
-		{ 
-			return false;	
+		{
+			return false;
 		}
 		if (productCount <= maxSize)
 		{
 			this.productCount = this.productCount + productCount;
-			
+
 			return true;
 		}
 		else

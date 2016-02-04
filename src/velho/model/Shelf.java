@@ -15,7 +15,7 @@ public class Shelf
 	/**
 	 * The next free shelf ID in the warehouse.
 	 */
-	private static long nextFreeShelfID = 0;
+	private static int nextFreeShelfID = 0;
 
 	/**
 	 * The identifier of a shelf in IDs.
@@ -25,7 +25,7 @@ public class Shelf
 	/**
 	 * The ID of this shelf.
 	 */
-	private long shelfID;
+	private int shelfID;
 
 	/**
 	 * The array of shelf slots for each level of the shelf.
@@ -72,8 +72,9 @@ public class Shelf
 	 * </ul>
 	 * @param slotID
 	 * @return an array of integers
+	 * @throws IllegalArgumentException if the given shelf slot ID was invalid
 	 */
-	public static Object[] tokenizeShelfSlotID(final String shelfSlotID)
+	public static Object[] tokenizeShelfSlotID(final String shelfSlotID) throws IllegalArgumentException
 	{
 		// If the shelf slot ID does not begin with S it is not a shelf slot ID.
 		if (shelfSlotID.charAt(0) != 'S')
@@ -90,7 +91,7 @@ public class Shelf
 		}
 		catch (NumberFormatException e)
 		{
-			throw new IllegalArgumentException("Invalid slot ID '" + shelfSlotID + "'.");
+			throw new IllegalArgumentException("Invalid shelf slot ID '" + shelfSlotID + "'.");
 		}
 
 		try
@@ -99,7 +100,7 @@ public class Shelf
 		}
 		catch (NumberFormatException e)
 		{
-			throw new IllegalArgumentException("Invalid slot ID '" + shelfSlotID + "'.");
+			throw new IllegalArgumentException("Invalid shelf slot ID '" + shelfSlotID + "'.");
 		}
 
 		try
@@ -108,7 +109,7 @@ public class Shelf
 		}
 		catch (NumberFormatException e)
 		{
-			throw new IllegalArgumentException("Invalid slot ID '" + shelfSlotID + "'.");
+			throw new IllegalArgumentException("Invalid shelf slot ID '" + shelfSlotID + "'.");
 		}
 
 		return tokens;
@@ -121,14 +122,18 @@ public class Shelf
 	 * <li>Index 1: is the level in the shelf</li>
 	 * <li>Index 2: is the slot ID in the shelf</li>
 	 * </ul>
+	 * <p>For internal use only. Automatically removes the S from shelf ID and converts the shelf level number back to
+	 * an index.</p>
+	 *
 	 * @param slotID
 	 * @return an array of integers
+	 * @throws IllegalArgumentException if the given shelf slot ID was invalid
 	 */
-	private static int[] shelfSlotIDTokenizer(final String shelfSlotID)
+	private static int[] shelfSlotIDTokenizer(final String shelfSlotID) throws IllegalArgumentException
 	{
 		// If the shelf slot ID does not begin with S it is not a shelf slot ID.
 		if (shelfSlotID.charAt(0) != 'S')
-			throw new IllegalArgumentException("Invalid slot ID '" + shelfSlotID + "'.");
+			throw new IllegalArgumentException("Invalid shelf slot ID '" + shelfSlotID + "'.");
 
 		// Remove the S from front so we can parse the values as integers.
 		String[] stringTokens = shelfSlotID.substring(1).split(ShelfSlot.ID_SEPARATOR);
@@ -143,7 +148,7 @@ public class Shelf
 			}
 			catch (NumberFormatException e)
 			{
-				throw new IllegalArgumentException("Invalid slot ID '" + shelfSlotID + "'.");
+				throw new IllegalArgumentException("Invalid shelf slot ID '" + shelfSlotID + "'.");
 			}
 		}
 
@@ -273,7 +278,7 @@ public class Shelf
 	 * @param shelfSlotID the ID of the shelf slot to get
 	 * @return the wanted shelf slot or <code>null</code> if shelf slow is not in this shelf
 	 */
-	public Set<ProductBox> getShelfSlotBoxes(final String shelfSlotID)
+	public Set<ProductBox> getShelfSlotBoxes(final String shelfSlotID) throws IllegalArgumentException
 	{
 		int[] tokens = Shelf.shelfSlotIDTokenizer(shelfSlotID);
 		return slots[tokens[1]][tokens[2]].boxes;
@@ -287,18 +292,11 @@ public class Shelf
 	 * @return <code>true</code> if box was added to the slot, <code>false</code> if the slot ID is not in this shelf,
 	 * or the slot did not have enough free space
 	 */
-	public boolean addToSlot(final String shelfSlotID, final ProductBox productBox)
+	public boolean addToSlot(final String shelfSlotID, final ProductBox productBox) throws IllegalArgumentException
 	{
 		int[] tokens;
-		try
-		{
-			// Was a shelf slot ID given?
-			tokens = Shelf.shelfSlotIDTokenizer(shelfSlotID);
-		}
-		catch (IllegalArgumentException e)
-		{
-			return false;
-		}
+		// Was a shelf slot ID given?
+		tokens = Shelf.shelfSlotIDTokenizer(shelfSlotID);
 
 		if (tokens.length == 0)
 			return false;
@@ -326,7 +324,7 @@ public class Shelf
 	 * @return <code>true</code> if box was added to the slot, <code>false</code> if the slot ID is not in this shelf,
 	 * or the slot did not have the specified box
 	 */
-	public boolean removeFromSlot(final String shelfSlotID, final ProductBox productBox)
+	public boolean removeFromSlot(final String shelfSlotID, final ProductBox productBox) throws IllegalArgumentException
 	{
 		int[] tokens = Shelf.shelfSlotIDTokenizer(shelfSlotID);
 
@@ -382,9 +380,9 @@ public class Shelf
 		private ShelfSlot(final int shelfLevel, final int indexInLevel, final int maxBoxCount)
 		{
 			// @formatter:off
-			// Zero pad shelf level and index.
+			// Zero pad shelf level and index and add 1 to level so levels begin at 1 instead of 0.
 			this.shelfSlotID = Shelf.SHELF_IDENTIFIER + shelfID + ID_SEPARATOR
-					+ String.format("%0" + String.valueOf(slots.length).length() + "d", shelfLevel) + ID_SEPARATOR
+					+ String.format("%0" + String.valueOf(slots.length).length() + "d", shelfLevel + 1) + ID_SEPARATOR
 					+ String.format("%0" + String.valueOf(slots[0].length).length() + "d", indexInLevel);
 			// @formatter:on
 			if (maxBoxCount < 1)
@@ -420,7 +418,7 @@ public class Shelf
 		 *
 		 * @return the ID of the parent shelf
 		 */
-		public long getShelfID()
+		public int getShelfID()
 		{
 			return shelfID;
 		}
@@ -436,7 +434,7 @@ public class Shelf
 		}
 
 		/**
-		 * Iterates through the stack and counts the number of products in the {@link ProductBox}es.
+		 * Iterates through the set and counts the number of products in the {@link ProductBox}es.
 		 *
 		 * @return the number of products in this shelf slot
 		 */
@@ -453,9 +451,9 @@ public class Shelf
 		}
 
 		/**
-		 * Gets the stack of {@link ProductBox}es in this shelf slot.
+		 * Gets the set of {@link ProductBox}es in this shelf slot.
 		 *
-		 * @return the stack of boxes
+		 * @return the set of boxes
 		 */
 		public Set<ProductBox> getBoxes()
 		{
