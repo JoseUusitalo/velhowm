@@ -18,7 +18,7 @@ public class ProductBrand
 	@Override
 	public String toString()
 	{
-		return "[" + databaseID + "] " + name;
+		return name;
 	}
 	
 	public String getName()

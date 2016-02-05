@@ -93,6 +93,6 @@ public class ProductTest
 	@Test
 	public final void testToString()
 	{
-		assertEquals("[20] porkkana ([-1] jotain / [-1] jahas ([-1] Regular)), Expires: 1970-01-01, Popularity: -1", product.toString());
+		assertEquals("[20] porkkana (jotain / jahas (Regular)), Expires: 1970-01-01, Popularity: -1", product.toString());
 	}
 }

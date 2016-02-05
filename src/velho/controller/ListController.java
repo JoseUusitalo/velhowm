@@ -3,7 +3,9 @@ package velho.controller;
 import java.util.Map;
 
 import javafx.collections.ObservableList;
+import javafx.collections.ObservableMap;
 import javafx.scene.Node;
+import velho.model.Product;
 import velho.model.User;
 import velho.view.ListView;
 
@@ -25,13 +27,26 @@ public class ListController
 	 * Gets a new table view.
 	 *
 	 * @param columnMap a map of column values and names
-	 * @param datalist the {@link ObservableList} of data to show
+	 * @param dataList the {@link ObservableList} of data to show
 	 * @return a new table view
 	 */
-	public Node getView(final Map<String, String> columnMap, final ObservableList<User> datalist)
+	public Node getUserListView(final Map<String, String> columnMap, final ObservableList<Object> dataList)
 	{
-		ListView list = new ListView(this, columnMap, datalist);
-		return list.getTableView();
+		ListView list = new ListView(this, columnMap, dataList);
+		return list.getUserTableView();
+	}
+
+	/**
+	 * Gets a new table view.
+	 *
+	 * @param columnMap a map of column values and names
+	 * @param dataMap the {@link ObservableMap} of data to show
+	 * @return a new table view
+	 */
+	public Node getProductListView(final Map<String, String> columnMap, final ObservableList<Object> observableList)
+	{
+		ListView list = new ListView(this, columnMap, observableList);
+		return list.getUserTableView();
 	}
 
 	/**

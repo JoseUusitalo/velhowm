@@ -43,7 +43,7 @@ public class ProductCategory
 	@Override
 	public String toString()
 	{
-		return "[" + databaseID + "] " + name + " (" + type + ")";
+		return name + " (" + type + ")";
 	}
 
 	/**

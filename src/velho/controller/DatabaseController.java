@@ -16,6 +16,7 @@ import org.h2.jdbcx.JdbcConnectionPool;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.collections.ObservableMap;
 import velho.model.Product;
 import velho.model.ProductBox;
 import velho.model.ProductBrand;
@@ -61,14 +62,16 @@ public class DatabaseController
 	/**
 	 * An observable list of users for display in the user interface.
 	 */
-	private static ObservableList<User> userViewList = FXCollections.observableArrayList();
-
+	private static ObservableList<Object> userViewList = FXCollections.observableArrayList();
+	
 	private static Map<Integer, ProductBrand> loadedProductBrands = new HashMap<Integer, ProductBrand>();
 	private static Map<Integer, ProductType> loadedProductTypes = new HashMap<Integer, ProductType>();
 	private static Map<Integer, ProductCategory> loadedProductCategories = new HashMap<Integer, ProductCategory>();
-	private static Map<Integer, Product> loadedProducts = new HashMap<Integer, Product>();
+	private static ObservableMap<Integer, Product> loadedProducts = FXCollections.observableHashMap();
 	private static Map<Integer, ProductContainer> loadedProductContainers = new HashMap<Integer, ProductContainer>();
 	private static Map<Integer, Shelf> loadedShelves = new HashMap<Integer, Shelf>();
+
+	private static ObservableList<Object> productViewList;
 
 	/*
 	 * PRIVATE DATABASE METHODS
@@ -741,6 +744,17 @@ public class DatabaseController
 		return cols;
 	}
 
+	public static Map<String, String> getPublicProductDataColumns()
+	{
+		LinkedHashMap<String, String> cols = new LinkedHashMap<String, String>();
+		cols.put("name", "Name");
+		cols.put("expirationDate", "Expires");
+		cols.put("brand", "Brand");
+		cols.put("category", "Category");
+		cols.put("popularity", "Popularity");
+
+		return cols;
+	}
 	/**
 	 * Gets the database ID of the given user role name.
 	 *
@@ -977,6 +991,16 @@ public class DatabaseController
 		return ints;
 	}
 
+	public static ObservableList<Object> getPublicProductDataList()
+	{
+		if (productViewList == null)
+		{
+			productViewList = FXCollections.observableArrayList();
+			productViewList.addAll(loadedProducts.values());
+		}
+		return productViewList;
+	}
+	
 	/**
 	 * Gets an {@link ObservableList} of user names and roles.
 	 *
@@ -984,7 +1008,7 @@ public class DatabaseController
 	 *
 	 * @throws NoDatabaseLinkException
 	 */
-	public static ObservableList<User> getPublicUserDataList() throws NoDatabaseLinkException
+	public static ObservableList<Object> getPublicUserDataList() throws NoDatabaseLinkException
 	{
 		String[] columns = { "user_id", "first_name", "last_name", "role" };
 
@@ -1106,7 +1130,7 @@ public class DatabaseController
 	}
 
 	/**
-	 * Loads data from database.
+	 * Loads data from database into memory.
 	 */
 	public static void loadData()
 	{

@@ -33,7 +33,7 @@ public class ProductType
 	@Override
 	public String toString()
 	{
-		return "[" + databaseID + "] " + name;
+		return name;
 	}
 
 	public String getName()

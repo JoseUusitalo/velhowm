@@ -7,6 +7,7 @@ import java.util.Map;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.ObservableList;
+import javafx.collections.ObservableMap;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Pos;
@@ -20,6 +21,7 @@ import javafx.scene.text.Font;
 import javafx.util.Callback;
 import velho.controller.ListController;
 import velho.controller.LoginController;
+import velho.model.Product;
 import velho.model.User;
 
 /**
@@ -37,7 +39,7 @@ public class ListView
 	/**
 	 * The list of data to show.
 	 */
-	private ObservableList<User> datalist;
+	private ObservableList<Object> datalist;
 
 	/**
 	 * Data columns.
@@ -50,10 +52,15 @@ public class ListView
 	private ListController listController;
 
 	/**
+	 * The map of data to show.
+	 */
+	private ObservableMap<Integer, Product> dataMap;
+
+	/**
 	 * @param columnMap
 	 * @param datalist
 	 */
-	public ListView(final ListController listController, final Map<String, String> columnMap, final ObservableList<User> datalist)
+	public ListView(final ListController listController, final Map<String, String> columnMap, final ObservableList<Object> datalist)
 	{
 		this.listController = listController;
 		columnNames = columnMap;
@@ -61,24 +68,24 @@ public class ListView
 	}
 
 	/**
-	 * Gets the table view.
+	 * Gets the user table view.
 	 *
-	 * @return a table view of data
+	 * @return a table view of users
 	 */
-	public BorderPane getTableView()
+	public BorderPane getUserTableView()
 	{
 		if (pane == null)
 		{
 			pane = new BorderPane();
 
-			TableView<User> tableView = new TableView<User>();
+			TableView<Object> tableView = new TableView<Object>();
 
-			List<TableColumn<User, String>> cols = new ArrayList<TableColumn<User, String>>();
+			List<TableColumn<Object, String>> cols = new ArrayList<TableColumn<Object, String>>();
 
 			for (final String key : columnNames.keySet())
 			{
-				TableColumn<User, String> col = new TableColumn<User, String>(columnNames.get(key));
-				col.setCellValueFactory(new PropertyValueFactory<User, String>(key));
+				TableColumn<Object, String> col = new TableColumn<Object, String>(columnNames.get(key));
+				col.setCellValueFactory(new PropertyValueFactory<Object, String>(key));
 				col.setSortType(TableColumn.SortType.ASCENDING);
 
 				// Hide database ID columns
@@ -87,20 +94,20 @@ public class ListView
 
 				if (key.equals("deleteButton"))
 				{
-					col.setCellValueFactory(new Callback<TableColumn.CellDataFeatures<User, String>, ObservableValue<String>>()
+					col.setCellValueFactory(new Callback<TableColumn.CellDataFeatures<Object, String>, ObservableValue<String>>()
 					{
 						@Override
-						public ObservableValue<String> call(TableColumn.CellDataFeatures<User, String> p)
+						public ObservableValue<String> call(TableColumn.CellDataFeatures<Object, String> p)
 						{
 							return new SimpleStringProperty(p.getValue(), key);
 						}
 					});
 
 					// Adding the button to the cell
-					col.setCellFactory(new Callback<TableColumn<User, String>, TableCell<User, String>>()
+					col.setCellFactory(new Callback<TableColumn<Object, String>, TableCell<Object, String>>()
 					{
 						@Override
-						public TableCell<User, String> call(TableColumn<User, String> p)
+						public TableCell<Object, String> call(TableColumn<Object, String> p)
 						{
 							TableCellDeleteButton button = new TableCellDeleteButton("Delete");
 							button.setAlignment(Pos.CENTER);
@@ -119,11 +126,46 @@ public class ListView
 	}
 
 	/**
+	 * Gets the product table view.
+	 *
+	 * @return a table view of products
+	 */
+	public BorderPane getProductTableView()
+	{
+		if (pane == null)
+		{
+			pane = new BorderPane();
+
+			TableView<Object> tableView = new TableView<Object>();
+
+			List<TableColumn<Object, String>> cols = new ArrayList<TableColumn<Object, String>>();
+
+			for (final String key : columnNames.keySet())
+			{
+				TableColumn<Object, String> col = new TableColumn<Object, String>(columnNames.get(key));
+				col.setCellValueFactory(new PropertyValueFactory<Object, String>(key));
+				col.setSortType(TableColumn.SortType.ASCENDING);
+
+				// Hide database ID columns
+				if (key.contains("databaseID"))
+					col.setVisible(false);
+
+				cols.add(col);
+			}
+
+			tableView.setItems(datalist);
+			tableView.getColumns().addAll(cols);
+			pane.setCenter(tableView);
+		}
+		return pane;
+	}
+
+	/**
 	 * A table cell with built-in a button.
 	 *
 	 * @author Jose Uusitalo
 	 */
-	private class TableCellDeleteButton extends TableCell<User, String>
+	private class TableCellDeleteButton extends TableCell<Object, String>
 	{
 		/**
 		 * The button itself.
@@ -142,7 +184,7 @@ public class ListView
 				public void handle(ActionEvent t)
 				{
 					// Get selected User object and Send information to list controller.
-					listController.removeUser(TableCellDeleteButton.this.getTableView().getItems().get(TableCellDeleteButton.this.getIndex()));
+					listController.removeUser((User) TableCellDeleteButton.this.getTableView().getItems().get(TableCellDeleteButton.this.getIndex()));
 				}
 			});
 		}
@@ -155,7 +197,7 @@ public class ListView
 			if (!empty)
 			{
 				// Permission check.
-				User rowUser = TableCellDeleteButton.this.getTableView().getItems().get(TableCellDeleteButton.this.getIndex());
+				User rowUser = (User) TableCellDeleteButton.this.getTableView().getItems().get(TableCellDeleteButton.this.getIndex());
 
 				if (rowUser.getRole().compareTo(LoginController.getCurrentUser().getRole()) <= 0)
 					setGraphic(button);
