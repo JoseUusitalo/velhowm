@@ -10,7 +10,8 @@ import org.junit.Test;
 
 import velho.model.Product;
 import velho.model.ProductBrand;
-import velho.model.ProductType;
+import velho.model.ProductCategory;
+import velho.model.enums.ProductType;
 
 /**
  * Tests for {@link Product}.
@@ -20,52 +21,64 @@ import velho.model.ProductType;
 public class ProductTest
 {
 
-	private ProductBrand brand = new ProductBrand("jotain") ;
-	private ProductType type = new ProductType("jahas") ;
+	private ProductBrand brand = new ProductBrand("jotain");
+	private ProductType type = ProductType.REGULAR;
+	private ProductCategory category = new ProductCategory("jahas", type);
 	private Product product;
 	private Date date = new Date(1000);
 	private String name = "porkkana";
 	private int id = 20;
-	
+
 	@Before public void createProduct()
 	{
-		product = new Product(name, date, id, brand, type);
+		product = new Product(name, date, id, brand, category);
 	}
+
 	@After public void destroyProduct()
 	{
 		product = null;
 	}
+
 	@Test public void testGetName()
 	{
 		assertEquals(name, product.getName());
 	}
+	
 	@Test public void testGetPopularity()
 	{
 		assertEquals(0, product.getPopularity());
 	}
+
 	@Test public void testGetExpirationDate()
 	{
 		assertEquals(date, product.getExpirationDate());
 	}
+
 	@Test public void testGetProductID()
 	{
 		assertEquals(id, product.getProductID());
 	}
+
 	@Test public void testGetBrand()
 	{
 		assertEquals(brand, product.getBrand());
 	}
+
+	@Test public void testGetBrandName()
+	{
+		assertEquals("jotain", product.getBrand().getName());
+	}
+
 	@Test public void testGetType()
 	{
-		assertEquals(type, product.getType());
+		assertEquals(category, product.getCategory());
 	}
+
 	@Test public void testSetPopularity()
 	{
 		int popularity = 10;
 		product.setPopularity(popularity);
 		assertEquals(popularity, product.getPopularity());
 	}
-	
-	
 
 }

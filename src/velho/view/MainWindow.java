@@ -24,6 +24,7 @@ import javafx.scene.layout.HBox;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
 import javafx.stage.Stage;
+import javafx.stage.WindowEvent;
 import velho.controller.DatabaseController;
 import velho.controller.DebugController;
 import velho.controller.ListController;
@@ -83,6 +84,11 @@ public class MainWindow extends Application
 	 * The {@link ListController}.
 	 */
 	private ListController listController;
+
+	/**
+	 * The debug window stage.
+	 */
+	private Stage debugStage;
 
 	/**
 	 * The main window constructor.
@@ -209,13 +215,53 @@ public class MainWindow extends Application
 
 			if (DEBUG_MODE)
 			{
-				Stage secondStage = new Stage();
-				debugController.createDebugWindow(secondStage);
+
+				debugStage = new Stage();
+				debugController.createDebugWindow(debugStage);
+
+				debugStage.setOnCloseRequest(new EventHandler<WindowEvent>()
+				{
+					@Override
+					public void handle(WindowEvent event)
+					{
+						shutdown(primaryStage);
+					}
+				});
 			}
+			
+			primaryStage.setOnCloseRequest(new EventHandler<WindowEvent>()
+			{
+				@Override
+				public void handle(WindowEvent event)
+				{
+					shutdown(primaryStage);
+				}
+			});
 		}
 
 		DatabaseController.loadData();
 		Platform.exit();
+	}
+
+	protected void shutdown(final Stage primaryStage)
+	{
+		primaryStage.close();
+
+		if (DEBUG_MODE)
+		{
+			if (debugStage != null)
+				debugStage.close();
+		}
+		System.out.println("[MainWindow] Closing windows.");
+		try
+		{
+			DatabaseController.unlink();
+		}
+		catch (NoDatabaseLinkException e)
+		{
+			// Ignore.
+		}
+		System.out.println("Exit.");
 	}
 
 	/**

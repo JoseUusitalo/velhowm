@@ -18,14 +18,69 @@ CREATE TABLE IF NOT EXISTS `users`
 	FOREIGN KEY (`role`) REFERENCES roles(`role_id`),
 	CONSTRAINT `CONST_unique_pin_login` UNIQUE (`pin`,`first_name`,`last_name`),
 	CONSTRAINT `CONST_unique_badge_login` UNIQUE (`badge_id`,`first_name`,`last_name`),
-	CONSTRAINT `CONST_name_role` UNIQUE (`first_name`,`last_name`,`role`)
+	CONSTRAINT `CONST_unique_name_role` UNIQUE (`first_name`,`last_name`,`role`)
 ) DEFAULT CHARSET=utf8;
 
-DROP TABLE IF EXISTS `productboxes`;
-CREATE TABLE IF NOT EXISTS `productboxes`
+DROP TABLE IF EXISTS `brands`;
+CREATE TABLE IF NOT EXISTS `brands`
 (
-	`productbox_id` INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
-	`product_count` INT UNSIGNED NOT NULL DEFAULT 0
+	`brand_id` INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+	`name` VARCHAR(128) NOT NULL UNIQUE
+) DEFAULT CHARSET=utf8;
+
+DROP TABLE IF EXISTS `types`;
+CREATE TABLE IF NOT EXISTS `types`
+(
+	`type_id` INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+	`name` VARCHAR(128) NOT NULL UNIQUE	
+) DEFAULT CHARSET=utf8;
+
+DROP TABLE IF EXISTS `categories`;
+CREATE TABLE IF NOT EXISTS `categories`
+(
+	`category_id` INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+	`name` VARCHAR(128) NOT NULL UNIQUE,
+	`type` VARCHAR(128) NOT NULL,
+	
+	FOREIGN KEY (`type`) REFERENCES types(`type_id`)
+) DEFAULT CHARSET=utf8;
+
+DROP TABLE IF EXISTS `products`;
+CREATE TABLE IF NOT EXISTS `products`
+(
+	`product_id` INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+	`name` VARCHAR(128) NOT NULL,
+	`expiration_date` DATE NULL,
+	`brand` VARCHAR(128) NOT NULL,
+	`category` VARCHAR(128) NOT NULL,
+	`popularity` INT DEFAULT -1,
+	
+	FOREIGN KEY (`brand`) REFERENCES brands(`brand_id`),
+	FOREIGN KEY (`category`) REFERENCES categories(`category_id`),
+	CONSTRAINT `CONST_unique_products` UNIQUE (`expiration_date`,`name`,`brand`,`category`)
+) DEFAULT CHARSET=utf8;
+
+DROP TABLE IF EXISTS `containers`;
+CREATE TABLE IF NOT EXISTS `containers`
+(
+	`container_id` INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+	`product` INT UNSIGNED NOT NULL,
+	`max_size` INT NOT NULL,
+	`product_count` INT UNSIGNED NOT NULL DEFAULT 0,
+	
+	FOREIGN KEY (`product`) REFERENCES products(`product_id`),
+	CHECK (`max_size`>0)
+) DEFAULT CHARSET=utf8;
+
+DROP TABLE IF EXISTS `container_products`;
+CREATE TABLE IF NOT EXISTS `container_products`
+(
+	`container` INT UNSIGNED NOT NULL,
+	`product` INT UNSIGNED NOT NULL,
+	
+	FOREIGN KEY (`container`) REFERENCES containers(`container_id`),
+	FOREIGN KEY (`product`) REFERENCES products(`product_id`),
+	PRIMARY KEY (`container`,`product`)
 ) DEFAULT CHARSET=utf8;
 
 DROP TABLE IF EXISTS `shelves`;
@@ -47,7 +102,7 @@ CREATE TABLE IF NOT EXISTS `shelf_productboxes`
 	
 	PRIMARY KEY (`shelf`, `productbox`),
 	FOREIGN KEY (`shelf`) REFERENCES shelves(`shelf_id`),
-	FOREIGN KEY (`productbox`) REFERENCES productboxes(`productbox_id`),
+	FOREIGN KEY (`productbox`) REFERENCES containers(`container_id`),
 	CONSTRAINT `CONST_no_duplicate_boxes` UNIQUE (`shelf`,`productbox`,`shelflevel_index`,`shelfslot_index`)
 ) DEFAULT CHARSET=utf8;
 
@@ -60,11 +115,17 @@ INSERT INTO `users`(`pin`,`first_name`,`last_name`,`role`) VALUES ('222222','Bos
 INSERT INTO `users`(`pin`,`first_name`,`last_name`,`role`) VALUES ('333333','Worker','Test',3);
 INSERT INTO `users`(`badge_id`,`first_name`,`last_name`,`role`) VALUES ('12345678','Badger','Testaccount',3);
 
+/* Test Products */
+INSERT INTO `brands` SET `name`='Test Brand #1';
+INSERT INTO `types` SET `name`='Test Type #1';
+INSERT INTO `categories` SET `name`='Test Category #1', type=1;
+INSERT INTO `products` SET `name`='Test Product #1', brand=1, category=1;
+
 /* Tiny Full Shelf: 1-4*/
-INSERT INTO `productboxes` SET `product_count`=10;
-INSERT INTO `productboxes` SET `product_count`=10;
-INSERT INTO `productboxes` SET `product_count`=10;
-INSERT INTO `productboxes` SET `product_count`=10;
+INSERT INTO `containers` SET product=1, `max_size`=10, `product_count`=10;
+INSERT INTO `containers` SET product=1, `max_size`=10, `product_count`=10;
+INSERT INTO `containers` SET product=1, `max_size`=10, `product_count`=10;
+INSERT INTO `containers` SET product=1, `max_size`=10, `product_count`=10;
 INSERT INTO `shelves` SET `max_levels`=1, `max_shelfslots_per_level`=4, `max_productboxes_per_shelfslot`=1;
 INSERT INTO `shelf_productboxes` SET `shelf`=1, `productbox`=1, `shelflevel_index`=1, `shelfslot_index`=1;
 INSERT INTO `shelf_productboxes` SET `shelf`=1, `productbox`=2, `shelflevel_index`=1, `shelfslot_index`=2;
@@ -72,11 +133,11 @@ INSERT INTO `shelf_productboxes` SET `shelf`=1, `productbox`=3, `shelflevel_inde
 INSERT INTO `shelf_productboxes` SET `shelf`=1, `productbox`=4, `shelflevel_index`=1, `shelfslot_index`=4;
 
 /* Slot Full Shelf: 5-9 */
-INSERT INTO `productboxes` SET `product_count`=0;
-INSERT INTO `productboxes` SET `product_count`=5;
-INSERT INTO `productboxes` SET `product_count`=10;
-INSERT INTO `productboxes` SET `product_count`=25;
-INSERT INTO `productboxes` SET `product_count`=50;
+INSERT INTO `containers` SET product=1, `max_size`=50, `product_count`=0;
+INSERT INTO `containers` SET product=1, `max_size`=50, `product_count`=5;
+INSERT INTO `containers` SET product=1, `max_size`=50, `product_count`=10;
+INSERT INTO `containers` SET product=1, `max_size`=50, `product_count`=25;
+INSERT INTO `containers` SET product=1, `max_size`=50, `product_count`=50;
 INSERT INTO `shelves` SET `max_levels`=2, `max_shelfslots_per_level`=20, `max_productboxes_per_shelfslot`=4;
 INSERT INTO `shelf_productboxes` SET `shelf`=2, `productbox`=5, `shelflevel_index`=1, `shelfslot_index`=1;
 INSERT INTO `shelf_productboxes` SET `shelf`=2, `productbox`=6, `shelflevel_index`=1, `shelfslot_index`=1;
@@ -85,10 +146,10 @@ INSERT INTO `shelf_productboxes` SET `shelf`=2, `productbox`=8, `shelflevel_inde
 INSERT INTO `shelf_productboxes` SET `shelf`=2, `productbox`=9, `shelflevel_index`=2, `shelfslot_index`=20;
 
 /* One Slot Level: 10-13*/
-INSERT INTO `productboxes` SET `product_count`=20;
-INSERT INTO `productboxes` SET `product_count`=20;
-INSERT INTO `productboxes` SET `product_count`=20;
-INSERT INTO `productboxes` SET `product_count`=20;
+INSERT INTO `containers` SET product=1, `max_size`=20, `product_count`=20;
+INSERT INTO `containers` SET product=1, `max_size`=20, `product_count`=20;
+INSERT INTO `containers` SET product=1, `max_size`=30, `product_count`=20;
+INSERT INTO `containers` SET product=1, `max_size`=30, `product_count`=20;
 INSERT INTO `shelves` SET `max_levels`=3, `max_shelfslots_per_level`=1, `max_productboxes_per_shelfslot`=50;
 INSERT INTO `shelf_productboxes` SET `shelf`=3, `productbox`=10, `shelflevel_index`=3, `shelfslot_index`=2;
 INSERT INTO `shelf_productboxes` SET `shelf`=3, `productbox`=11, `shelflevel_index`=3, `shelfslot_index`=50;
@@ -96,13 +157,13 @@ INSERT INTO `shelf_productboxes` SET `shelf`=3, `productbox`=12, `shelflevel_ind
 INSERT INTO `shelf_productboxes` SET `shelf`=3, `productbox`=13, `shelflevel_index`=3, `shelfslot_index`=32;
 
 /* Many Slot Level: 14-20*/
-INSERT INTO `productboxes` SET `product_count`=5;
-INSERT INTO `productboxes` SET `product_count`=5;
-INSERT INTO `productboxes` SET `product_count`=5;
-INSERT INTO `productboxes` SET `product_count`=5;
-INSERT INTO `productboxes` SET `product_count`=5;
-INSERT INTO `productboxes` SET `product_count`=5;
-INSERT INTO `productboxes` SET `product_count`=5;
+INSERT INTO `containers` SET product=1, `max_size`=10, `product_count`=5;
+INSERT INTO `containers` SET product=1, `max_size`=10, `product_count`=5;
+INSERT INTO `containers` SET product=1, `max_size`=10, `product_count`=5;
+INSERT INTO `containers` SET product=1, `max_size`=10, `product_count`=5;
+INSERT INTO `containers` SET product=1, `max_size`=10, `product_count`=5;
+INSERT INTO `containers` SET product=1, `max_size`=10, `product_count`=5;
+INSERT INTO `containers` SET product=1, `max_size`=10, `product_count`=5;
 INSERT INTO `shelves` SET `max_levels`=2, `max_shelfslots_per_level`=50, `max_productboxes_per_shelfslot`=1;
 INSERT INTO `shelf_productboxes` SET `shelf`=4, `productbox`=14, `shelflevel_index`=1, `shelfslot_index`=32;
 INSERT INTO `shelf_productboxes` SET `shelf`=4, `productbox`=15, `shelflevel_index`=1, `shelfslot_index`=3;

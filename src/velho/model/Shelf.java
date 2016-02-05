@@ -72,7 +72,7 @@ public class Shelf
 	public static Object[] tokenizeShelfSlotID(final String shelfSlotID) throws IllegalArgumentException
 	{
 		// If the shelf slot ID does not begin with S it is not a shelf slot ID.
-		if (shelfSlotID.charAt(0) != 'S')
+		if (shelfSlotID == null || shelfSlotID.charAt(0) != 'S')
 			throw new IllegalArgumentException("Invalid slot ID '" + shelfSlotID + "'.");
 
 		// Remove the S from front so we can parse the values as integers.
@@ -135,17 +135,43 @@ public class Shelf
 
 		int[] tokens = new int[3];
 
-		for (int i = 0; i < 3; i++)
+		try
 		{
-			try
-			{
-				tokens[i] = Integer.parseInt(stringTokens[i]);
-			}
-			catch (NumberFormatException e)
-			{
-				throw new IllegalArgumentException("Invalid shelf slot ID '" + shelfSlotID + "'.");
-			}
+			tokens[0] = Integer.parseInt(stringTokens[0]);
 		}
+		catch (NumberFormatException e)
+		{
+			throw new IllegalArgumentException("Invalid shelf slot ID '" + shelfSlotID + "'.");
+		}
+
+		try
+		{
+			tokens[1] = Integer.parseInt(stringTokens[1]) - 1;
+		}
+		catch (NumberFormatException e)
+		{
+			throw new IllegalArgumentException("Invalid shelf slot ID '" + shelfSlotID + "'.");
+		}
+
+		try
+		{
+			tokens[2] = Integer.parseInt(stringTokens[2]);
+		}
+		catch (NumberFormatException e)
+		{
+			throw new IllegalArgumentException("Invalid shelf slot ID '" + shelfSlotID + "'.");
+		}
+
+		return tokens;
+	}
+
+	private int[] tokenizeAndValidateShelfSlotID(final String shelfSlotID)
+	{
+		final int[] tokens = shelfSlotIDTokenizer(shelfSlotID);
+		
+		// Correct shelf? Enough levels? Enough slots?
+		if ((this.shelfID != tokens[0]) || (slots.length < tokens[1]) || (slots[0].length < tokens[2]))
+			throw new IllegalArgumentException("Invalid shelf slot ID '" + shelfSlotID + "'.");
 
 		return tokens;
 	}
@@ -281,7 +307,8 @@ public class Shelf
 	 */
 	public Set<ProductBox> getShelfSlotBoxes(final String shelfSlotID) throws IllegalArgumentException
 	{
-		int[] tokens = Shelf.shelfSlotIDTokenizer(shelfSlotID);
+		int[] tokens = tokenizeAndValidateShelfSlotID(shelfSlotID);
+
 		return slots[tokens[1]][tokens[2]].boxes;
 	}
 
@@ -295,24 +322,7 @@ public class Shelf
 	 */
 	public boolean addToSlot(final String shelfSlotID, final ProductBox productBox) throws IllegalArgumentException
 	{
-		int[] tokens;
-		// Was a shelf slot ID given?
-		tokens = Shelf.shelfSlotIDTokenizer(shelfSlotID);
-
-		if (tokens.length == 0)
-			return false;
-
-		// Correct shelf?
-		if (shelfID != tokens[0])
-			return false;
-
-		// Enough levels?
-		if (slots.length < tokens[1] - 1)
-			return false;
-
-		// Enough slots?
-		if (slots[0].length < tokens[2])
-			return false;
+		int[] tokens = tokenizeAndValidateShelfSlotID(shelfSlotID);
 
 		return slots[tokens[1]][tokens[2]].addBox(productBox);
 	}
@@ -327,19 +337,7 @@ public class Shelf
 	 */
 	public boolean removeFromSlot(final String shelfSlotID, final ProductBox productBox) throws IllegalArgumentException
 	{
-		int[] tokens = Shelf.shelfSlotIDTokenizer(shelfSlotID);
-
-		// Correct shelf?
-		if (shelfID != tokens[0])
-			return false;
-
-		// Enough levels?
-		if (slots.length < tokens[1] - 1)
-			return false;
-
-		// Enough slots?
-		if (slots[0].length < tokens[2])
-			return false;
+		int[] tokens = tokenizeAndValidateShelfSlotID(shelfSlotID);
 
 		return slots[tokens[1]][tokens[2]].removeBox(productBox);
 	}

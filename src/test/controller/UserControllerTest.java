@@ -2,16 +2,16 @@ package test.controller;
 
 import static org.junit.Assert.*;
 
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 
-import javafx.application.Application;
+import javafx.collections.ObservableList;
 import velho.controller.DatabaseController;
-import velho.controller.PopupController;
 import velho.controller.UserController;
 import velho.model.JavaFXThreadingRule;
+import velho.model.User;
 import velho.model.exceptions.ExistingDatabaseLinkException;
 import velho.model.exceptions.NoDatabaseLinkException;
 
@@ -20,9 +20,11 @@ import velho.model.exceptions.NoDatabaseLinkException;
  *
  * @author Jose Uusitalo
  */
+@SuppressWarnings("static-method")
 public class UserControllerTest
 {
-	@Rule public JavaFXThreadingRule javafxRule = new JavaFXThreadingRule();
+	@Rule
+	public JavaFXThreadingRule javafxRule = new JavaFXThreadingRule();
 
 	private static UserController controller;
 
@@ -30,33 +32,91 @@ public class UserControllerTest
 	private final String INVALID_BADGE_ID_SHORT = "15";
 	private final String INVALID_BADGE_ID_LONG = "1234567891";
 
-	private final String VALID_PIN_MAX = "999999";
-	private final String VALID_PIN_MIN = "000000";
-	private final String INVALID_PIN_SHORT = "12";
-	private final String INVALID_PIN_LONG = "1234567";
+	private final String VALID_PIN = "003000";
+	private final String INVALID_PIN = "1442";
 
 	private final String VALID_NAME = "First-Name";
-	private final String INVALID_NAME_LONG = "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa";
 
 	private final String VALID_ROLE_NAME = "Manager";
 	private final String INVALID_ROLE_NAME = "Worker";
 
-	@BeforeClass
-	public static final void createController() throws NoDatabaseLinkException, ClassNotFoundException, ExistingDatabaseLinkException
+	@Before
+	public final void createController() throws NoDatabaseLinkException, ClassNotFoundException, ExistingDatabaseLinkException
 	{
+		System.out.println("[UserControllerTest] Relinking database before test.");
 		DatabaseController.connectAndInitialize();
 		controller = new UserController();
+		System.out.println("[UserControllerTest] Begin test.");
 	}
 
-	@AfterClass
-	public static final void closeDatabase() throws NoDatabaseLinkException
+	@After
+	public final void closeDatabase()
 	{
+		System.out.println("[UserControllerTest] End test.");
+		try
+		{
+			DatabaseController.unlink();
+			System.out.println("[UserControllerTest] Unlinking database after test.");
+		}
+		catch (NoDatabaseLinkException e)
+		{
+			// Ignored.
+		}
+	}
+
+	/*
+	 *
+	 * IMPORTANT NOTE ABOUT TESTING.
+	 *
+	 * THE DATABASE MUST BE UNLINKED IMMEDIATELY AFTER YOU HAVE FINISHED USING IT.
+	 *
+	 * IF A TEST FAILS AND THE DATABASE CONNECTION IS STILL LINKED, ALL FURTHER ATTEMPTS TO LINK AGAIN WILL FAIL.
+	 *
+	 */
+
+	@Test
+	public final void testAddUserValid() throws NoDatabaseLinkException
+	{
+		System.out.println("[UserControllerTest] testAddUserValid()");
+		assertTrue(controller.addUser(VALID_BADGE_ID, null, VALID_NAME, VALID_NAME, VALID_ROLE_NAME));
+
+		boolean exists = false;
+		ObservableList<User> users = DatabaseController.getPublicUserDataList();
 		DatabaseController.unlink();
+
+		for (final User user : users)
+		{
+			if (user.getFullDetails().equals(VALID_NAME + " " + VALID_NAME + " (" + VALID_ROLE_NAME + ")"))
+			{
+				exists = true;
+				break;
+			}
+		}
+
+		if (!exists)
+			fail("User was not added to the database.");
 	}
 
 	@Test
-	public final void testAddUserValid()
+	public final void testAddUserInvalid() throws NoDatabaseLinkException
 	{
-		assertTrue(controller.addUser(VALID_BADGE_ID, null, VALID_NAME, VALID_NAME, VALID_ROLE_NAME));
+		System.out.println("[UserControllerTest] testAddUserInvalid()");
+		assertFalse(controller.addUser(null, VALID_PIN, VALID_NAME, VALID_NAME, INVALID_ROLE_NAME));
+
+		boolean exists = false;
+		ObservableList<User> users = DatabaseController.getPublicUserDataList();
+		DatabaseController.unlink();
+
+		for (final User user : users)
+		{
+			if (user.getFullDetails().equals(VALID_NAME + " " + VALID_NAME + " (" + INVALID_ROLE_NAME + ")"))
+			{
+				exists = true;
+				break;
+			}
+		}
+
+		if (exists)
+			fail("Invalid user added to the database.");
 	}
 }
