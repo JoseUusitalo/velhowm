@@ -18,7 +18,7 @@ CREATE TABLE IF NOT EXISTS `users`
 	FOREIGN KEY (`role`) REFERENCES roles(`role_id`),
 	CONSTRAINT `CONST_unique_pin_login` UNIQUE (`pin`,`first_name`,`last_name`),
 	CONSTRAINT `CONST_unique_badge_login` UNIQUE (`badge_id`,`first_name`,`last_name`),
-	CONSTRAINT `CONST_name_role` UNIQUE (`first_name`,`last_name`,`role`)
+	CONSTRAINT `CONST_unique_name_role` UNIQUE (`first_name`,`last_name`,`role`)
 ) DEFAULT CHARSET=utf8;
 
 DROP TABLE IF EXISTS `brands`;
@@ -53,21 +53,23 @@ CREATE TABLE IF NOT EXISTS `products`
 	`expiration_date` DATE NULL,
 	`brand` VARCHAR(128) NOT NULL,
 	`category` VARCHAR(128) NOT NULL,
-	`popularity` INT NOT NULL,
+	`popularity` INT DEFAULT -1,
 	
 	FOREIGN KEY (`brand`) REFERENCES brands(`brand_id`),
-	FOREIGN KEY (`category`) REFERENCES categories(`category_id`)
+	FOREIGN KEY (`category`) REFERENCES categories(`category_id`),
+	CONSTRAINT `CONST_unique_products` UNIQUE (`expiration_date`,`name`,`brand`,`category`)
 ) DEFAULT CHARSET=utf8;
 
 DROP TABLE IF EXISTS `containers`;
 CREATE TABLE IF NOT EXISTS `containers`
 (
 	`container_id` INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+	`product` INT UNSIGNED NOT NULL,
 	`max_size` INT NOT NULL,
-	`product` VARCHAR(128) NOT NULL,
-	`product_count` INT NULL,
+	`product_count` INT NOT NULL DEFAULT 0,
 	
-	FOREIGN KEY (`product`) REFERENCES products(`product_id`)
+	FOREIGN KEY (`product`) REFERENCES products(`product_id`),
+	CHECK (`max_size`>0)
 ) DEFAULT CHARSET=utf8;
 
 DROP TABLE IF EXISTS `container_products`;
