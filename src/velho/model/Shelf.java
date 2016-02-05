@@ -59,6 +59,18 @@ public class Shelf
 	}
 
 	/**
+	 * Converts the given coordinate number on a shelf into a shelf slot ID.
+	 * @param shelfID the ID of the shelf
+	 * @param shelfLevelNumber the level of the shelf
+	 * @param shelfSlotIndex the slot on a level
+	 * @return a shelf slot ID
+	 */
+	public static String coordinatesToShelfSlotID(final int shelfID, final int shelfLevelNumber, final int shelfSlotIndex)
+	{
+		return SHELF_IDENTIFIER + shelfID + ShelfSlot.ID_SEPARATOR + shelfLevelNumber + ShelfSlot.ID_SEPARATOR + shelfSlotIndex;
+	}
+
+	/**
 	 * Converts the given slot ID into an Object array where:
 	 * <ul>
 	 * <li>Index 0: is the shelf ID String</li>
@@ -168,7 +180,7 @@ public class Shelf
 	private int[] tokenizeAndValidateShelfSlotID(final String shelfSlotID)
 	{
 		final int[] tokens = shelfSlotIDTokenizer(shelfSlotID);
-		
+
 		// Correct shelf? Enough levels? Enough slots?
 		if ((this.shelfID != tokens[0]) || (slots.length < tokens[1]) || (slots[0].length < tokens[2]))
 			throw new IllegalArgumentException("Invalid shelf slot ID '" + shelfSlotID + "'.");
@@ -179,7 +191,8 @@ public class Shelf
 	@Override
 	public String toString()
 	{
-		return "[" + shelfID + "] Lvls: " + getLevels() + ", Slt/Lvl: " + slots[0].length + ", Box/Slt: " + slots[0][0].maxBoxCount + ", Boxs: " + getProductBoxCount() + ", Slts: " + getShelfSlotCount() + ", Free: " + getFreeShelfSlots().size();
+		return "[" + shelfID + "] Lvls: " + getLevels() + ", Slt/Lvl: " + slots[0].length + ", Box/Slt: " + slots[0][0].maxBoxCount + ", Boxs: "
+				+ getProductBoxCount() + ", Slts: " + getShelfSlotCount() + ", Free: " + getFreeShelfSlots().size();
 	}
 
 	/**
@@ -190,6 +203,16 @@ public class Shelf
 	public String getShelfID()
 	{
 		return SHELF_IDENTIFIER + shelfID;
+	}
+
+	/**
+	 * Gets the database ID of this shelf.
+	 * 
+	 * @return the database ID
+	 */
+	public int getDatabaseID()
+	{
+		return shelfID;
 	}
 
 	/**

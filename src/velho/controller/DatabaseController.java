@@ -68,6 +68,7 @@ public class DatabaseController
 	private static Map<Integer, ProductCategory> loadedProductCategories = new HashMap<Integer, ProductCategory>();
 	private static Map<Integer, Product> loadedProducts = new HashMap<Integer, Product>();
 	private static Map<Integer, ProductContainer> loadedProductContainers = new HashMap<Integer, ProductContainer>();
+	private static Map<Integer, Shelf> loadedShelves = new HashMap<Integer, Shelf>();
 
 	/*
 	 * PRIVATE DATABASE METHODS
@@ -219,7 +220,11 @@ public class DatabaseController
 		// Update queries.
 		int changed = 0;
 
+		// Most other queries.
 		Set<Object> dataSet = new LinkedHashSet<Object>();
+
+		// Putting boxes on shelves.
+		Map<Integer, ArrayList<Integer[]>> shelfBoxMap = null;
 
 		try
 		{
@@ -304,6 +309,38 @@ public class DatabaseController
 											result.getInt("max_productboxes_per_shelfslot")));
 								break;
 								// @formatter:on
+
+							case SHELF_PRODUCTBOXES:
+								shelfBoxMap = new HashMap<Integer, ArrayList<Integer[]>>();
+								Integer[] coords = null;
+								Integer shelfID = null;
+								ArrayList<Integer[]> list;
+
+								while (result.next())
+								{
+									coords = new Integer[3];
+									// Get all the data.
+									shelfID = result.getInt("shelf");
+									coords[0] = result.getInt("productbox");
+									coords[1] = result.getInt("shelflevel_index");
+									coords[2] = result.getInt("shelfslot_index");
+
+									// Does this shelf already have boxes in it?
+									if (shelfBoxMap.containsKey(shelfID))
+									{
+										// Add to the list.
+										shelfBoxMap.get(shelfID).add(coords);
+									}
+									else
+									{
+										// Create a new list and put in the data.
+										list = new ArrayList<Integer[]>();
+										list.add(coords);
+										shelfBoxMap.put(shelfID, list);
+									}
+								}
+
+								break;
 							default:
 								throw new IllegalArgumentException();
 						}
@@ -339,10 +376,7 @@ public class DatabaseController
 			// Connection pool has been disposed = no database connection.
 			throw new NoDatabaseLinkException();
 		}
-		catch (
-
-		SQLException e)
-
+		catch (SQLException e)
 		{
 			if (!e.toString().contains("Unique index or primary key violation"))
 				e.printStackTrace();
@@ -353,34 +387,25 @@ public class DatabaseController
 
 		// Close all resources.
 		try
-
 		{
 			if (statement != null)
 				statement.close();
 		}
-		catch (
-
-		SQLException e)
-
+		catch (SQLException e)
 		{
 			e.printStackTrace();
 		}
 
 		try
-
 		{
 			connection.close();
 		}
-		catch (
-
-		SQLException e)
-
+		catch (SQLException e)
 		{
 			e.printStackTrace();
 		}
 
 		switch (type)
-
 		{
 			case INSERT:
 			case DELETE:
@@ -398,6 +423,8 @@ public class DatabaseController
 					case CONTAINERS:
 					case SHELVES:
 						return dataSet;
+					case SHELF_PRODUCTBOXES:
+						return shelfBoxMap;
 					default:
 						throw new IllegalArgumentException();
 				}
@@ -1089,7 +1116,6 @@ public class DatabaseController
 		{
 			loadProductContainers();
 			loadShelves();
-			// setContainersToShelves();
 		}
 		catch (NoDatabaseLinkException e)
 		{
@@ -1129,7 +1155,7 @@ public class DatabaseController
 		// Store for reuse.
 		while (it.hasNext())
 		{
-			ProductContainer p = it.next();
+			final ProductContainer p = it.next();
 			System.out.println("Caching: " + p);
 			loadedProductContainers.put(p.getBoxID(), p);
 		}
@@ -1146,26 +1172,44 @@ public class DatabaseController
 		Set<Shelf> result = (Set<Shelf>) runQuery(DatabaseQueryType.SELECT, DatabaseTable.SHELVES, columns, null, null);
 
 		Iterator<Shelf> it = result.iterator();
-
+		// Store for reuse.
 		while (it.hasNext())
-			System.out.println(it.next().toString());
+		{
+			final Shelf s = it.next();
+			System.out.println("Caching: " + s);
+			loadedShelves.put(s.getDatabaseID(), s);
+		}
 
 		System.out.println("[DatabaseController] Shelves loaded.");
+
+		setContainersToShelves();
 	}
 
 	private static void setContainersToShelves() throws NoDatabaseLinkException
 	{
-		System.out.println("[DatabaseController] Loading shelves...");
+		System.out.println("[DatabaseController] Placing product boxes on shelves...");
 
 		String[] columns = { "*" };
 		@SuppressWarnings("unchecked")
-		Set<Shelf> result = (Set<Shelf>) runQuery(DatabaseQueryType.SELECT, DatabaseTable.SHELVES, columns, null, null);
+		Map<Integer, ArrayList<Integer[]>> shelfBoxMap = (HashMap<Integer, ArrayList<Integer[]>>) runQuery(DatabaseQueryType.SELECT,
+				DatabaseTable.SHELF_PRODUCTBOXES, columns, null, null);
 
-		Iterator<Shelf> it = result.iterator();
+		for (final Integer shelfID : shelfBoxMap.keySet())
+		{
+			if (loadedShelves.containsKey(shelfID))
+			{
+				ArrayList<Integer[]> boxes = shelfBoxMap.get(shelfID);
 
-		while (it.hasNext())
-			System.out.println(it.next().toString());
+				for (final Integer[] data : boxes)
+				{
+					if (loadedProductContainers.containsKey(data[0]))
+					{
+						loadedShelves.get(shelfID).addToSlot(Shelf.coordinatesToShelfSlotID(shelfID, data[1], data[2]), (ProductBox) loadedProductContainers.get(data[0]));
+					}
+				}
+			}
+		}
 
-		System.out.println("[DatabaseController] Shelves loaded.");
+		System.out.println("[DatabaseController] Product boxes placed on shelves.");
 	}
 }
