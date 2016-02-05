@@ -304,4 +304,12 @@ public class ShelfTest
 		assertTrue(fullShelf.addToSlot(fullShelf.getShelfID() + "-1-0", BOX_2));
 		assertFalse(fullShelf.hasFreeSpace());
 	}
+
+	@Test
+	public final void testToString()
+	{
+		final Shelf fullShelf = new Shelf(123, 1, 1, 1);
+		assertTrue(fullShelf.addToSlot(fullShelf.getShelfID() + "-1-0", BOX_2));
+		assertEquals("[123] Lvls: 1, Slt/Lvl: 1, Box/Slt: 1, Boxs: 1, Slts: 1, Free: 0", fullShelf.toString());
+	}
 }

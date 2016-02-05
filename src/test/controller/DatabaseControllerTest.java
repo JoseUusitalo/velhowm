@@ -4,6 +4,7 @@ import static org.junit.Assert.*;
 
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import org.junit.AfterClass;
@@ -133,9 +134,11 @@ public class DatabaseControllerTest
 	}
 
 	@Test
-	public final void testGetProductCodeList()
+	public final void testGetProductCodeList() throws NoDatabaseLinkException
 	{
-		fail("Not yet implemented");
+		List<Integer> list = DatabaseController.getProductCodeList();
+		assertEquals(1, list.size());
+		assertTrue(list.contains(1));
 	}
 
 	@Test

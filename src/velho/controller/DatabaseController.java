@@ -65,8 +65,8 @@ public class DatabaseController
 
 	private static Map<Integer, ProductContainer> loadedProductContainers = new HashMap<Integer, ProductContainer>();
 	private static Map<Integer, Product> loadedProducts = new HashMap<Integer, Product>();
-	//private static Map<Integer, ProductBrand> loadedProductBrands = new HashMap<Integer, ProductBrand>();
-	//private static Map<Integer, ProductType> loadedProductTypes = new HashMap<Integer, ProductType>();
+	// private static Map<Integer, ProductBrand> loadedProductBrands = new HashMap<Integer, ProductBrand>();
+	// private static Map<Integer, ProductType> loadedProductTypes = new HashMap<Integer, ProductType>();
 
 	/*
 	 * PRIVATE DATABASE METHODS
@@ -238,10 +238,10 @@ public class DatabaseController
 					ResultSet result = null;
 					result = statement.getResultSet();
 
-					if (columns.length == 1 && Arrays.asList(columns).contains("name"))
+					if (columns.length == 1)
 					{
 						while (result.next())
-							dataSet.add(result.getString("name"));
+							dataSet.add(result.getObject(columns[0]));
 					}
 					else
 					{
@@ -911,7 +911,6 @@ public class DatabaseController
 
 		@SuppressWarnings("unchecked")
 		Set<Integer> result = (LinkedHashSet<Integer>) (runQuery(DatabaseQueryType.SELECT, DatabaseTable.PRODUCTS, columns, null, null));
-
 		List<Integer> ints = new ArrayList<Integer>();
 		ints.addAll(result);
 		return ints;

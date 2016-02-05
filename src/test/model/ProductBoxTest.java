@@ -173,4 +173,10 @@ public class ProductBoxTest
 		assertFalse(box.addProduct(5));
 		assertEquals(maxSize - 3, box.getProductCount());
 	}
+	
+	@Test public void testToString()
+	{
+		ProductBox box2 = new ProductBox(1, 1, product2, 0);
+		assertEquals("[1] Box: peruna (0)", box2.toString());
+	}
 }
