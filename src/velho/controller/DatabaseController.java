@@ -63,10 +63,11 @@ public class DatabaseController
 	 */
 	private static ObservableList<User> userViewList = FXCollections.observableArrayList();
 
-	private static Map<Integer, ProductContainer> loadedProductContainers = new HashMap<Integer, ProductContainer>();
+	private static Map<Integer, ProductBrand> loadedProductBrands = new HashMap<Integer, ProductBrand>();
+	private static Map<Integer, ProductType> loadedProductTypes = new HashMap<Integer, ProductType>();
+	private static Map<Integer, ProductCategory> loadedProductCategories = new HashMap<Integer, ProductCategory>();
 	private static Map<Integer, Product> loadedProducts = new HashMap<Integer, Product>();
-	// private static Map<Integer, ProductBrand> loadedProductBrands = new HashMap<Integer, ProductBrand>();
-	// private static Map<Integer, ProductType> loadedProductTypes = new HashMap<Integer, ProductType>();
+	private static Map<Integer, ProductContainer> loadedProductContainers = new HashMap<Integer, ProductContainer>();
 
 	/*
 	 * PRIVATE DATABASE METHODS
@@ -238,7 +239,7 @@ public class DatabaseController
 					ResultSet result = null;
 					result = statement.getResultSet();
 
-					if (columns.length == 1)
+					if (columns.length == 1 && columns[0] != "*")
 					{
 						while (result.next())
 							dataSet.add(result.getObject(columns[0]));
@@ -830,47 +831,80 @@ public class DatabaseController
 
 	private static ProductType getProductTypeByID(final int typeid) throws NoDatabaseLinkException
 	{
-		String[] columns = { "name" };
-		Map<String, Object> where = new LinkedHashMap<String, Object>();
-		where.put("type_id", new Integer(typeid));
+		if (!loadedProductTypes.containsKey(typeid))
+		{
+			String[] columns = { "name" };
+			Map<String, Object> where = new LinkedHashMap<String, Object>();
+			where.put("type_id", new Integer(typeid));
 
-		@SuppressWarnings("unchecked")
-		Set<String> result = (LinkedHashSet<String>) (runQuery(DatabaseQueryType.SELECT, DatabaseTable.TYPES, columns, null, where));
+			@SuppressWarnings("unchecked")
+			Set<String> result = (LinkedHashSet<String>) (runQuery(DatabaseQueryType.SELECT, DatabaseTable.TYPES, columns, null, where));
 
-		if (result.size() == 0)
-			return null;
+			if (result.size() == 0)
+				return null;
 
-		return new ProductType(typeid, result.iterator().next());
+			final ProductType p = new ProductType(typeid, result.iterator().next());
+
+			// Store for reuse.
+			System.out.println("Caching: " + p);
+			loadedProductTypes.put(p.getDatabaseID(), p);
+			return p;
+		}
+
+		System.out.println("Loading category " + typeid + " from cache.");
+		return loadedProductTypes.get(typeid);
 	}
 
 	private static ProductCategory getProductCategoryByID(final int categoryid) throws NoDatabaseLinkException
 	{
-		String[] columns = { "category_id, name, type" };
-		Map<String, Object> where = new LinkedHashMap<String, Object>();
-		where.put("category_id", new Integer(categoryid));
+		if (!loadedProductCategories.containsKey(categoryid))
+		{
+			String[] columns = { "category_id", "name", "type" };
+			Map<String, Object> where = new LinkedHashMap<String, Object>();
+			where.put("category_id", new Integer(categoryid));
 
-		@SuppressWarnings("unchecked")
-		Set<Object> result = (LinkedHashSet<Object>) (runQuery(DatabaseQueryType.SELECT, DatabaseTable.CATEGORIES, columns, null, where));
+			@SuppressWarnings("unchecked")
+			Set<Object> result = (LinkedHashSet<Object>) (runQuery(DatabaseQueryType.SELECT, DatabaseTable.CATEGORIES, columns, null, where));
 
-		if (result.size() == 0)
-			return null;
+			if (result.size() == 0)
+				return null;
 
-		return (ProductCategory) result.iterator().next();
+			final ProductCategory p = (ProductCategory) result.iterator().next();
+
+			// Store for reuse.
+			System.out.println("Caching: " + p);
+			loadedProductCategories.put(p.getDatabaseID(), p);
+			return p;
+		}
+
+		System.out.println("Loading category " + categoryid + " from cache.");
+		return loadedProductCategories.get(categoryid);
 	}
 
 	private static ProductBrand getProductBrandByID(final int brandid) throws NoDatabaseLinkException
 	{
-		String[] columns = { "name" };
-		Map<String, Object> where = new LinkedHashMap<String, Object>();
-		where.put("brand_id", new Integer(brandid));
+		if (!loadedProductBrands.containsKey(brandid))
+		{
+			String[] columns = { "name" };
+			Map<String, Object> where = new LinkedHashMap<String, Object>();
+			where.put("brand_id", new Integer(brandid));
 
-		@SuppressWarnings("unchecked")
-		Set<String> result = (LinkedHashSet<String>) (runQuery(DatabaseQueryType.SELECT, DatabaseTable.BRANDS, columns, null, where));
+			@SuppressWarnings("unchecked")
+			Set<String> result = (LinkedHashSet<String>) (runQuery(DatabaseQueryType.SELECT, DatabaseTable.BRANDS, columns, null, where));
 
-		if (result.size() == 0)
-			return null;
+			if (result.size() == 0)
+				return null;
 
-		return new ProductBrand(brandid, result.iterator().next());
+			final ProductBrand p = new ProductBrand(brandid, result.iterator().next());
+
+			// Store for reuse.
+			System.out.println("Caching: " + p);
+			loadedProductBrands.put(p.getDatabaseID(), p);
+			return p;
+		}
+
+		System.out.println("Loading brand " + brandid + " from cache.");
+		return loadedProductBrands.get(brandid);
 	}
 
 	private static Product getProductByID(final int productid) throws NoDatabaseLinkException
@@ -1055,6 +1089,7 @@ public class DatabaseController
 		{
 			loadProductContainers();
 			loadShelves();
+			// setContainersToShelves();
 		}
 		catch (NoDatabaseLinkException e)
 		{
@@ -1103,6 +1138,22 @@ public class DatabaseController
 	}
 
 	private static void loadShelves() throws NoDatabaseLinkException
+	{
+		System.out.println("[DatabaseController] Loading shelves...");
+
+		String[] columns = { "*" };
+		@SuppressWarnings("unchecked")
+		Set<Shelf> result = (Set<Shelf>) runQuery(DatabaseQueryType.SELECT, DatabaseTable.SHELVES, columns, null, null);
+
+		Iterator<Shelf> it = result.iterator();
+
+		while (it.hasNext())
+			System.out.println(it.next().toString());
+
+		System.out.println("[DatabaseController] Shelves loaded.");
+	}
+
+	private static void setContainersToShelves() throws NoDatabaseLinkException
 	{
 		System.out.println("[DatabaseController] Loading shelves...");
 

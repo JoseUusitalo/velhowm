@@ -90,7 +90,7 @@ public class DatabaseControllerTest
 	@Test
 	public final void testAuthenticate_ValidPin() throws NoDatabaseLinkException
 	{
-		User user = DatabaseController.authenticatePIN("Admin", "Test","111111");
+		User user = DatabaseController.authenticatePIN("Admin", "Test", "111111");
 		assertEquals("Admin", user.getFirstName());
 		assertEquals("Test", user.getLastName());
 	}
@@ -137,8 +137,8 @@ public class DatabaseControllerTest
 	public final void testGetProductCodeList() throws NoDatabaseLinkException
 	{
 		List<Integer> list = DatabaseController.getProductCodeList();
-		assertEquals(1, list.size());
-		assertTrue(list.contains(1));
+		assertEquals(10, list.size());
+		assertTrue(list.containsAll(Arrays.asList(1, 2, 3, 4, 5, 6, 7, 8, 9, 10)));
 	}
 
 	@Test
