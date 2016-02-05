@@ -21,6 +21,65 @@ CREATE TABLE IF NOT EXISTS `users`
 	CONSTRAINT `CONST_name_role` UNIQUE (`first_name`,`last_name`,`role`)
 ) DEFAULT CHARSET=utf8;
 
+DROP TABLE IF EXISTS `brands`;
+CREATE TABLE IF NOT EXISTS `brands`
+(
+	`brand_id` INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+	`name` VARCHAR(128) NOT NULL UNIQUE
+) DEFAULT CHARSET=utf8;
+
+DROP TABLE IF EXISTS `types`;
+CREATE TABLE IF NOT EXISTS `types`
+(
+	`type_id` INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+	`name` VARCHAR(128) NOT NULL UNIQUE	
+) DEFAULT CHARSET=utf8;
+
+DROP TABLE IF EXISTS `categories`;
+CREATE TABLE IF NOT EXISTS `categories`
+(
+	`category_id` INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+	`name` VARCHAR(128) NOT NULL UNIQUE,
+	`type` VARCHAR(128) NOT NULL,
+	
+	FOREIGN KEY (`type`) REFERENCES types(`type_id`)
+) DEFAULT CHARSET=utf8;
+
+DROP TABLE IF EXISTS `products`;
+CREATE TABLE IF NOT EXISTS `products`
+(
+	`product_id` INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+	`name` VARCHAR(128) NOT NULL,
+	`expiration_date` DATE NULL,
+	`brand` VARCHAR(128) NOT NULL,
+	`category` VARCHAR(128) NOT NULL,
+	`popularity` INT NOT NULL,
+	
+	FOREIGN KEY (`brand`) REFERENCES brands(`brand_id`),
+	FOREIGN KEY (`category`) REFERENCES categories(`category_id`)
+) DEFAULT CHARSET=utf8;
+
+DROP TABLE IF EXISTS `containers`;
+CREATE TABLE IF NOT EXISTS `containers`
+(
+	`container_id` INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+	`max_size` INT NOT NULL,
+	`product` VARCHAR(128) NOT NULL,
+	`product_count` INT NULL,
+	
+	FOREIGN KEY (`product`) REFERENCES products(`product_id`)
+) DEFAULT CHARSET=utf8;
+
+DROP TABLE IF EXISTS `container_products`;
+CREATE TABLE IF NOT EXISTS `container_products`
+(
+	`container` INT UNSIGNED NOT NULL,
+	`product` INT UNSIGNED NOT NULL,
+	
+	FOREIGN KEY (`container`) REFERENCES containers(`container_id`),
+	FOREIGN KEY (`product`) REFERENCES products(`product_id`),
+	PRIMARY KEY (`container`,`product`)
+) DEFAULT CHARSET=utf8;
 
 INSERT INTO `roles` SET `name`='Administrator';
 INSERT INTO `roles` SET `name`='Manager';
