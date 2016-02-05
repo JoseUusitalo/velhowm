@@ -11,19 +11,18 @@ import org.junit.Test;
 import velho.model.Product;
 import velho.model.ProductBrand;
 import velho.model.ProductCategory;
-import velho.model.enums.ProductType;
+import velho.model.ProductType;
 
 /**
  * Tests for {@link Product}.
  * @author Joona
- *
  */
 public class ProductTest
 {
 
-	private ProductBrand brand = new ProductBrand("jotain");
-	private ProductType type = ProductType.REGULAR;
-	private ProductCategory category = new ProductCategory("jahas", type);
+	private ProductBrand brand = new ProductBrand(-1, "jotain");
+	private ProductType regular = new ProductType(-1, "Regular");
+	private ProductCategory category = new ProductCategory(-1, "jahas", regular);
 	private Product product;
 	private Date date = new Date(1000);
 	private String name = "porkkana";
@@ -31,7 +30,7 @@ public class ProductTest
 
 	@Before public void createProduct()
 	{
-		product = new Product(name, date, id, brand, category);
+		product = new Product(id, name, date, brand, category, -1);
 	}
 
 	@After public void destroyProduct()
@@ -46,7 +45,7 @@ public class ProductTest
 	
 	@Test public void testGetPopularity()
 	{
-		assertEquals(0, product.getPopularity());
+		assertEquals(-1, product.getPopularity());
 	}
 
 	@Test public void testGetExpirationDate()

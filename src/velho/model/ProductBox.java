@@ -1,21 +1,25 @@
 package velho.model;
 
-import velho.model.enums.ProductType;
-
 /**
  * The ProductBox class.
  * 
- * @author Joona
+ * @author Joona &amp; Jose Uusitalo
  */
 public class ProductBox extends ProductContainer
 {
-	public ProductBox(int boxID, int maxSize, Product product, int productCount)
+	public ProductBox(int databaseID, int maxSize, Product product, int productCount)
 	{
-		super(boxID, maxSize, product, productCount);
-		
-		if (this.getBoxType() == ProductType.COLD)
+		super(databaseID, maxSize, product, productCount);
+
+		if (product.getCategory().getType().getName() == "Cold")
 		{
 			throw new IllegalArgumentException();
 		}
+	}
+
+	@Override
+	public String toString()
+	{
+		return "[" + this.databaseID + "] Box: " + this.product.getName() + " (" + this.productCount + ")";
 	}
 }

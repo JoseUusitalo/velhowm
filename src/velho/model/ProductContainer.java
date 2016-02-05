@@ -1,29 +1,30 @@
 package velho.model;
 
-import velho.model.enums.ProductType;
-
+/**
+ * @author Joona &amp; Jose Uusitalo
+ */
 public abstract class ProductContainer
 {
 	/**
 	 * The maximum size of the product box.
 	 * 
 	 */
-	private int maxSize;
+	protected int maxSize;
 	/**
 	 * The ID of the product box.
 	 * 
 	 */
-	private int boxID;
+	protected int databaseID;
 	/**
 	 * The product.
 	 * 
 	 */
-	private Product product;
+	protected Product product;
 	/**
 	 * The number of products in the product box.
 	 * 
 	 */
-	private int productCount;
+	protected int productCount;
 
 	public ProductContainer(int boxID, int maxSize, Product product, int productCount)
 	{
@@ -32,11 +33,14 @@ public abstract class ProductContainer
 			throw new IllegalArgumentException();
 		}
 		this.maxSize = maxSize;
-		this.boxID = boxID;
+		this.databaseID = boxID;
 		this.product = product;
 		this.productCount = productCount;
 	}
 
+	@Override
+	public abstract String toString();
+	
 	/**
 	 * Gets the maximum size of the product box.
 	 * 
@@ -56,7 +60,7 @@ public abstract class ProductContainer
 	 */
 	public int getBoxID()
 	{
-		return boxID;
+		return databaseID;
 	}
 
 	/**

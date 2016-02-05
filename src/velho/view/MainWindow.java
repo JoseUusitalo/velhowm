@@ -1,7 +1,6 @@
 package velho.view;
 
 import javafx.application.Application;
-import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
@@ -48,7 +47,7 @@ public class MainWindow extends Application
 	/**
 	 * Enable or disable showing windows. DEBUG_MODE must be <code>true</code> to make this <code>false</code>.
 	 */
-	public static final boolean SHOW_WINDOWS = false;
+	public static final boolean SHOW_WINDOWS = true;
 
 	/**
 	 * The {@link DebugController}.
@@ -193,6 +192,8 @@ public class MainWindow extends Application
 	@Override
 	public void start(final Stage primaryStage)
 	{
+		DatabaseController.loadData();
+		
 		if (!SHOW_WINDOWS && DEBUG_MODE)
 		{
 			System.out.println("Windows are disabled.");
@@ -238,9 +239,6 @@ public class MainWindow extends Application
 				}
 			});
 		}
-
-		DatabaseController.loadData();
-		Platform.exit();
 	}
 
 	protected void shutdown(final Stage primaryStage)

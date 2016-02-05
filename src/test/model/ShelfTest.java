@@ -14,8 +14,8 @@ import velho.model.Product;
 import velho.model.ProductBox;
 import velho.model.ProductBrand;
 import velho.model.ProductCategory;
+import velho.model.ProductType;
 import velho.model.Shelf;
-import velho.model.enums.ProductType;
 
 /**
  * Tests for the {@link Shelf} classhelf.
@@ -39,13 +39,13 @@ public class ShelfTest
 
 	private static final int PRODUCT_1_ID = 10045;
 	private static final String PRODUCT_1_NAME = "A Test Product";
-	private static final Product PRODUCT_1 = new Product(PRODUCT_1_NAME, new Date(0), PRODUCT_1_ID, new ProductBrand("Brand #1"),
-			new ProductCategory("Type #1", ProductType.REGULAR));
+	private static final Product PRODUCT_1 = new Product(PRODUCT_1_ID, PRODUCT_1_NAME, new Date(0), new ProductBrand(-1, "Brand #1"),
+			new ProductCategory(-1, "Type #1", new ProductType(-1, "Regular")), -1);
 
 	private static final int PRODUCT_2_ID = 299;
 	private static final String PRODUCT_2_NAME = "A Test Product 2";
-	private static final Product PRODUCT_2 = new Product(PRODUCT_2_NAME, new Date(0), PRODUCT_2_ID, new ProductBrand("Brand #2"),
-			new ProductCategory("Type #2", ProductType.REGULAR));
+	private static final Product PRODUCT_2 = new Product(PRODUCT_2_ID, PRODUCT_2_NAME, new Date(0), new ProductBrand(-1, "Brand #2"),
+			new ProductCategory(-2, "Type #2", new ProductType(-1, "Regular")), -1);
 
 	private static final int BOX_1_ID = 11;
 	private static final int BOX_1_MAX_SIZE = 10;
@@ -223,7 +223,7 @@ public class ShelfTest
 	@Test(expected = IllegalArgumentException.class)
 	public final void testAddToSlot_Invalid_Shelf()
 	{
-		final String slotid = (shelf.getShelfID()+1) + "-2-12";
+		final String slotid = (shelf.getShelfID() + 1) + "-2-12";
 		shelf.addToSlot(slotid, BOX_2);
 	}
 
@@ -240,7 +240,7 @@ public class ShelfTest
 		final String slotid = shelf.getShelfID() + "-2-99999999";
 		shelf.addToSlot(slotid, BOX_2);
 	}
-	
+
 	@Test
 	public final void testRemoveFromSlot()
 	{
@@ -261,7 +261,7 @@ public class ShelfTest
 	@Test(expected = IllegalArgumentException.class)
 	public final void testRemoveFromSlot_Invalid_Shelf()
 	{
-		final String slotid = (shelf.getShelfID()+1) + "-2-12";
+		final String slotid = (shelf.getShelfID() + 1) + "-2-12";
 		shelf.removeFromSlot(slotid, BOX_2);
 	}
 
@@ -296,7 +296,7 @@ public class ShelfTest
 	{
 		shelf.getShelfSlotBoxes(shelf.getShelfID() + "-1-qwe");
 	}
-	
+
 	@Test
 	public final void testHasFreeSpace()
 	{

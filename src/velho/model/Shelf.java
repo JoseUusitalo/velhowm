@@ -179,7 +179,7 @@ public class Shelf
 	@Override
 	public String toString()
 	{
-		return "[" + shelfID + "] Lvl: " + getLevels() + ", Slt/Lvl: " + slots[0].length + ", Box/Slt: " + slots[0][0].maxBoxCount + ", Box: " + getProductBoxCount() + ", Slt: " + getShelfSlotCount() + ", Fr: " + getFreeShelfSlots().size();
+		return "[" + shelfID + "] Lvls: " + getLevels() + ", Slt/Lvl: " + slots[0].length + ", Box/Slt: " + slots[0][0].maxBoxCount + ", Boxs: " + getProductBoxCount() + ", Slts: " + getShelfSlotCount() + ", Free: " + getFreeShelfSlots().size();
 	}
 
 	/**
