@@ -29,14 +29,8 @@ public class UserControllerTest
 	private static UserController controller;
 
 	private final String VALID_BADGE_ID = "99955999";
-	private final String INVALID_BADGE_ID_SHORT = "15";
-	private final String INVALID_BADGE_ID_LONG = "1234567891";
-
 	private final String VALID_PIN = "003000";
-	private final String INVALID_PIN = "1442";
-
 	private final String VALID_NAME = "First-Name";
-
 	private final String VALID_ROLE_NAME = "Manager";
 	private final String INVALID_ROLE_NAME = "Worker";
 
@@ -81,12 +75,12 @@ public class UserControllerTest
 		assertTrue(controller.addUser(VALID_BADGE_ID, null, VALID_NAME, VALID_NAME, VALID_ROLE_NAME));
 
 		boolean exists = false;
-		ObservableList<User> users = DatabaseController.getPublicUserDataList();
+		ObservableList<Object> users = DatabaseController.getPublicUserDataList();
 		DatabaseController.unlink();
 
-		for (final User user : users)
+		for (final Object user : users)
 		{
-			if (user.getFullDetails().equals(VALID_NAME + " " + VALID_NAME + " (" + VALID_ROLE_NAME + ")"))
+			if (((User) user).getFullDetails().equals(VALID_NAME + " " + VALID_NAME + " (" + VALID_ROLE_NAME + ")"))
 			{
 				exists = true;
 				break;
@@ -104,12 +98,12 @@ public class UserControllerTest
 		assertFalse(controller.addUser(null, VALID_PIN, VALID_NAME, VALID_NAME, INVALID_ROLE_NAME));
 
 		boolean exists = false;
-		ObservableList<User> users = DatabaseController.getPublicUserDataList();
+		ObservableList<Object> users = DatabaseController.getPublicUserDataList();
 		DatabaseController.unlink();
 
-		for (final User user : users)
+		for (final Object user : users)
 		{
-			if (user.getFullDetails().equals(VALID_NAME + " " + VALID_NAME + " (" + INVALID_ROLE_NAME + ")"))
+			if (((User) user).getFullDetails().equals(VALID_NAME + " " + VALID_NAME + " (" + INVALID_ROLE_NAME + ")"))
 			{
 				exists = true;
 				break;

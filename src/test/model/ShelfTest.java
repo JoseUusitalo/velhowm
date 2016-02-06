@@ -26,16 +26,12 @@ import velho.model.Shelf;
 public class ShelfTest
 {
 	private static final int SHELF_ID_0 = 0;
-	private static final int SHELF_ID_1 = 1;
 	private static final int SHELF_LEVELS = 3;
 	private static final int SHELF_SLOTS = 20;
 	private static final int SHELF_BOXES_PER_SLOT = 32;
 	private static final String SHELF_0_LEVEL_1_SLOT_1 = "S0-1-01";
 	private static final String SHELF_1_LEVEL_3_SLOT_16 = "S1-3-16";
 	private static final String INVALID_SHELF_SLOT_ID = "1-1-1";
-	private static final String INVALID_SHELF_SLOT_ID_SHELF = "S999999-2-3";
-	private static final String INVALID_SHELF_SLOT_ID_LEVEL = "S1-999999-3";
-	private static final String INVALID_SHELF_SLOT_ID_SLOT = "S1-2-9999999";
 
 	private static final int PRODUCT_1_ID = 10045;
 	private static final String PRODUCT_1_NAME = "A Test Product";

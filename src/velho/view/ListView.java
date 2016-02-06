@@ -7,7 +7,6 @@ import java.util.Map;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.ObservableList;
-import javafx.collections.ObservableMap;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Pos;
@@ -21,7 +20,6 @@ import javafx.scene.text.Font;
 import javafx.util.Callback;
 import velho.controller.ListController;
 import velho.controller.LoginController;
-import velho.model.Product;
 import velho.model.User;
 
 /**
@@ -50,11 +48,6 @@ public class ListView
 	 * The {@link ListController}.
 	 */
 	private ListController listController;
-
-	/**
-	 * The map of data to show.
-	 */
-	private ObservableMap<Integer, Product> dataMap;
 
 	/**
 	 * @param columnMap

@@ -3,9 +3,7 @@ package velho.controller;
 import java.util.Map;
 
 import javafx.collections.ObservableList;
-import javafx.collections.ObservableMap;
 import javafx.scene.Node;
-import velho.model.Product;
 import velho.model.User;
 import velho.view.ListView;
 
