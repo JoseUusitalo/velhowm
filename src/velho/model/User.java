@@ -175,7 +175,7 @@ public class User
 		final boolean hasPIN = isValidPIN(pin);
 
 		// Must have exactly one.
-		if (hasBadgeID && hasPIN || !hasBadgeID && !hasPIN)
+		if ((hasBadgeID && hasPIN) || (!hasBadgeID && !hasPIN))
 			return false;
 
 		// Name cannot be null, empty, or longer than maximum and length.

@@ -1,10 +1,8 @@
 package velho.model;
 
-import velho.model.enums.ProductType;
-
 /**
  * The freezer class.
- * @author Joona
+ * @author Joona &amp; Jose Uusitalo
  */
 public class Freezer extends ProductContainer
 {
@@ -19,10 +17,15 @@ public class Freezer extends ProductContainer
 	{
 		super(freezerID, maxSize, product, productCount);
 
-		if (this.getBoxType() == ProductType.REGULAR)
+		if (this.getBoxType().getName() == "Regular")
 		{
 			throw new IllegalArgumentException();
 		}
 	}
 
+	@Override
+	public String toString()
+	{
+		return "[" + this.databaseID + "] Freezer: " + this.product.getName() + " (" + this.productCount + ")";
+	}
 }

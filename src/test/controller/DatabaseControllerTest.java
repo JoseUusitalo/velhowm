@@ -4,6 +4,7 @@ import static org.junit.Assert.*;
 
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import org.junit.AfterClass;
@@ -89,7 +90,7 @@ public class DatabaseControllerTest
 	@Test
 	public final void testAuthenticate_ValidPin() throws NoDatabaseLinkException
 	{
-		User user = DatabaseController.authenticatePIN("Admin", "Test","111111");
+		User user = DatabaseController.authenticatePIN("Admin", "Test", "111111");
 		assertEquals("Admin", user.getFirstName());
 		assertEquals("Test", user.getLastName());
 	}
@@ -133,9 +134,11 @@ public class DatabaseControllerTest
 	}
 
 	@Test
-	public final void testGetProductCodeList()
+	public final void testGetProductCodeList() throws NoDatabaseLinkException
 	{
-		fail("Not yet implemented");
+		List<Integer> list = DatabaseController.getProductCodeList();
+		assertEquals(10, list.size());
+		assertTrue(list.containsAll(Arrays.asList(1, 2, 3, 4, 5, 6, 7, 8, 9, 10)));
 	}
 
 	@Test
@@ -157,9 +160,9 @@ public class DatabaseControllerTest
 	public final void testAddUser_RemoveUser() throws NoDatabaseLinkException
 	{
 		// The method does not check for data validity.
-		DatabaseController.addUser("", "000001", "My PIN Is Practically Invalid", "But Technically Valid", 1);
+		DatabaseController.addUser("", "000001", "A very UNIQUE! n4m3", "Some text here!", 1);
 
-		assertTrue(DatabaseController.getUserByID(5).getFirstName().equals("My PIN Is Practically Invalid"));
+		assertTrue(DatabaseController.getUserByID(5).getFirstName().equals("A very UNIQUE! n4m3"));
 		assertNotEquals(null, DatabaseController.getUserByID(5));
 
 		DatabaseController.removeUser(5);

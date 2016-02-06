@@ -119,11 +119,11 @@ public class UserTest
 	{
 		assertFalse(User.validateUserData(null, null, VALID_NAME, VALID_NAME, VALID_ROLE_NAME));
 	}
-	
+
 	@Test
 	public final void testValidation_Name_Long() throws NoDatabaseLinkException
 	{
-		assertFalse(User.validateUserData(VALID_BADGE_ID_MAX, null, VALID_NAME, INVALID_NAME_LONG, VALID_ROLE_NAME));
+		assertFalse(User.validateUserData(VALID_BADGE_ID_MAX, null, INVALID_NAME_LONG, VALID_NAME, VALID_ROLE_NAME));
 	}
 
 	@Test
@@ -134,6 +134,24 @@ public class UserTest
 
 	@Test
 	public final void testValidation_Name_Empty() throws NoDatabaseLinkException
+	{
+		assertFalse(User.validateUserData(VALID_BADGE_ID_MAX, "", "", VALID_NAME, VALID_ROLE_NAME));
+	}
+
+	@Test
+	public final void testValidation_Name_Long2() throws NoDatabaseLinkException
+	{
+		assertFalse(User.validateUserData(VALID_BADGE_ID_MAX, null, VALID_NAME, INVALID_NAME_LONG, VALID_ROLE_NAME));
+	}
+
+	@Test
+	public final void testValidation_Name_Null2() throws NoDatabaseLinkException
+	{
+		assertFalse(User.validateUserData("", VALID_PIN_MAX, VALID_NAME, null, VALID_ROLE_NAME));
+	}
+
+	@Test
+	public final void testValidation_Name_Empty2() throws NoDatabaseLinkException
 	{
 		assertFalse(User.validateUserData(VALID_BADGE_ID_MAX, "", VALID_NAME, "", VALID_ROLE_NAME));
 	}
@@ -150,7 +168,6 @@ public class UserTest
 		assertFalse(User.isValidPIN("whatev"));
 	}
 
-	
 	@Test
 	public final void testIsValidPIN_Negative()
 	{
@@ -180,7 +197,7 @@ public class UserTest
 	{
 		assertTrue(User.isValidBadgeID("99999999"));
 	}
-	
+
 	@Test
 	public final void testGetFirstName()
 	{
@@ -192,7 +209,7 @@ public class UserTest
 	{
 		assertEquals("l", user.getLastName());
 	}
-	
+
 	@Test
 	public final void testGetFullName()
 	{

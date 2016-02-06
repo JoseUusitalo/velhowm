@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
@@ -15,6 +16,14 @@ import org.h2.jdbcx.JdbcConnectionPool;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.collections.ObservableMap;
+import velho.model.Product;
+import velho.model.ProductBox;
+import velho.model.ProductBrand;
+import velho.model.ProductCategory;
+import velho.model.ProductContainer;
+import velho.model.ProductType;
+import velho.model.Shelf;
 import velho.model.User;
 import velho.model.enums.DatabaseQueryType;
 import velho.model.enums.DatabaseTable;
@@ -53,7 +62,16 @@ public class DatabaseController
 	/**
 	 * An observable list of users for display in the user interface.
 	 */
-	private static ObservableList<User> userViewList = FXCollections.observableArrayList();
+	private static ObservableList<Object> userViewList = FXCollections.observableArrayList();
+	
+	private static Map<Integer, ProductBrand> loadedProductBrands = new HashMap<Integer, ProductBrand>();
+	private static Map<Integer, ProductType> loadedProductTypes = new HashMap<Integer, ProductType>();
+	private static Map<Integer, ProductCategory> loadedProductCategories = new HashMap<Integer, ProductCategory>();
+	private static ObservableMap<Integer, Product> loadedProducts = FXCollections.observableHashMap();
+	private static Map<Integer, ProductContainer> loadedProductContainers = new HashMap<Integer, ProductContainer>();
+	private static Map<Integer, Shelf> loadedShelves = new HashMap<Integer, Shelf>();
+
+	private static ObservableList<Object> productViewList;
 
 	/*
 	 * PRIVATE DATABASE METHODS
@@ -205,7 +223,11 @@ public class DatabaseController
 		// Update queries.
 		int changed = 0;
 
+		// Most other queries.
 		Set<Object> dataSet = new LinkedHashSet<Object>();
+
+		// Putting boxes on shelves.
+		Map<Integer, ArrayList<Integer[]>> shelfBoxMap = null;
 
 		try
 		{
@@ -225,29 +247,107 @@ public class DatabaseController
 					ResultSet result = null;
 					result = statement.getResultSet();
 
-					switch (tableName)
+					if (columns.length == 1 && columns[0] != "*")
 					{
-						case USERS:
-							while (result.next())
-								dataSet.add(new User(result.getInt("user_id"), result.getString("first_name"), result.getString("last_name"),
-										getRoleFromID(result.getInt("role"))));
-							break;
-						case ROLES:
-							if (columns.length == 1 && Arrays.asList(columns).contains("name"))
-							{
-								while (result.next())
-									dataSet.add(result.getString("name"));
-							}
-							else if (columns.length == 1 && Arrays.asList(columns).contains("role_id"))
-							{
-								while (result.next())
-									dataSet.add(result.getInt("role_id"));
-							}
-							break;
-						default:
-							throw new IllegalArgumentException();
+						while (result.next())
+							dataSet.add(result.getObject(columns[0]));
 					}
+					else
+					{
+						switch (tableName)
+						{
+							case USERS:
+								while (result.next())
+									dataSet.add(new User(result.getInt("user_id"), result.getString("first_name"), result.getString("last_name"),
+											getRoleByID(result.getInt("role"))));
+								break;
 
+							case ROLES:
+								if (columns.length == 1 && Arrays.asList(columns).contains("name"))
+								{
+									while (result.next())
+										dataSet.add(result.getString("name"));
+								}
+								else if (columns.length == 1 && Arrays.asList(columns).contains("role_id"))
+								{
+									while (result.next())
+										dataSet.add(result.getInt("role_id"));
+								}
+								break;
+
+							case CATEGORIES:
+								while (result.next())
+									dataSet.add(new ProductCategory(result.getInt("category_id"), result.getString("name"),
+											getProductTypeByID(result.getInt("type"))));
+								break;
+
+							case PRODUCTS:
+								// @formatter:off
+								while (result.next())
+									dataSet.add(new Product(
+											result.getInt("product_id"),
+											result.getString("name"),
+											result.getDate("expiration_date"),
+											getProductBrandByID(result.getInt("brand")),
+											getProductCategoryByID(result.getInt("category")),
+											result.getInt("popularity")));
+								break;
+								// @formatter:on
+
+							case CONTAINERS:
+								// @formatter:off
+								while (result.next())
+									dataSet.add(new ProductBox(
+											result.getInt("container_id"),
+											result.getInt("max_size"),
+											getProductByID(result.getInt("product")),
+											result.getInt("product_count")));
+								break;
+								// @formatter:on
+
+							case SHELVES:
+								// @formatter:off
+								while (result.next())
+									dataSet.add(new Shelf(result.getInt("shelf_id"), result.getInt("max_levels"), result.getInt("max_shelfslots_per_level"),
+											result.getInt("max_productboxes_per_shelfslot")));
+								break;
+								// @formatter:on
+
+							case SHELF_PRODUCTBOXES:
+								shelfBoxMap = new HashMap<Integer, ArrayList<Integer[]>>();
+								Integer[] coords = null;
+								Integer shelfID = null;
+								ArrayList<Integer[]> list;
+
+								while (result.next())
+								{
+									coords = new Integer[3];
+									// Get all the data.
+									shelfID = result.getInt("shelf");
+									coords[0] = result.getInt("productbox");
+									coords[1] = result.getInt("shelflevel_index");
+									coords[2] = result.getInt("shelfslot_index");
+
+									// Does this shelf already have boxes in it?
+									if (shelfBoxMap.containsKey(shelfID))
+									{
+										// Add to the list.
+										shelfBoxMap.get(shelfID).add(coords);
+									}
+									else
+									{
+										// Create a new list and put in the data.
+										list = new ArrayList<Integer[]>();
+										list.add(coords);
+										shelfBoxMap.put(shelfID, list);
+									}
+								}
+
+								break;
+							default:
+								throw new IllegalArgumentException();
+						}
+					}
 					break;
 				default:
 					throw new IllegalArgumentException();
@@ -319,13 +419,22 @@ public class DatabaseController
 				{
 					case USERS:
 					case ROLES:
+					case TYPES:
+					case BRANDS:
+					case CATEGORIES:
+					case PRODUCTS:
+					case CONTAINERS:
+					case SHELVES:
 						return dataSet;
+					case SHELF_PRODUCTBOXES:
+						return shelfBoxMap;
 					default:
 						throw new IllegalArgumentException();
 				}
 			default:
 				throw new IllegalArgumentException();
 		}
+
 	}
 
 	/**
@@ -387,7 +496,9 @@ public class DatabaseController
 				e.printStackTrace();
 
 			// If it was a UNIQUE constraint violation, continue normally as those are handled separately.
-			System.out.println("[DatabaseController] Silently ignored an SQL UNIQUE constraint violation with.");
+			System.out.println("[DatabaseController] Silently ignored an SQL UNIQUE constraint violation with: \n");
+			System.out.println(e.getMessage());
+			System.out.println("\n[DatabaseController] End of message.");
 		}
 
 		// Close all resources.
@@ -411,6 +522,36 @@ public class DatabaseController
 		}
 
 		return changed;
+	}
+
+	/**
+	 * Attempts to re-link the database.
+	 */
+	private static void relink()
+	{
+		System.out.println("[DatabaseController] Attempting relink.");
+		try
+		{
+			// Just in case.
+			unlink();
+		}
+		catch (NoDatabaseLinkException e)
+		{
+			// Do nothing. This is expected.
+		}
+
+		try
+		{
+			link();
+		}
+		catch (ClassNotFoundException e)
+		{
+			e.printStackTrace();
+		}
+		catch (ExistingDatabaseLinkException e)
+		{
+			e.printStackTrace();
+		}
 	}
 
 	/**
@@ -440,7 +581,14 @@ public class DatabaseController
 		}
 		catch (SQLException e)
 		{
-			e.printStackTrace();
+			if (!e.getMessage().contains("Database may be already in use"))
+			{
+				relink();
+			}
+			else
+			{
+				e.printStackTrace();
+			}
 		}
 		return connection;
 	}
@@ -596,6 +744,17 @@ public class DatabaseController
 		return cols;
 	}
 
+	public static Map<String, String> getPublicProductDataColumns()
+	{
+		LinkedHashMap<String, String> cols = new LinkedHashMap<String, String>();
+		cols.put("name", "Name");
+		cols.put("expirationDate", "Expires");
+		cols.put("brand", "Brand");
+		cols.put("category", "Category");
+		cols.put("popularity", "Popularity");
+
+		return cols;
+	}
 	/**
 	 * Gets the database ID of the given user role name.
 	 *
@@ -696,7 +855,7 @@ public class DatabaseController
 	 *
 	 * @throws NoDatabaseLinkException
 	 */
-	private static UserRole getRoleFromID(final int roleid) throws NoDatabaseLinkException
+	private static UserRole getRoleByID(final int roleid) throws NoDatabaseLinkException
 	{
 		String[] columns = { "name" };
 		Map<String, Object> where = new LinkedHashMap<String, Object>();
@@ -711,17 +870,137 @@ public class DatabaseController
 		return UserController.stringToRole(result.iterator().next());
 	}
 
+	private static ProductType getProductTypeByID(final int typeid) throws NoDatabaseLinkException
+	{
+		if (!loadedProductTypes.containsKey(typeid))
+		{
+			String[] columns = { "name" };
+			Map<String, Object> where = new LinkedHashMap<String, Object>();
+			where.put("type_id", new Integer(typeid));
+
+			@SuppressWarnings("unchecked")
+			Set<String> result = (LinkedHashSet<String>) (runQuery(DatabaseQueryType.SELECT, DatabaseTable.TYPES, columns, null, where));
+
+			if (result.size() == 0)
+				return null;
+
+			final ProductType p = new ProductType(typeid, result.iterator().next());
+
+			// Store for reuse.
+			System.out.println("Caching: " + p);
+			loadedProductTypes.put(p.getDatabaseID(), p);
+			return p;
+		}
+
+		System.out.println("Loading category " + typeid + " from cache.");
+		return loadedProductTypes.get(typeid);
+	}
+
+	private static ProductCategory getProductCategoryByID(final int categoryid) throws NoDatabaseLinkException
+	{
+		if (!loadedProductCategories.containsKey(categoryid))
+		{
+			String[] columns = { "category_id", "name", "type" };
+			Map<String, Object> where = new LinkedHashMap<String, Object>();
+			where.put("category_id", new Integer(categoryid));
+
+			@SuppressWarnings("unchecked")
+			Set<Object> result = (LinkedHashSet<Object>) (runQuery(DatabaseQueryType.SELECT, DatabaseTable.CATEGORIES, columns, null, where));
+
+			if (result.size() == 0)
+				return null;
+
+			final ProductCategory p = (ProductCategory) result.iterator().next();
+
+			// Store for reuse.
+			System.out.println("Caching: " + p);
+			loadedProductCategories.put(p.getDatabaseID(), p);
+			return p;
+		}
+
+		System.out.println("Loading category " + categoryid + " from cache.");
+		return loadedProductCategories.get(categoryid);
+	}
+
+	private static ProductBrand getProductBrandByID(final int brandid) throws NoDatabaseLinkException
+	{
+		if (!loadedProductBrands.containsKey(brandid))
+		{
+			String[] columns = { "name" };
+			Map<String, Object> where = new LinkedHashMap<String, Object>();
+			where.put("brand_id", new Integer(brandid));
+
+			@SuppressWarnings("unchecked")
+			Set<String> result = (LinkedHashSet<String>) (runQuery(DatabaseQueryType.SELECT, DatabaseTable.BRANDS, columns, null, where));
+
+			if (result.size() == 0)
+				return null;
+
+			final ProductBrand p = new ProductBrand(brandid, result.iterator().next());
+
+			// Store for reuse.
+			System.out.println("Caching: " + p);
+			loadedProductBrands.put(p.getDatabaseID(), p);
+			return p;
+		}
+
+		System.out.println("Loading brand " + brandid + " from cache.");
+		return loadedProductBrands.get(brandid);
+	}
+
+	private static Product getProductByID(final int productid) throws NoDatabaseLinkException
+	{
+		if (!loadedProducts.containsKey(productid))
+		{
+
+			String[] columns = { "*" };
+			Map<String, Object> where = new LinkedHashMap<String, Object>();
+			where.put("product_id", new Integer(productid));
+
+			@SuppressWarnings("unchecked")
+			Set<Object> result = (LinkedHashSet<Object>) (runQuery(DatabaseQueryType.SELECT, DatabaseTable.PRODUCTS, columns, null, where));
+
+			if (result.size() == 0)
+				return null;
+
+			final Product p = (Product) result.iterator().next();
+
+			// Store for reuse.
+			System.out.println("Caching: " + p);
+			loadedProducts.put(p.getProductID(), p);
+			return p;
+		}
+
+		System.out.println("Loading product " + productid + " from cache.");
+		return loadedProducts.get(productid);
+	}
+
 	/**
 	 * Gets a list product codes in the database.
 	 *
 	 * @return a list of integer product codes
 	 */
-	public static List<Integer> getProductCodeList()
+	public static List<Integer> getProductCodeList() throws NoDatabaseLinkException
 	{
-		// TODO Auto-generated method stub
-		return new ArrayList<Integer>();
+		String[] columns = { "product_id" };
+
+		@SuppressWarnings("unchecked")
+		Set<Integer> result = (LinkedHashSet<Integer>) (runQuery(DatabaseQueryType.SELECT, DatabaseTable.PRODUCTS, columns, null, null));
+		List<Integer> ints = new ArrayList<Integer>();
+		ints.addAll(result);
+		return ints;
 	}
 
+	public static ObservableList<Object> getPublicProductDataList()
+	{
+		if (productViewList == null)
+		{
+			productViewList = FXCollections.observableArrayList();
+			productViewList.addAll(loadedProducts.values());
+		}
+		return productViewList;
+	}
+	
 	/**
 	 * Gets an {@link ObservableList} of user names and roles.
 	 *
@@ -729,7 +1008,7 @@ public class DatabaseController
 	 *
 	 * @throws NoDatabaseLinkException
 	 */
-	public static ObservableList<User> getPublicUserDataList() throws NoDatabaseLinkException
+	public static ObservableList<Object> getPublicUserDataList() throws NoDatabaseLinkException
 	{
 		String[] columns = { "user_id", "first_name", "last_name", "role" };
 
@@ -848,5 +1127,113 @@ public class DatabaseController
 			getPublicUserDataList();
 
 		return changed;
+	}
+
+	/**
+	 * Loads data from database into memory.
+	 */
+	public static void loadData()
+	{
+		System.out.println("[DatabaseController] Loading data from database...");
+
+		try
+		{
+			loadProductContainers();
+			loadShelves();
+		}
+		catch (NoDatabaseLinkException e)
+		{
+			e.printStackTrace();
+		}
+	}
+
+	/*
+	 * private static void loadProducts() throws NoDatabaseLinkException
+	 * {
+	 * System.out.println("[DatabaseController] Loading products...");
+	 * 
+	 * String[] columns = { "*" };
+	 * 
+	 * @SuppressWarnings("unchecked")
+	 * Set<Product> result = (Set<Product>) runQuery(DatabaseQueryType.SELECT, DatabaseTable.PRODUCTS, columns, null,
+	 * null);
+	 * 
+	 * Iterator<Product> it = result.iterator();
+	 * 
+	 * while (it.hasNext())
+	 * System.out.println(it.next().toString());
+	 * 
+	 * System.out.println("[DatabaseController] Products loaded.");
+	 * }
+	 */
+	private static void loadProductContainers() throws NoDatabaseLinkException
+	{
+		System.out.println("[DatabaseController] Loading product containers...");
+
+		String[] columns = { "*" };
+		@SuppressWarnings("unchecked")
+		Set<ProductContainer> result = (Set<ProductContainer>) runQuery(DatabaseQueryType.SELECT, DatabaseTable.CONTAINERS, columns, null, null);
+
+		Iterator<ProductContainer> it = result.iterator();
+
+		// Store for reuse.
+		while (it.hasNext())
+		{
+			final ProductContainer p = it.next();
+			System.out.println("Caching: " + p);
+			loadedProductContainers.put(p.getBoxID(), p);
+		}
+
+		System.out.println("[DatabaseController] Product containers loaded.");
+	}
+
+	private static void loadShelves() throws NoDatabaseLinkException
+	{
+		System.out.println("[DatabaseController] Loading shelves...");
+
+		String[] columns = { "*" };
+		@SuppressWarnings("unchecked")
+		Set<Shelf> result = (Set<Shelf>) runQuery(DatabaseQueryType.SELECT, DatabaseTable.SHELVES, columns, null, null);
+
+		Iterator<Shelf> it = result.iterator();
+		// Store for reuse.
+		while (it.hasNext())
+		{
+			final Shelf s = it.next();
+			System.out.println("Caching: " + s);
+			loadedShelves.put(s.getDatabaseID(), s);
+		}
+
+		System.out.println("[DatabaseController] Shelves loaded.");
+
+		setContainersToShelves();
+	}
+
+	private static void setContainersToShelves() throws NoDatabaseLinkException
+	{
+		System.out.println("[DatabaseController] Placing product boxes on shelves...");
+
+		String[] columns = { "*" };
+		@SuppressWarnings("unchecked")
+		Map<Integer, ArrayList<Integer[]>> shelfBoxMap = (HashMap<Integer, ArrayList<Integer[]>>) runQuery(DatabaseQueryType.SELECT,
+				DatabaseTable.SHELF_PRODUCTBOXES, columns, null, null);
+
+		for (final Integer shelfID : shelfBoxMap.keySet())
+		{
+			if (loadedShelves.containsKey(shelfID))
+			{
+				ArrayList<Integer[]> boxes = shelfBoxMap.get(shelfID);
+
+				for (final Integer[] data : boxes)
+				{
+					if (loadedProductContainers.containsKey(data[0]))
+					{
+						loadedShelves.get(shelfID).addToSlot(Shelf.coordinatesToShelfSlotID(shelfID, data[1], data[2]), (ProductBox) loadedProductContainers.get(data[0]));
+					}
+				}
+			}
+		}
+
+		System.out.println("[DatabaseController] Product boxes placed on shelves.");
 	}
 }

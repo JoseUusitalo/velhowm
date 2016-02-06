@@ -1,11 +1,9 @@
 package velho.model;
 
-import velho.model.enums.ProductType;
-
 /**
  * The ProductCategory class.
  * 
- * @author Joona
+ * @author Joona &amp; Jose Uusitalo
  */
 public class ProductCategory
 {
@@ -21,20 +19,31 @@ public class ProductCategory
 	private ProductType type;
 
 	/**
+	 * The database ID of this product category.
+	 */
+	private int databaseID;
+
+	/**
 	 * @param name
 	 * @param type
 	 * 
 	 */
-	public ProductCategory(String name, ProductType type)
+	public ProductCategory(int databaseID, String name, ProductType type)
 	{
-		
+		this.databaseID = databaseID;
 		this.type = type;
 		this.name = name;
-		
+
 		if (this.type == null)
 		{
 			throw new IllegalArgumentException();
 		}
+	}
+
+	@Override
+	public String toString()
+	{
+		return name + " (" + type + ")";
 	}
 
 	/**
@@ -57,5 +66,15 @@ public class ProductCategory
 	public ProductType getType()
 	{
 		return type;
+	}
+
+	/**
+	 * Gets the database ID of this category.
+	 * 
+	 * @return the database id
+	 */
+	public int getDatabaseID()
+	{
+		return databaseID;
 	}
 }

@@ -5,38 +5,32 @@ import java.util.Date;
 /**
  * The Product class.
  * 
- * @author Joona
+ * @author Joona &amp; Jose Uusitalo
  */
 public class Product
 {
 	/**
 	 * The name of the product.
-	 * 
 	 */
 	private String name;
 	/**
 	 * The expiration date of the product.
-	 * 
 	 */
 	private Date expirationDate;
 	/**
 	 * The ID of the product.
-	 * 
 	 */
 	private int productID;
 	/**
 	 * The brand of the product.
-	 * 
 	 */
 	private ProductBrand brand;
 	/**
 	 * The category of the product.
-	 * 
 	 */
 	private ProductCategory category;
 	/**
 	 * Popularity of the product.
-	 * 
 	 */
 	private int popularity;
 
@@ -48,13 +42,20 @@ public class Product
 	 * @param category
 	 * 
 	 */
-	public Product(String name, Date expirationDate, int productID, ProductBrand brand, ProductCategory category)
+	public Product(int databaseID, String name, Date expirationDate, ProductBrand brand, ProductCategory category, int popularity)
 	{
+		this.productID = databaseID;
 		this.name = name;
 		this.expirationDate = expirationDate;
-		this.productID = productID;
 		this.brand = brand;
 		this.category = category;
+		this.popularity = popularity;
+	}
+
+	@Override
+	public String toString()
+	{
+		return "[" + productID + "] " + name + " (" + brand + " / " + category + "), Expires: " + expirationDate + ", Popularity: " + popularity;
 	}
 
 	/**

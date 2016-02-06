@@ -11,7 +11,7 @@ import org.junit.Test;
 import velho.model.ProductBox;
 import velho.model.ProductBrand;
 import velho.model.ProductCategory;
-import velho.model.enums.ProductType;
+import velho.model.ProductType;
 import velho.model.Product;
 
 /**
@@ -23,14 +23,14 @@ public class ProductBoxTest
 {
 
 	private ProductBox box;
-	private ProductBrand brand1 = new ProductBrand("pirkka");
-	private ProductType type = ProductType.REGULAR;
-	private ProductType type2 = ProductType.RAW;
-	private ProductType type3 = ProductType.COLD;
-	private ProductCategory category = new ProductCategory("tyyppi nimi", type);
-	private ProductCategory category2 = new ProductCategory("tyyppi nimi", type2);
-	private ProductCategory category3 = new ProductCategory("tyyppi nimi", type3);
-	private ProductBrand brand2 = new ProductBrand("rainbow");
+	private ProductBrand brand1 = new ProductBrand(-1, "pirkka");
+	private ProductType regular = new ProductType(-1, "Regular");
+	private ProductType raw = new ProductType(-1, "Raw");
+	private ProductType cold = new ProductType(-1, "Cold");
+	private ProductCategory category = new ProductCategory(-1, "tyyppi nimi", regular);
+	private ProductCategory category2 = new ProductCategory(-1, "tyyppi nimi", raw);
+	private ProductCategory category3 = new ProductCategory(-1, "tyyppi nimi", cold);
+	private ProductBrand brand2 = new ProductBrand(-1, "rainbow");
 	private Date date = new Date(1000);
 	private String name1 = "porkkana";
 	private String name2 = "peruna";
@@ -38,9 +38,9 @@ public class ProductBoxTest
 	private int id2 = 2;
 	private int maxSize = 12;
 
-	private Product product1 = new Product(name1, date, id1, brand1, category);
-	private Product product2 = new Product(name2, date, id2, brand2, category2);
-	private Product product3 = new Product(name2, date, id2, brand2, category3);
+	private Product product1 = new Product(id1, name1, date, brand1, category, -1);
+	private Product product2 = new Product(id2, name2, date, brand2, category2,-1);
+	private Product product3 = new Product(id2, name2, date, brand2, category3,-1);
 
 	@Before public void createProductBox()
 	{
@@ -79,7 +79,7 @@ public class ProductBoxTest
 	
 	@Test public void testGetBoxType()
 	{
-		assertEquals(type, box.getBoxType());
+		assertEquals(regular, box.getBoxType());
 	}
 
 	@Test public void testGetBoxID()
@@ -172,5 +172,11 @@ public class ProductBoxTest
 		assertTrue(box.addProduct(maxSize - 3));
 		assertFalse(box.addProduct(5));
 		assertEquals(maxSize - 3, box.getProductCount());
+	}
+	
+	@Test public void testToString()
+	{
+		ProductBox box2 = new ProductBox(1, 1, product2, 0);
+		assertEquals("[1] Box: peruna (0)", box2.toString());
 	}
 }

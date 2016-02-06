@@ -90,6 +90,7 @@ public class UIController
 				//$FALL-THROUGH$
 			case "Logistician":
 				mainView.addTab("User List", getUserListView(currentUserRole));
+				mainView.addTab("Product List", listController.getProductListView(DatabaseController.getPublicProductDataColumns(), DatabaseController.getPublicProductDataList()));
 				break;
 			default:
 				System.out.println("Unknown user role.");
@@ -114,9 +115,9 @@ public class UIController
 			{
 				case "Administrator":
 				case "Manager":
-					return listController.getView(DatabaseController.getPublicUserDataColumns(true), DatabaseController.getPublicUserDataList());
+					return listController.getUserListView(DatabaseController.getPublicUserDataColumns(true), DatabaseController.getPublicUserDataList());
 				case "Logistician":
-					return listController.getView(DatabaseController.getPublicUserDataColumns(false), DatabaseController.getPublicUserDataList());
+					return listController.getUserListView(DatabaseController.getPublicUserDataColumns(false), DatabaseController.getPublicUserDataList());
 				default:
 					System.out.println("Unknown user role.");
 			}
