@@ -26,8 +26,14 @@ public class User
 	 */
 	private static final int MAX_BADGE_ID_VALUE = 99999999;
 
+	/**
+	 * The number of digits a badge ID must have.
+	 */
 	private static final int BADGE_ID_LENGTH = 8;
 
+	/**
+	 * The number of digits a PIN must have.
+	 */
 	private static final int PIN_LENGTH = 6;
 
 	/**

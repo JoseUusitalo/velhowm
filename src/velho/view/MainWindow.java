@@ -35,6 +35,7 @@ import velho.model.exceptions.NoDatabaseLinkException;
 
 /**
  * The main window and class for Velho Warehouse Management.
+ * 
  * @author Jose Uusitalo &amp; Joona
  */
 public class MainWindow extends Application
@@ -188,12 +189,15 @@ public class MainWindow extends Application
 		rootBorderPane.setCenter(mainTabPane);
 	}
 
+	/**
+	 * Loads the data from the database and creates the window.
+	 */
 	@SuppressWarnings("unused")
 	@Override
 	public void start(final Stage primaryStage)
 	{
 		DatabaseController.loadData();
-		
+
 		if (!SHOW_WINDOWS && DEBUG_MODE)
 		{
 			System.out.println("Windows are disabled.");
@@ -229,7 +233,7 @@ public class MainWindow extends Application
 					}
 				});
 			}
-			
+
 			primaryStage.setOnCloseRequest(new EventHandler<WindowEvent>()
 			{
 				@Override
@@ -241,6 +245,11 @@ public class MainWindow extends Application
 		}
 	}
 
+	/**
+	 * A method called to shut down the software and perform any necessary cleanup.
+	 * 
+	 * @param primaryStage the stage the main window is open in
+	 */
 	protected void shutdown(final Stage primaryStage)
 	{
 		primaryStage.close();

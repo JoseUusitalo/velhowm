@@ -15,6 +15,9 @@ public class Administrator implements UserRole
 	 */
 	private String name;
 
+	/**
+	 * Creates a new administrator role with the name "Administrator".
+	 */
 	public Administrator()
 	{
 		name = "Administrator";
@@ -37,7 +40,7 @@ public class Administrator implements UserRole
 	{
 		if (role == null)
 			throw new IllegalArgumentException();
-		
+
 		switch (role.getName())
 		{
 			case "Administrator":

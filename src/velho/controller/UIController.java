@@ -90,7 +90,8 @@ public class UIController
 				//$FALL-THROUGH$
 			case "Logistician":
 				mainView.addTab("User List", getUserListView(currentUserRole));
-				mainView.addTab("Product List", listController.getProductListView(DatabaseController.getPublicProductDataColumns(), DatabaseController.getPublicProductDataList()));
+				mainView.addTab("Product List",
+						listController.getProductListView(DatabaseController.getPublicProductDataColumns(), DatabaseController.getPublicProductDataList()));
 				break;
 			default:
 				System.out.println("Unknown user role.");

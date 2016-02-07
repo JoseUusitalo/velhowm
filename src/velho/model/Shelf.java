@@ -177,6 +177,14 @@ public class Shelf
 		return tokens;
 	}
 
+	/**
+	 * Tokenizes the given shelf slot ID with {@link #shelfSlotIDTokenizer(String)} and validates the result to make
+	 * sure the given ID represent a slot in this shelf.
+	 * 
+	 * @param shelfSlotID shelf slot ID string to tokenize and validate
+	 * @return an array of integers where the values are the ID of this shelf, the index of the level, and the index of
+	 * the slot on the level
+	 */
 	private int[] tokenizeAndValidateShelfSlotID(final String shelfSlotID)
 	{
 		final int[] tokens = shelfSlotIDTokenizer(shelfSlotID);
@@ -376,6 +384,9 @@ public class Shelf
 	 */
 	class ShelfSlot implements Comparable<ShelfSlot>
 	{
+		/**
+		 * A separator string between values in shelf slot IDs.
+		 */
 		public static final String ID_SEPARATOR = "-";
 
 		/**

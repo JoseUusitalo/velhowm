@@ -7,22 +7,18 @@ public abstract class ProductContainer
 {
 	/**
 	 * The maximum size of the product box.
-	 * 
 	 */
 	protected int maxSize;
 	/**
 	 * The ID of the product box.
-	 * 
 	 */
 	protected int databaseID;
 	/**
 	 * The product.
-	 * 
 	 */
 	protected Product product;
 	/**
 	 * The number of products in the product box.
-	 * 
 	 */
 	protected int productCount;
 
@@ -40,12 +36,11 @@ public abstract class ProductContainer
 
 	@Override
 	public abstract String toString();
-	
+
 	/**
 	 * Gets the maximum size of the product box.
 	 * 
 	 * @return the maximum size of the product box.
-	 * 
 	 */
 	public int getMaxSize()
 	{
@@ -56,7 +51,6 @@ public abstract class ProductContainer
 	 * Gets the ID of the product box.
 	 * 
 	 * @return the ID of the product box.
-	 * 
 	 */
 	public int getBoxID()
 	{
@@ -67,7 +61,6 @@ public abstract class ProductContainer
 	 * Gets the product of the product box.
 	 * 
 	 * @return the product of the product box.
-	 * 
 	 */
 	public Product getProduct()
 	{
@@ -78,7 +71,6 @@ public abstract class ProductContainer
 	 * Gets the number of products in the product box.
 	 * 
 	 * @return the number of products in the products box.
-	 * 
 	 */
 	public int getProductCount()
 	{
@@ -89,9 +81,7 @@ public abstract class ProductContainer
 	 * Removes products from a product box.
 	 * 
 	 * @param productCount
-	 * 
 	 * @return true or false.
-	 * 
 	 */
 	public boolean removeProduct(int count)
 	{
@@ -111,9 +101,7 @@ public abstract class ProductContainer
 	 * Adds product to the product box.
 	 * 
 	 * @param productCount
-	 * 
 	 * @return true or false.
-	 * 
 	 */
 	public boolean addProduct(int count)
 	{
@@ -129,7 +117,6 @@ public abstract class ProductContainer
 	 * Gets the product category type.
 	 * 
 	 * @return the product category type.
-	 * 
 	 */
 	public ProductType getBoxType()
 	{

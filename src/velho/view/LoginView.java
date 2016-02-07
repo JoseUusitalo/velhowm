@@ -13,7 +13,7 @@ import velho.controller.LoginController;
 /**
  * Allows the users to log in to the system.
  *
- * @author Edward
+ * @author Jose Uusitalo &amp; Edward
  */
 public class LoginView
 {
@@ -22,6 +22,11 @@ public class LoginView
 	 */
 	private GridPane grid;
 
+	/**
+	 * Gets the login view.
+	 * 
+	 * @return the login view GridPane
+	 */
 	public GridPane getLoginView()
 	{
 		if (grid == null)
@@ -66,6 +71,9 @@ public class LoginView
 		return grid;
 	}
 
+	/**
+	 * Destroys the view.
+	 */
 	public void destroy()
 	{
 		grid = null;

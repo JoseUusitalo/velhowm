@@ -9,6 +9,11 @@ import velho.model.Logistician;
 import velho.model.Manager;
 import velho.model.interfaces.UserRole;
 
+/**
+ * Test for the {@link UserRole} interface and classes: {@link Administrator}, {@link Manager}, {@link Logistician}.
+ * 
+ * @author Jose Uusitalo
+ */
 public class UserRoleTest
 {
 	private UserRole administrator = new Administrator();
@@ -28,7 +33,7 @@ public class UserRoleTest
 		assertEquals(1, administrator.compareTo(logistician));
 		assertEquals(0, administrator.compareTo(administrator));
 	}
-	
+
 	@Test
 	public final void testCompareTo_Manager()
 	{
@@ -45,23 +50,24 @@ public class UserRoleTest
 		assertEquals(-1, logistician.compareTo(manager));
 	}
 
-	@Test (expected=IllegalArgumentException.class)
+	@Test(expected = IllegalArgumentException.class)
 	public final void testCompareTo_Administrator_Null()
 	{
 		administrator.compareTo(null);
 	}
 
-	@Test (expected=IllegalArgumentException.class)
+	@Test(expected = IllegalArgumentException.class)
 	public final void testCompareTo_Manager_Null()
 	{
 		manager.compareTo(null);
 	}
 
-	@Test (expected=IllegalArgumentException.class)
+	@Test(expected = IllegalArgumentException.class)
 	public final void testCompareTo_Logistician_Null()
 	{
 		logistician.compareTo(null);
 	}
+
 	@Test
 	public final void testToString()
 	{

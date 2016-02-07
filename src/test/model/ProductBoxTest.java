@@ -21,7 +21,6 @@ import velho.model.Product;
  */
 public class ProductBoxTest
 {
-
 	private ProductBox box;
 	private ProductBrand brand1 = new ProductBrand(-1, "pirkka");
 	private ProductType regular = new ProductType(-1, "Regular");
@@ -39,114 +38,132 @@ public class ProductBoxTest
 	private int maxSize = 12;
 
 	private Product product1 = new Product(id1, name1, date, brand1, category, -1);
-	private Product product2 = new Product(id2, name2, date, brand2, category2,-1);
-	private Product product3 = new Product(id2, name2, date, brand2, category3,-1);
+	private Product product2 = new Product(id2, name2, date, brand2, category2, -1);
+	private Product product3 = new Product(id2, name2, date, brand2, category3, -1);
 
-	@Before public void createProductBox()
+	@Before
+	public void createProductBox()
 	{
 		box = new ProductBox(id1, maxSize, product1, 0);
 	}
 
-	@After public void destroyProductBox()
+	@After
+	public void destroyProductBox()
 	{
 		box = null;
 	}
 
 	@SuppressWarnings("unused")
-	@Test public void testCreateProductBox_RAW()
+	@Test
+	public void testCreateProductBox_RAW()
 	{
 		ProductBox productBox2 = new ProductBox(1, 1, product2, 0);
 	}
 
 	@SuppressWarnings("unused")
-	@Test(expected = IllegalArgumentException.class) public void testCreateProductBox_COLD()
+	@Test(expected = IllegalArgumentException.class)
+	public void testCreateProductBox_COLD()
 	{
 		ProductBox productBox3 = new ProductBox(1, 1, product3, 0);
 	}
 
 	@SuppressWarnings("unused")
-	@Test(expected = IllegalArgumentException.class) public void testCreateProductBox_MaxSize_1()
+	@Test(expected = IllegalArgumentException.class)
+	public void testCreateProductBox_MaxSize_1()
 	{
-		ProductBox productBox4 = new ProductBox(1, maxSize, product3, maxSize+1);
+		ProductBox productBox4 = new ProductBox(1, maxSize, product3, maxSize + 1);
 	}
 
 	@SuppressWarnings("unused")
-	@Test(expected = IllegalArgumentException.class) public void testCreateProductBox_MaxSize_2()
+	@Test(expected = IllegalArgumentException.class)
+	public void testCreateProductBox_MaxSize_2()
 	{
-		ProductBox productBox5 = new ProductBox(1, maxSize-14, product3, maxSize);
+		ProductBox productBox5 = new ProductBox(1, maxSize - 14, product3, maxSize);
 	}
 
-	
-	@Test public void testGetBoxType()
+	@Test
+	public void testGetBoxType()
 	{
 		assertEquals(regular, box.getBoxType());
 	}
 
-	@Test public void testGetBoxID()
+	@Test
+	public void testGetBoxID()
 	{
 		assertEquals(id1, box.getBoxID());
 	}
 
-	@Test public void testGetProductCount()
+	@Test
+	public void testGetProductCount()
 	{
 		assertEquals(0, box.getProductCount());
 	}
 
-	@Test public void testGetMaxSize()
+	@Test
+	public void testGetMaxSize()
 	{
 		assertEquals(maxSize, box.getMaxSize());
 	}
 
-	@Test public void testGetProduct1()
+	@Test
+	public void testGetProduct1()
 	{
 		assertEquals(product1, box.getProduct());
 	}
 
-	@Test public void testGetProduct2()
+	@Test
+	public void testGetProduct2()
 	{
 		ProductBox box2 = new ProductBox(id1, maxSize, product2, 0);
 		assertEquals(product2, box2.getProduct());
 	}
 
-	@Test(expected = IllegalArgumentException.class) public void testGetProduct3()
+	@Test(expected = IllegalArgumentException.class)
+	public void testGetProduct3()
 	{
 		ProductBox box3 = new ProductBox(id1, maxSize, product3, 0);
 		assertEquals(product3, box3.getProduct());
 	}
 
-	@Test public void testProductBoxAdd()
+	@Test
+	public void testProductBoxAdd()
 	{
 		assertTrue(box.addProduct(2));
 		assertEquals(2, box.getProductCount());
 	}
-	
-	@Test public void testProductBoxAdd_False()
+
+	@Test
+	public void testProductBoxAdd_False()
 	{
-		assertFalse(box.addProduct(maxSize+1));
+		assertFalse(box.addProduct(maxSize + 1));
 		assertEquals(0, box.getProductCount());
 	}
-	
-	@Test public void testProductBoxAdd_2()
+
+	@Test
+	public void testProductBoxAdd_2()
 	{
 		assertTrue(box.addProduct(maxSize));
 		assertFalse(box.addProduct(2));
 		assertEquals(maxSize, box.getProductCount());
 	}
 
-	@Test public void testRemoveProduct_Empty()
+	@Test
+	public void testRemoveProduct_Empty()
 	{
 		assertFalse(box.removeProduct(2));
 		assertEquals(0, box.getProductCount());
 	}
 
-	@Test public void testRemoveProduct()
+	@Test
+	public void testRemoveProduct()
 	{
 		assertTrue(box.addProduct(3));
 		assertTrue(box.removeProduct(2));
 		assertEquals(1, box.getProductCount());
 	}
 
-	@Test public void testRemoveProduct2()
+	@Test
+	public void testRemoveProduct2()
 	{
 		assertTrue(box.addProduct(3));
 		assertEquals(3, box.getProductCount());
@@ -154,27 +171,31 @@ public class ProductBoxTest
 		assertEquals(3, box.getProductCount());
 	}
 
-	@Test public void testAddProduct_TooMany()
+	@Test
+	public void testAddProduct_TooMany()
 	{
 		assertFalse(box.addProduct(20));
 		assertEquals(0, box.getProductCount());
 	}
 
-	@Test public void testProductBoxAdd2()
+	@Test
+	public void testProductBoxAdd2()
 	{
 		assertTrue(box.addProduct(maxSize));
 		assertFalse(box.addProduct(2));
 		assertEquals(maxSize, box.getProductCount());
 	}
 
-	@Test public void testProductBoxAdd3()
+	@Test
+	public void testProductBoxAdd3()
 	{
 		assertTrue(box.addProduct(maxSize - 3));
 		assertFalse(box.addProduct(5));
 		assertEquals(maxSize - 3, box.getProductCount());
 	}
-	
-	@Test public void testToString()
+
+	@Test
+	public void testToString()
 	{
 		ProductBox box2 = new ProductBox(1, 1, product2, 0);
 		assertEquals("[1] Box: peruna (0)", box2.toString());

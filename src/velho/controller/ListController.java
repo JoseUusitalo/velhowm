@@ -14,6 +14,9 @@ import velho.view.ListView;
  */
 public class ListController
 {
+	/**
+	 * The {@link UserController}.
+	 */
 	private UserController userController;
 
 	public ListController(final UserController userController)

@@ -10,7 +10,6 @@ import javafx.scene.control.ButtonType;
  * A controller for popup alerts.
  *
  * @author Joona
- *
  */
 public class PopupController
 {
@@ -74,5 +73,4 @@ public class PopupController
 
 		alert.showAndWait();
 	}
-
 }

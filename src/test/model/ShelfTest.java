@@ -18,7 +18,7 @@ import velho.model.ProductType;
 import velho.model.Shelf;
 
 /**
- * Tests for the {@link Shelf} classhelf.
+ * Tests for the {@link Shelf} class.
  *
  * @author Jose Uusitalo
  */

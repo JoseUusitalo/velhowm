@@ -6,6 +6,9 @@ import java.util.List;
 import velho.controller.DatabaseController;
 import velho.model.exceptions.NoDatabaseLinkException;
 
+/**
+ * @author Edward
+ */
 public class BarcodeScanner
 {
 	/**

@@ -13,9 +13,9 @@ import velho.model.ProductCategory;
 import velho.model.ProductType;
 
 /**
+ * Tests for the {@link Freezer} class.
  * 
  * @author Joona
- * @see ProductBoxTest
  */
 public class FreezerTest
 {

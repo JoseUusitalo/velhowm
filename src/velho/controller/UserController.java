@@ -24,6 +24,9 @@ public class UserController
 	 */
 	private AddUserView view;
 
+	/**
+	 * @throws NoDatabaseLinkException
+	 */
 	public UserController() throws NoDatabaseLinkException
 	{
 		view = new AddUserView(this, DatabaseController.getUserRoleNames());

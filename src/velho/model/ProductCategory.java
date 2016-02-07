@@ -26,7 +26,6 @@ public class ProductCategory
 	/**
 	 * @param name
 	 * @param type
-	 * 
 	 */
 	public ProductCategory(int databaseID, String name, ProductType type)
 	{

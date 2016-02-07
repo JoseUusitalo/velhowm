@@ -10,6 +10,9 @@ import org.junit.Test;
 
 import velho.model.BarcodeScanner;
 
+/**
+ * @author Edward
+ */
 @SuppressWarnings("static-method")
 public class BarcodeScannerTest
 {

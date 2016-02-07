@@ -11,18 +11,15 @@ public class ProductType
 	 * The database ID of this product category.
 	 */
 	private int databaseID;
-	
+
 	/**
 	 * The product category name.
-	 * 
 	 */
 	private String name;
-	
 
 	/**
 	 * @param name
 	 * @param type
-	 * 
 	 */
 	public ProductType(final int databaseID, final String name)
 	{

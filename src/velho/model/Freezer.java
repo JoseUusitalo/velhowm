@@ -2,6 +2,7 @@ package velho.model;
 
 /**
  * The freezer class.
+ * 
  * @author Joona &amp; Jose Uusitalo
  */
 public class Freezer extends ProductContainer

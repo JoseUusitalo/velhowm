@@ -15,6 +15,9 @@ public class Manager implements UserRole
 	 */
 	private String name;
 
+	/**
+	 * Creates a new manager role with the name "Manager".
+	 */
 	public Manager()
 	{
 		name = "Manager";
@@ -37,7 +40,7 @@ public class Manager implements UserRole
 	{
 		if (role == null)
 			throw new IllegalArgumentException();
-		
+
 		switch (role.getName())
 		{
 			case "Administrator":

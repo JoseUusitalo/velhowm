@@ -14,12 +14,12 @@ import velho.model.ProductCategory;
 import velho.model.ProductType;
 
 /**
- * Tests for {@link Product}.
+ * Tests for the {@link Product} class.
+ * 
  * @author Joona
  */
 public class ProductTest
 {
-
 	private ProductBrand brand = new ProductBrand(-1, "jotain");
 	private ProductType regular = new ProductType(-1, "Regular");
 	private ProductCategory category = new ProductCategory(-1, "jahas", regular);

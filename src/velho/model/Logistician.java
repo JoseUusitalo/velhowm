@@ -15,6 +15,9 @@ public class Logistician implements UserRole
 	 */
 	private String name;
 
+	/**
+	 * Creates a new logistician role with the name "Logistician".
+	 */
 	public Logistician()
 	{
 		name = "Logistician";
@@ -37,7 +40,7 @@ public class Logistician implements UserRole
 	{
 		if (role == null)
 			throw new IllegalArgumentException();
-		
+
 		switch (role.getName())
 		{
 			case "Administrator":

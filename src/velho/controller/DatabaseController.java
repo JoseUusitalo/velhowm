@@ -16,7 +16,6 @@ import org.h2.jdbcx.JdbcConnectionPool;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.collections.ObservableMap;
 import velho.model.Product;
 import velho.model.ProductBox;
 import velho.model.ProductBrand;
@@ -63,15 +62,41 @@ public class DatabaseController
 	 * An observable list of users for display in the user interface.
 	 */
 	private static ObservableList<Object> userViewList = FXCollections.observableArrayList();
-	
-	private static Map<Integer, ProductBrand> loadedProductBrands = new HashMap<Integer, ProductBrand>();
-	private static Map<Integer, ProductType> loadedProductTypes = new HashMap<Integer, ProductType>();
-	private static Map<Integer, ProductCategory> loadedProductCategories = new HashMap<Integer, ProductCategory>();
-	private static ObservableMap<Integer, Product> loadedProducts = FXCollections.observableHashMap();
-	private static Map<Integer, ProductContainer> loadedProductContainers = new HashMap<Integer, ProductContainer>();
-	private static Map<Integer, Shelf> loadedShelves = new HashMap<Integer, Shelf>();
 
+	/**
+	 * An observable list of products for display in the user interface.
+	 */
 	private static ObservableList<Object> productViewList;
+
+	/**
+	 * A map of {@link ProductBrand} objects loaded from the database.
+	 */
+	private static Map<Integer, ProductBrand> loadedProductBrands = new HashMap<Integer, ProductBrand>();
+
+	/**
+	 * A map of {@link ProductType} objects loaded from the database.
+	 */
+	private static Map<Integer, ProductType> loadedProductTypes = new HashMap<Integer, ProductType>();
+
+	/**
+	 * A map of {@link ProductCategory} objects loaded from the database.
+	 */
+	private static Map<Integer, ProductCategory> loadedProductCategories = new HashMap<Integer, ProductCategory>();
+
+	/**
+	 * A map of {@link Product} objects loaded from the database.
+	 */
+	private static Map<Integer, Product> loadedProducts = new HashMap<Integer, Product>();
+
+	/**
+	 * A map of {@link ProductContainer} objects loaded from the database.
+	 */
+	private static Map<Integer, ProductContainer> loadedProductContainers = new HashMap<Integer, ProductContainer>();
+
+	/**
+	 * A map of {@link Shelf} objects loaded from the database.
+	 */
+	private static Map<Integer, Shelf> loadedShelves = new HashMap<Integer, Shelf>();
 
 	/*
 	 * PRIVATE DATABASE METHODS
@@ -211,7 +236,6 @@ public class DatabaseController
 	 * the number of rows that were changed as a result of the query as an {@link Integer}</li>
 	 * <li>if type is {@link DatabaseQueryType#SELECT}: a Set containing the selected data</li>
 	 * </ul>
-	 *
 	 * @throws NoDatabaseLinkException
 	 */
 	private static Object runQuery(final DatabaseQueryType type, final DatabaseTable tableName, final String[] columns, final Map<String, Object> columnValues,
@@ -442,7 +466,6 @@ public class DatabaseController
 	 *
 	 * @param sql SQL to run
 	 * @return an Object containing the appropriate data
-	 *
 	 * @throws NoDatabaseLinkException
 	 */
 	private static Object runQuery(final String sql) throws NoDatabaseLinkException
@@ -654,7 +677,6 @@ public class DatabaseController
 	 * Use {@link #unlink()} to close the connection.
 	 *
 	 * @return <code>true</code> if the link was created successfully
-	 *
 	 * @throws ClassNotFoundException when the H2 driver was unable to load
 	 * @throws ExistingDatabaseLinkException when a database link already exists
 	 */
@@ -701,7 +723,6 @@ public class DatabaseController
 	/**
 	 * Shuts down the connection to the database.
 	 * Use {@link #link()} to connect to the database again.
-	 *
 	 * @throws NoDatabaseLinkException when attempting unlink a database when no database link exists
 	 */
 	public static void unlink() throws NoDatabaseLinkException
@@ -744,6 +765,11 @@ public class DatabaseController
 		return cols;
 	}
 
+	/**
+	 * Gets a map of columns and column names for displaying {@link #getPublicProductDataList()()} data in a table.
+	 *
+	 * @return a map where the key is the column value and value is the column name
+	 */
 	public static Map<String, String> getPublicProductDataColumns()
 	{
 		LinkedHashMap<String, String> cols = new LinkedHashMap<String, String>();
@@ -755,6 +781,7 @@ public class DatabaseController
 
 		return cols;
 	}
+
 	/**
 	 * Gets the database ID of the given user role name.
 	 *
@@ -764,7 +791,7 @@ public class DatabaseController
 	 */
 	public static int getRoleID(final String roleName) throws NoDatabaseLinkException
 	{
-		String[] columns = { "role_id" };
+		final String[] columns = { "role_id" };
 		Map<String, Object> where = new LinkedHashMap<String, Object>();
 		where.put("name", roleName);
 
@@ -782,12 +809,11 @@ public class DatabaseController
 	 * Gets a set of user role names in the database.
 	 *
 	 * @return a set of user role names
-	 *
 	 * @throws NoDatabaseLinkException
 	 */
 	public static Set<String> getUserRoleNames() throws NoDatabaseLinkException
 	{
-		String[] columns = { "name" };
+		final String[] columns = { "name" };
 
 		@SuppressWarnings("unchecked")
 		Set<String> result = (LinkedHashSet<String>) (runQuery(DatabaseQueryType.SELECT, DatabaseTable.ROLES, columns, null, null));
@@ -799,15 +825,14 @@ public class DatabaseController
 	 * <p>Authenticates a user with the given badge ID string.</p>
 	 * <p>Warnign: Assumes that the badge ID is techinically valid.</p>
 	 *
-	 * @param badgeID a badge id string
+	 * @param badgeID a badge ID string
 	 * @return a {@link User} object representing the authenticated user or <code>null</code> for invalid credentials
-	 *
 	 * @throws NoDatabaseLinkException
 	 * @see {@link User#isValidBadgeID(String)}
 	 */
 	public static User authenticateBadgeID(final String badgeID) throws NoDatabaseLinkException
 	{
-		String[] columns = { "user_id", "first_name", "last_name", "role" };
+		final String[] columns = { "user_id", "first_name", "last_name", "role" };
 		Map<String, Object> where = new LinkedHashMap<String, Object>();
 		where.put("badge_id", badgeID);
 
@@ -826,13 +851,12 @@ public class DatabaseController
 	 *
 	 * @param pin a PIN string
 	 * @return a {@link User} object representing the authenticated user or <code>null</code> for invalid credentials
-	 *
 	 * @throws NoDatabaseLinkException
 	 * @see {@link User#isValidPIN(String)}
 	 */
 	public static User authenticatePIN(final String firstName, final String lastName, final String pin) throws NoDatabaseLinkException
 	{
-		String[] columns = { "user_id", "first_name", "last_name", "role" };
+		final String[] columns = { "user_id", "first_name", "last_name", "role" };
 		Map<String, Object> where = new LinkedHashMap<String, Object>();
 		where.put("first_name", firstName);
 		where.put("last_name", lastName);
@@ -848,16 +872,15 @@ public class DatabaseController
 	}
 
 	/**
-	 * Gets the a {@link UserRole} object from the given role id.
+	 * Gets the {@link UserRole} object from the given role ID.
 	 *
 	 * @param roleid role database ID
-	 * @return the corresponding {@link UserRole} object
-	 *
+	 * @return the corresponding user role object
 	 * @throws NoDatabaseLinkException
 	 */
 	private static UserRole getRoleByID(final int roleid) throws NoDatabaseLinkException
 	{
-		String[] columns = { "name" };
+		final String[] columns = { "name" };
 		Map<String, Object> where = new LinkedHashMap<String, Object>();
 		where.put("role_id", new Integer(roleid));
 
@@ -870,11 +893,18 @@ public class DatabaseController
 		return UserController.stringToRole(result.iterator().next());
 	}
 
+	/**
+	 * Gets the {@link ProductType} object from the given type ID.
+	 *
+	 * @param typeid product type database ID
+	 * @return the corresponding product type object
+	 * @throws NoDatabaseLinkException
+	 */
 	private static ProductType getProductTypeByID(final int typeid) throws NoDatabaseLinkException
 	{
 		if (!loadedProductTypes.containsKey(typeid))
 		{
-			String[] columns = { "name" };
+			final String[] columns = { "name" };
 			Map<String, Object> where = new LinkedHashMap<String, Object>();
 			where.put("type_id", new Integer(typeid));
 
@@ -896,11 +926,18 @@ public class DatabaseController
 		return loadedProductTypes.get(typeid);
 	}
 
+	/**
+	 * Gets the {@link ProductCategory} object from the given category ID.
+	 *
+	 * @param categoryid product category database ID
+	 * @return the corresponding product category object
+	 * @throws NoDatabaseLinkException
+	 */
 	private static ProductCategory getProductCategoryByID(final int categoryid) throws NoDatabaseLinkException
 	{
 		if (!loadedProductCategories.containsKey(categoryid))
 		{
-			String[] columns = { "category_id", "name", "type" };
+			final String[] columns = { "category_id", "name", "type" };
 			Map<String, Object> where = new LinkedHashMap<String, Object>();
 			where.put("category_id", new Integer(categoryid));
 
@@ -922,11 +959,18 @@ public class DatabaseController
 		return loadedProductCategories.get(categoryid);
 	}
 
+	/**
+	 * Gets the {@link ProductBrand} object from the given brand ID.
+	 *
+	 * @param brandid product brand database ID
+	 * @return the corresponding product brand object
+	 * @throws NoDatabaseLinkException
+	 */
 	private static ProductBrand getProductBrandByID(final int brandid) throws NoDatabaseLinkException
 	{
 		if (!loadedProductBrands.containsKey(brandid))
 		{
-			String[] columns = { "name" };
+			final String[] columns = { "name" };
 			Map<String, Object> where = new LinkedHashMap<String, Object>();
 			where.put("brand_id", new Integer(brandid));
 
@@ -948,12 +992,18 @@ public class DatabaseController
 		return loadedProductBrands.get(brandid);
 	}
 
+	/**
+	 * Gets the {@link Product} object from the given product ID.
+	 *
+	 * @param productid product database ID
+	 * @return the corresponding product object
+	 * @throws NoDatabaseLinkException
+	 */
 	private static Product getProductByID(final int productid) throws NoDatabaseLinkException
 	{
 		if (!loadedProducts.containsKey(productid))
 		{
-
-			String[] columns = { "*" };
+			final String[] columns = { "*" };
 			Map<String, Object> where = new LinkedHashMap<String, Object>();
 			where.put("product_id", new Integer(productid));
 
@@ -976,13 +1026,35 @@ public class DatabaseController
 	}
 
 	/**
+	 * Gets user data by their database ID.
+	 *
+	 * @param id database ID of the user
+	 * @return a {@link User} object or <code>null</code> if a user with that ID was not found
+	 */
+	public static User getUserByID(final int id) throws NoDatabaseLinkException
+	{
+		final String[] columns = { "user_id", "first_name", "last_name", "role" };
+		Map<String, Object> where = new LinkedHashMap<String, Object>();
+		where.put("user_id", new Integer(id));
+
+		@SuppressWarnings("unchecked")
+		Set<User> result = (LinkedHashSet<User>) (runQuery(DatabaseQueryType.SELECT, DatabaseTable.USERS, columns, null, where));
+
+		if (result.size() == 0)
+			return null;
+
+		// Only one result as IDs are unique.
+		return result.iterator().next();
+	}
+
+	/**
 	 * Gets a list product codes in the database.
 	 *
 	 * @return a list of integer product codes
 	 */
 	public static List<Integer> getProductCodeList() throws NoDatabaseLinkException
 	{
-		String[] columns = { "product_id" };
+		final String[] columns = { "product_id" };
 
 		@SuppressWarnings("unchecked")
 		Set<Integer> result = (LinkedHashSet<Integer>) (runQuery(DatabaseQueryType.SELECT, DatabaseTable.PRODUCTS, columns, null, null));
@@ -991,6 +1063,12 @@ public class DatabaseController
 		return ints;
 	}
 
+	/**
+	 * Gets an {@link ObservableList} of product data in shelves.
+	 *
+	 * @return a list of products in the database currently on shelves
+	 * @throws NoDatabaseLinkException
+	 */
 	public static ObservableList<Object> getPublicProductDataList()
 	{
 		if (productViewList == null)
@@ -1000,17 +1078,16 @@ public class DatabaseController
 		}
 		return productViewList;
 	}
-	
+
 	/**
 	 * Gets an {@link ObservableList} of user names and roles.
 	 *
 	 * @return a list of users in the database
-	 *
 	 * @throws NoDatabaseLinkException
 	 */
 	public static ObservableList<Object> getPublicUserDataList() throws NoDatabaseLinkException
 	{
-		String[] columns = { "user_id", "first_name", "last_name", "role" };
+		final String[] columns = { "user_id", "first_name", "last_name", "role" };
 
 		@SuppressWarnings("unchecked")
 		Set<User> result = (LinkedHashSet<User>) (runQuery(DatabaseQueryType.SELECT, DatabaseTable.USERS, columns, null, null));
@@ -1025,28 +1102,6 @@ public class DatabaseController
 		return userViewList;
 	}
 
-	/**
-	 * Gets user data by their database id.
-	 *
-	 * @param id database id of the user
-	 * @return a {@link User} object or <code>null</code> if a user with that ID was not found
-	 */
-	public static User getUserByID(final int id) throws NoDatabaseLinkException
-	{
-		String[] columns = { "user_id", "first_name", "last_name", "role" };
-		Map<String, Object> where = new LinkedHashMap<String, Object>();
-		where.put("user_id", new Integer(id));
-
-		@SuppressWarnings("unchecked")
-		Set<User> result = (LinkedHashSet<User>) (runQuery(DatabaseQueryType.SELECT, DatabaseTable.USERS, columns, null, where));
-
-		if (result.size() == 0)
-			return null;
-
-		// Only one result as IDs are unique.
-		return result.iterator().next();
-	}
-
 	/*
 	 * PUBLIC DATABASE SETTER METHODS
 	 */
@@ -1055,7 +1110,6 @@ public class DatabaseController
 	 * Initializes the database.
 	 *
 	 * @return <code>true</code> if database changed as a result of this call
-	 *
 	 * @throws NoDatabaseConnectionException
 	 */
 	public static boolean initializeDatabase() throws NoDatabaseLinkException
@@ -1079,7 +1133,6 @@ public class DatabaseController
 	 * @param lastName last name of the user
 	 * @param roleID the ID of the role of the user
 	 * @return <code>true</code> if user was added
-	 *
 	 * @throws NoDatabaseLinkException when database link was lost
 	 */
 	public static boolean addUser(final String badgeID, final String pin, final String firstName, final String lastName, final int roleID)
@@ -1087,7 +1140,7 @@ public class DatabaseController
 	{
 		Map<String, Object> values = new LinkedHashMap<String, Object>();
 
-		// If no pin is defined, add with badge id.
+		// If no pin is defined, add with badge ID.
 		if (pin == null || pin.isEmpty())
 			values.put("badge_id", badgeID);
 		else
@@ -1112,7 +1165,6 @@ public class DatabaseController
 	 *
 	 * @param databaseID the database ID of the user to delete
 	 * @return <code>true</code> if user was deleted
-	 *
 	 * @throws NoDatabaseLinkException
 	 */
 	public static boolean removeUser(final int databaseID) throws NoDatabaseLinkException
@@ -1147,30 +1199,22 @@ public class DatabaseController
 		}
 	}
 
-	/*
-	 * private static void loadProducts() throws NoDatabaseLinkException
-	 * {
-	 * System.out.println("[DatabaseController] Loading products...");
-	 * 
-	 * String[] columns = { "*" };
-	 * 
-	 * @SuppressWarnings("unchecked")
-	 * Set<Product> result = (Set<Product>) runQuery(DatabaseQueryType.SELECT, DatabaseTable.PRODUCTS, columns, null,
-	 * null);
-	 * 
-	 * Iterator<Product> it = result.iterator();
-	 * 
-	 * while (it.hasNext())
-	 * System.out.println(it.next().toString());
-	 * 
-	 * System.out.println("[DatabaseController] Products loaded.");
-	 * }
+	/**
+	 * Loads the following objects into memory:
+	 * <ul>
+	 * <li>{@link ProductBrand}</li>
+	 * <li>{@link ProductType}</li>
+	 * <li>{@link ProductCategory}</li>
+	 * <li>{@link Product}</li>
+	 * <li>{@link ProductContainer}</li>
+	 * </ul>
+	 * @throws NoDatabaseLinkException
 	 */
 	private static void loadProductContainers() throws NoDatabaseLinkException
 	{
 		System.out.println("[DatabaseController] Loading product containers...");
 
-		String[] columns = { "*" };
+		final String[] columns = { "*" };
 		@SuppressWarnings("unchecked")
 		Set<ProductContainer> result = (Set<ProductContainer>) runQuery(DatabaseQueryType.SELECT, DatabaseTable.CONTAINERS, columns, null, null);
 
@@ -1187,11 +1231,18 @@ public class DatabaseController
 		System.out.println("[DatabaseController] Product containers loaded.");
 	}
 
+	/**
+	 * Loads the following objects into memory:
+	 * <ul>
+	 * <li>{@link Shelf}</li>
+	 * </ul>
+	 * @throws NoDatabaseLinkException
+	 */
 	private static void loadShelves() throws NoDatabaseLinkException
 	{
 		System.out.println("[DatabaseController] Loading shelves...");
 
-		String[] columns = { "*" };
+		final String[] columns = { "*" };
 		@SuppressWarnings("unchecked")
 		Set<Shelf> result = (Set<Shelf>) runQuery(DatabaseQueryType.SELECT, DatabaseTable.SHELVES, columns, null, null);
 
@@ -1209,11 +1260,15 @@ public class DatabaseController
 		setContainersToShelves();
 	}
 
+	/**
+	 * Places the loaded {@link ProductContainer} objects into {@link Shelf} objects.
+	 * @throws NoDatabaseLinkException
+	 */
 	private static void setContainersToShelves() throws NoDatabaseLinkException
 	{
 		System.out.println("[DatabaseController] Placing product boxes on shelves...");
 
-		String[] columns = { "*" };
+		final String[] columns = { "*" };
 		@SuppressWarnings("unchecked")
 		Map<Integer, ArrayList<Integer[]>> shelfBoxMap = (HashMap<Integer, ArrayList<Integer[]>>) runQuery(DatabaseQueryType.SELECT,
 				DatabaseTable.SHELF_PRODUCTBOXES, columns, null, null);
@@ -1228,7 +1283,8 @@ public class DatabaseController
 				{
 					if (loadedProductContainers.containsKey(data[0]))
 					{
-						loadedShelves.get(shelfID).addToSlot(Shelf.coordinatesToShelfSlotID(shelfID, data[1], data[2]), (ProductBox) loadedProductContainers.get(data[0]));
+						loadedShelves.get(shelfID).addToSlot(Shelf.coordinatesToShelfSlotID(shelfID, data[1], data[2]),
+								(ProductBox) loadedProductContainers.get(data[0]));
 					}
 				}
 			}
