@@ -46,7 +46,7 @@ public class LoginView
 			grid.add(firstNameField, 0, 1, 1, 1);
 
 			final TextField lastNameField = new TextField();
-			firstNameField.setPromptText("Last Name");
+			lastNameField.setPromptText("Last Name");
 			grid.add(lastNameField, 1, 1, 1, 1);
 
 			final PasswordField authenticationStringField = new PasswordField();
