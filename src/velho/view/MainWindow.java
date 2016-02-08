@@ -35,7 +35,7 @@ import velho.model.exceptions.NoDatabaseLinkException;
 
 /**
  * The main window and class for Velho Warehouse Management.
- * 
+ *
  * @author Jose Uusitalo &amp; Joona
  */
 public class MainWindow extends Application
@@ -43,7 +43,7 @@ public class MainWindow extends Application
 	/**
 	 * Enable or disable debug features.
 	 */
-	public static final boolean DEBUG_MODE = true;
+	public static final boolean DEBUG_MODE = false;
 
 	/**
 	 * Enable or disable showing windows. DEBUG_MODE must be <code>true</code> to make this <code>false</code>.
@@ -247,7 +247,7 @@ public class MainWindow extends Application
 
 	/**
 	 * A method called to shut down the software and perform any necessary cleanup.
-	 * 
+	 *
 	 * @param primaryStage the stage the main window is open in
 	 */
 	protected void shutdown(final Stage primaryStage)
