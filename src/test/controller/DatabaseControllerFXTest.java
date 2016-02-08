@@ -32,9 +32,16 @@ public class DatabaseControllerFXTest
 	}
 
 	@After
-	public final void unlink() throws NoDatabaseLinkException
+	public final void unlink()
 	{
-		DatabaseController.unlink();
+		try
+		{
+			DatabaseController.unlink();
+		}
+		catch (NoDatabaseLinkException e)
+		{
+			// This is ok.
+		}
 	}
 
 	@Test
