@@ -4,7 +4,11 @@ import java.util.Collections;
 import java.util.List;
 
 import velho.controller.DatabaseController;
+import velho.model.exceptions.NoDatabaseLinkException;
 
+/**
+ * @author Edward
+ */
 public class BarcodeScanner
 {
 	/**
@@ -34,7 +38,16 @@ public class BarcodeScanner
 	public static int generateProductList()
 	{
 
-		List<Integer> numbers = DatabaseController.getProductCodeList(1 - 20);
+		List<Integer> numbers = null;
+		try
+		{
+			numbers = DatabaseController.getProductCodeList();
+		}
+		catch (NoDatabaseLinkException e)
+		{
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		int maximSize = (int) (Math.random() * (numbers.size() + 1));
 
 		for (int i = 0; i < maximSize; i++)

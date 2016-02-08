@@ -1,16 +1,34 @@
 package velho.controller;
 
+import java.util.Optional;
+
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
+import javafx.scene.control.ButtonType;
 
 /**
  * A controller for popup alerts.
  *
  * @author Joona
- *
  */
 public class PopupController
 {
+	/**
+	 * Displays a popup alert with the given message asking the user a yes/no question.
+	 *
+	 * @param stage the message to show
+	 */
+	public static boolean confirmation(final String msg)
+	{
+		Alert alert = new Alert(AlertType.CONFIRMATION);
+		alert.setTitle("Confirm");
+		alert.setHeaderText(null);
+		alert.setContentText(msg);
+
+		Optional<ButtonType> result = alert.showAndWait();
+		return (result.get() == ButtonType.OK);
+	}
+
 	/**
 	 * Displays a popup alert with the given message.
 	 *
@@ -55,5 +73,4 @@ public class PopupController
 
 		alert.showAndWait();
 	}
-
 }

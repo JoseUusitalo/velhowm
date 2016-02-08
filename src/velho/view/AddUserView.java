@@ -18,7 +18,6 @@ import velho.controller.UserController;
  * The add user view class.
  *
  * @author Joona
- *
  */
 public class AddUserView
 {
@@ -50,6 +49,7 @@ public class AddUserView
 
 	/**
 	 * Creates a grid for adding a new user.
+	 * 
 	 * @return
 	 */
 	public GridPane getAddUserView()
