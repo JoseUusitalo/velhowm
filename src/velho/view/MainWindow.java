@@ -23,8 +23,10 @@ import javafx.scene.layout.HBox;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
 import javafx.stage.Stage;
+import javafx.stage.WindowEvent;
 import velho.controller.DatabaseController;
 import velho.controller.DebugController;
+import velho.controller.ListController;
 import velho.controller.LoginController;
 import velho.controller.UIController;
 import velho.controller.UserController;
@@ -33,6 +35,7 @@ import velho.model.exceptions.NoDatabaseLinkException;
 
 /**
  * The main window and class for Velho Warehouse Management.
+ * 
  * @author Jose Uusitalo &amp; Joona
  */
 public class MainWindow extends Application
@@ -40,7 +43,12 @@ public class MainWindow extends Application
 	/**
 	 * Enable or disable debug features.
 	 */
-	public static final boolean DEBUG_MODE = false;
+	public static final boolean DEBUG_MODE = true;
+
+	/**
+	 * Enable or disable showing windows. DEBUG_MODE must be <code>true</code> to make this <code>false</code>.
+	 */
+	public static final boolean SHOW_WINDOWS = true;
 
 	/**
 	 * The {@link DebugController}.
@@ -58,11 +66,6 @@ public class MainWindow extends Application
 	private static UIController uiController;
 
 	/**
-	 * The {@link LoginController}.
-	 */
-	private static LoginController loginController;
-
-	/**
 	 * The root layout of the main window.
 	 */
 	private BorderPane rootBorderPane;
@@ -78,6 +81,16 @@ public class MainWindow extends Application
 	private Scene scene;
 
 	/**
+	 * The {@link ListController}.
+	 */
+	private ListController listController;
+
+	/**
+	 * The debug window stage.
+	 */
+	private Stage debugStage;
+
+	/**
 	 * The main window constructor.
 	 */
 	public MainWindow()
@@ -86,38 +99,18 @@ public class MainWindow extends Application
 		try
 		{
 			DatabaseController.connectAndInitialize();
+
+			debugController = new DebugController();
+			userController = new UserController();
+
+			listController = new ListController(userController);
+			uiController = new UIController(this, listController, userController);
+
+			LoginController.setControllers(uiController, debugController);
 		}
 		catch (ClassNotFoundException | ExistingDatabaseLinkException | NoDatabaseLinkException e1)
 		{
-			// TODO Auto-generated catch block
 			e1.printStackTrace();
-		}
-
-		try
-		{
-			userController = new UserController();
-		}
-		catch (NoDatabaseLinkException e)
-		{
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-
-		if (DatabaseController.isLinked())
-		{
-			uiController = new UIController(this);
-			uiController.setUserController(userController);
-			loginController = new LoginController(uiController);
-			try
-			{
-				debugController = new DebugController(loginController);
-				loginController.setDebugController(debugController);
-			}
-			catch (NoDatabaseLinkException e)
-			{
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
 		}
 	}
 
@@ -160,7 +153,7 @@ public class MainWindow extends Application
 		}
 
 		// Force log in to see main menu.
-		if (loginController.checkLogin())
+		if (LoginController.checkLogin())
 		{
 			HBox statusBar = new HBox();
 			statusBar.setAlignment(Pos.CENTER_RIGHT);
@@ -174,7 +167,7 @@ public class MainWindow extends Application
 
 			HBox userBar = new HBox(10);
 
-			Label userName = new Label("Hello, " + loginController.getCurrentUser().toString());
+			Label userName = new Label("Hello, " + LoginController.getCurrentUser().getRoleName() + " " + LoginController.getCurrentUser().getFullName());
 			Button logoutButton = new Button("Log Out");
 			logoutButton.setPrefHeight(5.0);
 
@@ -183,8 +176,7 @@ public class MainWindow extends Application
 				@Override
 				public void handle(ActionEvent event)
 				{
-					loginController.logout();
-					debugController.logout();
+					LoginController.logout();
 				}
 			});
 
@@ -197,28 +189,86 @@ public class MainWindow extends Application
 		rootBorderPane.setCenter(mainTabPane);
 	}
 
+	/**
+	 * Loads the data from the database and creates the window.
+	 */
+	@SuppressWarnings("unused")
 	@Override
 	public void start(final Stage primaryStage)
 	{
-		primaryStage.setTitle("Velho Warehouse Management");
-		Group root = new Group();
-		scene = new Scene(root, 1024, 700, Color.WHITE);
-		rootBorderPane = new BorderPane();
-		rootBorderPane.prefHeightProperty().bind(scene.heightProperty());
-		rootBorderPane.prefWidthProperty().bind(scene.widthProperty());
+		DatabaseController.loadData();
 
-		root.getChildren().add(rootBorderPane);
-
-		loginController.checkLogin();
-
-		primaryStage.setScene(scene);
-		primaryStage.show();
-
-		if (MainWindow.DEBUG_MODE)
+		if (!SHOW_WINDOWS && DEBUG_MODE)
 		{
-			Stage secondStage = new Stage();
-			debugController.createDebugWindow(secondStage);
+			System.out.println("Windows are disabled.");
 		}
+		else
+		{
+			primaryStage.setTitle("Velho Warehouse Management");
+			Group root = new Group();
+			scene = new Scene(root, 1024, 700, Color.WHITE);
+			rootBorderPane = new BorderPane();
+			rootBorderPane.prefHeightProperty().bind(scene.heightProperty());
+			rootBorderPane.prefWidthProperty().bind(scene.widthProperty());
+
+			root.getChildren().add(rootBorderPane);
+
+			LoginController.checkLogin();
+
+			primaryStage.setScene(scene);
+			primaryStage.show();
+
+			if (DEBUG_MODE)
+			{
+
+				debugStage = new Stage();
+				debugController.createDebugWindow(debugStage);
+
+				debugStage.setOnCloseRequest(new EventHandler<WindowEvent>()
+				{
+					@Override
+					public void handle(WindowEvent event)
+					{
+						shutdown(primaryStage);
+					}
+				});
+			}
+
+			primaryStage.setOnCloseRequest(new EventHandler<WindowEvent>()
+			{
+				@Override
+				public void handle(WindowEvent event)
+				{
+					shutdown(primaryStage);
+				}
+			});
+		}
+	}
+
+	/**
+	 * A method called to shut down the software and perform any necessary cleanup.
+	 * 
+	 * @param primaryStage the stage the main window is open in
+	 */
+	protected void shutdown(final Stage primaryStage)
+	{
+		primaryStage.close();
+
+		if (DEBUG_MODE)
+		{
+			if (debugStage != null)
+				debugStage.close();
+		}
+		System.out.println("[MainWindow] Closing windows.");
+		try
+		{
+			DatabaseController.unlink();
+		}
+		catch (NoDatabaseLinkException e)
+		{
+			// Ignore.
+		}
+		System.out.println("Exit.");
 	}
 
 	/**

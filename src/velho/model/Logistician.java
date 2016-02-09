@@ -4,8 +4,9 @@ import velho.model.interfaces.UserRole;
 
 /**
  * This is the logistician user role.
- * @author Edward
+ * Note: this class has a natural ordering that is inconsistent with equals.
  *
+ * @author Jose Uusitalo &amp; Edward
  */
 public class Logistician implements UserRole
 {
@@ -14,6 +15,9 @@ public class Logistician implements UserRole
 	 */
 	private String name;
 
+	/**
+	 * Creates a new logistician role with the name "Logistician".
+	 */
 	public Logistician()
 	{
 		name = "Logistician";
@@ -29,5 +33,23 @@ public class Logistician implements UserRole
 	public String toString()
 	{
 		return name;
+	}
+
+	@Override
+	public int compareTo(final UserRole role)
+	{
+		if (role == null)
+			throw new IllegalArgumentException();
+
+		switch (role.getName())
+		{
+			case "Administrator":
+			case "Manager":
+				return -1;
+			case "Logistician":
+				return 0;
+			default:
+				return -1;
+		}
 	}
 }

@@ -5,7 +5,9 @@ import java.util.Set;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.stage.Stage;
+import velho.controller.DatabaseController;
 import velho.controller.DebugController;
+import velho.model.BarcodeScanner;
 import javafx.scene.Group;
 import javafx.scene.Scene;
 import javafx.scene.layout.GridPane;
@@ -19,7 +21,6 @@ import javafx.scene.control.*;
  */
 public class DebugWindow
 {
-	private Button getScannerData = new Button("Get Scanner Data");
 	/**
 	 * Button has been tagged logInButton and named as "Log In" on the scene.
 	 */
@@ -28,7 +29,9 @@ public class DebugWindow
 	/**
 	 * Button has been tagged logOutButton and named as "Log Out" on the scene
 	 */
-	private Button logOutButton = new Button("Log Out");
+	public Button logOutButton = new Button("Log Out");
+
+	public Button barcodeScannerButton = new Button("Scanner Move Valid");
 
 	/**
 	 * The DebugController has been tagged as controller.
@@ -99,24 +102,15 @@ public class DebugWindow
 		grid.add(taskListBox, 1, 0);
 		logOutButton.setVisible(false);
 
-		grid.add(getScannerData, 4, 0);
-
 		grid.add(logInButton, 2, 0);
 
 		grid.add(logOutButton, 3, 0);
 
+		grid.add(barcodeScannerButton, 3, 1);
+
 		Group root = (Group) scene.getRoot();
 		root.getChildren().add(grid);
 
-		getScannerData.setOnAction(new EventHandler<ActionEvent>()
-		{
-			@Override
-			public void handle(ActionEvent event)
-			{
-				debugController.getScannerData();
-			}
-
-		});
 
 		logInButton.setOnAction(new EventHandler<ActionEvent>()
 		{
@@ -133,7 +127,18 @@ public class DebugWindow
 			@Override
 			public void handle(ActionEvent event)
 			{
+
 				debugController.logout();
+			}
+		});
+
+		barcodeScannerButton.setOnAction(new EventHandler<ActionEvent>()
+		{
+
+			@Override public void handle(ActionEvent event)
+			{
+
+				debugController.scannerMoveValid();
 			}
 		});
 

@@ -11,24 +11,19 @@ import velho.view.DebugWindow;
  */
 public class DebugController
 {
+
 	/**
 	 * The {@link DebugWindow}.
 	 */
 	private DebugWindow view;
 
 	/**
-	 * The {@link LoginController}.
-	 */
-	private LoginController loginController;
-
-	/**
 	 * @param loginController
 	 * @param debugView
 	 * @throws NoDatabaseLinkException
 	 */
-	public DebugController(final LoginController loginController) throws NoDatabaseLinkException
+	public DebugController() throws NoDatabaseLinkException
 	{
-		this.loginController = loginController;
 		view = new DebugWindow(this, DatabaseController.getUserRoleNames());
 	}
 
@@ -51,8 +46,7 @@ public class DebugController
 	{
 		try
 		{
-			loginController.debugLogin(userRoleName);
-			System.out.println("Logged in as " + userRoleName + ". (DEBUG)");
+			LoginController.debugLogin(userRoleName);
 			view.setLogInButton(false);
 			view.setLogOutButton(true);
 		}
@@ -64,22 +58,13 @@ public class DebugController
 	}
 
 	/**
-	 * Visually toggles the login/logout buttons in the debug window.
-	 */
-	public void login()
-	{
-		view.setLogInButton(false);
-		view.setLogOutButton(true);
-	}
-
-	/**
 	 * Sets the logout sets value to the buttons.
 	 */
 	public void logout()
 	{
 		// Only log out if a user is logged in, otherwise just visually toggle the buttons.
-		if (loginController.isLoggedIn())
-			loginController.logout();
+		if (LoginController.isLoggedIn())
+			LoginController.logout();
 		view.setLogInButton(true);
 		view.setLogOutButton(false);
 	}
@@ -104,14 +89,10 @@ public class DebugController
 		view.setLogOutButton(visibility);
 	}
 
-	public void getScannerData1()
-	{
-		ExternalSystemsController.getScannerData();
-	}
 
-	public void getScannerData()
+	public void scannerMoveValid()
 	{
-		// TODO Auto-generated method stub
-		return;
+
+		ExternalSystemsController.scannerMoveValid();
 	}
 }

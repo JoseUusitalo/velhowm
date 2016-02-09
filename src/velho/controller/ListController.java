@@ -9,21 +9,54 @@ import velho.view.ListView;
 
 /**
  * A class for controlling the creation of lists.
- * 
+ *
  * @author Jose Uusitalo
  */
 public class ListController
 {
 	/**
+	 * The {@link UserController}.
+	 */
+	private UserController userController;
+
+	public ListController(final UserController userController)
+	{
+		this.userController = userController;
+	}
+
+	/**
 	 * Gets a new table view.
-	 * 
+	 *
 	 * @param columnMap a map of column values and names
-	 * @param datalist the {@link ObservableList} of data to show
+	 * @param dataList the {@link ObservableList} of data to show
 	 * @return a new table view
 	 */
-	public static Node getView(final Map<String, String> columnMap, final ObservableList<User> datalist)
+	public Node getUserListView(final Map<String, String> columnMap, final ObservableList<Object> dataList)
 	{
-		ListView list = new ListView(columnMap, datalist);
-		return list.getTableView();
+		ListView list = new ListView(this, columnMap, dataList);
+		return list.getUserTableView();
+	}
+
+	/**
+	 * Gets a new table view.
+	 *
+	 * @param columnMap a map of column values and names
+	 * @param dataMap the {@link ObservableMap} of data to show
+	 * @return a new table view
+	 */
+	public Node getProductListView(final Map<String, String> columnMap, final ObservableList<Object> observableList)
+	{
+		ListView list = new ListView(this, columnMap, observableList);
+		return list.getUserTableView();
+	}
+
+	/**
+	 * Attemps to remove a user from the database.
+	 *
+	 * @param databaseID database ID of the user to remove
+	 */
+	public void removeUser(final User user)
+	{
+		userController.removeUser(user);
 	}
 }

@@ -13,4 +13,10 @@ public class ExternalSystemsController
 		return;
 	}
 
+	public static void scannerMoveValid()
+	{
+		// TODO Auto-generated method stub
+		
+	}
+
 }
