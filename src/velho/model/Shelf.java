@@ -180,7 +180,7 @@ public class Shelf
 	/**
 	 * Tokenizes the given shelf slot ID with {@link #shelfSlotIDTokenizer(String)} and validates the result to make
 	 * sure the given ID represent a slot in this shelf.
-	 * 
+	 *
 	 * @param shelfSlotID shelf slot ID string to tokenize and validate
 	 * @return an array of integers where the values are the ID of this shelf, the index of the level, and the index of
 	 * the slot on the level
@@ -215,7 +215,7 @@ public class Shelf
 
 	/**
 	 * Gets the database ID of this shelf.
-	 * 
+	 *
 	 * @return the database ID
 	 */
 	public int getDatabaseID()
@@ -382,7 +382,7 @@ public class Shelf
 	 *
 	 * @author Jose Uusitalo
 	 */
-	class ShelfSlot implements Comparable<ShelfSlot>
+	class ShelfSlot
 	{
 		/**
 		 * A separator string between values in shelf slot IDs.
@@ -426,14 +426,15 @@ public class Shelf
 			boxes = new HashSet<ProductBox>();
 		}
 
-		/**
+		/*
 		 * Compares the ID of this shelf slot to the given one.
+		 *
+		 * @Override
+		 * public int compareTo(final ShelfSlot s)
+		 * {
+		 * return getSlotID().compareToIgnoreCase(s.getSlotID());
+		 * }
 		 */
-		@Override
-		public int compareTo(final ShelfSlot s)
-		{
-			return getSlotID().compareToIgnoreCase(s.getSlotID());
-		}
 
 		/**
 		 * The ID of this shelf slot in the following format:
@@ -446,25 +447,27 @@ public class Shelf
 			return shelfSlotID;
 		}
 
-		/**
+		/*
 		 * The ID of the shelf this shelf slot is in.
 		 *
 		 * @return the ID of the parent shelf
+		 *
+		 * public int getShelfID()
+		 * {
+		 * return shelfID;
+		 * }
 		 */
-		public int getShelfID()
-		{
-			return shelfID;
-		}
 
-		/**
+		/*
 		 * Gets the maximum number of boxes this shelf slot can contain.
 		 *
 		 * @return the maximum number of boxes this shelf slot can contain
+		 *
+		 * public int getMaxBoxCount()
+		 * {
+		 * return maxBoxCount;
+		 * }
 		 */
-		public int getMaxBoxCount()
-		{
-			return maxBoxCount;
-		}
 
 		/**
 		 * Iterates through the set and counts the number of products in the {@link ProductBox}es.
@@ -483,15 +486,16 @@ public class Shelf
 			return sum;
 		}
 
-		/**
+		/*
 		 * Gets the set of {@link ProductBox}es in this shelf slot.
 		 *
 		 * @return the set of boxes
+		 *
+		 * public Set<ProductBox> getBoxes()
+		 * {
+		 * return boxes;
+		 * }
 		 */
-		public Set<ProductBox> getBoxes()
-		{
-			return boxes;
-		}
 
 		/**
 		 * Gets the number of {@link ProductBox}es in this shelf slot.

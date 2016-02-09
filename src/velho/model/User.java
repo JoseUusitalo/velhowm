@@ -170,13 +170,6 @@ public class User
 	public static boolean validateUserData(final String badgeID, final String pin, final String firstName, final String lastName, final String roleName)
 			throws NoDatabaseLinkException
 	{
-		// Cannot define both.
-		if (badgeID != null && pin != null)
-		{
-			if (!badgeID.isEmpty() && !pin.isEmpty())
-				return false;
-		}
-
 		final boolean hasBadgeID = isValidBadgeID(badgeID);
 		final boolean hasPIN = isValidPIN(pin);
 
