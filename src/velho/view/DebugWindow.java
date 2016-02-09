@@ -5,7 +5,9 @@ import java.util.Set;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.stage.Stage;
+import velho.controller.DatabaseController;
 import velho.controller.DebugController;
+import velho.model.BarcodeScanner;
 import javafx.scene.Group;
 import javafx.scene.Scene;
 import javafx.scene.layout.GridPane;
@@ -14,7 +16,7 @@ import javafx.scene.control.*;
 
 /**
  * A window with various debug features.
- * 
+ *
  * @author Edward
  */
 public class DebugWindow
@@ -28,6 +30,8 @@ public class DebugWindow
 	 * Button has been tagged logOutButton and named as "Log Out" on the scene
 	 */
 	public Button logOutButton = new Button("Log Out");
+
+	public Button barcodeScannerButton = new Button("Scanner Move Valid");
 
 	/**
 	 * The DebugController has been tagged as controller.
@@ -78,7 +82,7 @@ public class DebugWindow
 
 	/**
 	 * Shows the debug window.
-	 * 
+	 *
 	 * @param primaryStage stage to show the window in
 	 */
 	public void start(Stage primaryStage)
@@ -102,6 +106,8 @@ public class DebugWindow
 
 		grid.add(logOutButton, 3, 0);
 
+		grid.add(barcodeScannerButton, 3, 1);
+
 		Group root = (Group) scene.getRoot();
 		root.getChildren().add(grid);
 
@@ -120,7 +126,18 @@ public class DebugWindow
 			@Override
 			public void handle(ActionEvent event)
 			{
+
 				debugController.logout();
+			}
+		});
+
+		barcodeScannerButton.setOnAction(new EventHandler<ActionEvent>()
+		{
+
+			@Override public void handle(ActionEvent event)
+			{
+
+				debugController.scannerMoveValid();
 			}
 		});
 

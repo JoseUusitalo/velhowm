@@ -11,6 +11,7 @@ import velho.view.DebugWindow;
  */
 public class DebugController
 {
+
 	/**
 	 * The {@link DebugWindow}.
 	 */
@@ -86,5 +87,11 @@ public class DebugController
 	public void setLogOutButton(boolean visibility)
 	{
 		view.setLogOutButton(visibility);
+	}
+
+	public void scannerMoveValid()
+	{
+
+		ExternalSystemsController.scannerMoveValid();
 	}
 }
