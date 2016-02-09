@@ -163,7 +163,7 @@ public class ListController
 		// Search the database for the products.
 		try
 		{
-			DatabaseController.searchProductShelfSlots(productData);
+			DatabaseController.searchProductBoxShelfSlots(productData);
 		}
 		catch (NoDatabaseLinkException e)
 		{

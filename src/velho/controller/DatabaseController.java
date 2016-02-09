@@ -7,6 +7,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
@@ -21,6 +22,7 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import velho.model.Product;
 import velho.model.ProductBox;
+import velho.model.ProductBoxSearchResultRow;
 import velho.model.ProductBrand;
 import velho.model.ProductCategory;
 import velho.model.ProductContainer;
@@ -793,12 +795,12 @@ public class DatabaseController
 	public static Map<String, String> getProductSearchDataColumns()
 	{
 		LinkedHashMap<String, String> cols = new LinkedHashMap<String, String>();
-		cols.put("id", "ID");
-		cols.put("name", "Name");
-		cols.put("brand", "Brand");
-		cols.put("category", "Category");
-		cols.put("shelfslot", "Shelf Slot");
-		cols.put("amount", "Amount");
+		cols.put("productID", "ID");
+		cols.put("productName", "Name");
+		cols.put("productBrand", "Brand");
+		cols.put("productCategory", "Category");
+		cols.put("boxShelfSlot", "Shelf Slot");
+		cols.put("boxProductCount", "Amount");
 
 		return cols;
 	}
@@ -1151,7 +1153,7 @@ public class DatabaseController
 		return userViewList;
 	}
 
-	public static void searchProductShelfSlots(final Map<String, Integer> productData) throws NoDatabaseLinkException
+	public static void searchProductBoxShelfSlots(final Map<String, Integer> productData) throws NoDatabaseLinkException
 	{
 		int productID = -1;
 
@@ -1171,10 +1173,19 @@ public class DatabaseController
 			}
 		}
 
-		System.out.println("Updating product search results.");
+		// Remove nulls.
+		foundProducts.removeAll(Collections.singleton(null));
+
+		List<ProductBoxSearchResultRow> rows = new ArrayList<ProductBoxSearchResultRow>();
+
+		for (final ProductContainer box : loadedProductContainers.values())
+		{
+			rows.add(new ProductBoxSearchResultRow((ProductBox) box));
+		}
+
+		System.out.println("Updating product box search results.");
 		productSearchResultViewList.clear();
-		productSearchResultViewList.addAll(foundProducts);
-		System.out.println(productSearchResultViewList);
+		productSearchResultViewList.addAll(rows);
 	}
 
 	/*
