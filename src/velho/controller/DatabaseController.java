@@ -16,6 +16,7 @@ import org.h2.jdbcx.JdbcConnectionPool;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import velho.model.BarcodeScanner;
 import velho.model.Product;
 import velho.model.ProductBox;
 import velho.model.ProductBrand;
@@ -1292,4 +1293,19 @@ public class DatabaseController
 
 		System.out.println("[DatabaseController] Product boxes placed on shelves.");
 	}
+
+	public static String getRandomShelfSlot()
+	{
+
+		return "S1-1-0";
+	}
+
+	public static void getShelfByID(Integer shelfID)
+	{
+		BarcodeScanner.scannerMoveValid();
+
+		return;
+
+	}
+
 }

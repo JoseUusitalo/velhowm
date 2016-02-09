@@ -4,6 +4,7 @@ import java.util.Collections;
 import java.util.List;
 
 import velho.controller.DatabaseController;
+import velho.controller.ExternalSystemsController;
 import velho.model.exceptions.NoDatabaseLinkException;
 
 /**
@@ -58,18 +59,25 @@ public class BarcodeScanner
 		return numbers.get(maximSize);
 	}
 
-	public static void getProductCode()
+	public static void scannerMoveValid()
 	{
-		// TODO Auto-generated method stub
+
+		List<Integer> list = null;
+
 		try
 		{
-			DatabaseController.getProductCodeList();
+			list = DatabaseController.getProductCodeList();
+			Collections.shuffle(list);
 		} catch (NoDatabaseLinkException e)
 		{
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			DatabaseController.tryReLink();
 		}
-		return;
+		String shelf = DatabaseController.getRandomShelfSlot();
+
+		System.out.println("random product " + list.get(0));
+		System.out.println("random shelf slot " + shelf);
+
+		ExternalSystemsController.move(list.get(0), shelf);
 	}
 
 }

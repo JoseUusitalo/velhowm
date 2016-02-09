@@ -31,7 +31,7 @@ public class DebugWindow
 	 */
 	public Button logOutButton = new Button("Log Out");
 
-	public Button barcodeScannerButton = new Button("Scanner Move Valid");
+	public Button scannerMoveValid = new Button("Scanner Move Valid");
 
 	/**
 	 * The DebugController has been tagged as controller.
@@ -106,7 +106,7 @@ public class DebugWindow
 
 		grid.add(logOutButton, 3, 0);
 
-		grid.add(barcodeScannerButton, 3, 1);
+		grid.add(scannerMoveValid, 1, 2);
 
 		Group root = (Group) scene.getRoot();
 		root.getChildren().add(grid);
@@ -132,7 +132,7 @@ public class DebugWindow
 			}
 		});
 
-		barcodeScannerButton.setOnAction(new EventHandler<ActionEvent>()
+		scannerMoveValid.setOnAction(new EventHandler<ActionEvent>()
 		{
 
 			@Override public void handle(ActionEvent event)

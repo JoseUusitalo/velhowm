@@ -180,7 +180,7 @@ public class Shelf
 	/**
 	 * Tokenizes the given shelf slot ID with {@link #shelfSlotIDTokenizer(String)} and validates the result to make
 	 * sure the given ID represent a slot in this shelf.
-	 * 
+	 *
 	 * @param shelfSlotID shelf slot ID string to tokenize and validate
 	 * @return an array of integers where the values are the ID of this shelf, the index of the level, and the index of
 	 * the slot on the level
@@ -215,7 +215,7 @@ public class Shelf
 
 	/**
 	 * Gets the database ID of this shelf.
-	 * 
+	 *
 	 * @return the database ID
 	 */
 	public int getDatabaseID()
