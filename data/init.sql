@@ -72,15 +72,26 @@ CREATE TABLE IF NOT EXISTS `containers`
 	CHECK (`max_size`>0)
 ) DEFAULT CHARSET=utf8;
 
-DROP TABLE IF EXISTS `container_products`;
-CREATE TABLE IF NOT EXISTS `container_products`
+DROP TABLE IF EXISTS `productbox_products`;
+CREATE TABLE IF NOT EXISTS `productbox_products`
 (
-	`container` INT UNSIGNED NOT NULL,
+	`productbox` INT UNSIGNED NOT NULL,
 	`product` INT UNSIGNED NOT NULL,
 	
-	FOREIGN KEY (`container`) REFERENCES containers(`container_id`),
+	FOREIGN KEY (`productbox`) REFERENCES containers(`container_id`),
 	FOREIGN KEY (`product`) REFERENCES products(`product_id`),
-	PRIMARY KEY (`container`,`product`)
+	PRIMARY KEY (`productbox`,`product`)
+) DEFAULT CHARSET=utf8;
+
+DROP TABLE IF EXISTS `freezer_products`;
+CREATE TABLE IF NOT EXISTS `freezer_products`
+(
+	`freezer` INT UNSIGNED NOT NULL,
+	`product` INT UNSIGNED NOT NULL,
+	
+	FOREIGN KEY (`freezer`) REFERENCES containers(`container_id`),
+	FOREIGN KEY (`product`) REFERENCES products(`product_id`),
+	PRIMARY KEY (`freezer`,`product`)
 ) DEFAULT CHARSET=utf8;
 
 DROP TABLE IF EXISTS `shelves`;

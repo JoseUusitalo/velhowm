@@ -59,4 +59,10 @@ public class ListController
 	{
 		userController.removeUser(user);
 	}
+
+	public Node getProductSearchListView(final Map<String, String> productSearch, ObservableList<Object> observableList)
+	{
+		ListView list2 = new ListView (this, productSearch, observableList);
+		return list2.getUserTableView();
+	}
 }
