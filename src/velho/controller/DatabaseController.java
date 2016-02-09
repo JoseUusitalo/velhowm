@@ -781,6 +781,19 @@ public class DatabaseController
 
 		return cols;
 	}
+	
+	public static Map<String, String> getProductSearchDataColumns()
+	{
+		LinkedHashMap<String, String> cols = new LinkedHashMap<String, String>();
+		cols.put("id", "ID");
+		cols.put("name", "Name");
+		cols.put("brand", "Brand");
+		cols.put("category", "Category");
+		cols.put("shelfslot", "Shelf Slot");
+		cols.put("amount", "Amount");
+		
+		return cols;
+	}
 
 	/**
 	 * Gets the database ID of the given user role name.
@@ -1292,4 +1305,6 @@ public class DatabaseController
 
 		System.out.println("[DatabaseController] Product boxes placed on shelves.");
 	}
+
+	
 }
