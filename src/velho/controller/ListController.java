@@ -6,6 +6,7 @@ import java.util.Map;
 import javafx.collections.ObservableList;
 import javafx.scene.Node;
 import velho.model.User;
+import velho.model.exceptions.NoDatabaseLinkException;
 import velho.view.ListView;
 import velho.view.ProductListSearch;
 
@@ -70,7 +71,7 @@ public class ListController
 	public Node getProductListSearchView()
 	{
 		ProductListSearch searchView = new ProductListSearch(this);
-		ListView listView = new ListView(this, DatabaseController.getProductSearchDataColumns(), null);
+		ListView listView = new ListView(this, DatabaseController.getProductSearchDataColumns(), DatabaseController.getProductSearchResultViewList());
 
 		return searchView.getProductListSearch(listView.getUserTableView());
 	}
@@ -158,7 +159,17 @@ public class ListController
 					productData.put(productString, count);
 			}
 		}
-		System.out.println(productData);
+
+		// Search the database for the products.
+		try
+		{
+			DatabaseController.searchProductShelfSlots(productData);
+		}
+		catch (NoDatabaseLinkException e)
+		{
+			DatabaseController.tryReLink();
+		}
+
 		// Return the data for unit testing.
 		return productData;
 	}

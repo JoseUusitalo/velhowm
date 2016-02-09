@@ -1,15 +1,18 @@
 package velho.controller;
 
 import java.io.File;
-import java.sql.*;
-import java.util.List;
-import java.util.Map;
+import java.sql.Connection;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.h2.jdbcx.JdbcConnectionPool;
@@ -66,7 +69,12 @@ public class DatabaseController
 	/**
 	 * An observable list of products for display in the user interface.
 	 */
-	private static ObservableList<Object> productViewList;
+	private static ObservableList<Object> productViewList = FXCollections.observableArrayList();
+
+	/**
+	 * An observable list of product search results for display in the user interface.
+	 */
+	private static ObservableList<Object> productSearchResultViewList = FXCollections.observableArrayList();
 
 	/**
 	 * A map of {@link ProductBrand} objects loaded from the database.
@@ -781,7 +789,7 @@ public class DatabaseController
 
 		return cols;
 	}
-	
+
 	public static Map<String, String> getProductSearchDataColumns()
 	{
 		LinkedHashMap<String, String> cols = new LinkedHashMap<String, String>();
@@ -791,7 +799,7 @@ public class DatabaseController
 		cols.put("category", "Category");
 		cols.put("shelfslot", "Shelf Slot");
 		cols.put("amount", "Amount");
-		
+
 		return cols;
 	}
 
@@ -1039,6 +1047,28 @@ public class DatabaseController
 	}
 
 	/**
+	 * Gets the {@link Product} object from the given product name.
+	 *
+	 * @param name the exact product name
+	 * @return the corresponding product object
+	 * @throws NoDatabaseLinkException
+	 */
+	private static Product getProductByName(final String name) throws NoDatabaseLinkException
+	{
+		final String[] columns = { "product_id" };
+		Map<String, Object> where = new LinkedHashMap<String, Object>();
+		where.put("name", name);
+
+		@SuppressWarnings("unchecked")
+		Set<Integer> result = (LinkedHashSet<Integer>) (runQuery(DatabaseQueryType.SELECT, DatabaseTable.PRODUCTS, columns, null, where));
+
+		if (result.size() == 0)
+			return null;
+
+		return getProductByID(result.iterator().next());
+	}
+
+	/**
 	 * Gets user data by their database ID.
 	 *
 	 * @param id database ID of the user
@@ -1080,16 +1110,22 @@ public class DatabaseController
 	 * Gets an {@link ObservableList} of product data in shelves.
 	 *
 	 * @return a list of products in the database currently on shelves
-	 * @throws NoDatabaseLinkException
 	 */
 	public static ObservableList<Object> getPublicProductDataList()
 	{
-		if (productViewList == null)
-		{
-			productViewList = FXCollections.observableArrayList();
-			productViewList.addAll(loadedProducts.values());
-		}
+		productViewList.clear();
+		productViewList.addAll(loadedProducts.values());
 		return productViewList;
+	}
+
+	/**
+	 * Gets an {@link ObservableList} of product search results.
+	 *
+	 * @return a list of products searched by the user
+	 */
+	public static ObservableList<Object> getProductSearchResultViewList()
+	{
+		return productSearchResultViewList;
 	}
 
 	/**
@@ -1113,6 +1149,32 @@ public class DatabaseController
 
 		System.out.println("User list updated.");
 		return userViewList;
+	}
+
+	public static void searchProductShelfSlots(final Map<String, Integer> productData) throws NoDatabaseLinkException
+	{
+		int productID = -1;
+
+		List<Product> foundProducts = FXCollections.observableArrayList();
+
+		for (final String productString : productData.keySet())
+		{
+			// Determine if the string representing the product is a product ID.
+			try
+			{
+				productID = Integer.parseInt(productString);
+				foundProducts.add(getProductByID(productID));
+			}
+			catch (NumberFormatException e)
+			{
+				foundProducts.add(getProductByName(productString));
+			}
+		}
+
+		System.out.println("Updating product search results.");
+		productSearchResultViewList.clear();
+		productSearchResultViewList.addAll(foundProducts);
+		System.out.println(productSearchResultViewList);
 	}
 
 	/*
@@ -1275,6 +1337,7 @@ public class DatabaseController
 
 	/**
 	 * Places the loaded {@link ProductContainer} objects into {@link Shelf} objects.
+	 *
 	 * @throws NoDatabaseLinkException
 	 */
 	private static void setContainersToShelves() throws NoDatabaseLinkException
@@ -1305,6 +1368,4 @@ public class DatabaseController
 
 		System.out.println("[DatabaseController] Product boxes placed on shelves.");
 	}
-
-	
 }

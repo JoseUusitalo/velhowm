@@ -43,7 +43,7 @@ public class ProductListSearch
 			textArea.setPromptText("Please type one product code or name per line. "
 					+ "To Search for multiple products of the same type, type the number of products you want and a colon before the product name or ID. "
 					+ "Empty lines and redundant spaces are ignored.");
-			textArea.setPrefWidth(MainWindow.WINDOW_WIDTH / 3);
+			textArea.setPrefWidth(MainWindow.WINDOW_WIDTH / 5);
 
 			textArea.setOnKeyReleased(new EventHandler<KeyEvent>()
 			{
