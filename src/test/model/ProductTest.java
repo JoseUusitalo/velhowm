@@ -1,6 +1,6 @@
 package test.model;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 import java.sql.Date;
 
@@ -20,9 +20,9 @@ import velho.model.ProductType;
  */
 public class ProductTest
 {
-	private ProductBrand brand = new ProductBrand(-1, "jotain");
-	private ProductType regular = new ProductType(-1, "Regular");
-	private ProductCategory category = new ProductCategory(-1, "jahas", regular);
+	private ProductBrand brand = new ProductBrand(1, "jotain");
+	private ProductType regular = new ProductType(2, "Regular");
+	private ProductCategory category = new ProductCategory(3, "jahas", regular);
 	private Product product;
 	private Date date = new Date(1000);
 	private String name = "porkkana";
@@ -77,9 +77,27 @@ public class ProductTest
 	}
 
 	@Test
-	public void testGetType()
+	public void testGetBrandID()
+	{
+		assertEquals(1, product.getBrand().getDatabaseID());
+	}
+
+	@Test
+	public void testGetCategory()
 	{
 		assertEquals(category, product.getCategory());
+	}
+
+	@Test
+	public void testGetCategoryID()
+	{
+		assertEquals(3, product.getCategory().getDatabaseID());
+	}
+
+	@Test
+	public void testGetTypeID()
+	{
+		assertEquals(2, product.getCategory().getType().getDatabaseID());
 	}
 
 	@Test

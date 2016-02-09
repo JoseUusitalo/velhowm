@@ -1,6 +1,6 @@
 package test.model;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 import org.junit.Test;
 
@@ -11,7 +11,7 @@ import velho.model.interfaces.UserRole;
 
 /**
  * Test for the {@link UserRole} interface and classes: {@link Administrator}, {@link Manager}, {@link Logistician}.
- * 
+ *
  * @author Jose Uusitalo
  */
 public class UserRoleTest
