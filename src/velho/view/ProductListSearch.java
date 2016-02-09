@@ -35,7 +35,7 @@ public class ProductListSearch
 	 *
 	 * @return a search view for searching multiple products at once
 	 */
-	public BorderPane getProductListSearch()
+	public BorderPane getProductListSearch(final BorderPane list)
 	{
 		if (pane == null)
 		{
@@ -58,6 +58,7 @@ public class ProductListSearch
 			});
 
 			pane.setLeft(textArea);
+			pane.setCenter(list);
 		}
 		return pane;
 	}

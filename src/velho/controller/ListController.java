@@ -69,8 +69,10 @@ public class ListController
 	 */
 	public Node getProductListSearchView()
 	{
-		ProductListSearch list = new ProductListSearch(this);
-		return list.getProductListSearch();
+		ProductListSearch searchView = new ProductListSearch(this);
+		ListView listView = new ListView(this, DatabaseController.getProductSearchDataColumns(), null);
+
+		return searchView.getProductListSearch(listView.getUserTableView());
 	}
 
 	/**
