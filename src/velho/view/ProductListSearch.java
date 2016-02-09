@@ -5,7 +5,6 @@ import javafx.scene.control.TextArea;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.GridPane;
 import velho.controller.ListController;
 
 /**
@@ -40,11 +39,12 @@ public class ProductListSearch
 		if (pane == null)
 		{
 			pane = new BorderPane();
-			GridPane grid = new GridPane();
-
 			TextArea textArea = new TextArea();
-			textArea.setPromptText(
-					"Please type one product code or name per line. To Search for multiple products of the same type, type the number of products you want and a colon before the product name or ID.");
+			textArea.setPromptText("Please type one product code or name per line. "
+					+ "To Search for multiple products of the same type, type the number of products you want and a colon before the product name or ID. "
+					+ "Empty lines and redundant spaces are ignored.");
+			textArea.setPrefWidth(MainWindow.WINDOW_WIDTH / 3);
+
 			textArea.setOnKeyReleased(new EventHandler<KeyEvent>()
 			{
 				@Override

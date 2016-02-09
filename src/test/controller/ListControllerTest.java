@@ -55,7 +55,85 @@ public class ListControllerTest
 							+ "3: " + PRODUCT_1 + "\n"
 							+ "4: " + PRODUCT_1 + "\n";
 		// @formatter:on
+		assertEquals(expected, listController.searchByProductList(string));
+	}
 
+	@Test
+	public final void testSearchByProductList_Duplicates_Spaces()
+	{
+		final Map<String, Integer> expected = new LinkedHashMap<String, Integer>();
+		expected.put(PRODUCT_1, 8);
+		expected.put(PRODUCT_2, 2);
+		// @formatter:off
+		final String string = PRODUCT_1 + "\n"
+							+ "2   : " + PRODUCT_2 + "           \n"
+							+ "    3: " + PRODUCT_1 + "\n"
+							+ "   4   : " + PRODUCT_1 + "\n";
+		// @formatter:on
+		assertEquals(expected, listController.searchByProductList(string));
+	}
+
+	@Test
+	public final void testSearchByProductList_Nulls()
+	{
+		final Map<String, Integer> expected = new LinkedHashMap<String, Integer>();
+		expected.put(PRODUCT_1, 1);
+		expected.put(PRODUCT_2, 1);
+		// @formatter:off
+		final String string = "\n"
+							+ PRODUCT_1 + "\n"
+							+ "\n"
+							+ "\n"
+							+ PRODUCT_2;
+		// @formatter:on
+		assertEquals(expected, listController.searchByProductList(string));
+	}
+
+	@Test
+	public final void testSearchByProductList_Spaces()
+	{
+		final Map<String, Integer> expected = new LinkedHashMap<String, Integer>();
+		expected.put(PRODUCT_1, 1);
+		expected.put(PRODUCT_2, 1);
+		// @formatter:off
+		final String string = "   \n"
+							+ PRODUCT_1 + "\n"
+							+ "   \n"
+							+ " \n"
+							+ PRODUCT_2;
+		// @formatter:on
+		assertEquals(expected, listController.searchByProductList(string));
+	}
+
+	@Test
+	public final void testSearchByProductList_Spaces2()
+	{
+		final Map<String, Integer> expected = new LinkedHashMap<String, Integer>();
+		expected.put(PRODUCT_1, 1);
+		expected.put(PRODUCT_2, 1);
+		// @formatter:off
+		final String string = "2:   \n"
+							+ PRODUCT_1 + "\n"
+							+ "3:   \n"
+							+ "         12:        \n"
+							+ PRODUCT_2;
+		// @formatter:on
+		assertEquals(expected, listController.searchByProductList(string));
+	}
+
+	@Test
+	public final void testSearchByProductList_Spaces3()
+	{
+		final Map<String, Integer> expected = new LinkedHashMap<String, Integer>();
+		expected.put(PRODUCT_1, 10);
+		expected.put(PRODUCT_2, 2);
+		// @formatter:off
+		final String string = "2:   \n"
+							+ "      10:" + PRODUCT_1 + "      \n"
+							+ "3:   \n"
+							+ "         12:        \n"
+							+ "2: " + PRODUCT_2 + "           ";
+		// @formatter:on
 		assertEquals(expected, listController.searchByProductList(string));
 	}
 

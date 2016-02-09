@@ -105,7 +105,7 @@ public class ListController
 				// Example: 'Product C: Long Name'
 				try
 				{
-					count = Integer.valueOf(possibleProductAndCount[0]);
+					count = Integer.valueOf(possibleProductAndCount[0].trim());
 					productString = possibleProductAndCount[1].trim();
 				}
 				catch (NumberFormatException e)
@@ -121,7 +121,7 @@ public class ListController
 				int start = 0;
 				try
 				{
-					count = Integer.valueOf(possibleProductAndCount[0]);
+					count = Integer.valueOf(possibleProductAndCount[0].trim());
 					start = 1;
 				}
 				catch (NumberFormatException e)
@@ -149,13 +149,16 @@ public class ListController
 				productString = sb.toString();
 			}
 
-			// If the product already exists, add the new count to the previous count.
-			if (productData.containsKey(productString))
-				productData.put(productString, productData.get(productString) + count);
-			else
-				productData.put(productString, count);
+			if (!productString.isEmpty())
+			{
+				// If the product already exists, add the new count to the previous count.
+				if (productData.containsKey(productString))
+					productData.put(productString, productData.get(productString) + count);
+				else
+					productData.put(productString, count);
+			}
 		}
-
+		System.out.println(productData);
 		// Return the data for unit testing.
 		return productData;
 	}
