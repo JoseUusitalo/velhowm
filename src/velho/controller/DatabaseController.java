@@ -1,15 +1,18 @@
 package velho.controller;
 
 import java.io.File;
-import java.sql.*;
-import java.util.List;
-import java.util.Map;
+import java.sql.Connection;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.h2.jdbcx.JdbcConnectionPool;
@@ -781,7 +784,7 @@ public class DatabaseController
 
 		return cols;
 	}
-	
+
 	public static Map<String, String> getProductSearchDataColumns()
 	{
 		LinkedHashMap<String, String> cols = new LinkedHashMap<String, String>();
@@ -791,7 +794,7 @@ public class DatabaseController
 		cols.put("category", "Category");
 		cols.put("shelfslot", "Shelf Slot");
 		cols.put("amount", "Amount");
-		
+
 		return cols;
 	}
 
@@ -1061,6 +1064,39 @@ public class DatabaseController
 	}
 
 	/**
+	 * Gets the {@link Shelf} object from the given shelf ID.
+	 *
+	 * @param shelfid shelf database ID
+	 * @return the corresponding shelf object
+	 * @throws NoDatabaseLinkException
+	 */
+	public static Shelf getShelfByID(final int shelfid) throws NoDatabaseLinkException
+	{
+		if (!loadedShelves.containsKey(shelfid))
+		{
+			final String[] columns = { "*" };
+			Map<String, Object> where = new LinkedHashMap<String, Object>();
+			where.put("shelf_id", new Integer(shelfid));
+
+			@SuppressWarnings("unchecked")
+			Set<Object> result = (LinkedHashSet<Object>) (runQuery(DatabaseQueryType.SELECT, DatabaseTable.SHELVES, columns, null, where));
+
+			if (result.size() == 0)
+				return null;
+
+			final Shelf s = (Shelf) result.iterator().next();
+
+			// Store for reuse.
+			System.out.println("Caching: " + s);
+			loadedShelves.put(s.getDatabaseID(), s);
+			return s;
+		}
+
+		System.out.println("Loading shelf " + shelfid + " from cache.");
+		return loadedShelves.get(shelfid);
+	}
+
+	/**
 	 * Gets a list product codes in the database.
 	 *
 	 * @return a list of integer product codes
@@ -1306,5 +1342,4 @@ public class DatabaseController
 		System.out.println("[DatabaseController] Product boxes placed on shelves.");
 	}
 
-	
 }
