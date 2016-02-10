@@ -22,7 +22,12 @@ public abstract class ProductContainer
 	 */
 	protected int productCount;
 
-	public ProductContainer(int boxID, int maxSize, Product product, int productCount)
+	/**
+	 * For {@link ProductBox}: the shelf slot id.
+	 */
+	protected String shelfSlot;
+
+	public ProductContainer(final int boxID, final int maxSize, final Product product, final int productCount)
 	{
 		if (maxSize < 1 || maxSize < productCount)
 		{
@@ -39,7 +44,7 @@ public abstract class ProductContainer
 
 	/**
 	 * Gets the maximum size of the product box.
-	 * 
+	 *
 	 * @return the maximum size of the product box.
 	 */
 	public int getMaxSize()
@@ -49,7 +54,7 @@ public abstract class ProductContainer
 
 	/**
 	 * Gets the ID of the product box.
-	 * 
+	 *
 	 * @return the ID of the product box.
 	 */
 	public int getBoxID()
@@ -59,7 +64,7 @@ public abstract class ProductContainer
 
 	/**
 	 * Gets the product of the product box.
-	 * 
+	 *
 	 * @return the product of the product box.
 	 */
 	public Product getProduct()
@@ -69,7 +74,7 @@ public abstract class ProductContainer
 
 	/**
 	 * Gets the number of products in the product box.
-	 * 
+	 *
 	 * @return the number of products in the products box.
 	 */
 	public int getProductCount()
@@ -79,11 +84,11 @@ public abstract class ProductContainer
 
 	/**
 	 * Removes products from a product box.
-	 * 
+	 *
 	 * @param productCount
 	 * @return true or false.
 	 */
-	public boolean removeProduct(int count)
+	public boolean removeProduct(final int count)
 	{
 		if (this.productCount > 0)
 		{
@@ -99,11 +104,11 @@ public abstract class ProductContainer
 
 	/**
 	 * Adds product to the product box.
-	 * 
+	 *
 	 * @param productCount
 	 * @return true or false.
 	 */
-	public boolean addProduct(int count)
+	public boolean addProduct(final int count)
 	{
 		if ((this.productCount + count) > maxSize)
 		{
@@ -115,11 +120,29 @@ public abstract class ProductContainer
 
 	/**
 	 * Gets the product category type.
-	 * 
+	 *
 	 * @return the product category type.
 	 */
 	public ProductType getBoxType()
 	{
 		return product.getCategory().getType();
+	}
+
+	/**
+	 * Gets the shelf slot ID of this product container
+	 *
+	 * @return the shelf slot of this product container
+	 */
+	public String getShelfSlot()
+	{
+		return shelfSlot;
+	}
+
+	/**
+	 * Sets the shelf slot ID of this product container
+	 */
+	public void setShelfSlot(final String shelfSlot)
+	{
+		this.shelfSlot = shelfSlot;
 	}
 }

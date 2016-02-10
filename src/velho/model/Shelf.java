@@ -365,6 +365,8 @@ public class Shelf
 	{
 		int[] tokens = tokenizeAndValidateShelfSlotID(shelfSlotID);
 
+		productBox.setShelfSlot(shelfSlotID);
+
 		return slots[tokens[1]][tokens[2]].addBox(productBox);
 	}
 
@@ -383,6 +385,8 @@ public class Shelf
 	public boolean removeFromSlot(final String shelfSlotID, final ProductBox productBox) throws IllegalArgumentException
 	{
 		int[] tokens = tokenizeAndValidateShelfSlotID(shelfSlotID);
+
+		productBox.setShelfSlot(null);
 
 		return slots[tokens[1]][tokens[2]].removeBox(productBox);
 	}
