@@ -1,6 +1,8 @@
 package test.model;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -35,13 +37,11 @@ public class ShelfTest
 
 	private static final int PRODUCT_1_ID = 10045;
 	private static final String PRODUCT_1_NAME = "A Test Product";
-	private static final Product PRODUCT_1 = new Product(PRODUCT_1_ID, PRODUCT_1_NAME, new Date(0), new ProductBrand(-1, "Brand #1"),
-			new ProductCategory(-1, "Type #1", new ProductType(-1, "Regular")), -1);
+	private static final Product PRODUCT_1 = new Product(PRODUCT_1_ID, PRODUCT_1_NAME, new Date(0), new ProductBrand(-1, "Brand #1"), new ProductCategory(-1, "Type #1", new ProductType(-1, "Regular")), -1);
 
 	private static final int PRODUCT_2_ID = 299;
 	private static final String PRODUCT_2_NAME = "A Test Product 2";
-	private static final Product PRODUCT_2 = new Product(PRODUCT_2_ID, PRODUCT_2_NAME, new Date(0), new ProductBrand(-1, "Brand #2"),
-			new ProductCategory(-2, "Type #2", new ProductType(-1, "Regular")), -1);
+	private static final Product PRODUCT_2 = new Product(PRODUCT_2_ID, PRODUCT_2_NAME, new Date(0), new ProductBrand(-1, "Brand #2"), new ProductCategory(-2, "Type #2", new ProductType(-1, "Regular")), -1);
 
 	private static final int BOX_1_ID = 11;
 	private static final int BOX_1_MAX_SIZE = 10;
@@ -65,22 +65,19 @@ public class ShelfTest
 	@Test(expected = IllegalArgumentException.class)
 	public final void testCreateInvalid()
 	{
-		@SuppressWarnings("unused")
-		Shelf s = new Shelf(-1, -1, 2, 3);
+		@SuppressWarnings("unused") Shelf s = new Shelf(-1, -1, 2, 3);
 	}
 
 	@Test(expected = IllegalArgumentException.class)
 	public final void testCreateInvalid2()
 	{
-		@SuppressWarnings("unused")
-		Shelf s = new Shelf(1, 1, -2, 3);
+		@SuppressWarnings("unused") Shelf s = new Shelf(1, 1, -2, 3);
 	}
 
 	@Test(expected = IllegalArgumentException.class)
 	public final void testCreateInvalid3()
 	{
-		@SuppressWarnings("unused")
-		Shelf s = new Shelf(0, 1, 2, -3);
+		@SuppressWarnings("unused") Shelf s = new Shelf(0, 1, 2, -3);
 	}
 
 	@Test
@@ -243,42 +240,16 @@ public class ShelfTest
 		final String slotid = shelf.getShelfID() + "-2-12";
 		assertTrue(shelf.addToSlot(slotid, BOX_2));
 		assertTrue(shelf.getShelfSlotBoxes(slotid).contains(BOX_2));
-		assertTrue(shelf.removeFromSlot(slotid, BOX_2));
+		assertTrue(shelf.removeFromSlot(BOX_2));
 		assertFalse(shelf.getShelfSlotBoxes(slotid).contains(BOX_2));
 		assertTrue(shelf.isEmpty());
-	}
-
-	@Test(expected = IllegalArgumentException.class)
-	public final void testRemoveFromSlot_Invalid()
-	{
-		shelf.removeFromSlot(INVALID_SHELF_SLOT_ID, BOX_2);
 	}
 
 	@Test(expected = IllegalArgumentException.class)
 	public final void testRemoveFromSlot_Invalid_Shelf()
 	{
 		final String slotid = (shelf.getShelfID() + 1) + "-2-12";
-		shelf.removeFromSlot(slotid, BOX_2);
-	}
-
-	@Test(expected = IllegalArgumentException.class)
-	public final void testRemoveFromSlot_Invalid_Level()
-	{
-		final String slotid = shelf.getShelfID() + "-99999-12";
-		shelf.removeFromSlot(slotid, BOX_2);
-	}
-
-	@Test(expected = IllegalArgumentException.class)
-	public final void testRemoveFromSlot_Invalid_Slot()
-	{
-		final String slotid = shelf.getShelfID() + "-2-99999999";
-		shelf.removeFromSlot(slotid, BOX_2);
-	}
-
-	@Test(expected = IllegalArgumentException.class)
-	public final void testGetShelfSlotBoxes_Invalid_Shelf()
-	{
-		shelf.getShelfSlotBoxes("SASD-1-1");
+		shelf.removeFromSlot(BOX_2);
 	}
 
 	@Test(expected = IllegalArgumentException.class)
@@ -330,9 +301,9 @@ public class ShelfTest
 	}
 
 	@Test
-	public final void testRemoveFromSlot_Empty()
+	public final void testRemoveFromSlot_null()
 	{
 		final Shelf smallShelf = new Shelf(123, 1, 1, 1);
-		assertFalse(smallShelf.removeFromSlot(smallShelf.getShelfID() + "-1-0", BOX_2));
+		assertFalse(smallShelf.removeFromSlot(null));
 	}
 }

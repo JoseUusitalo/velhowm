@@ -35,6 +35,7 @@ public class ExternalSystemsController
 
 			oldShelfIDString = (String) Shelf.tokenizeShelfSlotID(boxToMove.getShelfSlot())[0];
 			oldShelfID = Integer.parseInt(oldShelfIDString.substring(1));
+			oldShelf = DatabaseController.getShelfByID(oldShelfID);
 		}
 		catch (NoDatabaseLinkException e)
 		{
@@ -42,6 +43,7 @@ public class ExternalSystemsController
 			DatabaseController.tryReLink();
 		}
 
+		oldShelf.removeFromSlot(boxToMove);
 		boolean success = true;
 		DebugController.moveResult(productBoxCode, newShelfSlotID, success);
 		return success;
