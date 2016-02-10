@@ -20,7 +20,7 @@ public class BarcodeScanner
 	 *            returns an array of random numbers
 	 * @return returns the total of numbers with maxSize of item/products
 	 */
-	public static int generateProductList(List<Integer> numbers)
+	public static int generateProductList(final List<Integer> numbers)
 	{
 
 		int maxSize = (int) (Math.random() * (numbers.size() + 1));
@@ -43,8 +43,7 @@ public class BarcodeScanner
 		try
 		{
 			numbers = DatabaseController.getProductCodeList();
-		}
-		catch (NoDatabaseLinkException e)
+		} catch (NoDatabaseLinkException e)
 		{
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -77,7 +76,14 @@ public class BarcodeScanner
 		System.out.println("random product " + list.get(0));
 		System.out.println("random shelf slot " + shelf);
 
-		ExternalSystemsController.move(list.get(0), shelf);
+		if (ExternalSystemsController.move(list.get(0), shelf))
+		{
+			System.out.println("Success");
+		}
+		else
+		{
+			System.out.println("Pint Failed");
+		}
 	}
 
 }

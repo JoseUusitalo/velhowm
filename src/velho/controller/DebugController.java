@@ -49,8 +49,7 @@ public class DebugController
 			LoginController.debugLogin(userRoleName);
 			view.setLogInButton(false);
 			view.setLogOutButton(true);
-		}
-		catch (NoDatabaseLinkException e)
+		} catch (NoDatabaseLinkException e)
 		{
 			PopupController.error("Login failed, no database connection.");
 			e.printStackTrace();
@@ -74,7 +73,7 @@ public class DebugController
 	 *
 	 * @param visibility show log in button?
 	 */
-	public void setLogInButton(boolean visibility)
+	public void setLogInButton(final boolean visibility)
 	{
 		view.setLogInButton(visibility);
 	}
@@ -84,15 +83,33 @@ public class DebugController
 	 *
 	 * @param visibility show log in button?
 	 */
-	public void setLogOutButton(boolean visibility)
+	public void setLogOutButton(final boolean visibility)
 	{
 		view.setLogOutButton(visibility);
 	}
-
 
 	public void scannerMoveValid()
 	{
 
 		ExternalSystemsController.scannerMoveValid();
+	}
+
+	public static void resultMessage()
+	{
+
+		boolean s = ExternalSystemsController.move(0, null);
+		if (s = true)
+		{
+			System.out.println("System registered changes");
+		}
+		else
+		{
+			System.out.println("Attempted changes were cancelled");
+		}
+	}
+
+	public static void moveResult(final int productCode, final String shelfSlotCode, final boolean success)
+	{
+		PopupController.info(productCode + " was moved to " + shelfSlotCode + ": " + success);
 	}
 }

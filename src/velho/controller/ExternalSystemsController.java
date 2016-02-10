@@ -2,6 +2,7 @@ package velho.controller;
 
 import velho.model.BarcodeScanner;
 import velho.model.Shelf;
+import velho.model.exceptions.NoDatabaseLinkException;
 
 public class ExternalSystemsController
 {
@@ -10,14 +11,27 @@ public class ExternalSystemsController
 	{
 		// TODO Auto-generated method stub
 		BarcodeScanner.scannerMoveValid();
-		System.out.println("homma toimii ehk");
 		return;
 	}
 
-	public static void move(Integer integer, String shelfSlotCode)
+	public static boolean move(final int productCode, final String shelfSlotCode)
 	{
-		// TODO Auto-generated method stub
-		Shelf.tokenizeShelfSlotID(shelfSlotCode);
+
+		String shelfidString = (String) Shelf.tokenizeShelfSlotID(shelfSlotCode)[0];
+		int shelfid = Integer.parseInt(shelfidString.substring(1));
+		Shelf shelf = null;
+		try
+		{
+			shelf = DatabaseController.getShelfByID(shelfid);
+		} catch (NoDatabaseLinkException e)
+		{
+
+			DatabaseController.tryReLink();
+		}
+		boolean success = true;
+		DebugController.moveResult(productCode, shelfSlotCode, success);
+		return success;
+
 	}
 
 }
