@@ -1,14 +1,20 @@
 package test.model;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import org.junit.AfterClass;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
+import velho.controller.DatabaseController;
 import velho.model.BarcodeScanner;
+import velho.model.exceptions.ExistingDatabaseLinkException;
+import velho.model.exceptions.NoDatabaseLinkException;
 
 /**
  * @author Edward
@@ -16,6 +22,20 @@ import velho.model.BarcodeScanner;
 @SuppressWarnings("static-method")
 public class BarcodeScannerTest
 {
+
+	@BeforeClass
+	public final static void connectAndInitializeDatabase() throws ClassNotFoundException, NoDatabaseLinkException, ExistingDatabaseLinkException
+	{
+		assertTrue(DatabaseController.link());
+		assertTrue(DatabaseController.initializeDatabase());
+	}
+
+	@AfterClass
+	public final static void unlink() throws NoDatabaseLinkException
+	{
+		DatabaseController.unlink();
+	}
+
 	@Test
 	public void testGetProductList()
 	{
@@ -25,6 +45,12 @@ public class BarcodeScannerTest
 		// System.out.println(BarcodeScanner.generateProductList()+"scanner"+scannerCodes);
 		// assertTrue(scannerCodes.size() <= proCodes.size()*2);
 		fail("not yet implemented");
+	}
+
+	@Test
+	public void testMoveValidProduct()
+	{
+		assertTrue(BarcodeScanner.scannerMoveValid());
 	}
 
 }

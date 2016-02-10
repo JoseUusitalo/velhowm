@@ -43,7 +43,8 @@ public class BarcodeScanner
 		try
 		{
 			numbers = DatabaseController.getProductCodeList();
-		} catch (NoDatabaseLinkException e)
+		}
+		catch (NoDatabaseLinkException e)
 		{
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -58,7 +59,7 @@ public class BarcodeScanner
 		return numbers.get(maximSize);
 	}
 
-	public static void scannerMoveValid()
+	public static boolean scannerMoveValid()
 	{
 
 		List<Integer> list = null;
@@ -67,7 +68,8 @@ public class BarcodeScanner
 		{
 			list = DatabaseController.getProductCodeList();
 			Collections.shuffle(list);
-		} catch (NoDatabaseLinkException e)
+		}
+		catch (NoDatabaseLinkException e)
 		{
 			DatabaseController.tryReLink();
 		}
@@ -79,11 +81,14 @@ public class BarcodeScanner
 		if (ExternalSystemsController.move(list.get(0), shelf))
 		{
 			System.out.println("Success");
+			return true;
 		}
 		else
 		{
 			System.out.println("Pint Failed");
+			return false;
 		}
+
 	}
 
 }

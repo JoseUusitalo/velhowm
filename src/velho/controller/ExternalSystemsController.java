@@ -44,6 +44,7 @@ public class ExternalSystemsController
 		}
 
 		oldShelf.removeFromSlot(boxToMove);
+		newShelf.addToSlot(newShelfSlotID, boxToMove);
 		boolean success = true;
 		DebugController.moveResult(productBoxCode, newShelfSlotID, success);
 		return success;
