@@ -1,6 +1,7 @@
 package velho.controller;
 
 import velho.model.BarcodeScanner;
+import velho.model.ProductBox;
 import velho.model.Shelf;
 import velho.model.exceptions.NoDatabaseLinkException;
 
@@ -14,24 +15,35 @@ public class ExternalSystemsController
 		return;
 	}
 
-	public static boolean move(final int productCode, final String shelfSlotCode)
+	public static boolean move(final int productBoxCode, final String newShelfSlotID)
 	{
 
-		String shelfidString = (String) Shelf.tokenizeShelfSlotID(shelfSlotCode)[0];
-		int shelfid = Integer.parseInt(shelfidString.substring(1));
-		Shelf shelf = null;
+		String newShelfIDString = (String) Shelf.tokenizeShelfSlotID(newShelfSlotID)[0];
+		int newShelfID = Integer.parseInt(newShelfIDString.substring(1));
+
+		String oldShelfIDString = null;
+		int oldShelfID = -1;
+
+		Shelf oldShelf = null;
+		Shelf newShelf = null;
+		ProductBox boxToMove = null;
+
 		try
 		{
-			shelf = DatabaseController.getShelfByID(shelfid);
-		} catch (NoDatabaseLinkException e)
+			newShelf = DatabaseController.getShelfByID(newShelfID);
+			boxToMove = DatabaseController.getProductBoxByID(productBoxCode);
+
+			oldShelfIDString = (String) Shelf.tokenizeShelfSlotID(boxToMove.getShelfSlot())[0];
+			oldShelfID = Integer.parseInt(oldShelfIDString.substring(1));
+		}
+		catch (NoDatabaseLinkException e)
 		{
 
 			DatabaseController.tryReLink();
 		}
+
 		boolean success = true;
-		DebugController.moveResult(productCode, shelfSlotCode, success);
+		DebugController.moveResult(productBoxCode, newShelfSlotID, success);
 		return success;
-
 	}
-
 }

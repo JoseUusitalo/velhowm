@@ -1071,7 +1071,7 @@ public class DatabaseController
 	 * @return the corresponding product object
 	 * @throws NoDatabaseLinkException
 	 */
-	private static ProductBox getProductBoxByID(final int productboxid) throws NoDatabaseLinkException
+	public static ProductBox getProductBoxByID(final int productboxid) throws NoDatabaseLinkException
 	{
 		if (!loadedProductBoxes.containsKey(productboxid))
 		{
