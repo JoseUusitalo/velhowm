@@ -59,6 +59,11 @@ public class BarcodeScanner
 		return numbers.get(maximSize);
 	}
 
+	/**
+	 * Validates the order to move the product/box/items.
+	 * 
+	 * @return Either a true or a false, if there is room in the shelf or no room.
+	 */
 	public static boolean scannerMoveValid()
 	{
 

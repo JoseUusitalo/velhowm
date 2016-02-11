@@ -30,7 +30,8 @@ public class DebugController
 	/**
 	 * Creates and shows the debug window.
 	 *
-	 * @param stage the stage to run the window in
+	 * @param stage
+	 *            the stage to run the window in
 	 */
 	public void createDebugWindow(final Stage stage)
 	{
@@ -49,7 +50,8 @@ public class DebugController
 			LoginController.debugLogin(userRoleName);
 			view.setLogInButton(false);
 			view.setLogOutButton(true);
-		} catch (NoDatabaseLinkException e)
+		}
+		catch (NoDatabaseLinkException e)
 		{
 			PopupController.error("Login failed, no database connection.");
 			e.printStackTrace();
@@ -71,7 +73,8 @@ public class DebugController
 	/**
 	 * The parameter for LogInButton is either false or true.
 	 *
-	 * @param visibility show log in button?
+	 * @param visibility
+	 *            show log in button?
 	 */
 	public void setLogInButton(final boolean visibility)
 	{
@@ -81,19 +84,27 @@ public class DebugController
 	/**
 	 * The parameter for LogInButton is either false or true.
 	 *
-	 * @param visibility show log in button?
+	 * @param visibility
+	 *            show log in button?
 	 */
 	public void setLogOutButton(final boolean visibility)
 	{
 		view.setLogOutButton(visibility);
 	}
 
+	/**
+	 * Sends the order from DebugWindow to the external systems controller.
+	 */
 	public void scannerMoveValid()
 	{
 
 		ExternalSystemsController.scannerMoveValid();
 	}
 
+	/**
+	 * Result message from the External systems controller to the DebugWindow of the prosegures end result.
+	 * Still in progress since there are not items in the database.
+	 */
 	public static void resultMessage()
 	{
 
@@ -108,6 +119,16 @@ public class DebugController
 		}
 	}
 
+	/**
+	 * moveResult what currently sends the message and informs the DebugWindow of current events.
+	 * 
+	 * @param productCode
+	 *            is the code the the product identifies with.
+	 * @param shelfSlotCode
+	 *            is the code for the Shelf slot where the product resides in.
+	 * @param success
+	 *            is actually a true that prints a message to the DebugWindow.
+	 */
 	public static void moveResult(final int productCode, final String shelfSlotCode, final boolean success)
 	{
 		PopupController.info(productCode + " was moved to " + shelfSlotCode + ": " + success);

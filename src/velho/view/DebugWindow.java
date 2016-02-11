@@ -4,15 +4,15 @@ import java.util.Set;
 
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
-import javafx.stage.Stage;
-import velho.controller.DatabaseController;
-import velho.controller.DebugController;
-import velho.model.BarcodeScanner;
+import javafx.geometry.Insets;
 import javafx.scene.Group;
 import javafx.scene.Scene;
+import javafx.scene.control.Button;
+import javafx.scene.control.ComboBox;
+import javafx.scene.control.Label;
 import javafx.scene.layout.GridPane;
-import javafx.geometry.Insets;
-import javafx.scene.control.*;
+import javafx.stage.Stage;
+import velho.controller.DebugController;
 
 /**
  * A window with various debug features.
@@ -31,6 +31,9 @@ public class DebugWindow
 	 */
 	public Button logOutButton = new Button("Log Out");
 
+	/**
+	 * Button has been tagged scannerMoveValid and named as "Scanner Move Valid" on the scene.
+	 */
 	public Button scannerMoveValid = new Button("Scanner Move Valid");
 
 	/**
@@ -62,9 +65,10 @@ public class DebugWindow
 	/**
 	 * Sets the value as either true or false to show in the scene.
 	 *
-	 * @param visibility show log in button?
+	 * @param visibility
+	 *            show log in button?
 	 */
-	public void setLogInButton(boolean visibility)
+	public void setLogInButton(final boolean visibility)
 	{
 		logInButton.setVisible(visibility);
 	}
@@ -73,9 +77,9 @@ public class DebugWindow
 	 * sets the value as either true or false to show in the scene.
 	 *
 	 * @param visibility
-	 * show log in button?
+	 *            show log in button?
 	 */
-	public void setLogOutButton(boolean visibility)
+	public void setLogOutButton(final boolean visibility)
 	{
 		logOutButton.setVisible(visibility);
 	}
@@ -83,9 +87,10 @@ public class DebugWindow
 	/**
 	 * Shows the debug window.
 	 *
-	 * @param primaryStage stage to show the window in
+	 * @param primaryStage
+	 *            stage to show the window in
 	 */
-	public void start(Stage primaryStage)
+	public void start(final Stage primaryStage)
 	{
 		primaryStage.setTitle("VELHO WM DEBUG");
 		Scene scene = new Scene(new Group(), 300, 150);
@@ -111,11 +116,10 @@ public class DebugWindow
 		Group root = (Group) scene.getRoot();
 		root.getChildren().add(grid);
 
-
 		logInButton.setOnAction(new EventHandler<ActionEvent>()
 		{
 			@Override
-			public void handle(ActionEvent event)
+			public void handle(final ActionEvent event)
 			{
 				debugController.login(taskListBox.getValue());
 			}
@@ -125,7 +129,7 @@ public class DebugWindow
 		logOutButton.setOnAction(new EventHandler<ActionEvent>()
 		{
 			@Override
-			public void handle(ActionEvent event)
+			public void handle(final ActionEvent event)
 			{
 
 				debugController.logout();
@@ -135,7 +139,8 @@ public class DebugWindow
 		scannerMoveValid.setOnAction(new EventHandler<ActionEvent>()
 		{
 
-			@Override public void handle(ActionEvent event)
+			@Override
+			public void handle(final ActionEvent event)
 			{
 
 				debugController.scannerMoveValid();

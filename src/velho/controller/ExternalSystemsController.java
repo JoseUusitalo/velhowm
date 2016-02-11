@@ -8,6 +8,9 @@ import velho.model.exceptions.NoDatabaseLinkException;
 public class ExternalSystemsController
 {
 
+	/**
+	 * Carries out initial order from DebugController to BarcodeScanner
+	 */
 	public static void scannerMoveValid()
 	{
 		// TODO Auto-generated method stub
@@ -15,6 +18,15 @@ public class ExternalSystemsController
 		return;
 	}
 
+	/**
+	 * Moves the box from the shelf in question.
+	 * 
+	 * @param productBoxCode
+	 *            the code that the Box posses.
+	 * @param newShelfSlotID
+	 *            the Boxes former shelf id that it modifies.
+	 * @return either a true or false, true when the prosses was compleated. False if not.
+	 */
 	public static boolean move(final int productBoxCode, final String newShelfSlotID)
 	{
 
