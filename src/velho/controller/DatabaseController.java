@@ -850,6 +850,16 @@ public class DatabaseController
 	 */
 	public static User authenticateBadgeID(final String badgeID) throws NoDatabaseLinkException
 	{
+		try
+		{
+			Integer.parseInt(badgeID);
+		}
+		catch (NumberFormatException e)
+		{
+			// Although badge IDs are stored as string, they are still numbers.
+			return null;
+		}
+
 		final String[] columns = { "user_id", "first_name", "last_name", "role" };
 		List<String> where = new ArrayList<String>();
 		where.add("badge_id = " + badgeID);
