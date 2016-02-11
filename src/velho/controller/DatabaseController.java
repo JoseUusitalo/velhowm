@@ -1222,10 +1222,13 @@ public class DatabaseController
 	public static void searchProduct_BoxShelfSlots(final Map<String, Integer> productData) throws NoDatabaseLinkException
 	{
 		List<ProductBoxSearchResultRow> foundProducts = FXCollections.observableArrayList();
+
 		List<String> where = null;
-		List<ProductBox> boxes = null;
 		Integer wantedProductCount = null;
+		List<ProductBox> boxes = null;
 		Map<Integer, List<ProductBox>> boxProductCount = new TreeMap<Integer, List<ProductBox>>();
+
+		List<ProductBox> nextSmallestBoxes = null;
 		int wantedWouldBeIndex = -1;
 		int addCountIndex = -1;
 		int productCountSum = 0;
@@ -1304,16 +1307,30 @@ public class DatabaseController
 					// Keep adding boxes to the foundProducts until we reach the wanted product count.
 					while (productCountSum < wantedProductCount)
 					{
-						// The next smallest product boxes.
-						List<ProductBox> nextSmallestBoxes = boxProductCount.get(boxSizeArray[--addCountIndex]);
+						// Looking for too few products, show the smallest box of that product instead.
+						if (wantedWouldBeIndex == 0)
+							addCountIndex++;
+
+						try
+						{
+							// The next smallest product boxes.
+							nextSmallestBoxes = boxProductCount.get(boxSizeArray[--addCountIndex]);
+						}
+						catch (IndexOutOfBoundsException e)
+						{
+							// If wantedWouldBeIndex is not 0 here it means that
+							System.out.println("Unable to find that many products. Listing all available boxes.");
+							break;
+						}
 
 						if (MainWindow.DEBUG_MODE)
-							System.out.println("The next smallest product boxes: " + nextSmallestBoxes);
+							System.out.println("The next smallest product boxes at index " + addCountIndex + " are: " + nextSmallestBoxes);
 
 						for (final ProductBox box : nextSmallestBoxes)
 						{
 							// Does adding this box to the set still keep the product counter under the wanted amount?
-							if (productCountSum + box.getProductCount() <= wantedProductCount)
+							// OR does a box that small not exist?
+							if (wantedWouldBeIndex == 0 || ((productCountSum + box.getProductCount() <= wantedProductCount) || addCountIndex == 0))
 							{
 								// Add up the product count.
 								productCountSum += box.getProductCount();
@@ -1340,11 +1357,31 @@ public class DatabaseController
 				{
 					// If found multiple boxes with the exact size, select one that will expire the soonest.
 					ProductBox oldest = boxes.get(0);
+
 					for (final ProductBox box : boxes)
 					{
-						// if (box.getExpirationDate() < oldest.getExpirationDate())
-						// oldest = box;
+						if (box.getExpirationDate() != null)
+						{
+							// Current box has an expiration date.
+							if (box.getExpirationDate() != null)
+							{
+								// Oldest box has an expiration date.
+								if (box.getExpirationDate().before(oldest.getExpirationDate()))
+								{
+									// Current box expires first.
+									oldest = box;
+								}
+							}
+							else
+							{
+								// Current box expires first.
+								oldest = box;
+							}
+						}
+						// Else current box does not have an expiration date.
 					}
+					boxes.clear();
+					boxes.add(oldest);
 				}
 			}
 			catch (NumberFormatException e)
