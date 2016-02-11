@@ -1,21 +1,24 @@
 package velho.model;
 
+import java.util.Date;
+
 /**
  * The ProductBox class.
- * 
+ *
  * @author Joona &amp; Jose Uusitalo
  */
 public class ProductBox extends ProductContainer
 {
 	/**
 	 * @param databaseID
+	 * @param expirationDate
 	 * @param maxSize
 	 * @param product
 	 * @param productCount
 	 */
-	public ProductBox(int databaseID, int maxSize, Product product, int productCount)
+	public ProductBox(final int databaseID, final Date expirationDate, final int maxSize, final Product product, final int productCount)
 	{
-		super(databaseID, maxSize, product, productCount);
+		super(databaseID, expirationDate, maxSize, product, productCount);
 
 		if (product.getCategory().getType().getName() == "Cold")
 		{

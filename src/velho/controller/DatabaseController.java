@@ -319,7 +319,6 @@ public class DatabaseController
 									dataSet.add(new Product(
 											result.getInt("product_id"),
 											result.getString("name"),
-											result.getDate("expiration_date"),
 											getProductBrandByID(result.getInt("brand")),
 											getProductCategoryByID(result.getInt("category")),
 											result.getInt("popularity")));
@@ -331,6 +330,7 @@ public class DatabaseController
 								while (result.next())
 									dataSet.add(new ProductBox(
 											result.getInt("container_id"),
+											result.getDate("expiration_date"),
 											result.getInt("max_size"),
 											getProductByID(result.getInt("product")),
 											result.getInt("product_count")));
@@ -780,7 +780,6 @@ public class DatabaseController
 	{
 		LinkedHashMap<String, String> cols = new LinkedHashMap<String, String>();
 		cols.put("name", "Name");
-		cols.put("expirationDate", "Expires");
 		cols.put("brand", "Brand");
 		cols.put("category", "Category");
 		cols.put("popularity", "Popularity");
@@ -795,6 +794,7 @@ public class DatabaseController
 		cols.put("productName", "Name");
 		cols.put("productBrand", "Brand");
 		cols.put("productCategory", "Category");
+		cols.put("expirationDate", "Expires");
 		cols.put("boxShelfSlot", "Shelf Slot");
 		cols.put("boxProductCount", "Amount");
 
