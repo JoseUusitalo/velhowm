@@ -20,16 +20,13 @@ public class ExternalSystemsController
 
 	/**
 	 * Moves the box from the shelf in question.
-	 * 
-	 * @param productBoxCode
-	 *            the code that the Box posses.
-	 * @param newShelfSlotID
-	 *            the Boxes former shelf id that it modifies.
+	 *
+	 * @param productBoxCode the code that the Box posses.
+	 * @param newShelfSlotID the Boxes former shelf id that it modifies.
 	 * @return either a true or false, true when the prosses was compleated. False if not.
 	 */
 	public static boolean move(final int productBoxCode, final String newShelfSlotID)
 	{
-
 		String newShelfIDString = (String) Shelf.tokenizeShelfSlotID(newShelfSlotID)[0];
 		int newShelfID = Integer.parseInt(newShelfIDString.substring(1));
 
@@ -42,21 +39,21 @@ public class ExternalSystemsController
 
 		try
 		{
-			newShelf = DatabaseController.getShelfByID(newShelfID);
+			newShelf = DatabaseController.getShelfByID(newShelfID, true);
 			boxToMove = DatabaseController.getProductBoxByID(productBoxCode);
 
 			oldShelfIDString = (String) Shelf.tokenizeShelfSlotID(boxToMove.getShelfSlot())[0];
 			oldShelfID = Integer.parseInt(oldShelfIDString.substring(1));
-			oldShelf = DatabaseController.getShelfByID(oldShelfID);
+			oldShelf = DatabaseController.getShelfByID(oldShelfID, true);
+
+			oldShelf.removeFromSlot(boxToMove);
+			newShelf.addToSlot(newShelfSlotID, boxToMove);
 		}
 		catch (NoDatabaseLinkException e)
 		{
-
 			DatabaseController.tryReLink();
 		}
 
-		oldShelf.removeFromSlot(boxToMove);
-		newShelf.addToSlot(newShelfSlotID, boxToMove);
 		boolean success = true;
 		DebugController.moveResult(productBoxCode, newShelfSlotID, success);
 		return success;

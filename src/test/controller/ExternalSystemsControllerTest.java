@@ -46,24 +46,23 @@ public class ExternalSystemsControllerTest
 		final ProductBox box = DatabaseController.getProductBoxByID(BOXDBID);
 		final String oldShelfIDString = (String) Shelf.tokenizeShelfSlotID(box.getShelfSlot())[0];
 		final int oldShelfID = Integer.parseInt(oldShelfIDString.substring(1));
-		final Shelf oldShelf = DatabaseController.getShelfByID(oldShelfID);
+		final Shelf oldShelf = DatabaseController.getShelfByID(oldShelfID, true);
 
 		String newShelfIDString = (String) Shelf.tokenizeShelfSlotID(NEWSHELFID)[0];
 		int newShelfID = Integer.parseInt(newShelfIDString.substring(1));
-		final Shelf newShelf = DatabaseController.getShelfByID(newShelfID);
+		final Shelf newShelf = DatabaseController.getShelfByID(newShelfID, true);
 
 		assertTrue(ExternalSystemsController.move(BOXDBID, NEWSHELFID));
 	}
 
 	@Test
-	public final void testMoveInValid() throws NoDatabaseLinkException
+	public final void testMoveInValid()
 	{
-
 		assertFalse(ExternalSystemsController.move(BOXDBID, "S999-1-1"));
 	}
 
 	@Test
-	public final void testMoveFull() throws NoDatabaseLinkException
+	public final void testMoveFull()
 	{
 
 		assertFalse(ExternalSystemsController.move(BOXDBID, "S1-1-1"));

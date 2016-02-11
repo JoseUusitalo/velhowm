@@ -17,7 +17,7 @@ public class BarcodeScanner
 	 * randomly.
 	 *
 	 * @param numbers
-	 *            returns an array of random numbers
+	 * returns an array of random numbers
 	 * @return returns the total of numbers with maxSize of item/products
 	 */
 	public static int generateProductList(final List<Integer> numbers)
@@ -61,24 +61,25 @@ public class BarcodeScanner
 
 	/**
 	 * Validates the order to move the product/box/items.
-	 * 
+	 *
 	 * @return Either a true or a false, if there is room in the shelf or no room.
 	 */
 	public static boolean scannerMoveValid()
 	{
 
 		List<Integer> list = null;
+		String shelf = null;
 
 		try
 		{
 			list = DatabaseController.getProductCodeList();
 			Collections.shuffle(list);
+			shelf = DatabaseController.getRandomShelfSlot();
 		}
 		catch (NoDatabaseLinkException e)
 		{
 			DatabaseController.tryReLink();
 		}
-		String shelf = DatabaseController.getRandomShelfSlot();
 
 		System.out.println("random product " + list.get(0));
 		System.out.println("random shelf slot " + shelf);

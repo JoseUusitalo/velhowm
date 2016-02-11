@@ -9,15 +9,19 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
+import velho.controller.DatabaseController;
 import velho.model.Product;
 import velho.model.ProductBox;
 import velho.model.ProductBrand;
 import velho.model.ProductCategory;
 import velho.model.ProductType;
 import velho.model.Shelf;
+import velho.model.exceptions.ExistingDatabaseLinkException;
+import velho.model.exceptions.NoDatabaseLinkException;
 
 /**
  * Tests for the {@link Shelf} class.
@@ -37,11 +41,13 @@ public class ShelfTest
 
 	private static final int PRODUCT_1_ID = 10045;
 	private static final String PRODUCT_1_NAME = "A Test Product";
-	private static final Product PRODUCT_1 = new Product(PRODUCT_1_ID, PRODUCT_1_NAME, new Date(0), new ProductBrand(-1, "Brand #1"), new ProductCategory(-1, "Type #1", new ProductType(-1, "Regular")), -1);
+	private static final Product PRODUCT_1 = new Product(PRODUCT_1_ID, PRODUCT_1_NAME, new Date(0), new ProductBrand(-1, "Brand #1"),
+			new ProductCategory(-1, "Type #1", new ProductType(-1, "Regular")), -1);
 
 	private static final int PRODUCT_2_ID = 299;
 	private static final String PRODUCT_2_NAME = "A Test Product 2";
-	private static final Product PRODUCT_2 = new Product(PRODUCT_2_ID, PRODUCT_2_NAME, new Date(0), new ProductBrand(-1, "Brand #2"), new ProductCategory(-2, "Type #2", new ProductType(-1, "Regular")), -1);
+	private static final Product PRODUCT_2 = new Product(PRODUCT_2_ID, PRODUCT_2_NAME, new Date(0), new ProductBrand(-1, "Brand #2"),
+			new ProductCategory(-2, "Type #2", new ProductType(-1, "Regular")), -1);
 
 	private static final int BOX_1_ID = 11;
 	private static final int BOX_1_MAX_SIZE = 10;
@@ -56,28 +62,39 @@ public class ShelfTest
 	private static Shelf shelf;
 
 	@Before
-	public final void createShelf()
+	public final void createShelf() throws ClassNotFoundException, ExistingDatabaseLinkException, NoDatabaseLinkException
 	{
 		// Create a new shelf before each test.
 		shelf = new Shelf(SHELF_ID_0, SHELF_LEVELS, SHELF_SLOTS, SHELF_BOXES_PER_SLOT);
+		assertTrue(DatabaseController.link());
+		assertTrue(DatabaseController.initializeDatabase());
+	}
+
+	@After
+	public final void unlinkDatabase() throws NoDatabaseLinkException
+	{
+		DatabaseController.unlink();
 	}
 
 	@Test(expected = IllegalArgumentException.class)
 	public final void testCreateInvalid()
 	{
-		@SuppressWarnings("unused") Shelf s = new Shelf(-1, -1, 2, 3);
+		@SuppressWarnings("unused")
+		Shelf s = new Shelf(-1, -1, 2, 3);
 	}
 
 	@Test(expected = IllegalArgumentException.class)
 	public final void testCreateInvalid2()
 	{
-		@SuppressWarnings("unused") Shelf s = new Shelf(1, 1, -2, 3);
+		@SuppressWarnings("unused")
+		Shelf s = new Shelf(1, 1, -2, 3);
 	}
 
 	@Test(expected = IllegalArgumentException.class)
 	public final void testCreateInvalid3()
 	{
-		@SuppressWarnings("unused") Shelf s = new Shelf(0, 1, 2, -3);
+		@SuppressWarnings("unused")
+		Shelf s = new Shelf(0, 1, 2, -3);
 	}
 
 	@Test
@@ -182,7 +199,7 @@ public class ShelfTest
 	}
 
 	@Test
-	public final void testAddToSlot_EmptyBox()
+	public final void testAddToSlot_EmptyBox() throws IllegalArgumentException, NoDatabaseLinkException
 	{
 		final String slotid = shelf.getShelfID() + "-1-03";
 		assertTrue(shelf.addToSlot(slotid, BOX_1_EMPTY));
@@ -191,7 +208,7 @@ public class ShelfTest
 	}
 
 	@Test
-	public final void testAddToSlot()
+	public final void testAddToSlot() throws IllegalArgumentException, NoDatabaseLinkException
 	{
 		final String slotid = shelf.getShelfID() + "-2-12";
 		assertTrue(shelf.addToSlot(slotid, BOX_2));
@@ -202,53 +219,54 @@ public class ShelfTest
 	}
 
 	@Test(expected = IllegalArgumentException.class)
-	public final void testAddToSlot_Invalid2()
+	public final void testAddToSlot_Invalid2() throws IllegalArgumentException, NoDatabaseLinkException
 	{
 		shelf.addToSlot("S1-NOPE-2", BOX_2);
 	}
 
 	@Test(expected = IllegalArgumentException.class)
-	public final void testAddToSlot_Invalid()
+	public final void testAddToSlot_Invalid() throws IllegalArgumentException, NoDatabaseLinkException
 	{
 		shelf.addToSlot(INVALID_SHELF_SLOT_ID, BOX_2);
 	}
 
 	@Test(expected = IllegalArgumentException.class)
-	public final void testAddToSlot_Invalid_Shelf()
+	public final void testAddToSlot_Invalid_Shelf() throws IllegalArgumentException, NoDatabaseLinkException
 	{
 		final String slotid = (shelf.getShelfID() + 1) + "-2-12";
 		shelf.addToSlot(slotid, BOX_2);
 	}
 
 	@Test(expected = IllegalArgumentException.class)
-	public final void testAddToSlot_Invalid_Level()
+	public final void testAddToSlot_Invalid_Level() throws IllegalArgumentException, NoDatabaseLinkException
 	{
 		final String slotid = shelf.getShelfID() + "-99999-12";
 		shelf.addToSlot(slotid, BOX_2);
 	}
 
 	@Test(expected = IllegalArgumentException.class)
-	public final void testAddToSlot_Invalid_Slot()
+	public final void testAddToSlot_Invalid_Slot() throws IllegalArgumentException, NoDatabaseLinkException
 	{
 		final String slotid = shelf.getShelfID() + "-2-99999999";
 		shelf.addToSlot(slotid, BOX_2);
 	}
 
 	@Test
-	public final void testRemoveFromSlot()
+	public final void testRemoveFromSlot() throws IllegalArgumentException, NoDatabaseLinkException
 	{
 		final String slotid = shelf.getShelfID() + "-2-12";
 		assertTrue(shelf.addToSlot(slotid, BOX_2));
 		assertTrue(shelf.getShelfSlotBoxes(slotid).contains(BOX_2));
+
 		assertTrue(shelf.removeFromSlot(BOX_2));
+
 		assertFalse(shelf.getShelfSlotBoxes(slotid).contains(BOX_2));
 		assertTrue(shelf.isEmpty());
 	}
 
 	@Test(expected = IllegalArgumentException.class)
-	public final void testRemoveFromSlot_Invalid_Shelf()
+	public final void testRemoveFromSlot_Invalid_Shelf() throws IllegalArgumentException, NoDatabaseLinkException
 	{
-		final String slotid = (shelf.getShelfID() + 1) + "-2-12";
 		shelf.removeFromSlot(BOX_2);
 	}
 
@@ -265,7 +283,7 @@ public class ShelfTest
 	}
 
 	@Test
-	public final void testHasFreeSpace()
+	public final void testHasFreeSpace() throws IllegalArgumentException, NoDatabaseLinkException
 	{
 		final Shelf fullShelf = new Shelf(123, 1, 1, 1);
 		assertTrue(fullShelf.addToSlot(fullShelf.getShelfID() + "-1-0", BOX_2));
@@ -273,7 +291,7 @@ public class ShelfTest
 	}
 
 	@Test
-	public final void testToString()
+	public final void testToString() throws IllegalArgumentException, NoDatabaseLinkException
 	{
 		final Shelf fullShelf = new Shelf(123, 1, 1, 1);
 		assertTrue(fullShelf.addToSlot(fullShelf.getShelfID() + "-1-0", BOX_2));
@@ -283,7 +301,7 @@ public class ShelfTest
 	@Test
 	public final void testCoordinatesToShelfSlotID()
 	{
-		assertEquals("S1-2-3", Shelf.coordinatesToShelfSlotID(1, 2, 3));
+		assertEquals("S1-2-3", Shelf.coordinatesToShelfSlotID(1, 2, 3, true));
 	}
 
 	@Test
@@ -293,7 +311,7 @@ public class ShelfTest
 	}
 
 	@Test
-	public final void testAddToSlot_Full()
+	public final void testAddToSlot_Full() throws IllegalArgumentException, NoDatabaseLinkException
 	{
 		final Shelf fullShelf = new Shelf(123, 1, 1, 1);
 		assertTrue(fullShelf.addToSlot(fullShelf.getShelfID() + "-1-0", BOX_2));
@@ -301,7 +319,7 @@ public class ShelfTest
 	}
 
 	@Test
-	public final void testRemoveFromSlot_null()
+	public final void testRemoveFromSlot_null() throws IllegalArgumentException, NoDatabaseLinkException
 	{
 		final Shelf smallShelf = new Shelf(123, 1, 1, 1);
 		assertFalse(smallShelf.removeFromSlot(null));

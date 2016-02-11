@@ -147,6 +147,8 @@ public class DatabaseController
 			case INSERT:
 				sb.append("INTO ");
 				break;
+			case UPDATE:
+				break;
 			default:
 				sb.append("FROM ");
 				break;
@@ -1189,9 +1191,9 @@ public class DatabaseController
 	 * @return the corresponding shelf object
 	 * @throws NoDatabaseLinkException
 	 */
-	public static Shelf getShelfByID(final int shelfid) throws NoDatabaseLinkException
+	public static Shelf getShelfByID(final int shelfid, final boolean getCached) throws NoDatabaseLinkException
 	{
-		if (!loadedShelves.containsKey(shelfid))
+		if (!loadedShelves.containsKey(shelfid) || !getCached)
 		{
 			final String[] columns = { "*" };
 			Map<String, Object> where = new LinkedHashMap<String, Object>();
@@ -1206,13 +1208,40 @@ public class DatabaseController
 			final Shelf s = (Shelf) result.iterator().next();
 
 			// Store for reuse.
-			System.out.println("Caching: " + s);
+			if (getCached)
+				System.out.println("Caching: " + s);
+			else
+				System.out.println("Updating cached: " + s);
+
 			loadedShelves.put(s.getDatabaseID(), s);
 			return s;
 		}
 
 		System.out.println("Loading shelf " + shelfid + " from cache.");
 		return loadedShelves.get(shelfid);
+	}
+
+	/**
+	 * Gets a random valid shelf slot ID string.
+	 *
+	 * @return random valid shelf slot ID string
+	 */
+	public static String getRandomShelfSlot() throws NoDatabaseLinkException
+	{
+		final String[] columns = { "shelf_id" };
+
+		@SuppressWarnings("unchecked")
+		Set<Integer> result = (LinkedHashSet<Integer>) (runQuery(DatabaseQueryType.SELECT, DatabaseTable.SHELVES, null, columns, null, null));
+
+		final List<Integer> list = new ArrayList<Integer>(result);
+
+		Collections.shuffle(list);
+
+		final Shelf randomShelf = getShelfByID(list.get(0), true);
+		final int randomLevel = (int) (Math.round(Math.random() * randomShelf.getLevels()) + 1);
+		final int randomSlotIndex = (int) (Math.round(Math.random() * randomShelf.getShelfSlotCount()));
+
+		return Shelf.coordinatesToShelfSlotID(list.get(0), randomLevel, randomSlotIndex, true);
 	}
 
 	/**
@@ -1406,6 +1435,55 @@ public class DatabaseController
 	}
 
 	/**
+	 * Adds the given product box to the shelf slot it specifies.
+	 *
+	 * @param productBox product box to update in the database
+	 * @return <code>true</code> if the database was updated
+	 */
+	public static boolean addProductToShelfSlot(final ProductBox productBox) throws NoDatabaseLinkException
+	{
+		final Object[] tokens = Shelf.tokenizeShelfSlotID(productBox.getShelfSlot());
+
+		final Map<String, Object> values = new LinkedHashMap<String, Object>();
+		values.put("shelflevel_index", (int) tokens[1] - 1);
+		values.put("shelfslot_index", tokens[2]);
+
+		final Map<String, Object> where = new LinkedHashMap<String, Object>();
+		where.put("productbox", productBox.getBoxID());
+
+		// TODO: Handle case where the product box is not in any shelf yet.
+
+		boolean changed = (0 != (Integer) runQuery(DatabaseQueryType.UPDATE, DatabaseTable.SHELF_PRODUCTBOXES, null, null, values, where));
+
+		// Update the cache.
+		if (changed)
+			getShelfByID(Integer.parseInt(((String) tokens[0]).substring(1)), false);
+
+		return changed;
+	}
+
+	/**
+	 * Removes the given product box from it's shelf slot.
+	 *
+	 * @param productBox product box to remove from it's shelf slot
+	 */
+	public static boolean removeProductFromShelfSlot(final ProductBox productBox) throws NoDatabaseLinkException
+	{
+		final Map<String, Object> where = new LinkedHashMap<String, Object>();
+		where.put("productbox", productBox.getBoxID());
+
+		boolean changed = (0 != (Integer) (runQuery(DatabaseQueryType.DELETE, DatabaseTable.SHELF_PRODUCTBOXES, null, null, null, where)));
+
+		final Object[] tokens = Shelf.tokenizeShelfSlotID(productBox.getShelfSlot());
+
+		// Update the cache.
+		if (changed)
+			getShelfByID(Integer.parseInt(((String) tokens[0]).substring(1)), false);
+
+		return changed;
+	}
+
+	/**
 	 * Loads data from database into memory.
 	 */
 	public static void loadData()
@@ -1508,17 +1586,12 @@ public class DatabaseController
 				{
 					if (loadedProductBoxes.containsKey(data[0]))
 					{
-						loadedShelves.get(shelfID).addToSlot(Shelf.coordinatesToShelfSlotID(shelfID, data[1], data[2]), loadedProductBoxes.get(data[0]));
+						loadedShelves.get(shelfID).addToSlot(Shelf.coordinatesToShelfSlotID(shelfID, data[1], data[2], true), loadedProductBoxes.get(data[0]));
 					}
 				}
 			}
 		}
 
 		System.out.println("[DatabaseController] Product boxes placed on shelves.");
-	}
-
-	public static String getRandomShelfSlot()
-	{
-		return "S1-1-0";
 	}
 }

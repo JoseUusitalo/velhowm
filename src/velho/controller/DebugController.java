@@ -31,7 +31,7 @@ public class DebugController
 	 * Creates and shows the debug window.
 	 *
 	 * @param stage
-	 *            the stage to run the window in
+	 * the stage to run the window in
 	 */
 	public void createDebugWindow(final Stage stage)
 	{
@@ -74,7 +74,7 @@ public class DebugController
 	 * The parameter for LogInButton is either false or true.
 	 *
 	 * @param visibility
-	 *            show log in button?
+	 * show log in button?
 	 */
 	public void setLogInButton(final boolean visibility)
 	{
@@ -85,7 +85,7 @@ public class DebugController
 	 * The parameter for LogInButton is either false or true.
 	 *
 	 * @param visibility
-	 *            show log in button?
+	 * show log in button?
 	 */
 	public void setLogOutButton(final boolean visibility)
 	{
@@ -109,7 +109,7 @@ public class DebugController
 	{
 
 		boolean s = ExternalSystemsController.move(0, null);
-		if (s = true)
+		if (s == true)
 		{
 			System.out.println("System registered changes");
 		}
@@ -121,13 +121,13 @@ public class DebugController
 
 	/**
 	 * moveResult what currently sends the message and informs the DebugWindow of current events.
-	 * 
+	 *
 	 * @param productCode
-	 *            is the code the the product identifies with.
+	 * is the code the the product identifies with.
 	 * @param shelfSlotCode
-	 *            is the code for the Shelf slot where the product resides in.
+	 * is the code for the Shelf slot where the product resides in.
 	 * @param success
-	 *            is actually a true that prints a message to the DebugWindow.
+	 * is actually a true that prints a message to the DebugWindow.
 	 */
 	public static void moveResult(final int productCode, final String shelfSlotCode, final boolean success)
 	{
