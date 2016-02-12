@@ -51,6 +51,16 @@ public class MainWindow extends Application
 	public static final boolean SHOW_WINDOWS = true;
 
 	/**
+	 * Print SQL Builder output?
+	 */
+	public static final boolean PRINT_SQL = true;
+
+	/**
+	 * Print messages about caching?
+	 */
+	public static final boolean PRINT_CACHE_MESSAGES = true;
+
+	/**
 	 * The height of the window.
 	 */
 	public static final double WINDOW_HEIGHT = 720;
@@ -109,6 +119,7 @@ public class MainWindow extends Application
 		try
 		{
 			DatabaseController.connectAndInitialize();
+			DatabaseController.loadData(false);
 
 			debugController = new DebugController();
 			userController = new UserController();
@@ -206,8 +217,6 @@ public class MainWindow extends Application
 	@Override
 	public void start(final Stage primaryStage)
 	{
-		DatabaseController.loadData();
-
 		if (!SHOW_WINDOWS && DEBUG_MODE)
 		{
 			System.out.println("Windows are disabled.");

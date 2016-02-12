@@ -107,14 +107,13 @@ DROP TABLE IF EXISTS `shelf_productboxes`;
 CREATE TABLE IF NOT EXISTS `shelf_productboxes`
 (
 	`shelf` INT UNSIGNED NOT NULL,
-	`productbox` INT UNSIGNED NOT NULL,
+	`productbox` INT UNSIGNED NOT NULL UNIQUE,
 	`shelflevel_index` INT UNSIGNED NOT NULL,
 	`shelfslot_index` INT UNSIGNED NOT NULL,
 	
 	PRIMARY KEY (`shelf`, `productbox`),
 	FOREIGN KEY (`shelf`) REFERENCES shelves(`shelf_id`),
 	FOREIGN KEY (`productbox`) REFERENCES containers(`container_id`),
-	CONSTRAINT `CONST_no_duplicate_boxes` UNIQUE (`shelf`,`productbox`,`shelflevel_index`,`shelfslot_index`)
 ) DEFAULT CHARSET=utf8;
 
 INSERT INTO `roles` SET `name`='Administrator';
@@ -144,48 +143,49 @@ INSERT INTO `products` SET `name`='Test Product #3', brand=1, category=2;
 INSERT INTO `products` SET `name`='Test Product #4', brand=1, category=2;
 INSERT INTO `products` SET `name`='Test Product #5', brand=1, category=2;
 INSERT INTO `products` SET `name`='Test Product #6', brand=2, category=1;
-INSERT INTO `products` SET `name`='Test Product #7', brand=2, category=2;
-INSERT INTO `products` SET `name`='Test Product #8', brand=2, category=3;
-INSERT INTO `products` SET `name`='Test Product #9', brand=3, category=3;
-INSERT INTO `products` SET `name`='Test Product #10', brand=3, category=3;
+INSERT INTO `products` SET `name`='Test Product #7', brand=2, category=1;
+INSERT INTO `products` SET `name`='Test Product #8', brand=2, category=1;
+INSERT INTO `products` SET `name`='Test Product #9', brand=3, category=1;
+INSERT INTO `products` SET `name`='Test Product #10', brand=3, category=1;
+INSERT INTO `products` SET `name`='Lonely Product #11', brand=2, category=4;
+INSERT INTO `products` SET `name`='Lonely Product #12', brand=2, category=4;
 
-
-/* Tiny Full Shelf: 1-4*/
+/* 1 - Tiny Full Shelf: 1-4*/
 INSERT INTO `containers` SET product=9, `max_size`=10, `product_count`=10;
 INSERT INTO `containers` SET product=1, `max_size`=10, `product_count`=10;
 INSERT INTO `containers` SET product=1, `max_size`=10, `product_count`=10;
 INSERT INTO `containers` SET product=3, `max_size`=10, `product_count`=10;
 INSERT INTO `shelves` SET `max_levels`=1, `max_shelfslots_per_level`=4, `max_productboxes_per_shelfslot`=1;
-INSERT INTO `shelf_productboxes` SET `shelf`=1, `productbox`=1, `shelflevel_index`=1, `shelfslot_index`=0;
-INSERT INTO `shelf_productboxes` SET `shelf`=1, `productbox`=2, `shelflevel_index`=1, `shelfslot_index`=1;
-INSERT INTO `shelf_productboxes` SET `shelf`=1, `productbox`=3, `shelflevel_index`=1, `shelfslot_index`=2;
-INSERT INTO `shelf_productboxes` SET `shelf`=1, `productbox`=4, `shelflevel_index`=1, `shelfslot_index`=3;
+INSERT INTO `shelf_productboxes` SET `shelf`=1, `productbox`=1, `shelflevel_index`=0, `shelfslot_index`=0;
+INSERT INTO `shelf_productboxes` SET `shelf`=1, `productbox`=2, `shelflevel_index`=0, `shelfslot_index`=1;
+INSERT INTO `shelf_productboxes` SET `shelf`=1, `productbox`=3, `shelflevel_index`=0, `shelfslot_index`=2;
+INSERT INTO `shelf_productboxes` SET `shelf`=1, `productbox`=4, `shelflevel_index`=0, `shelfslot_index`=3;
 
-/* Slot Full Shelf: 5-9 */
+/* 2 - Slot Full Shelf: 5-9 */
 INSERT INTO `containers` SET product=1, `max_size`=50, `product_count`=0;
 INSERT INTO `containers` SET product=3, `max_size`=50, `product_count`=5;
 INSERT INTO `containers` SET product=6, `max_size`=50, `product_count`=10;
 INSERT INTO `containers` SET product=6, `max_size`=50, `product_count`=25;
 INSERT INTO `containers` SET product=1, `max_size`=50, `product_count`=50;
 INSERT INTO `shelves` SET `max_levels`=2, `max_shelfslots_per_level`=20, `max_productboxes_per_shelfslot`=4;
-INSERT INTO `shelf_productboxes` SET `shelf`=2, `productbox`=5, `shelflevel_index`=1, `shelfslot_index`=0;
-INSERT INTO `shelf_productboxes` SET `shelf`=2, `productbox`=6, `shelflevel_index`=1, `shelfslot_index`=0;
-INSERT INTO `shelf_productboxes` SET `shelf`=2, `productbox`=7, `shelflevel_index`=1, `shelfslot_index`=0;
-INSERT INTO `shelf_productboxes` SET `shelf`=2, `productbox`=8, `shelflevel_index`=1, `shelfslot_index`=0;
-INSERT INTO `shelf_productboxes` SET `shelf`=2, `productbox`=9, `shelflevel_index`=2, `shelfslot_index`=19;
+INSERT INTO `shelf_productboxes` SET `shelf`=2, `productbox`=5, `shelflevel_index`=0, `shelfslot_index`=0;
+INSERT INTO `shelf_productboxes` SET `shelf`=2, `productbox`=6, `shelflevel_index`=0, `shelfslot_index`=0;
+INSERT INTO `shelf_productboxes` SET `shelf`=2, `productbox`=7, `shelflevel_index`=0, `shelfslot_index`=0;
+INSERT INTO `shelf_productboxes` SET `shelf`=2, `productbox`=8, `shelflevel_index`=0, `shelfslot_index`=0;
+INSERT INTO `shelf_productboxes` SET `shelf`=2, `productbox`=9, `shelflevel_index`=1, `shelfslot_index`=19;
 
-/* One Slot Level: 10-13*/
+/* 3 - One Slot Level: 10-13*/
 INSERT INTO `containers` SET product=1, `max_size`=20, `product_count`=20;
 INSERT INTO `containers` SET product=10, `max_size`=20, `product_count`=20;
 INSERT INTO `containers` SET product=10, `max_size`=30, `product_count`=20;
 INSERT INTO `containers` SET product=8, `max_size`=30, `product_count`=20;
 INSERT INTO `shelves` SET `max_levels`=3, `max_shelfslots_per_level`=1, `max_productboxes_per_shelfslot`=49;
-INSERT INTO `shelf_productboxes` SET `shelf`=3, `productbox`=10, `shelflevel_index`=3, `shelfslot_index`=0;
-INSERT INTO `shelf_productboxes` SET `shelf`=3, `productbox`=11, `shelflevel_index`=3, `shelfslot_index`=0;
-INSERT INTO `shelf_productboxes` SET `shelf`=3, `productbox`=12, `shelflevel_index`=3, `shelfslot_index`=0;
-INSERT INTO `shelf_productboxes` SET `shelf`=3, `productbox`=13, `shelflevel_index`=3, `shelfslot_index`=0;
+INSERT INTO `shelf_productboxes` SET `shelf`=3, `productbox`=10, `shelflevel_index`=2, `shelfslot_index`=0;
+INSERT INTO `shelf_productboxes` SET `shelf`=3, `productbox`=11, `shelflevel_index`=2, `shelfslot_index`=0;
+INSERT INTO `shelf_productboxes` SET `shelf`=3, `productbox`=12, `shelflevel_index`=2, `shelfslot_index`=0;
+INSERT INTO `shelf_productboxes` SET `shelf`=3, `productbox`=13, `shelflevel_index`=2, `shelfslot_index`=0;
 
-/* Many Slot Level: 14-20*/
+/* 4 - Many Slot Level: 14-20*/
 INSERT INTO `containers` SET product=1, `max_size`=10, `product_count`=5;
 INSERT INTO `containers` SET product=9, `max_size`=10, `product_count`=5;
 INSERT INTO `containers` SET product=3, `max_size`=10, `product_count`=5;
@@ -194,48 +194,18 @@ INSERT INTO `containers` SET product=5, `max_size`=10, `product_count`=5;
 INSERT INTO `containers` SET product=6, `max_size`=10, `product_count`=5;
 INSERT INTO `containers` SET product=7, `max_size`=10, `product_count`=5;
 INSERT INTO `shelves` SET `max_levels`=2, `max_shelfslots_per_level`=50, `max_productboxes_per_shelfslot`=1;
-INSERT INTO `shelf_productboxes` SET `shelf`=4, `productbox`=14, `shelflevel_index`=1, `shelfslot_index`=32;
-INSERT INTO `shelf_productboxes` SET `shelf`=4, `productbox`=15, `shelflevel_index`=1, `shelfslot_index`=3;
-INSERT INTO `shelf_productboxes` SET `shelf`=4, `productbox`=16, `shelflevel_index`=1, `shelfslot_index`=5;
-INSERT INTO `shelf_productboxes` SET `shelf`=4, `productbox`=17, `shelflevel_index`=1, `shelfslot_index`=28;
-INSERT INTO `shelf_productboxes` SET `shelf`=4, `productbox`=18, `shelflevel_index`=1, `shelfslot_index`=44;
-INSERT INTO `shelf_productboxes` SET `shelf`=4, `productbox`=19, `shelflevel_index`=1, `shelfslot_index`=0;
-INSERT INTO `shelf_productboxes` SET `shelf`=4, `productbox`=20, `shelflevel_index`=1, `shelfslot_index`=49;
+INSERT INTO `shelf_productboxes` SET `shelf`=4, `productbox`=14, `shelflevel_index`=0, `shelfslot_index`=32;
+INSERT INTO `shelf_productboxes` SET `shelf`=4, `productbox`=15, `shelflevel_index`=0, `shelfslot_index`=3;
+INSERT INTO `shelf_productboxes` SET `shelf`=4, `productbox`=16, `shelflevel_index`=0, `shelfslot_index`=5;
+INSERT INTO `shelf_productboxes` SET `shelf`=4, `productbox`=17, `shelflevel_index`=0, `shelfslot_index`=28;
+INSERT INTO `shelf_productboxes` SET `shelf`=4, `productbox`=18, `shelflevel_index`=0, `shelfslot_index`=44;
+INSERT INTO `shelf_productboxes` SET `shelf`=4, `productbox`=19, `shelflevel_index`=0, `shelfslot_index`=0;
+INSERT INTO `shelf_productboxes` SET `shelf`=4, `productbox`=20, `shelflevel_index`=0, `shelfslot_index`=49;
 
-/*
-DROP TABLE IF EXISTS `shelfslots`;
-CREATE TABLE IF NOT EXISTS `shelfslots`
-(
-	`shelfslot_db_id` INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
-	`productboxes_max` INT UNSIGNED NOT NULL,
-) DEFAULT CHARSET=utf8;
+/* 5 - Empty Shelf 2-slot */
+INSERT INTO `shelves` SET `max_levels`=1, `max_shelfslots_per_level`=2, `max_productboxes_per_shelfslot`=1;
 
-DROP TABLE IF EXISTS `shelflevels`;
-CREATE TABLE IF NOT EXISTS `shelflevels`
-(
-	`shelflevel_id` INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
-	`shelfslots_max` INT UNSIGNED NOT NULL,
-) DEFAULT CHARSET=utf8;
-
-DROP TABLE IF EXISTS `shelf_shelflevels`;
-CREATE TABLE IF NOT EXISTS `shelf_shelflevels`
-(
-	`shelf` INT UNSIGNED NOT NULL,
-	`shelflevel` INT UNSIGNED NOT NULL,
-	
-	PRIMARY KEY (`shelf`, `shelflevel`),
-	FOREIGN KEY (`shelf`) REFERENCES shelves(`shelf_id`),
-	FOREIGN KEY (`shelflevel`) REFERENCES shelflevels(`shelflevel_id`)
-) DEFAULT CHARSET=utf8;
-
-DROP TABLE IF EXISTS `shelflevel_shelfslots`;
-CREATE TABLE IF NOT EXISTS `shelflevel_shelfslots`
-(
-	`shelflevel` INT UNSIGNED NOT NULL,
-	`shelfslot` INT UNSIGNED NOT NULL,
-	
-	PRIMARY KEY (`shelflevel`, `shelfslot`),
-	FOREIGN KEY (`shelflevel`) REFERENCES shelflevels(`shelflevel_id`),
-	FOREIGN KEY (`shelfslot`) REFERENCES shelfslots(`shelfslot_db_id`)
-) DEFAULT CHARSET=utf8;
-*/
+/* Lonely Containers 21-23*/
+INSERT INTO `containers` SET product=11, `max_size`=2, `product_count`=2;
+INSERT INTO `containers` SET product=12, `max_size`=2, `product_count`=2;
+INSERT INTO `containers` SET product=1, `max_size`=1, `product_count`=0;
