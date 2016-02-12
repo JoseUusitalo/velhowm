@@ -34,10 +34,8 @@ public class ShelfTest
 	private static Shelf shelf_FREE_LVL_2;
 	private static final int SHELF_FREE_LVL_2_ID = 4;
 	private static final int SHELF_FREE_LVL_2_ID_LEVELS = 2;
-
 	private static Shelf emptyShelf_1_0_to_1_1;
 	private static final int EMPTYSHELF_1_0_to_1_1_ID = 5;
-
 	private static Shelf fullShelf_LVL_1_SLTIDX_0;
 	private static final int FULLSHELF_LVL_1_SLTIDX_0_ID = 1;
 

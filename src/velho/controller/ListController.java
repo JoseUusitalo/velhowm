@@ -1,5 +1,6 @@
 package velho.controller;
 
+import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -82,88 +83,53 @@ public class ListController
 	 * @param products a string of product names or IDs (one per line)
 	 * @return
 	 */
-	public Map<String, Integer> searchByProductList(final String products)
+	public Map<Integer, Integer> searchByProductList(final String products)
 	{
 		String[] productStringLines = products.split("\n");
-		Map<String, Integer> productData = new LinkedHashMap<String, Integer>();
+		Map<Integer, Integer> productID_BoxSize = new LinkedHashMap<Integer, Integer>();
+		Integer productID = -1;
+		Object[] countName = null;
 
 		// Convert lines to a map.
 		for (final String line : productStringLines)
 		{
-			// Count first, then product.
-			String[] possibleProductAndCount = line.split(":");
-			int count = 1;
-			String productString = null;
+			countName = parseProductLine(line);
 
-			if (possibleProductAndCount.length == 1)
+			if (!((String) countName[1]).isEmpty())
 			{
-				// Example: 'Product A'
-				productString = possibleProductAndCount[0].trim();
-			}
-			else if (possibleProductAndCount.length == 2)
-			{
-				// Example: '15: Product B'
-				// Example: 'Product C: Long Name'
+				// Convert all names to IDs for easier processing.
 				try
 				{
-					count = Integer.valueOf(possibleProductAndCount[0].trim());
-					productString = possibleProductAndCount[1].trim();
+					productID = Integer.parseInt((String) countName[1]);
 				}
 				catch (NumberFormatException e)
 				{
-					// Count remains 1.
-					productString = (possibleProductAndCount[0] + ":" + possibleProductAndCount[1]).trim();
-				}
-			}
-			else
-			{
-				// Example: '90: Product C: The Better Version'
-				// Example: 'Product D: Cool 'n Stuff: Too Many Colons Version'
-				int start = 0;
-				try
-				{
-					count = Integer.valueOf(possibleProductAndCount[0].trim());
-					start = 1;
-				}
-				catch (NumberFormatException e)
-				{
-					// Count remains 1.
-				}
-
-				// Rebuild the product string.
-				StringBuffer sb = new StringBuffer();
-				int length = possibleProductAndCount.length;
-
-				for (int i = start; i < length; i++)
-				{
-					if (start == 1 && i == 1)
+					try
 					{
-						// Left trim spaces because the first element was a number.
-						sb.append(possibleProductAndCount[i].replaceAll("^\\s+", ""));
+						productID = DatabaseController.getProductIDFromName((String) countName[1]);
 					}
-					else
-						sb.append(possibleProductAndCount[i]);
-
-					if (i < length - 1)
-						sb.append(":");
+					catch (NoDatabaseLinkException e1)
+					{
+						DatabaseController.tryReLink();
+					}
 				}
-				productString = sb.toString();
-			}
 
-			if (!productString.isEmpty())
-			{
 				// If the product already exists, add the new count to the previous count.
-				if (productData.containsKey(productString))
-					productData.put(productString, productData.get(productString) + count);
+				if (productID_BoxSize.containsKey(productID))
+				{
+					productID_BoxSize.put(productID, productID_BoxSize.get(productID) + ((int) countName[0]));
+				}
 				else
-					productData.put(productString, count);
+				{
+					productID_BoxSize.put(productID, (int) countName[0]);
+				}
 			}
 		}
 
 		// Search the database for the products.
 		try
 		{
-			DatabaseController.searchProduct_BoxShelfSlots(productData);
+			DatabaseController.searchProduct_BoxShelfSlots(productID_BoxSize);
 		}
 		catch (NoDatabaseLinkException e)
 		{
@@ -171,6 +137,81 @@ public class ListController
 		}
 
 		// Return the data for unit testing.
-		return productData;
+		return productID_BoxSize;
+	}
+
+	/**
+	 * Parses a line of product information in the format:
+	 * <p>
+	 * <code>&lt;an integer&gt; : &lt;product ID or name&gt;</code>
+	 * </p>
+	 * @param line String to parse
+	 * @return an object array where the first element is the integer and the second element is the product name
+	 */
+	public static Object[] parseProductLine(final String line)
+	{
+		Object[] countName = new Object[2];
+		countName[0] = 1;
+
+		// Count first, then product string.
+		String[] possibleProductAndCount = line.split(":");
+
+		if (possibleProductAndCount.length == 1)
+		{
+			// Example: 'Product A'
+			countName[1] = possibleProductAndCount[0].trim();
+		}
+		else if (possibleProductAndCount.length == 2)
+		{
+			// Example: '15: Product B'
+			// Example: 'Product C: Long Name'
+			try
+			{
+				countName[0] = Integer.valueOf(possibleProductAndCount[0].trim());
+				countName[1] = possibleProductAndCount[1].trim();
+			}
+			catch (NumberFormatException e)
+			{
+				// Count remains 1.
+				countName[1] = (possibleProductAndCount[0] + ":" + possibleProductAndCount[1]).trim();
+			}
+		}
+		else
+		{
+			// Example: '90: Product C: The Better Version'
+			// Example: 'Product D: Cool 'n Stuff: Too Many Colons Version'
+			int start = 0;
+			try
+			{
+				countName[0] = Integer.valueOf(possibleProductAndCount[0].trim());
+				start = 1;
+			}
+			catch (NumberFormatException e)
+			{
+				// Count remains 1.
+			}
+
+			// Rebuild the product string.
+			StringBuffer sb = new StringBuffer();
+			int length = possibleProductAndCount.length;
+
+			for (int i = start; i < length; i++)
+			{
+				if (start == 1 && i == 1)
+				{
+					// Left trim spaces because the first element was a number.
+					sb.append(possibleProductAndCount[i].replaceAll("^\\s+", ""));
+				}
+				else
+					sb.append(possibleProductAndCount[i]);
+
+				if (i < length - 1)
+					sb.append(":");
+			}
+			countName[1] = sb.toString();
+		}
+		System.out.println("GOT++++++++++++" + Arrays.asList(countName));
+
+		return countName;
 	}
 }

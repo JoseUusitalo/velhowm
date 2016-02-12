@@ -1,7 +1,9 @@
 package test.controller;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
+import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -19,12 +21,14 @@ import velho.model.exceptions.NoDatabaseLinkException;
  *
  * @author Jose Uusitalo
  */
+
+@SuppressWarnings("static-method")
 public class ListControllerTest
 {
-	private static final String PRODUCT_1 = "Product 1";
-	private static final String PRODUCT_2 = "Product 2";
-	private static final String PRODUCT_3 = "Product 3";
-	private static final String PRODUCT_4 = "Product 4";
+	private static final Integer PRODUCT_1 = new Integer(1);
+	private static final Integer PRODUCT_2 = new Integer(2);
+	private static final Integer PRODUCT_3 = new Integer(3);
+	private static final Integer PRODUCT_4 = new Integer(4);
 	private static final String PRODUCT_TWO_COLONS = "A Very Long Product Name: With Two: Colons";
 	private static final String PRODUCT_WITH_COLON = "Product Name: With a Single Colon";
 
@@ -46,7 +50,7 @@ public class ListControllerTest
 	@Test
 	public final void testSearchByProductList() throws NoDatabaseLinkException
 	{
-		final Map<String, Integer> expected = new LinkedHashMap<String, Integer>();
+		final Map<Integer, Integer> expected = new LinkedHashMap<Integer, Integer>();
 		expected.put(PRODUCT_1, 1);
 		expected.put(PRODUCT_2, 2);
 		expected.put(PRODUCT_3, 3);
@@ -58,7 +62,7 @@ public class ListControllerTest
 							+ PRODUCT_4 + "\n";
 		// @formatter:on
 
-		final Map<String, Integer> actual = listController.searchByProductList(string);
+		final Map<Integer, Integer> actual = listController.searchByProductList(string);
 		DatabaseController.unlink();
 
 		assertEquals(expected, actual);
@@ -67,7 +71,7 @@ public class ListControllerTest
 	@Test
 	public final void testSearchByProductList_Duplicates() throws NoDatabaseLinkException
 	{
-		final Map<String, Integer> expected = new LinkedHashMap<String, Integer>();
+		final Map<Integer, Integer> expected = new LinkedHashMap<Integer, Integer>();
 		expected.put(PRODUCT_1, 8);
 		expected.put(PRODUCT_2, 2);
 		// @formatter:off
@@ -76,7 +80,7 @@ public class ListControllerTest
 							+ "3: " + PRODUCT_1 + "\n"
 							+ "4: " + PRODUCT_1 + "\n";
 		// @formatter:on
-		final Map<String, Integer> actual = listController.searchByProductList(string);
+		final Map<Integer, Integer> actual = listController.searchByProductList(string);
 		DatabaseController.unlink();
 
 		assertEquals(expected, actual);
@@ -85,7 +89,7 @@ public class ListControllerTest
 	@Test
 	public final void testSearchByProductList_Duplicates_Spaces() throws NoDatabaseLinkException
 	{
-		final Map<String, Integer> expected = new LinkedHashMap<String, Integer>();
+		final Map<Integer, Integer> expected = new LinkedHashMap<Integer, Integer>();
 		expected.put(PRODUCT_1, 8);
 		expected.put(PRODUCT_2, 2);
 		// @formatter:off
@@ -94,7 +98,7 @@ public class ListControllerTest
 							+ "    3: " + PRODUCT_1 + "\n"
 							+ "   4   : " + PRODUCT_1 + "\n";
 		// @formatter:on
-		final Map<String, Integer> actual = listController.searchByProductList(string);
+		final Map<Integer, Integer> actual = listController.searchByProductList(string);
 		DatabaseController.unlink();
 
 		assertEquals(expected, actual);
@@ -103,7 +107,7 @@ public class ListControllerTest
 	@Test
 	public final void testSearchByProductList_Nulls() throws NoDatabaseLinkException
 	{
-		final Map<String, Integer> expected = new LinkedHashMap<String, Integer>();
+		final Map<Integer, Integer> expected = new LinkedHashMap<Integer, Integer>();
 		expected.put(PRODUCT_1, 1);
 		expected.put(PRODUCT_2, 1);
 		// @formatter:off
@@ -113,7 +117,7 @@ public class ListControllerTest
 							+ "\n"
 							+ PRODUCT_2;
 		// @formatter:on
-		final Map<String, Integer> actual = listController.searchByProductList(string);
+		final Map<Integer, Integer> actual = listController.searchByProductList(string);
 		DatabaseController.unlink();
 
 		assertEquals(expected, actual);
@@ -122,7 +126,7 @@ public class ListControllerTest
 	@Test
 	public final void testSearchByProductList_Spaces() throws NoDatabaseLinkException
 	{
-		final Map<String, Integer> expected = new LinkedHashMap<String, Integer>();
+		final Map<Integer, Integer> expected = new LinkedHashMap<Integer, Integer>();
 		expected.put(PRODUCT_1, 1);
 		expected.put(PRODUCT_2, 1);
 		// @formatter:off
@@ -132,7 +136,7 @@ public class ListControllerTest
 							+ " \n"
 							+ PRODUCT_2;
 		// @formatter:on
-		final Map<String, Integer> actual = listController.searchByProductList(string);
+		final Map<Integer, Integer> actual = listController.searchByProductList(string);
 		DatabaseController.unlink();
 
 		assertEquals(expected, actual);
@@ -141,7 +145,7 @@ public class ListControllerTest
 	@Test
 	public final void testSearchByProductList_Spaces2() throws NoDatabaseLinkException
 	{
-		final Map<String, Integer> expected = new LinkedHashMap<String, Integer>();
+		final Map<Integer, Integer> expected = new LinkedHashMap<Integer, Integer>();
 		expected.put(PRODUCT_1, 1);
 		expected.put(PRODUCT_2, 1);
 		// @formatter:off
@@ -152,7 +156,7 @@ public class ListControllerTest
 							+ PRODUCT_2;
 		// @formatter:on
 
-		final Map<String, Integer> actual = listController.searchByProductList(string);
+		final Map<Integer, Integer> actual = listController.searchByProductList(string);
 		DatabaseController.unlink();
 
 		assertEquals(expected, actual);
@@ -161,7 +165,7 @@ public class ListControllerTest
 	@Test
 	public final void testSearchByProductList_Spaces3() throws NoDatabaseLinkException
 	{
-		final Map<String, Integer> expected = new LinkedHashMap<String, Integer>();
+		final Map<Integer, Integer> expected = new LinkedHashMap<Integer, Integer>();
 		expected.put(PRODUCT_1, 10);
 		expected.put(PRODUCT_2, 2);
 		// @formatter:off
@@ -171,30 +175,55 @@ public class ListControllerTest
 							+ "         12:        \n"
 							+ "2: " + PRODUCT_2 + "           ";
 		// @formatter:on
+		final Map<Integer, Integer> actual = listController.searchByProductList(string);
 
-		final Map<String, Integer> actual = listController.searchByProductList(string);
 		DatabaseController.unlink();
 
 		assertEquals(expected, actual);
 	}
 
 	@Test
-	public final void testSearchByProductList_NameWithColon() throws NoDatabaseLinkException
+	public final void testParse_NameWithColon() throws NoDatabaseLinkException
 	{
-		final Map<String, Integer> expected = new LinkedHashMap<String, Integer>();
-		expected.put("Product: A Colon!", 1);
-		expected.put(PRODUCT_WITH_COLON, 10);
-		expected.put(PRODUCT_TWO_COLONS, 1);
+		final Object[] expected = new Object[2];
+		expected[0] = 1;
+		expected[1] = "Product: A Colon!";
 
-		// @formatter:off
-		final String string = "Product: A Colon!" + "\n"
-							+ "10: " + PRODUCT_WITH_COLON + "\n"
-							+ PRODUCT_TWO_COLONS + "\n";
-		// @formatter:on
-
-		final Map<String, Integer> actual = listController.searchByProductList(string);
+		final Object[] actual = ListController.parseProductLine("Product: A Colon!    ");
 		DatabaseController.unlink();
 
-		assertEquals(expected, actual);
+		System.out.println("Expected:\t" + Arrays.asList(expected));
+		System.out.println("Actual:\t\t" + Arrays.asList(actual));
+		assertTrue(Arrays.equals(expected, actual));
+	}
+
+	@Test
+	public final void testParse_NameWithColon2() throws NoDatabaseLinkException
+	{
+		final Object[] expected = new Object[2];
+		expected[0] = 10;
+		expected[1] = PRODUCT_WITH_COLON;
+
+		final Object[] actual = ListController.parseProductLine("   10   :   " + PRODUCT_WITH_COLON);
+		DatabaseController.unlink();
+
+		System.out.println("Expected:\t" + Arrays.asList(expected));
+		System.out.println("Actual:\t\t" + Arrays.asList(actual));
+		assertTrue(Arrays.equals(expected, actual));
+	}
+
+	@Test
+	public final void testParse_NameWithColon3() throws NoDatabaseLinkException
+	{
+		final Object[] expected = new Object[2];
+		expected[0] = 1;
+		expected[1] = PRODUCT_TWO_COLONS;
+
+		final Object[] actual = ListController.parseProductLine("     " + PRODUCT_TWO_COLONS);
+		DatabaseController.unlink();
+
+		System.out.println("Expected:\t" + Arrays.asList(expected));
+		System.out.println("Actual:\t\t" + Arrays.asList(actual));
+		assertTrue(Arrays.equals(expected, actual));
 	}
 }

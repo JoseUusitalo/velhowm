@@ -50,37 +50,26 @@ CREATE TABLE IF NOT EXISTS `products`
 (
 	`product_id` INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
 	`name` VARCHAR(128) NOT NULL,
-	`expiration_date` DATE NULL,
 	`brand` VARCHAR(128) NOT NULL,
 	`category` VARCHAR(128) NOT NULL,
 	`popularity` INT DEFAULT -1,
 	
 	FOREIGN KEY (`brand`) REFERENCES brands(`brand_id`),
 	FOREIGN KEY (`category`) REFERENCES categories(`category_id`),
-	CONSTRAINT `CONST_unique_products` UNIQUE (`expiration_date`,`name`,`brand`,`category`)
+	CONSTRAINT `CONST_unique_products` UNIQUE (`name`,`brand`,`category`)
 ) DEFAULT CHARSET=utf8;
 
 DROP TABLE IF EXISTS `containers`;
 CREATE TABLE IF NOT EXISTS `containers`
 (
 	`container_id` INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+	`expiration_date` DATE NULL,
 	`product` INT UNSIGNED NOT NULL,
 	`max_size` INT NOT NULL,
 	`product_count` INT UNSIGNED NOT NULL DEFAULT 0,
 	
 	FOREIGN KEY (`product`) REFERENCES products(`product_id`),
 	CHECK (`max_size`>0)
-) DEFAULT CHARSET=utf8;
-
-DROP TABLE IF EXISTS `productbox_products`;
-CREATE TABLE IF NOT EXISTS `productbox_products`
-(
-	`productbox` INT UNSIGNED NOT NULL,
-	`product` INT UNSIGNED NOT NULL,
-	
-	FOREIGN KEY (`productbox`) REFERENCES containers(`container_id`),
-	FOREIGN KEY (`product`) REFERENCES products(`product_id`),
-	PRIMARY KEY (`productbox`,`product`)
 ) DEFAULT CHARSET=utf8;
 
 DROP TABLE IF EXISTS `freezer_products`;

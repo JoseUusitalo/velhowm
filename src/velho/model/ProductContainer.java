@@ -1,10 +1,17 @@
 package velho.model;
 
+import java.util.Date;
+
 /**
  * @author Joona &amp; Jose Uusitalo
  */
 public abstract class ProductContainer
 {
+	/**
+	 * The expiration date of the product.
+	 */
+	private Date expirationDate;
+
 	/**
 	 * The maximum size of the product box.
 	 */
@@ -27,12 +34,20 @@ public abstract class ProductContainer
 	 */
 	protected String shelfSlot;
 
-	public ProductContainer(final int boxID, final int maxSize, final Product product, final int productCount)
+	/**
+	 * @param boxID
+	 * @param expirationDate
+	 * @param maxSize
+	 * @param product
+	 * @param productCount
+	 */
+	public ProductContainer(final int boxID, final Date expirationDate, final int maxSize, final Product product, final int productCount)
 	{
 		if (maxSize < 1 || maxSize < productCount)
 		{
 			throw new IllegalArgumentException();
 		}
+		this.expirationDate = expirationDate;
 		this.maxSize = maxSize;
 		this.databaseID = boxID;
 		this.product = product;
@@ -144,5 +159,15 @@ public abstract class ProductContainer
 	public void setShelfSlot(final String shelfSlot)
 	{
 		this.shelfSlot = shelfSlot;
+	}
+
+	/**
+	 * Gets the expiration date of the products in this product container.
+	 *
+	 * @return the expiration date of this container
+	 */
+	public Date getExpirationDate()
+	{
+		return expirationDate;
 	}
 }
