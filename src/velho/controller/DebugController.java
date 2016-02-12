@@ -108,7 +108,7 @@ public class DebugController
 	public static void resultMessage()
 	{
 
-		boolean s = ExternalSystemsController.move(0, null);
+		boolean s = ExternalSystemsController.move(0, null, true);
 		if (s == true)
 		{
 			System.out.println("System registered changes");

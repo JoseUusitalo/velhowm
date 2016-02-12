@@ -85,7 +85,7 @@ public class BarcodeScanner
 		System.out.println("random product " + list.get(0));
 		System.out.println("random shelf slot " + shelf);
 
-		if (ExternalSystemsController.move(list.get(0), shelf))
+		if (ExternalSystemsController.move(list.get(0), shelf, true))
 		{
 			System.out.println("Success");
 			return true;
