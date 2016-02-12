@@ -1226,6 +1226,7 @@ public class DatabaseController
 		List<String> where = null;
 		Integer wantedProductCount = null;
 		List<ProductBox> boxes = null;
+		boolean searchByName = false;
 
 		// For every unique string representing a product.
 		for (final String productString : productData.keySet())
@@ -1247,10 +1248,10 @@ public class DatabaseController
 			}
 			catch (NumberFormatException e)
 			{
-				// FIXME: Fix SQL error.
 				// Else search by name.
 				where.add("products.name = '" + productString + "'");
 				where.add("containers.product_count = " + productData.get(productString));
+				searchByName = true;
 
 				boxes = getProductBoxesByProductName(where);
 			}
@@ -1264,7 +1265,10 @@ public class DatabaseController
 				// Remove the product count condition and find all product boxes with the wanted product ID.
 				where.remove(1);
 
-				boxes = getBoxesContainingAtLeastProducts(getProductBoxesByProductID(where), wantedProductCount);
+				if (searchByName)
+					boxes = getBoxesContainingAtLeastProducts(getProductBoxesByProductName(where), wantedProductCount);
+				else
+					boxes = getBoxesContainingAtLeastProducts(getProductBoxesByProductID(where), wantedProductCount);
 			}
 			else if (boxes.size() > 1)
 			{
@@ -1281,6 +1285,7 @@ public class DatabaseController
 		foundProducts.removeAll(Collections.singleton(null));
 
 		System.out.println("Updating product box search results.");
+		System.out.println(foundProducts);
 		productSearchResultViewList.clear();
 		productSearchResultViewList.addAll(foundProducts);
 	}
