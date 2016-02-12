@@ -1094,6 +1094,7 @@ public class DatabaseController
 	 * @return the corresponding product object
 	 * @throws NoDatabaseLinkException
 	 */
+	@SuppressWarnings("unused")
 	private static List<ProductBox> getProductBoxesByProductName(final List<String> where) throws NoDatabaseLinkException
 	{
 		final String[] columns = { "containers.container_id" };
@@ -1159,6 +1160,28 @@ public class DatabaseController
 	}
 
 	/**
+	 * Gets the product ID by its name.
+	 *
+	 * @param name unique name of the product
+	 * @return the database ID of the product or <code>-1</code> if the product is not present in the database
+	 */
+	public static int getProductIDFromName(final String name) throws NoDatabaseLinkException
+	{
+		final String[] columns = { "product_id" };
+		List<String> where = new ArrayList<String>();
+		where.add("name = '" + name + "'");
+
+		@SuppressWarnings("unchecked")
+		Set<Integer> result = (LinkedHashSet<Integer>) (runQuery(DatabaseQueryType.SELECT, DatabaseTable.PRODUCTS, null, columns, null, where));
+
+		if (result.size() == 0)
+			return -1;
+
+		// Only one result as names are unique.
+		return result.iterator().next();
+	}
+
+	/**
 	 * Gets a list product codes in the database.
 	 *
 	 * @return a list of integer product codes
@@ -1219,42 +1242,28 @@ public class DatabaseController
 		return userViewList;
 	}
 
-	public static void searchProduct_BoxShelfSlots(final Map<String, Integer> productData) throws NoDatabaseLinkException
+	public static void searchProduct_BoxShelfSlots(final Map<Integer, Integer> productData) throws NoDatabaseLinkException
 	{
 		List<ProductBoxSearchResultRow> foundProducts = FXCollections.observableArrayList();
 
 		List<String> where = null;
 		Integer wantedProductCount = null;
 		List<ProductBox> boxes = null;
-		boolean searchByName = false;
 
 		// For every unique string representing a product.
-		for (final String productString : productData.keySet())
+		for (Integer productID : productData.keySet())
 		{
 			boxes = new ArrayList<ProductBox>();
 			where = new ArrayList<String>();
-			wantedProductCount = productData.get(productString);
+			wantedProductCount = productData.get(productID);
 
-			// Determine if the string representing the product is a product ID.
-			try
-			{
-				System.out.println("Looking for " + productString + " of size " + wantedProductCount);
-				where.add("product = " + Integer.parseInt(productString));
+			System.out.println("Looking for [" + productID + "] of size " + wantedProductCount);
+			where.add("product = " + productID);
 
-				// First look for an exact amount.
-				where.add("product_count = " + wantedProductCount);
+			// First look for an exact amount.
+			where.add("product_count = " + wantedProductCount);
 
-				boxes = getProductBoxesByProductID(where);
-			}
-			catch (NumberFormatException e)
-			{
-				// Else search by name.
-				where.add("products.name = '" + productString + "'");
-				where.add("containers.product_count = " + productData.get(productString));
-				searchByName = true;
-
-				boxes = getProductBoxesByProductName(where);
-			}
+			boxes = getProductBoxesByProductID(where);
 
 			// Couldn't find a box with exactly the number of products wanted.
 			if (boxes.isEmpty())
@@ -1264,17 +1273,15 @@ public class DatabaseController
 
 				// Remove the product count condition and find all product boxes with the wanted product ID.
 				where.remove(1);
-
-				if (searchByName)
-					boxes = getBoxesContainingAtLeastProducts(getProductBoxesByProductName(where), wantedProductCount);
-				else
-					boxes = getBoxesContainingAtLeastProducts(getProductBoxesByProductID(where), wantedProductCount);
+				boxes = getBoxesContainingAtLeastProducts(getProductBoxesByProductID(where), wantedProductCount);
 			}
 			else if (boxes.size() > 1)
 			{
 				// If found multiple boxes with the exact size, select one that will expire the soonest.
+				final ProductBox oldest = getOldestProductBox(boxes);
+
 				boxes.clear();
-				boxes.add(getOldestProductBox(boxes));
+				boxes.add(oldest);
 			}
 
 			for (final ProductBox box : boxes)
@@ -1285,7 +1292,6 @@ public class DatabaseController
 		foundProducts.removeAll(Collections.singleton(null));
 
 		System.out.println("Updating product box search results.");
-		System.out.println(foundProducts);
 		productSearchResultViewList.clear();
 		productSearchResultViewList.addAll(foundProducts);
 	}
@@ -1298,6 +1304,7 @@ public class DatabaseController
 	 */
 	private static ProductBox getOldestProductBox(final List<ProductBox> boxes)
 	{
+		System.out.println("+++got boxes " + boxes);
 		ProductBox oldest = boxes.get(0);
 
 		for (final ProductBox box : boxes)
