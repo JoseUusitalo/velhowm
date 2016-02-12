@@ -28,7 +28,6 @@ import velho.controller.DatabaseController;
 import velho.controller.DebugController;
 import velho.controller.ListController;
 import velho.controller.LoginController;
-import velho.controller.PopupController;
 import velho.controller.UIController;
 import velho.controller.UserController;
 import velho.model.exceptions.ExistingDatabaseLinkException;
@@ -132,10 +131,9 @@ public class MainWindow extends Application
 			}
 			else
 			{
-				// FIXME: Creation always fails.
-				PopupController.error("Database creation failed. Please restart the program.");
+				System.out.println("Closing application.");
+				System.exit(0);
 			}
-
 		}
 		catch (ClassNotFoundException | ExistingDatabaseLinkException | NoDatabaseLinkException e1)
 		{
@@ -164,7 +162,7 @@ public class MainWindow extends Application
 		if (mainTabPane == null)
 			showMainMenu();
 
-		Tab tab = new Tab();
+		final Tab tab = new Tab();
 		tab.setText(tabName);
 		tab.setContent(view);
 		mainTabPane.getTabs().add(tab);
@@ -184,7 +182,7 @@ public class MainWindow extends Application
 		// Force log in to see main menu.
 		if (LoginController.checkLogin())
 		{
-			HBox statusBar = new HBox();
+			final HBox statusBar = new HBox();
 			statusBar.setAlignment(Pos.CENTER_RIGHT);
 			statusBar.setPadding(new Insets(4.0));
 
@@ -194,10 +192,10 @@ public class MainWindow extends Application
 					new BorderStroke(Paint.valueOf("b5b5b5"), Paint.valueOf(Color.TRANSPARENT.toString()), Paint.valueOf(Color.TRANSPARENT.toString()),
 							Paint.valueOf(Color.TRANSPARENT.toString()), BorderStrokeStyle.SOLID, null, null, null, null, null, null)));
 
-			HBox userBar = new HBox(10);
+			final HBox userBar = new HBox(10);
 
-			Label userName = new Label("Hello, " + LoginController.getCurrentUser().getRoleName() + " " + LoginController.getCurrentUser().getFullName());
-			Button logoutButton = new Button("Log Out");
+			final Label userName = new Label("Hello, " + LoginController.getCurrentUser().getRoleName() + " " + LoginController.getCurrentUser().getFullName());
+			final Button logoutButton = new Button("Log Out");
 			logoutButton.setPrefHeight(5.0);
 
 			logoutButton.setOnAction(new EventHandler<ActionEvent>()
@@ -232,7 +230,7 @@ public class MainWindow extends Application
 		else
 		{
 			primaryStage.setTitle("Velho Warehouse Management");
-			Group root = new Group();
+			final Group root = new Group();
 			scene = new Scene(root, WINDOW_WIDTH, WINDOW_HEIGHT, Color.WHITE);
 			rootBorderPane = new BorderPane();
 			rootBorderPane.prefHeightProperty().bind(scene.heightProperty());
@@ -263,11 +261,13 @@ public class MainWindow extends Application
 
 			primaryStage.setOnCloseRequest(new EventHandler<WindowEvent>()
 			{
+
 				@Override
 				public void handle(final WindowEvent event)
 				{
 					shutdown(primaryStage);
 				}
+
 			});
 		}
 	}
@@ -291,7 +291,7 @@ public class MainWindow extends Application
 		{
 			DatabaseController.unlink();
 		}
-		catch (NoDatabaseLinkException e)
+		catch (final NoDatabaseLinkException e)
 		{
 			// Ignore.
 		}
