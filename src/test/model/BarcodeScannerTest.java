@@ -1,14 +1,13 @@
 package test.model;
 
-import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
 import velho.controller.DatabaseController;
-import velho.model.BarcodeScanner;
 import velho.model.exceptions.ExistingDatabaseLinkException;
 import velho.model.exceptions.NoDatabaseLinkException;
 
@@ -33,17 +32,8 @@ public class BarcodeScannerTest
 	}
 
 	@Test
-	public void testMoveValidProduct()
-	{
-		assertTrue(BarcodeScanner.scannerMoveValid());
-
-	}
-
-	@Test
 	public void generateProductList()
 	{
-		int numbers = BarcodeScanner.generateProductList();
-		assertNotNull(numbers);
-		return;
+		fail("Not yet implemented.");
 	}
 }

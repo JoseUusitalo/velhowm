@@ -1,5 +1,10 @@
 package velho.model;
 
+/**
+ * A table row object containing the necessary data for display in search lists.
+ *
+ * @author Jose Uusitalo
+ */
 public class ProductBoxSearchResultRow
 {
 	/**

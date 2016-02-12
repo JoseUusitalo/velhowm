@@ -28,6 +28,7 @@ import velho.controller.DatabaseController;
 import velho.controller.DebugController;
 import velho.controller.ListController;
 import velho.controller.LoginController;
+import velho.controller.PopupController;
 import velho.controller.UIController;
 import velho.controller.UserController;
 import velho.model.exceptions.ExistingDatabaseLinkException;
@@ -118,16 +119,23 @@ public class MainWindow extends Application
 		System.out.println("Running VELHO Warehouse Management.");
 		try
 		{
-			DatabaseController.connectAndInitialize();
-			DatabaseController.loadData(false);
+			if (DatabaseController.connectAndInitialize())
+			{
+				DatabaseController.loadData(false);
+				debugController = new DebugController();
+				userController = new UserController();
 
-			debugController = new DebugController();
-			userController = new UserController();
+				listController = new ListController(userController);
+				uiController = new UIController(this, listController, userController);
 
-			listController = new ListController(userController);
-			uiController = new UIController(this, listController, userController);
+				LoginController.setControllers(uiController, debugController);
+			}
+			else
+			{
+				// FIXME: Creation always fails.
+				PopupController.error("Database creation failed. Please restart the program.");
+			}
 
-			LoginController.setControllers(uiController, debugController);
 		}
 		catch (ClassNotFoundException | ExistingDatabaseLinkException | NoDatabaseLinkException e1)
 		{

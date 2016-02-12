@@ -1778,7 +1778,7 @@ public class DatabaseController
 		{
 			// Otherwise UPDATE.
 
-			final List<String> where = new ArrayList<String>();
+			final List<String>  where = new ArrayList<String>();
 			where.add("productbox = " + productBox.getBoxID());
 			changed = (0 != (Integer) runQuery(DatabaseQueryType.UPDATE, DatabaseTable.SHELF_PRODUCTBOXES, null, null, values, where));
 		}
