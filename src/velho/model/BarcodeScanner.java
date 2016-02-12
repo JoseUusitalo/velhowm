@@ -8,6 +8,8 @@ import velho.controller.ExternalSystemsController;
 import velho.model.exceptions.NoDatabaseLinkException;
 
 /**
+ * Created to scan newly arrived product boxes. This class creates product boxes into the system.
+ *
  * @author Edward
  */
 public class BarcodeScanner
@@ -17,7 +19,7 @@ public class BarcodeScanner
 	 * randomly.
 	 *
 	 * @param numbers
-	 * returns an array of random numbers
+	 *            returns an array of random numbers
 	 * @return returns the total of numbers with maxSize of item/products
 	 */
 	public static int generateProductList(final List<Integer> numbers)
@@ -46,7 +48,6 @@ public class BarcodeScanner
 		}
 		catch (NoDatabaseLinkException e)
 		{
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		int maximSize = (int) (Math.random() * (numbers.size() + 1));
