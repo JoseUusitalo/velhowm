@@ -1226,12 +1226,6 @@ public class DatabaseController
 		List<String> where = null;
 		Integer wantedProductCount = null;
 		List<ProductBox> boxes = null;
-		Map<Integer, List<ProductBox>> boxProductCount = new TreeMap<Integer, List<ProductBox>>();
-
-		List<ProductBox> nextSmallestBoxes = null;
-		int wantedWouldBeIndex = -1;
-		int addCountIndex = -1;
-		int productCountSum = 0;
 
 		// For every unique string representing a product.
 		for (final String productString : productData.keySet())
@@ -1250,147 +1244,33 @@ public class DatabaseController
 				where.add("product_count = " + wantedProductCount);
 
 				boxes = getProductBoxesByProductID(where);
-
-				// Couldn't find a box with exactly the number of products wanted.
-				if (boxes.isEmpty())
-				{
-					if (MainWindow.DEBUG_MODE)
-						System.out.println("Unable to find a product box with the wanted size of " + wantedProductCount + ". Looking from multiple boxes.");
-
-					// Remove the product count condition and find all product boxes with the wanted product ID.
-					where.remove(1);
-
-					boxes = getProductBoxesByProductID(where);
-
-					if (MainWindow.DEBUG_MODE)
-						System.out.println("Found " + boxes.size() + " product boxes with the ID " + productString + ".");
-
-					// Build a list of product box content sizes.
-					for (final ProductBox box : boxes)
-					{
-						// Ignore empty boxes.
-						if (box.getProductCount() > 0)
-						{
-							// No product box recorded with this size?
-							if (boxProductCount.get(box.getProductCount()) == null)
-							{
-								// Create the box array with the product count as key.
-								boxProductCount.put(box.getProductCount(), new ArrayList<ProductBox>());
-							}
-
-							// Add the box to the array.
-							boxProductCount.get(box.getProductCount()).add(box);
-						}
-					}
-
-					// Further processing is done with the boxProductCount map.
-					boxes = new ArrayList<ProductBox>();
-
-					if (MainWindow.DEBUG_MODE)
-					{
-						System.out.println("Found product box sizes:");
-						for (final Integer i : boxProductCount.keySet())
-							System.out.println(i + " (x" + boxProductCount.get(i).size() + ")");
-					}
-
-					// Convert the ordered key set to an arrray for binary search.
-					Integer[] boxSizeArray = new Integer[boxProductCount.size()];
-					boxSizeArray = boxProductCount.keySet().toArray(boxSizeArray);
-
-					// Find the index at which the wantedProductCount Integer would be in, if it were in the array.
-					wantedWouldBeIndex = -Arrays.binarySearch(boxSizeArray, wantedProductCount) - 1;
-					addCountIndex = wantedWouldBeIndex;
-
-					if (MainWindow.DEBUG_MODE)
-						System.out.println("Wanted box of size " + wantedProductCount + " would have been at index " + wantedWouldBeIndex + ".");
-
-					// Keep adding boxes to the foundProducts until we reach the wanted product count.
-					while (productCountSum < wantedProductCount)
-					{
-						// Looking for too few products, show the smallest box of that product instead.
-						if (wantedWouldBeIndex == 0)
-							addCountIndex++;
-
-						try
-						{
-							// The next smallest product boxes.
-							nextSmallestBoxes = boxProductCount.get(boxSizeArray[--addCountIndex]);
-						}
-						catch (IndexOutOfBoundsException e)
-						{
-							// If wantedWouldBeIndex is not 0 here it means that
-							System.out.println("Unable to find that many products. Listing all available boxes.");
-							break;
-						}
-
-						if (MainWindow.DEBUG_MODE)
-							System.out.println("The next smallest product boxes at index " + addCountIndex + " are: " + nextSmallestBoxes);
-
-						for (final ProductBox box : nextSmallestBoxes)
-						{
-							// Does adding this box to the set still keep the product counter under the wanted amount?
-							// OR does a box that small not exist?
-							if (wantedWouldBeIndex == 0 || ((productCountSum + box.getProductCount() <= wantedProductCount) || addCountIndex == 0))
-							{
-								// Add up the product count.
-								productCountSum += box.getProductCount();
-
-								if (MainWindow.DEBUG_MODE)
-									System.out.println(box + " added to list, current product count sum is " + productCountSum + ".");
-
-								// Add the found box to the set.
-								boxes.add(box);
-							}
-							else
-							{
-								// If not, break the loop and find the next smallest boxes.
-								if (MainWindow.DEBUG_MODE)
-									System.out.println("Adding " + box + " to list would put the product count over the limit.");
-
-								break;
-							}
-						}
-					}
-
-				}
-				else if (boxes.size() > 1)
-				{
-					// If found multiple boxes with the exact size, select one that will expire the soonest.
-					ProductBox oldest = boxes.get(0);
-
-					for (final ProductBox box : boxes)
-					{
-						if (box.getExpirationDate() != null)
-						{
-							// Current box has an expiration date.
-							if (box.getExpirationDate() != null)
-							{
-								// Oldest box has an expiration date.
-								if (box.getExpirationDate().before(oldest.getExpirationDate()))
-								{
-									// Current box expires first.
-									oldest = box;
-								}
-							}
-							else
-							{
-								// Current box expires first.
-								oldest = box;
-							}
-						}
-						// Else current box does not have an expiration date.
-					}
-					boxes.clear();
-					boxes.add(oldest);
-				}
 			}
 			catch (NumberFormatException e)
 			{
+				// FIXME: Fix SQL error.
 				// Else search by name.
 				where.add("products.name = '" + productString + "'");
-				where.add("containers.product_count >= " + productData.get(productString));
+				where.add("containers.product_count = " + productData.get(productString));
 
 				boxes = getProductBoxesByProductName(where);
+			}
+
+			// Couldn't find a box with exactly the number of products wanted.
+			if (boxes.isEmpty())
+			{
+				if (MainWindow.DEBUG_MODE)
+					System.out.println("Unable to find a product box with the wanted size of " + wantedProductCount + ". Looking from multiple boxes.");
+
+				// Remove the product count condition and find all product boxes with the wanted product ID.
+				where.remove(1);
+
+				boxes = getBoxesContainingAtLeastProducts(getProductBoxesByProductID(where), wantedProductCount);
+			}
+			else if (boxes.size() > 1)
+			{
+				// If found multiple boxes with the exact size, select one that will expire the soonest.
+				boxes.clear();
+				boxes.add(getOldestProductBox(boxes));
 			}
 
 			for (final ProductBox box : boxes)
@@ -1400,18 +1280,198 @@ public class DatabaseController
 		// Remove nulls.
 		foundProducts.removeAll(Collections.singleton(null));
 
-		/*
-		 * List<ProductBoxSearchResultRow> rows = new ArrayList<ProductBoxSearchResultRow>();
-		 *
-		 * for (final ProductBox box : loadedProductBoxes.values())
-		 * {
-		 * rows.add(new ProductBoxSearchResultRow(box));
-		 * }
-		 */
-
 		System.out.println("Updating product box search results.");
 		productSearchResultViewList.clear();
 		productSearchResultViewList.addAll(foundProducts);
+	}
+
+	/**
+	 * Gets the product box that will expire the soonest.
+	 *
+	 * @param boxes boxes to search from
+	 * @return the oldest product box
+	 */
+	private static ProductBox getOldestProductBox(final List<ProductBox> boxes)
+	{
+		ProductBox oldest = boxes.get(0);
+
+		for (final ProductBox box : boxes)
+		{
+			if (box.getExpirationDate() != null)
+			{
+				// Current box has an expiration date.
+				if (box.getExpirationDate() != null)
+				{
+					// Oldest box has an expiration date.
+					if (box.getExpirationDate().before(oldest.getExpirationDate()))
+					{
+						// Current box expires first.
+						oldest = box;
+					}
+				}
+				else
+				{
+					// Current box expires first.
+					oldest = box;
+				}
+			}
+			// Else current box does not have an expiration date.
+		}
+
+		return oldest;
+	}
+
+	private static List<ProductBox> getBoxesContainingAtLeastProducts(final List<ProductBox> boxes, final Integer wantedProductCount)
+	{
+		Map<Integer, List<ProductBox>> boxProductCount = new TreeMap<Integer, List<ProductBox>>();
+		List<ProductBox> nextSmallestBoxes = null;
+		List<ProductBox> resultingBoxes = new ArrayList<ProductBox>();
+
+		int emptyCount = 0;
+		int wantedWouldBeIndex = -1;
+		int addCountIndex = -1;
+		int productCountSum = 0;
+		boolean lookingForLarger = false;
+
+		// Build a list of product box content sizes.
+		for (final ProductBox box : boxes)
+		{
+			// Ignore empty boxes.
+			if (box.getProductCount() > 0)
+			{
+				// No product box recorded with this size?
+				if (boxProductCount.get(box.getProductCount()) == null)
+				{
+					// Create the box array with the product count as key.
+					boxProductCount.put(box.getProductCount(), new ArrayList<ProductBox>());
+				}
+
+				// Add the box to the array.
+				boxProductCount.get(box.getProductCount()).add(box);
+			}
+			else
+				emptyCount++;
+		}
+
+		if (MainWindow.DEBUG_MODE)
+		{
+			if (emptyCount == 0)
+				System.out.println("Found " + boxes.size() + " product boxes.");
+			else
+				System.out.println("Found " + boxes.size() + " product boxes of which " + emptyCount + " were empty.");
+		}
+
+		if (MainWindow.DEBUG_MODE)
+		{
+			System.out.println("Found product box sizes:");
+			for (final Integer i : boxProductCount.keySet())
+				System.out.println(i + " (x" + boxProductCount.get(i).size() + ")");
+		}
+
+		// Convert the ordered key set to an arrray for binary search.
+		Integer[] boxSizeArray = new Integer[boxProductCount.size()];
+		boxSizeArray = boxProductCount.keySet().toArray(boxSizeArray);
+
+		// Find the index at which the wantedProductCount Integer would be in, if it were in the array.
+		wantedWouldBeIndex = -Arrays.binarySearch(boxSizeArray, wantedProductCount) - 1;
+		addCountIndex = wantedWouldBeIndex;
+
+		if (MainWindow.DEBUG_MODE)
+			System.out.println("Wanted box of size " + wantedProductCount + " would have been at index " + wantedWouldBeIndex + ".");
+
+		// Keep adding boxes to the foundProducts until we reach the wanted product count.
+		while (productCountSum < wantedProductCount)
+		{
+			System.out.println("Search status | Count: " + productCountSum + " / " + wantedProductCount + " | Would Be Index: " + wantedWouldBeIndex
+					+ " | Add Index: " + addCountIndex + " / " + boxProductCount.size());
+
+			// Looking for too few products, show the smallest box of that product instead.
+			if (wantedWouldBeIndex == 0)
+				addCountIndex++;
+
+			try
+			{
+				// The next smallest product boxes.
+				// Can throw an IndexOutOfBounds exception.
+				nextSmallestBoxes = boxProductCount.get(boxSizeArray[--addCountIndex]);
+
+				if (MainWindow.DEBUG_MODE)
+					System.out.println("The next smallest product boxes at index " + addCountIndex + " are: " + nextSmallestBoxes);
+
+				for (final ProductBox box : nextSmallestBoxes)
+				{
+					// Does adding this box to the set still keep the product counter under the wanted amount?
+					// OR does a box that small not exist?
+					if (wantedWouldBeIndex == 0 || addCountIndex == 0 || ((productCountSum + box.getProductCount() <= wantedProductCount)))
+					{
+						// Add up the product count.
+						productCountSum += box.getProductCount();
+
+						if (MainWindow.DEBUG_MODE)
+							System.out.println(box + " added to list, current product count sum is " + productCountSum + ".");
+
+						// Add the found box to the set.
+						resultingBoxes.add(box);
+					}
+					else if (lookingForLarger)
+					{
+						// Allow going over the wanted size limit if looking for a larger box.
+						// Add up the product count.
+						productCountSum += box.getProductCount();
+
+						if (MainWindow.DEBUG_MODE)
+							System.out.println(box + " added to list, current product count sum is " + productCountSum + ".");
+
+						// Add the found box to the set.
+						resultingBoxes.add(box);
+
+						// Found the box that we wanted.
+						break;
+					}
+					else
+					{
+						// Else break the loop and find the next smallest boxes.
+						if (MainWindow.DEBUG_MODE)
+							System.out.println("Adding " + box + " to list would put the product count over the limit.");
+
+						break;
+					}
+				}
+			}
+			catch (IndexOutOfBoundsException e)
+			{
+				if (resultingBoxes.size() == boxes.size())
+				{
+					// All boxes are in the result. Too bad.
+					System.out.println("Unable to find that many products. Listing all available boxes.");
+					break;
+				}
+				else if (wantedProductCount > productCountSum)
+				{
+					/*
+					 * All boxes are not in the result.
+					 * Still have not reached the wanted product count.
+					 * Restart the loop at one higher index.
+					 * Repeat until either the wanted count is reached or all products have been added to the result.
+					 */
+					System.out.println("Unable to build a product box list of that size from smaller boxes. Going one size larger.");
+					resultingBoxes.clear();
+					productCountSum = 0;
+					wantedWouldBeIndex++;
+					addCountIndex = wantedWouldBeIndex;
+					lookingForLarger = true;
+				}
+				else
+				{
+					System.out.println("what");
+					System.out.println("Search status | Count: " + productCountSum + " / " + wantedProductCount + " | Would Be Index: " + wantedWouldBeIndex
+							+ " | Add Index: " + addCountIndex + " / " + boxProductCount.size());
+
+				}
+			}
+		}
+
+		return resultingBoxes;
 	}
 
 	/*
