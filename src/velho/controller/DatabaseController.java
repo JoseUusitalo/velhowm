@@ -247,7 +247,7 @@ public class DatabaseController
 
 		sb.append(";");
 
-		if (MainWindow.DEBUG_MODE)
+		if (MainWindow.PRINT_SQL)
 			System.out.println("[SQLBUILDER] " + sb.toString());
 
 		return sb.toString();
@@ -958,12 +958,16 @@ public class DatabaseController
 			final ProductType p = new ProductType(typeid, result.iterator().next());
 
 			// Store for reuse.
-			System.out.println("Caching: " + p);
+
+			if (MainWindow.PRINT_CACHE_MESSAGES)
+				System.out.println("Caching: " + p);
+
 			loadedProductTypes.put(p.getDatabaseID(), p);
 			return p;
 		}
 
-		System.out.println("Loading category " + typeid + " from cache.");
+		if (MainWindow.PRINT_CACHE_MESSAGES)
+			System.out.println("Loading category " + typeid + " from cache.");
 		return loadedProductTypes.get(typeid);
 	}
 
@@ -991,12 +995,15 @@ public class DatabaseController
 			final ProductCategory p = (ProductCategory) result.iterator().next();
 
 			// Store for reuse.
-			System.out.println("Caching: " + p);
+			if (MainWindow.PRINT_CACHE_MESSAGES)
+				System.out.println("Caching: " + p);
+
 			loadedProductCategories.put(p.getDatabaseID(), p);
 			return p;
 		}
 
-		System.out.println("Loading category " + categoryid + " from cache.");
+		if (MainWindow.PRINT_CACHE_MESSAGES)
+			System.out.println("Loading category " + categoryid + " from cache.");
 		return loadedProductCategories.get(categoryid);
 	}
 
@@ -1024,12 +1031,15 @@ public class DatabaseController
 			final ProductBrand p = new ProductBrand(brandid, result.iterator().next());
 
 			// Store for reuse.
-			System.out.println("Caching: " + p);
+			if (MainWindow.PRINT_CACHE_MESSAGES)
+				System.out.println("Caching: " + p);
+
 			loadedProductBrands.put(p.getDatabaseID(), p);
 			return p;
 		}
 
-		System.out.println("Loading brand " + brandid + " from cache.");
+		if (MainWindow.PRINT_CACHE_MESSAGES)
+			System.out.println("Loading brand " + brandid + " from cache.");
 		return loadedProductBrands.get(brandid);
 	}
 
@@ -1057,12 +1067,15 @@ public class DatabaseController
 			final Product p = (Product) result.iterator().next();
 
 			// Store for reuse.
-			System.out.println("Caching: " + p);
+			if (MainWindow.PRINT_CACHE_MESSAGES)
+				System.out.println("Caching: " + p);
+
 			loadedProducts.put(p.getProductID(), p);
 			return p;
 		}
 
-		System.out.println("Loading product " + productid + " from cache.");
+		if (MainWindow.PRINT_CACHE_MESSAGES)
+			System.out.println("Loading product " + productid + " from cache.");
 		return loadedProducts.get(productid);
 	}
 
@@ -1090,12 +1103,15 @@ public class DatabaseController
 			final ProductBox p = result.iterator().next();
 
 			// Store for reuse.
-			System.out.println("Caching: " + p);
+			if (MainWindow.PRINT_CACHE_MESSAGES)
+				System.out.println("Caching: " + p);
+
 			loadedProductBoxes.put(p.getBoxID(), p);
 			return p;
 		}
 
-		System.out.println("Loading product box " + productboxid + " from cache.");
+		if (MainWindow.PRINT_CACHE_MESSAGES)
+			System.out.println("Loading product box " + productboxid + " from cache.");
 		return loadedProductBoxes.get(productboxid);
 	}
 
@@ -1185,6 +1201,54 @@ public class DatabaseController
 	}
 
 	/**
+	 * Places the loaded {@link ProductContainer} objects into {@link Shelf} objects.
+	 *
+	 * @throws NoDatabaseLinkException
+	 */
+	private static void setContainersToShelf(final int shelfid) throws NoDatabaseLinkException
+	{
+		System.out.println("[DatabaseController] Placing product boxes on shelf " + shelfid + "...");
+
+		final String[] columns = { "*" };
+
+		Map<String, Object> where = new LinkedHashMap<String, Object>();
+		where.put("shelf", shelfid);
+
+		final Shelf shelf = getShelfByID(shelfid, true);
+
+		@SuppressWarnings("unchecked")
+		Map<Integer, ArrayList<Integer[]>> shelfBoxMap = (HashMap<Integer, ArrayList<Integer[]>>) runQuery(DatabaseQueryType.SELECT,
+				DatabaseTable.SHELF_PRODUCTBOXES, null, columns, null, where);
+
+		// If the shelf is not empty.
+		if (!shelfBoxMap.isEmpty())
+		{
+			ProductBox box = null;
+			String shelfSlotID = null;
+
+			ArrayList<Integer[]> boxes = shelfBoxMap.get(shelfid);
+
+			for (final Integer[] data : boxes)
+			{
+				box = getProductBoxByID(data[0]);
+
+				// data[1] is the level index
+				shelfSlotID = Shelf.coordinatesToShelfSlotID(shelfid, data[1] + 1, data[2], true);
+
+				if (!shelf.getShelfSlotBoxes(shelfSlotID).contains(box))
+					shelf.addToSlot(shelfSlotID, box, false);
+			}
+
+			System.out.println("[DatabaseController] Product boxes placed on shelf " + shelfid + ".");
+		}
+		else
+		{
+			System.out.println("[DatabaseController] Nothing to place.");
+		}
+
+	}
+
+	/**
 	 * Gets the {@link Shelf} object from the given shelf ID.
 	 *
 	 * @param shelfid shelf database ID
@@ -1209,15 +1273,25 @@ public class DatabaseController
 
 			// Store for reuse.
 			if (getCached)
-				System.out.println("Caching: " + s);
+			{
+				if (MainWindow.PRINT_CACHE_MESSAGES)
+					System.out.println("Caching: " + s);
+			}
 			else
-				System.out.println("Updating cached: " + s);
+			{
+				if (MainWindow.PRINT_CACHE_MESSAGES)
+					System.out.println("Updating cache: " + s);
+			}
 
 			loadedShelves.put(s.getDatabaseID(), s);
-			return s;
+
+			setContainersToShelf(shelfid);
+
+			return loadedShelves.get(shelfid);
 		}
 
-		System.out.println("Loading shelf " + shelfid + " from cache.");
+		if (MainWindow.PRINT_CACHE_MESSAGES)
+			System.out.println("Loading shelf " + shelfid + " from cache.");
 		return loadedShelves.get(shelfid);
 	}
 
@@ -1238,7 +1312,7 @@ public class DatabaseController
 		Collections.shuffle(list);
 
 		final Shelf randomShelf = getShelfByID(list.get(0), true);
-		final int randomLevel = (int) (Math.round(Math.random() * randomShelf.getLevels()) + 1);
+		final int randomLevel = (int) (Math.round(Math.random() * randomShelf.getLevelCount()) + 1);
 		final int randomSlotIndex = (int) (Math.round(Math.random() * randomShelf.getShelfSlotCount()));
 
 		return Shelf.coordinatesToShelfSlotID(list.get(0), randomLevel, randomSlotIndex, true);
@@ -1440,24 +1514,36 @@ public class DatabaseController
 	 * @param productBox product box to update in the database
 	 * @return <code>true</code> if the database was updated
 	 */
-	public static boolean addProductToShelfSlot(final ProductBox productBox) throws NoDatabaseLinkException
+	public static boolean addProductBoxToShelfSlot(final ProductBox productBox, final String shelfSlotID) throws NoDatabaseLinkException
 	{
-		final Object[] tokens = Shelf.tokenizeShelfSlotID(productBox.getShelfSlot());
+		final Object[] tokens = Shelf.tokenizeShelfSlotID(shelfSlotID);
+		int shelfID = Integer.parseInt(((String) tokens[0]).substring(1));
 
 		final Map<String, Object> values = new LinkedHashMap<String, Object>();
 		values.put("shelflevel_index", (int) tokens[1] - 1);
 		values.put("shelfslot_index", tokens[2]);
 
-		final Map<String, Object> where = new LinkedHashMap<String, Object>();
-		where.put("productbox", productBox.getBoxID());
+		boolean changed = false;
 
-		// TODO: Handle case where the product box is not in any shelf yet.
+		// If the product box is not in a shelf yet, INSERT.
+		if (productBox.getShelfSlot() == null)
+		{
+			values.put("shelf", shelfID);
+			values.put("productbox", productBox.getBoxID());
+			changed = (0 != (Integer) runQuery(DatabaseQueryType.INSERT, DatabaseTable.SHELF_PRODUCTBOXES, null, null, values, null));
+		}
+		else
+		{
+			// Otherwise UPDATE.
 
-		boolean changed = (0 != (Integer) runQuery(DatabaseQueryType.UPDATE, DatabaseTable.SHELF_PRODUCTBOXES, null, null, values, where));
+			final Map<String, Object> where = new LinkedHashMap<String, Object>();
+			where.put("productbox", productBox.getBoxID());
+			changed = (0 != (Integer) runQuery(DatabaseQueryType.UPDATE, DatabaseTable.SHELF_PRODUCTBOXES, null, null, values, where));
+		}
 
 		// Update the cache.
 		if (changed)
-			getShelfByID(Integer.parseInt(((String) tokens[0]).substring(1)), false);
+			getShelfByID(shelfID, false);
 
 		return changed;
 	}
@@ -1467,7 +1553,7 @@ public class DatabaseController
 	 *
 	 * @param productBox product box to remove from it's shelf slot
 	 */
-	public static boolean removeProductFromShelfSlot(final ProductBox productBox) throws NoDatabaseLinkException
+	public static boolean removeProductBoxFromShelfSlot(final ProductBox productBox) throws NoDatabaseLinkException
 	{
 		final Map<String, Object> where = new LinkedHashMap<String, Object>();
 		where.put("productbox", productBox.getBoxID());
@@ -1486,14 +1572,15 @@ public class DatabaseController
 	/**
 	 * Loads data from database into memory.
 	 */
-	public static void loadData()
+	public static void loadData(final boolean silent)
 	{
-		System.out.println("[DatabaseController] Loading data from database...");
+		if (!silent)
+			System.out.println("[DatabaseController] Loading data from database...");
 
 		try
 		{
-			loadProductBoxes();
-			loadShelves();
+			loadProductBoxes(silent);
+			loadShelves(silent);
 		}
 		catch (NoDatabaseLinkException e)
 		{
@@ -1512,9 +1599,10 @@ public class DatabaseController
 	 * </ul>
 	 * @throws NoDatabaseLinkException
 	 */
-	private static void loadProductBoxes() throws NoDatabaseLinkException
+	private static void loadProductBoxes(final boolean silent) throws NoDatabaseLinkException
 	{
-		System.out.println("[DatabaseController] Loading product containers...");
+		if (!silent)
+			System.out.println("[DatabaseController] Loading product containers...");
 
 		final String[] columns = { "*" };
 		@SuppressWarnings("unchecked")
@@ -1526,11 +1614,15 @@ public class DatabaseController
 		while (it.hasNext())
 		{
 			final ProductBox p = it.next();
-			System.out.println("Caching: " + p);
+
+			if (MainWindow.PRINT_CACHE_MESSAGES)
+				System.out.println("Caching: " + p);
+
 			loadedProductBoxes.put(p.getBoxID(), p);
 		}
 
-		System.out.println("[DatabaseController] Product containers loaded.");
+		if (!silent)
+			System.out.println("[DatabaseController] Product containers loaded.");
 	}
 
 	/**
@@ -1540,9 +1632,10 @@ public class DatabaseController
 	 * </ul>
 	 * @throws NoDatabaseLinkException
 	 */
-	private static void loadShelves() throws NoDatabaseLinkException
+	private static void loadShelves(final boolean silent) throws NoDatabaseLinkException
 	{
-		System.out.println("[DatabaseController] Loading shelves...");
+		if (!silent)
+			System.out.println("[DatabaseController] Loading shelves...");
 
 		final String[] columns = { "*" };
 		@SuppressWarnings("unchecked")
@@ -1553,13 +1646,17 @@ public class DatabaseController
 		while (it.hasNext())
 		{
 			final Shelf s = it.next();
-			System.out.println("Caching: " + s);
+
+			if (MainWindow.PRINT_CACHE_MESSAGES)
+				System.out.println("Caching: " + s);
+
 			loadedShelves.put(s.getDatabaseID(), s);
 		}
 
-		System.out.println("[DatabaseController] Shelves loaded.");
+		if (!silent)
+			System.out.println("[DatabaseController] Shelves loaded.");
 
-		setContainersToShelves();
+		setAllContainersToAllShelves(silent);
 	}
 
 	/**
@@ -1567,9 +1664,10 @@ public class DatabaseController
 	 *
 	 * @throws NoDatabaseLinkException
 	 */
-	private static void setContainersToShelves() throws NoDatabaseLinkException
+	private static void setAllContainersToAllShelves(final boolean silent) throws NoDatabaseLinkException
 	{
-		System.out.println("[DatabaseController] Placing product boxes on shelves...");
+		if (!silent)
+			System.out.println("[DatabaseController] Placing product boxes on shelves...");
 
 		final String[] columns = { "*" };
 		@SuppressWarnings("unchecked")
@@ -1586,12 +1684,15 @@ public class DatabaseController
 				{
 					if (loadedProductBoxes.containsKey(data[0]))
 					{
-						loadedShelves.get(shelfID).addToSlot(Shelf.coordinatesToShelfSlotID(shelfID, data[1], data[2], true), loadedProductBoxes.get(data[0]));
+						// Do not update the database as this method loads the data from the database into objects.
+						loadedShelves.get(shelfID).addToSlot(Shelf.coordinatesToShelfSlotID(shelfID, data[1] + 1, data[2], true),
+								loadedProductBoxes.get(data[0]), false);
 					}
 				}
 			}
 		}
 
-		System.out.println("[DatabaseController] Product boxes placed on shelves.");
+		if (!silent)
+			System.out.println("[DatabaseController] Product boxes placed on shelves.");
 	}
 }
