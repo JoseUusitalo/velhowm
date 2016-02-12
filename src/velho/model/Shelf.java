@@ -1,9 +1,13 @@
 package velho.model;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Set;
-import java.util.TreeSet;
+
+import velho.controller.DatabaseController;
+import velho.model.exceptions.NoDatabaseLinkException;
 
 /**
  * A class representing a physical shelf structure in the warehouse.
@@ -31,9 +35,12 @@ public class Shelf
 	 * Automatically creates the shelf slots for this shelf as well.
 	 *
 	 * @param shelfID
-	 * @param levels must be greater than 0
-	 * @param slotsPerLevel must be greater than 0
-	 * @param maxBoxesPerSlot must be greater than 0
+	 * @param levels
+	 * must be greater than 0
+	 * @param slotsPerLevel
+	 * must be greater than 0
+	 * @param maxBoxesPerSlot
+	 * must be greater than 0
 	 */
 	public Shelf(final int shelfID, final int levels, final int slotsPerLevel, final int maxBoxesPerSlot)
 	{
@@ -59,15 +66,30 @@ public class Shelf
 	}
 
 	/**
-	 * Converts the given coordinate number on a shelf into a shelf slot ID.
-	 * @param shelfID the ID of the shelf
-	 * @param shelfLevelNumber the level of the shelf
-	 * @param shelfSlotIndex the slot on a level
+	 * Converts the given coordinate number on a shelf into a shelf slot ID and validates it.
+	 *
+	 * @param shelfID
+	 * the ID of the shelf
+	 * @param shelfLevelNumber
+	 * the level of the shelf
+	 * @param shelfSlotIndex
+	 * the slot on a level
+	 * @param validateValues
+	 * validate the given values?
 	 * @return a shelf slot ID
+	 * @throws IllegalArgumentException
+	 * if the values were validated and were invalid
 	 */
-	public static String coordinatesToShelfSlotID(final int shelfID, final int shelfLevelNumber, final int shelfSlotIndex)
+	public static String coordinatesToShelfSlotID(final int shelfID, final int shelfLevelNumber, final int shelfSlotIndex, final boolean validateValues)
+			throws IllegalArgumentException
 	{
-		return SHELF_IDENTIFIER + shelfID + ShelfSlot.ID_SEPARATOR + shelfLevelNumber + ShelfSlot.ID_SEPARATOR + shelfSlotIndex;
+		final String shelfSlotID = SHELF_IDENTIFIER + shelfID + ShelfSlot.ID_SEPARATOR + shelfLevelNumber + ShelfSlot.ID_SEPARATOR + shelfSlotIndex;
+
+		if (validateValues)
+			Shelf.tokenizeShelfSlotID(shelfSlotID);
+
+		return shelfSlotID;
+
 	}
 
 	/**
@@ -77,14 +99,16 @@ public class Shelf
 	 * <li>Index 1: is the Integer level in the shelf</li>
 	 * <li>Index 2: is the slot ID Integer in the shelf</li>
 	 * </ul>
+	 *
 	 * @param slotID
 	 * @return an array of integers
-	 * @throws IllegalArgumentException if the given shelf slot ID was invalid
+	 * @throws IllegalArgumentException
+	 * if the given shelf slot ID was invalid
 	 */
 	public static Object[] tokenizeShelfSlotID(final String shelfSlotID) throws IllegalArgumentException
 	{
 		// If the shelf slot ID does not begin with S it is not a shelf slot ID.
-		if (shelfSlotID == null || shelfSlotID.charAt(0) != 'S')
+		if (shelfSlotID == null || shelfSlotID.isEmpty() || shelfSlotID.charAt(0) != 'S')
 			throw new IllegalArgumentException("Invalid slot ID '" + shelfSlotID + "'.");
 
 		// Remove the S from front so we can parse the values as integers.
@@ -129,15 +153,20 @@ public class Shelf
 	 * <li>Index 1: is the level in the shelf</li>
 	 * <li>Index 2: is the slot ID in the shelf</li>
 	 * </ul>
-	 * <p>For internal use only. Automatically removes the S from shelf ID and converts the shelf level number back to
-	 * an index.</p>
+	 * <p>
+	 * For internal use only. Automatically removes the S from shelf ID and converts the shelf level number back to
+	 * an index.
+	 * </p>
 	 *
 	 * @param slotID
 	 * @return an array of integers
-	 * @throws IllegalArgumentException if the given shelf slot ID was invalid
+	 * @throws IllegalArgumentException
+	 * if the given shelf slot ID was invalid
 	 */
 	private static int[] shelfSlotIDTokenizer(final String shelfSlotID) throws IllegalArgumentException
 	{
+		if (shelfSlotID == null)
+			throw new IllegalArgumentException("Invalid shelf slot ID '" + shelfSlotID + "'.");
 		// If the shelf slot ID does not begin with S it is not a shelf slot ID.
 		if (shelfSlotID.charAt(0) != 'S')
 			throw new IllegalArgumentException("Invalid shelf slot ID '" + shelfSlotID + "'.");
@@ -181,7 +210,8 @@ public class Shelf
 	 * Tokenizes the given shelf slot ID with {@link #shelfSlotIDTokenizer(String)} and validates the result to make
 	 * sure the given ID represent a slot in this shelf.
 	 *
-	 * @param shelfSlotID shelf slot ID string to tokenize and validate
+	 * @param shelfSlotID
+	 * shelf slot ID string to tokenize and validate
 	 * @return an array of integers where the values are the ID of this shelf, the index of the level, and the index of
 	 * the slot on the level
 	 */
@@ -199,7 +229,7 @@ public class Shelf
 	@Override
 	public String toString()
 	{
-		return "[" + shelfID + "] Lvls: " + getLevels() + ", Slt/Lvl: " + slots[0].length + ", Box/Slt: " + slots[0][0].maxBoxCount + ", Boxs: "
+		return "[" + shelfID + "] Lvls: " + getLevelCount() + ", Slt/Lvl: " + slots[0].length + ", Box/Slt: " + slots[0][0].maxBoxCount + ", Boxs: "
 				+ getProductBoxCount() + ", Slts: " + getShelfSlotCount() + ", Free: " + getFreeShelfSlots().size();
 	}
 
@@ -238,7 +268,7 @@ public class Shelf
 	 *
 	 * @return the number of levels of this shelf
 	 */
-	public int getLevels()
+	public int getLevelCount()
 	{
 		return slots.length;
 	}
@@ -248,9 +278,9 @@ public class Shelf
 	 *
 	 * @return shelf slots with free space of this shelf
 	 */
-	public TreeSet<String> getFreeShelfSlots()
+	public List<String> getFreeShelfSlots()
 	{
-		TreeSet<String> freeSlots = new TreeSet<String>();
+		List<String> freeSlots = new ArrayList<String>();
 		final int levels = slots.length;
 		final int slotCount = slots[0].length;
 
@@ -333,7 +363,8 @@ public class Shelf
 	/**
 	 * Gets the specified {@link ShelfSlot}.
 	 *
-	 * @param shelfSlotID the ID of the shelf slot to get
+	 * @param shelfSlotID
+	 * the ID of the shelf slot to get
 	 * @return the wanted shelf slot or <code>null</code> if shelf slow is not in this shelf
 	 */
 	public Set<ProductBox> getShelfSlotBoxes(final String shelfSlotID) throws IllegalArgumentException
@@ -346,31 +377,107 @@ public class Shelf
 	/**
 	 * Attempts to add the given {@link ProductBox} into the {@link ShelfSlot} specified by the slot ID.
 	 *
-	 * @param shelfSlotID ID of the shelf slot
-	 * @param box box to add
+	 * @param shelfSlotID
+	 * ID of the shelf slot
+	 * @param productBox
+	 * box to add
+	 * @param updateDatabase
+	 * update the database?
 	 * @return <code>true</code> if box was added to the slot, <code>false</code> if the slot ID is not in this shelf,
 	 * or the slot did not have enough free space
 	 */
-	public boolean addToSlot(final String shelfSlotID, final ProductBox productBox) throws IllegalArgumentException
+	public boolean addToSlot(final String shelfSlotID, final ProductBox productBox, final boolean updateDatabase)
+			throws IllegalArgumentException, NoDatabaseLinkException
 	{
 		int[] tokens = tokenizeAndValidateShelfSlotID(shelfSlotID);
 
-		return slots[tokens[1]][tokens[2]].addBox(productBox);
+		final boolean addedToSlot = slots[tokens[1]][tokens[2]].addBox(productBox);
+		boolean databaseModified = false;
+
+		if (updateDatabase)
+			databaseModified = DatabaseController.addProductBoxToShelfSlot(productBox, shelfSlotID);
+
+		productBox.setShelfSlot(shelfSlotID);
+
+		return addedToSlot && databaseModified;
+	}
+
+	/**
+	 * Attempts to add the given {@link ProductBox} into the {@link ShelfSlot} specified by the slot ID.
+	 * Updates the database.
+	 *
+	 * @param shelfSlotID
+	 * ID of the shelf slot
+	 * @param productBox
+	 * box to add
+	 * @return <code>true</code> if box was added to the slot, <code>false</code> if the slot ID is not in this shelf,
+	 * or the slot did not have enough free space
+	 */
+	public boolean addToSlot(final String shelfSlotID, final ProductBox productBox) throws IllegalArgumentException, NoDatabaseLinkException
+	{
+		int[] tokens = tokenizeAndValidateShelfSlotID(shelfSlotID);
+
+		final boolean databaseModified = DatabaseController.addProductBoxToShelfSlot(productBox, shelfSlotID);
+		final boolean addedToSlot = slots[tokens[1]][tokens[2]].addBox(productBox);
+
+		productBox.setShelfSlot(shelfSlotID);
+
+		// TODO: Exception on DB update failed.
+		return addedToSlot && databaseModified;
 	}
 
 	/**
 	 * Attempts to remove the given {@link ProductBox} from the {@link ShelfSlot} specified by the slot ID.
 	 *
-	 * @param shelfSlotID ID of the shelf slot
-	 * @param box box to remove
+	 * @param shelfSlotID
+	 * ID of the shelf slot
+	 * @param productBox
+	 * box to remove
+	 * @param updateDatabase
+	 * update the database?
 	 * @return <code>true</code> if box was added to the slot, <code>false</code> if the slot ID is not in this shelf,
 	 * or the slot did not have the specified box
 	 */
-	public boolean removeFromSlot(final String shelfSlotID, final ProductBox productBox) throws IllegalArgumentException
+	public boolean removeFromSlot(final ProductBox productBox, final boolean updateDatabase) throws IllegalArgumentException, NoDatabaseLinkException
 	{
-		int[] tokens = tokenizeAndValidateShelfSlotID(shelfSlotID);
+		if (productBox == null)
+			return false;
 
-		return slots[tokens[1]][tokens[2]].removeBox(productBox);
+		final int[] tokens = tokenizeAndValidateShelfSlotID(productBox.getShelfSlot());
+
+		final boolean removedFromSlot = slots[tokens[1]][tokens[2]].removeBox(productBox);
+		boolean databaseModified = false;
+
+		if (updateDatabase)
+			databaseModified = DatabaseController.removeProductBoxFromShelfSlot(productBox);
+
+		productBox.setShelfSlot(null);
+
+		return removedFromSlot && databaseModified;
+	}
+
+	/**
+	 * Attempts to remove the given {@link ProductBox} from the {@link ShelfSlot} specified by the slot ID.
+	 * Updates to the database.
+	 *
+	 * @param shelfSlotID
+	 * ID of the shelf slot
+	 * @param productBox
+	 * box to remove
+	 * @return <code>true</code> if box was added to the slot, <code>false</code> if the slot ID is not in this shelf,
+	 * or the slot did not have the specified box
+	 */
+	public boolean removeFromSlot(final ProductBox productBox) throws IllegalArgumentException, NoDatabaseLinkException
+	{
+		if (productBox == null)
+			return false;
+
+		final int[] tokens = tokenizeAndValidateShelfSlotID(productBox.getShelfSlot());
+
+		final boolean removedFromSlot = slots[tokens[1]][tokens[2]].removeBox(productBox);
+		final boolean databaseModified = DatabaseController.removeProductBoxFromShelfSlot(productBox);
+
+		return removedFromSlot && databaseModified;
 	}
 
 	/*
@@ -408,7 +515,8 @@ public class Shelf
 		 * @param parent
 		 * @param level
 		 * @param indexInLevel
-		 * @param maxBoxCount must be greater than 0
+		 * @param maxBoxCount
+		 * must be greater than 0
 		 */
 		private ShelfSlot(final int shelfLevel, final int indexInLevel, final int maxBoxCount)
 		{
@@ -520,7 +628,8 @@ public class Shelf
 		/**
 		 * Attempts to add the given {@link ProductBox} to this shelf slot.
 		 *
-		 * @param box box to add
+		 * @param box
+		 * box to add
 		 * @return <code>true</code> if the box was added, <code>false</code> if there wasn't enough space
 		 */
 		public boolean addBox(final ProductBox box)
@@ -534,7 +643,8 @@ public class Shelf
 		/**
 		 * Attempts to remove the given {@link ProductBox} to this shelf slot.
 		 *
-		 * @param box box to remove
+		 * @param box
+		 * box to remove
 		 * @return <code>true</code> if the box was removed, <code>false</code> if the box was not present
 		 */
 		public boolean removeBox(final ProductBox box)

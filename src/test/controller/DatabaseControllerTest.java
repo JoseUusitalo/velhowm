@@ -141,7 +141,7 @@ public class DatabaseControllerTest
 	public final void testGetProductCodeList() throws NoDatabaseLinkException
 	{
 		List<Integer> list = DatabaseController.getProductCodeList();
-		assertEquals(10, list.size());
+		assertEquals(12, list.size());
 		assertTrue(list.containsAll(Arrays.asList(1, 2, 3, 4, 5, 6, 7, 8, 9, 10)));
 	}
 

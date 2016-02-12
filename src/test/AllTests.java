@@ -30,6 +30,6 @@ public class AllTests
 	@AfterClass
 	public final static void after()
 	{
-		System.out.println("AllTests Done.");
+		System.out.println("All Tests Done.");
 	}
 }

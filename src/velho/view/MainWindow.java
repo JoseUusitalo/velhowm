@@ -35,7 +35,7 @@ import velho.model.exceptions.NoDatabaseLinkException;
 
 /**
  * The main window and class for Velho Warehouse Management.
- * 
+ *
  * @author Jose Uusitalo &amp; Joona
  */
 public class MainWindow extends Application
@@ -49,6 +49,26 @@ public class MainWindow extends Application
 	 * Enable or disable showing windows. DEBUG_MODE must be <code>true</code> to make this <code>false</code>.
 	 */
 	public static final boolean SHOW_WINDOWS = true;
+
+	/**
+	 * Print SQL Builder output?
+	 */
+	public static final boolean PRINT_SQL = true;
+
+	/**
+	 * Print messages about caching?
+	 */
+	public static final boolean PRINT_CACHE_MESSAGES = true;
+
+	/**
+	 * The height of the window.
+	 */
+	public static final double WINDOW_HEIGHT = 720;
+
+	/**
+	 * The width of the window.
+	 */
+	public static final double WINDOW_WIDTH = 1024;
 
 	/**
 	 * The {@link DebugController}.
@@ -99,6 +119,7 @@ public class MainWindow extends Application
 		try
 		{
 			DatabaseController.connectAndInitialize();
+			DatabaseController.loadData(false);
 
 			debugController = new DebugController();
 			userController = new UserController();
@@ -119,7 +140,7 @@ public class MainWindow extends Application
 	 *
 	 * @param args
 	 */
-	public static void main(String[] args)
+	public static void main(final String[] args)
 	{
 		launch(args);
 	}
@@ -174,7 +195,7 @@ public class MainWindow extends Application
 			logoutButton.setOnAction(new EventHandler<ActionEvent>()
 			{
 				@Override
-				public void handle(ActionEvent event)
+				public void handle(final ActionEvent event)
 				{
 					LoginController.logout();
 				}
@@ -196,8 +217,6 @@ public class MainWindow extends Application
 	@Override
 	public void start(final Stage primaryStage)
 	{
-		DatabaseController.loadData();
-
 		if (!SHOW_WINDOWS && DEBUG_MODE)
 		{
 			System.out.println("Windows are disabled.");
@@ -206,7 +225,7 @@ public class MainWindow extends Application
 		{
 			primaryStage.setTitle("Velho Warehouse Management");
 			Group root = new Group();
-			scene = new Scene(root, 1024, 700, Color.WHITE);
+			scene = new Scene(root, WINDOW_WIDTH, WINDOW_HEIGHT, Color.WHITE);
 			rootBorderPane = new BorderPane();
 			rootBorderPane.prefHeightProperty().bind(scene.heightProperty());
 			rootBorderPane.prefWidthProperty().bind(scene.widthProperty());
@@ -227,7 +246,7 @@ public class MainWindow extends Application
 				debugStage.setOnCloseRequest(new EventHandler<WindowEvent>()
 				{
 					@Override
-					public void handle(WindowEvent event)
+					public void handle(final WindowEvent event)
 					{
 						shutdown(primaryStage);
 					}
@@ -237,7 +256,7 @@ public class MainWindow extends Application
 			primaryStage.setOnCloseRequest(new EventHandler<WindowEvent>()
 			{
 				@Override
-				public void handle(WindowEvent event)
+				public void handle(final WindowEvent event)
 				{
 					shutdown(primaryStage);
 				}
@@ -247,7 +266,7 @@ public class MainWindow extends Application
 
 	/**
 	 * A method called to shut down the software and perform any necessary cleanup.
-	 * 
+	 *
 	 * @param primaryStage the stage the main window is open in
 	 */
 	protected void shutdown(final Stage primaryStage)

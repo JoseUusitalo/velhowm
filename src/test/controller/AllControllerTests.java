@@ -12,7 +12,10 @@ import org.junit.runners.Suite.SuiteClasses;
  * @author Jose Uusitalo
  */
 @RunWith(Suite.class)
-@SuiteClasses({ DatabaseControllerTest.class })
+// @formatter:off
+@SuiteClasses({ DatabaseControllerTest.class,
+				ListControllerTest.class})
+//@formatter:on
 public class AllControllerTests
 {
 	@BeforeClass
