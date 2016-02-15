@@ -78,16 +78,21 @@ public class ExternalSystemsControllerTest
 	@Test
 	public final void testMoveValid2() throws NoDatabaseLinkException
 	{
+		System.out.println("Test Move Valid 2");
 		final ProductBox box = DatabaseController.getProductBoxByID(BOXDBID2);
 		final String oldShelfIDString = (String) Shelf.tokenizeShelfSlotID(box.getShelfSlot())[0];
 		final int oldShelfID = Integer.parseInt(oldShelfIDString.substring(1));
 		final Shelf oldShelf = DatabaseController.getShelfByID(oldShelfID, true);
 
+		assertTrue(oldShelf.getShelfSlotBoxes(box.getShelfSlot()).contains(box));
+		System.out.println("move");
+		assertTrue(ExternalSystemsController.move(BOXDBID2, NEWSHELFID, false));
+
 		String newShelfIDString = (String) Shelf.tokenizeShelfSlotID(NEWSHELFID)[0];
 		int newShelfID = Integer.parseInt(newShelfIDString.substring(1));
-		final Shelf newShelf = DatabaseController.getShelfByID(newShelfID, true);
+		final Shelf newShelf = DatabaseController.getShelfByID(newShelfID, false);
 
-		assertTrue(ExternalSystemsController.move(BOXDBID2, NEWSHELFID, false));
+		assertTrue(newShelf.getShelfSlotBoxes(NEWSHELFID).contains(box));
 	}
 
 }
