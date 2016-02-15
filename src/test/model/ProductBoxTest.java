@@ -1,6 +1,8 @@
 package test.model;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 import java.sql.Date;
 
@@ -8,15 +10,15 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
+import velho.model.Product;
 import velho.model.ProductBox;
 import velho.model.ProductBrand;
 import velho.model.ProductCategory;
 import velho.model.ProductType;
-import velho.model.Product;
 
 /**
  * Tests for {@link ProductBox}.
- * 
+ *
  * @author Joona
  */
 public class ProductBoxTest
@@ -37,14 +39,14 @@ public class ProductBoxTest
 	private int id2 = 2;
 	private int maxSize = 12;
 
-	private Product product1 = new Product(id1, name1, date, brand1, category, -1);
-	private Product product2 = new Product(id2, name2, date, brand2, category2, -1);
-	private Product product3 = new Product(id2, name2, date, brand2, category3, -1);
+	private Product product1 = new Product(id1, name1, brand1, category, -1);
+	private Product product2 = new Product(id2, name2, brand2, category2, -1);
+	private Product product3 = new Product(id2, name2, brand2, category3, -1);
 
 	@Before
 	public void createProductBox()
 	{
-		box = new ProductBox(id1, maxSize, product1, 0);
+		box = new ProductBox(id1, date, maxSize, product1, 0);
 	}
 
 	@After
@@ -57,28 +59,28 @@ public class ProductBoxTest
 	@Test
 	public void testCreateProductBox_RAW()
 	{
-		ProductBox productBox2 = new ProductBox(1, 1, product2, 0);
+		ProductBox productBox2 = new ProductBox(1, date, 1, product2, 0);
 	}
 
 	@SuppressWarnings("unused")
 	@Test(expected = IllegalArgumentException.class)
 	public void testCreateProductBox_COLD()
 	{
-		ProductBox productBox3 = new ProductBox(1, 1, product3, 0);
+		ProductBox productBox3 = new ProductBox(1, date, 1, product3, 0);
 	}
 
 	@SuppressWarnings("unused")
 	@Test(expected = IllegalArgumentException.class)
 	public void testCreateProductBox_MaxSize_1()
 	{
-		ProductBox productBox4 = new ProductBox(1, maxSize, product3, maxSize + 1);
+		ProductBox productBox4 = new ProductBox(1, date, maxSize, product3, maxSize + 1);
 	}
 
 	@SuppressWarnings("unused")
 	@Test(expected = IllegalArgumentException.class)
 	public void testCreateProductBox_MaxSize_2()
 	{
-		ProductBox productBox5 = new ProductBox(1, maxSize - 14, product3, maxSize);
+		ProductBox productBox5 = new ProductBox(1, date, maxSize - 14, product3, maxSize);
 	}
 
 	@Test
@@ -114,14 +116,14 @@ public class ProductBoxTest
 	@Test
 	public void testGetProduct2()
 	{
-		ProductBox box2 = new ProductBox(id1, maxSize, product2, 0);
+		ProductBox box2 = new ProductBox(id1, date, maxSize, product2, 0);
 		assertEquals(product2, box2.getProduct());
 	}
 
 	@Test(expected = IllegalArgumentException.class)
 	public void testGetProduct3()
 	{
-		ProductBox box3 = new ProductBox(id1, maxSize, product3, 0);
+		ProductBox box3 = new ProductBox(id1, date, maxSize, product3, 0);
 		assertEquals(product3, box3.getProduct());
 	}
 
@@ -197,7 +199,13 @@ public class ProductBoxTest
 	@Test
 	public void testToString()
 	{
-		ProductBox box2 = new ProductBox(1, 1, product2, 0);
+		ProductBox box2 = new ProductBox(1, date, 1, product2, 0);
 		assertEquals("[1] Box: peruna (0)", box2.toString());
+	}
+
+	@Test
+	public void testGetExpirationDate()
+	{
+		assertEquals(date, box.getExpirationDate());
 	}
 }

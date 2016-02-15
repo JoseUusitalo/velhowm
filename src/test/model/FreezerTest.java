@@ -14,7 +14,7 @@ import velho.model.ProductType;
 
 /**
  * Tests for the {@link Freezer} class.
- * 
+ *
  * @author Joona
  */
 public class FreezerTest
@@ -33,35 +33,42 @@ public class FreezerTest
 	private int id1 = 1;
 	private int id2 = 2;
 
-	private Product product1 = new Product(id1, name1, date, brand1, category, -1);
-	private Product product2 = new Product(id2, name2, date, brand2, category2, -1);
-	private Product product3 = new Product(id2, name2, date, brand2, category3, -1);
+	private Product product1 = new Product(id1, name1, brand1, category, -1);
+	private Product product2 = new Product(id2, name2, brand2, category2, -1);
+	private Product product3 = new Product(id2, name2, brand2, category3, -1);
 
 	@SuppressWarnings("unused")
 	@Test(expected = IllegalArgumentException.class)
 	public void testFreezer_Regular()
 	{
-		Freezer freezer = new Freezer(1, 1, product1, 0);
+		Freezer freezer = new Freezer(1, date, 1, product1, 0);
 	}
 
 	@SuppressWarnings("unused")
 	@Test
 	public void testFreezer_RAW()
 	{
-		Freezer freezer = new Freezer(1, 1, product2, 0);
+		Freezer freezer = new Freezer(1, date, 1, product2, 0);
 	}
 
 	@SuppressWarnings("unused")
 	@Test
 	public void testFreezer_COLD()
 	{
-		Freezer freezer = new Freezer(1, 1, product3, 0);
+		Freezer freezer = new Freezer(1, date, 1, product3, 0);
 	}
 
 	@Test
 	public void testToString()
 	{
-		Freezer f2 = new Freezer(1, 1, product2, 0);
+		Freezer f2 = new Freezer(1, date, 1, product2, 0);
 		assertEquals("[1] Freezer: peruna (0)", f2.toString());
+	}
+
+	@Test
+	public void testGetExpirationDate()
+	{
+		Freezer freezer = new Freezer(1, date, 1, product2, 0);
+		assertEquals(date, freezer.getExpirationDate());
 	}
 }

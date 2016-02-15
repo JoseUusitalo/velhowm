@@ -1,22 +1,25 @@
 package velho.model;
 
+import java.util.Date;
+
 /**
  * The freezer class.
- * 
+ *
  * @author Joona &amp; Jose Uusitalo
  */
 public class Freezer extends ProductContainer
 {
 	/**
 	 * @param freezerID
+	 * @param expirationDate
 	 * @param maxSize
 	 * @param product
 	 * @param productCount
 	 * @param category
 	 */
-	public Freezer(int freezerID, int maxSize, Product product, int productCount)
+	public Freezer(final int freezerID, final Date expirationDate, final int maxSize, final Product product, final int productCount)
 	{
-		super(freezerID, maxSize, product, productCount);
+		super(freezerID, expirationDate, maxSize, product, productCount);
 
 		if (this.getBoxType().getName() == "Regular")
 		{

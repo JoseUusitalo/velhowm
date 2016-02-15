@@ -1,8 +1,6 @@
 package test.model;
 
-import static org.junit.Assert.*;
-
-import java.sql.Date;
+import static org.junit.Assert.assertEquals;
 
 import org.junit.After;
 import org.junit.Before;
@@ -15,23 +13,22 @@ import velho.model.ProductType;
 
 /**
  * Tests for the {@link Product} class.
- * 
+ *
  * @author Joona
  */
 public class ProductTest
 {
-	private ProductBrand brand = new ProductBrand(-1, "jotain");
-	private ProductType regular = new ProductType(-1, "Regular");
-	private ProductCategory category = new ProductCategory(-1, "jahas", regular);
+	private ProductBrand brand = new ProductBrand(1, "jotain");
+	private ProductType regular = new ProductType(2, "Regular");
+	private ProductCategory category = new ProductCategory(3, "jahas", regular);
 	private Product product;
-	private Date date = new Date(1000);
 	private String name = "porkkana";
 	private int id = 20;
 
 	@Before
 	public void createProduct()
 	{
-		product = new Product(id, name, date, brand, category, -1);
+		product = new Product(id, name, brand, category, -1);
 	}
 
 	@After
@@ -53,12 +50,6 @@ public class ProductTest
 	}
 
 	@Test
-	public void testGetExpirationDate()
-	{
-		assertEquals(date, product.getExpirationDate());
-	}
-
-	@Test
 	public void testGetProductID()
 	{
 		assertEquals(id, product.getProductID());
@@ -77,9 +68,27 @@ public class ProductTest
 	}
 
 	@Test
-	public void testGetType()
+	public void testGetBrandID()
+	{
+		assertEquals(1, product.getBrand().getDatabaseID());
+	}
+
+	@Test
+	public void testGetCategory()
 	{
 		assertEquals(category, product.getCategory());
+	}
+
+	@Test
+	public void testGetCategoryID()
+	{
+		assertEquals(3, product.getCategory().getDatabaseID());
+	}
+
+	@Test
+	public void testGetTypeID()
+	{
+		assertEquals(2, product.getCategory().getType().getDatabaseID());
 	}
 
 	@Test
@@ -93,6 +102,6 @@ public class ProductTest
 	@Test
 	public final void testToString()
 	{
-		assertEquals("[20] porkkana (jotain / jahas (Regular)), Expires: 1970-01-01, Popularity: -1", product.toString());
+		assertEquals("[20] porkkana (jotain / jahas (Regular)), Popularity: -1", product.toString());
 	}
 }

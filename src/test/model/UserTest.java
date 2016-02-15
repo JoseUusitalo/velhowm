@@ -1,6 +1,8 @@
 package test.model;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
@@ -115,6 +117,17 @@ public class UserTest
 	public final void testValidation_PinBadge_Neither2() throws NoDatabaseLinkException
 	{
 		assertFalse(User.validateUserData(null, null, VALID_NAME, VALID_NAME, VALID_ROLE_NAME));
+	}
+
+	@Test
+	public final void testValidation_PinBadge_Both() throws NoDatabaseLinkException
+	{
+		System.out.println("both");
+		System.out.println(User.isValidPIN(VALID_PIN_MIN));
+		System.out.println(User.isValidPIN(VALID_PIN_MAX));
+		System.out.println(User.isValidBadgeID(VALID_BADGE_ID_MAX));
+		System.out.println(User.isValidBadgeID(VALID_BADGE_ID_MIN));
+		assertFalse(User.validateUserData(VALID_BADGE_ID_MIN, VALID_PIN_MAX, VALID_NAME, VALID_NAME, VALID_ROLE_NAME));
 	}
 
 	@Test

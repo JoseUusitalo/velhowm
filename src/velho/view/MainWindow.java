@@ -51,6 +51,26 @@ public class MainWindow extends Application
 	public static final boolean SHOW_WINDOWS = true;
 
 	/**
+	 * Print SQL Builder output?
+	 */
+	public static final boolean PRINT_SQL = true;
+
+	/**
+	 * Print messages about caching?
+	 */
+	public static final boolean PRINT_CACHE_MESSAGES = true;
+
+	/**
+	 * The height of the window.
+	 */
+	public static final double WINDOW_HEIGHT = 720;
+
+	/**
+	 * The width of the window.
+	 */
+	public static final double WINDOW_WIDTH = 1024;
+
+	/**
 	 * The {@link DebugController}.
 	 */
 	private static DebugController debugController;
@@ -98,15 +118,22 @@ public class MainWindow extends Application
 		System.out.println("Running VELHO Warehouse Management.");
 		try
 		{
-			DatabaseController.connectAndInitialize();
+			if (DatabaseController.connectAndInitialize())
+			{
+				DatabaseController.loadData(false);
+				debugController = new DebugController();
+				userController = new UserController();
 
-			debugController = new DebugController();
-			userController = new UserController();
+				listController = new ListController(userController);
+				uiController = new UIController(this, listController, userController);
 
-			listController = new ListController(userController);
-			uiController = new UIController(this, listController, userController);
-
-			LoginController.setControllers(uiController, debugController);
+				LoginController.setControllers(uiController, debugController);
+			}
+			else
+			{
+				System.out.println("Closing application.");
+				System.exit(0);
+			}
 		}
 		catch (ClassNotFoundException | ExistingDatabaseLinkException | NoDatabaseLinkException e1)
 		{
@@ -119,7 +146,7 @@ public class MainWindow extends Application
 	 *
 	 * @param args
 	 */
-	public static void main(String[] args)
+	public static void main(final String[] args)
 	{
 		launch(args);
 	}
@@ -135,7 +162,7 @@ public class MainWindow extends Application
 		if (mainTabPane == null)
 			showMainMenu();
 
-		Tab tab = new Tab();
+		final Tab tab = new Tab();
 		tab.setText(tabName);
 		tab.setContent(view);
 		mainTabPane.getTabs().add(tab);
@@ -155,7 +182,7 @@ public class MainWindow extends Application
 		// Force log in to see main menu.
 		if (LoginController.checkLogin())
 		{
-			HBox statusBar = new HBox();
+			final HBox statusBar = new HBox();
 			statusBar.setAlignment(Pos.CENTER_RIGHT);
 			statusBar.setPadding(new Insets(4.0));
 
@@ -165,16 +192,16 @@ public class MainWindow extends Application
 					new BorderStroke(Paint.valueOf("b5b5b5"), Paint.valueOf(Color.TRANSPARENT.toString()), Paint.valueOf(Color.TRANSPARENT.toString()),
 							Paint.valueOf(Color.TRANSPARENT.toString()), BorderStrokeStyle.SOLID, null, null, null, null, null, null)));
 
-			HBox userBar = new HBox(10);
+			final HBox userBar = new HBox(10);
 
-			Label userName = new Label("Hello, " + LoginController.getCurrentUser().getRoleName() + " " + LoginController.getCurrentUser().getFullName());
-			Button logoutButton = new Button("Log Out");
+			final Label userName = new Label("Hello, " + LoginController.getCurrentUser().getRoleName() + " " + LoginController.getCurrentUser().getFullName());
+			final Button logoutButton = new Button("Log Out");
 			logoutButton.setPrefHeight(5.0);
 
 			logoutButton.setOnAction(new EventHandler<ActionEvent>()
 			{
 				@Override
-				public void handle(ActionEvent event)
+				public void handle(final ActionEvent event)
 				{
 					LoginController.logout();
 				}
@@ -196,8 +223,6 @@ public class MainWindow extends Application
 	@Override
 	public void start(final Stage primaryStage)
 	{
-		DatabaseController.loadData();
-
 		if (!SHOW_WINDOWS && DEBUG_MODE)
 		{
 			System.out.println("Windows are disabled.");
@@ -205,8 +230,8 @@ public class MainWindow extends Application
 		else
 		{
 			primaryStage.setTitle("Velho Warehouse Management");
-			Group root = new Group();
-			scene = new Scene(root, 1024, 700, Color.WHITE);
+			final Group root = new Group();
+			scene = new Scene(root, WINDOW_WIDTH, WINDOW_HEIGHT, Color.WHITE);
 			rootBorderPane = new BorderPane();
 			rootBorderPane.prefHeightProperty().bind(scene.heightProperty());
 			rootBorderPane.prefWidthProperty().bind(scene.widthProperty());
@@ -227,7 +252,7 @@ public class MainWindow extends Application
 				debugStage.setOnCloseRequest(new EventHandler<WindowEvent>()
 				{
 					@Override
-					public void handle(WindowEvent event)
+					public void handle(final WindowEvent event)
 					{
 						shutdown(primaryStage);
 					}
@@ -236,11 +261,13 @@ public class MainWindow extends Application
 
 			primaryStage.setOnCloseRequest(new EventHandler<WindowEvent>()
 			{
+
 				@Override
-				public void handle(WindowEvent event)
+				public void handle(final WindowEvent event)
 				{
 					shutdown(primaryStage);
 				}
+
 			});
 		}
 	}
@@ -264,7 +291,7 @@ public class MainWindow extends Application
 		{
 			DatabaseController.unlink();
 		}
-		catch (NoDatabaseLinkException e)
+		catch (final NoDatabaseLinkException e)
 		{
 			// Ignore.
 		}
