@@ -183,12 +183,16 @@ public class ListView
 			// Display button only if the row is not empty.
 			if (!empty)
 			{
-				// Permission check.
-				User rowUser = (User) TableCellDeleteButton.this.getTableView().getItems().get(TableCellDeleteButton.this.getIndex());
+				Object rowObject = TableCellDeleteButton.this.getTableView().getItems().get(TableCellDeleteButton.this.getIndex());
 
-				// Show delete button for users that have a lower or equal role than current user.
-				if (rowUser.getRole().compareTo(LoginController.getCurrentUser().getRole()) <= 0)
-					setGraphic(button);
+				if (rowObject instanceof User)
+				{
+					// Permission check.
+
+					// Show delete button for users that have a lower or equal role than current user.
+					if (((User) rowObject).getRole().compareTo(LoginController.getCurrentUser().getRole()) <= 0)
+						setGraphic(button);
+				}
 			}
 			else
 				setGraphic(null);

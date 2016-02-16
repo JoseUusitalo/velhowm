@@ -28,6 +28,8 @@ import velho.model.ProductBoxSearchResultRow;
 import velho.model.ProductBrand;
 import velho.model.ProductCategory;
 import velho.model.ProductType;
+import velho.model.RemovalList;
+import velho.model.RemovalListState;
 import velho.model.Shelf;
 import velho.model.User;
 import velho.model.enums.DatabaseQueryType;
@@ -113,6 +115,16 @@ public class DatabaseController
 	 * A map of {@link Shelf} objects loaded from the database.
 	 */
 	private static Map<Integer, Shelf> loadedShelves = new HashMap<Integer, Shelf>();
+
+	/**
+	 * A map of {@link RemovalList} objects loaded from the database.
+	 */
+	private static Map<Integer, RemovalList> loadedRemovalLists = new HashMap<Integer, RemovalList>();
+
+	/**
+	 * A map of {@link RemovalListState} objects loaded from the database.
+	 */
+	private static Map<Integer, RemovalListState> loadedRemovalListStates = new HashMap<Integer, RemovalListState>();
 
 	/*
 	 * PRIVATE DATABASE METHODS
@@ -277,6 +289,7 @@ public class DatabaseController
 
 		// Putting boxes on shelves.
 		Map<Integer, ArrayList<Integer[]>> shelfBoxMap = null;
+		Map<Integer, ArrayList<Integer>> listBoxMap = null;
 
 		try
 		{
@@ -393,6 +406,41 @@ public class DatabaseController
 								}
 
 								break;
+
+							case REMOVALLISTS:
+								// @formatter:off
+								while (result.next())
+									dataSet.add(new RemovalList(
+											result.getInt("removallist_id"),
+											getRemovalListStateByID(result.getInt("liststate"))));
+								break;
+								// @formatter:on
+
+							case REMOVALLIST_PRODUCTBOXES:
+								listBoxMap = new HashMap<Integer, ArrayList<Integer>>();
+								Integer listID = null;
+								ArrayList<Integer> boxIDs = new ArrayList<Integer>();
+
+								while (result.next())
+								{
+									listID = result.getInt("removallist");
+
+									// Does this removal list already have boxes in it?
+									if (listBoxMap.containsKey(listID))
+									{
+										// Add to the list.
+										listBoxMap.get(listID).add(result.getInt("productbox"));
+									}
+									else
+									{
+										// Create a new list and put in the data.
+										boxIDs = new ArrayList<Integer>();
+										boxIDs.add(result.getInt("productbox"));
+										listBoxMap.put(listID, boxIDs);
+									}
+								}
+
+								break;
 							default:
 								throw new IllegalArgumentException();
 						}
@@ -474,9 +522,13 @@ public class DatabaseController
 					case PRODUCTS:
 					case CONTAINERS:
 					case SHELVES:
+					case REMOVALLISTS:
+					case REMOVALLIST_STATES:
 						return dataSet;
 					case SHELF_PRODUCTBOXES:
 						return shelfBoxMap;
+					case REMOVALLIST_PRODUCTBOXES:
+						return listBoxMap;
 					default:
 						throw new IllegalArgumentException();
 				}
@@ -845,8 +897,9 @@ public class DatabaseController
 	public static Map<String, String> getRemovalListDataColumns()
 	{
 		final LinkedHashMap<String, String> cols = new LinkedHashMap<String, String>();
-		cols.put("name", "Name");
+		cols.put("databaseID", "ID");
 		cols.put("state", "State");
+		cols.put("size", "Size");
 		cols.put("viewButton", "View");
 
 		// Only managers and administrators can delete lists.
@@ -1001,6 +1054,37 @@ public class DatabaseController
 			return null;
 
 		return UserController.stringToRole(result.iterator().next());
+	}
+
+	private static RemovalListState getRemovalListStateByID(final int stateid) throws NoDatabaseLinkException
+	{
+		if (!loadedRemovalListStates.containsKey(stateid))
+		{
+			final String[] columns = { "name" };
+			final List<String> where = new ArrayList<String>();
+			where.add("removallist_state_id = " + new Integer(stateid));
+
+			@SuppressWarnings("unchecked")
+			final Set<String> result = (LinkedHashSet<String>) (runQuery(DatabaseQueryType.SELECT, DatabaseTable.REMOVALLIST_STATES, null, columns, null,
+					where));
+
+			if (result.size() == 0)
+				return null;
+
+			final RemovalListState s = new RemovalListState(stateid, result.iterator().next());
+
+			// Store for reuse.
+
+			if (MainWindow.PRINT_CACHE_MESSAGES)
+				System.out.println("Caching: " + s);
+
+			loadedRemovalListStates.put(s.getDatabaseID(), s);
+			return s;
+		}
+
+		if (MainWindow.PRINT_CACHE_MESSAGES)
+			System.out.println("Loading removal list state " + stateid + " from cache.");
+		return loadedRemovalListStates.get(stateid);
 	}
 
 	/**
@@ -1448,6 +1532,8 @@ public class DatabaseController
 
 	public static ObservableList<Object> getRemovalListsViewList()
 	{
+		removalListsViewList.clear();
+		removalListsViewList.addAll(loadedRemovalLists.values());
 		return removalListsViewList;
 	}
 
@@ -1873,6 +1959,12 @@ public class DatabaseController
 		return changed;
 	}
 
+	public static boolean updateRemovalList(final RemovalList removalList)
+	{
+		// TODO Auto-generated method stub
+		return false;
+	}
+
 	/**
 	 * Loads data from database into memory.
 	 */
@@ -1885,6 +1977,7 @@ public class DatabaseController
 		{
 			loadProductBoxes(silent);
 			loadShelves(silent);
+			loadRemovalLists(silent);
 		}
 		catch (final NoDatabaseLinkException e)
 		{
@@ -2000,5 +2093,78 @@ public class DatabaseController
 
 		if (!silent)
 			System.out.println("[DatabaseController] Product boxes placed on shelves.");
+	}
+
+	/**
+	 * Loads the following objects into memory:
+	 * <ul>
+	 * <li>{@link RemovalListState}</li>
+	 * <li>{@link RemovalList}</li>
+	 * </ul>
+	 *
+	 * @throws NoDatabaseLinkException
+	 */
+	private static void loadRemovalLists(final boolean silent) throws NoDatabaseLinkException
+	{
+		if (!silent)
+			System.out.println("[DatabaseController] Loading removal lists...");
+
+		final String[] columns = { "*" };
+		@SuppressWarnings("unchecked")
+		final Set<RemovalList> result = (Set<RemovalList>) runQuery(DatabaseQueryType.SELECT, DatabaseTable.REMOVALLISTS, null, columns, null, null);
+
+		final Iterator<RemovalList> it = result.iterator();
+
+		// Store for reuse.
+		while (it.hasNext())
+		{
+			final RemovalList r = it.next();
+
+			if (MainWindow.PRINT_CACHE_MESSAGES)
+				System.out.println("Caching: " + r);
+
+			loadedRemovalLists.put(r.getDatabaseID(), r);
+		}
+
+		if (!silent)
+			System.out.println("[DatabaseController] Removal lists loaded.");
+
+		setAllContainersToAllRemovalLists(silent);
+	}
+
+	/**
+	 * Places the loaded {@link ProductContainer} objects into {@link RemovalList} objects.
+	 *
+	 * @throws NoDatabaseLinkException
+	 */
+	private static void setAllContainersToAllRemovalLists(final boolean silent) throws NoDatabaseLinkException
+	{
+		if (!silent)
+			System.out.println("[DatabaseController] Placing product boxes on removal lists...");
+
+		final String[] columns = { "*" };
+		@SuppressWarnings("unchecked")
+		final Map<Integer, ArrayList<Integer>> removaListBoxes = (HashMap<Integer, ArrayList<Integer>>) runQuery(DatabaseQueryType.SELECT,
+				DatabaseTable.REMOVALLIST_PRODUCTBOXES, null, columns, null, null);
+
+		for (final Integer removalListID : removaListBoxes.keySet())
+		{
+			if (loadedRemovalLists.containsKey(removalListID))
+			{
+				final ArrayList<Integer> boxIDs = removaListBoxes.get(removalListID);
+
+				for (final Integer id : boxIDs)
+				{
+					if (loadedProductBoxes.containsKey(id))
+					{
+						// Do not update the database as this method loads the data from the database into objects.
+						loadedRemovalLists.get(removalListID).addProductBox(loadedProductBoxes.get(id));
+					}
+				}
+			}
+		}
+
+		if (!silent)
+			System.out.println("[DatabaseController] Product boxes placed on removal lists.");
 	}
 }

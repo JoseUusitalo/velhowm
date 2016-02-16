@@ -47,6 +47,18 @@ public class RemovalListController implements UIActionController
 	}
 
 	/**
+	 * Gets the removal list creation view.
+	 *
+	 * @return view for creating new removal lists
+	 */
+	private Node getRemovalListCreationView()
+	{
+		managementView.setBrowseListsButtonVisiblity(true);
+		RemovalListCreationView creationView = new RemovalListCreationView(this, listController);
+		return creationView.getView();
+	}
+
+	/**
 	 * Changes the removal list management view to the removal list creation view.
 	 */
 	public void showNewRemovalListView()
@@ -69,18 +81,6 @@ public class RemovalListController implements UIActionController
 	}
 
 	/**
-	 * Gets the removal list creation view.
-	 *
-	 * @return view for creating new removal lists
-	 */
-	private Node getRemovalListCreationView()
-	{
-		managementView.setBrowseListsButtonVisiblity(true);
-		RemovalListCreationView creationView = new RemovalListCreationView(this, listController);
-		return creationView.getView();
-	}
-
-	/**
 	 * Gets a view showing the removal list currently being created.
 	 *
 	 * @return view for the current removal list being created
@@ -88,7 +88,7 @@ public class RemovalListController implements UIActionController
 	public BorderPane getCurrentRemovalListView()
 	{
 		System.out.println("Showing current new removal list.");
-		return (BorderPane) ListController.getTableView(this, DatabaseController.getPublicProductDataColumns(false, true), newRemovalList.getObservableList());
+		return (BorderPane) ListController.getTableView(this, DatabaseController.getPublicProductDataColumns(false, true), newRemovalList.getBoxes());
 	}
 
 	@Override
