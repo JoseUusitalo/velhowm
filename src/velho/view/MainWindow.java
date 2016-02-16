@@ -29,6 +29,7 @@ import velho.controller.DebugController;
 import velho.controller.ListController;
 import velho.controller.LoginController;
 import velho.controller.RemovalListController;
+import velho.controller.SearchController;
 import velho.controller.UIController;
 import velho.controller.UserController;
 import velho.model.exceptions.ExistingDatabaseLinkException;
@@ -75,6 +76,11 @@ public class MainWindow extends Application
 	 * The {@link DebugController}.
 	 */
 	private static DebugController debugController;
+
+	/**
+	 * The {@link SearchController}.
+	 */
+	private SearchController searchController;
 
 	/**
 	 * The {@link UserController}.
@@ -129,10 +135,11 @@ public class MainWindow extends Application
 				DatabaseController.loadData(false);
 				debugController = new DebugController();
 				userController = new UserController();
+				searchController = new SearchController();
 
 				listController = new ListController(userController);
 				removalListController = new RemovalListController(listController);
-				uiController = new UIController(this, listController, userController, removalListController);
+				uiController = new UIController(this, listController, userController, removalListController, searchController);
 
 				LoginController.setControllers(uiController, debugController);
 			}
