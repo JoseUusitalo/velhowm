@@ -1,6 +1,5 @@
 package velho.controller;
 
-import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -38,7 +37,7 @@ public class ListController
 	public Node getUserListView(final Map<String, String> columnMap, final ObservableList<Object> dataList)
 	{
 		ListView list = new ListView(this, columnMap, dataList);
-		return list.getUserTableView();
+		return list.getView();
 	}
 
 	/**
@@ -51,7 +50,7 @@ public class ListController
 	public Node getProductListView(final Map<String, String> columnMap, final ObservableList<Object> observableList)
 	{
 		ListView list = new ListView(this, columnMap, observableList);
-		return list.getUserTableView();
+		return list.getView();
 	}
 
 	/**
@@ -74,7 +73,33 @@ public class ListController
 		ProductListSearch searchView = new ProductListSearch(this);
 		ListView listView = new ListView(this, DatabaseController.getProductSearchDataColumns(), DatabaseController.getProductSearchResultViewList());
 
-		return searchView.getProductListSearch(listView.getUserTableView());
+		return searchView.getView(listView.getView());
+	}
+
+	public Node getRemovalListView()
+	{
+		ListView listView = new ListView(this, DatabaseController.getRemovalListDataColumns(), DatabaseController.getRemovalListsViewList());
+		return listView.getView();
+	}
+
+	/**
+	 * Gets a view for displaying tabular data with the specified columns and data.
+	 *
+	 * @param columnMap map of columns and their values
+	 * @param data data to display
+	 * @return a table view of the given data
+	 */
+	public Node getTableView(final Map<String, String> columnMap, final ObservableList<Object> data)
+	{
+		ListView listView = new ListView(this, columnMap, data);
+		return listView.getView();
+	}
+
+	public Node getProductSearchResultsView()
+	{
+		// TODO: Temporary
+		System.out.println("Getting search results for removal list.");
+		return getProductListView(DatabaseController.getPublicProductDataColumns(true), DatabaseController.getPublicProductDataList());
 	}
 
 	/**
@@ -83,6 +108,7 @@ public class ListController
 	 * @param products a string of product names or IDs (one per line)
 	 * @return
 	 */
+	@SuppressWarnings("static-method")
 	public Map<Integer, Integer> searchByProductList(final String products)
 	{
 		String[] productStringLines = products.split("\n");
@@ -210,8 +236,19 @@ public class ListController
 			}
 			countName[1] = sb.toString();
 		}
-		System.out.println("GOT++++++++++++" + Arrays.asList(countName));
 
 		return countName;
+	}
+
+	/**
+	 * Performs an add action for the given data depending on the type of the object.
+	 *
+	 * @param object data to process
+	 */
+	@SuppressWarnings("static-method")
+	public void addData(final Object object)
+	{
+		System.out.println("OBJECT FROM BUTTON: " + object);
+
 	}
 }

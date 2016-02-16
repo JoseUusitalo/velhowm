@@ -21,6 +21,7 @@ import org.h2.jdbcx.JdbcConnectionPool;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import velho.model.Manager;
 import velho.model.Product;
 import velho.model.ProductBox;
 import velho.model.ProductBoxSearchResultRow;
@@ -77,6 +78,11 @@ public class DatabaseController
 	 * An observable list of product search results for display in the user interface.
 	 */
 	private static ObservableList<Object> productSearchResultViewList = FXCollections.observableArrayList();
+
+	/**
+	 * An observable list of removal lists for display in the user interface.
+	 */
+	private static ObservableList<Object> removalListsViewList = FXCollections.observableArrayList();
 
 	/**
 	 * A map of {@link ProductBrand} objects loaded from the database.
@@ -809,17 +815,40 @@ public class DatabaseController
 	}
 
 	/**
-	 * Gets a map of columns and column names for displaying {@link #getPublicProductDataList()()} data in a table.
+	 * Gets a map of columns and column names for displaying {@link #getPublicProductDataList()} data in a table.
 	 *
 	 * @return a map where the key is the column value and value is the column name
 	 */
-	public static Map<String, String> getPublicProductDataColumns()
+	public static Map<String, String> getPublicProductDataColumns(final boolean witAddColumn)
 	{
 		final LinkedHashMap<String, String> cols = new LinkedHashMap<String, String>();
+
+		if (witAddColumn)
+			cols.put("addButton", "Add");
+
 		cols.put("name", "Name");
 		cols.put("brand", "Brand");
 		cols.put("category", "Category");
 		cols.put("popularity", "Popularity");
+
+		return cols;
+	}
+
+	/**
+	 * Gets a map of columns and column names for displaying {@link #getPublicProductDataList()} data in a table.
+	 *
+	 * @return a map where the key is the column value and value is the column name
+	 */
+	public static Map<String, String> getRemovalListDataColumns()
+	{
+		final LinkedHashMap<String, String> cols = new LinkedHashMap<String, String>();
+		cols.put("name", "Name");
+		cols.put("state", "State");
+		cols.put("viewButton", "View");
+
+		// Only managers and administrators can delete lists.
+		if (LoginController.getCurrentUser().getRole().compareTo(new Manager()) >= 0)
+			cols.put("deleteButton", "Delete");
 
 		return cols;
 	}
@@ -1412,6 +1441,11 @@ public class DatabaseController
 	public static ObservableList<Object> getProductSearchResultViewList()
 	{
 		return productSearchResultViewList;
+	}
+
+	public static ObservableList<Object> getRemovalListsViewList()
+	{
+		return removalListsViewList;
 	}
 
 	/**

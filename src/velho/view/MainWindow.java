@@ -28,6 +28,7 @@ import velho.controller.DatabaseController;
 import velho.controller.DebugController;
 import velho.controller.ListController;
 import velho.controller.LoginController;
+import velho.controller.RemovalListController;
 import velho.controller.UIController;
 import velho.controller.UserController;
 import velho.model.exceptions.ExistingDatabaseLinkException;
@@ -111,6 +112,11 @@ public class MainWindow extends Application
 	private Stage debugStage;
 
 	/**
+	 * The {@link RemovalListController}.
+	 */
+	private RemovalListController removalListController;
+
+	/**
 	 * The main window constructor.
 	 */
 	public MainWindow()
@@ -125,7 +131,8 @@ public class MainWindow extends Application
 				userController = new UserController();
 
 				listController = new ListController(userController);
-				uiController = new UIController(this, listController, userController);
+				removalListController = new RemovalListController(listController);
+				uiController = new UIController(this, listController, userController, removalListController);
 
 				LoginController.setControllers(uiController, debugController);
 			}
@@ -245,7 +252,6 @@ public class MainWindow extends Application
 
 			if (DEBUG_MODE)
 			{
-
 				debugStage = new Stage();
 				debugController.createDebugWindow(debugStage);
 
@@ -261,13 +267,11 @@ public class MainWindow extends Application
 
 			primaryStage.setOnCloseRequest(new EventHandler<WindowEvent>()
 			{
-
 				@Override
 				public void handle(final WindowEvent event)
 				{
 					shutdown(primaryStage);
 				}
-
 			});
 		}
 	}

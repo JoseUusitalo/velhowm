@@ -123,7 +123,7 @@ public class UserController
 	 */
 	public Node getView()
 	{
-		return view.getAddUserView();
+		return view.getView();
 	}
 
 	/**

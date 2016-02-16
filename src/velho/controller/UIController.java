@@ -29,14 +29,23 @@ public class UIController
 	private ListController listController;
 
 	/**
+	 * The {@link RemovalListController}.
+	 */
+	private RemovalListController removalListController;
+
+	/**
 	 * @param mainWindow
 	 * @param listController
+	 * @param userController
+	 * @param removalListController
 	 */
-	public UIController(final MainWindow mainWindow, final ListController listController, final UserController userController)
+	public UIController(final MainWindow mainWindow, final ListController listController, final UserController userController,
+			final RemovalListController removalListController)
 	{
-		mainView = mainWindow;
+		this.mainView = mainWindow;
 		this.listController = listController;
 		this.userController = userController;
+		this.removalListController = removalListController;
 	}
 
 	/**
@@ -87,11 +96,12 @@ public class UIController
 			case "Administrator":
 			case "Manager":
 				mainView.addTab("Add User", userController.getView());
+				mainView.addTab("Removal Lists", removalListController.getRemovalListManagementView());
 				//$FALL-THROUGH$
 			case "Logistician":
 				mainView.addTab("User List", getUserListView(currentUserRole));
-				mainView.addTab("Product List",
-						listController.getProductListView(DatabaseController.getPublicProductDataColumns(), DatabaseController.getPublicProductDataList()));
+				mainView.addTab("Product List", listController.getProductListView(DatabaseController.getPublicProductDataColumns(false),
+						DatabaseController.getPublicProductDataList()));
 				mainView.addTab("Product List Search", listController.getProductListSearchView());
 				break;
 			default:

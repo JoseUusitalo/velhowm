@@ -52,7 +52,7 @@ public class AddUserView
 	 * 
 	 * @return
 	 */
-	public GridPane getAddUserView()
+	public GridPane getView()
 	{
 		if (grid == null)
 		{
