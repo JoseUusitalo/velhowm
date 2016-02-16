@@ -28,22 +28,29 @@ public class UIController
 	 */
 	private ListController listController;
 
+	private SearchController searchController;
+
 	/**
 	 * @param mainWindow
 	 * @param listController
+	 * @param userController
+	 * @param searchController
 	 */
-	public UIController(final MainWindow mainWindow, final ListController listController, final UserController userController)
+	public UIController(final MainWindow mainWindow, final ListController listController, final UserController userController, final SearchController searchController)
 	{
 		mainView = mainWindow;
 		this.listController = listController;
 		this.userController = userController;
+		this.searchController = searchController;
 	}
 
 	/**
 	 * Shows a view in the main window.
 	 *
-	 * @param position {@link Position} to show the view in
-	 * @param view view to show
+	 * @param position
+	 *            {@link Position} to show the view in
+	 * @param view
+	 *            view to show
 	 */
 	public void setView(final Position position, final Node view)
 	{
@@ -72,7 +79,8 @@ public class UIController
 	/**
 	 * Shows the main menu as seen by the specified role.
 	 *
-	 * @param currentUserRole {@link UserRole} viewing the main menu
+	 * @param currentUserRole
+	 *            {@link UserRole} viewing the main menu
 	 */
 	public void showMainMenu(final UserRole currentUserRole)
 	{
@@ -87,11 +95,11 @@ public class UIController
 			case "Administrator":
 			case "Manager":
 				mainView.addTab("Add User", userController.getView());
+				mainView.addTab("Search", searchController.getView());
 				//$FALL-THROUGH$
 			case "Logistician":
 				mainView.addTab("User List", getUserListView(currentUserRole));
-				mainView.addTab("Product List",
-						listController.getProductListView(DatabaseController.getPublicProductDataColumns(), DatabaseController.getPublicProductDataList()));
+				mainView.addTab("Product List", listController.getProductListView(DatabaseController.getPublicProductDataColumns(), DatabaseController.getPublicProductDataList()));
 				mainView.addTab("Product List Search", listController.getProductListSearchView());
 				break;
 			default:
@@ -100,10 +108,11 @@ public class UIController
 	}
 
 	/**
-	 * Creates the user list view.
-	 * The list contents change depending on who is logged in.
+	 * Creates the user list view. The list contents change depending on who is
+	 * logged in.
 	 *
-	 * @param currentUserRole the role of the user who is currently logged in
+	 * @param currentUserRole
+	 *            the role of the user who is currently logged in
 	 * @return the user list view
 	 */
 	private Node getUserListView(final UserRole currentUserRole)
@@ -123,8 +132,7 @@ public class UIController
 				default:
 					System.out.println("Unknown user role.");
 			}
-		}
-		catch (NoDatabaseLinkException e)
+		} catch (NoDatabaseLinkException e)
 		{
 			// TODO Auto-generated catch block
 			e.printStackTrace();
