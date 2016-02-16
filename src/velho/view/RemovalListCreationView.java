@@ -13,6 +13,7 @@ import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import velho.controller.ListController;
 import velho.controller.RemovalListController;
+import velho.controller.SearchController;
 
 /**
  * View for creating new removal lists
@@ -36,10 +37,17 @@ public class RemovalListCreationView
 	 */
 	private RemovalListController removalListController;
 
-	public RemovalListCreationView(final RemovalListController removalListController, final ListController listController)
+	/**
+	 * The {@link SearchController}.
+	 */
+	private SearchController searchController;
+
+	public RemovalListCreationView(final RemovalListController removalListController, final ListController listController,
+			final SearchController searchController)
 	{
 		this.removalListController = removalListController;
 		this.listController = listController;
+		this.searchController = searchController;
 	}
 
 	/**
@@ -52,12 +60,8 @@ public class RemovalListCreationView
 		if (bpane == null)
 		{
 			bpane = new BorderPane();
+			bpane.setTop(searchController.getView());
 
-			Label temp = new Label("<Insert Product Search Here>");
-			temp.setAlignment(Pos.CENTER);
-			temp.setPadding(new Insets(20));
-
-			bpane.setTop(temp);
 			VBox left = new VBox(10);
 			// TODO: Use CSS.
 			left.setBackground(new Background(new BackgroundFill(Paint.valueOf("EEEEEE"), null, null)));

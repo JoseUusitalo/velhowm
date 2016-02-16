@@ -97,12 +97,12 @@ public class UIController
 			case "Manager":
 				mainView.addTab("Add User", userController.getView());
 				mainView.addTab("Removal Lists", removalListController.getRemovalListManagementView());
-				mainView.addTab("Search", searchController.getView());
 				//$FALL-THROUGH$
 			case "Logistician":
 				mainView.addTab("User List", getUserListView(currentUserRole));
 				mainView.addTab("Product List", listController.getProductListView(DatabaseController.getPublicProductDataColumns(false, false),
 						DatabaseController.getPublicProductDataList()));
+				mainView.addTab("Search", searchController.getView());
 				mainView.addTab("Product List Search", listController.getProductListSearchView());
 				break;
 			default:

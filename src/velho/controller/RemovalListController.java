@@ -24,12 +24,15 @@ public class RemovalListController implements UIActionController
 	 */
 	private RemovalList newRemovalList;
 
+	private SearchController searchController;
+
 	/**
 	 * @throws NoDatabaseLinkException
 	 */
-	public RemovalListController(final ListController listController)
+	public RemovalListController(final ListController listController, final SearchController searchController)
 	{
 		this.listController = listController;
+		this.searchController = searchController;
 		managementView = new RemovalListManagementView(this, this.listController);
 	}
 
@@ -54,7 +57,7 @@ public class RemovalListController implements UIActionController
 	private Node getRemovalListCreationView()
 	{
 		managementView.setBrowseListsButtonVisiblity(true);
-		RemovalListCreationView creationView = new RemovalListCreationView(this, listController);
+		RemovalListCreationView creationView = new RemovalListCreationView(this, listController, searchController);
 		return creationView.getView();
 	}
 

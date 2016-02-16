@@ -13,7 +13,10 @@ import javafx.scene.control.Label;
 import javafx.scene.control.Spinner;
 import javafx.scene.control.SpinnerValueFactory;
 import javafx.scene.control.TextField;
+import javafx.scene.layout.Background;
+import javafx.scene.layout.BackgroundFill;
 import javafx.scene.layout.GridPane;
+import javafx.scene.paint.Paint;
 import velho.controller.SearchController;
 
 public class SearchView
@@ -51,6 +54,9 @@ public class SearchView
 			grid.setVgap(10);
 			grid.setHgap(10);
 			grid.setAlignment(Pos.CENTER);
+
+			// TODO: Use CSS.
+			grid.setBackground(new Background(new BackgroundFill(Paint.valueOf("EEEEEE"), null, null)));
 
 			final TextField nameField = new TextField();
 			nameField.setPromptText("Product Name or Product ID");

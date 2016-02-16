@@ -138,7 +138,7 @@ public class MainWindow extends Application
 				searchController = new SearchController();
 
 				listController = new ListController(userController);
-				removalListController = new RemovalListController(listController);
+				removalListController = new RemovalListController(listController, searchController);
 				uiController = new UIController(this, listController, userController, removalListController, searchController);
 
 				LoginController.setControllers(uiController, debugController);
