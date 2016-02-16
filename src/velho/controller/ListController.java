@@ -264,4 +264,9 @@ public class ListController
 	{
 		System.out.println("OBJECT FROM ADD BUTTON: " + object);
 	}
+
+	public static void viewAction(final Object object)
+	{
+		System.out.println("VIEWING: " + object);
+	}
 }
