@@ -1,15 +1,15 @@
 package velho.controller;
 
 import javafx.scene.Node;
-import velho.view.AddUserView;
-import velho.view.MainWindow;
-
 import velho.model.Administrator;
 import velho.model.Logistician;
 import velho.model.Manager;
 import velho.model.User;
 import velho.model.exceptions.NoDatabaseLinkException;
+import velho.model.interfaces.UIActionController;
 import velho.model.interfaces.UserRole;
+import velho.view.AddUserView;
+import velho.view.MainWindow;
 
 /**
  * A controller for managing users.
@@ -17,7 +17,7 @@ import velho.model.interfaces.UserRole;
  * @author Jose Uusitalo &amp; Joona
  */
 @SuppressWarnings("static-method")
-public class UserController
+public class UserController implements UIActionController
 {
 	/**
 	 * The add user view.
@@ -140,7 +140,7 @@ public class UserController
 	 * @param userRoleName role to create the user as
 	 * @return a {@link User} object or <code>null</code> if {@link MainWindow#DEBUG_MODE} is <code>false</code>
 	 */
-	public static User getDebugUser(String userRoleName)
+	public static User getDebugUser(final String userRoleName)
 	{
 		if (MainWindow.DEBUG_MODE)
 		{
@@ -170,5 +170,43 @@ public class UserController
 				System.out.println("ERROR: Unknown role '" + userRoleName + "'.");
 				return null;
 		}
+	}
+
+	@Override
+	public void createAction(final Object data)
+	{
+		// TODO Auto-generated method stub
+		try
+		{
+			throw new Exception("Unimplemented.");
+		}
+		catch (Exception e)
+		{
+			e.printStackTrace();
+		}
+	}
+
+	@Override
+	public void updateAction(final Object data)
+	{
+		System.out.println("Controller got from UI: " + data);
+	}
+
+	@Override
+	public void removeAction(final Object data)
+	{
+		System.out.println("Controller got from UI: " + data);
+	}
+
+	@Override
+	public void deleteAction(final Object data)
+	{
+		removeUser((User) data);
+	}
+
+	@Override
+	public void addAction(final Object data)
+	{
+		System.out.println("Controller got from UI: " + data);
 	}
 }

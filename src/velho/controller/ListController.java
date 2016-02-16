@@ -7,6 +7,7 @@ import javafx.collections.ObservableList;
 import javafx.scene.Node;
 import velho.model.User;
 import velho.model.exceptions.NoDatabaseLinkException;
+import velho.model.interfaces.UIActionController;
 import velho.view.ListView;
 import velho.view.ProductListSearch;
 
@@ -36,7 +37,7 @@ public class ListController
 	 */
 	public Node getUserListView(final Map<String, String> columnMap, final ObservableList<Object> dataList)
 	{
-		ListView list = new ListView(this, columnMap, dataList);
+		ListView list = new ListView(userController, columnMap, dataList);
 		return list.getView();
 	}
 
@@ -47,9 +48,10 @@ public class ListController
 	 * @param dataMap the {@link ObservableMap} of data to show
 	 * @return a new table view
 	 */
+	@SuppressWarnings("static-method")
 	public Node getProductListView(final Map<String, String> columnMap, final ObservableList<Object> observableList)
 	{
-		ListView list = new ListView(this, columnMap, observableList);
+		ListView list = new ListView(null, columnMap, observableList);
 		return list.getView();
 	}
 
@@ -71,15 +73,9 @@ public class ListController
 	public Node getProductListSearchView()
 	{
 		ProductListSearch searchView = new ProductListSearch(this);
-		ListView listView = new ListView(this, DatabaseController.getProductSearchDataColumns(), DatabaseController.getProductSearchResultViewList());
+		ListView listView = new ListView(null, DatabaseController.getProductSearchDataColumns(), DatabaseController.getProductSearchResultViewList());
 
 		return searchView.getView(listView.getView());
-	}
-
-	public Node getRemovalListView()
-	{
-		ListView listView = new ListView(this, DatabaseController.getRemovalListDataColumns(), DatabaseController.getRemovalListsViewList());
-		return listView.getView();
 	}
 
 	/**
@@ -89,17 +85,19 @@ public class ListController
 	 * @param data data to display
 	 * @return a table view of the given data
 	 */
-	public Node getTableView(final Map<String, String> columnMap, final ObservableList<Object> data)
+	public static Node getTableView(final UIActionController parentController, final Map<String, String> columnMap, final ObservableList<Object> data)
 	{
-		ListView listView = new ListView(this, columnMap, data);
+		if (parentController == null)
+			System.out.println("table view parent is null for  " + data);
+		ListView listView = new ListView(parentController, columnMap, data);
 		return listView.getView();
 	}
 
 	public Node getProductSearchResultsView()
 	{
-		// TODO: Temporary
+		// TODO: Temporarily showing all products
 		System.out.println("Getting search results for removal list.");
-		return getProductListView(DatabaseController.getPublicProductDataColumns(true), DatabaseController.getPublicProductDataList());
+		return getProductListView(DatabaseController.getPublicProductDataColumns(true, false), DatabaseController.getPublicProductDataList());
 	}
 
 	/**
@@ -248,7 +246,6 @@ public class ListController
 	@SuppressWarnings("static-method")
 	public void addData(final Object object)
 	{
-		System.out.println("OBJECT FROM BUTTON: " + object);
-
+		System.out.println("OBJECT FROM ADD BUTTON: " + object);
 	}
 }

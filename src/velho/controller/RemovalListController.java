@@ -1,11 +1,13 @@
 package velho.controller;
 
 import javafx.scene.Node;
+import javafx.scene.layout.BorderPane;
 import velho.model.RemovalList;
+import velho.model.interfaces.UIActionController;
 import velho.view.RemovalListCreationView;
 import velho.view.RemovalListManagementView;
 
-public class RemovalListController
+public class RemovalListController implements UIActionController
 {
 	/**
 	 * The {@link ListController}.
@@ -38,6 +40,9 @@ public class RemovalListController
 	 */
 	public Node getRemovalListManagementView()
 	{
+		// Initially the browsing view is shown.
+		if (managementView.getView().getCenter() == null)
+			showBrowseRemovalListsView();
 		return managementView.getView();
 	}
 
@@ -50,7 +55,7 @@ public class RemovalListController
 		if (newRemovalList == null)
 			newRemovalList = new RemovalList();
 
-		managementView.getView().setCenter(getRemovalListCreationView());
+		managementView.setContent(getRemovalListCreationView());
 	}
 
 	/**
@@ -58,7 +63,9 @@ public class RemovalListController
 	 */
 	public void showBrowseRemovalListsView()
 	{
-		managementView.getView().setCenter(listController.getRemovalListView());
+		managementView.setBrowseListsButtonVisiblity(false);
+		managementView
+				.setContent(ListController.getTableView(this, DatabaseController.getRemovalListDataColumns(), DatabaseController.getRemovalListsViewList()));
 	}
 
 	/**
@@ -68,7 +75,7 @@ public class RemovalListController
 	 */
 	private Node getRemovalListCreationView()
 	{
-		System.out.println("Showing removal list creation view.");
+		managementView.setBrowseListsButtonVisiblity(true);
 		RemovalListCreationView creationView = new RemovalListCreationView(this, listController);
 		return creationView.getView();
 	}
@@ -78,9 +85,46 @@ public class RemovalListController
 	 *
 	 * @return view for the current removal list being created
 	 */
-	public Node getCurrentRemovalListView()
+	public BorderPane getCurrentRemovalListView()
 	{
 		System.out.println("Showing current new removal list.");
-		return listController.getTableView(DatabaseController.getPublicProductDataColumns(false), newRemovalList.getObservableList());
+		return (BorderPane) ListController.getTableView(this, DatabaseController.getPublicProductDataColumns(false, true), newRemovalList.getObservableList());
+	}
+
+	@Override
+	public void createAction(final Object data)
+	{
+		System.out.println("Controller got from UI: " + data);
+	}
+
+	@Override
+	public void updateAction(final Object data)
+	{
+		System.out.println("Controller got from UI: " + data);
+	}
+
+	@Override
+	public void removeAction(final Object data)
+	{
+		System.out.println("Controller got from UI: " + data);
+	}
+
+	@Override
+	public void deleteAction(final Object data)
+	{
+		System.out.println("Controller got from UI: " + data);
+	}
+
+	@Override
+	public void addAction(final Object data)
+	{
+		System.out.println("Controller got from UI: " + data);
+	}
+
+	public BorderPane getSearchResults()
+	{
+		// FIXME: temporarily showing all products
+		return (BorderPane) ListController.getTableView(this, DatabaseController.getPublicProductDataColumns(true, false),
+				DatabaseController.getPublicProductDataList());
 	}
 }

@@ -819,12 +819,15 @@ public class DatabaseController
 	 *
 	 * @return a map where the key is the column value and value is the column name
 	 */
-	public static Map<String, String> getPublicProductDataColumns(final boolean witAddColumn)
+	public static Map<String, String> getPublicProductDataColumns(final boolean withAddColumn, final boolean withDeleteColumn)
 	{
 		final LinkedHashMap<String, String> cols = new LinkedHashMap<String, String>();
 
-		if (witAddColumn)
+		if (withAddColumn)
 			cols.put("addButton", "Add");
+
+		if (withDeleteColumn)
+			cols.put("deleteButton", "Delete");
 
 		cols.put("name", "Name");
 		cols.put("brand", "Brand");
@@ -1701,6 +1704,8 @@ public class DatabaseController
 					wantedWouldBeIndex++;
 					addCountIndex = wantedWouldBeIndex;
 					lookingForLarger = true;
+
+					// FIXME: Infinite loop when looking for more products than are available.
 				}
 				else
 				{

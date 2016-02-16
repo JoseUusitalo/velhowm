@@ -4,12 +4,14 @@ import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
+import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.layout.Background;
 import javafx.scene.layout.BackgroundFill;
 import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.VBox;
+import javafx.scene.layout.GridPane;
+import javafx.scene.layout.Priority;
 import javafx.scene.paint.Paint;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
@@ -65,22 +67,26 @@ public class RemovalListManagementView
 		{
 			bpane = new BorderPane();
 
-			VBox managementPanel = new VBox(10);
+			GridPane managementPanel = new GridPane();
 			// TODO: Use CSS.
 			managementPanel.setBackground(new Background(new BackgroundFill(Paint.valueOf("EEEEEE"), null, null)));
 			managementPanel.setPadding(new Insets(10));
 
-			Label removalListManagementLabel = new Label("Removal List\nManagement");
+			browseListsButton = new Button("Browse Removal Lists");
+			browseListsButton.setAlignment(Pos.CENTER_LEFT);
+			managementPanel.add(browseListsButton, 0, 0);
+
+			Label removalListManagementLabel = new Label("Removal List Management");
 			removalListManagementLabel.setFont(Font.font("Tahoma", FontWeight.NORMAL, 20));
 			removalListManagementLabel.setPadding(new Insets(10));
-			removalListManagementLabel.setMaxWidth(Double.MAX_VALUE);
 			removalListManagementLabel.setAlignment(Pos.CENTER);
+			removalListManagementLabel.setMaxWidth(Double.MAX_VALUE);
+			managementPanel.add(removalListManagementLabel, 1, 0);
+			GridPane.setHgrow(removalListManagementLabel, Priority.ALWAYS);
 
 			newListButton = new Button("Create New Removal List");
-			newListButton.setMaxWidth(Double.MAX_VALUE);
-
-			browseListsButton = new Button("Browse Removal Lists");
-			browseListsButton.setMaxWidth(Double.MAX_VALUE);
+			newListButton.setAlignment(Pos.CENTER_RIGHT);
+			managementPanel.add(newListButton, 2, 0);
 
 			newListButton.setOnAction(new EventHandler<ActionEvent>()
 			{
@@ -100,11 +106,15 @@ public class RemovalListManagementView
 				}
 			});
 
-			managementPanel.getChildren().addAll(removalListManagementLabel, newListButton, browseListsButton);
-			bpane.setLeft(managementPanel);
+			bpane.setTop(managementPanel);
 		}
 
 		return bpane;
+	}
+
+	public void setContent(final Node view)
+	{
+		bpane.setCenter(view);
 	}
 
 	/**
@@ -116,10 +126,12 @@ public class RemovalListManagementView
 	}
 
 	/**
-	 * Toggles the visibility of the browse removal lists button.
+	 * Sets the visibility of the browse removal lists button.
+	 *
+	 * @param visible <code>true</code> to show the button
 	 */
-	public void toggleBrowseListsButton()
+	public void setBrowseListsButtonVisiblity(final boolean visible)
 	{
-		browseListsButton.setVisible(!browseListsButton.isVisible());
+		browseListsButton.setVisible(visible);
 	}
 }

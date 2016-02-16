@@ -18,9 +18,9 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.text.Font;
 import javafx.util.Callback;
-import velho.controller.ListController;
 import velho.controller.LoginController;
 import velho.model.User;
+import velho.model.interfaces.UIActionController;
 
 /**
  * A class for creating lists and tables of data.
@@ -44,18 +44,15 @@ public class ListView
 	 */
 	private Map<String, String> columnNames;
 
-	/**
-	 * The {@link ListController}.
-	 */
-	private ListController listController;
+	private UIActionController parentController;
 
 	/**
 	 * @param columnMap
 	 * @param datalist
 	 */
-	public ListView(final ListController listController, final Map<String, String> columnMap, final ObservableList<Object> datalist)
+	public ListView(final UIActionController parentController, final Map<String, String> columnMap, final ObservableList<Object> datalist)
 	{
-		this.listController = listController;
+		this.parentController = parentController;
 		columnNames = columnMap;
 		this.datalist = datalist;
 	}
@@ -99,7 +96,7 @@ public class ListView
 						@Override
 						public TableCell<Object, String> call(final TableColumn<Object, String> p)
 						{
-							TableCellDeleteButton button = new TableCellDeleteButton("Delete");
+							TableCellDeleteButton button = new TableCellDeleteButton(parentController, "Delete");
 							button.setAlignment(Pos.CENTER);
 							return button;
 						}
@@ -124,7 +121,7 @@ public class ListView
 						@Override
 						public TableCell<Object, String> call(final TableColumn<Object, String> p)
 						{
-							TableCellAddButton button = new TableCellAddButton("+");
+							TableCellAddButton button = new TableCellAddButton(parentController, "+");
 							button.setAlignment(Pos.CENTER);
 							return button;
 						}
@@ -154,10 +151,16 @@ public class ListView
 		private Button button;
 
 		/**
+		 * The controller to send information to when this button is pressed.
+		 */
+		private UIActionController controller;
+
+		/**
 		 * @param text button text
 		 */
-		private TableCellDeleteButton(final String text)
+		private TableCellDeleteButton(final UIActionController parentController, final String text)
 		{
+			this.controller = parentController;
 			button = new Button(text);
 			button.setFont(new Font(12));
 
@@ -166,8 +169,8 @@ public class ListView
 				@Override
 				public void handle(final ActionEvent t)
 				{
-					// Get selected User object and send information to list controller.
-					listController.removeUser((User) TableCellDeleteButton.this.getTableView().getItems().get(TableCellDeleteButton.this.getIndex()));
+					// Get selected object and send information to parent controller.
+					controller.deleteAction(TableCellDeleteButton.this.getTableView().getItems().get(TableCellDeleteButton.this.getIndex()));
 				}
 			});
 		}
@@ -205,10 +208,17 @@ public class ListView
 		private Button button;
 
 		/**
+		 * The controller to send information to when this button is pressed.
+		 */
+		protected UIActionController controller;
+
+		/**
 		 * @param text button text
 		 */
-		private TableCellAddButton(final String text)
+		private TableCellAddButton(final UIActionController parentController, final String text)
 		{
+			System.out.println("Creating a UI add button with parent: " + parentController.toString());
+			this.controller = parentController;
 			button = new Button(text);
 			button.setFont(new Font(12));
 
@@ -217,8 +227,8 @@ public class ListView
 				@Override
 				public void handle(final ActionEvent t)
 				{
-					// Send information to list controller.
-					listController.addData(TableCellAddButton.this.getTableView().getItems().get(TableCellAddButton.this.getIndex()));
+					// Send information to parent controller.
+					controller.addAction(TableCellAddButton.this.getTableView().getItems().get(TableCellAddButton.this.getIndex()));
 				}
 			});
 		}

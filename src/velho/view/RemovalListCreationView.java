@@ -3,9 +3,12 @@ package velho.view;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.Label;
+import javafx.scene.layout.Background;
+import javafx.scene.layout.BackgroundFill;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
+import javafx.scene.paint.Paint;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import velho.controller.ListController;
@@ -56,11 +59,16 @@ public class RemovalListCreationView
 
 			bpane.setTop(temp);
 			VBox left = new VBox(10);
+			// TODO: Use CSS.
+			left.setBackground(new Background(new BackgroundFill(Paint.valueOf("EEEEEE"), null, null)));
+			left.setPadding(new Insets(10, 0, 0, 0));
 
 			Label resultsLabel = new Label("Search Results");
+			resultsLabel.setAlignment(Pos.CENTER);
+			resultsLabel.setMaxWidth(Double.MAX_VALUE);
 			resultsLabel.setFont(Font.font("Tahoma", FontWeight.NORMAL, 20));
 
-			BorderPane resultList = (BorderPane) listController.getProductSearchResultsView();
+			BorderPane resultList = removalListController.getSearchResults();
 			resultList.setPrefWidth(MainWindow.WINDOW_WIDTH / 2);
 			left.getChildren().addAll(resultsLabel, resultList);
 
@@ -68,10 +76,16 @@ public class RemovalListCreationView
 			VBox.setVgrow(resultList, Priority.ALWAYS);
 
 			VBox center = new VBox(10);
+			// TODO: Use CSS.
+			center.setBackground(new Background(new BackgroundFill(Paint.valueOf("EEEEEE"), null, null)));
+			center.setPadding(new Insets(10, 0, 0, 0));
+
 			Label removalListLabel = new Label("New Removal List");
+			removalListLabel.setAlignment(Pos.CENTER);
+			removalListLabel.setMaxWidth(Double.MAX_VALUE);
 			removalListLabel.setFont(Font.font("Tahoma", FontWeight.NORMAL, 20));
 
-			BorderPane newList = (BorderPane) removalListController.getCurrentRemovalListView();
+			BorderPane newList = removalListController.getCurrentRemovalListView();
 			newList.setPrefWidth(MainWindow.WINDOW_WIDTH / 2);
 			center.getChildren().addAll(removalListLabel, newList);
 
