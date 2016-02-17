@@ -20,9 +20,9 @@ public class ExternalSystemsController
 	 * Moves the box from the shelf in question.
 	 *
 	 * @param productBoxCode
-	 * the code that the Box posses.
+	 *            the code that the Box posses.
 	 * @param newShelfSlotID
-	 * the Boxes former shelf id that it modifies.
+	 *            the Boxes former shelf id that it modifies.
 	 * @return either a true or false, true when the prosses was compleated. False if not.
 	 */
 	public static boolean move(final int productBoxCode, final String newShelfSlotID, final boolean showPopup)
@@ -33,15 +33,29 @@ public class ExternalSystemsController
 		String oldShelfIDString = null;
 		int oldShelfID = -1;
 		boolean boxWasNotInShelf = false;
+		boolean boxSaveOnShelf = true;
 		Shelf oldShelf = null;
 		Shelf newShelf = null;
 		ProductBox boxToMove = null;
+		boolean success = true;
 
 		try
 		{
+
 			newShelf = DatabaseController.getShelfByID(newShelfID, true);
 			boxToMove = DatabaseController.getProductBoxByID(productBoxCode);
+
 			if (boxToMove == null)
+			{
+				return false;
+			}
+
+			if (newShelf == null)
+			{
+				return false;
+			}
+
+			if (newShelf.addToSlot(newShelfSlotID, boxToMove) == false)
 			{
 				return false;
 			}
@@ -50,19 +64,28 @@ public class ExternalSystemsController
 			oldShelfID = Integer.parseInt(oldShelfIDString.substring(1));
 			oldShelf = DatabaseController.getShelfByID(oldShelfID, true);
 
-			oldShelf.removeFromSlot(boxToMove);
-			if (newShelf == null)
+			if (oldShelf == null)
 			{
 				return false;
 			}
-			newShelf.addToSlot(newShelfSlotID, boxToMove);
+			if (oldShelf.addToSlot(newShelfSlotID, boxToMove) == false)
+			{
+				return false;
+			}
+			if (oldShelf.addToSlot(newShelfSlotID, boxToMove) == true)
+			{
+				return true;
+			}
+
 		}
 		catch (NoDatabaseLinkException e)
 		{
 			DatabaseController.tryReLink();
+			if (e != null)
+			{
+				return false;
+			}
 		}
-
-		boolean success = true;
 		if (showPopup)
 			DebugController.moveResult(productBoxCode, newShelfSlotID, success);
 
