@@ -198,7 +198,7 @@ public class LoginController
 	{
 		if (view == null)
 			view = new LoginView();
-		return view.getLoginView();
+		return view.getView();
 	}
 
 	/**

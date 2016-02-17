@@ -28,22 +28,30 @@ public class UIController
 	 */
 	private ListController listController;
 
+	private SearchController searchController;
+
 	/**
-	 * @param mainWindow
-	 * @param listController
+	 * The {@link RemovalListController}.
 	 */
-	public UIController(final MainWindow mainWindow, final ListController listController, final UserController userController)
+	private RemovalListController removalListController;
+
+	public UIController(final MainWindow mainWindow, final ListController listController, final UserController userController,
+			final RemovalListController removalListController, final SearchController searchController)
 	{
-		mainView = mainWindow;
+		this.mainView = mainWindow;
 		this.listController = listController;
 		this.userController = userController;
+		this.removalListController = removalListController;
+		this.searchController = searchController;
 	}
 
 	/**
 	 * Shows a view in the main window.
 	 *
-	 * @param position {@link Position} to show the view in
-	 * @param view view to show
+	 * @param position
+	 * {@link Position} to show the view in
+	 * @param view
+	 * view to show
 	 */
 	public void setView(final Position position, final Node view)
 	{
@@ -72,7 +80,8 @@ public class UIController
 	/**
 	 * Shows the main menu as seen by the specified role.
 	 *
-	 * @param currentUserRole {@link UserRole} viewing the main menu
+	 * @param currentUserRole
+	 * {@link UserRole} viewing the main menu
 	 */
 	public void showMainMenu(final UserRole currentUserRole)
 	{
@@ -87,11 +96,13 @@ public class UIController
 			case "Administrator":
 			case "Manager":
 				mainView.addTab("Add User", userController.getView());
+				mainView.addTab("Removal Lists", removalListController.getRemovalListManagementView());
 				//$FALL-THROUGH$
 			case "Logistician":
 				mainView.addTab("User List", getUserListView(currentUserRole));
-				mainView.addTab("Product List",
-						listController.getProductListView(DatabaseController.getPublicProductDataColumns(), DatabaseController.getPublicProductDataList()));
+				mainView.addTab("Product List", listController.getProductListView(DatabaseController.getPublicProductDataColumns(false, false),
+						DatabaseController.getPublicProductDataList()));
+				mainView.addTab("Search", searchController.getView());
 				mainView.addTab("Product List Search", listController.getProductListSearchView());
 				break;
 			default:
@@ -100,10 +111,11 @@ public class UIController
 	}
 
 	/**
-	 * Creates the user list view.
-	 * The list contents change depending on who is logged in.
+	 * Creates the user list view. The list contents change depending on who is
+	 * logged in.
 	 *
-	 * @param currentUserRole the role of the user who is currently logged in
+	 * @param currentUserRole
+	 * the role of the user who is currently logged in
 	 * @return the user list view
 	 */
 	private Node getUserListView(final UserRole currentUserRole)

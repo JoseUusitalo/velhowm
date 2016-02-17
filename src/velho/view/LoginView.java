@@ -27,7 +27,7 @@ public class LoginView
 	 * 
 	 * @return the login view GridPane
 	 */
-	public GridPane getLoginView()
+	public GridPane getView()
 	{
 		if (grid == null)
 		{

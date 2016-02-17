@@ -21,6 +21,7 @@ import javafx.util.Callback;
 import velho.controller.ListController;
 import velho.controller.LoginController;
 import velho.model.User;
+import velho.model.interfaces.UIActionController;
 
 /**
  * A class for creating lists and tables of data.
@@ -44,28 +45,25 @@ public class ListView
 	 */
 	private Map<String, String> columnNames;
 
-	/**
-	 * The {@link ListController}.
-	 */
-	private ListController listController;
+	private UIActionController parentController;
 
 	/**
 	 * @param columnMap
 	 * @param datalist
 	 */
-	public ListView(final ListController listController, final Map<String, String> columnMap, final ObservableList<Object> datalist)
+	public ListView(final UIActionController parentController, final Map<String, String> columnMap, final ObservableList<Object> datalist)
 	{
-		this.listController = listController;
+		this.parentController = parentController;
 		columnNames = columnMap;
 		this.datalist = datalist;
 	}
 
 	/**
-	 * Gets the user table view.
+	 * Gets the table view of data given to this ListView.
 	 *
-	 * @return a table view of users
+	 * @return a table view of data
 	 */
-	public BorderPane getUserTableView()
+	public BorderPane getView()
 	{
 		if (pane == null)
 		{
@@ -81,16 +79,13 @@ public class ListView
 				col.setCellValueFactory(new PropertyValueFactory<Object, String>(key));
 				col.setSortType(TableColumn.SortType.ASCENDING);
 
-				// Hide database ID columns
-				if (key.contains("databaseID"))
-					col.setVisible(false);
-
+				// Handle custom delete button list cell.
 				if (key.equals("deleteButton"))
 				{
 					col.setCellValueFactory(new Callback<TableColumn.CellDataFeatures<Object, String>, ObservableValue<String>>()
 					{
 						@Override
-						public ObservableValue<String> call(TableColumn.CellDataFeatures<Object, String> p)
+						public ObservableValue<String> call(final TableColumn.CellDataFeatures<Object, String> p)
 						{
 							return new SimpleStringProperty(p.getValue(), key);
 						}
@@ -100,14 +95,91 @@ public class ListView
 					col.setCellFactory(new Callback<TableColumn<Object, String>, TableCell<Object, String>>()
 					{
 						@Override
-						public TableCell<Object, String> call(TableColumn<Object, String> p)
+						public TableCell<Object, String> call(final TableColumn<Object, String> p)
 						{
-							TableCellDeleteButton button = new TableCellDeleteButton("Delete");
+							TableCellDeleteButton button = new TableCellDeleteButton(parentController, "Delete");
 							button.setAlignment(Pos.CENTER);
 							return button;
 						}
 					});
 				}
+
+				// Handle custom add button list cell.
+				if (key.equals("addButton"))
+				{
+					col.setCellValueFactory(new Callback<TableColumn.CellDataFeatures<Object, String>, ObservableValue<String>>()
+					{
+						@Override
+						public ObservableValue<String> call(final TableColumn.CellDataFeatures<Object, String> p)
+						{
+							return new SimpleStringProperty(p.getValue(), key);
+						}
+					});
+
+					// Adding the button to the cell
+					col.setCellFactory(new Callback<TableColumn<Object, String>, TableCell<Object, String>>()
+					{
+						@Override
+						public TableCell<Object, String> call(final TableColumn<Object, String> p)
+						{
+							TableCellAddButton button = new TableCellAddButton(parentController, "+");
+							button.setAlignment(Pos.CENTER);
+							return button;
+						}
+					});
+				}
+
+				// Handle custom remove button list cell.
+				if (key.equals("removeButton"))
+				{
+					col.setCellValueFactory(new Callback<TableColumn.CellDataFeatures<Object, String>, ObservableValue<String>>()
+					{
+						@Override
+						public ObservableValue<String> call(final TableColumn.CellDataFeatures<Object, String> p)
+						{
+							return new SimpleStringProperty(p.getValue(), key);
+						}
+					});
+
+					// Adding the button to the cell
+					col.setCellFactory(new Callback<TableColumn<Object, String>, TableCell<Object, String>>()
+					{
+						@Override
+						public TableCell<Object, String> call(final TableColumn<Object, String> p)
+						{
+							TableCellRemoveButton button = new TableCellRemoveButton(parentController, "-");
+							button.setAlignment(Pos.CENTER);
+							return button;
+						}
+					});
+				}
+
+				// Handle custom view button table cell.
+				if (key.equals("viewButton"))
+				{
+					col.setCellValueFactory(new Callback<TableColumn.CellDataFeatures<Object, String>, ObservableValue<String>>()
+					{
+						@Override
+						public ObservableValue<String> call(final TableColumn.CellDataFeatures<Object, String> p)
+						{
+							return new SimpleStringProperty(p.getValue(), key);
+						}
+					});
+
+					// Adding the button to the cell
+					col.setCellFactory(new Callback<TableColumn<Object, String>, TableCell<Object, String>>()
+					{
+
+						@Override
+						public TableCell<Object, String> call(final TableColumn<Object, String> p)
+						{
+							TableCellViewButton button = new TableCellViewButton("View");
+							button.setAlignment(Pos.CENTER);
+							return button;
+						}
+					});
+				}
+
 				cols.add(col);
 			}
 
@@ -119,42 +191,7 @@ public class ListView
 	}
 
 	/**
-	 * Gets the product table view.
-	 *
-	 * @return a table view of products
-	 */
-	public BorderPane getProductTableView()
-	{
-		if (pane == null)
-		{
-			pane = new BorderPane();
-
-			TableView<Object> tableView = new TableView<Object>();
-
-			List<TableColumn<Object, String>> cols = new ArrayList<TableColumn<Object, String>>();
-
-			for (final String key : columnNames.keySet())
-			{
-				TableColumn<Object, String> col = new TableColumn<Object, String>(columnNames.get(key));
-				col.setCellValueFactory(new PropertyValueFactory<Object, String>(key));
-				col.setSortType(TableColumn.SortType.ASCENDING);
-
-				// Hide database ID columns
-				if (key.contains("databaseID"))
-					col.setVisible(false);
-
-				cols.add(col);
-			}
-
-			tableView.setItems(datalist);
-			tableView.getColumns().addAll(cols);
-			pane.setCenter(tableView);
-		}
-		return pane;
-	}
-
-	/**
-	 * A table cell with built-in a button.
+	 * A table cell with a built-in delete button.
 	 *
 	 * @author Jose Uusitalo
 	 */
@@ -165,36 +202,198 @@ public class ListView
 		 */
 		private Button button;
 
-		private TableCellDeleteButton(final String text)
+		/**
+		 * The controller to send information to when this button is pressed.
+		 */
+		private UIActionController controller;
+
+		/**
+		 * @param text button text
+		 */
+		private TableCellDeleteButton(final UIActionController parentController, final String text)
 		{
+			this.controller = parentController;
 			button = new Button(text);
 			button.setFont(new Font(12));
 
-			// When the button is pressed
 			button.setOnAction(new EventHandler<ActionEvent>()
 			{
 				@Override
-				public void handle(ActionEvent t)
+				public void handle(final ActionEvent t)
 				{
-					// Get selected User object and Send information to list controller.
-					listController.removeUser((User) TableCellDeleteButton.this.getTableView().getItems().get(TableCellDeleteButton.this.getIndex()));
+					// Get selected object and send information to parent controller.
+					controller.deleteAction(TableCellDeleteButton.this.getTableView().getItems().get(TableCellDeleteButton.this.getIndex()));
 				}
 			});
 		}
 
-		// Display button only if the row is not empty.
 		@Override
-		protected void updateItem(String string, boolean empty)
+		protected void updateItem(final String string, final boolean empty)
 		{
 			super.updateItem(string, empty);
+
+			// Display button only if the row is not empty.
 			if (!empty)
 			{
-				// Permission check.
-				User rowUser = (User) TableCellDeleteButton.this.getTableView().getItems().get(TableCellDeleteButton.this.getIndex());
+				Object rowObject = TableCellDeleteButton.this.getTableView().getItems().get(TableCellDeleteButton.this.getIndex());
 
-				if (rowUser.getRole().compareTo(LoginController.getCurrentUser().getRole()) <= 0)
+				if (rowObject instanceof User)
+				{
+					// Permission check.
+
+					// Show delete button for users that have a lower or equal role than current user.
+					if (((User) rowObject).getRole().compareTo(LoginController.getCurrentUser().getRole()) <= 0)
+						setGraphic(button);
+				}
+				else
+				{
 					setGraphic(button);
+				}
 			}
+			else
+				setGraphic(null);
+		}
+	}
+
+	/**
+	 * A table cell with a built-in add button.
+	 *
+	 * @author Jose Uusitalo
+	 */
+	private class TableCellAddButton extends TableCell<Object, String>
+	{
+		/**
+		 * The button itself.
+		 */
+		private Button button;
+
+		/**
+		 * The controller to send information to when this button is pressed.
+		 */
+		protected UIActionController controller;
+
+		/**
+		 * @param text button text
+		 */
+		private TableCellAddButton(final UIActionController parentController, final String text)
+		{
+			this.controller = parentController;
+			button = new Button(text);
+			button.setFont(new Font(12));
+
+			button.setOnAction(new EventHandler<ActionEvent>()
+			{
+				@Override
+				public void handle(final ActionEvent t)
+				{
+					// Send information to parent controller.
+					controller.addAction(TableCellAddButton.this.getTableView().getItems().get(TableCellAddButton.this.getIndex()));
+				}
+			});
+		}
+
+		@Override
+		protected void updateItem(final String string, final boolean empty)
+		{
+			super.updateItem(string, empty);
+
+			// Display button only if the row is not empty.
+			if (!empty)
+				setGraphic(button);
+			else
+				setGraphic(null);
+		}
+	}
+
+	/**
+	 * A table cell with a built-in remove button.
+	 *
+	 * @author Jose Uusitalo
+	 */
+	private class TableCellRemoveButton extends TableCell<Object, String>
+	{
+		/**
+		 * The button itself.
+		 */
+		private Button button;
+
+		/**
+		 * The controller to send information to when this button is pressed.
+		 */
+		protected UIActionController controller;
+
+		/**
+		 * @param text button text
+		 */
+		private TableCellRemoveButton(final UIActionController parentController, final String text)
+		{
+			this.controller = parentController;
+			button = new Button(text);
+			button.setFont(new Font(12));
+
+			button.setOnAction(new EventHandler<ActionEvent>()
+			{
+				@Override
+				public void handle(final ActionEvent t)
+				{
+					// Send information to parent controller.
+					controller.removeAction(TableCellRemoveButton.this.getTableView().getItems().get(TableCellRemoveButton.this.getIndex()));
+				}
+			});
+		}
+
+		@Override
+		protected void updateItem(final String string, final boolean empty)
+		{
+			super.updateItem(string, empty);
+
+			// Display button only if the row is not empty.
+			if (!empty)
+				setGraphic(button);
+			else
+				setGraphic(null);
+		}
+	}
+
+	/**
+	 * A table cell with a built-in add button.
+	 *
+	 * @author Jose Uusitalo
+	 */
+	private class TableCellViewButton extends TableCell<Object, String>
+	{
+		/**
+		 * The button itself.
+		 */
+		private Button button;
+
+		/**
+		 * @param text button text
+		 */
+		private TableCellViewButton(final String text)
+		{
+			button = new Button(text);
+			button.setFont(new Font(12));
+
+			button.setOnAction(new EventHandler<ActionEvent>()
+			{
+				@Override
+				public void handle(final ActionEvent t)
+				{
+					// Send information to parent controller.
+					ListController.viewAction(TableCellViewButton.this.getTableView().getItems().get(TableCellViewButton.this.getIndex()));
+				}
+			});
+		}
+
+		@Override
+		protected void updateItem(final String string, final boolean empty)
+		{
+			super.updateItem(string, empty);
+
+			// Display button only if the row is not empty.
+			if (!empty)
+				setGraphic(button);
 			else
 				setGraphic(null);
 		}
