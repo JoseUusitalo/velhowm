@@ -3,6 +3,7 @@ package velho.view;
 import java.util.HashSet;
 import java.util.Set;
 
+import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Pos;
@@ -18,6 +19,8 @@ import javafx.scene.layout.BackgroundFill;
 import javafx.scene.layout.GridPane;
 import javafx.scene.paint.Paint;
 import velho.controller.SearchController;
+import velho.model.ProductBrand;
+import velho.model.ProductCategory;
 
 public class SearchView
 
@@ -25,20 +28,24 @@ public class SearchView
 	/**
 	 * A set of user role names.
 	 */
-	private Set<String> brandnameSet = new HashSet<String>();
+	private Set<ProductBrand> brandnameSet = new HashSet<ProductBrand>();
 	/**
 	 * A set of user role names.
 	 */
-	private Set<String> categorynameSet = new HashSet<String>();
+	private Set<ProductCategory> categorynameSet = new HashSet<ProductCategory>();
 	/**
 	 * The root GridPane for this view.
 	 */
 	private GridPane grid;
 	private SearchController searchController;
+	private ObservableList<Object> productCategories;
+	private ObservableList<Object> productBrands;
 
-	public SearchView(final SearchController searchController)
+	public SearchView(final SearchController searchController, final ObservableList<Object> productBrands, final ObservableList<Object> productCategories)
 	{
 		this.searchController = searchController;
+		this.productBrands = productBrands;
+		this.productCategories = productCategories;
 	}
 
 	/**
@@ -82,16 +89,16 @@ public class SearchView
 			popularityField.setPrefWidth(75.0);
 			grid.add(popularityField, 3, 2, 1, 1);
 
-			final ComboBox<String> brandbox = new ComboBox<String>();
+			final ComboBox<Object> brandbox = new ComboBox<Object>();
 			brandbox.setPromptText("Product Brand");
-			brandbox.getItems().addAll(brandnameSet);
+			brandbox.getItems().addAll(productBrands);
 			brandbox.setMaxWidth(Double.MAX_VALUE);
 			brandbox.getSelectionModel().selectFirst();
 			grid.add(brandbox, 4, 1, 1, 1);
 
-			final ComboBox<String> categorybox = new ComboBox<String>();
+			final ComboBox<Object> categorybox = new ComboBox<Object>();
 			categorybox.setPromptText("Product Category");
-			categorybox.getItems().addAll(categorynameSet);
+			categorybox.getItems().addAll(productCategories);
 			categorybox.getSelectionModel().selectFirst();
 			grid.add(categorybox, 4, 2, 1, 1);
 
@@ -111,15 +118,13 @@ public class SearchView
 
 			searchButton.setOnAction(new EventHandler<ActionEvent>()
 			{
-				@Override
-				public void handle(final ActionEvent event)
+				@Override public void handle(final ActionEvent event)
 				{
 
 					try
 					{
 						Integer.parseInt(productCountField.getValue().toString());
-					}
-					catch (final NumberFormatException e)
+					} catch (final NumberFormatException e)
 					{
 						// Although badge IDs are stored as string, they are still numbers.
 					}
@@ -127,18 +132,17 @@ public class SearchView
 					try
 					{
 						Integer.parseInt(popularityField.getValue().toString());
-					}
-					catch (final NumberFormatException e)
+					} catch (final NumberFormatException e)
 					{
 						// Although badge IDs are stored as string, they are still numbers.
 					}
-					searchController.productSearch(nameField.getText(), productCountField.getValue(), popularityField.getValue(), brandbox.getValue(),
-							categorybox.getValue(), dpStart.getValue(), dpEnd.getValue());
+					searchController.productSearch(nameField.getText(), productCountField.getValue(), popularityField.getValue(), brandbox.getValue(), categorybox.getValue(), dpStart.getValue(), dpEnd.getValue());
 					// System.out.println(nameField.getText() + " " + productCountField.getEditor() + " " +
 					// popularityField.getEditor() + " " + brandbox.getValue() + " " + categorybox.getValue() + " " +
 					// dpStart.getValue() + " " + dpEnd.getValue());
 				}
 			});
+			//GridPane.setTop(grid);
 		}
 
 		return grid;
@@ -147,6 +151,7 @@ public class SearchView
 	/**
 	 * Destroys the view.
 	 */
+
 	public void destroy()
 	{
 		grid = null;
