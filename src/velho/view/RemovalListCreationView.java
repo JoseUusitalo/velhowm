@@ -2,12 +2,13 @@ package velho.view;
 
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
+import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.layout.Background;
 import javafx.scene.layout.BackgroundFill;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Priority;
-import javafx.scene.layout.VBox;
 import javafx.scene.paint.Paint;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
@@ -42,8 +43,12 @@ public class RemovalListCreationView
 	 */
 	private SearchController searchController;
 
-	public RemovalListCreationView(final RemovalListController removalListController, final ListController listController,
-			final SearchController searchController)
+	/**
+	 * The grid panel.
+	 */
+	private GridPane grid;
+
+	public RemovalListCreationView(final RemovalListController removalListController, final ListController listController, final SearchController searchController)
 	{
 		this.removalListController = removalListController;
 		this.listController = listController;
@@ -57,12 +62,15 @@ public class RemovalListCreationView
 	 */
 	public BorderPane getView()
 	{
+
 		if (bpane == null)
 		{
+			final ComboBox<String> removalListState = new ComboBox<String>();
+
 			bpane = new BorderPane();
 			bpane.setTop(searchController.getView());
 
-			VBox left = new VBox(10);
+			GridPane left = new GridPane();
 			// TODO: Use CSS.
 			left.setBackground(new Background(new BackgroundFill(Paint.valueOf("EEEEEE"), null, null)));
 			left.setPadding(new Insets(10, 0, 0, 0));
@@ -71,15 +79,16 @@ public class RemovalListCreationView
 			resultsLabel.setAlignment(Pos.CENTER);
 			resultsLabel.setMaxWidth(Double.MAX_VALUE);
 			resultsLabel.setFont(Font.font("Tahoma", FontWeight.NORMAL, 20));
+			left.add(resultsLabel, 0, 0);
 
 			BorderPane resultList = removalListController.getSearchResults();
 			resultList.setPrefWidth(MainWindow.WINDOW_WIDTH / 2);
-			left.getChildren().addAll(resultsLabel, resultList);
+			left.add(resultList, 0, 1);
 
 			// Make the list always take up the full vertical space.
-			VBox.setVgrow(resultList, Priority.ALWAYS);
+			GridPane.setVgrow(resultList, Priority.ALWAYS);
 
-			VBox center = new VBox(10);
+			GridPane center = new GridPane();
 			// TODO: Use CSS.
 			center.setBackground(new Background(new BackgroundFill(Paint.valueOf("EEEEEE"), null, null)));
 			center.setPadding(new Insets(10, 0, 0, 0));
@@ -89,12 +98,19 @@ public class RemovalListCreationView
 			removalListLabel.setMaxWidth(Double.MAX_VALUE);
 			removalListLabel.setFont(Font.font("Tahoma", FontWeight.NORMAL, 20));
 
+			GridPane.setHgrow(removalListLabel, Priority.ALWAYS);
+
 			BorderPane newList = removalListController.getCurrentRemovalListView();
 			newList.setPrefWidth(MainWindow.WINDOW_WIDTH / 2);
-			center.getChildren().addAll(removalListLabel, newList);
+			center.add(removalListLabel, 0, 0);
+			center.add(newList, 0, 1, 2, 1);
+			center.add(removalListState, 1, 0);
 
 			// Make the list always take up the full vertical space.
-			VBox.setVgrow(newList, Priority.ALWAYS);
+			GridPane.setVgrow(newList, Priority.ALWAYS);
+
+			removalListState.getItems().addAll();
+			removalListState.getSelectionModel().selectFirst();
 
 			bpane.setLeft(left);
 			bpane.setCenter(center);
