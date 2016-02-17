@@ -3,6 +3,7 @@ package velho.model;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableSet;
 import velho.controller.DatabaseController;
+import velho.model.exceptions.NoDatabaseLinkException;
 
 public class RemovalList
 {
@@ -84,7 +85,7 @@ public class RemovalList
 	 *
 	 * @return <code>true</code> if update was successfull
 	 */
-	public boolean updateDatabase()
+	public boolean updateDatabase() throws NoDatabaseLinkException
 	{
 		return DatabaseController.updateRemovalList(this);
 	}
@@ -98,5 +99,16 @@ public class RemovalList
 	public boolean addProductBox(final ProductBox productBox)
 	{
 		return boxes.add(productBox);
+	}
+
+	/**
+	 * Removes a {@link ProductBox} from this removal list.
+	 *
+	 * @param productBox box to remove from this list
+	 * @return <code>true</code> if the box was present on the list and was removed
+	 */
+	public boolean removeProductBox(final ProductBox productBox)
+	{
+		return boxes.remove(productBox);
 	}
 }

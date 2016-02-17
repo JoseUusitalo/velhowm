@@ -27,6 +27,7 @@ import velho.model.ProductBox;
 import velho.model.ProductBoxSearchResultRow;
 import velho.model.ProductBrand;
 import velho.model.ProductCategory;
+import velho.model.ProductContainer;
 import velho.model.ProductType;
 import velho.model.RemovalList;
 import velho.model.RemovalListState;
@@ -322,19 +323,6 @@ public class DatabaseController
 								while (result.next())
 									dataSet.add(new User(result.getInt("user_id"), result.getString("first_name"), result.getString("last_name"),
 											getRoleByID(result.getInt("role"))));
-								break;
-
-							case ROLES:
-								if (columns.length == 1 && Arrays.asList(columns).contains("name"))
-								{
-									while (result.next())
-										dataSet.add(result.getString("name"));
-								}
-								else if (columns.length == 1 && Arrays.asList(columns).contains("role_id"))
-								{
-									while (result.next())
-										dataSet.add(result.getInt("role_id"));
-								}
 								break;
 
 							case CATEGORIES:
@@ -1010,8 +998,7 @@ public class DatabaseController
 	 * Warnign: Assumes that the PIN is techinically valid.
 	 * </p>
 	 *
-	 * @param pin
-	 * a PIN string
+	 * @param pin a PIN string
 	 * @return a {@link User} object representing the authenticated user or <code>null</code> for invalid credentials
 	 * @throws NoDatabaseLinkException
 	 * @see {@link User#isValidPIN(String)}
@@ -1036,8 +1023,7 @@ public class DatabaseController
 	/**
 	 * Gets the {@link UserRole} object from the given role ID.
 	 *
-	 * @param roleid
-	 * role database ID
+	 * @param roleid role database ID
 	 * @return the corresponding user role object
 	 * @throws NoDatabaseLinkException
 	 */
@@ -1056,6 +1042,13 @@ public class DatabaseController
 		return UserController.stringToRole(result.iterator().next());
 	}
 
+	/**
+	 * Gets the {@link RemovalListState} object from the given database ID.
+	 *
+	 * @param stateid removal list state database ID
+	 * @return the corresponding removal list state object
+	 * @throws NoDatabaseLinkException
+	 */
 	private static RemovalListState getRemovalListStateByID(final int stateid) throws NoDatabaseLinkException
 	{
 		if (!loadedRemovalListStates.containsKey(stateid))
@@ -1090,8 +1083,7 @@ public class DatabaseController
 	/**
 	 * Gets the {@link ProductType} object from the given type ID.
 	 *
-	 * @param typeid
-	 * product type database ID
+	 * @param typeid product type database ID
 	 * @return the corresponding product type object
 	 * @throws NoDatabaseLinkException
 	 */
@@ -1128,8 +1120,7 @@ public class DatabaseController
 	/**
 	 * Gets the {@link ProductCategory} object from the given category ID.
 	 *
-	 * @param categoryid
-	 * product category database ID
+	 * @param categoryid product category database ID
 	 * @return the corresponding product category object
 	 * @throws NoDatabaseLinkException
 	 */
@@ -1165,8 +1156,7 @@ public class DatabaseController
 	/**
 	 * Gets the {@link ProductBrand} object from the given brand ID.
 	 *
-	 * @param brandid
-	 * product brand database ID
+	 * @param brandid product brand database ID
 	 * @return the corresponding product brand object
 	 * @throws NoDatabaseLinkException
 	 */
@@ -1202,8 +1192,7 @@ public class DatabaseController
 	/**
 	 * Gets the {@link Product} object from the given product ID.
 	 *
-	 * @param productid
-	 * product database ID
+	 * @param productid product database ID
 	 * @return the corresponding product object
 	 * @throws NoDatabaseLinkException
 	 */
@@ -1239,8 +1228,7 @@ public class DatabaseController
 	/**
 	 * Gets the {@link Product} object from the given product ID.
 	 *
-	 * @param productid
-	 * product database ID
+	 * @param productid product database ID
 	 * @return the corresponding product object
 	 * @throws NoDatabaseLinkException
 	 */
@@ -1277,8 +1265,7 @@ public class DatabaseController
 	/**
 	 * Gets the {@link Product} object from the given product name.
 	 *
-	 * @param name
-	 * the exact product name
+	 * @param name the exact product name
 	 * @return the corresponding product object
 	 * @throws NoDatabaseLinkException
 	 */
@@ -1305,8 +1292,7 @@ public class DatabaseController
 	/**
 	 * Gets the {@link Product} object from the given product name.
 	 *
-	 * @param name
-	 * the exact product name
+	 * @param name the exact product name
 	 * @return the corresponding product object
 	 * @throws NoDatabaseLinkException
 	 */
@@ -1329,8 +1315,7 @@ public class DatabaseController
 	/**
 	 * Gets user data by their database ID.
 	 *
-	 * @param id
-	 * database ID of the user
+	 * @param id database ID of the user
 	 * @return a {@link User} object or <code>null</code> if a user with that ID was not found
 	 */
 	public static User getUserByID(final int id) throws NoDatabaseLinkException
@@ -1416,7 +1401,28 @@ public class DatabaseController
 		{
 			System.out.println("[DatabaseController] Nothing to place.");
 		}
+	}
 
+	/**
+	 * Places the correct product boxes in the cached removal list.
+	 *
+	 * @param listid removal list to place product boxes into
+	 * @throws NoDatabaseLinkException
+	 */
+	private static void setContainersToRemovalList(final int listid) throws NoDatabaseLinkException
+	{
+		System.out.println("[DatabaseController] Placing product boxes on removal list " + listid + "...");
+
+		final List<String> where = new ArrayList<String>();
+		where.add("removallist = " + listid);
+
+		final String[] columns = { "productbox" };
+		@SuppressWarnings("unchecked")
+		final Set<Integer> removalListBoxes = (LinkedHashSet<Integer>) runQuery(DatabaseQueryType.SELECT, DatabaseTable.REMOVALLIST_PRODUCTBOXES, null, columns,
+				null, where);
+
+		for (final Integer id : removalListBoxes)
+			loadedRemovalLists.get(listid).addProductBox(getProductBoxByID(id));
 	}
 
 	/**
@@ -1465,6 +1471,53 @@ public class DatabaseController
 		if (MainWindow.PRINT_CACHE_MESSAGES)
 			System.out.println("Loading shelf " + shelfid + " from cache.");
 		return loadedShelves.get(shelfid);
+	}
+
+	/**
+	 * Gets the {@link RemovalList} object from the given removal list ID.
+	 *
+	 * @param listid removal list database ID
+	 * @return the corresponding removal list object
+	 * @throws NoDatabaseLinkException
+	 */
+	public static RemovalList getRemovalListByID(final int listid, final boolean getCached) throws NoDatabaseLinkException
+	{
+		if (!loadedRemovalLists.containsKey(listid) || !getCached)
+		{
+			final String[] columns = { "*" };
+			final List<String> where = new ArrayList<String>();
+			where.add("removallist_id = " + listid);
+
+			@SuppressWarnings("unchecked")
+			final Set<Object> result = (LinkedHashSet<Object>) (runQuery(DatabaseQueryType.SELECT, DatabaseTable.REMOVALLISTS, null, columns, null, where));
+
+			if (result.size() == 0)
+				return null;
+
+			final RemovalList r = (RemovalList) result.iterator().next();
+
+			// Store for reuse.
+			if (getCached)
+			{
+				if (MainWindow.PRINT_CACHE_MESSAGES)
+					System.out.println("Caching: " + r);
+			}
+			else
+			{
+				if (MainWindow.PRINT_CACHE_MESSAGES)
+					System.out.println("Updating cache: " + r);
+			}
+
+			loadedRemovalLists.put(r.getDatabaseID(), r);
+
+			setContainersToRemovalList(listid);
+
+			return loadedRemovalLists.get(listid);
+		}
+
+		if (MainWindow.PRINT_CACHE_MESSAGES)
+			System.out.println("Loading removal list " + listid + " from cache.");
+		return loadedRemovalLists.get(listid);
 	}
 
 	/**
@@ -1521,15 +1574,20 @@ public class DatabaseController
 	}
 
 	/**
-	 * Gets an {@link ObservableList} of product search results.
+	 * Gets an {@link ObservableList} of cached product search results.
 	 *
-	 * @return a list of products searched by the user
+	 * @return a cached list of products searched by the user
 	 */
 	public static ObservableList<Object> getProductSearchResultViewList()
 	{
 		return productSearchResultViewList;
 	}
 
+	/**
+	 * Gets an {@link ObservableList} of cached removal lists.
+	 *
+	 * @return a cached list of removal lists
+	 */
 	public static ObservableList<Object> getRemovalListsViewList()
 	{
 		removalListsViewList.clear();
@@ -1538,9 +1596,9 @@ public class DatabaseController
 	}
 
 	/**
-	 * Gets an {@link ObservableList} of user names and roles.
+	 * Gets an {@link ObservableList} of cached user names and roles.
 	 *
-	 * @return a list of users in the database
+	 * @return a cached list of users in the database
 	 * @throws NoDatabaseLinkException
 	 */
 	public static ObservableList<Object> getPublicUserDataList() throws NoDatabaseLinkException
@@ -1560,7 +1618,14 @@ public class DatabaseController
 		return userViewList;
 	}
 
-	public static void searchProduct_BoxShelfSlots(final Map<Integer, Integer> productData) throws NoDatabaseLinkException
+	/**
+	 * Searches the database for product boxes of the specified size.
+	 *
+	 * @param productData a map of data to search for where the key is the product box database ID and the value is the
+	 * number of products
+	 * @throws NoDatabaseLinkException
+	 */
+	public static List<ProductBoxSearchResultRow> searchProduct_BoxShelfSlots(final Map<Integer, Integer> productData) throws NoDatabaseLinkException
 	{
 		final List<ProductBoxSearchResultRow> foundProducts = FXCollections.observableArrayList();
 
@@ -1612,6 +1677,9 @@ public class DatabaseController
 		System.out.println("Updating product box search results.");
 		productSearchResultViewList.clear();
 		productSearchResultViewList.addAll(foundProducts);
+
+		// Return the data for unit testing.
+		return foundProducts;
 	}
 
 	/**
@@ -1959,10 +2027,61 @@ public class DatabaseController
 		return changed;
 	}
 
-	public static boolean updateRemovalList(final RemovalList removalList)
+	/**
+	 * Updates an existing removal list in the database with the data from the given removal list or creates a new one
+	 * if it doesn't exist.
+	 *
+	 * @param removalList new or existing removal list
+	 * @return <code>true</code> if existing data was updated or a new removal list was created in the database
+	 */
+	public static boolean updateRemovalList(final RemovalList removalList) throws NoDatabaseLinkException
 	{
-		// TODO Auto-generated method stub
-		return false;
+		int listID = removalList.getDatabaseID();
+
+		final Map<String, Object> values = new LinkedHashMap<String, Object>();
+		values.put("liststate", removalList.getState().getDatabaseID());
+
+		final List<String> where = new ArrayList<String>();
+
+		DatabaseQueryType query;
+
+		// If the removal list does not exist yet, INSERT.
+		if (removalList.getDatabaseID() < 1)
+			query = DatabaseQueryType.INSERT;
+		else
+			query = DatabaseQueryType.UPDATE;
+
+		// Insert/Update the list itself
+		if (0 == (Integer) runQuery(query, DatabaseTable.REMOVALLISTS, null, null, values, null))
+			return false;
+
+		// Delete all boxes from the list in the database.
+		if (0 == (Integer) runQuery(DatabaseQueryType.DELETE, DatabaseTable.REMOVALLIST_PRODUCTBOXES, null, null, null, where))
+			return false;
+
+		// Add all boxes to the database.
+		Iterator<Object> it = removalList.getBoxes().iterator();
+		values.clear();
+		values.put("removallist", listID);
+		values.put("productbox", -1);
+
+		while (it.hasNext())
+		{
+			// Remove the previous box ID.
+			values.remove("productbox");
+
+			// Put in the new box ID.
+			values.put("productbox", ((ProductContainer) it.next()).getBoxID());
+
+			// Run the query.
+			if (0 == (Integer) runQuery(DatabaseQueryType.INSERT, DatabaseTable.REMOVALLIST_PRODUCTBOXES, null, null, values, null))
+				return false;
+		}
+
+		// Update the cache.
+		getRemovalListByID(listID, false);
+
+		return true;
 	}
 
 	/**
@@ -2140,7 +2259,7 @@ public class DatabaseController
 	private static void setAllContainersToAllRemovalLists(final boolean silent) throws NoDatabaseLinkException
 	{
 		if (!silent)
-			System.out.println("[DatabaseController] Placing product boxes on removal lists...");
+			System.out.println("[DatabaseController] Placing product boxes on all removal lists...");
 
 		final String[] columns = { "*" };
 		@SuppressWarnings("unchecked")
@@ -2165,6 +2284,6 @@ public class DatabaseController
 		}
 
 		if (!silent)
-			System.out.println("[DatabaseController] Product boxes placed on removal lists.");
+			System.out.println("[DatabaseController] Product boxes placed on all removal lists.");
 	}
 }

@@ -8,6 +8,7 @@ import static org.junit.Assert.fail;
 
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Set;
 
@@ -194,5 +195,64 @@ public class DatabaseControllerTest
 		assertTrue(DatabaseController.removeUser(1));
 
 		assertTrue(DatabaseController.initializeDatabase());
+	}
+
+	@Test
+	public final void testGetPublicProductDataColumns()
+	{
+		// This test is worhtless but it exists to improve coverage.
+
+		final LinkedHashMap<String, String> cols = new LinkedHashMap<String, String>();
+		cols.put("name", "Name");
+		cols.put("brand", "Brand");
+		cols.put("category", "Category");
+		cols.put("popularity", "Popularity");
+
+		assertEquals(cols, DatabaseController.getPublicProductDataColumns(false, false));
+	}
+
+	@Test
+	public final void testGetPublicProductDataColumns2()
+	{
+		// This test is worhtless but it exists to improve coverage.
+
+		final LinkedHashMap<String, String> cols = new LinkedHashMap<String, String>();
+		cols.put("addButton", "Add");
+		cols.put("deleteButton", "Delete");
+		cols.put("name", "Name");
+		cols.put("brand", "Brand");
+		cols.put("category", "Category");
+		cols.put("popularity", "Popularity");
+
+		assertEquals(cols, DatabaseController.getPublicProductDataColumns(true, true));
+	}
+
+	@Test
+	public final void testGetProductSearchDataColumns()
+	{
+		// This test is worhtless but it exists to improve coverage.
+
+		final LinkedHashMap<String, String> cols = new LinkedHashMap<String, String>();
+		cols.put("productID", "ID");
+		cols.put("productName", "Name");
+		cols.put("productBrand", "Brand");
+		cols.put("productCategory", "Category");
+		cols.put("expirationDate", "Expires");
+		cols.put("boxShelfSlot", "Shelf Slot");
+		cols.put("boxProductCount", "Amount");
+
+		assertEquals(cols, DatabaseController.getProductSearchDataColumns());
+	}
+
+	@Test
+	public final void testGetRoleID_Invalid() throws NoDatabaseLinkException
+	{
+		assertEquals(-1, DatabaseController.getRoleID("This is DEFINITELY! not a role name..."));
+	}
+
+	@Test
+	public final void testAuthenticatePIN_Invalid() throws NoDatabaseLinkException
+	{
+		assertEquals(null, DatabaseController.authenticatePIN(null, "", "-1"));
 	}
 }
