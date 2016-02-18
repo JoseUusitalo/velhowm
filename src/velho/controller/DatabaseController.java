@@ -67,70 +67,83 @@ public class DatabaseController
 	 */
 	private static JdbcConnectionPool connectionPool;
 
+	/*
+	 * ---- UI LISTS ----
+	 */
+
 	/**
 	 * An observable list of users for display in the user interface.
 	 */
-	private static ObservableList<Object> userViewList = FXCollections.observableArrayList();
+	private static ObservableList<Object> observableUsers = FXCollections.observableArrayList();
 
 	/**
-	 * An observable list of products for display in the user interface.
+	 * An observable list of {@link Product} objects display in the user interface.
 	 */
-	private static ObservableList<Object> productViewList = FXCollections.observableArrayList();
+	private static ObservableList<Object> observableProducts = FXCollections.observableArrayList();
 
 	/**
-	 * An observable list of product search results for display in the user
-	 * interface.
+	 * An observable list of {@link Product} search results for display in the user interface.
 	 */
-	private static ObservableList<Object> productSearchResultViewList = FXCollections.observableArrayList();
+	private static ObservableList<Object> observableProductSearchResults = FXCollections.observableArrayList();
 
 	/**
-	 * An observable list of removal lists for display in the user interface.
+	 * An observable list of {@link RemovalList} objects for display in the user interface.
 	 */
-	private static ObservableList<Object> removalListsViewList = FXCollections.observableArrayList();
+	private static ObservableList<Object> observableRemovalLists = FXCollections.observableArrayList();
+
+	/**
+	 * An observable list of {@link ProductCategory} objects for display in the user interface.
+	 */
+	private static ObservableList<Object> observableProductCategories = FXCollections.observableArrayList();
+
+	/**
+	 * An observable list of {@link ProductBrand} objects for display in the user interface.
+	 */
+	private static ObservableList<Object> observableProductBrands = FXCollections.observableArrayList();
+
+	/*
+	 * ---- CACHE MAPS ----
+	 */
 
 	/**
 	 * A map of {@link ProductBrand} objects loaded from the database.
 	 */
-	private static Map<Integer, ProductBrand> loadedProductBrands = new HashMap<Integer, ProductBrand>();
+	private static Map<Integer, ProductBrand> cachedProductBrands = new HashMap<Integer, ProductBrand>();
 
 	/**
 	 * A map of {@link ProductType} objects loaded from the database.
 	 */
-	private static Map<Integer, ProductType> loadedProductTypes = new HashMap<Integer, ProductType>();
+	private static Map<Integer, ProductType> cachedProductTypes = new HashMap<Integer, ProductType>();
 
 	/**
 	 * A map of {@link ProductCategory} objects loaded from the database.
 	 */
-	private static Map<Integer, ProductCategory> loadedProductCategories = new HashMap<Integer, ProductCategory>();
+	private static Map<Integer, ProductCategory> cachedProductCategories = new HashMap<Integer, ProductCategory>();
 
 	/**
 	 * A map of {@link Product} objects loaded from the database.
 	 */
-	private static Map<Integer, Product> loadedProducts = new HashMap<Integer, Product>();
+	private static Map<Integer, Product> cachedProducts = new HashMap<Integer, Product>();
 
 	/**
 	 * A map of {@link ProductContainer} objects loaded from the database.
 	 */
-	private static Map<Integer, ProductBox> loadedProductBoxes = new HashMap<Integer, ProductBox>();
+	private static Map<Integer, ProductBox> cachedProductBoxes = new HashMap<Integer, ProductBox>();
 
 	/**
 	 * A map of {@link Shelf} objects loaded from the database.
 	 */
-	private static Map<Integer, Shelf> loadedShelves = new HashMap<Integer, Shelf>();
+	private static Map<Integer, Shelf> cachedShelves = new HashMap<Integer, Shelf>();
 
 	/**
 	 * A map of {@link RemovalList} objects loaded from the database.
 	 */
-	private static Map<Integer, RemovalList> loadedRemovalLists = new HashMap<Integer, RemovalList>();
+	private static Map<Integer, RemovalList> cachedRemovalLists = new HashMap<Integer, RemovalList>();
 
 	/**
 	 * A map of {@link RemovalListState} objects loaded from the database.
 	 */
-	private static Map<Integer, RemovalListState> loadedRemovalListStates = new HashMap<Integer, RemovalListState>();
-
-	private static ObservableList<Object> productCategoriesViewList = FXCollections.observableArrayList();
-
-	private static ObservableList<Object> productBrandsViewList = FXCollections.observableArrayList();
+	private static Map<Integer, RemovalListState> cachedRemovalListStates = new HashMap<Integer, RemovalListState>();
 
 	/*
 	 * -------------------------------- PRIVATE DATABASE METHODS --------------------------------
@@ -1018,7 +1031,7 @@ public class DatabaseController
 	 */
 	private static RemovalListState getRemovalListStateByID(final int stateid) throws NoDatabaseLinkException
 	{
-		if (!loadedRemovalListStates.containsKey(stateid))
+		if (!cachedRemovalListStates.containsKey(stateid))
 		{
 			final String[] columns = { "name" };
 			final List<String> where = new ArrayList<String>();
@@ -1038,13 +1051,13 @@ public class DatabaseController
 			if (MainWindow.PRINT_CACHE_MESSAGES)
 				System.out.println("Caching: " + s);
 
-			loadedRemovalListStates.put(s.getDatabaseID(), s);
+			cachedRemovalListStates.put(s.getDatabaseID(), s);
 			return s;
 		}
 
 		if (MainWindow.PRINT_CACHE_MESSAGES)
 			System.out.println("Loading removal list state " + stateid + " from cache.");
-		return loadedRemovalListStates.get(stateid);
+		return cachedRemovalListStates.get(stateid);
 	}
 
 	/**
@@ -1056,7 +1069,7 @@ public class DatabaseController
 	 */
 	private static ProductType getProductTypeByID(final int typeid) throws NoDatabaseLinkException
 	{
-		if (!loadedProductTypes.containsKey(typeid))
+		if (!cachedProductTypes.containsKey(typeid))
 		{
 			final String[] columns = { "name" };
 			final List<String> where = new ArrayList<String>();
@@ -1075,13 +1088,13 @@ public class DatabaseController
 			if (MainWindow.PRINT_CACHE_MESSAGES)
 				System.out.println("Caching: " + p);
 
-			loadedProductTypes.put(p.getDatabaseID(), p);
+			cachedProductTypes.put(p.getDatabaseID(), p);
 			return p;
 		}
 
 		if (MainWindow.PRINT_CACHE_MESSAGES)
 			System.out.println("Loading category " + typeid + " from cache.");
-		return loadedProductTypes.get(typeid);
+		return cachedProductTypes.get(typeid);
 	}
 
 	/**
@@ -1093,7 +1106,7 @@ public class DatabaseController
 	 */
 	private static ProductCategory getProductCategoryByID(final int categoryid) throws NoDatabaseLinkException
 	{
-		if (!loadedProductCategories.containsKey(categoryid))
+		if (!cachedProductCategories.containsKey(categoryid))
 		{
 			final String[] columns = { "category_id", "name", "type" };
 			final List<String> where = new ArrayList<String>();
@@ -1111,13 +1124,13 @@ public class DatabaseController
 			if (MainWindow.PRINT_CACHE_MESSAGES)
 				System.out.println("Caching: " + p);
 
-			loadedProductCategories.put(p.getDatabaseID(), p);
+			cachedProductCategories.put(p.getDatabaseID(), p);
 			return p;
 		}
 
 		if (MainWindow.PRINT_CACHE_MESSAGES)
 			System.out.println("Loading category " + categoryid + " from cache.");
-		return loadedProductCategories.get(categoryid);
+		return cachedProductCategories.get(categoryid);
 	}
 
 	/**
@@ -1129,7 +1142,7 @@ public class DatabaseController
 	 */
 	private static ProductBrand getProductBrandByID(final int brandid) throws NoDatabaseLinkException
 	{
-		if (!loadedProductBrands.containsKey(brandid))
+		if (!cachedProductBrands.containsKey(brandid))
 		{
 			final String[] columns = { "name" };
 			final List<String> where = new ArrayList<String>();
@@ -1147,13 +1160,13 @@ public class DatabaseController
 			if (MainWindow.PRINT_CACHE_MESSAGES)
 				System.out.println("Caching: " + p);
 
-			loadedProductBrands.put(p.getDatabaseID(), p);
+			cachedProductBrands.put(p.getDatabaseID(), p);
 			return p;
 		}
 
 		if (MainWindow.PRINT_CACHE_MESSAGES)
 			System.out.println("Loading brand " + brandid + " from cache.");
-		return loadedProductBrands.get(brandid);
+		return cachedProductBrands.get(brandid);
 	}
 
 	/**
@@ -1165,7 +1178,7 @@ public class DatabaseController
 	 */
 	private static Product getProductByID(final int productid) throws NoDatabaseLinkException
 	{
-		if (!loadedProducts.containsKey(productid))
+		if (!cachedProducts.containsKey(productid))
 		{
 			final String[] columns = { "*" };
 			final List<String> where = new ArrayList<String>();
@@ -1183,13 +1196,13 @@ public class DatabaseController
 			if (MainWindow.PRINT_CACHE_MESSAGES)
 				System.out.println("Caching: " + p);
 
-			loadedProducts.put(p.getProductID(), p);
+			cachedProducts.put(p.getProductID(), p);
 			return p;
 		}
 
 		if (MainWindow.PRINT_CACHE_MESSAGES)
 			System.out.println("Loading product " + productid + " from cache.");
-		return loadedProducts.get(productid);
+		return cachedProducts.get(productid);
 	}
 
 	/**
@@ -1588,7 +1601,7 @@ public class DatabaseController
 	 */
 	public static ProductBox getProductBoxByID(final int productboxid) throws NoDatabaseLinkException
 	{
-		if (!loadedProductBoxes.containsKey(productboxid))
+		if (!cachedProductBoxes.containsKey(productboxid))
 		{
 			final String[] columns = { "*" };
 			final List<String> where = new ArrayList<String>();
@@ -1607,13 +1620,13 @@ public class DatabaseController
 			if (MainWindow.PRINT_CACHE_MESSAGES)
 				System.out.println("Caching: " + p);
 
-			loadedProductBoxes.put(p.getBoxID(), p);
+			cachedProductBoxes.put(p.getBoxID(), p);
 			return p;
 		}
 
 		if (MainWindow.PRINT_CACHE_MESSAGES)
 			System.out.println("Loading product box " + productboxid + " from cache.");
-		return loadedProductBoxes.get(productboxid);
+		return cachedProductBoxes.get(productboxid);
 	}
 
 	/**
@@ -1672,7 +1685,7 @@ public class DatabaseController
 	 */
 	public static Shelf getShelfByID(final int shelfid, final boolean getCached) throws NoDatabaseLinkException
 	{
-		if (!loadedShelves.containsKey(shelfid) || !getCached)
+		if (!cachedShelves.containsKey(shelfid) || !getCached)
 		{
 			final String[] columns = { "*" };
 			final List<String> where = new ArrayList<String>();
@@ -1698,16 +1711,16 @@ public class DatabaseController
 					System.out.println("Updating cache: " + s);
 			}
 
-			loadedShelves.put(s.getDatabaseID(), s);
+			cachedShelves.put(s.getDatabaseID(), s);
 
 			setContainersToShelf(shelfid);
 
-			return loadedShelves.get(shelfid);
+			return cachedShelves.get(shelfid);
 		}
 
 		if (MainWindow.PRINT_CACHE_MESSAGES)
 			System.out.println("Loading shelf " + shelfid + " from cache.");
-		return loadedShelves.get(shelfid);
+		return cachedShelves.get(shelfid);
 	}
 
 	/**
@@ -1719,7 +1732,7 @@ public class DatabaseController
 	 */
 	public static RemovalList getRemovalListByID(final int listid, final boolean getCached) throws NoDatabaseLinkException
 	{
-		if (!loadedRemovalLists.containsKey(listid) || !getCached)
+		if (!cachedRemovalLists.containsKey(listid) || !getCached)
 		{
 			final String[] columns = { "*" };
 			final List<String> where = new ArrayList<String>();
@@ -1745,16 +1758,16 @@ public class DatabaseController
 					System.out.println("Updating cache: " + r);
 			}
 
-			loadedRemovalLists.put(r.getDatabaseID(), r);
+			cachedRemovalLists.put(r.getDatabaseID(), r);
 
 			setContainersToRemovalList(listid);
 
-			return loadedRemovalLists.get(listid);
+			return cachedRemovalLists.get(listid);
 		}
 
 		if (MainWindow.PRINT_CACHE_MESSAGES)
 			System.out.println("Loading removal list " + listid + " from cache.");
-		return loadedRemovalLists.get(listid);
+		return cachedRemovalLists.get(listid);
 	}
 
 	/**
@@ -1805,9 +1818,9 @@ public class DatabaseController
 	 */
 	public static ObservableList<Object> getPublicProductDataList()
 	{
-		productViewList.clear();
-		productViewList.addAll(loadedProducts.values());
-		return productViewList;
+		observableProducts.clear();
+		observableProducts.addAll(cachedProducts.values());
+		return observableProducts;
 	}
 
 	/**
@@ -1817,7 +1830,7 @@ public class DatabaseController
 	 */
 	public static ObservableList<Object> getProductSearchResultViewList()
 	{
-		return productSearchResultViewList;
+		return observableProductSearchResults;
 	}
 
 	/**
@@ -1827,9 +1840,9 @@ public class DatabaseController
 	 */
 	public static ObservableList<Object> getRemovalListsViewList()
 	{
-		removalListsViewList.clear();
-		removalListsViewList.addAll(loadedRemovalLists.values());
-		return removalListsViewList;
+		observableRemovalLists.clear();
+		observableRemovalLists.addAll(cachedRemovalLists.values());
+		return observableRemovalLists;
 	}
 
 	/**
@@ -1847,12 +1860,12 @@ public class DatabaseController
 
 		final Iterator<User> it = result.iterator();
 
-		userViewList.clear();
+		observableUsers.clear();
 		while (it.hasNext())
-			userViewList.add(it.next());
+			observableUsers.add(it.next());
 
 		System.out.println("User list updated.");
-		return userViewList;
+		return observableUsers;
 	}
 
 	/**
@@ -1912,8 +1925,8 @@ public class DatabaseController
 		foundProducts.removeAll(Collections.singleton(null));
 
 		System.out.println("Updating product box search results.");
-		productSearchResultViewList.clear();
-		productSearchResultViewList.addAll(foundProducts);
+		observableProductSearchResults.clear();
+		observableProductSearchResults.addAll(foundProducts);
 
 		// Return the data for unit testing.
 		return foundProducts;
@@ -1928,17 +1941,17 @@ public class DatabaseController
 	public static ObservableList<Object> getAllProductCategories()
 	{
 		// TODO Auto-generated method stub
-		productCategoriesViewList.clear();
-		productCategoriesViewList.addAll(loadedProductCategories.values());
-		return productCategoriesViewList;
+		observableProductCategories.clear();
+		observableProductCategories.addAll(cachedProductCategories.values());
+		return observableProductCategories;
 	}
 
 	public static ObservableList<Object> getAllProductBrands()
 	{
 		// TODO Auto-generated method stub
-		productBrandsViewList.clear();
-		productBrandsViewList.addAll(loadedProductBrands.values());
-		return productBrandsViewList;
+		observableProductBrands.clear();
+		observableProductBrands.addAll(cachedProductBrands.values());
+		return observableProductBrands;
 	}
 
 	/*
@@ -2012,7 +2025,7 @@ public class DatabaseController
 		if (!removalListBoxes.isEmpty())
 		{
 			for (final Integer id : removalListBoxes)
-				loadedRemovalLists.get(listid).addProductBox(getProductBoxByID(id));
+				cachedRemovalLists.get(listid).addProductBox(getProductBoxByID(id));
 
 			System.out.println("[DatabaseController] Product boxes placed on removal list " + listid + ".");
 		}
@@ -2306,7 +2319,7 @@ public class DatabaseController
 			if (MainWindow.PRINT_CACHE_MESSAGES)
 				System.out.println("Caching: " + p);
 
-			loadedProductBoxes.put(p.getBoxID(), p);
+			cachedProductBoxes.put(p.getBoxID(), p);
 		}
 
 		if (!silent)
@@ -2339,7 +2352,7 @@ public class DatabaseController
 			if (MainWindow.PRINT_CACHE_MESSAGES)
 				System.out.println("Caching: " + s);
 
-			loadedShelves.put(s.getDatabaseID(), s);
+			cachedShelves.put(s.getDatabaseID(), s);
 		}
 
 		if (!silent)
@@ -2366,17 +2379,17 @@ public class DatabaseController
 
 		for (final Integer shelfID : shelfBoxMap.keySet())
 		{
-			if (loadedShelves.containsKey(shelfID))
+			if (cachedShelves.containsKey(shelfID))
 			{
 				final ArrayList<Integer[]> boxes = shelfBoxMap.get(shelfID);
 
 				for (final Integer[] data : boxes)
 				{
-					if (loadedProductBoxes.containsKey(data[0]))
+					if (cachedProductBoxes.containsKey(data[0]))
 					{
 						// Do not update the database as this method loads the data from the database into objects.
-						loadedShelves.get(shelfID).addToSlot(Shelf.coordinatesToShelfSlotID(shelfID, data[1] + 1, data[2], true),
-								loadedProductBoxes.get(data[0]), false);
+						cachedShelves.get(shelfID).addToSlot(Shelf.coordinatesToShelfSlotID(shelfID, data[1] + 1, data[2], true),
+								cachedProductBoxes.get(data[0]), false);
 					}
 				}
 			}
@@ -2414,7 +2427,7 @@ public class DatabaseController
 			if (MainWindow.PRINT_CACHE_MESSAGES)
 				System.out.println("Caching: " + r);
 
-			loadedRemovalLists.put(r.getDatabaseID(), r);
+			cachedRemovalLists.put(r.getDatabaseID(), r);
 		}
 
 		if (!silent)
@@ -2441,16 +2454,16 @@ public class DatabaseController
 
 		for (final Integer removalListID : removaListBoxes.keySet())
 		{
-			if (loadedRemovalLists.containsKey(removalListID))
+			if (cachedRemovalLists.containsKey(removalListID))
 			{
 				final ArrayList<Integer> boxIDs = removaListBoxes.get(removalListID);
 
 				for (final Integer id : boxIDs)
 				{
-					if (loadedProductBoxes.containsKey(id))
+					if (cachedProductBoxes.containsKey(id))
 					{
 						// Do not update the database as this method loads the data from the database into objects.
-						loadedRemovalLists.get(removalListID).addProductBox(loadedProductBoxes.get(id));
+						cachedRemovalLists.get(removalListID).addProductBox(cachedProductBoxes.get(id));
 					}
 				}
 			}
@@ -2466,14 +2479,14 @@ public class DatabaseController
 	public static void clearAllCaches()
 	{
 		System.out.println("[DatabaseController] Clearing all cached data.");
-		loadedProductBoxes.clear();
-		loadedProductBrands.clear();
-		loadedProductCategories.clear();
-		loadedProducts.clear();
-		loadedProductTypes.clear();
-		loadedRemovalLists.clear();
-		loadedRemovalListStates.clear();
-		loadedShelves.clear();
+		cachedProductBoxes.clear();
+		cachedProductBrands.clear();
+		cachedProductCategories.clear();
+		cachedProducts.clear();
+		cachedProductTypes.clear();
+		cachedRemovalLists.clear();
+		cachedRemovalListStates.clear();
+		cachedShelves.clear();
 	}
 
 	/**
@@ -2484,6 +2497,6 @@ public class DatabaseController
 	 */
 	public static Map<Integer, RemovalList> getCachedRemovalLists()
 	{
-		return loadedRemovalLists;
+		return cachedRemovalLists;
 	}
 }
