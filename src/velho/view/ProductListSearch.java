@@ -48,12 +48,15 @@ public class ProductListSearch
 			pane = new BorderPane();
 			VBox left = new VBox();
 			Button printButton = new Button("Print");
+			Button sendToScannerButton = new Button("Send to Scanner ");
 
 			final TextArea textArea = new TextArea();
 			textArea.setPromptText("Please type one product code or name per line. " + "To Search for multiple products of the same type, type the number of products you want and a colon before the product name or ID. " + "Empty lines and redundant spaces are ignored.");
 			textArea.setPrefWidth(MainWindow.WINDOW_WIDTH / 5);
 			printButton.setMaxWidth(Double.MAX_VALUE);
 			printButton.setAlignment(Pos.CENTER);
+			sendToScannerButton.setMaxWidth(Double.MAX_VALUE);
+			sendToScannerButton.setAlignment(Pos.CENTER);
 
 			printButton.setOnAction(new EventHandler<ActionEvent>()
 			{
@@ -64,7 +67,16 @@ public class ProductListSearch
 				}
 			});
 
-			left.getChildren().addAll(textArea, printButton);
+			sendToScannerButton.setOnAction(new EventHandler<ActionEvent>()
+			{
+				@Override
+				public void handle(final ActionEvent event)
+				{
+					ExternalSystemsController.sendDataToBarcodeScanner(DatabaseController.getProductSearchResultViewList());
+				}
+			});
+
+			left.getChildren().addAll(textArea, printButton, sendToScannerButton);
 
 			VBox.setVgrow(textArea, Priority.ALWAYS);
 
