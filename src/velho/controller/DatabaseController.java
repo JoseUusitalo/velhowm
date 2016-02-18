@@ -1106,15 +1106,8 @@ public class DatabaseController
 	 * Warnign: Assumes that the PIN is techinically valid.
 	 * </p>
 	 *
-	 * <<<<<<< HEAD
 	 * @param pin a PIN string
 	 * @return a {@link User} object representing the authenticated user or <code>null</code> for invalid credentials
-	 * =======
-	 * @param pin
-	 * a PIN string
-	 * @return a {@link User} object representing the authenticated user or
-	 * <code>null</code> for invalid credentials
-	 * >>>>>>> branch 'removal-list' of https://gitlab.com/joseu/velho.git
 	 * @throws NoDatabaseLinkException
 	 * @see {@link User#isValidPIN(String)}
 	 */
@@ -1138,12 +1131,7 @@ public class DatabaseController
 	/**
 	 * Gets the {@link UserRole} object from the given role ID.
 	 *
-	 * <<<<<<< HEAD
 	 * @param roleid role database ID
-	 * =======
-	 * @param roleid
-	 * role database ID
-	 * >>>>>>> branch 'removal-list' of https://gitlab.com/joseu/velho.git
 	 * @return the corresponding user role object
 	 * @throws NoDatabaseLinkException
 	 */
@@ -1203,12 +1191,7 @@ public class DatabaseController
 	/**
 	 * Gets the {@link ProductType} object from the given type ID.
 	 *
-	 * <<<<<<< HEAD
 	 * @param typeid product type database ID
-	 * =======
-	 * @param typeid
-	 * product type database ID
-	 * >>>>>>> branch 'removal-list' of https://gitlab.com/joseu/velho.git
 	 * @return the corresponding product type object
 	 * @throws NoDatabaseLinkException
 	 */
@@ -1245,12 +1228,7 @@ public class DatabaseController
 	/**
 	 * Gets the {@link ProductCategory} object from the given category ID.
 	 *
-	 * <<<<<<< HEAD
 	 * @param categoryid product category database ID
-	 * =======
-	 * @param categoryid
-	 * product category database ID
-	 * >>>>>>> branch 'removal-list' of https://gitlab.com/joseu/velho.git
 	 * @return the corresponding product category object
 	 * @throws NoDatabaseLinkException
 	 */
@@ -1286,12 +1264,7 @@ public class DatabaseController
 	/**
 	 * Gets the {@link ProductBrand} object from the given brand ID.
 	 *
-	 * <<<<<<< HEAD
 	 * @param brandid product brand database ID
-	 * =======
-	 * @param brandid
-	 * product brand database ID
-	 * >>>>>>> branch 'removal-list' of https://gitlab.com/joseu/velho.git
 	 * @return the corresponding product brand object
 	 * @throws NoDatabaseLinkException
 	 */
@@ -1327,12 +1300,7 @@ public class DatabaseController
 	/**
 	 * Gets the {@link Product} object from the given product ID.
 	 *
-	 * <<<<<<< HEAD
 	 * @param productid product database ID
-	 * =======
-	 * @param productid
-	 * product database ID
-	 * >>>>>>> branch 'removal-list' of https://gitlab.com/joseu/velho.git
 	 * @return the corresponding product object
 	 * @throws NoDatabaseLinkException
 	 */
@@ -1368,12 +1336,7 @@ public class DatabaseController
 	/**
 	 * Gets the {@link Product} object from the given product ID.
 	 *
-	 * <<<<<<< HEAD
 	 * @param productid product database ID
-	 * =======
-	 * @param productid
-	 * product database ID
-	 * >>>>>>> branch 'removal-list' of https://gitlab.com/joseu/velho.git
 	 * @return the corresponding product object
 	 * @throws NoDatabaseLinkException
 	 */
@@ -1410,12 +1373,7 @@ public class DatabaseController
 	/**
 	 * Gets the {@link Product} object from the given product name.
 	 *
-	 * <<<<<<< HEAD
 	 * @param name the exact product name
-	 * =======
-	 * @param name
-	 * the exact product name
-	 * >>>>>>> branch 'removal-list' of https://gitlab.com/joseu/velho.git
 	 * @return the corresponding product object
 	 * @throws NoDatabaseLinkException
 	 */
@@ -1442,12 +1400,7 @@ public class DatabaseController
 	/**
 	 * Gets the {@link Product} object from the given product name.
 	 *
-	 * <<<<<<< HEAD
 	 * @param name the exact product name
-	 * =======
-	 * @param name
-	 * the exact product name
-	 * >>>>>>> branch 'removal-list' of https://gitlab.com/joseu/velho.git
 	 * @return the corresponding product object
 	 * @throws NoDatabaseLinkException
 	 */
@@ -1470,15 +1423,8 @@ public class DatabaseController
 	/**
 	 * Gets user data by their database ID.
 	 *
-	 * <<<<<<< HEAD
 	 * @param id database ID of the user
 	 * @return a {@link User} object or <code>null</code> if a user with that ID was not found
-	 * =======
-	 * @param id
-	 * database ID of the user
-	 * @return a {@link User} object or <code>null</code> if a user with that ID
-	 * was not found
-	 * >>>>>>> branch 'removal-list' of https://gitlab.com/joseu/velho.git
 	 */
 	public static User getUserByID(final int id) throws NoDatabaseLinkException
 	{
