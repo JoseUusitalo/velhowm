@@ -101,6 +101,11 @@ public class DatabaseController
 	 */
 	private static ObservableList<Object> observableProductBrands = FXCollections.observableArrayList();
 
+	/**
+	 * An observable list of {@link RemovalListState} objects for display in the user interface.
+	 */
+	private static ObservableList<Object> observableRemovalListStates = FXCollections.observableArrayList();
+
 	/*
 	 * ---- CACHE MAPS ----
 	 */
@@ -2580,6 +2585,13 @@ public class DatabaseController
 		observableProductBrands.clear();
 		observableProductBrands.addAll(cachedProductBrands.values());
 		return observableProductBrands;
+	}
+
+	public static ObservableList<Object> getAllRemovalListStates()
+	{
+		observableRemovalListStates.clear();
+		observableRemovalListStates.addAll(cachedRemovalLists.values());
+		return observableRemovalListStates;
 	}
 
 	/**

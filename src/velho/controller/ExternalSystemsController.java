@@ -33,15 +33,29 @@ public class ExternalSystemsController
 		String oldShelfIDString = null;
 		int oldShelfID = -1;
 		boolean boxWasNotInShelf = false;
+		boolean boxSaveOnShelf = true;
 		Shelf oldShelf = null;
 		Shelf newShelf = null;
 		ProductBox boxToMove = null;
+		boolean success = true;
 
 		try
 		{
+
 			newShelf = DatabaseController.getShelfByID(newShelfID, true);
 			boxToMove = DatabaseController.getProductBoxByID(productBoxCode);
+
 			if (boxToMove == null)
+			{
+				return false;
+			}
+
+			if (newShelf == null)
+			{
+				return false;
+			}
+
+			if (newShelf.addToSlot(newShelfSlotID, boxToMove) == false)
 			{
 				return false;
 			}
@@ -50,19 +64,24 @@ public class ExternalSystemsController
 			oldShelfID = Integer.parseInt(oldShelfIDString.substring(1));
 			oldShelf = DatabaseController.getShelfByID(oldShelfID, true);
 
-			oldShelf.removeFromSlot(boxToMove);
-			if (newShelf == null)
+			if (oldShelf == null)
 			{
 				return false;
 			}
-			newShelf.addToSlot(newShelfSlotID, boxToMove);
+			if (oldShelf.addToSlot(newShelfSlotID, boxToMove) == false)
+			{
+				return false;
+			}
+			if (oldShelf.addToSlot(newShelfSlotID, boxToMove) == true)
+			{
+				return true;
+			}
+
 		}
 		catch (NoDatabaseLinkException e)
 		{
 			DatabaseController.tryReLink();
 		}
-
-		boolean success = true;
 		if (showPopup)
 			DebugController.moveResult(productBoxCode, newShelfSlotID, success);
 

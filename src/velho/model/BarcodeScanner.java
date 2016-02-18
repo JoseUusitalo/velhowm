@@ -76,26 +76,25 @@ public class BarcodeScanner
 			list = DatabaseController.getProductCodeList();
 			Collections.shuffle(list);
 			shelf = DatabaseController.getRandomShelfSlot();
+			System.out.println("random product " + list.get(0));
+			System.out.println("random shelf slot " + shelf);
+
+			if (ExternalSystemsController.move(list.get(0), shelf, true))
+			{
+				System.out.println("Success");
+				return true;
+			}
+			else
+			{
+				System.out.println("Pint Failed");
+				return false;
+			}
 		}
 		catch (NoDatabaseLinkException e)
 		{
 			DatabaseController.tryReLink();
 		}
-
-		System.out.println("random product " + list.get(0));
-		System.out.println("random shelf slot " + shelf);
-
-		if (ExternalSystemsController.move(list.get(0), shelf, true))
-		{
-			System.out.println("Success");
-			return true;
-		}
-		else
-		{
-			System.out.println("Pint Failed");
-			return false;
-		}
-
+		return false;
 	}
 
 }

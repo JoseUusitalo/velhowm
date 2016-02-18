@@ -4,6 +4,7 @@ import javafx.scene.Node;
 import javafx.scene.layout.BorderPane;
 import velho.model.ProductBoxSearchResultRow;
 import velho.model.RemovalList;
+import velho.model.RemovalListState;
 import velho.model.interfaces.UIActionController;
 import velho.view.RemovalListCreationView;
 import velho.view.RemovalListManagementView;
@@ -135,5 +136,16 @@ public class RemovalListController implements UIActionController
 		System.out.println("Getting search result list: " + DatabaseController.getObservableProductSearchResults());
 		return (BorderPane) ListController.getTableView(this, DatabaseController.getProductSearchDataColumns(true, false),
 				DatabaseController.getObservableProductSearchResults());
+	}
+
+	public void saveNewRemovalList()
+	{
+		System.out.println("Saving List : " + newRemovalList.getObservableBoxes());
+
+	}
+
+	public void setNewRemovalListState(final RemovalListState newState)
+	{
+		System.out.println("New state is : " + newState);
 	}
 }
