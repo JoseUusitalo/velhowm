@@ -2590,7 +2590,7 @@ public class DatabaseController
 	public static ObservableList<Object> getAllRemovalListStates()
 	{
 		observableRemovalListStates.clear();
-		observableRemovalListStates.addAll(cachedRemovalLists.values());
+		observableRemovalListStates.addAll(cachedRemovalListStates.values());
 		return observableRemovalListStates;
 	}
 
