@@ -48,7 +48,8 @@ public class MainWindow extends Application
 	public static final boolean DEBUG_MODE = true;
 
 	/**
-	 * Enable or disable showing windows. DEBUG_MODE must be <code>true</code> to make this <code>false</code>.
+	 * Enable or disable showing windows. DEBUG_MODE must be <code>true</code>
+	 * to make this <code>false</code>.
 	 */
 	public static final boolean SHOW_WINDOWS = true;
 
@@ -65,12 +66,12 @@ public class MainWindow extends Application
 	/**
 	 * The height of the window.
 	 */
-	public static final double WINDOW_HEIGHT = 720;
+	public static final double WINDOW_HEIGHT = 640;
 
 	/**
 	 * The width of the window.
 	 */
-	public static final double WINDOW_WIDTH = 1024;
+	public static final double WINDOW_WIDTH = 800;
 
 	/**
 	 * The {@link DebugController}.
@@ -135,9 +136,8 @@ public class MainWindow extends Application
 				DatabaseController.loadData(false);
 				debugController = new DebugController();
 				userController = new UserController();
-				searchController = new SearchController();
-
 				listController = new ListController(userController);
+				searchController = new SearchController(listController);
 				removalListController = new RemovalListController(listController, searchController);
 				uiController = new UIController(this, listController, userController, removalListController, searchController);
 
@@ -148,8 +148,7 @@ public class MainWindow extends Application
 				System.out.println("Closing application.");
 				System.exit(0);
 			}
-		}
-		catch (ClassNotFoundException | ExistingDatabaseLinkException | NoDatabaseLinkException e1)
+		} catch (ClassNotFoundException | ExistingDatabaseLinkException | NoDatabaseLinkException e1)
 		{
 			e1.printStackTrace();
 		}
@@ -168,8 +167,10 @@ public class MainWindow extends Application
 	/**
 	 * Adds a new tab to the main tab panel.
 	 *
-	 * @param tabName name of the tab
-	 * @param view view to show in the tab
+	 * @param tabName
+	 *            name of the tab
+	 * @param view
+	 *            view to show in the tab
 	 */
 	public void addTab(final String tabName, final Node view)
 	{
@@ -202,9 +203,7 @@ public class MainWindow extends Application
 
 			// TODO: Use CSS.
 			statusBar.setBackground(new Background(new BackgroundFill(Paint.valueOf(Color.LIGHTGRAY.toString()), null, null)));
-			statusBar.setBorder(new Border(
-					new BorderStroke(Paint.valueOf("b5b5b5"), Paint.valueOf(Color.TRANSPARENT.toString()), Paint.valueOf(Color.TRANSPARENT.toString()),
-							Paint.valueOf(Color.TRANSPARENT.toString()), BorderStrokeStyle.SOLID, null, null, null, null, null, null)));
+			statusBar.setBorder(new Border(new BorderStroke(Paint.valueOf("b5b5b5"), Paint.valueOf(Color.TRANSPARENT.toString()), Paint.valueOf(Color.TRANSPARENT.toString()), Paint.valueOf(Color.TRANSPARENT.toString()), BorderStrokeStyle.SOLID, null, null, null, null, null, null)));
 
 			final HBox userBar = new HBox(10);
 
@@ -214,8 +213,7 @@ public class MainWindow extends Application
 
 			logoutButton.setOnAction(new EventHandler<ActionEvent>()
 			{
-				@Override
-				public void handle(final ActionEvent event)
+				@Override public void handle(final ActionEvent event)
 				{
 					LoginController.logout();
 				}
@@ -233,9 +231,7 @@ public class MainWindow extends Application
 	/**
 	 * Loads the data from the database and creates the window.
 	 */
-	@SuppressWarnings("unused")
-	@Override
-	public void start(final Stage primaryStage)
+	@SuppressWarnings("unused") @Override public void start(final Stage primaryStage)
 	{
 		if (!SHOW_WINDOWS && DEBUG_MODE)
 		{
@@ -264,8 +260,7 @@ public class MainWindow extends Application
 
 				debugStage.setOnCloseRequest(new EventHandler<WindowEvent>()
 				{
-					@Override
-					public void handle(final WindowEvent event)
+					@Override public void handle(final WindowEvent event)
 					{
 						shutdown(primaryStage);
 					}
@@ -274,8 +269,7 @@ public class MainWindow extends Application
 
 			primaryStage.setOnCloseRequest(new EventHandler<WindowEvent>()
 			{
-				@Override
-				public void handle(final WindowEvent event)
+				@Override public void handle(final WindowEvent event)
 				{
 					shutdown(primaryStage);
 				}
@@ -284,9 +278,11 @@ public class MainWindow extends Application
 	}
 
 	/**
-	 * A method called to shut down the software and perform any necessary cleanup.
+	 * A method called to shut down the software and perform any necessary
+	 * cleanup.
 	 *
-	 * @param primaryStage the stage the main window is open in
+	 * @param primaryStage
+	 *            the stage the main window is open in
 	 */
 	protected void shutdown(final Stage primaryStage)
 	{
@@ -301,8 +297,7 @@ public class MainWindow extends Application
 		try
 		{
 			DatabaseController.unlink();
-		}
-		catch (final NoDatabaseLinkException e)
+		} catch (final NoDatabaseLinkException e)
 		{
 			// Ignore.
 		}
@@ -312,7 +307,8 @@ public class MainWindow extends Application
 	/**
 	 * Replaces the top view of the window
 	 *
-	 * @param view view to set the top of the window
+	 * @param view
+	 *            view to set the top of the window
 	 */
 	public void setTopView(final Node view)
 	{
@@ -322,7 +318,8 @@ public class MainWindow extends Application
 	/**
 	 * Replaces the right side view of the window
 	 *
-	 * @param view view to set the right of the window
+	 * @param view
+	 *            view to set the right of the window
 	 */
 	public void setRightView(final Node view)
 	{
@@ -332,7 +329,8 @@ public class MainWindow extends Application
 	/**
 	 * Replaces the bottom view of the window
 	 *
-	 * @param view view to set the bottom of the window
+	 * @param view
+	 *            view to set the bottom of the window
 	 */
 	public void setBottomView(final Node view)
 	{
@@ -342,7 +340,8 @@ public class MainWindow extends Application
 	/**
 	 * Replaces the left side view of the window
 	 *
-	 * @param view view to set the l of the window
+	 * @param view
+	 *            view to set the l of the window
 	 */
 	public void setLeftView(final Node view)
 	{
@@ -352,7 +351,8 @@ public class MainWindow extends Application
 	/**
 	 * Replaces the center view of the window
 	 *
-	 * @param view view to set the middle of the window
+	 * @param view
+	 *            view to set the middle of the window
 	 */
 	public void setCenterView(final Node view)
 	{

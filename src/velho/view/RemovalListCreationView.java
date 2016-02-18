@@ -68,12 +68,13 @@ public class RemovalListCreationView
 			final ComboBox<String> removalListState = new ComboBox<String>();
 
 			bpane = new BorderPane();
-			bpane.setTop(searchController.getView());
+			GridPane searchView = (GridPane) searchController.getSearchView();
+			searchView.setPadding(new Insets(0, 10, 10, 10));
+			bpane.setTop(searchView);
 
 			GridPane left = new GridPane();
 			// TODO: Use CSS.
 			left.setBackground(new Background(new BackgroundFill(Paint.valueOf("EEEEEE"), null, null)));
-			left.setPadding(new Insets(10, 0, 0, 0));
 
 			Label resultsLabel = new Label("Search Results");
 			resultsLabel.setAlignment(Pos.CENTER);
@@ -91,7 +92,6 @@ public class RemovalListCreationView
 			GridPane center = new GridPane();
 			// TODO: Use CSS.
 			center.setBackground(new Background(new BackgroundFill(Paint.valueOf("EEEEEE"), null, null)));
-			center.setPadding(new Insets(10, 0, 0, 0));
 
 			Label removalListLabel = new Label("New Removal List");
 			removalListLabel.setAlignment(Pos.CENTER);

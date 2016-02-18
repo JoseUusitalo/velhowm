@@ -23,7 +23,8 @@ public class ExternalSystemsController
 	 *            the code that the Box posses.
 	 * @param newShelfSlotID
 	 *            the Boxes former shelf id that it modifies.
-	 * @return either a true or false, true when the prosses was compleated. False if not.
+	 * @return either a true or false, true when the prosses was compleated.
+	 *         False if not.
 	 */
 	public static boolean move(final int productBoxCode, final String newShelfSlotID, final boolean showPopup)
 	{
@@ -77,14 +78,10 @@ public class ExternalSystemsController
 				return true;
 			}
 
-		}
-		catch (NoDatabaseLinkException e)
+		} catch (NoDatabaseLinkException e)
 		{
 			DatabaseController.tryReLink();
-			if (e != null)
-			{
-				return false;
-			}
+
 		}
 		if (showPopup)
 			DebugController.moveResult(productBoxCode, newShelfSlotID, success);
