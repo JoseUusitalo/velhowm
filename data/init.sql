@@ -235,7 +235,7 @@ INSERT INTO `containers` SET `product`=1, `max_size`=200, `product_count`=2;
 INSERT INTO `containers` SET `product`=1, `max_size`=200, `product_count`=10;
 INSERT INTO `containers` SET `product`=4, `max_size`=5, `product_count`=0;
 
-/* Removal Lists */
+/* Removal Lists 1-5 */
 INSERT INTO `removallist_states` SET `name`='Active';
 INSERT INTO `removallist_states` SET `name`='Canceled';
 INSERT INTO `removallist_states` SET `name`='Finished';
@@ -254,3 +254,5 @@ INSERT INTO `removallist_productboxes` SET `removallist`=3, `productbox`=29;
 
 INSERT INTO `removallists` SET `liststate`=3;
 INSERT INTO `removallist_productboxes` SET `removallist`=4, `productbox`=30;
+
+INSERT INTO `removallists` SET `liststate`=2;

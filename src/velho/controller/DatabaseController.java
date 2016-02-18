@@ -282,9 +282,6 @@ public class DatabaseController
 		final Connection connection = getConnection();
 		Statement statement = null;
 
-		// Update queries.
-		int changed = 0;
-
 		// Most other queries.
 		final Set<Object> dataSet = new LinkedHashSet<Object>();
 
@@ -294,20 +291,58 @@ public class DatabaseController
 
 		try
 		{
+			ResultSet result = null;
+
 			// Initialize a statement.
 			statement = connection.createStatement();
 
-			statement.execute(sqlBuilder(type, tableName, joinOnValues, columns, columnValues, where));
+			statement.execute(sqlBuilder(type, tableName, joinOnValues, columns, columnValues, where), Statement.RETURN_GENERATED_KEYS);
 
 			switch (type)
 			{
 				case INSERT:
 				case DELETE:
 				case UPDATE:
-					changed = statement.getUpdateCount();
+					if (statement.getUpdateCount() > 0)
+					{
+						// Get the database rows that were created or an empty set if none were created.
+						result = statement.getGeneratedKeys();
+						if (result != null)
+						{
+							// This is silly. Why isn't there an easier way to get the number of rows in a ResultSet?
+							result.last();
+							final int rowCount = result.getRow();
+							result.beforeFirst();
+
+							if (rowCount == 0)
+							{
+								/*
+								 * A successfull DELETE statement does not return anything but we need /something/ in
+								 * the dataSet.
+								 */
+								dataSet.add(true);
+							}
+							else
+							{
+								// INSERT and UPDATE statements return the updated/inserted rows.
+								// Get all the IDs of the rows that were updated.
+								while (result.next())
+									dataSet.add(result.getInt(1));
+							}
+						}
+
+						try
+						{
+							if (result != null)
+								result.close();
+						}
+						catch (SQLException e)
+						{
+							e.printStackTrace();
+						}
+					}
 					break;
 				case SELECT:
-					ResultSet result = null;
 					result = statement.getResultSet();
 
 					if (columns.length == 1 && columns[0] != "*")
@@ -430,18 +465,71 @@ public class DatabaseController
 
 								break;
 							default:
+								// Close all resources.
+								try
+								{
+									result.close();
+								}
+								catch (final SQLException e)
+								{
+									e.printStackTrace();
+								}
+
+								try
+								{
+									statement.close();
+								}
+								catch (final SQLException e)
+								{
+									e.printStackTrace();
+								}
+
+								try
+								{
+									connection.close();
+								}
+								catch (final SQLException e)
+								{
+									e.printStackTrace();
+								}
 								throw new IllegalArgumentException();
 						}
 					}
+
+					try
+					{
+						result.close();
+					}
+					catch (SQLException e)
+					{
+						e.printStackTrace();
+					}
 					break;
 				default:
+					// Close all resources.
+					try
+					{
+						statement.close();
+					}
+					catch (final SQLException e)
+					{
+						e.printStackTrace();
+					}
+
+					try
+					{
+						connection.close();
+					}
+					catch (final SQLException e)
+					{
+						e.printStackTrace();
+					}
 					throw new IllegalArgumentException();
 			}
 		}
 		catch (final IllegalStateException e)
 		{
 			// Close all resources.
-
 			try
 			{
 				if (statement != null)
@@ -470,7 +558,9 @@ public class DatabaseController
 				e.printStackTrace();
 
 			// If it was a UNIQUE constraint violation, continue normally as those are handled separately.
-			System.out.println("[DatabaseController] Silently ignored an SQL UNIQUE constraint violation.");
+			System.out.println("[DatabaseController] Silently ignored an SQL UNIQUE constraint violation with: \n");
+			System.out.println(e.getMessage());
+			System.out.println("\n[DatabaseController] End of message.");
 		}
 
 		// Close all resources.
@@ -498,7 +588,7 @@ public class DatabaseController
 			case INSERT:
 			case DELETE:
 			case UPDATE:
-				return changed;
+				return dataSet;
 			case SELECT:
 				switch (tableName)
 				{
@@ -516,6 +606,8 @@ public class DatabaseController
 					case SHELF_PRODUCTBOXES:
 						return shelfBoxMap;
 					case REMOVALLIST_PRODUCTBOXES:
+						if (columns.length == 1 && columns[0] != "*")
+							return dataSet;
 						return listBoxMap;
 					default:
 						throw new IllegalArgumentException();
@@ -1390,9 +1482,7 @@ public class DatabaseController
 
 				// data[1] is the level index
 				shelfSlotID = Shelf.coordinatesToShelfSlotID(shelfid, data[1] + 1, data[2], true);
-
-				if (!shelf.getShelfSlotBoxes(shelfSlotID).contains(box))
-					shelf.addToSlot(shelfSlotID, box, false);
+				shelf.addToSlot(shelfSlotID, box, false);
 			}
 
 			System.out.println("[DatabaseController] Product boxes placed on shelf " + shelfid + ".");
@@ -1421,8 +1511,16 @@ public class DatabaseController
 		final Set<Integer> removalListBoxes = (LinkedHashSet<Integer>) runQuery(DatabaseQueryType.SELECT, DatabaseTable.REMOVALLIST_PRODUCTBOXES, null, columns,
 				null, where);
 
-		for (final Integer id : removalListBoxes)
-			loadedRemovalLists.get(listid).addProductBox(getProductBoxByID(id));
+		if (!removalListBoxes.isEmpty())
+		{
+			for (final Integer id : removalListBoxes)
+				loadedRemovalLists.get(listid).addProductBox(getProductBoxByID(id));
+
+			System.out.println("[DatabaseController] Product boxes placed on removal list " + listid + ".");
+		}
+		else
+			System.out.println("[DatabaseController] Nothing to place.");
+
 	}
 
 	/**
@@ -1932,7 +2030,8 @@ public class DatabaseController
 		values.put("last_name", lastName);
 		values.put("role", roleID);
 
-		final boolean changed = (0 != (Integer) runQuery(DatabaseQueryType.INSERT, DatabaseTable.USERS, null, null, values, null));
+		@SuppressWarnings("unchecked")
+		final boolean changed = (0 < ((Set<Integer>) runQuery(DatabaseQueryType.INSERT, DatabaseTable.USERS, null, null, values, null)).size());
 
 		// Update the user list displayed in the UI after adding a new user.
 		if (changed)
@@ -1955,7 +2054,8 @@ public class DatabaseController
 		final List<String> where = new ArrayList<String>();
 		where.add("user_id = " + new Integer(databaseID));
 
-		final boolean changed = (0 != (Integer) (runQuery(DatabaseQueryType.DELETE, DatabaseTable.USERS, null, null, null, where)));
+		@SuppressWarnings("unchecked")
+		final boolean changed = (0 < ((Set<Integer>) (runQuery(DatabaseQueryType.DELETE, DatabaseTable.USERS, null, null, null, where))).size());
 
 		// Update the user list displayed in the UI if database changed.
 		if (changed)
@@ -1971,6 +2071,7 @@ public class DatabaseController
 	 * product box to update in the database
 	 * @return <code>true</code> if the database was updated
 	 */
+	@SuppressWarnings("unchecked")
 	public static boolean addProductBoxToShelfSlot(final ProductBox productBox, final String shelfSlotID) throws NoDatabaseLinkException
 	{
 		final Object[] tokens = Shelf.tokenizeShelfSlotID(shelfSlotID);
@@ -1987,7 +2088,7 @@ public class DatabaseController
 		{
 			values.put("shelf", shelfID);
 			values.put("productbox", productBox.getBoxID());
-			changed = (0 != (Integer) runQuery(DatabaseQueryType.INSERT, DatabaseTable.SHELF_PRODUCTBOXES, null, null, values, null));
+			changed = (0 < ((LinkedHashSet<Object>) runQuery(DatabaseQueryType.INSERT, DatabaseTable.SHELF_PRODUCTBOXES, null, null, values, null)).size());
 		}
 		else
 		{
@@ -1995,7 +2096,7 @@ public class DatabaseController
 
 			final List<String> where = new ArrayList<String>();
 			where.add("productbox = " + productBox.getBoxID());
-			changed = (0 != (Integer) runQuery(DatabaseQueryType.UPDATE, DatabaseTable.SHELF_PRODUCTBOXES, null, null, values, where));
+			changed = (0 < ((LinkedHashSet<Object>) runQuery(DatabaseQueryType.UPDATE, DatabaseTable.SHELF_PRODUCTBOXES, null, null, values, where)).size());
 		}
 
 		// Update the cache.
@@ -2014,9 +2115,11 @@ public class DatabaseController
 	public static boolean removeProductBoxFromShelfSlot(final ProductBox productBox) throws NoDatabaseLinkException
 	{
 		final List<String> where = new ArrayList<String>();
-		where.add("productbox= " + productBox.getBoxID());
+		where.add("productbox = " + productBox.getBoxID());
 
-		final boolean changed = (0 != (Integer) (runQuery(DatabaseQueryType.DELETE, DatabaseTable.SHELF_PRODUCTBOXES, null, null, null, where)));
+		@SuppressWarnings("unchecked")
+		final boolean changed = (0 < ((LinkedHashSet<Object>) runQuery(DatabaseQueryType.DELETE, DatabaseTable.SHELF_PRODUCTBOXES, null, null, null, where))
+				.size());
 
 		final Object[] tokens = Shelf.tokenizeShelfSlotID(productBox.getShelfSlot());
 
@@ -2034,6 +2137,7 @@ public class DatabaseController
 	 * @param removalList new or existing removal list
 	 * @return <code>true</code> if existing data was updated or a new removal list was created in the database
 	 */
+	@SuppressWarnings("unchecked")
 	public static boolean updateRemovalList(final RemovalList removalList) throws NoDatabaseLinkException
 	{
 		int listID = removalList.getDatabaseID();
@@ -2046,18 +2150,30 @@ public class DatabaseController
 		DatabaseQueryType query;
 
 		// If the removal list does not exist yet, INSERT.
-		if (removalList.getDatabaseID() < 1)
+		if (listID < 1)
 			query = DatabaseQueryType.INSERT;
 		else
 			query = DatabaseQueryType.UPDATE;
 
 		// Insert/Update the list itself
-		if (0 == (Integer) runQuery(query, DatabaseTable.REMOVALLISTS, null, null, values, null))
+		@SuppressWarnings("unchecked")
+		Set<Integer> result = (LinkedHashSet<Integer>) runQuery(query, DatabaseTable.REMOVALLISTS, null, null, values, null);
+
+		if (result.size() == 0)
 			return false;
 
-		// Delete all boxes from the list in the database.
-		if (0 == (Integer) runQuery(DatabaseQueryType.DELETE, DatabaseTable.REMOVALLIST_PRODUCTBOXES, null, null, null, where))
-			return false;
+		// Get the inserted removal list database ID.
+		if (listID < 1)
+			listID = result.iterator().next();
+
+		// Even if multiple rows were changed, they all have the same ID.
+		where.add("removallist = " + listID);
+
+		/*
+		 * Delete all boxes from the list in the database.
+		 * We don't really care whether anything was deleted or not, if there was something, it is now deleted.
+		 */
+		runQuery(DatabaseQueryType.DELETE, DatabaseTable.REMOVALLIST_PRODUCTBOXES, null, null, null, where);
 
 		// Add all boxes to the database.
 		Iterator<Object> it = removalList.getBoxes().iterator();
@@ -2074,7 +2190,9 @@ public class DatabaseController
 			values.put("productbox", ((ProductContainer) it.next()).getBoxID());
 
 			// Run the query.
-			if (0 == (Integer) runQuery(DatabaseQueryType.INSERT, DatabaseTable.REMOVALLIST_PRODUCTBOXES, null, null, values, null))
+			result = (LinkedHashSet<Integer>) runQuery(DatabaseQueryType.INSERT, DatabaseTable.REMOVALLIST_PRODUCTBOXES, null, null, values, null);
+
+			if (result.size() == 0)
 				return false;
 		}
 
@@ -2285,5 +2403,32 @@ public class DatabaseController
 
 		if (!silent)
 			System.out.println("[DatabaseController] Product boxes placed on all removal lists.");
+	}
+
+	/**
+	 * Clears all cached data.
+	 */
+	public static void clearAllCaches()
+	{
+		System.out.println("[DatabaseController] Clearing all cached data.");
+		loadedProductBoxes.clear();
+		loadedProductBrands.clear();
+		loadedProductCategories.clear();
+		loadedProducts.clear();
+		loadedProductTypes.clear();
+		loadedRemovalLists.clear();
+		loadedRemovalListStates.clear();
+		loadedShelves.clear();
+	}
+
+	/**
+	 * Gets all the {@link RemovalList} objects that have been loaded from the database at some point during the
+	 * execution of the program.
+	 *
+	 * @return a map of cached removal lists where the key is the database ID and the value is the object
+	 */
+	public static Map<Integer, RemovalList> getCachedRemovalLists()
+	{
+		return loadedRemovalLists;
 	}
 }

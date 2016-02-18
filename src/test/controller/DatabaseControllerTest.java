@@ -17,6 +17,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 import velho.controller.DatabaseController;
+import velho.model.RemovalList;
 import velho.model.User;
 import velho.model.exceptions.ExistingDatabaseLinkException;
 import velho.model.exceptions.NoDatabaseLinkException;
@@ -192,6 +193,7 @@ public class DatabaseControllerTest
 	@Test
 	public final void testRemoveUser() throws NoDatabaseLinkException
 	{
+		DatabaseController.loadData(true);
 		assertTrue(DatabaseController.removeUser(1));
 
 		assertTrue(DatabaseController.initializeDatabase());
@@ -254,5 +256,75 @@ public class DatabaseControllerTest
 	public final void testAuthenticatePIN_Invalid() throws NoDatabaseLinkException
 	{
 		assertEquals(null, DatabaseController.authenticatePIN(null, "", "-1"));
+	}
+
+	@Test
+	public final void testGetProductBoxByID_Invalid() throws NoDatabaseLinkException
+	{
+		assertEquals(null, DatabaseController.getProductBoxByID(-1));
+	}
+
+	@Test
+	public final void testgetProductIDFromName_Invalid() throws NoDatabaseLinkException
+	{
+		assertEquals(-1, DatabaseController.getProductIDFromName("just some random text here not a product name"));
+	}
+
+	@Test
+	public final void testGetRemovalListByID_Invalid_Cached() throws NoDatabaseLinkException
+	{
+		assertEquals(null, DatabaseController.getRemovalListByID(-1, true));
+	}
+
+	@Test
+	public final void testGetRemovalListByID_Invalid_ForceLoad() throws NoDatabaseLinkException
+	{
+		assertEquals(null, DatabaseController.getRemovalListByID(-1, false));
+	}
+
+	@Test
+	public final void testGetRemovalListByID_ForceLoad() throws NoDatabaseLinkException
+	{
+		assertEquals("[1] Active: 3 boxes", DatabaseController.getRemovalListByID(1, false).toString());
+	}
+
+	@Test
+	public final void testGetRemovalListByID_Cached() throws NoDatabaseLinkException
+	{
+		assertEquals("[1] Active: 3 boxes", DatabaseController.getRemovalListByID(1, true).toString());
+	}
+
+	@Test
+	public final void testGetRemovalListByID_LoadAndCache() throws NoDatabaseLinkException
+	{
+		DatabaseController.clearAllCaches();
+		assertEquals("[1] Active: 3 boxes", DatabaseController.getRemovalListByID(1, true).toString());
+	}
+
+	@Test
+	public final void testGetRemovalListsViewList()
+	{
+		// This test is useless but improves coverage.
+		assertTrue(DatabaseController.getRemovalListsViewList().containsAll(DatabaseController.getCachedRemovalLists().values()));
+	}
+
+	@Test
+	public final void testLoadData() throws NoDatabaseLinkException
+	{
+		DatabaseController.clearAllCaches();
+		DatabaseController.loadData(true);
+
+		// Make sure that a removal list was loaded and the product boxes were placed on it.
+		assertEquals(0, DatabaseController.getRemovalListByID(5, true).getSize());
+	}
+
+	@Test
+	public final void testInsertRemovalList() throws NoDatabaseLinkException
+	{
+		RemovalList list = new RemovalList();
+		list.addProductBox(DatabaseController.getProductBoxByID(1));
+
+		assertTrue(DatabaseController.updateRemovalList(list));
+		assertTrue(DatabaseController.getRemovalListByID(6, true).getBoxes().contains(DatabaseController.getProductBoxByID(1)));
 	}
 }
