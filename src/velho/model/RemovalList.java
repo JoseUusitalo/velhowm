@@ -4,14 +4,14 @@ import java.util.LinkedHashSet;
 import java.util.Set;
 
 import javafx.collections.FXCollections;
-import javafx.collections.ObservableSet;
+import javafx.collections.ObservableList;
 import velho.controller.DatabaseController;
 import velho.model.exceptions.NoDatabaseLinkException;
 
 public class RemovalList
 {
 	private Set<ProductBox> boxes;
-	private ObservableSet<Object> observableBoxes;
+	private ObservableList<Object> observableBoxes;
 	private int databaseID;
 	private RemovalListState state;
 
@@ -19,7 +19,7 @@ public class RemovalList
 	{
 		this.state = new RemovalListState(1, "Active");
 		this.boxes = new LinkedHashSet<ProductBox>();
-		this.observableBoxes = FXCollections.observableSet();
+		this.observableBoxes = FXCollections.observableArrayList();
 	}
 
 	public RemovalList(final int databaseID, final RemovalListState state)
@@ -27,7 +27,7 @@ public class RemovalList
 		this.databaseID = databaseID;
 		this.state = state;
 		this.boxes = new LinkedHashSet<ProductBox>();
-		this.observableBoxes = FXCollections.observableSet();
+		this.observableBoxes = FXCollections.observableArrayList();
 	}
 
 	@Override
@@ -81,7 +81,7 @@ public class RemovalList
 	 *
 	 * @return the {@link ProductBox} objects on this list
 	 */
-	public ObservableSet<Object> getObservableBoxes()
+	public ObservableList<Object> getObservableBoxes()
 	{
 		System.out.println("Getting " + observableBoxes);
 		return observableBoxes;

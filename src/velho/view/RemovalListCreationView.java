@@ -50,19 +50,8 @@ public class RemovalListCreationView
 	 */
 	private SearchController searchController;
 
-	/**
-	 * The grid panel.
-	 */
-	private GridPane grid;
-
-	/**
-	 * Saves Items
-	 */
-	private Button saveButton = new Button("Save");
-
-	protected RemovalListState newState;
-
-	public RemovalListCreationView(final RemovalListController removalListController, final ListController listController, final SearchController searchController)
+	public RemovalListCreationView(final RemovalListController removalListController, final ListController listController,
+			final SearchController searchController)
 	{
 		this.removalListController = removalListController;
 		this.listController = listController;
@@ -114,7 +103,8 @@ public class RemovalListCreationView
 
 			GridPane.setHgrow(removalListLabel, Priority.ALWAYS);
 
-			BorderPane newList = removalListController.getCurrentRemovalListView();
+			BorderPane newList = (BorderPane) ListController.getTableView(removalListController, DatabaseController.getProductSearchDataColumns(false, true),
+					removalListController.getCurrentRemovalListContents());
 			newList.setPadding(new Insets(10, 0, 0, 0));
 			newList.setPrefWidth(MainWindow.WINDOW_WIDTH / 2);
 			center.add(removalListLabel, 1, 0);
@@ -135,6 +125,7 @@ public class RemovalListCreationView
 				}
 			});
 
+			Button saveButton = new Button("Save");
 			center.add(saveButton, 2, 0);
 
 			saveButton.setOnAction(new EventHandler<ActionEvent>()

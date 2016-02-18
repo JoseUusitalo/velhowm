@@ -1,5 +1,6 @@
 package velho.controller;
 
+import javafx.collections.ObservableList;
 import javafx.scene.Node;
 import javafx.scene.layout.BorderPane;
 import velho.model.ProductBoxSearchResultRow;
@@ -9,6 +10,11 @@ import velho.model.interfaces.UIActionController;
 import velho.view.RemovalListCreationView;
 import velho.view.RemovalListManagementView;
 
+/**
+ * A class for managing {@link RemovalList} objects.
+ *
+ * @author Jose Uusitalo
+ */
 public class RemovalListController implements UIActionController
 {
 	/**
@@ -26,7 +32,12 @@ public class RemovalListController implements UIActionController
 	 */
 	private RemovalList newRemovalList;
 
+	/**
+	 * The {@link SearchController}.
+	 */
 	private SearchController searchController;
+
+	private RemovalListCreationView creationView;
 
 	/**
 	 * @throws NoDatabaseLinkException
@@ -36,6 +47,7 @@ public class RemovalListController implements UIActionController
 		this.listController = listController;
 		this.searchController = searchController;
 		managementView = new RemovalListManagementView(this, this.listController);
+		creationView = new RemovalListCreationView(this, listController, searchController);
 	}
 
 	/**
@@ -59,7 +71,6 @@ public class RemovalListController implements UIActionController
 	private Node getRemovalListCreationView()
 	{
 		managementView.setBrowseListsButtonVisiblity(true);
-		RemovalListCreationView creationView = new RemovalListCreationView(this, listController, searchController);
 		return creationView.getView();
 	}
 
@@ -71,6 +82,8 @@ public class RemovalListController implements UIActionController
 		// Create a new removal list if it does not exist.
 		if (newRemovalList == null)
 			newRemovalList = new RemovalList();
+
+		System.out.println("Removal list is currently: " + newRemovalList.getObservableBoxes());
 
 		managementView.setContent(getRemovalListCreationView());
 	}
@@ -90,10 +103,9 @@ public class RemovalListController implements UIActionController
 	 *
 	 * @return view for the current removal list being created
 	 */
-	public BorderPane getCurrentRemovalListView()
+	public ObservableList<Object> getCurrentRemovalListContents()
 	{
-		System.out.println("Showing current new removal list.");
-		return (BorderPane) ListController.getTableView(this, DatabaseController.getProductSearchDataColumns(false, true), newRemovalList.getObservableBoxes());
+		return newRemovalList.getObservableBoxes();
 	}
 
 	@Override
@@ -128,7 +140,6 @@ public class RemovalListController implements UIActionController
 		System.out.println("Adding to new removal list: " + ((ProductBoxSearchResultRow) data).getBox());
 		if (!newRemovalList.addProductBox(((ProductBoxSearchResultRow) data).getBox()))
 			PopupController.error("Action failed.");
-
 	}
 
 	public BorderPane getSearchResults()

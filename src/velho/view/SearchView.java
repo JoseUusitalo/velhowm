@@ -1,8 +1,5 @@
 package velho.view;
 
-import java.util.HashSet;
-import java.util.Set;
-
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
@@ -19,20 +16,9 @@ import javafx.scene.layout.BackgroundFill;
 import javafx.scene.layout.GridPane;
 import javafx.scene.paint.Paint;
 import velho.controller.SearchController;
-import velho.model.ProductBrand;
-import velho.model.ProductCategory;
 
 public class SearchView
-
 {
-	/**
-	 * A set of user role names.
-	 */
-	private Set<ProductBrand> brandnameSet = new HashSet<ProductBrand>();
-	/**
-	 * A set of user role names.
-	 */
-	private Set<ProductCategory> categorynameSet = new HashSet<ProductCategory>();
 	/**
 	 * The root GridPane for this view.
 	 */
