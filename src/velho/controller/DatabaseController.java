@@ -27,7 +27,6 @@ import velho.model.ProductBox;
 import velho.model.ProductBoxSearchResultRow;
 import velho.model.ProductBrand;
 import velho.model.ProductCategory;
-import velho.model.ProductContainer;
 import velho.model.ProductType;
 import velho.model.RemovalList;
 import velho.model.RemovalListState;
@@ -1951,6 +1950,12 @@ public class DatabaseController
 
 	public static List<ProductBoxSearchResultRow> searchProductBox(final List<String> where) throws NoDatabaseLinkException
 	{
+		return searchProductBox(where, null);
+	}
+
+	public static List<ProductBoxSearchResultRow> searchProductBox(final List<String> where, final Map<DatabaseTable, String> joins)
+			throws NoDatabaseLinkException
+	{
 		final List<ProductBoxSearchResultRow> foundProducts = FXCollections.observableArrayList();
 
 		if (MainWindow.DEBUG_MODE)
@@ -1960,6 +1965,9 @@ public class DatabaseController
 
 		final Map<DatabaseTable, String> join = new LinkedHashMap<DatabaseTable, String>();
 		join.put(DatabaseTable.PRODUCTS, "containers.product = products.product_id");
+
+		if (joins != null)
+			join.putAll(joins);
 
 		@SuppressWarnings("unchecked")
 		final Set<ProductBox> result = (LinkedHashSet<ProductBox>) (runQuery(DatabaseQueryType.SELECT, DatabaseTable.CONTAINERS, join, columns, null, where));
@@ -2240,6 +2248,8 @@ public class DatabaseController
 		int listID = removalList.getDatabaseID();
 
 		final Map<String, Object> values = new LinkedHashMap<String, Object>();
+		System.out.println("saving " + removalList.getObservableBoxes());
+		System.out.println("sac " + removalList.getState());
 		values.put("liststate", removalList.getState().getDatabaseID());
 
 		final List<String> where = new ArrayList<String>();
@@ -2283,7 +2293,7 @@ public class DatabaseController
 			values.remove("productbox");
 
 			// Put in the new box ID.
-			values.put("productbox", ((ProductContainer) it.next()).getBoxID());
+			values.put("productbox", ((ProductBoxSearchResultRow) it.next()).getBoxID());
 
 			// Run the query.
 			result = (LinkedHashSet<Integer>) runQuery(DatabaseQueryType.INSERT, DatabaseTable.REMOVALLIST_PRODUCTBOXES, null, null, values, null);

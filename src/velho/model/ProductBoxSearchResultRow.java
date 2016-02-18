@@ -90,4 +90,14 @@ public class ProductBoxSearchResultRow
 	{
 		return box.getProduct().getCategory();
 	}
+
+	/**
+	 * Gets the database ID of the product box.
+	 *
+	 * @return ID of the box
+	 */
+	public int getBoxID()
+	{
+		return box.getBoxID();
+	}
 }

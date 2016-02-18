@@ -6,6 +6,7 @@ import javafx.scene.layout.BorderPane;
 import velho.model.ProductBoxSearchResultRow;
 import velho.model.RemovalList;
 import velho.model.RemovalListState;
+import velho.model.exceptions.NoDatabaseLinkException;
 import velho.model.interfaces.UIActionController;
 import velho.view.RemovalListCreationView;
 import velho.view.RemovalListManagementView;
@@ -117,7 +118,7 @@ public class RemovalListController implements UIActionController
 	@Override
 	public void updateAction(final Object data)
 	{
-		System.out.println("Controller got from UI: " + ((ProductBoxSearchResultRow) data).getBox());
+		// System.out.println("Controller got from UI update: " + ((ProductBoxSearchResultRow) data).getBox());
 	}
 
 	@Override
@@ -125,13 +126,13 @@ public class RemovalListController implements UIActionController
 	{
 		System.out.println("Removing from new removal list: " + ((ProductBoxSearchResultRow) data).getBox());
 		if (!newRemovalList.removeProductBox(((ProductBoxSearchResultRow) data).getBox()))
-			PopupController.error("Action failed.");
+			PopupController.error("Failed to remove product box from removal list.");
 	}
 
 	@Override
 	public void deleteAction(final Object data)
 	{
-		System.out.println("Controller got from UI delete: " + ((ProductBoxSearchResultRow) data).getBox());
+		// System.out.println("Controller got from UI delete: " + ((ProductBoxSearchResultRow) data).getBox());
 	}
 
 	@Override
@@ -139,7 +140,7 @@ public class RemovalListController implements UIActionController
 	{
 		System.out.println("Adding to new removal list: " + ((ProductBoxSearchResultRow) data).getBox());
 		if (!newRemovalList.addProductBox(((ProductBoxSearchResultRow) data).getBox()))
-			PopupController.error("Action failed.");
+			PopupController.error("That product box is already on the removal list.");
 	}
 
 	public BorderPane getSearchResults()
@@ -151,8 +152,23 @@ public class RemovalListController implements UIActionController
 
 	public void saveNewRemovalList()
 	{
-		System.out.println("Saving List : " + newRemovalList.getObservableBoxes());
-
+		if (newRemovalList.getObservableBoxes().size() > 0)
+		{
+			try
+			{
+				System.out.println("Saving List : " + newRemovalList.getObservableBoxes());
+				if (!newRemovalList.saveToDatabase())
+					PopupController.error("Removal list saving failed.");
+			}
+			catch (NoDatabaseLinkException e)
+			{
+				DatabaseController.tryReLink();
+			}
+		}
+		else
+		{
+			PopupController.info("Please add some product boxes first.");
+		}
 	}
 
 	public void setNewRemovalListState(final RemovalListState newState)
