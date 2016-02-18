@@ -80,4 +80,9 @@ public class ProductBoxSearchResultRow
 	{
 		return box.getProduct().getCategory();
 	}
+
+	public ProductBox getBox()
+	{
+		return box;
+	}
 }

@@ -1,12 +1,50 @@
 package velho.controller;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.List;
+
 import velho.model.BarcodeScanner;
+import velho.model.Printer;
 import velho.model.ProductBox;
+import velho.model.ProductBoxSearchResultRow;
 import velho.model.Shelf;
 import velho.model.exceptions.NoDatabaseLinkException;
 
 public class ExternalSystemsController
 {
+
+	public static void sendDataToPrinter(final Object data)
+	{
+		if (data instanceof Collection)
+		{
+			Collection<Object> dataList = (Collection<Object>) data;
+			Iterator<Object> it = dataList.iterator();
+			if (it.hasNext())
+			{
+
+				if (dataList.iterator().next() instanceof ProductBoxSearchResultRow)
+				{
+					it = dataList.iterator();
+					List<ProductBox> boxProduct = new ArrayList<ProductBox>();
+					while (it.hasNext())
+					{
+						boxProduct.add(((ProductBoxSearchResultRow) it.next()).getBox());
+					}
+					Printer.print(boxProduct);
+				}
+			}
+			else
+			{
+				PopupController.info("List is empty.");
+			}
+		}
+		else
+		{
+			Printer.print(data);
+		}
+	}
 
 	/**
 	 * Carries out initial order from DebugController to BarcodeScanner

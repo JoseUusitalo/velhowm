@@ -132,8 +132,7 @@ public class SearchView
 					{
 						// Although badge IDs are stored as string, they are still numbers.
 					}
-					searchController.productSearch(nameField.getText(), productCountField.getValue(), popularityField.getValue(), brandbox.getValue(),
-							categorybox.getValue(), dpStart.getValue(), dpEnd.getValue());
+					searchController.productSearch(nameField.getText(), productCountField.getValue(), popularityField.getValue(), brandbox.getValue(), categorybox.getValue(), dpStart.getValue(), dpEnd.getValue());
 					// System.out.println(nameField.getText() + " " + productCountField.getEditor() + " " +
 					// popularityField.getEditor() + " " + brandbox.getValue() + " " + categorybox.getValue() + " " +
 					// dpStart.getValue() + " " + dpEnd.getValue());
