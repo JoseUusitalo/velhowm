@@ -133,7 +133,7 @@ public class DatabaseController
 	private static ObservableList<Object> productBrandsViewList = FXCollections.observableArrayList();
 
 	/*
-	 * PRIVATE DATABASE METHODS
+	 * -------------------------------- PRIVATE DATABASE METHODS --------------------------------
 	 */
 
 	/**
@@ -782,7 +782,7 @@ public class DatabaseController
 	}
 
 	/*
-	 * PUBLIC DATABASE METHODS
+	 * -------------------------------- PUBLIC DATABASE METHODS --------------------------------
 	 */
 
 	/**
@@ -934,7 +934,458 @@ public class DatabaseController
 	}
 
 	/*
-	 * PUBLIC DATABASE GETTER METHODS
+	 * -------------------------------- PRIVATE GETTER METHODS --------------------------------
+	 */
+
+	/**
+	 * Gets the {@link UserRole} object from the given role ID.
+	 *
+	 * @param roleid role database ID
+	 * @return the corresponding user role object
+	 * @throws NoDatabaseLinkException
+	 */
+	private static UserRole getRoleByID(final int roleid) throws NoDatabaseLinkException
+	{
+		final String[] columns = { "name" };
+		final List<String> where = new ArrayList<String>();
+		where.add("role_id = " + new Integer(roleid));
+
+		@SuppressWarnings("unchecked")
+		final Set<String> result = (LinkedHashSet<String>) (runQuery(DatabaseQueryType.SELECT, DatabaseTable.ROLES, null, columns, null, where));
+
+		if (result.size() == 0)
+			return null;
+
+		return UserController.stringToRole(result.iterator().next());
+	}
+
+	/**
+	 * Gets the {@link Product} object from the given product name.
+	 *
+	 * @param name the exact product name
+	 * @return the corresponding product object
+	 * @throws NoDatabaseLinkException
+	 */
+	@SuppressWarnings("unused")
+	private static List<ProductBox> getProductBoxesByProductName(final List<String> where) throws NoDatabaseLinkException
+	{
+		final String[] columns = { "containers.container_id" };
+
+		final Map<DatabaseTable, String> join = new LinkedHashMap<DatabaseTable, String>();
+		join.put(DatabaseTable.PRODUCTS, "containers.product = products.product_id");
+
+		@SuppressWarnings("unchecked")
+		final Set<Integer> result = (LinkedHashSet<Integer>) (runQuery(DatabaseQueryType.SELECT, DatabaseTable.CONTAINERS, join, columns, null, where));
+
+		final List<ProductBox> boxes = new ArrayList<ProductBox>();
+		final Iterator<Integer> it = result.iterator();
+
+		while (it.hasNext())
+			boxes.add(getProductBoxByID(it.next()));
+
+		return boxes;
+	}
+
+	/**
+	 * Gets the {@link Product} object from the given product name.
+	 *
+	 * @param name the exact product name
+	 * @return the corresponding product object
+	 * @throws NoDatabaseLinkException
+	 */
+	private static List<ProductBox> getProductBoxesByProductID(final List<String> where) throws NoDatabaseLinkException
+	{
+		final String[] columns = { "container_id" };
+
+		@SuppressWarnings("unchecked")
+		final Set<Integer> result = (LinkedHashSet<Integer>) (runQuery(DatabaseQueryType.SELECT, DatabaseTable.CONTAINERS, null, columns, null, where));
+
+		final List<ProductBox> boxes = new ArrayList<ProductBox>();
+		final Iterator<Integer> it = result.iterator();
+
+		while (it.hasNext())
+			boxes.add(getProductBoxByID(it.next()));
+
+		return boxes;
+	}
+
+	/**
+	 * Gets the {@link RemovalListState} object from the given database ID.
+	 *
+	 * @param stateid removal list state database ID
+	 * @return the corresponding removal list state object
+	 * @throws NoDatabaseLinkException
+	 */
+	private static RemovalListState getRemovalListStateByID(final int stateid) throws NoDatabaseLinkException
+	{
+		if (!loadedRemovalListStates.containsKey(stateid))
+		{
+			final String[] columns = { "name" };
+			final List<String> where = new ArrayList<String>();
+			where.add("removallist_state_id = " + new Integer(stateid));
+
+			@SuppressWarnings("unchecked")
+			final Set<String> result = (LinkedHashSet<String>) (runQuery(DatabaseQueryType.SELECT, DatabaseTable.REMOVALLIST_STATES, null, columns, null,
+					where));
+
+			if (result.size() == 0)
+				return null;
+
+			final RemovalListState s = new RemovalListState(stateid, result.iterator().next());
+
+			// Store for reuse.
+
+			if (MainWindow.PRINT_CACHE_MESSAGES)
+				System.out.println("Caching: " + s);
+
+			loadedRemovalListStates.put(s.getDatabaseID(), s);
+			return s;
+		}
+
+		if (MainWindow.PRINT_CACHE_MESSAGES)
+			System.out.println("Loading removal list state " + stateid + " from cache.");
+		return loadedRemovalListStates.get(stateid);
+	}
+
+	/**
+	 * Gets the {@link ProductType} object from the given type ID.
+	 *
+	 * @param typeid product type database ID
+	 * @return the corresponding product type object
+	 * @throws NoDatabaseLinkException
+	 */
+	private static ProductType getProductTypeByID(final int typeid) throws NoDatabaseLinkException
+	{
+		if (!loadedProductTypes.containsKey(typeid))
+		{
+			final String[] columns = { "name" };
+			final List<String> where = new ArrayList<String>();
+			where.add("type_id = " + new Integer(typeid));
+
+			@SuppressWarnings("unchecked")
+			final Set<String> result = (LinkedHashSet<String>) (runQuery(DatabaseQueryType.SELECT, DatabaseTable.TYPES, null, columns, null, where));
+
+			if (result.size() == 0)
+				return null;
+
+			final ProductType p = new ProductType(typeid, result.iterator().next());
+
+			// Store for reuse.
+
+			if (MainWindow.PRINT_CACHE_MESSAGES)
+				System.out.println("Caching: " + p);
+
+			loadedProductTypes.put(p.getDatabaseID(), p);
+			return p;
+		}
+
+		if (MainWindow.PRINT_CACHE_MESSAGES)
+			System.out.println("Loading category " + typeid + " from cache.");
+		return loadedProductTypes.get(typeid);
+	}
+
+	/**
+	 * Gets the {@link ProductCategory} object from the given category ID.
+	 *
+	 * @param categoryid product category database ID
+	 * @return the corresponding product category object
+	 * @throws NoDatabaseLinkException
+	 */
+	private static ProductCategory getProductCategoryByID(final int categoryid) throws NoDatabaseLinkException
+	{
+		if (!loadedProductCategories.containsKey(categoryid))
+		{
+			final String[] columns = { "category_id", "name", "type" };
+			final List<String> where = new ArrayList<String>();
+			where.add("category_id = " + new Integer(categoryid));
+
+			@SuppressWarnings("unchecked")
+			final Set<Object> result = (LinkedHashSet<Object>) (runQuery(DatabaseQueryType.SELECT, DatabaseTable.CATEGORIES, null, columns, null, where));
+
+			if (result.size() == 0)
+				return null;
+
+			final ProductCategory p = (ProductCategory) result.iterator().next();
+
+			// Store for reuse.
+			if (MainWindow.PRINT_CACHE_MESSAGES)
+				System.out.println("Caching: " + p);
+
+			loadedProductCategories.put(p.getDatabaseID(), p);
+			return p;
+		}
+
+		if (MainWindow.PRINT_CACHE_MESSAGES)
+			System.out.println("Loading category " + categoryid + " from cache.");
+		return loadedProductCategories.get(categoryid);
+	}
+
+	/**
+	 * Gets the {@link ProductBrand} object from the given brand ID.
+	 *
+	 * @param brandid product brand database ID
+	 * @return the corresponding product brand object
+	 * @throws NoDatabaseLinkException
+	 */
+	private static ProductBrand getProductBrandByID(final int brandid) throws NoDatabaseLinkException
+	{
+		if (!loadedProductBrands.containsKey(brandid))
+		{
+			final String[] columns = { "name" };
+			final List<String> where = new ArrayList<String>();
+			where.add("brand_id = " + new Integer(brandid));
+
+			@SuppressWarnings("unchecked")
+			final Set<String> result = (LinkedHashSet<String>) (runQuery(DatabaseQueryType.SELECT, DatabaseTable.BRANDS, null, columns, null, where));
+
+			if (result.size() == 0)
+				return null;
+
+			final ProductBrand p = new ProductBrand(brandid, result.iterator().next());
+
+			// Store for reuse.
+			if (MainWindow.PRINT_CACHE_MESSAGES)
+				System.out.println("Caching: " + p);
+
+			loadedProductBrands.put(p.getDatabaseID(), p);
+			return p;
+		}
+
+		if (MainWindow.PRINT_CACHE_MESSAGES)
+			System.out.println("Loading brand " + brandid + " from cache.");
+		return loadedProductBrands.get(brandid);
+	}
+
+	/**
+	 * Gets the {@link Product} object from the given product ID.
+	 *
+	 * @param productid product database ID
+	 * @return the corresponding product object
+	 * @throws NoDatabaseLinkException
+	 */
+	private static Product getProductByID(final int productid) throws NoDatabaseLinkException
+	{
+		if (!loadedProducts.containsKey(productid))
+		{
+			final String[] columns = { "*" };
+			final List<String> where = new ArrayList<String>();
+			where.add("product_id = " + new Integer(productid));
+
+			@SuppressWarnings("unchecked")
+			final Set<Object> result = (LinkedHashSet<Object>) (runQuery(DatabaseQueryType.SELECT, DatabaseTable.PRODUCTS, null, columns, null, where));
+
+			if (result.size() == 0)
+				return null;
+
+			final Product p = (Product) result.iterator().next();
+
+			// Store for reuse.
+			if (MainWindow.PRINT_CACHE_MESSAGES)
+				System.out.println("Caching: " + p);
+
+			loadedProducts.put(p.getProductID(), p);
+			return p;
+		}
+
+		if (MainWindow.PRINT_CACHE_MESSAGES)
+			System.out.println("Loading product " + productid + " from cache.");
+		return loadedProducts.get(productid);
+	}
+
+	/**
+	 * Gets the product box that will expire the soonest.
+	 *
+	 * @param boxes
+	 * boxes to search from
+	 * @return the oldest product box
+	 */
+	private static ProductBox getOldestProductBox(final List<ProductBox> boxes)
+	{
+		System.out.println("+++got boxes " + boxes);
+		ProductBox oldest = boxes.get(0);
+
+		for (final ProductBox box : boxes)
+		{
+			if (box.getExpirationDate() != null)
+			{
+				// Current box has an expiration date.
+				if (box.getExpirationDate() != null)
+				{
+					// Oldest box has an expiration date.
+					if (box.getExpirationDate().before(oldest.getExpirationDate()))
+					{
+						// Current box expires first.
+						oldest = box;
+					}
+				}
+				else
+				{
+					// Current box expires first.
+					oldest = box;
+				}
+			}
+			// Else current box does not have an expiration date.
+		}
+
+		return oldest;
+	}
+
+	private static List<ProductBox> getBoxesContainingAtLeastProducts(final List<ProductBox> boxes, final Integer wantedProductCount)
+	{
+		final Map<Integer, List<ProductBox>> boxProductCount = new TreeMap<Integer, List<ProductBox>>();
+		List<ProductBox> nextSmallestBoxes = null;
+		final List<ProductBox> resultingBoxes = new ArrayList<ProductBox>();
+
+		int emptyCount = 0;
+		int wantedWouldBeIndex = -1;
+		int addCountIndex = -1;
+		int productCountSum = 0;
+		boolean lookingForLarger = false;
+
+		// Build a list of product box content sizes.
+		for (final ProductBox box : boxes)
+		{
+			// Ignore empty boxes.
+			if (box.getProductCount() > 0)
+			{
+				// No product box recorded with this size?
+				if (boxProductCount.get(box.getProductCount()) == null)
+				{
+					// Create the box array with the product count as key.
+					boxProductCount.put(box.getProductCount(), new ArrayList<ProductBox>());
+				}
+
+				// Add the box to the array.
+				boxProductCount.get(box.getProductCount()).add(box);
+			}
+			else
+				emptyCount++;
+		}
+
+		if (MainWindow.DEBUG_MODE)
+		{
+			if (emptyCount == 0)
+				System.out.println("Found " + boxes.size() + " product boxes.");
+			else
+				System.out.println("Found " + boxes.size() + " product boxes of which " + emptyCount + " were empty.");
+		}
+
+		if (MainWindow.DEBUG_MODE)
+		{
+			System.out.println("Found product box sizes:");
+			for (final Integer i : boxProductCount.keySet())
+				System.out.println(i + " (x" + boxProductCount.get(i).size() + ")");
+		}
+
+		// Convert the ordered key set to an arrray for binary search.
+		Integer[] boxSizeArray = new Integer[boxProductCount.size()];
+		boxSizeArray = boxProductCount.keySet().toArray(boxSizeArray);
+
+		// Find the index at which the wantedProductCount Integer would be in, if it were in the array.
+		wantedWouldBeIndex = -Arrays.binarySearch(boxSizeArray, wantedProductCount) - 1;
+		addCountIndex = wantedWouldBeIndex;
+
+		if (MainWindow.DEBUG_MODE)
+			System.out.println("Wanted box of size " + wantedProductCount + " would have been at index " + wantedWouldBeIndex + ".");
+
+		// Keep adding boxes to the foundProducts until we reach the wanted product count.
+		while (productCountSum < wantedProductCount)
+		{
+			System.out.println("Search status | Count: " + productCountSum + " / " + wantedProductCount + " | Would Be Index: " + wantedWouldBeIndex
+					+ " | Add Index: " + addCountIndex + " / " + boxProductCount.size());
+
+			// Looking for too few products, show the smallest box of that product instead.
+			if (wantedWouldBeIndex == 0)
+				addCountIndex++;
+
+			try
+			{
+				// The next smallest product boxes.
+				// Can throw an IndexOutOfBounds exception.
+				nextSmallestBoxes = boxProductCount.get(boxSizeArray[--addCountIndex]);
+
+				if (MainWindow.DEBUG_MODE)
+					System.out.println("The next smallest product boxes at index " + addCountIndex + " are: " + nextSmallestBoxes);
+
+				for (final ProductBox box : nextSmallestBoxes)
+				{
+					// Does adding this box to the set still keep the product counter under the wanted amount?
+					// OR does a box that small not exist?
+					if (wantedWouldBeIndex == 0 || addCountIndex == 0 || ((productCountSum + box.getProductCount() <= wantedProductCount)))
+					{
+						// Add up the product count.
+						productCountSum += box.getProductCount();
+
+						if (MainWindow.DEBUG_MODE)
+							System.out.println(box + " added to list, current product count sum is " + productCountSum + ".");
+
+						// Add the found box to the set.
+						resultingBoxes.add(box);
+					}
+					else if (lookingForLarger)
+					{
+						// Allow going over the wanted size limit if looking for a larger box.
+						// Add up the product count.
+						productCountSum += box.getProductCount();
+
+						if (MainWindow.DEBUG_MODE)
+							System.out.println(box + " added to list, current product count sum is " + productCountSum + ".");
+
+						// Add the found box to the set.
+						resultingBoxes.add(box);
+
+						// Found the box that we wanted.
+						break;
+					}
+					else
+					{
+						// Else break the loop and find the next smallest boxes.
+						if (MainWindow.DEBUG_MODE)
+							System.out.println("Adding " + box + " to list would put the product count over the limit.");
+
+						break;
+					}
+				}
+			}
+			catch (final IndexOutOfBoundsException e)
+			{
+				if (resultingBoxes.size() == boxes.size())
+				{
+					// All boxes are in the result. Too bad.
+					System.out.println("Unable to find that many products. Listing all available boxes.");
+					break;
+				}
+				else if (wantedProductCount > productCountSum)
+				{
+					/*
+					 * All boxes are not in the result.
+					 * Still have not reached the wanted product count.
+					 * Restart the loop at one higher index.
+					 * Repeat until either the wanted count is reached or all products have been added to the result.
+					 */
+					System.out.println("Unable to build a product box list of that size from smaller boxes. Going one size larger.");
+					resultingBoxes.clear();
+					productCountSum = 0;
+					wantedWouldBeIndex++;
+					addCountIndex = wantedWouldBeIndex;
+					lookingForLarger = true;
+
+					// FIXME: Infinite loop when looking for more products than are available.
+				}
+				else
+				{
+					System.out.println("what");
+					System.out.println("Search status | Count: " + productCountSum + " / " + wantedProductCount + " | Would Be Index: " + wantedWouldBeIndex
+							+ " | Add Index: " + addCountIndex + " / " + boxProductCount.size());
+				}
+			}
+		}
+
+		return resultingBoxes;
+	}
+
+	/*
+	 * -------------------------------- PUBLIC GETTER METHODS --------------------------------
 	 */
 
 	/**
@@ -1129,211 +1580,6 @@ public class DatabaseController
 	}
 
 	/**
-	 * Gets the {@link UserRole} object from the given role ID.
-	 *
-	 * @param roleid role database ID
-	 * @return the corresponding user role object
-	 * @throws NoDatabaseLinkException
-	 */
-	private static UserRole getRoleByID(final int roleid) throws NoDatabaseLinkException
-	{
-		final String[] columns = { "name" };
-		final List<String> where = new ArrayList<String>();
-		where.add("role_id = " + new Integer(roleid));
-
-		@SuppressWarnings("unchecked")
-		final Set<String> result = (LinkedHashSet<String>) (runQuery(DatabaseQueryType.SELECT, DatabaseTable.ROLES, null, columns, null, where));
-
-		if (result.size() == 0)
-			return null;
-
-		return UserController.stringToRole(result.iterator().next());
-	}
-
-	/**
-	 * Gets the {@link RemovalListState} object from the given database ID.
-	 *
-	 * @param stateid removal list state database ID
-	 * @return the corresponding removal list state object
-	 * @throws NoDatabaseLinkException
-	 */
-	private static RemovalListState getRemovalListStateByID(final int stateid) throws NoDatabaseLinkException
-	{
-		if (!loadedRemovalListStates.containsKey(stateid))
-		{
-			final String[] columns = { "name" };
-			final List<String> where = new ArrayList<String>();
-			where.add("removallist_state_id = " + new Integer(stateid));
-
-			@SuppressWarnings("unchecked")
-			final Set<String> result = (LinkedHashSet<String>) (runQuery(DatabaseQueryType.SELECT, DatabaseTable.REMOVALLIST_STATES, null, columns, null,
-					where));
-
-			if (result.size() == 0)
-				return null;
-
-			final RemovalListState s = new RemovalListState(stateid, result.iterator().next());
-
-			// Store for reuse.
-
-			if (MainWindow.PRINT_CACHE_MESSAGES)
-				System.out.println("Caching: " + s);
-
-			loadedRemovalListStates.put(s.getDatabaseID(), s);
-			return s;
-		}
-
-		if (MainWindow.PRINT_CACHE_MESSAGES)
-			System.out.println("Loading removal list state " + stateid + " from cache.");
-		return loadedRemovalListStates.get(stateid);
-	}
-
-	/**
-	 * Gets the {@link ProductType} object from the given type ID.
-	 *
-	 * @param typeid product type database ID
-	 * @return the corresponding product type object
-	 * @throws NoDatabaseLinkException
-	 */
-	private static ProductType getProductTypeByID(final int typeid) throws NoDatabaseLinkException
-	{
-		if (!loadedProductTypes.containsKey(typeid))
-		{
-			final String[] columns = { "name" };
-			final List<String> where = new ArrayList<String>();
-			where.add("type_id = " + new Integer(typeid));
-
-			@SuppressWarnings("unchecked")
-			final Set<String> result = (LinkedHashSet<String>) (runQuery(DatabaseQueryType.SELECT, DatabaseTable.TYPES, null, columns, null, where));
-
-			if (result.size() == 0)
-				return null;
-
-			final ProductType p = new ProductType(typeid, result.iterator().next());
-
-			// Store for reuse.
-
-			if (MainWindow.PRINT_CACHE_MESSAGES)
-				System.out.println("Caching: " + p);
-
-			loadedProductTypes.put(p.getDatabaseID(), p);
-			return p;
-		}
-
-		if (MainWindow.PRINT_CACHE_MESSAGES)
-			System.out.println("Loading category " + typeid + " from cache.");
-		return loadedProductTypes.get(typeid);
-	}
-
-	/**
-	 * Gets the {@link ProductCategory} object from the given category ID.
-	 *
-	 * @param categoryid product category database ID
-	 * @return the corresponding product category object
-	 * @throws NoDatabaseLinkException
-	 */
-	private static ProductCategory getProductCategoryByID(final int categoryid) throws NoDatabaseLinkException
-	{
-		if (!loadedProductCategories.containsKey(categoryid))
-		{
-			final String[] columns = { "category_id", "name", "type" };
-			final List<String> where = new ArrayList<String>();
-			where.add("category_id = " + new Integer(categoryid));
-
-			@SuppressWarnings("unchecked")
-			final Set<Object> result = (LinkedHashSet<Object>) (runQuery(DatabaseQueryType.SELECT, DatabaseTable.CATEGORIES, null, columns, null, where));
-
-			if (result.size() == 0)
-				return null;
-
-			final ProductCategory p = (ProductCategory) result.iterator().next();
-
-			// Store for reuse.
-			if (MainWindow.PRINT_CACHE_MESSAGES)
-				System.out.println("Caching: " + p);
-
-			loadedProductCategories.put(p.getDatabaseID(), p);
-			return p;
-		}
-
-		if (MainWindow.PRINT_CACHE_MESSAGES)
-			System.out.println("Loading category " + categoryid + " from cache.");
-		return loadedProductCategories.get(categoryid);
-	}
-
-	/**
-	 * Gets the {@link ProductBrand} object from the given brand ID.
-	 *
-	 * @param brandid product brand database ID
-	 * @return the corresponding product brand object
-	 * @throws NoDatabaseLinkException
-	 */
-	private static ProductBrand getProductBrandByID(final int brandid) throws NoDatabaseLinkException
-	{
-		if (!loadedProductBrands.containsKey(brandid))
-		{
-			final String[] columns = { "name" };
-			final List<String> where = new ArrayList<String>();
-			where.add("brand_id = " + new Integer(brandid));
-
-			@SuppressWarnings("unchecked")
-			final Set<String> result = (LinkedHashSet<String>) (runQuery(DatabaseQueryType.SELECT, DatabaseTable.BRANDS, null, columns, null, where));
-
-			if (result.size() == 0)
-				return null;
-
-			final ProductBrand p = new ProductBrand(brandid, result.iterator().next());
-
-			// Store for reuse.
-			if (MainWindow.PRINT_CACHE_MESSAGES)
-				System.out.println("Caching: " + p);
-
-			loadedProductBrands.put(p.getDatabaseID(), p);
-			return p;
-		}
-
-		if (MainWindow.PRINT_CACHE_MESSAGES)
-			System.out.println("Loading brand " + brandid + " from cache.");
-		return loadedProductBrands.get(brandid);
-	}
-
-	/**
-	 * Gets the {@link Product} object from the given product ID.
-	 *
-	 * @param productid product database ID
-	 * @return the corresponding product object
-	 * @throws NoDatabaseLinkException
-	 */
-	private static Product getProductByID(final int productid) throws NoDatabaseLinkException
-	{
-		if (!loadedProducts.containsKey(productid))
-		{
-			final String[] columns = { "*" };
-			final List<String> where = new ArrayList<String>();
-			where.add("product_id = " + new Integer(productid));
-
-			@SuppressWarnings("unchecked")
-			final Set<Object> result = (LinkedHashSet<Object>) (runQuery(DatabaseQueryType.SELECT, DatabaseTable.PRODUCTS, null, columns, null, where));
-
-			if (result.size() == 0)
-				return null;
-
-			final Product p = (Product) result.iterator().next();
-
-			// Store for reuse.
-			if (MainWindow.PRINT_CACHE_MESSAGES)
-				System.out.println("Caching: " + p);
-
-			loadedProducts.put(p.getProductID(), p);
-			return p;
-		}
-
-		if (MainWindow.PRINT_CACHE_MESSAGES)
-			System.out.println("Loading product " + productid + " from cache.");
-		return loadedProducts.get(productid);
-	}
-
-	/**
 	 * Gets the {@link Product} object from the given product ID.
 	 *
 	 * @param productid product database ID
@@ -1368,56 +1614,6 @@ public class DatabaseController
 		if (MainWindow.PRINT_CACHE_MESSAGES)
 			System.out.println("Loading product box " + productboxid + " from cache.");
 		return loadedProductBoxes.get(productboxid);
-	}
-
-	/**
-	 * Gets the {@link Product} object from the given product name.
-	 *
-	 * @param name the exact product name
-	 * @return the corresponding product object
-	 * @throws NoDatabaseLinkException
-	 */
-	@SuppressWarnings("unused")
-	private static List<ProductBox> getProductBoxesByProductName(final List<String> where) throws NoDatabaseLinkException
-	{
-		final String[] columns = { "containers.container_id" };
-
-		final Map<DatabaseTable, String> join = new LinkedHashMap<DatabaseTable, String>();
-		join.put(DatabaseTable.PRODUCTS, "containers.product = products.product_id");
-
-		@SuppressWarnings("unchecked")
-		final Set<Integer> result = (LinkedHashSet<Integer>) (runQuery(DatabaseQueryType.SELECT, DatabaseTable.CONTAINERS, join, columns, null, where));
-
-		final List<ProductBox> boxes = new ArrayList<ProductBox>();
-		final Iterator<Integer> it = result.iterator();
-
-		while (it.hasNext())
-			boxes.add(getProductBoxByID(it.next()));
-
-		return boxes;
-	}
-
-	/**
-	 * Gets the {@link Product} object from the given product name.
-	 *
-	 * @param name the exact product name
-	 * @return the corresponding product object
-	 * @throws NoDatabaseLinkException
-	 */
-	private static List<ProductBox> getProductBoxesByProductID(final List<String> where) throws NoDatabaseLinkException
-	{
-		final String[] columns = { "container_id" };
-
-		@SuppressWarnings("unchecked")
-		final Set<Integer> result = (LinkedHashSet<Integer>) (runQuery(DatabaseQueryType.SELECT, DatabaseTable.CONTAINERS, null, columns, null, where));
-
-		final List<ProductBox> boxes = new ArrayList<ProductBox>();
-		final Iterator<Integer> it = result.iterator();
-
-		while (it.hasNext())
-			boxes.add(getProductBoxByID(it.next()));
-
-		return boxes;
 	}
 
 	/**
@@ -1464,82 +1660,6 @@ public class DatabaseController
 
 		// Only one result as names are unique.
 		return result.iterator().next();
-	}
-
-	/**
-	 * Places the loaded {@link ProductContainer} objects into {@link Shelf}
-	 * objects.
-	 *
-	 * @throws NoDatabaseLinkException
-	 */
-	private static void setContainersToShelf(final int shelfid) throws NoDatabaseLinkException
-	{
-		System.out.println("[DatabaseController] Placing product boxes on shelf " + shelfid + "...");
-
-		final String[] columns = { "*" };
-
-		final List<String> where = new ArrayList<String>();
-		where.add("shelf = " + shelfid);
-
-		final Shelf shelf = getShelfByID(shelfid, true);
-
-		@SuppressWarnings("unchecked")
-		final Map<Integer, ArrayList<Integer[]>> shelfBoxMap = (HashMap<Integer, ArrayList<Integer[]>>) runQuery(DatabaseQueryType.SELECT,
-				DatabaseTable.SHELF_PRODUCTBOXES, null, columns, null, where);
-
-		// If the shelf is not empty.
-		if (!shelfBoxMap.isEmpty())
-		{
-			ProductBox box = null;
-			String shelfSlotID = null;
-
-			final ArrayList<Integer[]> boxes = shelfBoxMap.get(shelfid);
-
-			for (final Integer[] data : boxes)
-			{
-				box = getProductBoxByID(data[0]);
-
-				// data[1] is the level index
-				shelfSlotID = Shelf.coordinatesToShelfSlotID(shelfid, data[1] + 1, data[2], true);
-				shelf.addToSlot(shelfSlotID, box, false);
-			}
-
-			System.out.println("[DatabaseController] Product boxes placed on shelf " + shelfid + ".");
-		}
-		else
-		{
-			System.out.println("[DatabaseController] Nothing to place.");
-		}
-	}
-
-	/**
-	 * Places the correct product boxes in the cached removal list.
-	 *
-	 * @param listid removal list to place product boxes into
-	 * @throws NoDatabaseLinkException
-	 */
-	private static void setContainersToRemovalList(final int listid) throws NoDatabaseLinkException
-	{
-		System.out.println("[DatabaseController] Placing product boxes on removal list " + listid + "...");
-
-		final List<String> where = new ArrayList<String>();
-		where.add("removallist = " + listid);
-
-		final String[] columns = { "productbox" };
-		@SuppressWarnings("unchecked")
-		final Set<Integer> removalListBoxes = (LinkedHashSet<Integer>) runQuery(DatabaseQueryType.SELECT, DatabaseTable.REMOVALLIST_PRODUCTBOXES, null, columns,
-				null, where);
-
-		if (!removalListBoxes.isEmpty())
-		{
-			for (final Integer id : removalListBoxes)
-				loadedRemovalLists.get(listid).addProductBox(getProductBoxByID(id));
-
-			System.out.println("[DatabaseController] Product boxes placed on removal list " + listid + ".");
-		}
-		else
-			System.out.println("[DatabaseController] Nothing to place.");
-
 	}
 
 	/**
@@ -1799,201 +1919,110 @@ public class DatabaseController
 		return foundProducts;
 	}
 
-	/**
-	 * Gets the product box that will expire the soonest.
-	 *
-	 * @param boxes
-	 * boxes to search from
-	 * @return the oldest product box
-	 */
-	private static ProductBox getOldestProductBox(final List<ProductBox> boxes)
+	public static void productSearch(final List<String> where)
 	{
-		System.out.println("+++got boxes " + boxes);
-		ProductBox oldest = boxes.get(0);
+		// TODO Auto-generated method stub
 
-		for (final ProductBox box : boxes)
-		{
-			if (box.getExpirationDate() != null)
-			{
-				// Current box has an expiration date.
-				if (box.getExpirationDate() != null)
-				{
-					// Oldest box has an expiration date.
-					if (box.getExpirationDate().before(oldest.getExpirationDate()))
-					{
-						// Current box expires first.
-						oldest = box;
-					}
-				}
-				else
-				{
-					// Current box expires first.
-					oldest = box;
-				}
-			}
-			// Else current box does not have an expiration date.
-		}
-
-		return oldest;
 	}
 
-	private static List<ProductBox> getBoxesContainingAtLeastProducts(final List<ProductBox> boxes, final Integer wantedProductCount)
+	public static ObservableList<Object> getAllProductCategories()
 	{
-		final Map<Integer, List<ProductBox>> boxProductCount = new TreeMap<Integer, List<ProductBox>>();
-		List<ProductBox> nextSmallestBoxes = null;
-		final List<ProductBox> resultingBoxes = new ArrayList<ProductBox>();
+		// TODO Auto-generated method stub
+		productCategoriesViewList.clear();
+		productCategoriesViewList.addAll(loadedProductCategories.values());
+		return productCategoriesViewList;
+	}
 
-		int emptyCount = 0;
-		int wantedWouldBeIndex = -1;
-		int addCountIndex = -1;
-		int productCountSum = 0;
-		boolean lookingForLarger = false;
-
-		// Build a list of product box content sizes.
-		for (final ProductBox box : boxes)
-		{
-			// Ignore empty boxes.
-			if (box.getProductCount() > 0)
-			{
-				// No product box recorded with this size?
-				if (boxProductCount.get(box.getProductCount()) == null)
-				{
-					// Create the box array with the product count as key.
-					boxProductCount.put(box.getProductCount(), new ArrayList<ProductBox>());
-				}
-
-				// Add the box to the array.
-				boxProductCount.get(box.getProductCount()).add(box);
-			}
-			else
-				emptyCount++;
-		}
-
-		if (MainWindow.DEBUG_MODE)
-		{
-			if (emptyCount == 0)
-				System.out.println("Found " + boxes.size() + " product boxes.");
-			else
-				System.out.println("Found " + boxes.size() + " product boxes of which " + emptyCount + " were empty.");
-		}
-
-		if (MainWindow.DEBUG_MODE)
-		{
-			System.out.println("Found product box sizes:");
-			for (final Integer i : boxProductCount.keySet())
-				System.out.println(i + " (x" + boxProductCount.get(i).size() + ")");
-		}
-
-		// Convert the ordered key set to an arrray for binary search.
-		Integer[] boxSizeArray = new Integer[boxProductCount.size()];
-		boxSizeArray = boxProductCount.keySet().toArray(boxSizeArray);
-
-		// Find the index at which the wantedProductCount Integer would be in, if it were in the array.
-		wantedWouldBeIndex = -Arrays.binarySearch(boxSizeArray, wantedProductCount) - 1;
-		addCountIndex = wantedWouldBeIndex;
-
-		if (MainWindow.DEBUG_MODE)
-			System.out.println("Wanted box of size " + wantedProductCount + " would have been at index " + wantedWouldBeIndex + ".");
-
-		// Keep adding boxes to the foundProducts until we reach the wanted product count.
-		while (productCountSum < wantedProductCount)
-		{
-			System.out.println("Search status | Count: " + productCountSum + " / " + wantedProductCount + " | Would Be Index: " + wantedWouldBeIndex
-					+ " | Add Index: " + addCountIndex + " / " + boxProductCount.size());
-
-			// Looking for too few products, show the smallest box of that product instead.
-			if (wantedWouldBeIndex == 0)
-				addCountIndex++;
-
-			try
-			{
-				// The next smallest product boxes.
-				// Can throw an IndexOutOfBounds exception.
-				nextSmallestBoxes = boxProductCount.get(boxSizeArray[--addCountIndex]);
-
-				if (MainWindow.DEBUG_MODE)
-					System.out.println("The next smallest product boxes at index " + addCountIndex + " are: " + nextSmallestBoxes);
-
-				for (final ProductBox box : nextSmallestBoxes)
-				{
-					// Does adding this box to the set still keep the product counter under the wanted amount?
-					// OR does a box that small not exist?
-					if (wantedWouldBeIndex == 0 || addCountIndex == 0 || ((productCountSum + box.getProductCount() <= wantedProductCount)))
-					{
-						// Add up the product count.
-						productCountSum += box.getProductCount();
-
-						if (MainWindow.DEBUG_MODE)
-							System.out.println(box + " added to list, current product count sum is " + productCountSum + ".");
-
-						// Add the found box to the set.
-						resultingBoxes.add(box);
-					}
-					else if (lookingForLarger)
-					{
-						// Allow going over the wanted size limit if looking for a larger box.
-						// Add up the product count.
-						productCountSum += box.getProductCount();
-
-						if (MainWindow.DEBUG_MODE)
-							System.out.println(box + " added to list, current product count sum is " + productCountSum + ".");
-
-						// Add the found box to the set.
-						resultingBoxes.add(box);
-
-						// Found the box that we wanted.
-						break;
-					}
-					else
-					{
-						// Else break the loop and find the next smallest boxes.
-						if (MainWindow.DEBUG_MODE)
-							System.out.println("Adding " + box + " to list would put the product count over the limit.");
-
-						break;
-					}
-				}
-			}
-			catch (final IndexOutOfBoundsException e)
-			{
-				if (resultingBoxes.size() == boxes.size())
-				{
-					// All boxes are in the result. Too bad.
-					System.out.println("Unable to find that many products. Listing all available boxes.");
-					break;
-				}
-				else if (wantedProductCount > productCountSum)
-				{
-					/*
-					 * All boxes are not in the result.
-					 * Still have not reached the wanted product count.
-					 * Restart the loop at one higher index.
-					 * Repeat until either the wanted count is reached or all products have been added to the result.
-					 */
-					System.out.println("Unable to build a product box list of that size from smaller boxes. Going one size larger.");
-					resultingBoxes.clear();
-					productCountSum = 0;
-					wantedWouldBeIndex++;
-					addCountIndex = wantedWouldBeIndex;
-					lookingForLarger = true;
-
-					// FIXME: Infinite loop when looking for more products than are available.
-				}
-				else
-				{
-					System.out.println("what");
-					System.out.println("Search status | Count: " + productCountSum + " / " + wantedProductCount + " | Would Be Index: " + wantedWouldBeIndex
-							+ " | Add Index: " + addCountIndex + " / " + boxProductCount.size());
-
-				}
-			}
-		}
-
-		return resultingBoxes;
+	public static ObservableList<Object> getAllProductBrands()
+	{
+		// TODO Auto-generated method stub
+		productBrandsViewList.clear();
+		productBrandsViewList.addAll(loadedProductBrands.values());
+		return productBrandsViewList;
 	}
 
 	/*
-	 * PUBLIC DATABASE SETTER METHODS
+	 * -------------------------------- PRIVATE SETTER METHODS --------------------------------
+	 */
+
+	/**
+	 * Places the loaded {@link ProductContainer} objects into {@link Shelf}
+	 * objects.
+	 *
+	 * @throws NoDatabaseLinkException
+	 */
+	private static void setContainersToShelf(final int shelfid) throws NoDatabaseLinkException
+	{
+		System.out.println("[DatabaseController] Placing product boxes on shelf " + shelfid + "...");
+
+		final String[] columns = { "*" };
+
+		final List<String> where = new ArrayList<String>();
+		where.add("shelf = " + shelfid);
+
+		final Shelf shelf = getShelfByID(shelfid, true);
+
+		@SuppressWarnings("unchecked")
+		final Map<Integer, ArrayList<Integer[]>> shelfBoxMap = (HashMap<Integer, ArrayList<Integer[]>>) runQuery(DatabaseQueryType.SELECT,
+				DatabaseTable.SHELF_PRODUCTBOXES, null, columns, null, where);
+
+		// If the shelf is not empty.
+		if (!shelfBoxMap.isEmpty())
+		{
+			ProductBox box = null;
+			String shelfSlotID = null;
+
+			final ArrayList<Integer[]> boxes = shelfBoxMap.get(shelfid);
+
+			for (final Integer[] data : boxes)
+			{
+				box = getProductBoxByID(data[0]);
+
+				// data[1] is the level index
+				shelfSlotID = Shelf.coordinatesToShelfSlotID(shelfid, data[1] + 1, data[2], true);
+				shelf.addToSlot(shelfSlotID, box, false);
+			}
+
+			System.out.println("[DatabaseController] Product boxes placed on shelf " + shelfid + ".");
+		}
+		else
+		{
+			System.out.println("[DatabaseController] Nothing to place.");
+		}
+	}
+
+	/**
+	 * Places the correct product boxes in the cached removal list.
+	 *
+	 * @param listid removal list to place product boxes into
+	 * @throws NoDatabaseLinkException
+	 */
+	private static void setContainersToRemovalList(final int listid) throws NoDatabaseLinkException
+	{
+		System.out.println("[DatabaseController] Placing product boxes on removal list " + listid + "...");
+
+		final List<String> where = new ArrayList<String>();
+		where.add("removallist = " + listid);
+
+		final String[] columns = { "productbox" };
+		@SuppressWarnings("unchecked")
+		final Set<Integer> removalListBoxes = (LinkedHashSet<Integer>) runQuery(DatabaseQueryType.SELECT, DatabaseTable.REMOVALLIST_PRODUCTBOXES, null, columns,
+				null, where);
+
+		if (!removalListBoxes.isEmpty())
+		{
+			for (final Integer id : removalListBoxes)
+				loadedRemovalLists.get(listid).addProductBox(getProductBoxByID(id));
+
+			System.out.println("[DatabaseController] Product boxes placed on removal list " + listid + ".");
+		}
+		else
+			System.out.println("[DatabaseController] Nothing to place.");
+
+	}
+
+	/*
+	 * -------------------------------- PUBLIC SETTER METHODS --------------------------------
 	 */
 
 	/**
@@ -2221,6 +2250,10 @@ public class DatabaseController
 
 		return true;
 	}
+
+	/*
+	 * -------------------------------- CACHING --------------------------------
+	 */
 
 	/**
 	 * Loads data from database into memory.
@@ -2452,27 +2485,5 @@ public class DatabaseController
 	public static Map<Integer, RemovalList> getCachedRemovalLists()
 	{
 		return loadedRemovalLists;
-	}
-
-	public static void productSearch(final List<String> where)
-	{
-		// TODO Auto-generated method stub
-
-	}
-
-	public static ObservableList<Object> getAllProductCategories()
-	{
-		// TODO Auto-generated method stub
-		productCategoriesViewList.clear();
-		productCategoriesViewList.addAll(loadedProductCategories.values());
-		return productCategoriesViewList;
-	}
-
-	public static ObservableList<Object> getAllProductBrands()
-	{
-		// TODO Auto-generated method stub
-		productBrandsViewList.clear();
-		productBrandsViewList.addAll(loadedProductBrands.values());
-		return productBrandsViewList;
 	}
 }
