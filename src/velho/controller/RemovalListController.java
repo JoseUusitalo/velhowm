@@ -3,6 +3,8 @@ package velho.controller;
 import javafx.scene.Node;
 import javafx.scene.layout.BorderPane;
 import velho.model.RemovalList;
+import velho.model.RemovalListState;
+import velho.model.exceptions.NoDatabaseLinkException;
 import velho.model.interfaces.UIActionController;
 import velho.view.RemovalListCreationView;
 import velho.view.RemovalListManagementView;
@@ -79,8 +81,7 @@ public class RemovalListController implements UIActionController
 	public void showBrowseRemovalListsView()
 	{
 		managementView.setBrowseListsButtonVisiblity(false);
-		managementView
-				.setContent(ListController.getTableView(this, DatabaseController.getRemovalListDataColumns(), DatabaseController.getRemovalListsViewList()));
+		managementView.setContent(ListController.getTableView(this, DatabaseController.getRemovalListDataColumns(), DatabaseController.getRemovalListsViewList()));
 	}
 
 	/**
@@ -127,7 +128,18 @@ public class RemovalListController implements UIActionController
 	public BorderPane getSearchResults()
 	{
 		// FIXME: temporarily showing all products
-		return (BorderPane) ListController.getTableView(this, DatabaseController.getPublicProductDataColumns(true, false),
-				DatabaseController.getPublicProductDataList());
+		return (BorderPane) ListController.getTableView(this, DatabaseController.getPublicProductDataColumns(true, false), DatabaseController.getPublicProductDataList());
+	}
+
+	public void saveNewRemovalList()
+	{
+		System.out.println("Saving List : " + newRemovalList.getBoxes());
+
+	}
+
+	public void setNewRemovalListState(final RemovalListState newState)
+	{
+
+		System.out.println("New state is : " + newState);
 	}
 }
