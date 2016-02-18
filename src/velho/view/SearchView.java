@@ -84,7 +84,7 @@ public class SearchView
 			grid.add(popularitySpinnerLabel, 2, 2, 1, 1);
 
 			final Spinner<Integer> productCountField = new Spinner<Integer>();
-			productCountField.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(0, 10000));
+			productCountField.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(-1, 10000));
 			productCountField.setEditable(true);
 			productCountField.setPrefWidth(75.0);
 			grid.add(productCountField, 3, 1, 1, 1);
@@ -96,6 +96,7 @@ public class SearchView
 			grid.add(popularityField, 3, 2, 1, 1);
 
 			final ComboBox<Object> brandbox = new ComboBox<Object>();
+			brandbox.getItems().add(null);
 			brandbox.setPromptText("Product Brand");
 			brandbox.getItems().addAll(productBrands);
 			brandbox.setMaxWidth(Double.MAX_VALUE);
@@ -103,6 +104,7 @@ public class SearchView
 			grid.add(brandbox, 4, 1, 1, 1);
 
 			final ComboBox<Object> categorybox = new ComboBox<Object>();
+			categorybox.getItems().add(null);
 			categorybox.setPromptText("Product Category");
 			categorybox.getItems().addAll(productCategories);
 			categorybox.getSelectionModel().selectFirst();
