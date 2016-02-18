@@ -23,8 +23,7 @@ public class SearchController
 		this.searchTabView = new SearchTabView(this);
 	}
 
-	public void productSearch(final String nameField, final Integer productCountField, final Integer popularityField, final Object productBrand,
-			final Object productCategory, final LocalDate localDate, final LocalDate localDate2)
+	public void productSearch(final String nameField, final Integer productCountField, final Integer popularityField, final Object productBrand, final Object productCategory, final LocalDate localDate, final LocalDate localDate2)
 	{
 		final List<String> where = new ArrayList<String>();
 
@@ -34,12 +33,12 @@ public class SearchController
 			where.add("products.name = '" + nameField + "'");
 		}
 
-		if (productCountField != null)
+		if (productCountField != null && productCountField >= 0)
 		{
 			where.add("containers.product_count = " + productCountField.intValue());
 		}
 
-		if (popularityField != null)
+		if (popularityField != null && popularityField >= 0)
 		{
 			where.add("products.popularity = " + popularityField.intValue());
 		}
@@ -56,20 +55,19 @@ public class SearchController
 
 		if (localDate != null)
 		{
-			// where.add("containers.expiration_date >= " + localDate);
+			where.add("containers.expiration_date >= '" + localDate + "'");
 		}
 
 		if (localDate2 != null)
 		{
-			// where.add("containers.expiration_date <= " + localDate2);
+			where.add("containers.expiration_date <= '" + localDate2 + "'");
 		}
 		System.out.println(where.toString());
 
 		try
 		{
 			DatabaseController.searchProductBox(where);
-		}
-		catch (NoDatabaseLinkException e)
+		} catch (NoDatabaseLinkException e)
 		{
 			DatabaseController.tryReLink();
 		}
@@ -80,8 +78,7 @@ public class SearchController
 		try
 		{
 			return new SearchView(this, DatabaseController.getAllProductBrands(), DatabaseController.getAllProductCategories()).getView();
-		}
-		catch (NoDatabaseLinkException e)
+		} catch (NoDatabaseLinkException e)
 		{
 			DatabaseController.tryReLink();
 			return null;
@@ -98,7 +95,7 @@ public class SearchController
 		// TODO: Temporarily showing all products
 		// FIXME: Product boxes!
 		System.out.println("Getting search results for removal list.");
-		return listController.getProductListView(DatabaseController.getPublicProductDataColumns(false, false), DatabaseController.getObservableProducts());
+		return listController.getProductListView(DatabaseController.getProductSearchDataColumns(false, false), DatabaseController.getObservableProductSearchResults());
 
 	}
 }

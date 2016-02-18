@@ -84,8 +84,7 @@ public class ListView
 				{
 					col.setCellValueFactory(new Callback<TableColumn.CellDataFeatures<Object, String>, ObservableValue<String>>()
 					{
-						@Override
-						public ObservableValue<String> call(final TableColumn.CellDataFeatures<Object, String> p)
+						@Override public ObservableValue<String> call(final TableColumn.CellDataFeatures<Object, String> p)
 						{
 							return new SimpleStringProperty(p.getValue(), key);
 						}
@@ -94,8 +93,7 @@ public class ListView
 					// Adding the button to the cell
 					col.setCellFactory(new Callback<TableColumn<Object, String>, TableCell<Object, String>>()
 					{
-						@Override
-						public TableCell<Object, String> call(final TableColumn<Object, String> p)
+						@Override public TableCell<Object, String> call(final TableColumn<Object, String> p)
 						{
 							TableCellDeleteButton button = new TableCellDeleteButton(parentController, "Delete");
 							button.setAlignment(Pos.CENTER);
@@ -109,8 +107,7 @@ public class ListView
 				{
 					col.setCellValueFactory(new Callback<TableColumn.CellDataFeatures<Object, String>, ObservableValue<String>>()
 					{
-						@Override
-						public ObservableValue<String> call(final TableColumn.CellDataFeatures<Object, String> p)
+						@Override public ObservableValue<String> call(final TableColumn.CellDataFeatures<Object, String> p)
 						{
 							return new SimpleStringProperty(p.getValue(), key);
 						}
@@ -119,8 +116,7 @@ public class ListView
 					// Adding the button to the cell
 					col.setCellFactory(new Callback<TableColumn<Object, String>, TableCell<Object, String>>()
 					{
-						@Override
-						public TableCell<Object, String> call(final TableColumn<Object, String> p)
+						@Override public TableCell<Object, String> call(final TableColumn<Object, String> p)
 						{
 							TableCellAddButton button = new TableCellAddButton(parentController, "+");
 							button.setAlignment(Pos.CENTER);
@@ -134,8 +130,7 @@ public class ListView
 				{
 					col.setCellValueFactory(new Callback<TableColumn.CellDataFeatures<Object, String>, ObservableValue<String>>()
 					{
-						@Override
-						public ObservableValue<String> call(final TableColumn.CellDataFeatures<Object, String> p)
+						@Override public ObservableValue<String> call(final TableColumn.CellDataFeatures<Object, String> p)
 						{
 							return new SimpleStringProperty(p.getValue(), key);
 						}
@@ -144,8 +139,7 @@ public class ListView
 					// Adding the button to the cell
 					col.setCellFactory(new Callback<TableColumn<Object, String>, TableCell<Object, String>>()
 					{
-						@Override
-						public TableCell<Object, String> call(final TableColumn<Object, String> p)
+						@Override public TableCell<Object, String> call(final TableColumn<Object, String> p)
 						{
 							TableCellRemoveButton button = new TableCellRemoveButton(parentController, "-");
 							button.setAlignment(Pos.CENTER);
@@ -159,8 +153,7 @@ public class ListView
 				{
 					col.setCellValueFactory(new Callback<TableColumn.CellDataFeatures<Object, String>, ObservableValue<String>>()
 					{
-						@Override
-						public ObservableValue<String> call(final TableColumn.CellDataFeatures<Object, String> p)
+						@Override public ObservableValue<String> call(final TableColumn.CellDataFeatures<Object, String> p)
 						{
 							return new SimpleStringProperty(p.getValue(), key);
 						}
@@ -170,8 +163,7 @@ public class ListView
 					col.setCellFactory(new Callback<TableColumn<Object, String>, TableCell<Object, String>>()
 					{
 
-						@Override
-						public TableCell<Object, String> call(final TableColumn<Object, String> p)
+						@Override public TableCell<Object, String> call(final TableColumn<Object, String> p)
 						{
 							TableCellViewButton button = new TableCellViewButton("View");
 							button.setAlignment(Pos.CENTER);
@@ -208,7 +200,8 @@ public class ListView
 		private UIActionController controller;
 
 		/**
-		 * @param text button text
+		 * @param text
+		 *            button text
 		 */
 		private TableCellDeleteButton(final UIActionController parentController, final String text)
 		{
@@ -218,8 +211,7 @@ public class ListView
 
 			button.setOnAction(new EventHandler<ActionEvent>()
 			{
-				@Override
-				public void handle(final ActionEvent t)
+				@Override public void handle(final ActionEvent t)
 				{
 					// Get selected object and send information to parent controller.
 					controller.deleteAction(TableCellDeleteButton.this.getTableView().getItems().get(TableCellDeleteButton.this.getIndex()));
@@ -227,8 +219,7 @@ public class ListView
 			});
 		}
 
-		@Override
-		protected void updateItem(final String string, final boolean empty)
+		@Override protected void updateItem(final String string, final boolean empty)
 		{
 			super.updateItem(string, empty);
 
@@ -273,7 +264,8 @@ public class ListView
 		protected UIActionController controller;
 
 		/**
-		 * @param text button text
+		 * @param text
+		 *            button text
 		 */
 		private TableCellAddButton(final UIActionController parentController, final String text)
 		{
@@ -283,8 +275,7 @@ public class ListView
 
 			button.setOnAction(new EventHandler<ActionEvent>()
 			{
-				@Override
-				public void handle(final ActionEvent t)
+				@Override public void handle(final ActionEvent t)
 				{
 					// Send information to parent controller.
 					controller.addAction(TableCellAddButton.this.getTableView().getItems().get(TableCellAddButton.this.getIndex()));
@@ -292,8 +283,7 @@ public class ListView
 			});
 		}
 
-		@Override
-		protected void updateItem(final String string, final boolean empty)
+		@Override protected void updateItem(final String string, final boolean empty)
 		{
 			super.updateItem(string, empty);
 
@@ -323,7 +313,8 @@ public class ListView
 		protected UIActionController controller;
 
 		/**
-		 * @param text button text
+		 * @param text
+		 *            button text
 		 */
 		private TableCellRemoveButton(final UIActionController parentController, final String text)
 		{
@@ -333,8 +324,7 @@ public class ListView
 
 			button.setOnAction(new EventHandler<ActionEvent>()
 			{
-				@Override
-				public void handle(final ActionEvent t)
+				@Override public void handle(final ActionEvent t)
 				{
 					// Send information to parent controller.
 					controller.removeAction(TableCellRemoveButton.this.getTableView().getItems().get(TableCellRemoveButton.this.getIndex()));
@@ -342,8 +332,7 @@ public class ListView
 			});
 		}
 
-		@Override
-		protected void updateItem(final String string, final boolean empty)
+		@Override protected void updateItem(final String string, final boolean empty)
 		{
 			super.updateItem(string, empty);
 
@@ -368,7 +357,8 @@ public class ListView
 		private Button button;
 
 		/**
-		 * @param text button text
+		 * @param text
+		 *            button text
 		 */
 		private TableCellViewButton(final String text)
 		{
@@ -377,8 +367,7 @@ public class ListView
 
 			button.setOnAction(new EventHandler<ActionEvent>()
 			{
-				@Override
-				public void handle(final ActionEvent t)
+				@Override public void handle(final ActionEvent t)
 				{
 					// Send information to parent controller.
 					ListController.viewAction(TableCellViewButton.this.getTableView().getItems().get(TableCellViewButton.this.getIndex()));
@@ -386,8 +375,7 @@ public class ListView
 			});
 		}
 
-		@Override
-		protected void updateItem(final String string, final boolean empty)
+		@Override protected void updateItem(final String string, final boolean empty)
 		{
 			super.updateItem(string, empty);
 

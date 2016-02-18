@@ -64,7 +64,7 @@ public class SearchView
 			grid.add(popularitySpinnerLabel, 2, 2, 1, 1);
 
 			final Spinner<Integer> productCountField = new Spinner<Integer>();
-			productCountField.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(0, 10000));
+			productCountField.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(-1, 10000));
 			productCountField.setEditable(true);
 			productCountField.setPrefWidth(75.0);
 			grid.add(productCountField, 3, 1, 1, 1);
@@ -76,6 +76,7 @@ public class SearchView
 			grid.add(popularityField, 3, 2, 1, 1);
 
 			final ComboBox<Object> brandbox = new ComboBox<Object>();
+			brandbox.getItems().add(null);
 			brandbox.setPromptText("Product Brand");
 			brandbox.getItems().addAll(productBrands);
 			brandbox.setMaxWidth(Double.MAX_VALUE);
@@ -83,6 +84,7 @@ public class SearchView
 			grid.add(brandbox, 4, 1, 1, 1);
 
 			final ComboBox<Object> categorybox = new ComboBox<Object>();
+			categorybox.getItems().add(null);
 			categorybox.setPromptText("Product Category");
 			categorybox.getItems().addAll(productCategories);
 			categorybox.getSelectionModel().selectFirst();
@@ -104,15 +106,13 @@ public class SearchView
 
 			searchButton.setOnAction(new EventHandler<ActionEvent>()
 			{
-				@Override
-				public void handle(final ActionEvent event)
+				@Override public void handle(final ActionEvent event)
 				{
 
 					try
 					{
 						Integer.parseInt(productCountField.getValue().toString());
-					}
-					catch (final NumberFormatException e)
+					} catch (final NumberFormatException e)
 					{
 						// Although badge IDs are stored as string, they are still numbers.
 					}
@@ -120,13 +120,11 @@ public class SearchView
 					try
 					{
 						Integer.parseInt(popularityField.getValue().toString());
-					}
-					catch (final NumberFormatException e)
+					} catch (final NumberFormatException e)
 					{
 						// Although badge IDs are stored as string, they are still numbers.
 					}
-					searchController.productSearch(nameField.getText(), productCountField.getValue(), popularityField.getValue(), brandbox.getValue(),
-							categorybox.getValue(), dpStart.getValue(), dpEnd.getValue());
+					searchController.productSearch(nameField.getText(), productCountField.getValue(), popularityField.getValue(), brandbox.getValue(), categorybox.getValue(), dpStart.getValue(), dpEnd.getValue());
 					// System.out.println(nameField.getText() + " " + productCountField.getEditor() + " " +
 					// popularityField.getEditor() + " " + brandbox.getValue() + " " + categorybox.getValue() + " " +
 					// dpStart.getValue() + " " + dpEnd.getValue());
