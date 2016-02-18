@@ -6,6 +6,7 @@ import javafx.scene.control.Label;
 import javafx.scene.layout.Background;
 import javafx.scene.layout.BackgroundFill;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Paint;
@@ -42,8 +43,7 @@ public class RemovalListCreationView
 	 */
 	private SearchController searchController;
 
-	public RemovalListCreationView(final RemovalListController removalListController, final ListController listController,
-			final SearchController searchController)
+	public RemovalListCreationView(final RemovalListController removalListController, final ListController listController, final SearchController searchController)
 	{
 		this.removalListController = removalListController;
 		this.listController = listController;
@@ -60,12 +60,13 @@ public class RemovalListCreationView
 		if (bpane == null)
 		{
 			bpane = new BorderPane();
-			bpane.setTop(searchController.getView());
+			GridPane searchView = (GridPane) searchController.getSearchView();
+			searchView.setPadding(new Insets(0, 10, 10, 10));
+			bpane.setTop(searchView);
 
 			VBox left = new VBox(10);
 			// TODO: Use CSS.
 			left.setBackground(new Background(new BackgroundFill(Paint.valueOf("EEEEEE"), null, null)));
-			left.setPadding(new Insets(10, 0, 0, 0));
 
 			Label resultsLabel = new Label("Search Results");
 			resultsLabel.setAlignment(Pos.CENTER);
@@ -82,7 +83,6 @@ public class RemovalListCreationView
 			VBox center = new VBox(10);
 			// TODO: Use CSS.
 			center.setBackground(new Background(new BackgroundFill(Paint.valueOf("EEEEEE"), null, null)));
-			center.setPadding(new Insets(10, 0, 0, 0));
 
 			Label removalListLabel = new Label("New Removal List");
 			removalListLabel.setAlignment(Pos.CENTER);

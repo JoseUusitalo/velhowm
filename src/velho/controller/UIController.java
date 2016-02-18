@@ -35,8 +35,7 @@ public class UIController
 	 */
 	private RemovalListController removalListController;
 
-	public UIController(final MainWindow mainWindow, final ListController listController, final UserController userController,
-			final RemovalListController removalListController, final SearchController searchController)
+	public UIController(final MainWindow mainWindow, final ListController listController, final UserController userController, final RemovalListController removalListController, final SearchController searchController)
 	{
 		this.mainView = mainWindow;
 		this.listController = listController;
@@ -49,9 +48,9 @@ public class UIController
 	 * Shows a view in the main window.
 	 *
 	 * @param position
-	 * {@link Position} to show the view in
+	 *            {@link Position} to show the view in
 	 * @param view
-	 * view to show
+	 *            view to show
 	 */
 	public void setView(final Position position, final Node view)
 	{
@@ -81,7 +80,7 @@ public class UIController
 	 * Shows the main menu as seen by the specified role.
 	 *
 	 * @param currentUserRole
-	 * {@link UserRole} viewing the main menu
+	 *            {@link UserRole} viewing the main menu
 	 */
 	public void showMainMenu(final UserRole currentUserRole)
 	{
@@ -100,9 +99,8 @@ public class UIController
 				//$FALL-THROUGH$
 			case "Logistician":
 				mainView.addTab("User List", getUserListView(currentUserRole));
-				mainView.addTab("Product List", listController.getProductListView(DatabaseController.getPublicProductDataColumns(false, false),
-						DatabaseController.getPublicProductDataList()));
-				mainView.addTab("Search", searchController.getView());
+				mainView.addTab("Product List", listController.getProductListView(DatabaseController.getPublicProductDataColumns(false, false), DatabaseController.getPublicProductDataList()));
+				mainView.addTab("Search", searchController.getSearchTabView());
 				mainView.addTab("Product List Search", listController.getProductListSearchView());
 				break;
 			default:
@@ -115,7 +113,7 @@ public class UIController
 	 * logged in.
 	 *
 	 * @param currentUserRole
-	 * the role of the user who is currently logged in
+	 *            the role of the user who is currently logged in
 	 * @return the user list view
 	 */
 	private Node getUserListView(final UserRole currentUserRole)
@@ -135,8 +133,7 @@ public class UIController
 				default:
 					System.out.println("Unknown user role.");
 			}
-		}
-		catch (NoDatabaseLinkException e)
+		} catch (NoDatabaseLinkException e)
 		{
 			// TODO Auto-generated catch block
 			e.printStackTrace();

@@ -78,7 +78,8 @@ public class DatabaseController
 	private static ObservableList<Object> productViewList = FXCollections.observableArrayList();
 
 	/**
-	 * An observable list of product search results for display in the user interface.
+	 * An observable list of product search results for display in the user
+	 * interface.
 	 */
 	private static ObservableList<Object> productSearchResultViewList = FXCollections.observableArrayList();
 
@@ -126,6 +127,10 @@ public class DatabaseController
 	 * A map of {@link RemovalListState} objects loaded from the database.
 	 */
 	private static Map<Integer, RemovalListState> loadedRemovalListStates = new HashMap<Integer, RemovalListState>();
+
+	private static ObservableList<Object> productCategoriesViewList = FXCollections.observableArrayList();
+
+	private static ObservableList<Object> productBrandsViewList = FXCollections.observableArrayList();
 
 	/*
 	 * PRIVATE DATABASE METHODS
@@ -270,9 +275,11 @@ public class DatabaseController
 	 * conditions (can be <code>null</code>)
 	 * @return
 	 * <ul>
-	 * <li>if type is {@link DatabaseQueryType#UPDATE} or {@link DatabaseQueryType#DELETE}:
-	 * the number of rows that were changed as a result of the query as an {@link Integer}</li>
-	 * <li>if type is {@link DatabaseQueryType#SELECT}: a Set containing the selected data</li>
+	 * <li>if type is {@link DatabaseQueryType#UPDATE} or
+	 * {@link DatabaseQueryType#DELETE}: the number of rows that were
+	 * changed as a result of the query as an {@link Integer}</li>
+	 * <li>if type is {@link DatabaseQueryType#SELECT}: a Set containing
+	 * the selected data</li>
 	 * </ul>
 	 * @throws NoDatabaseLinkException
 	 */
@@ -360,6 +367,19 @@ public class DatabaseController
 											getRoleByID(result.getInt("role"))));
 								break;
 
+							case ROLES:
+								if (columns.length == 1 && Arrays.asList(columns).contains("name"))
+								{
+									while (result.next())
+										dataSet.add(result.getString("name"));
+								}
+								else if (columns.length == 1 && Arrays.asList(columns).contains("role_id"))
+								{
+									while (result.next())
+										dataSet.add(result.getInt("role_id"));
+								}
+								break;
+
 							case CATEGORIES:
 								while (result.next())
 									dataSet.add(new ProductCategory(result.getInt("category_id"), result.getString("name"),
@@ -369,34 +389,23 @@ public class DatabaseController
 							case PRODUCTS:
 								// @formatter:off
 								while (result.next())
-									dataSet.add(new Product(
-											result.getInt("product_id"),
-											result.getString("name"),
-											getProductBrandByID(result.getInt("brand")),
-											getProductCategoryByID(result.getInt("category")),
-											result.getInt("popularity")));
+									dataSet.add(new Product(result.getInt("product_id"), result.getString("name"), getProductBrandByID(result.getInt("brand")), getProductCategoryByID(result.getInt("category")), result.getInt("popularity")));
 								break;
-								// @formatter:on
+							// @formatter:on
 
 							case CONTAINERS:
 								// @formatter:off
 								while (result.next())
-									dataSet.add(new ProductBox(
-											result.getInt("container_id"),
-											result.getDate("expiration_date"),
-											result.getInt("max_size"),
-											getProductByID(result.getInt("product")),
-											result.getInt("product_count")));
+									dataSet.add(new ProductBox(result.getInt("container_id"), result.getDate("expiration_date"), result.getInt("max_size"), getProductByID(result.getInt("product")), result.getInt("product_count")));
 								break;
-								// @formatter:on
+							// @formatter:on
 
 							case SHELVES:
 								// @formatter:off
 								while (result.next())
-									dataSet.add(new Shelf(result.getInt("shelf_id"), result.getInt("max_levels"), result.getInt("max_shelfslots_per_level"),
-											result.getInt("max_productboxes_per_shelfslot")));
+									dataSet.add(new Shelf(result.getInt("shelf_id"), result.getInt("max_levels"), result.getInt("max_shelfslots_per_level"), result.getInt("max_productboxes_per_shelfslot")));
 								break;
-								// @formatter:on
+							// @formatter:on
 
 							case SHELF_PRODUCTBOXES:
 								shelfBoxMap = new HashMap<Integer, ArrayList<Integer[]>>();
@@ -433,11 +442,9 @@ public class DatabaseController
 							case REMOVALLISTS:
 								// @formatter:off
 								while (result.next())
-									dataSet.add(new RemovalList(
-											result.getInt("removallist_id"),
-											getRemovalListStateByID(result.getInt("liststate"))));
+									dataSet.add(new RemovalList(result.getInt("removallist_id"), getRemovalListStateByID(result.getInt("liststate"))));
 								break;
-								// @formatter:on
+							// @formatter:on
 
 							case REMOVALLIST_PRODUCTBOXES:
 								listBoxMap = new HashMap<Integer, ArrayList<Integer>>();
@@ -745,7 +752,8 @@ public class DatabaseController
 	}
 
 	/**
-	 * Checks for a database link and gets a new connection to the database for running statements.
+	 * Checks for a database link and gets a new connection to the database for
+	 * running statements.
 	 *
 	 * @return a database connection
 	 */
@@ -788,9 +796,9 @@ public class DatabaseController
 	}
 
 	/**
-	 * Checks if a database link exists and throws a {@link NoDatabaseConnectionException} exception if it
-	 * doesn't.
-	 * To be used when a database link must exist.
+	 * Checks if a database link exists and throws a
+	 * {@link NoDatabaseConnectionException} exception if it doesn't. To be used
+	 * when a database link must exist.
 	 */
 	public static void checkLink() throws NoDatabaseLinkException
 	{
@@ -830,8 +838,8 @@ public class DatabaseController
 	}
 
 	/**
-	 * Creates the link to the database.
-	 * Use {@link #unlink()} to close the connection.
+	 * Creates the link to the database. Use {@link #unlink()} to close the
+	 * connection.
 	 *
 	 * @return <code>true</code> if the link was created successfully
 	 * @throws ClassNotFoundException
@@ -900,11 +908,12 @@ public class DatabaseController
 	}
 
 	/**
-	 * Shuts down the connection to the database.
-	 * Use {@link #link()} to connect to the database again.
+	 * Shuts down the connection to the database. Use {@link #link()} to connect
+	 * to the database again.
 	 *
 	 * @throws NoDatabaseLinkException
-	 * when attempting unlink a database when no database link exists
+	 * when attempting unlink a database when no database link
+	 * exists
 	 */
 	public static void unlink() throws NoDatabaseLinkException
 	{
@@ -929,9 +938,11 @@ public class DatabaseController
 	 */
 
 	/**
-	 * Gets a map of columns and column names for displaying {@link #getPublicUserDataList()} data in a table.
+	 * Gets a map of columns and column names for displaying
+	 * {@link #getPublicUserDataList()} data in a table.
 	 *
-	 * @return a map where the key is the column value and value is the column name
+	 * @return a map where the key is the column value and value is the column
+	 * name
 	 */
 	public static Map<String, String> getPublicUserDataColumns(final boolean withDeleteColumn)
 	{
@@ -947,9 +958,11 @@ public class DatabaseController
 	}
 
 	/**
-	 * Gets a map of columns and column names for displaying {@link #getPublicProductDataList()} data in a table.
+	 * Gets a map of columns and column names for displaying
+	 * {@link #getPublicProductDataList()} data in a table.
 	 *
-	 * @return a map where the key is the column value and value is the column name
+	 * @return a map where the key is the column value and value is the column
+	 * name
 	 */
 	public static Map<String, String> getPublicProductDataColumns(final boolean withAddColumn, final boolean withDeleteColumn)
 	{
@@ -970,9 +983,11 @@ public class DatabaseController
 	}
 
 	/**
-	 * Gets a map of columns and column names for displaying {@link #getPublicProductDataList()} data in a table.
+	 * Gets a map of columns and column names for displaying
+	 * {@link #getPublicProductDataList()} data in a table.
 	 *
-	 * @return a map where the key is the column value and value is the column name
+	 * @return a map where the key is the column value and value is the column
+	 * name
 	 */
 	public static Map<String, String> getRemovalListDataColumns()
 	{
@@ -1008,8 +1023,8 @@ public class DatabaseController
 	 *
 	 * @param roleName
 	 * the name of the role
-	 * @return the database ID of the given role (a value greater than 0) or <code>-1</code> if the role does not exist
-	 * in the database
+	 * @return the database ID of the given role (a value greater than 0) or
+	 * <code>-1</code> if the role does not exist in the database
 	 */
 	public static int getRoleID(final String roleName) throws NoDatabaseLinkException
 	{
@@ -1053,7 +1068,8 @@ public class DatabaseController
 	 *
 	 * @param badgeID
 	 * a badge ID string
-	 * @return a {@link User} object representing the authenticated user or <code>null</code> for invalid credentials
+	 * @return a {@link User} object representing the authenticated user or
+	 * <code>null</code> for invalid credentials
 	 * @throws NoDatabaseLinkException
 	 * @see {@link User#isValidBadgeID(String)}
 	 */
@@ -1090,8 +1106,15 @@ public class DatabaseController
 	 * Warnign: Assumes that the PIN is techinically valid.
 	 * </p>
 	 *
+	 * <<<<<<< HEAD
 	 * @param pin a PIN string
 	 * @return a {@link User} object representing the authenticated user or <code>null</code> for invalid credentials
+	 * =======
+	 * @param pin
+	 * a PIN string
+	 * @return a {@link User} object representing the authenticated user or
+	 * <code>null</code> for invalid credentials
+	 * >>>>>>> branch 'removal-list' of https://gitlab.com/joseu/velho.git
 	 * @throws NoDatabaseLinkException
 	 * @see {@link User#isValidPIN(String)}
 	 */
@@ -1115,7 +1138,12 @@ public class DatabaseController
 	/**
 	 * Gets the {@link UserRole} object from the given role ID.
 	 *
+	 * <<<<<<< HEAD
 	 * @param roleid role database ID
+	 * =======
+	 * @param roleid
+	 * role database ID
+	 * >>>>>>> branch 'removal-list' of https://gitlab.com/joseu/velho.git
 	 * @return the corresponding user role object
 	 * @throws NoDatabaseLinkException
 	 */
@@ -1175,7 +1203,12 @@ public class DatabaseController
 	/**
 	 * Gets the {@link ProductType} object from the given type ID.
 	 *
+	 * <<<<<<< HEAD
 	 * @param typeid product type database ID
+	 * =======
+	 * @param typeid
+	 * product type database ID
+	 * >>>>>>> branch 'removal-list' of https://gitlab.com/joseu/velho.git
 	 * @return the corresponding product type object
 	 * @throws NoDatabaseLinkException
 	 */
@@ -1212,7 +1245,12 @@ public class DatabaseController
 	/**
 	 * Gets the {@link ProductCategory} object from the given category ID.
 	 *
+	 * <<<<<<< HEAD
 	 * @param categoryid product category database ID
+	 * =======
+	 * @param categoryid
+	 * product category database ID
+	 * >>>>>>> branch 'removal-list' of https://gitlab.com/joseu/velho.git
 	 * @return the corresponding product category object
 	 * @throws NoDatabaseLinkException
 	 */
@@ -1248,7 +1286,12 @@ public class DatabaseController
 	/**
 	 * Gets the {@link ProductBrand} object from the given brand ID.
 	 *
+	 * <<<<<<< HEAD
 	 * @param brandid product brand database ID
+	 * =======
+	 * @param brandid
+	 * product brand database ID
+	 * >>>>>>> branch 'removal-list' of https://gitlab.com/joseu/velho.git
 	 * @return the corresponding product brand object
 	 * @throws NoDatabaseLinkException
 	 */
@@ -1284,7 +1327,12 @@ public class DatabaseController
 	/**
 	 * Gets the {@link Product} object from the given product ID.
 	 *
+	 * <<<<<<< HEAD
 	 * @param productid product database ID
+	 * =======
+	 * @param productid
+	 * product database ID
+	 * >>>>>>> branch 'removal-list' of https://gitlab.com/joseu/velho.git
 	 * @return the corresponding product object
 	 * @throws NoDatabaseLinkException
 	 */
@@ -1320,7 +1368,12 @@ public class DatabaseController
 	/**
 	 * Gets the {@link Product} object from the given product ID.
 	 *
+	 * <<<<<<< HEAD
 	 * @param productid product database ID
+	 * =======
+	 * @param productid
+	 * product database ID
+	 * >>>>>>> branch 'removal-list' of https://gitlab.com/joseu/velho.git
 	 * @return the corresponding product object
 	 * @throws NoDatabaseLinkException
 	 */
@@ -1357,7 +1410,12 @@ public class DatabaseController
 	/**
 	 * Gets the {@link Product} object from the given product name.
 	 *
+	 * <<<<<<< HEAD
 	 * @param name the exact product name
+	 * =======
+	 * @param name
+	 * the exact product name
+	 * >>>>>>> branch 'removal-list' of https://gitlab.com/joseu/velho.git
 	 * @return the corresponding product object
 	 * @throws NoDatabaseLinkException
 	 */
@@ -1384,7 +1442,12 @@ public class DatabaseController
 	/**
 	 * Gets the {@link Product} object from the given product name.
 	 *
+	 * <<<<<<< HEAD
 	 * @param name the exact product name
+	 * =======
+	 * @param name
+	 * the exact product name
+	 * >>>>>>> branch 'removal-list' of https://gitlab.com/joseu/velho.git
 	 * @return the corresponding product object
 	 * @throws NoDatabaseLinkException
 	 */
@@ -1407,8 +1470,15 @@ public class DatabaseController
 	/**
 	 * Gets user data by their database ID.
 	 *
+	 * <<<<<<< HEAD
 	 * @param id database ID of the user
 	 * @return a {@link User} object or <code>null</code> if a user with that ID was not found
+	 * =======
+	 * @param id
+	 * database ID of the user
+	 * @return a {@link User} object or <code>null</code> if a user with that ID
+	 * was not found
+	 * >>>>>>> branch 'removal-list' of https://gitlab.com/joseu/velho.git
 	 */
 	public static User getUserByID(final int id) throws NoDatabaseLinkException
 	{
@@ -1429,8 +1499,10 @@ public class DatabaseController
 	/**
 	 * Gets the product ID by its name.
 	 *
-	 * @param name unique name of the product
-	 * @return the database ID of the product or <code>-1</code> if the product is not present in the database
+	 * @param name
+	 * unique name of the product
+	 * @return the database ID of the product or <code>-1</code> if the product
+	 * is not present in the database
 	 */
 	public static int getProductIDFromName(final String name) throws NoDatabaseLinkException
 	{
@@ -1449,7 +1521,8 @@ public class DatabaseController
 	}
 
 	/**
-	 * Places the loaded {@link ProductContainer} objects into {@link Shelf} objects.
+	 * Places the loaded {@link ProductContainer} objects into {@link Shelf}
+	 * objects.
 	 *
 	 * @throws NoDatabaseLinkException
 	 */
@@ -1783,7 +1856,8 @@ public class DatabaseController
 	/**
 	 * Gets the product box that will expire the soonest.
 	 *
-	 * @param boxes boxes to search from
+	 * @param boxes
+	 * boxes to search from
 	 * @return the oldest product box
 	 */
 	private static ProductBox getOldestProductBox(final List<ProductBox> boxes)
@@ -1994,8 +2068,8 @@ public class DatabaseController
 
 	/**
 	 * <p>
-	 * Adds a new user to the database.
-	 * If database changed as a result of the call, updates the {@link ObservableList} of user data shown in the UI.
+	 * Adds a new user to the database. If database changed as a result of the
+	 * call, updates the {@link ObservableList} of user data shown in the UI.
 	 * </p>
 	 * <p>
 	 * Warning: Assumes that given data is valid.
@@ -2041,8 +2115,9 @@ public class DatabaseController
 	}
 
 	/**
-	 * Removes a user with the specified database row ID.
-	 * If database changed as a result of the call, updates the {@link ObservableList} of user data shown in the UI.
+	 * Removes a user with the specified database row ID. If database changed as
+	 * a result of the call, updates the {@link ObservableList} of user data
+	 * shown in the UI.
 	 *
 	 * @param databaseID
 	 * the database ID of the user to delete
@@ -2156,7 +2231,6 @@ public class DatabaseController
 			query = DatabaseQueryType.UPDATE;
 
 		// Insert/Update the list itself
-		@SuppressWarnings("unchecked")
 		Set<Integer> result = (LinkedHashSet<Integer>) runQuery(query, DatabaseTable.REMOVALLISTS, null, null, values, null);
 
 		if (result.size() == 0)
@@ -2296,7 +2370,8 @@ public class DatabaseController
 	}
 
 	/**
-	 * Places the loaded {@link ProductContainer} objects into {@link Shelf} objects.
+	 * Places the loaded {@link ProductContainer} objects into {@link Shelf}
+	 * objects.
 	 *
 	 * @throws NoDatabaseLinkException
 	 */
@@ -2370,7 +2445,8 @@ public class DatabaseController
 	}
 
 	/**
-	 * Places the loaded {@link ProductContainer} objects into {@link RemovalList} objects.
+	 * Places the loaded {@link ProductContainer} objects into
+	 * {@link RemovalList} objects.
 	 *
 	 * @throws NoDatabaseLinkException
 	 */
@@ -2430,5 +2506,27 @@ public class DatabaseController
 	public static Map<Integer, RemovalList> getCachedRemovalLists()
 	{
 		return loadedRemovalLists;
+	}
+
+	public static void productSearch(final List<String> where)
+	{
+		// TODO Auto-generated method stub
+
+	}
+
+	public static ObservableList<Object> getAllProductCategories()
+	{
+		// TODO Auto-generated method stub
+		productCategoriesViewList.clear();
+		productCategoriesViewList.addAll(loadedProductCategories.values());
+		return productCategoriesViewList;
+	}
+
+	public static ObservableList<Object> getAllProductBrands()
+	{
+		// TODO Auto-generated method stub
+		productBrandsViewList.clear();
+		productBrandsViewList.addAll(loadedProductBrands.values());
+		return productBrandsViewList;
 	}
 }
