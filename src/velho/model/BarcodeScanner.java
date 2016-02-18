@@ -15,11 +15,21 @@ import velho.model.exceptions.NoDatabaseLinkException;
 public class BarcodeScanner
 {
 	/**
+	 * Receives the message from ProductListSeacrh
+	 *
+	 * @param received
+	 */
+	public static void deviceBarcode(final Object received)
+	{
+		System.out.println("Barcode Scanner received data ");
+		System.out.println(received.toString());
+	}
+
+	/**
 	 * Generates the product barcodes trought the scanner and sorts them
 	 * randomly.
 	 *
-	 * @param numbers
-	 *            returns an array of random numbers
+	 * @param numbers returns an array of random numbers
 	 * @return returns the total of numbers with maxSize of item/products
 	 */
 	public static int generateProductList(final List<Integer> numbers)
