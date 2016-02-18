@@ -150,7 +150,7 @@ public class DatabaseControllerTest
 	@Test
 	public final void testGetPublicUserDataList() throws NoDatabaseLinkException
 	{
-		assertEquals(4, DatabaseController.getPublicUserDataList().size());
+		assertEquals(4, DatabaseController.getObservableUsers().size());
 	}
 
 	@Test
@@ -243,7 +243,26 @@ public class DatabaseControllerTest
 		cols.put("boxShelfSlot", "Shelf Slot");
 		cols.put("boxProductCount", "Amount");
 
-		assertEquals(cols, DatabaseController.getProductSearchDataColumns());
+		assertEquals(cols, DatabaseController.getProductSearchDataColumns(false, false));
+	}
+
+	@Test
+	public final void testGetProductSearchDataColumns2()
+	{
+		// This test is worhtless but it exists to improve coverage.
+
+		final LinkedHashMap<String, String> cols = new LinkedHashMap<String, String>();
+		cols.put("addButton", "Add");
+		cols.put("removeButton", "Remove");
+		cols.put("productID", "ID");
+		cols.put("productName", "Name");
+		cols.put("productBrand", "Brand");
+		cols.put("productCategory", "Category");
+		cols.put("expirationDate", "Expires");
+		cols.put("boxShelfSlot", "Shelf Slot");
+		cols.put("boxProductCount", "Amount");
+
+		assertEquals(cols, DatabaseController.getProductSearchDataColumns(true, true));
 	}
 
 	@Test
@@ -305,7 +324,7 @@ public class DatabaseControllerTest
 	public final void testGetRemovalListsViewList()
 	{
 		// This test is useless but improves coverage.
-		assertTrue(DatabaseController.getRemovalListsViewList().containsAll(DatabaseController.getCachedRemovalLists().values()));
+		assertTrue(DatabaseController.getObservableRemovalLists().containsAll(DatabaseController.getCachedRemovalLists().values()));
 	}
 
 	@Test
@@ -325,6 +344,6 @@ public class DatabaseControllerTest
 		list.addProductBox(DatabaseController.getProductBoxByID(1));
 
 		assertTrue(DatabaseController.updateRemovalList(list));
-		assertTrue(DatabaseController.getRemovalListByID(6, true).getBoxes().contains(DatabaseController.getProductBoxByID(1)));
+		assertTrue(DatabaseController.getRemovalListByID(6, true).getObservableBoxes().contains(DatabaseController.getProductBoxByID(1)));
 	}
 }

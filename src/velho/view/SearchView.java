@@ -84,7 +84,7 @@ public class SearchView
 			grid.add(productCountField, 3, 1, 1, 1);
 
 			final Spinner<Integer> popularityField = new Spinner<Integer>();
-			popularityField.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(0, 10000));
+			popularityField.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(-1, 10000));
 			popularityField.setEditable(true);
 			popularityField.setPrefWidth(75.0);
 			grid.add(popularityField, 3, 2, 1, 1);
@@ -118,13 +118,15 @@ public class SearchView
 
 			searchButton.setOnAction(new EventHandler<ActionEvent>()
 			{
-				@Override public void handle(final ActionEvent event)
+				@Override
+				public void handle(final ActionEvent event)
 				{
 
 					try
 					{
 						Integer.parseInt(productCountField.getValue().toString());
-					} catch (final NumberFormatException e)
+					}
+					catch (final NumberFormatException e)
 					{
 						// Although badge IDs are stored as string, they are still numbers.
 					}
@@ -132,17 +134,19 @@ public class SearchView
 					try
 					{
 						Integer.parseInt(popularityField.getValue().toString());
-					} catch (final NumberFormatException e)
+					}
+					catch (final NumberFormatException e)
 					{
 						// Although badge IDs are stored as string, they are still numbers.
 					}
-					searchController.productSearch(nameField.getText(), productCountField.getValue(), popularityField.getValue(), brandbox.getValue(), categorybox.getValue(), dpStart.getValue(), dpEnd.getValue());
+					searchController.productSearch(nameField.getText(), productCountField.getValue(), popularityField.getValue(), brandbox.getValue(),
+							categorybox.getValue(), dpStart.getValue(), dpEnd.getValue());
 					// System.out.println(nameField.getText() + " " + productCountField.getEditor() + " " +
 					// popularityField.getEditor() + " " + brandbox.getValue() + " " + categorybox.getValue() + " " +
 					// dpStart.getValue() + " " + dpEnd.getValue());
 				}
 			});
-			//GridPane.setTop(grid);
+			// GridPane.setTop(grid);
 		}
 
 		return grid;

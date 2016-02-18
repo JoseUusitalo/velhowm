@@ -43,7 +43,8 @@ public class RemovalListCreationView
 	 */
 	private SearchController searchController;
 
-	public RemovalListCreationView(final RemovalListController removalListController, final ListController listController, final SearchController searchController)
+	public RemovalListCreationView(final RemovalListController removalListController, final ListController listController,
+			final SearchController searchController)
 	{
 		this.removalListController = removalListController;
 		this.listController = listController;

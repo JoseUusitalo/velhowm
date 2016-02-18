@@ -1473,9 +1473,16 @@ public class DatabaseController
 		return cols;
 	}
 
-	public static Map<String, String> getProductSearchDataColumns()
+	public static Map<String, String> getProductSearchDataColumns(final boolean withAddColumn, final boolean withRemoveColumn)
 	{
 		final LinkedHashMap<String, String> cols = new LinkedHashMap<String, String>();
+
+		if (withAddColumn)
+			cols.put("addButton", "Add");
+
+		if (withRemoveColumn)
+			cols.put("removeButton", "Remove");
+
 		cols.put("productID", "ID");
 		cols.put("productName", "Name");
 		cols.put("productBrand", "Brand");
@@ -1821,7 +1828,7 @@ public class DatabaseController
 	 *
 	 * @return a list of products in the database currently on shelves
 	 */
-	public static ObservableList<Object> getPublicProductDataList()
+	public static ObservableList<Object> getObservableProducts()
 	{
 		observableProducts.clear();
 		observableProducts.addAll(cachedProducts.values());
@@ -1833,7 +1840,7 @@ public class DatabaseController
 	 *
 	 * @return a cached list of products searched by the user
 	 */
-	public static ObservableList<Object> getProductSearchResultViewList()
+	public static ObservableList<Object> getObservableProductSearchResults()
 	{
 		return observableProductSearchResults;
 	}
@@ -1843,7 +1850,7 @@ public class DatabaseController
 	 *
 	 * @return a cached list of removal lists
 	 */
-	public static ObservableList<Object> getRemovalListsViewList()
+	public static ObservableList<Object> getObservableRemovalLists()
 	{
 		observableRemovalLists.clear();
 		observableRemovalLists.addAll(cachedRemovalLists.values());
@@ -1856,7 +1863,7 @@ public class DatabaseController
 	 * @return a cached list of users in the database
 	 * @throws NoDatabaseLinkException
 	 */
-	public static ObservableList<Object> getPublicUserDataList() throws NoDatabaseLinkException
+	public static ObservableList<Object> getObservableUsers() throws NoDatabaseLinkException
 	{
 		final String[] columns = { "user_id", "first_name", "last_name", "role" };
 
@@ -1880,7 +1887,7 @@ public class DatabaseController
 	 * number of products
 	 * @throws NoDatabaseLinkException
 	 */
-	public static List<ProductBoxSearchResultRow> searchProduct_BoxShelfSlots(final Map<Integer, Integer> productData) throws NoDatabaseLinkException
+	public static List<ProductBoxSearchResultRow> searchProductBoxByDataList(final Map<Integer, Integer> productData) throws NoDatabaseLinkException
 	{
 		final List<ProductBoxSearchResultRow> foundProducts = FXCollections.observableArrayList();
 
@@ -1937,10 +1944,43 @@ public class DatabaseController
 		return foundProducts;
 	}
 
-	public static void productSearch(final List<String> where)
+	public static List<ProductBoxSearchResultRow> searchProductBox(final List<String> where) throws NoDatabaseLinkException
 	{
-		// TODO Auto-generated method stub
+		final List<ProductBoxSearchResultRow> foundProducts = FXCollections.observableArrayList();
 
+		if (MainWindow.DEBUG_MODE)
+			System.out.println("Searching for a product box where: " + where);
+
+		final String[] columns = { "*" };
+
+		final Map<DatabaseTable, String> join = new LinkedHashMap<DatabaseTable, String>();
+		join.put(DatabaseTable.PRODUCTS, "containers.product = products.product_id");
+
+		@SuppressWarnings("unchecked")
+		final Set<ProductBox> result = (LinkedHashSet<ProductBox>) (runQuery(DatabaseQueryType.SELECT, DatabaseTable.CONTAINERS, join, columns, null, where));
+
+		System.out.println("\n\nSEARCH RESULT\n\n" + result);
+
+		for (final ProductBox box : result)
+		{
+			if (!cachedProductBoxes.containsKey(box.getBoxID()))
+			{
+				// Store for reuse.
+				if (MainWindow.PRINT_CACHE_MESSAGES)
+					System.out.println("Caching: " + box);
+
+				cachedProductBoxes.put(box.getBoxID(), box);
+			}
+
+			foundProducts.add(new ProductBoxSearchResultRow(box));
+		}
+
+		System.out.println("Updating product box search results.");
+		observableProductSearchResults.clear();
+		observableProductSearchResults.addAll(foundProducts);
+
+		// Return the data for unit testing.
+		return foundProducts;
 	}
 
 	/*
@@ -2086,7 +2126,7 @@ public class DatabaseController
 
 		// Update the user list displayed in the UI after adding a new user.
 		if (changed)
-			getPublicUserDataList();
+			getObservableUsers();
 
 		return changed;
 	}
@@ -2111,7 +2151,7 @@ public class DatabaseController
 
 		// Update the user list displayed in the UI if database changed.
 		if (changed)
-			getPublicUserDataList();
+			getObservableUsers();
 
 		return changed;
 	}
@@ -2227,7 +2267,7 @@ public class DatabaseController
 		runQuery(DatabaseQueryType.DELETE, DatabaseTable.REMOVALLIST_PRODUCTBOXES, null, null, null, where);
 
 		// Add all boxes to the database.
-		Iterator<Object> it = removalList.getBoxes().iterator();
+		Iterator<Object> it = removalList.getObservableBoxes().iterator();
 		values.clear();
 		values.put("removallist", listID);
 		values.put("productbox", -1);

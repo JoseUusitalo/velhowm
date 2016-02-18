@@ -20,6 +20,7 @@ public class SearchController
 	public SearchController(final ListController listController)
 	{
 		this.listController = listController;
+		this.searchTabView = new SearchTabView(this);
 	}
 
 	public void productSearch(final String nameField, final Integer productCountField, final Integer popularityField, final Object productBrand,
@@ -64,7 +65,14 @@ public class SearchController
 		}
 		System.out.println(where.toString());
 
-		DatabaseController.productSearch(where);
+		try
+		{
+			DatabaseController.searchProductBox(where);
+		}
+		catch (NoDatabaseLinkException e)
+		{
+			DatabaseController.tryReLink();
+		}
 	}
 
 	public Node getSearchView()
@@ -82,15 +90,15 @@ public class SearchController
 
 	public Node getSearchTabView()
 	{
-		return new SearchTabView(this).getView();
+		return searchTabView.getView();
 	}
 
 	public Node getResultsView()
 	{
-
 		// TODO: Temporarily showing all products
+		// FIXME: Product boxes!
 		System.out.println("Getting search results for removal list.");
-		return listController.getProductListView(DatabaseController.getPublicProductDataColumns(false, false), DatabaseController.getPublicProductDataList());
+		return listController.getProductListView(DatabaseController.getPublicProductDataColumns(false, false), DatabaseController.getObservableProducts());
 
 	}
 }

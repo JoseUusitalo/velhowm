@@ -1,5 +1,8 @@
 package velho.model;
 
+import java.util.LinkedHashSet;
+import java.util.Set;
+
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableSet;
 import velho.controller.DatabaseController;
@@ -7,21 +10,24 @@ import velho.model.exceptions.NoDatabaseLinkException;
 
 public class RemovalList
 {
-	private ObservableSet<Object> boxes;
+	private Set<ProductBox> boxes;
+	private ObservableSet<Object> observableBoxes;
 	private int databaseID;
 	private RemovalListState state;
 
 	public RemovalList()
 	{
 		this.state = new RemovalListState(1, "Active");
-		this.boxes = FXCollections.observableSet();
+		this.boxes = new LinkedHashSet<ProductBox>();
+		this.observableBoxes = FXCollections.observableSet();
 	}
 
 	public RemovalList(final int databaseID, final RemovalListState state)
 	{
 		this.databaseID = databaseID;
 		this.state = state;
-		this.boxes = FXCollections.observableSet();
+		this.boxes = new LinkedHashSet<ProductBox>();
+		this.observableBoxes = FXCollections.observableSet();
 	}
 
 	@Override
@@ -75,9 +81,10 @@ public class RemovalList
 	 *
 	 * @return the {@link ProductBox} objects on this list
 	 */
-	public ObservableSet<Object> getBoxes()
+	public ObservableSet<Object> getObservableBoxes()
 	{
-		return boxes;
+		System.out.println("Getting " + observableBoxes);
+		return observableBoxes;
 	}
 
 	/**
@@ -98,7 +105,16 @@ public class RemovalList
 	 */
 	public boolean addProductBox(final ProductBox productBox)
 	{
-		return boxes.add(productBox);
+		System.out.println("Adding " + productBox);
+		if (boxes.add(productBox))
+		{
+			if (observableBoxes.add(new ProductBoxSearchResultRow(productBox)))
+			{
+				System.out.println("New list is " + observableBoxes);
+				return true;
+			}
+		}
+		return false;
 	}
 
 	/**
@@ -109,6 +125,20 @@ public class RemovalList
 	 */
 	public boolean removeProductBox(final ProductBox productBox)
 	{
-		return boxes.remove(productBox);
+		if (boxes.add(productBox))
+		{
+			for (final Object row : observableBoxes)
+			{
+				if (((ProductBoxSearchResultRow) row).getBox().equals(productBox))
+				{
+					if (observableBoxes.remove(row))
+					{
+						System.out.println("New list is " + observableBoxes);
+						return true;
+					}
+				}
+			}
+		}
+		return false;
 	}
 }

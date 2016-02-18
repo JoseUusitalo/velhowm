@@ -76,7 +76,8 @@ public class ListController
 	public Node getProductListSearchView()
 	{
 		ProductListSearch searchView = new ProductListSearch(this);
-		ListView listView = new ListView(null, DatabaseController.getProductSearchDataColumns(), DatabaseController.getProductSearchResultViewList());
+		ListView listView = new ListView(null, DatabaseController.getProductSearchDataColumns(false, false),
+				DatabaseController.getObservableProductSearchResults());
 
 		return searchView.getView(listView.getView());
 	}
@@ -113,7 +114,7 @@ public class ListController
 	{
 		// TODO: Temporarily showing all products
 		System.out.println("Getting search results for removal list.");
-		return getProductListView(DatabaseController.getPublicProductDataColumns(true, false), DatabaseController.getPublicProductDataList());
+		return getProductListView(DatabaseController.getPublicProductDataColumns(true, false), DatabaseController.getObservableProducts());
 	}
 
 	/**
@@ -169,7 +170,7 @@ public class ListController
 		// Search the database for the products.
 		try
 		{
-			DatabaseController.searchProduct_BoxShelfSlots(productID_BoxSize);
+			DatabaseController.searchProductBoxByDataList(productID_BoxSize);
 		}
 		catch (NoDatabaseLinkException e)
 		{
