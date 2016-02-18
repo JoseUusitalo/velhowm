@@ -393,6 +393,11 @@ public class DatabaseController
 								}
 								break;
 
+							case BRANDS:
+								while (result.next())
+									dataSet.add(new ProductBrand(result.getInt("brand_id"), result.getString("name")));
+								break;
+
 							case CATEGORIES:
 								while (result.next())
 									dataSet.add(new ProductCategory(result.getInt("category_id"), result.getString("name"),
@@ -1938,22 +1943,6 @@ public class DatabaseController
 
 	}
 
-	public static ObservableList<Object> getAllProductCategories()
-	{
-		// TODO Auto-generated method stub
-		observableProductCategories.clear();
-		observableProductCategories.addAll(cachedProductCategories.values());
-		return observableProductCategories;
-	}
-
-	public static ObservableList<Object> getAllProductBrands()
-	{
-		// TODO Auto-generated method stub
-		observableProductBrands.clear();
-		observableProductBrands.addAll(cachedProductBrands.values());
-		return observableProductBrands;
-	}
-
 	/*
 	 * -------------------------------- PRIVATE SETTER METHODS --------------------------------
 	 */
@@ -2471,6 +2460,86 @@ public class DatabaseController
 
 		if (!silent)
 			System.out.println("[DatabaseController] Product boxes placed on all removal lists.");
+	}
+
+	/**
+	 * Loads all {@link ProductCategory} objects from the database into the cache.
+	 *
+	 * @return an {@link ObservableList} of all product categories
+	 */
+	public static ObservableList<Object> getAllProductCategories() throws NoDatabaseLinkException
+	{
+		if (MainWindow.PRINT_CACHE_MESSAGES)
+			System.out.println("Caching all Product Categories.");
+
+		final String[] columns = { "*" };
+
+		@SuppressWarnings("unchecked")
+		final Set<ProductCategory> result = (LinkedHashSet<ProductCategory>) (runQuery(DatabaseQueryType.SELECT, DatabaseTable.CATEGORIES, null, columns, null,
+				null));
+
+		if (result.size() == 0)
+			System.out.println("No Product Categories present in the database.");
+
+		final Iterator<ProductCategory> it = result.iterator();
+
+		// Store for reuse.
+		while (it.hasNext())
+		{
+			final ProductCategory p = it.next();
+
+			if (MainWindow.PRINT_CACHE_MESSAGES)
+				System.out.println("Caching: " + p);
+
+			cachedProductCategories.put(p.getDatabaseID(), p);
+		}
+
+		if (MainWindow.PRINT_CACHE_MESSAGES)
+			System.out.println("All Product Categories cached.");
+
+		observableProductCategories.clear();
+		observableProductCategories.addAll(cachedProductCategories.values());
+
+		return observableProductCategories;
+	}
+
+	/**
+	 * Loads all {@link ProductBrand} objects from the database into the cache.
+	 *
+	 * @return an {@link ObservableList} of all product brands
+	 */
+	public static ObservableList<Object> getAllProductBrands() throws NoDatabaseLinkException
+	{
+		if (MainWindow.PRINT_CACHE_MESSAGES)
+			System.out.println("Caching all Product Brands.");
+
+		final String[] columns = { "*" };
+
+		@SuppressWarnings("unchecked")
+		final Set<ProductBrand> result = (LinkedHashSet<ProductBrand>) (runQuery(DatabaseQueryType.SELECT, DatabaseTable.BRANDS, null, columns, null, null));
+
+		if (result.size() == 0)
+			System.out.println("No Product Brands present in the database.");
+
+		final Iterator<ProductBrand> it = result.iterator();
+
+		// Store for reuse.
+		while (it.hasNext())
+		{
+			final ProductBrand p = it.next();
+
+			if (MainWindow.PRINT_CACHE_MESSAGES)
+				System.out.println("Caching: " + p);
+
+			cachedProductBrands.put(p.getDatabaseID(), p);
+		}
+
+		if (MainWindow.PRINT_CACHE_MESSAGES)
+			System.out.println("All Product Brands cached.");
+
+		observableProductBrands.clear();
+		observableProductBrands.addAll(cachedProductBrands.values());
+		return observableProductBrands;
 	}
 
 	/**

@@ -7,6 +7,7 @@ import java.util.List;
 import javafx.scene.Node;
 import velho.model.ProductBrand;
 import velho.model.ProductCategory;
+import velho.model.exceptions.NoDatabaseLinkException;
 import velho.view.SearchTabView;
 import velho.view.SearchView;
 
@@ -21,7 +22,8 @@ public class SearchController
 		this.listController = listController;
 	}
 
-	public void productSearch(final String nameField, final Integer productCountField, final Integer popularityField, final Object productBrand, final Object productCategory, final LocalDate localDate, final LocalDate localDate2)
+	public void productSearch(final String nameField, final Integer productCountField, final Integer popularityField, final Object productBrand,
+			final Object productCategory, final LocalDate localDate, final LocalDate localDate2)
 	{
 		final List<String> where = new ArrayList<String>();
 
@@ -53,12 +55,12 @@ public class SearchController
 
 		if (localDate != null)
 		{
-			//where.add("containers.expiration_date >= " + localDate);
+			// where.add("containers.expiration_date >= " + localDate);
 		}
 
 		if (localDate2 != null)
 		{
-			//where.add("containers.expiration_date <= " + localDate2);
+			// where.add("containers.expiration_date <= " + localDate2);
 		}
 		System.out.println(where.toString());
 
@@ -67,7 +69,15 @@ public class SearchController
 
 	public Node getSearchView()
 	{
-		return new SearchView(this, DatabaseController.getAllProductBrands(), DatabaseController.getAllProductCategories()).getView();
+		try
+		{
+			return new SearchView(this, DatabaseController.getAllProductBrands(), DatabaseController.getAllProductCategories()).getView();
+		}
+		catch (NoDatabaseLinkException e)
+		{
+			DatabaseController.tryReLink();
+			return null;
+		}
 	}
 
 	public Node getSearchTabView()
