@@ -4,10 +4,13 @@ import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.collections.ObservableSet;
 import javafx.scene.Node;
 import velho.model.User;
 import velho.model.exceptions.NoDatabaseLinkException;
+import velho.model.interfaces.UIActionController;
 import velho.view.ListView;
 import velho.view.ProductListSearch;
 
@@ -37,8 +40,8 @@ public class ListController
 	 */
 	public Node getUserListView(final Map<String, String> columnMap, final ObservableList<Object> dataList)
 	{
-		ListView list = new ListView(this, columnMap, dataList);
-		return list.getUserTableView();
+		ListView list = new ListView(userController, columnMap, dataList);
+		return list.getView();
 	}
 
 	/**
@@ -48,10 +51,11 @@ public class ListController
 	 * @param dataMap the {@link ObservableMap} of data to show
 	 * @return a new table view
 	 */
+	@SuppressWarnings("static-method")
 	public Node getProductListView(final Map<String, String> columnMap, final ObservableList<Object> observableList)
 	{
-		ListView list = new ListView(this, columnMap, observableList);
-		return list.getUserTableView();
+		ListView list = new ListView(null, columnMap, observableList);
+		return list.getView();
 	}
 
 	/**
@@ -72,9 +76,44 @@ public class ListController
 	public Node getProductListSearchView()
 	{
 		ProductListSearch searchView = new ProductListSearch(this);
-		ListView listView = new ListView(this, DatabaseController.getProductSearchDataColumns(), DatabaseController.getProductSearchResultViewList());
+		ListView listView = new ListView(null, DatabaseController.getProductSearchDataColumns(), DatabaseController.getProductSearchResultViewList());
 
-		return searchView.getProductListSearch(listView.getUserTableView());
+		return searchView.getView(listView.getView());
+	}
+
+	/**
+	 * Gets a view for displaying tabular data with the specified columns and data.
+	 *
+	 * @param columnMap map of columns and their values
+	 * @param data data to display
+	 * @return a table view of the given data
+	 */
+	public static Node getTableView(final UIActionController parentController, final Map<String, String> columnMap, final ObservableList<Object> data)
+	{
+		ListView listView = new ListView(parentController, columnMap, data);
+		return listView.getView();
+	}
+
+	/**
+	 * Gets a view for displaying tabular data with the specified columns and data.
+	 *
+	 * @param columnMap map of columns and their values
+	 * @param data data to display
+	 * @return a table view of the given data
+	 */
+	public static Node getTableView(final UIActionController parentController, final Map<String, String> columnMap, final ObservableSet<Object> data)
+	{
+		ObservableList<Object> list = FXCollections.observableArrayList(Arrays.asList(data.toArray()));
+
+		ListView listView = new ListView(parentController, columnMap, list);
+		return listView.getView();
+	}
+
+	public Node getProductSearchResultsView()
+	{
+		// TODO: Temporarily showing all products
+		System.out.println("Getting search results for removal list.");
+		return getProductListView(DatabaseController.getPublicProductDataColumns(true, false), DatabaseController.getPublicProductDataList());
 	}
 
 	/**
@@ -83,6 +122,7 @@ public class ListController
 	 * @param products a string of product names or IDs (one per line)
 	 * @return
 	 */
+	@SuppressWarnings("static-method")
 	public Map<Integer, Integer> searchByProductList(final String products)
 	{
 		String[] productStringLines = products.split("\n");
@@ -210,8 +250,23 @@ public class ListController
 			}
 			countName[1] = sb.toString();
 		}
-		System.out.println("GOT++++++++++++" + Arrays.asList(countName));
 
 		return countName;
+	}
+
+	/**
+	 * Performs an add action for the given data depending on the type of the object.
+	 *
+	 * @param object data to process
+	 */
+	@SuppressWarnings("static-method")
+	public void addData(final Object object)
+	{
+		System.out.println("OBJECT FROM ADD BUTTON: " + object);
+	}
+
+	public static void viewAction(final Object object)
+	{
+		System.out.println("VIEWING: " + object);
 	}
 }

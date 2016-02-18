@@ -28,6 +28,7 @@ import velho.controller.DatabaseController;
 import velho.controller.DebugController;
 import velho.controller.ListController;
 import velho.controller.LoginController;
+import velho.controller.RemovalListController;
 import velho.controller.SearchController;
 import velho.controller.UIController;
 import velho.controller.UserController;
@@ -75,7 +76,7 @@ public class MainWindow extends Application
 	 * The {@link DebugController}.
 	 */
 	private static DebugController debugController;
-	
+
 	/**
 	 * The {@link SearchController}.
 	 */
@@ -117,6 +118,11 @@ public class MainWindow extends Application
 	private Stage debugStage;
 
 	/**
+	 * The {@link RemovalListController}.
+	 */
+	private RemovalListController removalListController;
+
+	/**
 	 * The main window constructor.
 	 */
 	public MainWindow()
@@ -130,9 +136,10 @@ public class MainWindow extends Application
 				debugController = new DebugController();
 				userController = new UserController();
 				searchController = new SearchController();
-				
+
 				listController = new ListController(userController);
-				uiController = new UIController(this, listController, userController, searchController);
+				removalListController = new RemovalListController(listController, searchController);
+				uiController = new UIController(this, listController, userController, removalListController, searchController);
 
 				LoginController.setControllers(uiController, debugController);
 			}
@@ -252,7 +259,6 @@ public class MainWindow extends Application
 
 			if (DEBUG_MODE)
 			{
-
 				debugStage = new Stage();
 				debugController.createDebugWindow(debugStage);
 
@@ -268,13 +274,11 @@ public class MainWindow extends Application
 
 			primaryStage.setOnCloseRequest(new EventHandler<WindowEvent>()
 			{
-
 				@Override
 				public void handle(final WindowEvent event)
 				{
 					shutdown(primaryStage);
 				}
-
 			});
 		}
 	}

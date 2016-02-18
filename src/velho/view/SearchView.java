@@ -13,7 +13,10 @@ import javafx.scene.control.Label;
 import javafx.scene.control.Spinner;
 import javafx.scene.control.SpinnerValueFactory;
 import javafx.scene.control.TextField;
+import javafx.scene.layout.Background;
+import javafx.scene.layout.BackgroundFill;
 import javafx.scene.layout.GridPane;
+import javafx.scene.paint.Paint;
 import velho.controller.SearchController;
 
 public class SearchView
@@ -52,6 +55,9 @@ public class SearchView
 			grid.setHgap(10);
 			grid.setAlignment(Pos.CENTER);
 
+			// TODO: Use CSS.
+			grid.setBackground(new Background(new BackgroundFill(Paint.valueOf("EEEEEE"), null, null)));
+
 			final TextField nameField = new TextField();
 			nameField.setPromptText("Product Name or Product ID");
 			grid.add(nameField, 0, 1, 2, 1);
@@ -64,13 +70,13 @@ public class SearchView
 			popularitySpinnerLabel.setAlignment(Pos.CENTER);
 			grid.add(popularitySpinnerLabel, 2, 2, 1, 1);
 
-			final Spinner productCountField = new Spinner();
+			final Spinner<Integer> productCountField = new Spinner<Integer>();
 			productCountField.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(0, 10000));
 			productCountField.setEditable(true);
 			productCountField.setPrefWidth(75.0);
 			grid.add(productCountField, 3, 1, 1, 1);
 
-			final Spinner popularityField = new Spinner();
+			final Spinner<Integer> popularityField = new Spinner<Integer>();
 			popularityField.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(0, 10000));
 			popularityField.setEditable(true);
 			popularityField.setPrefWidth(75.0);
@@ -105,13 +111,15 @@ public class SearchView
 
 			searchButton.setOnAction(new EventHandler<ActionEvent>()
 			{
-				@Override public void handle(final ActionEvent event)
+				@Override
+				public void handle(final ActionEvent event)
 				{
 
 					try
 					{
 						Integer.parseInt(productCountField.getValue().toString());
-					} catch (final NumberFormatException e)
+					}
+					catch (final NumberFormatException e)
 					{
 						// Although badge IDs are stored as string, they are still numbers.
 					}
@@ -119,12 +127,16 @@ public class SearchView
 					try
 					{
 						Integer.parseInt(popularityField.getValue().toString());
-					} catch (final NumberFormatException e)
+					}
+					catch (final NumberFormatException e)
 					{
 						// Although badge IDs are stored as string, they are still numbers.
 					}
-					searchController.productSearch(nameField.getText(), (int) productCountField.getValue(), (int) popularityField.getValue(), brandbox.getValue(), categorybox.getValue(), dpStart.getValue(), dpEnd.getValue());
-					//System.out.println(nameField.getText() + " " + productCountField.getEditor() + " " + popularityField.getEditor() + " " + brandbox.getValue()  + " " + categorybox.getValue() + " " + dpStart.getValue() + " " + dpEnd.getValue());
+					searchController.productSearch(nameField.getText(), productCountField.getValue(), popularityField.getValue(), brandbox.getValue(),
+							categorybox.getValue(), dpStart.getValue(), dpEnd.getValue());
+					// System.out.println(nameField.getText() + " " + productCountField.getEditor() + " " +
+					// popularityField.getEditor() + " " + brandbox.getValue() + " " + categorybox.getValue() + " " +
+					// dpStart.getValue() + " " + dpEnd.getValue());
 				}
 			});
 		}

@@ -34,7 +34,7 @@ public class ProductListSearch
 	 *
 	 * @return a search view for searching multiple products at once
 	 */
-	public BorderPane getProductListSearch(final BorderPane list)
+	public BorderPane getView(final BorderPane list)
 	{
 		if (pane == null)
 		{
