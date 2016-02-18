@@ -122,7 +122,7 @@ public class UserTest
 	@Test
 	public final void testValidation_PinBadge_Both() throws NoDatabaseLinkException
 	{
-		System.out.println("both");
+		System.out.println("testValidation_PinBadge_Both():");
 		System.out.println(User.isValidPIN(VALID_PIN_MIN));
 		System.out.println(User.isValidPIN(VALID_PIN_MAX));
 		System.out.println(User.isValidBadgeID(VALID_BADGE_ID_MAX));

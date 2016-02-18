@@ -1,7 +1,12 @@
 package velho.view;
 
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
+import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.layout.Background;
@@ -12,9 +17,11 @@ import javafx.scene.layout.Priority;
 import javafx.scene.paint.Paint;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
+import velho.controller.DatabaseController;
 import velho.controller.ListController;
 import velho.controller.RemovalListController;
 import velho.controller.SearchController;
+import velho.model.RemovalListState;
 
 /**
  * View for creating new removal lists
@@ -43,11 +50,6 @@ public class RemovalListCreationView
 	 */
 	private SearchController searchController;
 
-	/**
-	 * The grid panel.
-	 */
-	private GridPane grid;
-
 	public RemovalListCreationView(final RemovalListController removalListController, final ListController listController, final SearchController searchController)
 	{
 		this.removalListController = removalListController;
@@ -65,7 +67,6 @@ public class RemovalListCreationView
 
 		if (bpane == null)
 		{
-			final ComboBox<String> removalListState = new ComboBox<String>();
 
 			bpane = new BorderPane();
 			GridPane searchView = (GridPane) searchController.getSearchView();
@@ -83,6 +84,7 @@ public class RemovalListCreationView
 			left.add(resultsLabel, 0, 0);
 
 			BorderPane resultList = removalListController.getSearchResults();
+			resultList.setPadding(new Insets(10, 0, 0, 0));
 			resultList.setPrefWidth(MainWindow.WINDOW_WIDTH / 2);
 			left.add(resultList, 0, 1);
 
@@ -100,11 +102,36 @@ public class RemovalListCreationView
 
 			GridPane.setHgrow(removalListLabel, Priority.ALWAYS);
 
-			BorderPane newList = removalListController.getCurrentRemovalListView();
+			BorderPane newList = (BorderPane) ListController.getTableView(removalListController, DatabaseController.getProductSearchDataColumns(false, true), removalListController.getCurrentRemovalListContents());
+			newList.setPadding(new Insets(10, 0, 0, 0));
 			newList.setPrefWidth(MainWindow.WINDOW_WIDTH / 2);
-			center.add(removalListLabel, 0, 0);
-			center.add(newList, 0, 1, 2, 1);
-			center.add(removalListState, 1, 0);
+			center.add(removalListLabel, 1, 0);
+			center.add(newList, 0, 1, 3, 1);
+
+			final ComboBox<Object> removalListState = new ComboBox<Object>();
+
+			removalListState.getItems().addAll(DatabaseController.getAllRemovalListStates());
+
+			center.add(removalListState, 0, 0);
+
+			removalListState.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<Object>()
+			{
+				@Override public void changed(final ObservableValue<?> observableValue, final Object oldValue, final Object newValue)
+				{
+					removalListController.setNewRemovalListState((RemovalListState) newValue);
+				}
+			});
+
+			Button saveButton = new Button("Save");
+			center.add(saveButton, 2, 0);
+
+			saveButton.setOnAction(new EventHandler<ActionEvent>()
+			{
+				@Override public void handle(final ActionEvent event)
+				{
+					removalListController.saveNewRemovalList();
+				}
+			});
 
 			// Make the list always take up the full vertical space.
 			GridPane.setVgrow(newList, Priority.ALWAYS);

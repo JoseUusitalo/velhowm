@@ -167,9 +167,9 @@ INSERT INTO `products` SET `name`='Lonely Product #11', brand=2, category=4;
 INSERT INTO `products` SET `name`='Lonely Product #12', brand=2, category=4;
 
 /* 1 - Tiny Full Shelf: 1-4*/
-INSERT INTO `containers` SET `product`=9, `max_size`=10, `product_count`=10;
-INSERT INTO `containers` SET `product`=1, `max_size`=10, `product_count`=10;
-INSERT INTO `containers` SET `product`=1, `max_size`=10, `product_count`=10;
+INSERT INTO `containers` SET `product`=9, `max_size`=10, `product_count`=10, `expiration_date`='2016-02-18';
+INSERT INTO `containers` SET `product`=1, `max_size`=10, `product_count`=10, `expiration_date`='2016-10-30';
+INSERT INTO `containers` SET `product`=1, `max_size`=10, `product_count`=10; 
 INSERT INTO `containers` SET `product`=3, `max_size`=10, `product_count`=10;
 INSERT INTO `shelves` SET `max_levels`=1, `max_shelfslots_per_level`=4, `max_productboxes_per_shelfslot`=1;
 INSERT INTO `shelf_productboxes` SET `shelf`=1, `productbox`=1, `shelflevel_index`=0, `shelfslot_index`=0;
@@ -178,11 +178,11 @@ INSERT INTO `shelf_productboxes` SET `shelf`=1, `productbox`=3, `shelflevel_inde
 INSERT INTO `shelf_productboxes` SET `shelf`=1, `productbox`=4, `shelflevel_index`=0, `shelfslot_index`=3;
 
 /* 2 - Slot Full Shelf: 5-9 */
-INSERT INTO `containers` SET `product`=1, `max_size`=50, `product_count`=0;
-INSERT INTO `containers` SET `product`=3, `max_size`=50, `product_count`=5;
-INSERT INTO `containers` SET `product`=6, `max_size`=50, `product_count`=10;
+INSERT INTO `containers` SET `product`=1, `max_size`=50, `product_count`=0; 
+INSERT INTO `containers` SET `product`=3, `max_size`=50, `product_count`=5, `expiration_date`='2005-12-12';
+INSERT INTO `containers` SET `product`=6, `max_size`=50, `product_count`=10, `expiration_date`='2008-01-10';
 INSERT INTO `containers` SET `product`=6, `max_size`=50, `product_count`=25;
-INSERT INTO `containers` SET `product`=1, `max_size`=50, `product_count`=50;
+INSERT INTO `containers` SET `product`=1, `max_size`=50, `product_count`=50, `expiration_date`='2020-05-26';
 INSERT INTO `shelves` SET `max_levels`=2, `max_shelfslots_per_level`=20, `max_productboxes_per_shelfslot`=4;
 INSERT INTO `shelf_productboxes` SET `shelf`=2, `productbox`=5, `shelflevel_index`=0, `shelfslot_index`=0;
 INSERT INTO `shelf_productboxes` SET `shelf`=2, `productbox`=6, `shelflevel_index`=0, `shelfslot_index`=0;
@@ -192,7 +192,7 @@ INSERT INTO `shelf_productboxes` SET `shelf`=2, `productbox`=9, `shelflevel_inde
 
 /* 3 - One Slot Level: 10-13*/
 INSERT INTO `containers` SET `product`=1, `max_size`=20, `product_count`=20;
-INSERT INTO `containers` SET `product`=10, `max_size`=20, `product_count`=20;
+INSERT INTO `containers` SET `product`=10, `max_size`=20, `product_count`=20, `expiration_date`='2015-03-20';
 INSERT INTO `containers` SET `product`=10, `max_size`=30, `product_count`=20;
 INSERT INTO `containers` SET `product`=8, `max_size`=30, `product_count`=20;
 INSERT INTO `shelves` SET `max_levels`=3, `max_shelfslots_per_level`=1, `max_productboxes_per_shelfslot`=49;
@@ -202,12 +202,12 @@ INSERT INTO `shelf_productboxes` SET `shelf`=3, `productbox`=12, `shelflevel_ind
 INSERT INTO `shelf_productboxes` SET `shelf`=3, `productbox`=13, `shelflevel_index`=2, `shelfslot_index`=0;
 
 /* 4 - Many Slot Level: 14-20*/
-INSERT INTO `containers` SET `product`=1, `max_size`=10, `product_count`=5;
+INSERT INTO `containers` SET `product`=1, `max_size`=10, `product_count`=5, `expiration_date`='2030-01-02';
 INSERT INTO `containers` SET `product`=9, `max_size`=10, `product_count`=5;
-INSERT INTO `containers` SET `product`=3, `max_size`=10, `product_count`=5;
+INSERT INTO `containers` SET `product`=3, `max_size`=10, `product_count`=5, `expiration_date`='2012-04-18';
 INSERT INTO `containers` SET `product`=4, `max_size`=10, `product_count`=5;
 INSERT INTO `containers` SET `product`=5, `max_size`=10, `product_count`=5;
-INSERT INTO `containers` SET `product`=6, `max_size`=10, `product_count`=5;
+INSERT INTO `containers` SET `product`=6, `max_size`=10, `product_count`=5, `expiration_date`='2016-05-16';
 INSERT INTO `containers` SET `product`=7, `max_size`=10, `product_count`=5;
 INSERT INTO `shelves` SET `max_levels`=2, `max_shelfslots_per_level`=50, `max_productboxes_per_shelfslot`=1;
 INSERT INTO `shelf_productboxes` SET `shelf`=4, `productbox`=14, `shelflevel_index`=0, `shelfslot_index`=32;
@@ -224,18 +224,18 @@ INSERT INTO `shelves` SET `max_levels`=1, `max_shelfslots_per_level`=2, `max_pro
 /* Lonely Containers 21-23*/
 INSERT INTO `containers` SET `product`=11, `max_size`=2, `product_count`=2;
 INSERT INTO `containers` SET `product`=12, `max_size`=2, `product_count`=2;
-INSERT INTO `containers` SET `product`=1, `max_size`=1, `product_count`=0;
+INSERT INTO `containers` SET `product`=1, `max_size`=1, `product_count`=0, `expiration_date`='2003-11-30';
 
 /* Containers 24-30 */
-INSERT INTO `containers` SET `product`=10, `max_size`=15, `product_count`=10;
-INSERT INTO `containers` SET `product`=5, `max_size`=25, `product_count`=0;
+INSERT INTO `containers` SET `product`=10, `max_size`=15, `product_count`=10, `expiration_date`='2017-06-17';
+INSERT INTO `containers` SET `product`=5, `max_size`=25, `product_count`=0, `expiration_date`='2018-06-20';
 INSERT INTO `containers` SET `product`=3, `max_size`=200, `product_count`=120;
 INSERT INTO `containers` SET `product`=12, `max_size`=200, `product_count`=96;
-INSERT INTO `containers` SET `product`=1, `max_size`=200, `product_count`=2;
-INSERT INTO `containers` SET `product`=1, `max_size`=200, `product_count`=10;
+INSERT INTO `containers` SET `product`=1, `max_size`=200, `product_count`=2, `expiration_date`='2016-08-30';
+INSERT INTO `containers` SET `product`=1, `max_size`=200, `product_count`=10, `expiration_date`='2016-08-11';
 INSERT INTO `containers` SET `product`=4, `max_size`=5, `product_count`=0;
 
-/* Removal Lists */
+/* Removal Lists 1-5 */
 INSERT INTO `removallist_states` SET `name`='Active';
 INSERT INTO `removallist_states` SET `name`='Canceled';
 INSERT INTO `removallist_states` SET `name`='Finished';
@@ -254,3 +254,5 @@ INSERT INTO `removallist_productboxes` SET `removallist`=3, `productbox`=29;
 
 INSERT INTO `removallists` SET `liststate`=3;
 INSERT INTO `removallist_productboxes` SET `removallist`=4, `productbox`=30;
+
+INSERT INTO `removallists` SET `liststate`=2;

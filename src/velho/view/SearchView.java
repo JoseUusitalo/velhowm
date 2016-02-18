@@ -1,8 +1,5 @@
 package velho.view;
 
-import java.util.HashSet;
-import java.util.Set;
-
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
@@ -19,20 +16,9 @@ import javafx.scene.layout.BackgroundFill;
 import javafx.scene.layout.GridPane;
 import javafx.scene.paint.Paint;
 import velho.controller.SearchController;
-import velho.model.ProductBrand;
-import velho.model.ProductCategory;
 
 public class SearchView
-
 {
-	/**
-	 * A set of user role names.
-	 */
-	private Set<ProductBrand> brandnameSet = new HashSet<ProductBrand>();
-	/**
-	 * A set of user role names.
-	 */
-	private Set<ProductCategory> categorynameSet = new HashSet<ProductCategory>();
 	/**
 	 * The root GridPane for this view.
 	 */
@@ -78,18 +64,19 @@ public class SearchView
 			grid.add(popularitySpinnerLabel, 2, 2, 1, 1);
 
 			final Spinner<Integer> productCountField = new Spinner<Integer>();
-			productCountField.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(0, 10000));
+			productCountField.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(-1, 10000));
 			productCountField.setEditable(true);
 			productCountField.setPrefWidth(75.0);
 			grid.add(productCountField, 3, 1, 1, 1);
 
 			final Spinner<Integer> popularityField = new Spinner<Integer>();
-			popularityField.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(0, 10000));
+			popularityField.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(-1, 10000));
 			popularityField.setEditable(true);
 			popularityField.setPrefWidth(75.0);
 			grid.add(popularityField, 3, 2, 1, 1);
 
 			final ComboBox<Object> brandbox = new ComboBox<Object>();
+			brandbox.getItems().add(null);
 			brandbox.setPromptText("Product Brand");
 			brandbox.getItems().addAll(productBrands);
 			brandbox.setMaxWidth(Double.MAX_VALUE);
@@ -97,6 +84,7 @@ public class SearchView
 			grid.add(brandbox, 4, 1, 1, 1);
 
 			final ComboBox<Object> categorybox = new ComboBox<Object>();
+			categorybox.getItems().add(null);
 			categorybox.setPromptText("Product Category");
 			categorybox.getItems().addAll(productCategories);
 			categorybox.getSelectionModel().selectFirst();
@@ -142,7 +130,7 @@ public class SearchView
 					// dpStart.getValue() + " " + dpEnd.getValue());
 				}
 			});
-			//GridPane.setTop(grid);
+			// GridPane.setTop(grid);
 		}
 
 		return grid;

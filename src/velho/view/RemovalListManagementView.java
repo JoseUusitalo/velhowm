@@ -50,6 +50,10 @@ public class RemovalListManagementView
 	 */
 	private Button browseListsButton;
 
+	/**
+	 * @param removalListController
+	 * @param listController
+	 */
 	public RemovalListManagementView(final RemovalListController removalListController, final ListController listController)
 	{
 		this.removalListController = removalListController;

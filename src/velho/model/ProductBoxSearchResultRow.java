@@ -21,6 +21,16 @@ public class ProductBoxSearchResultRow
 	}
 
 	/**
+	 * Gets the {@link ProductBox} object stored in this search result row.
+	 *
+	 * @return the product box in this row
+	 */
+	public ProductBox getBox()
+	{
+		return box;
+	}
+
+	/**
 	 * Gets the number of products in the product box.
 	 *
 	 * @return the number of products in the products box.

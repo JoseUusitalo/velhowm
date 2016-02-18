@@ -22,9 +22,11 @@ public class ExternalSystemsController
 	 * @param productBoxCode
 	 *            the code that the Box posses.
 	 * @param newShelfSlotID
-	 *            the Boxes former shelf id that it modifies.
+	 *            <<<<<<< HEAD the Boxes former shelf id that it modifies.
 	 * @return either a true or false, true when the prosses was compleated.
-	 *         False if not.
+	 *         False if not. ======= the Boxes former shelf id that it modifies.
+	 * @return either a true or false, true when the prosses was compleated.
+	 *         False if not. >>>>>>> refs/heads/removal-list
 	 */
 	public static boolean move(final int productBoxCode, final String newShelfSlotID, final boolean showPopup)
 	{

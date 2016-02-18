@@ -1,26 +1,33 @@
 package velho.model;
 
+import java.util.LinkedHashSet;
+import java.util.Set;
+
 import javafx.collections.FXCollections;
-import javafx.collections.ObservableSet;
+import javafx.collections.ObservableList;
 import velho.controller.DatabaseController;
+import velho.model.exceptions.NoDatabaseLinkException;
 
 public class RemovalList
 {
-	private ObservableSet<Object> boxes;
+	private Set<ProductBox> boxes;
+	private ObservableList<Object> observableBoxes;
 	private int databaseID;
 	private RemovalListState state;
 
 	public RemovalList()
 	{
 		this.state = new RemovalListState(1, "Active");
-		this.boxes = FXCollections.observableSet();
+		this.boxes = new LinkedHashSet<ProductBox>();
+		this.observableBoxes = FXCollections.observableArrayList();
 	}
 
 	public RemovalList(final int databaseID, final RemovalListState state)
 	{
 		this.databaseID = databaseID;
 		this.state = state;
-		this.boxes = FXCollections.observableSet();
+		this.boxes = new LinkedHashSet<ProductBox>();
+		this.observableBoxes = FXCollections.observableArrayList();
 	}
 
 	@Override
@@ -74,9 +81,10 @@ public class RemovalList
 	 *
 	 * @return the {@link ProductBox} objects on this list
 	 */
-	public ObservableSet<Object> getBoxes()
+	public ObservableList<Object> getObservableBoxes()
 	{
-		return boxes;
+		System.out.println("Getting " + observableBoxes);
+		return observableBoxes;
 	}
 
 	/**
@@ -84,7 +92,7 @@ public class RemovalList
 	 *
 	 * @return <code>true</code> if update was successfull
 	 */
-	public boolean updateDatabase()
+	public boolean updateDatabase() throws NoDatabaseLinkException
 	{
 		return DatabaseController.updateRemovalList(this);
 	}
@@ -97,6 +105,40 @@ public class RemovalList
 	 */
 	public boolean addProductBox(final ProductBox productBox)
 	{
-		return boxes.add(productBox);
+		System.out.println("Adding " + productBox);
+		if (boxes.add(productBox))
+		{
+			if (observableBoxes.add(new ProductBoxSearchResultRow(productBox)))
+			{
+				System.out.println("New list is " + observableBoxes);
+				return true;
+			}
+		}
+		return false;
+	}
+
+	/**
+	 * Removes a {@link ProductBox} from this removal list.
+	 *
+	 * @param productBox box to remove from this list
+	 * @return <code>true</code> if the box was present on the list and was removed
+	 */
+	public boolean removeProductBox(final ProductBox productBox)
+	{
+		if (boxes.add(productBox))
+		{
+			for (final Object row : observableBoxes)
+			{
+				if (((ProductBoxSearchResultRow) row).getBox().equals(productBox))
+				{
+					if (observableBoxes.remove(row))
+					{
+						System.out.println("New list is " + observableBoxes);
+						return true;
+					}
+				}
+			}
+		}
+		return false;
 	}
 }

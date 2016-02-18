@@ -26,8 +26,7 @@ public class ProductBox extends ProductContainer
 		}
 	}
 
-	@Override
-	public String toString()
+	@Override public String toString()
 	{
 		return "[" + this.databaseID + "] Box: " + this.product.getName() + " (" + this.productCount + ")";
 	}

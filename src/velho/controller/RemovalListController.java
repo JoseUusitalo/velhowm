@@ -1,12 +1,20 @@
 package velho.controller;
 
+import javafx.collections.ObservableList;
 import javafx.scene.Node;
 import javafx.scene.layout.BorderPane;
+import velho.model.ProductBoxSearchResultRow;
 import velho.model.RemovalList;
+import velho.model.RemovalListState;
 import velho.model.interfaces.UIActionController;
 import velho.view.RemovalListCreationView;
 import velho.view.RemovalListManagementView;
 
+/**
+ * A class for managing {@link RemovalList} objects.
+ *
+ * @author Jose Uusitalo
+ */
 public class RemovalListController implements UIActionController
 {
 	/**
@@ -24,7 +32,12 @@ public class RemovalListController implements UIActionController
 	 */
 	private RemovalList newRemovalList;
 
+	/**
+	 * The {@link SearchController}.
+	 */
 	private SearchController searchController;
+
+	private RemovalListCreationView creationView;
 
 	/**
 	 * @throws NoDatabaseLinkException
@@ -34,6 +47,7 @@ public class RemovalListController implements UIActionController
 		this.listController = listController;
 		this.searchController = searchController;
 		managementView = new RemovalListManagementView(this, this.listController);
+		creationView = new RemovalListCreationView(this, listController, searchController);
 	}
 
 	/**
@@ -57,7 +71,6 @@ public class RemovalListController implements UIActionController
 	private Node getRemovalListCreationView()
 	{
 		managementView.setBrowseListsButtonVisiblity(true);
-		RemovalListCreationView creationView = new RemovalListCreationView(this, listController, searchController);
 		return creationView.getView();
 	}
 
@@ -70,6 +83,8 @@ public class RemovalListController implements UIActionController
 		if (newRemovalList == null)
 			newRemovalList = new RemovalList();
 
+		System.out.println("Removal list is currently: " + newRemovalList.getObservableBoxes());
+
 		managementView.setContent(getRemovalListCreationView());
 	}
 
@@ -80,7 +95,7 @@ public class RemovalListController implements UIActionController
 	{
 		managementView.setBrowseListsButtonVisiblity(false);
 		managementView
-				.setContent(ListController.getTableView(this, DatabaseController.getRemovalListDataColumns(), DatabaseController.getRemovalListsViewList()));
+				.setContent(ListController.getTableView(this, DatabaseController.getRemovalListDataColumns(), DatabaseController.getObservableRemovalLists()));
 	}
 
 	/**
@@ -88,10 +103,9 @@ public class RemovalListController implements UIActionController
 	 *
 	 * @return view for the current removal list being created
 	 */
-	public BorderPane getCurrentRemovalListView()
+	public ObservableList<Object> getCurrentRemovalListContents()
 	{
-		System.out.println("Showing current new removal list.");
-		return (BorderPane) ListController.getTableView(this, DatabaseController.getPublicProductDataColumns(false, true), newRemovalList.getBoxes());
+		return newRemovalList.getObservableBoxes();
 	}
 
 	@Override
@@ -103,31 +117,46 @@ public class RemovalListController implements UIActionController
 	@Override
 	public void updateAction(final Object data)
 	{
-		System.out.println("Controller got from UI: " + data);
+		System.out.println("Controller got from UI: " + ((ProductBoxSearchResultRow) data).getBox());
 	}
 
 	@Override
 	public void removeAction(final Object data)
 	{
-		System.out.println("Controller got from UI: " + data);
+		System.out.println("Removing from new removal list: " + ((ProductBoxSearchResultRow) data).getBox());
+		if (!newRemovalList.removeProductBox(((ProductBoxSearchResultRow) data).getBox()))
+			PopupController.error("Action failed.");
 	}
 
 	@Override
 	public void deleteAction(final Object data)
 	{
-		System.out.println("Controller got from UI: " + data);
+		System.out.println("Controller got from UI delete: " + ((ProductBoxSearchResultRow) data).getBox());
 	}
 
 	@Override
 	public void addAction(final Object data)
 	{
-		System.out.println("Controller got from UI: " + data);
+		System.out.println("Adding to new removal list: " + ((ProductBoxSearchResultRow) data).getBox());
+		if (!newRemovalList.addProductBox(((ProductBoxSearchResultRow) data).getBox()))
+			PopupController.error("Action failed.");
 	}
 
 	public BorderPane getSearchResults()
 	{
-		// FIXME: temporarily showing all products
-		return (BorderPane) ListController.getTableView(this, DatabaseController.getPublicProductDataColumns(true, false),
-				DatabaseController.getPublicProductDataList());
+		System.out.println("Getting search result list: " + DatabaseController.getObservableProductSearchResults());
+		return (BorderPane) ListController.getTableView(this, DatabaseController.getProductSearchDataColumns(true, false),
+				DatabaseController.getObservableProductSearchResults());
+	}
+
+	public void saveNewRemovalList()
+	{
+		System.out.println("Saving List : " + newRemovalList.getObservableBoxes());
+
+	}
+
+	public void setNewRemovalListState(final RemovalListState newState)
+	{
+		System.out.println("New state is : " + newState);
 	}
 }
