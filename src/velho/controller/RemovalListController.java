@@ -40,6 +40,8 @@ public class RemovalListController implements UIActionController
 
 	private RemovalListCreationView creationView;
 
+	private Node browseView;
+
 	/**
 	 * @throws NoDatabaseLinkException
 	 */
@@ -94,9 +96,11 @@ public class RemovalListController implements UIActionController
 	 */
 	public void showBrowseRemovalListsView()
 	{
+		if (browseView == null)
+			ListController.getTableView(this, DatabaseController.getRemovalListDataColumns(), DatabaseController.getObservableRemovalLists());
+
 		managementView.setBrowseListsButtonVisiblity(false);
-		managementView
-				.setContent(ListController.getTableView(this, DatabaseController.getRemovalListDataColumns(), DatabaseController.getObservableRemovalLists()));
+		managementView.setContent(browseView);
 	}
 
 	/**
@@ -132,7 +136,16 @@ public class RemovalListController implements UIActionController
 	@Override
 	public void deleteAction(final Object data)
 	{
-		// System.out.println("Controller got from UI delete: " + ((ProductBoxSearchResultRow) data).getBox());
+		try
+		{
+			System.out.println("Deleting removal list " + ((RemovalList) data).getDatabaseID());
+			if (!DatabaseController.deleteRemovalListByID(((RemovalList) data).getDatabaseID()))
+				PopupController.error("Deleting removal list failed.");
+		}
+		catch (NoDatabaseLinkException e)
+		{
+			DatabaseController.tryReLink();
+		}
 	}
 
 	@Override

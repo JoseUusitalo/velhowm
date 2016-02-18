@@ -89,7 +89,7 @@ public class UserController implements UIActionController
 				if (PopupController.confirmation(
 						"Are you sure you wish the delete your own user account? You will be logged out and be unable to log in again as a result of this action."))
 				{
-					if (DatabaseController.removeUser(user.getDatabaseID()))
+					if (DatabaseController.deleteUser(user.getDatabaseID()))
 					{
 						LoginController.logout();
 						PopupController.info("User removed: " + user.getFullDetails());
@@ -104,7 +104,7 @@ public class UserController implements UIActionController
 				return false;
 			}
 
-			DatabaseController.removeUser(user.getDatabaseID());
+			DatabaseController.deleteUser(user.getDatabaseID());
 			PopupController.info("User removed: " + user.getFullDetails());
 			return true;
 		}

@@ -171,7 +171,7 @@ public class DatabaseControllerTest
 		assertTrue(DatabaseController.getUserByID(5).getFirstName().equals("A very UNIQUE! n4m3"));
 		assertNotEquals(null, DatabaseController.getUserByID(5));
 
-		DatabaseController.removeUser(5);
+		DatabaseController.deleteUser(5);
 		assertEquals(null, DatabaseController.getUserByID(5));
 
 		assertTrue(DatabaseController.initializeDatabase());
@@ -186,15 +186,15 @@ public class DatabaseControllerTest
 	@Test
 	public final void testRemoveUser_Invalid() throws NoDatabaseLinkException
 	{
-		assertFalse(DatabaseController.removeUser(-123));
-		assertFalse(DatabaseController.removeUser(Integer.MAX_VALUE));
+		assertFalse(DatabaseController.deleteUser(-123));
+		assertFalse(DatabaseController.deleteUser(Integer.MAX_VALUE));
 	}
 
 	@Test
 	public final void testRemoveUser() throws NoDatabaseLinkException
 	{
 		DatabaseController.loadData(true);
-		assertTrue(DatabaseController.removeUser(1));
+		assertTrue(DatabaseController.deleteUser(1));
 
 		assertTrue(DatabaseController.initializeDatabase());
 	}

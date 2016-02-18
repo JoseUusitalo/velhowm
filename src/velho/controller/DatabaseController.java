@@ -2154,7 +2154,7 @@ public class DatabaseController
 	 * @return <code>true</code> if user was deleted
 	 * @throws NoDatabaseLinkException
 	 */
-	public static boolean removeUser(final int databaseID) throws NoDatabaseLinkException
+	public static boolean deleteUser(final int databaseID) throws NoDatabaseLinkException
 	{
 		final List<String> where = new ArrayList<String>();
 		where.add("user_id = " + new Integer(databaseID));
@@ -2165,6 +2165,28 @@ public class DatabaseController
 		// Update the user list displayed in the UI if database changed.
 		if (changed)
 			getObservableUsers();
+
+		return changed;
+	}
+
+	public static boolean deleteRemovalListByID(final int databaseID) throws NoDatabaseLinkException
+	{
+		final List<String> where = new ArrayList<String>();
+		where.add("removallist = " + databaseID);
+
+		// First delete the boxes from the list if there are any.
+		runQuery(DatabaseQueryType.DELETE, DatabaseTable.REMOVALLIST_PRODUCTBOXES, null, null, null, where);
+
+		// Then delete the list.
+		where.clear();
+		where.add("removallist_id = " + databaseID);
+
+		@SuppressWarnings("unchecked")
+		final boolean changed = (0 < ((Set<Integer>) (runQuery(DatabaseQueryType.DELETE, DatabaseTable.REMOVALLISTS, null, null, null, where))).size());
+
+		// Update the user list displayed in the UI if database changed.
+		if (changed)
+			getObservableRemovalLists();
 
 		return changed;
 	}
