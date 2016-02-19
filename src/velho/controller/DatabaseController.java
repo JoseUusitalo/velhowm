@@ -2167,7 +2167,7 @@ public class DatabaseController
 	 * @throws NoDatabaseLinkException
 	 * when database link was lost
 	 */
-	public static boolean addUser(final String badgeID, final String pin, final String firstName, final String lastName, final int roleID)
+	public static boolean insertUser(final String badgeID, final String pin, final String firstName, final String lastName, final int roleID)
 			throws NoDatabaseLinkException
 	{
 		final Map<String, Object> values = new LinkedHashMap<String, Object>();

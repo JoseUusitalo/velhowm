@@ -106,7 +106,7 @@ public class AddUserView
 				@Override
 				public void handle(ActionEvent e)
 				{
-					controller.addUser(badgeIDField.getText(), pinField.getText(), userFnameField.getText(), userLNameField.getText(), listbox.getValue());
+					controller.createUser(badgeIDField.getText(), pinField.getText(), userFnameField.getText(), userLNameField.getText(), listbox.getValue());
 				}
 			});
 		}

@@ -166,7 +166,7 @@ public class DatabaseControllerTest
 	public final void testAddUser_RemoveUser() throws NoDatabaseLinkException
 	{
 		// The method does not check for data validity.
-		DatabaseController.addUser("", "000001", "A very UNIQUE! n4m3", "Some text here!", 1);
+		DatabaseController.insertUser("", "000001", "A very UNIQUE! n4m3", "Some text here!", 1);
 
 		assertTrue(DatabaseController.getUserByID(5).getFirstName().equals("A very UNIQUE! n4m3"));
 		assertNotEquals(null, DatabaseController.getUserByID(5));

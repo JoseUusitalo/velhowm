@@ -32,6 +32,37 @@ public class UserController implements UIActionController
 		view = new AddUserView(this, DatabaseController.getUserRoleNames());
 	}
 
+	@Override
+	public void updateAction(final Object data)
+	{
+		System.out.println("Update user: " + data);
+	}
+
+	@Override
+	public void removeAction(final Object data)
+	{
+		System.out.println("Remove user: " + data);
+	}
+
+	@Override
+	public void deleteAction(final Object data)
+	{
+		System.out.println("Delete user: " + data);
+		deleteUser((User) data);
+	}
+
+	@Override
+	public void addAction(final Object data)
+	{
+		System.out.println("Add user: " + data);
+	}
+
+	@Override
+	public void viewAction(final Object data)
+	{
+		System.out.println("View user: " + data);
+	}
+
 	/**
 	 * Attempts to add a new user to the database.
 	 *
@@ -40,7 +71,7 @@ public class UserController implements UIActionController
 	 * @param userLastName user's last name
 	 * @param userRole user's role in the company
 	 */
-	public boolean addUser(final String badgeID, final String userPIN, final String userFirstName, final String userLastName, final String userRoleName)
+	public boolean createUser(final String badgeID, final String userPIN, final String userFirstName, final String userLastName, final String userRoleName)
 	{
 		// Validate user data.
 		try
@@ -49,9 +80,9 @@ public class UserController implements UIActionController
 			{
 				System.out.println(
 						"Badge: " + badgeID + " PIN: " + userPIN + " First Name: " + userFirstName + " Last Name: " + userLastName + " Role: " + userRoleName);
-				int roleID = DatabaseController.getRoleID(userRoleName);
+				final int roleID = DatabaseController.getRoleID(userRoleName);
 
-				if (DatabaseController.addUser(badgeID, userPIN, userFirstName, userLastName, roleID))
+				if (DatabaseController.insertUser(badgeID, userPIN, userFirstName, userLastName, roleID))
 				{
 					PopupController.info("User created.");
 					return true;
@@ -65,7 +96,7 @@ public class UserController implements UIActionController
 
 			PopupController.warning("Invalid user data.");
 		}
-		catch (NoDatabaseLinkException e)
+		catch (final NoDatabaseLinkException e)
 		{
 			DatabaseController.tryReLink();
 		}
@@ -78,9 +109,9 @@ public class UserController implements UIActionController
 	 *
 	 * @param user user to remove
 	 */
-	public boolean removeUser(final User user)
+	public boolean deleteUser(final User user)
 	{
-		System.out.println("Attempting to remove: " + user.toString());
+		System.out.println("Attempting to delete: " + user.toString());
 
 		try
 		{
@@ -92,7 +123,7 @@ public class UserController implements UIActionController
 					if (DatabaseController.deleteUser(user.getDatabaseID()))
 					{
 						LoginController.logout();
-						PopupController.info("User removed: " + user.getFullDetails());
+						PopupController.info("User deleted: " + user.getFullDetails());
 						return true;
 					}
 
@@ -108,7 +139,7 @@ public class UserController implements UIActionController
 			PopupController.info("User removed: " + user.getFullDetails());
 			return true;
 		}
-		catch (NoDatabaseLinkException e)
+		catch (final NoDatabaseLinkException e)
 		{
 			e.printStackTrace();
 		}
@@ -180,33 +211,9 @@ public class UserController implements UIActionController
 		{
 			throw new Exception("Unimplemented.");
 		}
-		catch (Exception e)
+		catch (final Exception e)
 		{
 			e.printStackTrace();
 		}
-	}
-
-	@Override
-	public void updateAction(final Object data)
-	{
-		System.out.println("Controller got from UI: " + data);
-	}
-
-	@Override
-	public void removeAction(final Object data)
-	{
-		System.out.println("Controller got from UI: " + data);
-	}
-
-	@Override
-	public void deleteAction(final Object data)
-	{
-		removeUser((User) data);
-	}
-
-	@Override
-	public void addAction(final Object data)
-	{
-		System.out.println("Controller got from UI: " + data);
 	}
 }
