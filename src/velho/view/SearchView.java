@@ -17,6 +17,10 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.paint.Paint;
 import velho.controller.SearchController;
 
+/**
+ *
+ * @author Joona &amp; Jose Uusitalo
+ */
 public class SearchView
 {
 	/**
@@ -26,10 +30,26 @@ public class SearchView
 	private SearchController searchController;
 	private ObservableList<Object> productCategories;
 	private ObservableList<Object> productBrands;
+	private String limits;
 
 	public SearchView(final SearchController searchController, final ObservableList<Object> productBrands, final ObservableList<Object> productCategories)
 	{
 		this.searchController = searchController;
+		this.productBrands = productBrands;
+		this.productCategories = productCategories;
+	}
+
+	/**
+	 * @param searchController2
+	 * @param limits
+	 * @param allProductBrands
+	 * @param allProductCategories
+	 */
+	public SearchView(final SearchController searchController, final String limits, final ObservableList<Object> productBrands,
+			final ObservableList<Object> productCategories)
+	{
+		this.searchController = searchController;
+		this.limits = limits;
 		this.productBrands = productBrands;
 		this.productCategories = productCategories;
 	}
@@ -106,13 +126,15 @@ public class SearchView
 
 			searchButton.setOnAction(new EventHandler<ActionEvent>()
 			{
-				@Override public void handle(final ActionEvent event)
+				@Override
+				public void handle(final ActionEvent event)
 				{
 
 					try
 					{
 						Integer.parseInt(productCountField.getValue().toString());
-					} catch (final NumberFormatException e)
+					}
+					catch (final NumberFormatException e)
 					{
 						// Although badge IDs are stored as string, they are still numbers.
 					}
@@ -120,11 +142,13 @@ public class SearchView
 					try
 					{
 						Integer.parseInt(popularityField.getValue().toString());
-					} catch (final NumberFormatException e)
+					}
+					catch (final NumberFormatException e)
 					{
 						// Although badge IDs are stored as string, they are still numbers.
 					}
-					searchController.productSearch(nameField.getText(), productCountField.getValue(), popularityField.getValue(), brandbox.getValue(), categorybox.getValue(), dpStart.getValue(), dpEnd.getValue());
+					searchController.productSearch(limits, nameField.getText(), productCountField.getValue(), popularityField.getValue(), brandbox.getValue(),
+							categorybox.getValue(), dpStart.getValue(), dpEnd.getValue());
 					// System.out.println(nameField.getText() + " " + productCountField.getEditor() + " " +
 					// popularityField.getEditor() + " " + brandbox.getValue() + " " + categorybox.getValue() + " " +
 					// dpStart.getValue() + " " + dpEnd.getValue());

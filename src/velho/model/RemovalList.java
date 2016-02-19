@@ -92,7 +92,7 @@ public class RemovalList
 	 *
 	 * @return <code>true</code> if update was successfull
 	 */
-	public boolean updateDatabase() throws NoDatabaseLinkException
+	public boolean saveToDatabase() throws NoDatabaseLinkException
 	{
 		return DatabaseController.updateRemovalList(this);
 	}
@@ -105,14 +105,9 @@ public class RemovalList
 	 */
 	public boolean addProductBox(final ProductBox productBox)
 	{
-		System.out.println("Adding " + productBox);
 		if (boxes.add(productBox))
 		{
-			if (observableBoxes.add(new ProductBoxSearchResultRow(productBox)))
-			{
-				System.out.println("New list is " + observableBoxes);
-				return true;
-			}
+			return observableBoxes.add(new ProductBoxSearchResultRow(productBox));
 		}
 		return false;
 	}
@@ -125,20 +120,26 @@ public class RemovalList
 	 */
 	public boolean removeProductBox(final ProductBox productBox)
 	{
-		if (boxes.add(productBox))
+		if (boxes.remove(productBox))
 		{
 			for (final Object row : observableBoxes)
 			{
 				if (((ProductBoxSearchResultRow) row).getBox().equals(productBox))
 				{
-					if (observableBoxes.remove(row))
-					{
-						System.out.println("New list is " + observableBoxes);
-						return true;
-					}
+					return observableBoxes.remove(row);
 				}
 			}
 		}
 		return false;
+	}
+
+	/**
+	 * Resets this removal lists state to Active and clears all boxes from it.
+	 */
+	public void reset()
+	{
+		state = new RemovalListState(1, "Active");
+		boxes.clear();
+		observableBoxes.clear();
 	}
 }

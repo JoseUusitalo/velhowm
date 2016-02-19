@@ -125,7 +125,7 @@ DROP TABLE IF EXISTS `removallist_productboxes`;
 CREATE TABLE IF NOT EXISTS `removallist_productboxes`
 (
 	`removallist` INT UNSIGNED NOT NULL,
-	`productbox` INT UNSIGNED NOT NULL,
+	`productbox` INT UNSIGNED NOT NULL UNIQUE,
 	
 	FOREIGN KEY (`removallist`) REFERENCES removallists(`removallist_id`),
 	FOREIGN KEY (`productbox`) REFERENCES containers(`container_id`),

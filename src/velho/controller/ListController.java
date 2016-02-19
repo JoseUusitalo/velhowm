@@ -40,7 +40,7 @@ public class ListController
 	 */
 	public Node getUserListView(final Map<String, String> columnMap, final ObservableList<Object> dataList)
 	{
-		ListView list = new ListView(userController, columnMap, dataList);
+		final ListView list = new ListView(userController, columnMap, dataList);
 		return list.getView();
 	}
 
@@ -54,7 +54,7 @@ public class ListController
 	@SuppressWarnings("static-method")
 	public Node getProductListView(final Map<String, String> columnMap, final ObservableList<Object> observableList)
 	{
-		ListView list = new ListView(null, columnMap, observableList);
+		final ListView list = new ListView(null, columnMap, observableList);
 		return list.getView();
 	}
 
@@ -65,7 +65,7 @@ public class ListController
 	 */
 	public void removeUser(final User user)
 	{
-		userController.removeUser(user);
+		userController.deleteUser(user);
 	}
 
 	/**
@@ -75,8 +75,8 @@ public class ListController
 	 */
 	public Node getProductListSearchView()
 	{
-		ProductListSearch searchView = new ProductListSearch(this);
-		ListView listView = new ListView(null, DatabaseController.getProductSearchDataColumns(false, false),
+		final ProductListSearch searchView = new ProductListSearch(this);
+		final ListView listView = new ListView(null, DatabaseController.getProductSearchDataColumns(false, false),
 				DatabaseController.getObservableProductSearchResults());
 
 		return searchView.getView(listView.getView());
@@ -91,7 +91,7 @@ public class ListController
 	 */
 	public static Node getTableView(final UIActionController parentController, final Map<String, String> columnMap, final ObservableList<Object> data)
 	{
-		ListView listView = new ListView(parentController, columnMap, data);
+		final ListView listView = new ListView(parentController, columnMap, data);
 		return listView.getView();
 	}
 
@@ -104,9 +104,9 @@ public class ListController
 	 */
 	public static Node getTableView(final UIActionController parentController, final Map<String, String> columnMap, final ObservableSet<Object> data)
 	{
-		ObservableList<Object> list = FXCollections.observableArrayList(Arrays.asList(data.toArray()));
+		final ObservableList<Object> list = FXCollections.observableArrayList(Arrays.asList(data.toArray()));
 
-		ListView listView = new ListView(parentController, columnMap, list);
+		final ListView listView = new ListView(parentController, columnMap, list);
 		return listView.getView();
 	}
 
@@ -126,8 +126,8 @@ public class ListController
 	@SuppressWarnings("static-method")
 	public Map<Integer, Integer> searchByProductList(final String products)
 	{
-		String[] productStringLines = products.split("\n");
-		Map<Integer, Integer> productID_BoxSize = new LinkedHashMap<Integer, Integer>();
+		final String[] productStringLines = products.split("\n");
+		final Map<Integer, Integer> productID_BoxSize = new LinkedHashMap<Integer, Integer>();
 		Integer productID = -1;
 		Object[] countName = null;
 
@@ -143,13 +143,13 @@ public class ListController
 				{
 					productID = Integer.parseInt((String) countName[1]);
 				}
-				catch (NumberFormatException e)
+				catch (final NumberFormatException e)
 				{
 					try
 					{
 						productID = DatabaseController.getProductIDFromName((String) countName[1]);
 					}
-					catch (NoDatabaseLinkException e1)
+					catch (final NoDatabaseLinkException e1)
 					{
 						DatabaseController.tryReLink();
 					}
@@ -172,7 +172,7 @@ public class ListController
 		{
 			DatabaseController.searchProductBoxByDataList(productID_BoxSize);
 		}
-		catch (NoDatabaseLinkException e)
+		catch (final NoDatabaseLinkException e)
 		{
 			DatabaseController.tryReLink();
 		}
@@ -191,11 +191,11 @@ public class ListController
 	 */
 	public static Object[] parseProductLine(final String line)
 	{
-		Object[] countName = new Object[2];
+		final Object[] countName = new Object[2];
 		countName[0] = 1;
 
 		// Count first, then product string.
-		String[] possibleProductAndCount = line.split(":");
+		final String[] possibleProductAndCount = line.split(":");
 
 		if (possibleProductAndCount.length == 1)
 		{
@@ -211,7 +211,7 @@ public class ListController
 				countName[0] = Integer.valueOf(possibleProductAndCount[0].trim());
 				countName[1] = possibleProductAndCount[1].trim();
 			}
-			catch (NumberFormatException e)
+			catch (final NumberFormatException e)
 			{
 				// Count remains 1.
 				countName[1] = (possibleProductAndCount[0] + ":" + possibleProductAndCount[1]).trim();
@@ -227,14 +227,14 @@ public class ListController
 				countName[0] = Integer.valueOf(possibleProductAndCount[0].trim());
 				start = 1;
 			}
-			catch (NumberFormatException e)
+			catch (final NumberFormatException e)
 			{
 				// Count remains 1.
 			}
 
 			// Rebuild the product string.
-			StringBuffer sb = new StringBuffer();
-			int length = possibleProductAndCount.length;
+			final StringBuffer sb = new StringBuffer();
+			final int length = possibleProductAndCount.length;
 
 			for (int i = start; i < length; i++)
 			{
@@ -264,10 +264,5 @@ public class ListController
 	public void addData(final Object object)
 	{
 		System.out.println("OBJECT FROM ADD BUTTON: " + object);
-	}
-
-	public static void viewAction(final Object object)
-	{
-		System.out.println("VIEWING: " + object);
 	}
 }

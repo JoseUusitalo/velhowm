@@ -71,7 +71,7 @@ public class RemovalListManagementView
 		{
 			bpane = new BorderPane();
 
-			GridPane managementPanel = new GridPane();
+			final GridPane managementPanel = new GridPane();
 			// TODO: Use CSS.
 			managementPanel.setBackground(new Background(new BackgroundFill(Paint.valueOf("EEEEEE"), null, null)));
 			managementPanel.setPadding(new Insets(10));
@@ -80,7 +80,7 @@ public class RemovalListManagementView
 			browseListsButton.setAlignment(Pos.CENTER_LEFT);
 			managementPanel.add(browseListsButton, 0, 0);
 
-			Label removalListManagementLabel = new Label("Removal List Management");
+			final Label removalListManagementLabel = new Label("Removal List Management");
 			removalListManagementLabel.setFont(Font.font("Tahoma", FontWeight.NORMAL, 20));
 			removalListManagementLabel.setPadding(new Insets(10));
 			removalListManagementLabel.setAlignment(Pos.CENTER);
@@ -116,11 +116,22 @@ public class RemovalListManagementView
 		return bpane;
 	}
 
+	/**
+	 * Sets the view below the management pane.
+	 */
 	public void setContent(final Node view)
 	{
 		bpane.setCenter(view);
 	}
 
+	/**
+	 * Gets the view below the management pane.
+	 */
+	public Node getContent()
+	{
+		return bpane.getCenter();
+	}
+	
 	/**
 	 * Destroys the view.
 	 */

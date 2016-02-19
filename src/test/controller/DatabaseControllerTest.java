@@ -57,7 +57,7 @@ public class DatabaseControllerTest
 			DatabaseController.unlink();
 			assertFalse(DatabaseController.isLinked());
 		}
-		catch (NoDatabaseLinkException e)
+		catch (final NoDatabaseLinkException e)
 		{
 			fail(e.toString());
 		}
@@ -66,13 +66,13 @@ public class DatabaseControllerTest
 		{
 			assertFalse(DatabaseController.initializeDatabase());
 		}
-		catch (NoDatabaseLinkException e)
+		catch (final NoDatabaseLinkException e)
 		{
 			try
 			{
 				connectAndInitializeDatabase();
 			}
-			catch (NoDatabaseLinkException e1)
+			catch (final NoDatabaseLinkException e1)
 			{
 				fail(e1.toString());
 			}
@@ -88,7 +88,7 @@ public class DatabaseControllerTest
 	@Test
 	public final void testGetUserRoleNames() throws NoDatabaseLinkException
 	{
-		Set<String> names = new HashSet<String>(Arrays.asList("Manager", "Logistician", "Administrator"));
+		final Set<String> names = new HashSet<String>(Arrays.asList("Manager", "Logistician", "Administrator"));
 
 		assertTrue(DatabaseController.getUserRoleNames().containsAll(names));
 	}
@@ -96,7 +96,7 @@ public class DatabaseControllerTest
 	@Test
 	public final void testAuthenticate_ValidPin() throws NoDatabaseLinkException
 	{
-		User user = DatabaseController.authenticatePIN("Admin", "Test", "111111");
+		final User user = DatabaseController.authenticatePIN("Admin", "Test", "111111");
 		assertEquals("Admin", user.getFirstName());
 		assertEquals("Test", user.getLastName());
 	}
@@ -122,7 +122,7 @@ public class DatabaseControllerTest
 	@Test
 	public final void testAuthenticate_ValidBadge() throws NoDatabaseLinkException
 	{
-		User user = DatabaseController.authenticateBadgeID("12345678");
+		final User user = DatabaseController.authenticateBadgeID("12345678");
 		assertEquals("Badger", user.getFirstName());
 		assertEquals("Testaccount", user.getLastName());
 	}
@@ -142,7 +142,7 @@ public class DatabaseControllerTest
 	@Test
 	public final void testGetProductCodeList() throws NoDatabaseLinkException
 	{
-		List<Integer> list = DatabaseController.getProductCodeList();
+		final List<Integer> list = DatabaseController.getProductCodeList();
 		assertEquals(12, list.size());
 		assertTrue(list.containsAll(Arrays.asList(1, 2, 3, 4, 5, 6, 7, 8, 9, 10)));
 	}
@@ -166,12 +166,12 @@ public class DatabaseControllerTest
 	public final void testAddUser_RemoveUser() throws NoDatabaseLinkException
 	{
 		// The method does not check for data validity.
-		DatabaseController.addUser("", "000001", "A very UNIQUE! n4m3", "Some text here!", 1);
+		DatabaseController.insertUser("", "000001", "A very UNIQUE! n4m3", "Some text here!", 1);
 
 		assertTrue(DatabaseController.getUserByID(5).getFirstName().equals("A very UNIQUE! n4m3"));
 		assertNotEquals(null, DatabaseController.getUserByID(5));
 
-		DatabaseController.removeUser(5);
+		DatabaseController.deleteUser(5);
 		assertEquals(null, DatabaseController.getUserByID(5));
 
 		assertTrue(DatabaseController.initializeDatabase());
@@ -186,15 +186,15 @@ public class DatabaseControllerTest
 	@Test
 	public final void testRemoveUser_Invalid() throws NoDatabaseLinkException
 	{
-		assertFalse(DatabaseController.removeUser(-123));
-		assertFalse(DatabaseController.removeUser(Integer.MAX_VALUE));
+		assertFalse(DatabaseController.deleteUser(-123));
+		assertFalse(DatabaseController.deleteUser(Integer.MAX_VALUE));
 	}
 
 	@Test
 	public final void testRemoveUser() throws NoDatabaseLinkException
 	{
 		DatabaseController.loadData(true);
-		assertTrue(DatabaseController.removeUser(1));
+		assertTrue(DatabaseController.deleteUser(1));
 
 		assertTrue(DatabaseController.initializeDatabase());
 	}
@@ -321,7 +321,7 @@ public class DatabaseControllerTest
 	}
 
 	@Test
-	public final void testGetRemovalListsViewList()
+	public final void testGetRemovalListsViewList() throws NoDatabaseLinkException
 	{
 		// This test is useless but improves coverage.
 		assertTrue(DatabaseController.getObservableRemovalLists().containsAll(DatabaseController.getCachedRemovalLists().values()));
@@ -340,7 +340,7 @@ public class DatabaseControllerTest
 	@Test
 	public final void testInsertRemovalList() throws NoDatabaseLinkException
 	{
-		RemovalList list = new RemovalList();
+		final RemovalList list = new RemovalList();
 		list.addProductBox(DatabaseController.getProductBoxByID(1));
 
 		assertTrue(DatabaseController.updateRemovalList(list));

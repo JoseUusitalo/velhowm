@@ -39,20 +39,20 @@ public class SearchTabView
 	{
 		if (bPane == null)
 		{
-			VBox top = new VBox();
+			final VBox top = new VBox();
 			top.setBackground(new Background(new BackgroundFill(Paint.valueOf("EEEEEE"), null, null)));
 
 			bPane = new BorderPane();
-			GridPane uus = (GridPane) searchController.getSearchView();
-			uus.setPadding(new Insets(0, 10, 10, 10));
+			final GridPane searchPane = (GridPane) searchController.getSearchView();
+			searchPane.setPadding(new Insets(0, 10, 10, 10));
 
-			HBox buttonsBox = new HBox(10);
+			final HBox buttonsBox = new HBox(10);
 			// TODO: Use CSS.
 			buttonsBox.setBackground(new Background(new BackgroundFill(Paint.valueOf("EEEEEE"), null, null)));
 			buttonsBox.setPadding(new Insets(0, 10, 10, 10));
 
-			Button printButton = new Button("Print");
-			Button sendToScannerButton = new Button("Send to BarcodeScanner ");
+			final Button printButton = new Button("Print");
+			final Button sendToScannerButton = new Button("Send to BarcodeScanner ");
 
 			printButton.setMaxWidth(Double.MAX_VALUE);
 			printButton.setAlignment(Pos.CENTER);
@@ -61,7 +61,8 @@ public class SearchTabView
 
 			printButton.setOnAction(new EventHandler<ActionEvent>()
 			{
-				@Override public void handle(final ActionEvent event)
+				@Override
+				public void handle(final ActionEvent event)
 				{
 					ExternalSystemsController.sendDataToPrinter(DatabaseController.getObservableProductSearchResults());
 				}
@@ -69,7 +70,8 @@ public class SearchTabView
 
 			sendToScannerButton.setOnAction(new EventHandler<ActionEvent>()
 			{
-				@Override public void handle(final ActionEvent event)
+				@Override
+				public void handle(final ActionEvent event)
 				{
 					ExternalSystemsController.sendDataToBarcodeScanner(DatabaseController.getObservableProductSearchResults());
 				}
@@ -77,9 +79,8 @@ public class SearchTabView
 
 			buttonsBox.getChildren().addAll(printButton, sendToScannerButton);
 
-			top.getChildren().addAll(uus, buttonsBox);
+			top.getChildren().addAll(searchPane, buttonsBox);
 
-			bPane.setTop(top);
 			bPane.setCenter(searchController.getResultsView());
 
 		}

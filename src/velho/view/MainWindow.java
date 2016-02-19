@@ -133,6 +133,8 @@ public class MainWindow extends Application
 		{
 			if (DatabaseController.connectAndInitialize())
 			{
+				System.out.println("[MainWindow] Creating all controllers...");
+
 				DatabaseController.loadData(false);
 				debugController = new DebugController();
 				userController = new UserController();
@@ -142,6 +144,8 @@ public class MainWindow extends Application
 				uiController = new UIController(this, listController, userController, removalListController, searchController);
 
 				LoginController.setControllers(uiController, debugController);
+
+				System.out.println("[MainWindow] All controllers created.");
 			}
 			else
 			{
