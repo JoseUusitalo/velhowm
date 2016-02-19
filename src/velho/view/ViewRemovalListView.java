@@ -66,7 +66,7 @@ public class ViewRemovalListView
 			bpane = new BorderPane();
 
 			final GridPane top = new GridPane();
-			top.setPadding(new Insets(0, 10, 10, 10));
+			top.setPadding(new Insets(10, 10, 10, 10));
 			// TODO: Use CSS.
 			top.setBackground(new Background(new BackgroundFill(Paint.valueOf("EEEEEE"), null, null)));
 
