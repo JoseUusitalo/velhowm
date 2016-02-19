@@ -10,6 +10,8 @@ import velho.model.exceptions.NoDatabaseLinkException;
 import velho.model.interfaces.UIActionController;
 import velho.view.RemovalListCreationView;
 import velho.view.RemovalListManagementView;
+import velho.view.RemovalListTabView;
+import velho.view.ViewRemovalListView;
 
 /**
  * A class for managing {@link RemovalList} objects.
@@ -49,6 +51,11 @@ public class RemovalListController implements UIActionController
 	private Node browseView;
 
 	/**
+	 * The view in the tab itself.
+	 */
+	private RemovalListTabView tabView;
+
+	/**
 	 * @param listController
 	 * @param searchController
 	 */
@@ -56,6 +63,61 @@ public class RemovalListController implements UIActionController
 	{
 		this.listController = listController;
 		this.searchController = searchController;
+		tabView = new RemovalListTabView();
+	}
+
+	@Override
+	public void createAction(final Object data)
+	{
+		// System.out.println("Controller got from UI: " + data);
+	}
+
+	@Override
+	public void updateAction(final Object data)
+	{
+		// System.out.println("Controller got from UI update: " + ((ProductBoxSearchResultRow) data).getBox());
+	}
+
+	@Override
+	public void removeAction(final Object data)
+	{
+		System.out.println("Removing from new removal list: " + ((ProductBoxSearchResultRow) data).getBox());
+		if (!newRemovalList.removeProductBox(((ProductBoxSearchResultRow) data).getBox()))
+			PopupController.error("Failed to remove product box from removal list.");
+	}
+
+	@Override
+	public void deleteAction(final Object data)
+	{
+		try
+		{
+			System.out.println("Deleting removal list " + data);
+			if (!DatabaseController.deleteRemovalListByID(((RemovalList) data).getDatabaseID()))
+				PopupController.error("Deleting removal list failed.");
+		}
+		catch (final NoDatabaseLinkException e)
+		{
+			DatabaseController.tryReLink();
+		}
+	}
+
+	@Override
+	public void addAction(final Object data)
+	{
+		System.out.println("Adding to new removal list: " + ((ProductBoxSearchResultRow) data).getBox());
+		if (!newRemovalList.addProductBox(((ProductBoxSearchResultRow) data).getBox()))
+			PopupController.error("That product box is already on the removal list.");
+	}
+
+	@Override
+	public void viewAction(final Object data)
+	{
+		System.out.println("Viewing removal list " + data);
+
+		if (LoginController.userRoleIsGreaterOrEqualTo(new Manager()))
+			managementView.setContent(new ViewRemovalListView((RemovalList) data, this, listController).getView());
+		else
+			tabView.setView(new ViewRemovalListView((RemovalList) data, this, listController).getView());
 	}
 
 	/**
@@ -65,6 +127,9 @@ public class RemovalListController implements UIActionController
 	 */
 	public Node getView()
 	{
+		// Create the view.
+		tabView.getView();
+
 		// Managers and greater see the management view.
 		if (LoginController.userRoleIsGreaterOrEqualTo(new Manager()))
 		{
@@ -75,19 +140,26 @@ public class RemovalListController implements UIActionController
 			if (managementView.getView().getCenter() == null)
 				showBrowseRemovalListsView();
 
-			return managementView.getView();
+			tabView.setView(managementView.getView());
+		}
+		else
+		{
+			// Others see just the browsing view.
+			try
+			{
+				if (browseView == null)
+					browseView = ListController.getTableView(this, DatabaseController.getRemovalListDataColumns(),
+							DatabaseController.getObservableRemovalLists());
+			}
+			catch (final NoDatabaseLinkException e)
+			{
+				DatabaseController.tryReLink();
+			}
+			tabView.setView(browseView);
 		}
 
-		// Others see just the browsing view.
-		try
-		{
-			browseView = ListController.getTableView(this, DatabaseController.getRemovalListDataColumns(), DatabaseController.getObservableRemovalLists());
-		}
-		catch (final NoDatabaseLinkException e)
-		{
-			DatabaseController.tryReLink();
-		}
-		return browseView;
+		// Return it.
+		return tabView.getView();
 	}
 
 	/**
@@ -125,16 +197,18 @@ public class RemovalListController implements UIActionController
 	}
 
 	/**
-	 * Changes the removal list management view to the removal list browsing view.
+	 * Changes the removal list management view to the removal list browsing view for Managers and greater.
+	 * Other see the plain browsing view.
 	 */
 	public void showBrowseRemovalListsView()
 	{
 		try
 		{
-			System.out.println("Creating removal list browsing view.");
-
 			if (browseView == null)
+			{
+				System.out.println("Creating removal list browsing view.");
 				browseView = ListController.getTableView(this, DatabaseController.getRemovalListDataColumns(), DatabaseController.getObservableRemovalLists());
+			}
 
 			System.out.println("Removal list browsing: " + DatabaseController.getObservableRemovalLists());
 		}
@@ -143,51 +217,17 @@ public class RemovalListController implements UIActionController
 			DatabaseController.tryReLink();
 		}
 
-		managementView.setBrowseListsButtonVisiblity(false);
-		managementView.setContent(browseView);
-	}
-
-	@Override
-	public void createAction(final Object data)
-	{
-		System.out.println("Controller got from UI: " + data);
-	}
-
-	@Override
-	public void updateAction(final Object data)
-	{
-		// System.out.println("Controller got from UI update: " + ((ProductBoxSearchResultRow) data).getBox());
-	}
-
-	@Override
-	public void removeAction(final Object data)
-	{
-		System.out.println("Removing from new removal list: " + ((ProductBoxSearchResultRow) data).getBox());
-		if (!newRemovalList.removeProductBox(((ProductBoxSearchResultRow) data).getBox()))
-			PopupController.error("Failed to remove product box from removal list.");
-	}
-
-	@Override
-	public void deleteAction(final Object data)
-	{
-		try
+		// Managers and greater see the management view.
+		if (LoginController.userRoleIsGreaterOrEqualTo(new Manager()))
 		{
-			System.out.println("Deleting removal list " + ((RemovalList) data).getDatabaseID());
-			if (!DatabaseController.deleteRemovalListByID(((RemovalList) data).getDatabaseID()))
-				PopupController.error("Deleting removal list failed.");
+			managementView.setBrowseListsButtonVisiblity(false);
+			managementView.setContent(browseView);
 		}
-		catch (final NoDatabaseLinkException e)
+		else
 		{
-			DatabaseController.tryReLink();
+			// Others see just the browsing view.
+			tabView.setView(browseView);
 		}
-	}
-
-	@Override
-	public void addAction(final Object data)
-	{
-		System.out.println("Adding to new removal list: " + ((ProductBoxSearchResultRow) data).getBox());
-		if (!newRemovalList.addProductBox(((ProductBoxSearchResultRow) data).getBox()))
-			PopupController.error("That product box is already on the removal list.");
 	}
 
 	public BorderPane getSearchResultsListView()
@@ -246,5 +286,21 @@ public class RemovalListController implements UIActionController
 	{
 		System.out.println("New state is : " + newState);
 		newRemovalList.setState(newState);
+	}
+
+	@SuppressWarnings("static-method")
+	public void updateRemovalListState(final RemovalList removalList, final RemovalListState state)
+	{
+		removalList.setState(state);
+
+		try
+		{
+			if (!DatabaseController.updateRemovalList(removalList))
+				PopupController.error("Unable to save removal list state.");
+		}
+		catch (final NoDatabaseLinkException e)
+		{
+			DatabaseController.tryReLink();
+		}
 	}
 }

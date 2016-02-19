@@ -2320,8 +2320,6 @@ public class DatabaseController
 		int listID = removalList.getDatabaseID();
 
 		final Map<String, Object> values = new LinkedHashMap<String, Object>();
-		System.out.println("saving " + removalList.getObservableBoxes());
-		System.out.println("sac " + removalList.getState());
 		values.put("liststate", removalList.getState().getDatabaseID());
 
 		final List<String> where = new ArrayList<String>();
@@ -2332,10 +2330,13 @@ public class DatabaseController
 		if (listID < 1)
 			query = DatabaseQueryType.INSERT;
 		else
+		{
 			query = DatabaseQueryType.UPDATE;
+			where.add("removallist_id = " + listID);
+		}
 
 		// Insert/Update the list itself
-		Set<Integer> result = (LinkedHashSet<Integer>) runQuery(query, DatabaseTable.REMOVALLISTS, null, null, values, null);
+		Set<Integer> result = (LinkedHashSet<Integer>) runQuery(query, DatabaseTable.REMOVALLISTS, null, null, values, where);
 
 		if (result.size() == 0)
 			return false;
@@ -2343,6 +2344,10 @@ public class DatabaseController
 		// Get the inserted removal list database ID.
 		if (listID < 1)
 			listID = result.iterator().next();
+
+		// If the removallist_id was added previously, remove it.
+		if (!where.isEmpty())
+			where.clear();
 
 		// Even if multiple rows were changed, they all have the same ID.
 		where.add("removallist = " + listID);
