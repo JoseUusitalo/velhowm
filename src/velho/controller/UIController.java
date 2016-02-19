@@ -98,7 +98,7 @@ public class UIController
 				mainView.addTab("Add User", userController.getView());
 				//$FALL-THROUGH$
 			case "Logistician":
-				mainView.addTab("Removal Lists", removalListController.getRemovalListManagementView());
+				mainView.addTab("Removal Lists", removalListController.getView());
 				mainView.addTab("User List", getUserListView(currentUserRole));
 				mainView.addTab("Product List", listController.getProductListView(DatabaseController.getPublicProductDataColumns(false, false),
 						DatabaseController.getObservableProducts()));

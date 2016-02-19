@@ -2,6 +2,7 @@ package velho.controller;
 
 import javafx.scene.Node;
 import javafx.scene.layout.BorderPane;
+import velho.model.Manager;
 import velho.model.ProductBoxSearchResultRow;
 import velho.model.RemovalList;
 import velho.model.RemovalListState;
@@ -55,8 +56,6 @@ public class RemovalListController implements UIActionController
 	{
 		this.listController = listController;
 		this.searchController = searchController;
-		managementView = new RemovalListManagementView(this, this.listController);
-		creationView = new RemovalListCreationView(this, this.listController, this.searchController);
 	}
 
 	/**
@@ -64,13 +63,31 @@ public class RemovalListController implements UIActionController
 	 *
 	 * @return the removal list management view
 	 */
-	public Node getRemovalListManagementView()
+	public Node getView()
 	{
-		// Initially the browsing view is shown.
-		if (managementView.getView().getCenter() == null)
-			showBrowseRemovalListsView();
+		// Managers and greater see the management view.
+		if (LoginController.userRoleIsGreaterOrEqualTo(new Manager()))
+		{
+			managementView = new RemovalListManagementView(this, this.listController);
+			creationView = new RemovalListCreationView(this, this.listController, this.searchController);
 
-		return managementView.getView();
+			// Initially the browsing view is shown.
+			if (managementView.getView().getCenter() == null)
+				showBrowseRemovalListsView();
+
+			return managementView.getView();
+		}
+
+		// Others see just the browsing view.
+		try
+		{
+			browseView = ListController.getTableView(this, DatabaseController.getRemovalListDataColumns(), DatabaseController.getObservableRemovalLists());
+		}
+		catch (final NoDatabaseLinkException e)
+		{
+			DatabaseController.tryReLink();
+		}
+		return browseView;
 	}
 
 	/**
@@ -93,9 +110,18 @@ public class RemovalListController implements UIActionController
 		if (newRemovalList == null)
 			newRemovalList = new RemovalList();
 
-		System.out.println("Removal list is currently: " + newRemovalList.getObservableBoxes());
+		if (managementView.getContent().equals(getRemovalListCreationView()))
+		{
+			System.out.println("Resetting new removal list.");
+			newRemovalList.reset();
+		}
+		else
+		{
+			System.out.println("Setting new removal list view.");
+			managementView.setContent(getRemovalListCreationView());
+		}
 
-		managementView.setContent(getRemovalListCreationView());
+		System.out.println("Removal list is currently: " + newRemovalList.getObservableBoxes());
 	}
 
 	/**
