@@ -29,9 +29,9 @@ public class SearchTabView
 		if (bPane == null)
 		{
 			bPane = new BorderPane();
-			GridPane uus = (GridPane) searchController.getSearchView();
-			uus.setPadding(new Insets(0, 10, 10, 10));
-			bPane.setTop(uus);
+			GridPane searchPane = (GridPane) searchController.getSearchView();
+			searchPane.setPadding(new Insets(0, 10, 10, 10));
+			bPane.setTop(searchPane);
 			bPane.setCenter(searchController.getResultsView());
 		}
 		return bPane;
