@@ -238,9 +238,10 @@ public class ListController
 
 			for (int i = start; i < length; i++)
 			{
-				if (start == 1 && i == 1)
+				if (start == i)
 				{
-					// Left trim spaces because the first element was a number.
+					// Left trim spaces from the first element.
+					// This assumes that no product name can begin with a space character.
 					sb.append(possibleProductAndCount[i].replaceAll("^\\s+", ""));
 				}
 				else
