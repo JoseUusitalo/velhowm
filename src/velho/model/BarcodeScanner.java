@@ -1,5 +1,6 @@
 package velho.model;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -15,17 +16,27 @@ import velho.model.exceptions.NoDatabaseLinkException;
 public class BarcodeScanner
 {
 	/**
+	 * Receives the message from ProductListSeacrh
+	 *
+	 * @param received
+	 */
+	public static void deviceBarcode(final Object received)
+	{
+		System.out.println("Barcode Scanner received data ");
+		System.out.println(received.toString());
+	}
+
+	/**
 	 * Generates the product barcodes trought the scanner and sorts them
 	 * randomly.
 	 *
-	 * @param numbers
-	 *            returns an array of random numbers
+	 * @param numbers returns an array of random numbers
 	 * @return returns the total of numbers with maxSize of item/products
 	 */
 	public static int generateProductList(final List<Integer> numbers)
 	{
 
-		int maxSize = (int) (Math.random() * (numbers.size() + 1));
+		final int maxSize = (int) (Math.random() * (numbers.size() + 1));
 
 		for (int i = 0; i < maxSize; i++)
 		{
@@ -41,16 +52,17 @@ public class BarcodeScanner
 	public static int generateProductList()
 	{
 
-		List<Integer> numbers = null;
+		List<Integer> numbers = new ArrayList<Integer>();
 		try
 		{
 			numbers = DatabaseController.getProductCodeList();
 		}
-		catch (NoDatabaseLinkException e)
+		catch (final NoDatabaseLinkException e)
 		{
 			e.printStackTrace();
 		}
-		int maximSize = (int) (Math.random() * (numbers.size() + 1));
+
+		final int maximSize = (int) (Math.random() * (numbers.size() + 1));
 
 		for (int i = 0; i < maximSize; i++)
 		{
@@ -76,26 +88,23 @@ public class BarcodeScanner
 			list = DatabaseController.getProductCodeList();
 			Collections.shuffle(list);
 			shelf = DatabaseController.getRandomShelfSlot();
-		}
-		catch (NoDatabaseLinkException e)
-		{
-			DatabaseController.tryReLink();
-		}
+			System.out.println("random product " + list.get(0));
+			System.out.println("random shelf slot " + shelf);
 
-		System.out.println("random product " + list.get(0));
-		System.out.println("random shelf slot " + shelf);
+			if (ExternalSystemsController.move(list.get(0), shelf, true))
+			{
+				System.out.println("Success");
+				return true;
+			}
 
-		if (ExternalSystemsController.move(list.get(0), shelf, true))
-		{
-			System.out.println("Success");
-			return true;
-		}
-		else
-		{
 			System.out.println("Pint Failed");
 			return false;
 		}
-
+		catch (final NoDatabaseLinkException e)
+		{
+			DatabaseController.tryReLink();
+		}
+		return false;
 	}
 
 }

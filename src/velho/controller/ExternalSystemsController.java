@@ -1,12 +1,58 @@
 package velho.controller;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.List;
+
 import velho.model.BarcodeScanner;
+import velho.model.Printer;
 import velho.model.ProductBox;
+import velho.model.ProductBoxSearchResultRow;
 import velho.model.Shelf;
 import velho.model.exceptions.NoDatabaseLinkException;
 
+/**
+ * @author Edward &amp; Jose Uusitalo
+ */
 public class ExternalSystemsController
 {
+	/**
+	 * Prints received list, if list is empty it prints "List is empty." to the user.
+	 *
+	 * @param data
+	 */
+	@SuppressWarnings("unchecked")
+	public static void sendDataToPrinter(final Object data)
+	{
+		if (data instanceof Collection)
+		{
+			final Collection<Object> dataList = (Collection<Object>) data;
+			Iterator<Object> it = dataList.iterator();
+			if (it.hasNext())
+			{
+
+				if (dataList.iterator().next() instanceof ProductBoxSearchResultRow)
+				{
+					it = dataList.iterator();
+					final List<ProductBox> boxProduct = new ArrayList<ProductBox>();
+					while (it.hasNext())
+					{
+						boxProduct.add(((ProductBoxSearchResultRow) it.next()).getBox());
+					}
+					Printer.print(boxProduct);
+				}
+			}
+			else
+			{
+				PopupController.info("List is empty.");
+			}
+		}
+		else
+		{
+			Printer.print(data);
+		}
+	}
 
 	/**
 	 * Carries out initial order from DebugController to BarcodeScanner
@@ -17,31 +63,74 @@ public class ExternalSystemsController
 	}
 
 	/**
+	 * Sends signal to barcode scanner
+	 *
+	 * @param received
+	 */
+	@SuppressWarnings("unchecked")
+	public static void sendDataToBarcodeScanner(final Object data)
+	{
+
+		if (data instanceof Collection)
+		{
+			final Collection<Object> dataList = (Collection<Object>) data;
+			Iterator<Object> it = dataList.iterator();
+			if (it.hasNext())
+			{
+
+				if (dataList.iterator().next() instanceof ProductBoxSearchResultRow)
+				{
+					it = dataList.iterator();
+					final List<ProductBox> boxProduct = new ArrayList<ProductBox>();
+					while (it.hasNext())
+					{
+						boxProduct.add(((ProductBoxSearchResultRow) it.next()).getBox());
+					}
+					BarcodeScanner.deviceBarcode(boxProduct);
+				}
+			}
+			else
+			{
+				PopupController.info("List is empty.");
+			}
+		}
+		else
+		{
+			BarcodeScanner.deviceBarcode(data);
+		}
+	}
+
+	/**
 	 * Moves the box from the shelf in question.
 	 *
-	 * @param productBoxCode
-	 * the code that the Box posses.
-	 * @param newShelfSlotID
-	 * the Boxes former shelf id that it modifies.
+	 * @param productBoxCode the code that the Box posses.
+	 * @param newShelfSlotID the Boxes former shelf id that it modifies.
 	 * @return either a true or false, true when the prosses was compleated. False if not.
 	 */
 	public static boolean move(final int productBoxCode, final String newShelfSlotID, final boolean showPopup)
 	{
-		String newShelfIDString = (String) Shelf.tokenizeShelfSlotID(newShelfSlotID)[0];
-		int newShelfID = Integer.parseInt(newShelfIDString.substring(1));
+		final String newShelfIDString = (String) Shelf.tokenizeShelfSlotID(newShelfSlotID)[0];
+		final int newShelfID = Integer.parseInt(newShelfIDString.substring(1));
 
 		String oldShelfIDString = null;
 		int oldShelfID = -1;
-		boolean boxWasNotInShelf = false;
 		Shelf oldShelf = null;
 		Shelf newShelf = null;
 		ProductBox boxToMove = null;
+		final boolean success = true;
 
 		try
 		{
+
 			newShelf = DatabaseController.getShelfByID(newShelfID, true);
 			boxToMove = DatabaseController.getProductBoxByID(productBoxCode);
+
 			if (boxToMove == null)
+			{
+				return false;
+			}
+
+			if (newShelf == null)
 			{
 				return false;
 			}
@@ -50,19 +139,26 @@ public class ExternalSystemsController
 			oldShelfID = Integer.parseInt(oldShelfIDString.substring(1));
 			oldShelf = DatabaseController.getShelfByID(oldShelfID, true);
 
-			oldShelf.removeFromSlot(boxToMove);
-			if (newShelf == null)
+			if (oldShelf == null)
 			{
 				return false;
 			}
-			newShelf.addToSlot(newShelfSlotID, boxToMove);
+
+			if (oldShelf.removeFromSlot(boxToMove) == false)
+			{
+				return false;
+			}
+			if (newShelf.addToSlot(newShelfSlotID, boxToMove) == false)
+			{
+				return false;
+			}
+
 		}
-		catch (NoDatabaseLinkException e)
+		catch (final NoDatabaseLinkException e)
 		{
 			DatabaseController.tryReLink();
-		}
 
-		boolean success = true;
+		}
 		if (showPopup)
 			DebugController.moveResult(productBoxCode, newShelfSlotID, success);
 

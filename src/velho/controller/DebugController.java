@@ -31,7 +31,7 @@ public class DebugController
 	 * Creates and shows the debug window.
 	 *
 	 * @param stage
-	 *            the stage to run the window in
+	 * the stage to run the window in
 	 */
 	public void createDebugWindow(final Stage stage)
 	{
@@ -51,7 +51,7 @@ public class DebugController
 			view.setLogInButton(false);
 			view.setLogOutButton(true);
 		}
-		catch (NoDatabaseLinkException e)
+		catch (final NoDatabaseLinkException e)
 		{
 			PopupController.error("Login failed, no database connection.");
 			e.printStackTrace();
@@ -74,7 +74,7 @@ public class DebugController
 	 * The parameter for LogInButton is either false or true.
 	 *
 	 * @param visibility
-	 *            show log in button?
+	 * show log in button?
 	 */
 	public void setLogInButton(final boolean visibility)
 	{
@@ -85,7 +85,7 @@ public class DebugController
 	 * The parameter for LogInButton is either false or true.
 	 *
 	 * @param visibility
-	 *            show log in button?
+	 * show log in button?
 	 */
 	public void setLogOutButton(final boolean visibility)
 	{
@@ -95,9 +95,9 @@ public class DebugController
 	/**
 	 * Sends the order from DebugWindow to the external systems controller.
 	 */
+	@SuppressWarnings("static-method")
 	public void scannerMoveValid()
 	{
-
 		ExternalSystemsController.scannerMoveValid();
 	}
 
@@ -108,7 +108,7 @@ public class DebugController
 	public static void resultMessage()
 	{
 
-		boolean s = ExternalSystemsController.move(0, null, true);
+		final boolean s = ExternalSystemsController.move(0, null, true);
 		if (s == true)
 		{
 			System.out.println("System registered changes");
@@ -123,11 +123,11 @@ public class DebugController
 	 * moveResult what currently sends the message and informs the DebugWindow of current events.
 	 *
 	 * @param productCode
-	 *            is the code the the product identifies with.
+	 * is the code the the product identifies with.
 	 * @param shelfSlotCode
-	 *            is the code for the Shelf slot where the product resides in.
+	 * is the code for the Shelf slot where the product resides in.
 	 * @param success
-	 *            is actually a true that prints a message to the DebugWindow.
+	 * is actually a true that prints a message to the DebugWindow.
 	 */
 	public static void moveResult(final int productCode, final String shelfSlotCode, final boolean success)
 	{
@@ -136,9 +136,8 @@ public class DebugController
 			PopupController.info(productCode + " was moved to " + shelfSlotCode + ": " + success);
 			return;
 		}
-		else
-		{
-			PopupController.info(productCode + " was not moved to " + shelfSlotCode + " error: If the product was not moved it either does not exist or the shelf does not exist!");
-		}
+
+		PopupController.info(productCode + " was not moved to " + shelfSlotCode
+				+ " error: If the product was not moved it either does not exist or the shelf does not exist!");
 	}
 }

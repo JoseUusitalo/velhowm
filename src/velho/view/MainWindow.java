@@ -28,6 +28,8 @@ import velho.controller.DatabaseController;
 import velho.controller.DebugController;
 import velho.controller.ListController;
 import velho.controller.LoginController;
+import velho.controller.RemovalListController;
+import velho.controller.SearchController;
 import velho.controller.UIController;
 import velho.controller.UserController;
 import velho.model.exceptions.ExistingDatabaseLinkException;
@@ -46,7 +48,8 @@ public class MainWindow extends Application
 	public static final boolean DEBUG_MODE = false;
 
 	/**
-	 * Enable or disable showing windows. DEBUG_MODE must be <code>true</code> to make this <code>false</code>.
+	 * Enable or disable showing windows. DEBUG_MODE must be <code>true</code>
+	 * to make this <code>false</code>.
 	 */
 	public static final boolean SHOW_WINDOWS = true;
 
@@ -63,7 +66,7 @@ public class MainWindow extends Application
 	/**
 	 * The height of the window.
 	 */
-	public static final double WINDOW_HEIGHT = 720;
+	public static final double WINDOW_HEIGHT = 640;
 
 	/**
 	 * The width of the window.
@@ -74,6 +77,11 @@ public class MainWindow extends Application
 	 * The {@link DebugController}.
 	 */
 	private static DebugController debugController;
+
+	/**
+	 * The {@link SearchController}.
+	 */
+	private SearchController searchController;
 
 	/**
 	 * The {@link UserController}.
@@ -111,6 +119,11 @@ public class MainWindow extends Application
 	private Stage debugStage;
 
 	/**
+	 * The {@link RemovalListController}.
+	 */
+	private RemovalListController removalListController;
+
+	/**
 	 * The main window constructor.
 	 */
 	public MainWindow()
@@ -120,14 +133,19 @@ public class MainWindow extends Application
 		{
 			if (DatabaseController.connectAndInitialize())
 			{
+				System.out.println("[MainWindow] Creating all controllers...");
+
 				DatabaseController.loadData(false);
 				debugController = new DebugController();
 				userController = new UserController();
-
 				listController = new ListController(userController);
-				uiController = new UIController(this, listController, userController);
+				searchController = new SearchController(listController);
+				removalListController = new RemovalListController(searchController);
+				uiController = new UIController(this, listController, userController, removalListController, searchController);
 
 				LoginController.setControllers(uiController, debugController);
+
+				System.out.println("[MainWindow] All controllers created.");
 			}
 			else
 			{
@@ -154,8 +172,10 @@ public class MainWindow extends Application
 	/**
 	 * Adds a new tab to the main tab panel.
 	 *
-	 * @param tabName name of the tab
-	 * @param view view to show in the tab
+	 * @param tabName
+	 * name of the tab
+	 * @param view
+	 * view to show in the tab
 	 */
 	public void addTab(final String tabName, final Node view)
 	{
@@ -245,7 +265,6 @@ public class MainWindow extends Application
 
 			if (DEBUG_MODE)
 			{
-
 				debugStage = new Stage();
 				debugController.createDebugWindow(debugStage);
 
@@ -261,21 +280,21 @@ public class MainWindow extends Application
 
 			primaryStage.setOnCloseRequest(new EventHandler<WindowEvent>()
 			{
-
 				@Override
 				public void handle(final WindowEvent event)
 				{
 					shutdown(primaryStage);
 				}
-
 			});
 		}
 	}
 
 	/**
-	 * A method called to shut down the software and perform any necessary cleanup.
+	 * A method called to shut down the software and perform any necessary
+	 * cleanup.
 	 *
-	 * @param primaryStage the stage the main window is open in
+	 * @param primaryStage
+	 * the stage the main window is open in
 	 */
 	protected void shutdown(final Stage primaryStage)
 	{
@@ -301,7 +320,8 @@ public class MainWindow extends Application
 	/**
 	 * Replaces the top view of the window
 	 *
-	 * @param view view to set the top of the window
+	 * @param view
+	 * view to set the top of the window
 	 */
 	public void setTopView(final Node view)
 	{
@@ -311,7 +331,8 @@ public class MainWindow extends Application
 	/**
 	 * Replaces the right side view of the window
 	 *
-	 * @param view view to set the right of the window
+	 * @param view
+	 * view to set the right of the window
 	 */
 	public void setRightView(final Node view)
 	{
@@ -321,7 +342,8 @@ public class MainWindow extends Application
 	/**
 	 * Replaces the bottom view of the window
 	 *
-	 * @param view view to set the bottom of the window
+	 * @param view
+	 * view to set the bottom of the window
 	 */
 	public void setBottomView(final Node view)
 	{
@@ -331,7 +353,8 @@ public class MainWindow extends Application
 	/**
 	 * Replaces the left side view of the window
 	 *
-	 * @param view view to set the l of the window
+	 * @param view
+	 * view to set the l of the window
 	 */
 	public void setLeftView(final Node view)
 	{
@@ -341,7 +364,8 @@ public class MainWindow extends Application
 	/**
 	 * Replaces the center view of the window
 	 *
-	 * @param view view to set the middle of the window
+	 * @param view
+	 * view to set the middle of the window
 	 */
 	public void setCenterView(final Node view)
 	{

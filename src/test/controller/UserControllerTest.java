@@ -74,10 +74,10 @@ public class UserControllerTest
 	public final void testAddUserValid() throws NoDatabaseLinkException
 	{
 		System.out.println("[UserControllerTest] testAddUserValid()");
-		assertTrue(controller.addUser(VALID_BADGE_ID, null, VALID_NAME, VALID_NAME, VALID_ROLE_NAME));
+		assertTrue(controller.createUser(VALID_BADGE_ID, null, VALID_NAME, VALID_NAME, VALID_ROLE_NAME));
 
 		boolean exists = false;
-		ObservableList<Object> users = DatabaseController.getPublicUserDataList();
+		ObservableList<Object> users = DatabaseController.getObservableUsers();
 		DatabaseController.unlink();
 
 		for (final Object user : users)
@@ -97,10 +97,10 @@ public class UserControllerTest
 	public final void testAddUserInvalid() throws NoDatabaseLinkException
 	{
 		System.out.println("[UserControllerTest] testAddUserInvalid()");
-		assertFalse(controller.addUser(null, VALID_PIN, VALID_NAME, VALID_NAME, INVALID_ROLE_NAME));
+		assertFalse(controller.createUser(null, VALID_PIN, VALID_NAME, VALID_NAME, INVALID_ROLE_NAME));
 
 		boolean exists = false;
-		ObservableList<Object> users = DatabaseController.getPublicUserDataList();
+		ObservableList<Object> users = DatabaseController.getObservableUsers();
 		DatabaseController.unlink();
 
 		for (final Object user : users)

@@ -4,6 +4,7 @@ import javafx.scene.layout.GridPane;
 import velho.model.User;
 import velho.model.enums.Position;
 import velho.model.exceptions.NoDatabaseLinkException;
+import velho.model.interfaces.UserRole;
 import velho.view.LoginView;
 import velho.view.MainWindow;
 
@@ -49,7 +50,7 @@ public class LoginController
 	 * @param uiController the {@link UIController}
 	 * @param debugController the {@link DebugController}
 	 */
-	public static void setControllers(final UIController uiController, DebugController debugController)
+	public static void setControllers(final UIController uiController, final DebugController debugController)
 	{
 		LoginController.uiController = uiController;
 		LoginController.debugController = debugController;
@@ -92,7 +93,7 @@ public class LoginController
 						PopupController.warning("Incorrect Badge ID.");
 					}
 				}
-				catch (NoDatabaseLinkException e)
+				catch (final NoDatabaseLinkException e)
 				{
 					DatabaseController.tryReLink();
 				}
@@ -128,7 +129,7 @@ public class LoginController
 						PopupController.warning("Incorrect PIN or Names.");
 					}
 				}
-				catch (NoDatabaseLinkException e)
+				catch (final NoDatabaseLinkException e)
 				{
 					DatabaseController.tryReLink();
 				}
@@ -198,7 +199,7 @@ public class LoginController
 	{
 		if (view == null)
 			view = new LoginView();
-		return view.getLoginView();
+		return view.getView();
 	}
 
 	/**
@@ -229,5 +230,18 @@ public class LoginController
 	public static User getCurrentUser()
 	{
 		return currentUser;
+	}
+
+	/**
+	 * Checks if the currently logged in user's role is greater than or equal to the given role.
+	 *
+	 * @param role role to check against
+	 * @return <code>true</code> if logged in user's role is greater than or equal to the given role
+	 */
+	public static boolean userRoleIsGreaterOrEqualTo(final UserRole role)
+	{
+		if (isLoggedIn())
+			return currentUser.getRole().compareTo(role) >= 0;
+		return false;
 	}
 }

@@ -59,7 +59,7 @@ public class Shelf
 			// Create new slots.
 			for (int index = 0; index < slotsPerLevel; index++)
 			{
-				ShelfSlot slot = new ShelfSlot(level, index, maxBoxesPerSlot);
+				final ShelfSlot slot = new ShelfSlot(level, index, maxBoxesPerSlot);
 				slots[level][index] = slot;
 			}
 		}
@@ -112,15 +112,15 @@ public class Shelf
 			throw new IllegalArgumentException("Invalid slot ID '" + shelfSlotID + "'.");
 
 		// Remove the S from front so we can parse the values as integers.
-		String[] stringTokens = shelfSlotID.substring(1).split(ShelfSlot.ID_SEPARATOR);
+		final String[] stringTokens = shelfSlotID.substring(1).split(ShelfSlot.ID_SEPARATOR);
 
-		Object[] tokens = new Object[3];
+		final Object[] tokens = new Object[3];
 
 		try
 		{
 			tokens[0] = Shelf.SHELF_IDENTIFIER + Integer.parseInt(stringTokens[0]);
 		}
-		catch (NumberFormatException e)
+		catch (final NumberFormatException e)
 		{
 			throw new IllegalArgumentException("Invalid shelf slot ID '" + shelfSlotID + "'.");
 		}
@@ -129,7 +129,7 @@ public class Shelf
 		{
 			tokens[1] = Integer.parseInt(stringTokens[1]);
 		}
-		catch (NumberFormatException e)
+		catch (final NumberFormatException e)
 		{
 			throw new IllegalArgumentException("Invalid shelf slot ID '" + shelfSlotID + "'.");
 		}
@@ -138,7 +138,7 @@ public class Shelf
 		{
 			tokens[2] = Integer.parseInt(stringTokens[2]);
 		}
-		catch (NumberFormatException e)
+		catch (final NumberFormatException e)
 		{
 			throw new IllegalArgumentException("Invalid shelf slot ID '" + shelfSlotID + "'.");
 		}
@@ -172,15 +172,15 @@ public class Shelf
 			throw new IllegalArgumentException("Invalid shelf slot ID '" + shelfSlotID + "'.");
 
 		// Remove the S from front so we can parse the values as integers.
-		String[] stringTokens = shelfSlotID.substring(1).split(ShelfSlot.ID_SEPARATOR);
+		final String[] stringTokens = shelfSlotID.substring(1).split(ShelfSlot.ID_SEPARATOR);
 
-		int[] tokens = new int[3];
+		final int[] tokens = new int[3];
 
 		try
 		{
 			tokens[0] = Integer.parseInt(stringTokens[0]);
 		}
-		catch (NumberFormatException e)
+		catch (final NumberFormatException e)
 		{
 			throw new IllegalArgumentException("Invalid shelf slot ID '" + shelfSlotID + "'.");
 		}
@@ -189,7 +189,7 @@ public class Shelf
 		{
 			tokens[1] = Integer.parseInt(stringTokens[1]) - 1;
 		}
-		catch (NumberFormatException e)
+		catch (final NumberFormatException e)
 		{
 			throw new IllegalArgumentException("Invalid shelf slot ID '" + shelfSlotID + "'.");
 		}
@@ -198,7 +198,7 @@ public class Shelf
 		{
 			tokens[2] = Integer.parseInt(stringTokens[2]);
 		}
-		catch (NumberFormatException e)
+		catch (final NumberFormatException e)
 		{
 			throw new IllegalArgumentException("Invalid shelf slot ID '" + shelfSlotID + "'.");
 		}
@@ -280,7 +280,7 @@ public class Shelf
 	 */
 	public List<String> getFreeShelfSlots()
 	{
-		List<String> freeSlots = new ArrayList<String>();
+		final List<String> freeSlots = new ArrayList<String>();
 		final int levels = slots.length;
 		final int slotCount = slots[0].length;
 
@@ -369,7 +369,7 @@ public class Shelf
 	 */
 	public Set<ProductBox> getShelfSlotBoxes(final String shelfSlotID) throws IllegalArgumentException
 	{
-		int[] tokens = tokenizeAndValidateShelfSlotID(shelfSlotID);
+		final int[] tokens = tokenizeAndValidateShelfSlotID(shelfSlotID);
 
 		return slots[tokens[1]][tokens[2]].boxes;
 	}
@@ -389,7 +389,7 @@ public class Shelf
 	public boolean addToSlot(final String shelfSlotID, final ProductBox productBox, final boolean updateDatabase)
 			throws IllegalArgumentException, NoDatabaseLinkException
 	{
-		int[] tokens = tokenizeAndValidateShelfSlotID(shelfSlotID);
+		final int[] tokens = tokenizeAndValidateShelfSlotID(shelfSlotID);
 
 		final boolean addedToSlot = slots[tokens[1]][tokens[2]].addBox(productBox);
 		boolean databaseModified = false;
@@ -415,7 +415,7 @@ public class Shelf
 	 */
 	public boolean addToSlot(final String shelfSlotID, final ProductBox productBox) throws IllegalArgumentException, NoDatabaseLinkException
 	{
-		int[] tokens = tokenizeAndValidateShelfSlotID(shelfSlotID);
+		final int[] tokens = tokenizeAndValidateShelfSlotID(shelfSlotID);
 
 		final boolean databaseModified = DatabaseController.addProductBoxToShelfSlot(productBox, shelfSlotID);
 		final boolean addedToSlot = slots[tokens[1]][tokens[2]].addBox(productBox);
@@ -476,6 +476,8 @@ public class Shelf
 
 		final boolean removedFromSlot = slots[tokens[1]][tokens[2]].removeBox(productBox);
 		final boolean databaseModified = DatabaseController.removeProductBoxFromShelfSlot(productBox);
+
+		productBox.setShelfSlot(null);
 
 		return removedFromSlot && databaseModified;
 	}
@@ -584,7 +586,7 @@ public class Shelf
 		 */
 		public int getProductCount()
 		{
-			Iterator<ProductBox> it = boxes.iterator();
+			final Iterator<ProductBox> it = boxes.iterator();
 
 			int sum = 0;
 

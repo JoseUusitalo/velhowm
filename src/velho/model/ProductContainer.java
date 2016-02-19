@@ -54,8 +54,7 @@ public abstract class ProductContainer
 		this.productCount = productCount;
 	}
 
-	@Override
-	public abstract String toString();
+	@Override public abstract String toString();
 
 	/**
 	 * Gets the maximum size of the product box.

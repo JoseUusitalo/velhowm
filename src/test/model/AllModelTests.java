@@ -13,8 +13,7 @@ import org.junit.runners.Suite.SuiteClasses;
  */
 @RunWith(Suite.class)
 // @formatter:off
-@SuiteClasses({ BarcodeScannerTest.class,
-				FreezerTest.class,
+@SuiteClasses({ FreezerTest.class,
 				ProductBoxTest.class,
 				ProductCategoryTest.class,
 				ProductTest.class,

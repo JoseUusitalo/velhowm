@@ -29,14 +29,23 @@ public class UIController
 	private ListController listController;
 
 	/**
-	 * @param mainWindow
-	 * @param listController
+	 * The {@link SearchController}.
 	 */
-	public UIController(final MainWindow mainWindow, final ListController listController, final UserController userController)
+	private SearchController searchController;
+
+	/**
+	 * The {@link RemovalListController}.
+	 */
+	private RemovalListController removalListController;
+
+	public UIController(final MainWindow mainWindow, final ListController listController, final UserController userController,
+			final RemovalListController removalListController, final SearchController searchController)
 	{
-		mainView = mainWindow;
+		this.mainView = mainWindow;
 		this.listController = listController;
 		this.userController = userController;
+		this.removalListController = removalListController;
+		this.searchController = searchController;
 	}
 
 	/**
@@ -89,9 +98,11 @@ public class UIController
 				mainView.addTab("Add User", userController.getView());
 				//$FALL-THROUGH$
 			case "Logistician":
+				mainView.addTab("Removal Lists", removalListController.getView());
 				mainView.addTab("User List", getUserListView(currentUserRole));
-				mainView.addTab("Product List",
-						listController.getProductListView(DatabaseController.getPublicProductDataColumns(), DatabaseController.getPublicProductDataList()));
+				mainView.addTab("Product List", listController.getProductListView(DatabaseController.getPublicProductDataColumns(false, false),
+						DatabaseController.getObservableProducts()));
+				mainView.addTab("Search", searchController.getSearchTabView());
 				mainView.addTab("Product List Search", listController.getProductListSearchView());
 				break;
 			default:
@@ -100,8 +111,8 @@ public class UIController
 	}
 
 	/**
-	 * Creates the user list view.
-	 * The list contents change depending on who is logged in.
+	 * Creates the user list view. The list contents change depending on who is
+	 * logged in.
 	 *
 	 * @param currentUserRole the role of the user who is currently logged in
 	 * @return the user list view
@@ -117,14 +128,14 @@ public class UIController
 			{
 				case "Administrator":
 				case "Manager":
-					return listController.getUserListView(DatabaseController.getPublicUserDataColumns(true), DatabaseController.getPublicUserDataList());
+					return listController.getUserListView(DatabaseController.getPublicUserDataColumns(true), DatabaseController.getObservableUsers());
 				case "Logistician":
-					return listController.getUserListView(DatabaseController.getPublicUserDataColumns(false), DatabaseController.getPublicUserDataList());
+					return listController.getUserListView(DatabaseController.getPublicUserDataColumns(false), DatabaseController.getObservableUsers());
 				default:
 					System.out.println("Unknown user role.");
 			}
 		}
-		catch (NoDatabaseLinkException e)
+		catch (final NoDatabaseLinkException e)
 		{
 			// TODO Auto-generated catch block
 			e.printStackTrace();

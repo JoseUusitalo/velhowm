@@ -4,10 +4,13 @@ import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.collections.ObservableSet;
 import javafx.scene.Node;
 import velho.model.User;
 import velho.model.exceptions.NoDatabaseLinkException;
+import velho.model.interfaces.UIActionController;
 import velho.view.ListView;
 import velho.view.ProductListSearch;
 
@@ -37,8 +40,8 @@ public class ListController
 	 */
 	public Node getUserListView(final Map<String, String> columnMap, final ObservableList<Object> dataList)
 	{
-		ListView list = new ListView(this, columnMap, dataList);
-		return list.getUserTableView();
+		final ListView list = new ListView(userController, columnMap, dataList);
+		return list.getView();
 	}
 
 	/**
@@ -48,10 +51,11 @@ public class ListController
 	 * @param dataMap the {@link ObservableMap} of data to show
 	 * @return a new table view
 	 */
+	@SuppressWarnings("static-method")
 	public Node getProductListView(final Map<String, String> columnMap, final ObservableList<Object> observableList)
 	{
-		ListView list = new ListView(this, columnMap, observableList);
-		return list.getUserTableView();
+		final ListView list = new ListView(null, columnMap, observableList);
+		return list.getView();
 	}
 
 	/**
@@ -61,7 +65,7 @@ public class ListController
 	 */
 	public void removeUser(final User user)
 	{
-		userController.removeUser(user);
+		userController.deleteUser(user);
 	}
 
 	/**
@@ -71,10 +75,46 @@ public class ListController
 	 */
 	public Node getProductListSearchView()
 	{
-		ProductListSearch searchView = new ProductListSearch(this);
-		ListView listView = new ListView(this, DatabaseController.getProductSearchDataColumns(), DatabaseController.getProductSearchResultViewList());
+		final ProductListSearch searchView = new ProductListSearch(this);
+		final ListView listView = new ListView(null, DatabaseController.getProductSearchDataColumns(false, false),
+				DatabaseController.getObservableProductSearchResults());
 
-		return searchView.getProductListSearch(listView.getUserTableView());
+		return searchView.getView(listView.getView());
+	}
+
+	/**
+	 * Gets a view for displaying tabular data with the specified columns and data.
+	 *
+	 * @param columnMap map of columns and their values
+	 * @param data data to display
+	 * @return a table view of the given data
+	 */
+	public static Node getTableView(final UIActionController parentController, final Map<String, String> columnMap, final ObservableList<Object> data)
+	{
+		final ListView listView = new ListView(parentController, columnMap, data);
+		return listView.getView();
+	}
+
+	/**
+	 * Gets a view for displaying tabular data with the specified columns and data.
+	 *
+	 * @param columnMap map of columns and their values
+	 * @param data data to display
+	 * @return a table view of the given data
+	 */
+	public static Node getTableView(final UIActionController parentController, final Map<String, String> columnMap, final ObservableSet<Object> data)
+	{
+		final ObservableList<Object> list = FXCollections.observableArrayList(Arrays.asList(data.toArray()));
+
+		final ListView listView = new ListView(parentController, columnMap, list);
+		return listView.getView();
+	}
+
+	public Node getProductSearchResultsView()
+	{
+		// TODO: Temporarily showing all products
+		System.out.println("Getting search results for removal list.");
+		return getProductListView(DatabaseController.getPublicProductDataColumns(true, false), DatabaseController.getObservableProducts());
 	}
 
 	/**
@@ -83,10 +123,11 @@ public class ListController
 	 * @param products a string of product names or IDs (one per line)
 	 * @return
 	 */
+	@SuppressWarnings("static-method")
 	public Map<Integer, Integer> searchByProductList(final String products)
 	{
-		String[] productStringLines = products.split("\n");
-		Map<Integer, Integer> productID_BoxSize = new LinkedHashMap<Integer, Integer>();
+		final String[] productStringLines = products.split("\n");
+		final Map<Integer, Integer> productID_BoxSize = new LinkedHashMap<Integer, Integer>();
 		Integer productID = -1;
 		Object[] countName = null;
 
@@ -102,13 +143,13 @@ public class ListController
 				{
 					productID = Integer.parseInt((String) countName[1]);
 				}
-				catch (NumberFormatException e)
+				catch (final NumberFormatException e)
 				{
 					try
 					{
 						productID = DatabaseController.getProductIDFromName((String) countName[1]);
 					}
-					catch (NoDatabaseLinkException e1)
+					catch (final NoDatabaseLinkException e1)
 					{
 						DatabaseController.tryReLink();
 					}
@@ -129,9 +170,9 @@ public class ListController
 		// Search the database for the products.
 		try
 		{
-			DatabaseController.searchProduct_BoxShelfSlots(productID_BoxSize);
+			DatabaseController.searchProductBoxByDataList(productID_BoxSize);
 		}
-		catch (NoDatabaseLinkException e)
+		catch (final NoDatabaseLinkException e)
 		{
 			DatabaseController.tryReLink();
 		}
@@ -150,11 +191,11 @@ public class ListController
 	 */
 	public static Object[] parseProductLine(final String line)
 	{
-		Object[] countName = new Object[2];
+		final Object[] countName = new Object[2];
 		countName[0] = 1;
 
 		// Count first, then product string.
-		String[] possibleProductAndCount = line.split(":");
+		final String[] possibleProductAndCount = line.split(":");
 
 		if (possibleProductAndCount.length == 1)
 		{
@@ -170,7 +211,7 @@ public class ListController
 				countName[0] = Integer.valueOf(possibleProductAndCount[0].trim());
 				countName[1] = possibleProductAndCount[1].trim();
 			}
-			catch (NumberFormatException e)
+			catch (final NumberFormatException e)
 			{
 				// Count remains 1.
 				countName[1] = (possibleProductAndCount[0] + ":" + possibleProductAndCount[1]).trim();
@@ -186,20 +227,21 @@ public class ListController
 				countName[0] = Integer.valueOf(possibleProductAndCount[0].trim());
 				start = 1;
 			}
-			catch (NumberFormatException e)
+			catch (final NumberFormatException e)
 			{
 				// Count remains 1.
 			}
 
 			// Rebuild the product string.
-			StringBuffer sb = new StringBuffer();
-			int length = possibleProductAndCount.length;
+			final StringBuffer sb = new StringBuffer();
+			final int length = possibleProductAndCount.length;
 
 			for (int i = start; i < length; i++)
 			{
-				if (start == 1 && i == 1)
+				if (start == i)
 				{
-					// Left trim spaces because the first element was a number.
+					// Left trim spaces from the first element.
+					// This assumes that no product name can begin with a space character.
 					sb.append(possibleProductAndCount[i].replaceAll("^\\s+", ""));
 				}
 				else
@@ -210,8 +252,18 @@ public class ListController
 			}
 			countName[1] = sb.toString();
 		}
-		System.out.println("GOT++++++++++++" + Arrays.asList(countName));
 
 		return countName;
+	}
+
+	/**
+	 * Performs an add action for the given data depending on the type of the object.
+	 *
+	 * @param object data to process
+	 */
+	@SuppressWarnings("static-method")
+	public void addData(final Object object)
+	{
+		System.out.println("OBJECT FROM ADD BUTTON: " + object);
 	}
 }
