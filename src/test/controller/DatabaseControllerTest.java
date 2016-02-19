@@ -6,8 +6,10 @@ import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Set;
@@ -16,7 +18,10 @@ import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import javafx.collections.ObservableList;
 import velho.controller.DatabaseController;
+import velho.model.ProductBox;
+import velho.model.ProductBoxSearchResultRow;
 import velho.model.RemovalList;
 import velho.model.User;
 import velho.model.exceptions.ExistingDatabaseLinkException;
@@ -340,10 +345,21 @@ public class DatabaseControllerTest
 	@Test
 	public final void testInsertRemovalList() throws NoDatabaseLinkException
 	{
+		DatabaseController.clearAllCaches();
+		DatabaseController.loadData(true);
+
 		final RemovalList list = new RemovalList();
-		list.addProductBox(DatabaseController.getProductBoxByID(1));
+		final ProductBox box = DatabaseController.getProductBoxByID(1);
+		list.addProductBox(box);
 
 		assertTrue(DatabaseController.updateRemovalList(list));
-		assertTrue(DatabaseController.getRemovalListByID(6, true).getObservableBoxes().contains(DatabaseController.getProductBoxByID(1)));
+		final ObservableList<Object> obsboxes = DatabaseController.getRemovalListByID(6, true).getObservableBoxes();
+		final List<ProductBox> boxes = new ArrayList<ProductBox>();
+		final Iterator<Object> it = obsboxes.iterator();
+
+		while (it.hasNext())
+			boxes.add(((ProductBoxSearchResultRow) it.next()).getBox());
+
+		assertTrue(boxes.contains(box));
 	}
 }

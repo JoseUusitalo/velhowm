@@ -79,7 +79,7 @@ public class RemovalList
 	/**
 	 * Gets the contents of this removal list.
 	 *
-	 * @return the {@link ProductBox} objects on this list
+	 * @return the {@link ProductBoxSearchResultRow} objects on this list
 	 */
 	public ObservableList<Object> getObservableBoxes()
 	{
