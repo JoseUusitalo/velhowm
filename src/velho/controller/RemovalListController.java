@@ -21,11 +21,6 @@ import velho.view.ViewRemovalListView;
 public class RemovalListController implements UIActionController
 {
 	/**
-	 * The {@link ListController}.
-	 */
-	private ListController listController;
-
-	/**
 	 * The management view.
 	 */
 	private RemovalListManagementView managementView;
@@ -59,9 +54,8 @@ public class RemovalListController implements UIActionController
 	 * @param listController
 	 * @param searchController
 	 */
-	public RemovalListController(final ListController listController, final SearchController searchController)
+	public RemovalListController(final SearchController searchController)
 	{
-		this.listController = listController;
 		this.searchController = searchController;
 		tabView = new RemovalListTabView();
 	}
@@ -115,9 +109,9 @@ public class RemovalListController implements UIActionController
 		System.out.println("Viewing removal list " + data);
 
 		if (LoginController.userRoleIsGreaterOrEqualTo(new Manager()))
-			managementView.setContent(new ViewRemovalListView((RemovalList) data, this, listController).getView());
+			managementView.setContent(new ViewRemovalListView((RemovalList) data, this).getView());
 		else
-			tabView.setView(new ViewRemovalListView((RemovalList) data, this, listController).getView());
+			tabView.setView(new ViewRemovalListView((RemovalList) data, this).getView());
 	}
 
 	/**
@@ -133,8 +127,8 @@ public class RemovalListController implements UIActionController
 		// Managers and greater see the management view.
 		if (LoginController.userRoleIsGreaterOrEqualTo(new Manager()))
 		{
-			managementView = new RemovalListManagementView(this, this.listController);
-			creationView = new RemovalListCreationView(this, this.listController, this.searchController);
+			managementView = new RemovalListManagementView(this);
+			creationView = new RemovalListCreationView(this, this.searchController);
 
 			// Initially the browsing view is shown.
 			if (managementView.getView().getCenter() == null)

@@ -27,6 +27,7 @@ public class SearchController
 		this.searchTabView = new SearchTabView(this);
 	}
 
+	@SuppressWarnings("static-method")
 	public void productSearch(final String limits, final String nameField, final Integer productCountField, final Integer popularityField,
 			final Object productBrand, final Object productCategory, final LocalDate localDate, final LocalDate localDate2)
 	{

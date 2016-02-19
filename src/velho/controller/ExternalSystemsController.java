@@ -19,11 +19,12 @@ public class ExternalSystemsController
 	 *
 	 * @param data
 	 */
+	@SuppressWarnings("unchecked")
 	public static void sendDataToPrinter(final Object data)
 	{
 		if (data instanceof Collection)
 		{
-			Collection<Object> dataList = (Collection<Object>) data;
+			final Collection<Object> dataList = (Collection<Object>) data;
 			Iterator<Object> it = dataList.iterator();
 			if (it.hasNext())
 			{
@@ -31,7 +32,7 @@ public class ExternalSystemsController
 				if (dataList.iterator().next() instanceof ProductBoxSearchResultRow)
 				{
 					it = dataList.iterator();
-					List<ProductBox> boxProduct = new ArrayList<ProductBox>();
+					final List<ProductBox> boxProduct = new ArrayList<ProductBox>();
 					while (it.hasNext())
 					{
 						boxProduct.add(((ProductBoxSearchResultRow) it.next()).getBox());
@@ -63,12 +64,13 @@ public class ExternalSystemsController
 	 *
 	 * @param received
 	 */
+	@SuppressWarnings("unchecked")
 	public static void sendDataToBarcodeScanner(final Object data)
 	{
 
 		if (data instanceof Collection)
 		{
-			Collection<Object> dataList = (Collection<Object>) data;
+			final Collection<Object> dataList = (Collection<Object>) data;
 			Iterator<Object> it = dataList.iterator();
 			if (it.hasNext())
 			{
@@ -76,7 +78,7 @@ public class ExternalSystemsController
 				if (dataList.iterator().next() instanceof ProductBoxSearchResultRow)
 				{
 					it = dataList.iterator();
-					List<ProductBox> boxProduct = new ArrayList<ProductBox>();
+					final List<ProductBox> boxProduct = new ArrayList<ProductBox>();
 					while (it.hasNext())
 					{
 						boxProduct.add(((ProductBoxSearchResultRow) it.next()).getBox());
@@ -99,27 +101,25 @@ public class ExternalSystemsController
 	 * Moves the box from the shelf in question.
 	 *
 	 * @param productBoxCode
-	 *            the code that the Box posses.
+	 * the code that the Box posses.
 	 * @param newShelfSlotID
-	 *            <<<<<<< HEAD the Boxes former shelf id that it modifies.
+	 * <<<<<<< HEAD the Boxes former shelf id that it modifies.
 	 * @return either a true or false, true when the prosses was compleated.
-	 *         False if not. ======= the Boxes former shelf id that it modifies.
+	 * False if not. ======= the Boxes former shelf id that it modifies.
 	 * @return either a true or false, true when the prosses was compleated.
-	 *         False if not. >>>>>>> refs/heads/removal-list
+	 * False if not. >>>>>>> refs/heads/removal-list
 	 */
 	public static boolean move(final int productBoxCode, final String newShelfSlotID, final boolean showPopup)
 	{
-		String newShelfIDString = (String) Shelf.tokenizeShelfSlotID(newShelfSlotID)[0];
-		int newShelfID = Integer.parseInt(newShelfIDString.substring(1));
+		final String newShelfIDString = (String) Shelf.tokenizeShelfSlotID(newShelfSlotID)[0];
+		final int newShelfID = Integer.parseInt(newShelfIDString.substring(1));
 
 		String oldShelfIDString = null;
 		int oldShelfID = -1;
-		boolean boxWasNotInShelf = false;
-		boolean boxSaveOnShelf = true;
 		Shelf oldShelf = null;
 		Shelf newShelf = null;
 		ProductBox boxToMove = null;
-		boolean success = true;
+		final boolean success = true;
 
 		try
 		{
@@ -159,7 +159,8 @@ public class ExternalSystemsController
 				return true;
 			}
 
-		} catch (NoDatabaseLinkException e)
+		}
+		catch (final NoDatabaseLinkException e)
 		{
 			DatabaseController.tryReLink();
 

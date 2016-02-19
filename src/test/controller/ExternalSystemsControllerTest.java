@@ -22,8 +22,6 @@ import velho.model.exceptions.NoDatabaseLinkException;
 @SuppressWarnings("static-method")
 public class ExternalSystemsControllerTest
 {
-
-	private static final String BOXSLOTID = "S1-1-0";
 	private static final String NEWSHELFID = "S2-1-1";
 	private static final int BOXDBID = 1;
 	private static final int BOXDBID2 = 2;
@@ -52,8 +50,8 @@ public class ExternalSystemsControllerTest
 		final int oldShelfID = Integer.parseInt(oldShelfIDString.substring(1));
 		final Shelf oldShelf = DatabaseController.getShelfByID(oldShelfID, true);
 
-		String newShelfIDString = (String) Shelf.tokenizeShelfSlotID(NEWSHELFID)[0];
-		int newShelfID = Integer.parseInt(newShelfIDString.substring(1));
+		final String newShelfIDString = (String) Shelf.tokenizeShelfSlotID(NEWSHELFID)[0];
+		final int newShelfID = Integer.parseInt(newShelfIDString.substring(1));
 		final Shelf newShelf = DatabaseController.getShelfByID(newShelfID, true);
 
 		assertTrue(ExternalSystemsController.move(BOXDBID, NEWSHELFID, false));
@@ -94,8 +92,8 @@ public class ExternalSystemsControllerTest
 		assertTrue(ExternalSystemsController.move(BOXDBID2, NEWSHELFID, false));
 		assertFalse(oldShelf.getShelfSlotBoxes(oldShelfSlot).contains(box));
 
-		String newShelfIDString = (String) Shelf.tokenizeShelfSlotID(NEWSHELFID)[0];
-		int newShelfID = Integer.parseInt(newShelfIDString.substring(1));
+		final String newShelfIDString = (String) Shelf.tokenizeShelfSlotID(NEWSHELFID)[0];
+		final int newShelfID = Integer.parseInt(newShelfIDString.substring(1));
 		final Shelf newShelf = DatabaseController.getShelfByID(newShelfID, false);
 
 		assertFalse(newShelf.getShelfSlotBoxes(NEWSHELFID).contains(box));

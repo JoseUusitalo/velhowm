@@ -36,11 +36,6 @@ public class ViewRemovalListView
 	private BorderPane bpane;
 
 	/**
-	 * The {@link ListController}.
-	 */
-	private ListController listController;
-
-	/**
 	 * The {@link RemovalListController}.
 	 */
 	private RemovalListController removalListController;
@@ -52,11 +47,10 @@ public class ViewRemovalListView
 
 	private RemovalList removalList;
 
-	public ViewRemovalListView(final RemovalList removalList, final RemovalListController removalListController, final ListController listController)
+	public ViewRemovalListView(final RemovalList removalList, final RemovalListController removalListController)
 	{
 		this.removalList = removalList;
 		this.removalListController = removalListController;
-		this.listController = listController;
 	}
 
 	/**

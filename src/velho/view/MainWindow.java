@@ -140,7 +140,7 @@ public class MainWindow extends Application
 				userController = new UserController();
 				listController = new ListController(userController);
 				searchController = new SearchController(listController);
-				removalListController = new RemovalListController(listController, searchController);
+				removalListController = new RemovalListController(searchController);
 				uiController = new UIController(this, listController, userController, removalListController, searchController);
 
 				LoginController.setControllers(uiController, debugController);

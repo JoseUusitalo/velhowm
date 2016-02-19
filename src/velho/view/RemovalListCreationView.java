@@ -18,7 +18,6 @@ import javafx.scene.paint.Paint;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import velho.controller.DatabaseController;
-import velho.controller.ListController;
 import velho.controller.RemovalListController;
 import velho.controller.SearchController;
 import velho.model.RemovalListState;
@@ -34,11 +33,6 @@ public class RemovalListCreationView
 	 * The root BorderPane for this view.
 	 */
 	private BorderPane bpane;
-
-	/**
-	 * The {@link ListController}.
-	 */
-	private ListController listController;
 
 	/**
 	 * The {@link RemovalListController}.
@@ -60,11 +54,9 @@ public class RemovalListCreationView
 	 */
 	private BorderPane resultList;
 
-	public RemovalListCreationView(final RemovalListController removalListController, final ListController listController,
-			final SearchController searchController)
+	public RemovalListCreationView(final RemovalListController removalListController, final SearchController searchController)
 	{
 		this.removalListController = removalListController;
-		this.listController = listController;
 		this.searchController = searchController;
 	}
 

@@ -15,7 +15,6 @@ import javafx.scene.layout.Priority;
 import javafx.scene.paint.Paint;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
-import velho.controller.ListController;
 import velho.controller.RemovalListController;
 
 /**
@@ -29,11 +28,6 @@ public class RemovalListManagementView
 	 * The root BorderPane for this view.
 	 */
 	private BorderPane bpane;
-
-	/**
-	 * The {@link ListController}.
-	 */
-	private ListController listController;
 
 	/**
 	 * The {@link RemovalListController}.
@@ -54,10 +48,9 @@ public class RemovalListManagementView
 	 * @param removalListController
 	 * @param listController
 	 */
-	public RemovalListManagementView(final RemovalListController removalListController, final ListController listController)
+	public RemovalListManagementView(final RemovalListController removalListController)
 	{
 		this.removalListController = removalListController;
-		this.listController = listController;
 	}
 
 	/**
@@ -131,7 +124,7 @@ public class RemovalListManagementView
 	{
 		return bpane.getCenter();
 	}
-	
+
 	/**
 	 * Destroys the view.
 	 */
