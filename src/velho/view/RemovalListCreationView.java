@@ -148,7 +148,6 @@ public class RemovalListCreationView
 			// Make the list always take up the full vertical space.
 			GridPane.setVgrow(newList, Priority.ALWAYS);
 
-			removalListState.getItems().addAll();
 			removalListState.getSelectionModel().selectFirst();
 
 			bpane.setLeft(left);

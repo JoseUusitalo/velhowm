@@ -245,5 +245,6 @@ public class RemovalListController implements UIActionController
 	public void setNewRemovalListState(final RemovalListState newState)
 	{
 		System.out.println("New state is : " + newState);
+		newRemovalList.setState(newState);
 	}
 }
