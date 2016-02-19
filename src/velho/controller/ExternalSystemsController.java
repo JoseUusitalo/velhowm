@@ -12,6 +12,9 @@ import velho.model.ProductBoxSearchResultRow;
 import velho.model.Shelf;
 import velho.model.exceptions.NoDatabaseLinkException;
 
+/**
+ * @author Edward &amp; Jose Uusitalo
+ */
 public class ExternalSystemsController
 {
 	/**
@@ -100,14 +103,9 @@ public class ExternalSystemsController
 	/**
 	 * Moves the box from the shelf in question.
 	 *
-	 * @param productBoxCode
-	 * the code that the Box posses.
-	 * @param newShelfSlotID
-	 * <<<<<<< HEAD the Boxes former shelf id that it modifies.
-	 * @return either a true or false, true when the prosses was compleated.
-	 * False if not. ======= the Boxes former shelf id that it modifies.
-	 * @return either a true or false, true when the prosses was compleated.
-	 * False if not. >>>>>>> refs/heads/removal-list
+	 * @param productBoxCode the code that the Box posses.
+	 * @param newShelfSlotID the Boxes former shelf id that it modifies.
+	 * @return either a true or false, true when the prosses was compleated. False if not.
 	 */
 	public static boolean move(final int productBoxCode, final String newShelfSlotID, final boolean showPopup)
 	{
@@ -137,11 +135,6 @@ public class ExternalSystemsController
 				return false;
 			}
 
-			if (newShelf.addToSlot(newShelfSlotID, boxToMove) == false)
-			{
-				return false;
-			}
-
 			oldShelfIDString = (String) Shelf.tokenizeShelfSlotID(boxToMove.getShelfSlot())[0];
 			oldShelfID = Integer.parseInt(oldShelfIDString.substring(1));
 			oldShelf = DatabaseController.getShelfByID(oldShelfID, true);
@@ -150,13 +143,14 @@ public class ExternalSystemsController
 			{
 				return false;
 			}
-			if (oldShelf.addToSlot(newShelfSlotID, boxToMove) == false)
+
+			if (oldShelf.removeFromSlot(boxToMove) == false)
 			{
 				return false;
 			}
-			if (oldShelf.addToSlot(newShelfSlotID, boxToMove) == true)
+			if (newShelf.addToSlot(newShelfSlotID, boxToMove) == false)
 			{
-				return true;
+				return false;
 			}
 
 		}
