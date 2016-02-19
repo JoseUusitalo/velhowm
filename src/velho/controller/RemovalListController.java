@@ -38,19 +38,26 @@ public class RemovalListController implements UIActionController
 	 */
 	private SearchController searchController;
 
+	/**
+	 * The creation view for removal lists.
+	 */
 	private RemovalListCreationView creationView;
 
+	/**
+	 * The removal list browsing view.
+	 */
 	private Node browseView;
 
 	/**
-	 * @throws NoDatabaseLinkException
+	 * @param listController
+	 * @param searchController
 	 */
 	public RemovalListController(final ListController listController, final SearchController searchController)
 	{
 		this.listController = listController;
 		this.searchController = searchController;
 		managementView = new RemovalListManagementView(this, this.listController);
-		creationView = new RemovalListCreationView(this, listController, searchController);
+		creationView = new RemovalListCreationView(this, this.listController, this.searchController);
 	}
 
 	/**
@@ -63,6 +70,7 @@ public class RemovalListController implements UIActionController
 		// Initially the browsing view is shown.
 		if (managementView.getView().getCenter() == null)
 			showBrowseRemovalListsView();
+
 		return managementView.getView();
 	}
 
@@ -96,8 +104,18 @@ public class RemovalListController implements UIActionController
 	 */
 	public void showBrowseRemovalListsView()
 	{
-		if (browseView == null)
-			ListController.getTableView(this, DatabaseController.getRemovalListDataColumns(), DatabaseController.getObservableRemovalLists());
+
+		try
+		{
+			if (browseView == null)
+				browseView = ListController.getTableView(this, DatabaseController.getRemovalListDataColumns(), DatabaseController.getObservableRemovalLists());
+
+			System.out.println("Removal list browsing: " + DatabaseController.getObservableRemovalLists());
+		}
+		catch (final NoDatabaseLinkException e)
+		{
+			DatabaseController.tryReLink();
+		}
 
 		managementView.setBrowseListsButtonVisiblity(false);
 		managementView.setContent(browseView);
@@ -142,7 +160,7 @@ public class RemovalListController implements UIActionController
 			if (!DatabaseController.deleteRemovalListByID(((RemovalList) data).getDatabaseID()))
 				PopupController.error("Deleting removal list failed.");
 		}
-		catch (NoDatabaseLinkException e)
+		catch (final NoDatabaseLinkException e)
 		{
 			DatabaseController.tryReLink();
 		}
@@ -173,7 +191,7 @@ public class RemovalListController implements UIActionController
 				if (!newRemovalList.saveToDatabase())
 					PopupController.error("Removal list saving failed.");
 			}
-			catch (NoDatabaseLinkException e)
+			catch (final NoDatabaseLinkException e)
 			{
 				DatabaseController.tryReLink();
 			}
