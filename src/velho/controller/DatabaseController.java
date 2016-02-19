@@ -85,7 +85,7 @@ public class DatabaseController
 	 * An observable list of {@link Product} search results for display in the
 	 * user interface.
 	 */
-	private static ObservableList<Object> observableProductSearchResults = FXCollections.observableArrayList();
+	private static ObservableList<Object> observableProductBoxSearchResults = FXCollections.observableArrayList();
 
 	/**
 	 * An observable list of {@link RemovalList} objects for display in the user
@@ -1866,7 +1866,7 @@ public class DatabaseController
 	 */
 	public static ObservableList<Object> getObservableProductSearchResults()
 	{
-		return observableProductSearchResults;
+		return observableProductBoxSearchResults;
 	}
 
 	/**
@@ -1890,16 +1890,20 @@ public class DatabaseController
 		RemovalList list = null;
 
 		cachedRemovalLists.clear();
-		observableRemovalLists.clear();
 
 		while (it.hasNext())
 		{
 			list = it.next();
-			observableRemovalLists.add(list);
 			cachedRemovalLists.put(list.getDatabaseID(), list);
 		}
+		setAllContainersToAllRemovalLists(false);
+
+		observableRemovalLists.clear();
+		observableRemovalLists.addAll(cachedRemovalLists.values());
 
 		System.out.println("Observable & cached list of removal lists updated.");
+		System.out.println(cachedRemovalLists);
+		System.out.println(observableRemovalLists);
 		return observableRemovalLists;
 	}
 
@@ -1984,8 +1988,8 @@ public class DatabaseController
 		foundProducts.removeAll(Collections.singleton(null));
 
 		System.out.println("Updating product box search results.");
-		observableProductSearchResults.clear();
-		observableProductSearchResults.addAll(foundProducts);
+		observableProductBoxSearchResults.clear();
+		observableProductBoxSearchResults.addAll(foundProducts);
 
 		// Return the data for unit testing.
 		return foundProducts;
@@ -2032,8 +2036,8 @@ public class DatabaseController
 		}
 
 		System.out.println("Updating product box search results.");
-		observableProductSearchResults.clear();
-		observableProductSearchResults.addAll(foundProducts);
+		observableProductBoxSearchResults.clear();
+		observableProductBoxSearchResults.addAll(foundProducts);
 
 		// Return the data for unit testing.
 		return foundProducts;
@@ -2561,23 +2565,17 @@ public class DatabaseController
 
 		final String[] columns = { "*" };
 		@SuppressWarnings("unchecked")
-		final Map<Integer, ArrayList<Integer>> removaListBoxes = (HashMap<Integer, ArrayList<Integer>>) runQuery(DatabaseQueryType.SELECT,
+		final Map<Integer, ArrayList<Integer>> removalListBoxes = (HashMap<Integer, ArrayList<Integer>>) runQuery(DatabaseQueryType.SELECT,
 				DatabaseTable.REMOVALLIST_PRODUCTBOXES, null, columns, null, null);
 
-		for (final Integer removalListID : removaListBoxes.keySet())
+		for (final Integer removalListID : removalListBoxes.keySet())
 		{
-			if (cachedRemovalLists.containsKey(removalListID))
-			{
-				final ArrayList<Integer> boxIDs = removaListBoxes.get(removalListID);
+			final ArrayList<Integer> boxIDs = removalListBoxes.get(removalListID);
 
-				for (final Integer id : boxIDs)
-				{
-					if (cachedProductBoxes.containsKey(id))
-					{
-						// Do not update the database as this method loads the data from the database into objects.
-						cachedRemovalLists.get(removalListID).addProductBox(cachedProductBoxes.get(id));
-					}
-				}
+			for (final Integer id : boxIDs)
+			{
+				// Do not update the database as this method loads the data from the database into objects.
+				getRemovalListByID(removalListID, true).addProductBox(getProductBoxByID(id));
 			}
 		}
 
@@ -2699,5 +2697,13 @@ public class DatabaseController
 	public static Map<Integer, RemovalList> getCachedRemovalLists()
 	{
 		return cachedRemovalLists;
+	}
+
+	/**
+	 * Clears the observable list of product box search results.
+	 */
+	public static void clearSearchResults()
+	{
+		observableProductBoxSearchResults.clear();
 	}
 }

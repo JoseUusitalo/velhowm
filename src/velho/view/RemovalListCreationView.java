@@ -50,6 +50,16 @@ public class RemovalListCreationView
 	 */
 	private SearchController searchController;
 
+	/**
+	 * The new removal list view.
+	 */
+	private BorderPane newList;
+
+	/**
+	 * The search results list.
+	 */
+	private BorderPane resultList;
+
 	public RemovalListCreationView(final RemovalListController removalListController, final ListController listController,
 			final SearchController searchController)
 	{
@@ -68,23 +78,22 @@ public class RemovalListCreationView
 
 		if (bpane == null)
 		{
-
 			bpane = new BorderPane();
-			GridPane searchView = (GridPane) searchController.getSearchView("removal-list");
+			final GridPane searchView = (GridPane) searchController.getSearchView("removal-list");
 			searchView.setPadding(new Insets(0, 10, 10, 10));
 			bpane.setTop(searchView);
 
-			GridPane left = new GridPane();
+			final GridPane left = new GridPane();
 			// TODO: Use CSS.
 			left.setBackground(new Background(new BackgroundFill(Paint.valueOf("EEEEEE"), null, null)));
 
-			Label resultsLabel = new Label("Search Results");
+			final Label resultsLabel = new Label("Search Results");
 			resultsLabel.setAlignment(Pos.CENTER);
 			resultsLabel.setMaxWidth(Double.MAX_VALUE);
 			resultsLabel.setFont(Font.font("Tahoma", FontWeight.NORMAL, 20));
 			left.add(resultsLabel, 0, 0);
 
-			BorderPane resultList = removalListController.getSearchResults();
+			resultList = removalListController.getSearchResultsListView();
 			resultList.setPadding(new Insets(10, 0, 0, 0));
 			resultList.setPrefWidth(MainWindow.WINDOW_WIDTH / 2);
 			left.add(resultList, 0, 1);
@@ -92,19 +101,18 @@ public class RemovalListCreationView
 			// Make the list always take up the full vertical space.
 			GridPane.setVgrow(resultList, Priority.ALWAYS);
 
-			GridPane center = new GridPane();
+			final GridPane center = new GridPane();
 			// TODO: Use CSS.
 			center.setBackground(new Background(new BackgroundFill(Paint.valueOf("EEEEEE"), null, null)));
 
-			Label removalListLabel = new Label("New Removal List");
+			final Label removalListLabel = new Label("New Removal List");
 			removalListLabel.setAlignment(Pos.CENTER);
 			removalListLabel.setMaxWidth(Double.MAX_VALUE);
 			removalListLabel.setFont(Font.font("Tahoma", FontWeight.NORMAL, 20));
 
 			GridPane.setHgrow(removalListLabel, Priority.ALWAYS);
 
-			BorderPane newList = (BorderPane) ListController.getTableView(removalListController, DatabaseController.getProductSearchDataColumns(false, true),
-					removalListController.getCurrentRemovalListContents());
+			newList = removalListController.getNewRemovalListView();
 			newList.setPadding(new Insets(10, 0, 0, 0));
 			newList.setPrefWidth(MainWindow.WINDOW_WIDTH / 2);
 			center.add(removalListLabel, 1, 0);
@@ -125,7 +133,7 @@ public class RemovalListCreationView
 				}
 			});
 
-			Button saveButton = new Button("Save");
+			final Button saveButton = new Button("Save");
 			center.add(saveButton, 2, 0);
 
 			saveButton.setOnAction(new EventHandler<ActionEvent>()
@@ -156,5 +164,15 @@ public class RemovalListCreationView
 	public void destroy()
 	{
 		bpane = null;
+	}
+
+	/**
+	 * Gets the search results list and the current new removal list views again.
+	 */
+	public void refresh()
+	{
+		System.out.println("Refreshing removal list creation view.");
+		resultList = removalListController.getSearchResultsListView();
+		newList = removalListController.getNewRemovalListView();
 	}
 }

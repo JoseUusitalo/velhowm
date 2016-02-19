@@ -1,6 +1,5 @@
 package velho.controller;
 
-import javafx.collections.ObservableList;
 import javafx.scene.Node;
 import javafx.scene.layout.BorderPane;
 import velho.model.ProductBoxSearchResultRow;
@@ -104,9 +103,10 @@ public class RemovalListController implements UIActionController
 	 */
 	public void showBrowseRemovalListsView()
 	{
-
 		try
 		{
+			System.out.println("Creating removal list browsing view.");
+
 			if (browseView == null)
 				browseView = ListController.getTableView(this, DatabaseController.getRemovalListDataColumns(), DatabaseController.getObservableRemovalLists());
 
@@ -119,16 +119,6 @@ public class RemovalListController implements UIActionController
 
 		managementView.setBrowseListsButtonVisiblity(false);
 		managementView.setContent(browseView);
-	}
-
-	/**
-	 * Gets a view showing the removal list currently being created.
-	 *
-	 * @return view for the current removal list being created
-	 */
-	public ObservableList<Object> getCurrentRemovalListContents()
-	{
-		return newRemovalList.getObservableBoxes();
 	}
 
 	@Override
@@ -174,11 +164,19 @@ public class RemovalListController implements UIActionController
 			PopupController.error("That product box is already on the removal list.");
 	}
 
-	public BorderPane getSearchResults()
+	public BorderPane getSearchResultsListView()
 	{
 		System.out.println("Getting search result list: " + DatabaseController.getObservableProductSearchResults());
+
 		return (BorderPane) ListController.getTableView(this, DatabaseController.getProductSearchDataColumns(true, false),
 				DatabaseController.getObservableProductSearchResults());
+	}
+
+	public BorderPane getNewRemovalListView()
+	{
+		System.out.println("Getting new removal list: " + newRemovalList.getObservableBoxes());
+
+		return (BorderPane) ListController.getTableView(this, DatabaseController.getProductSearchDataColumns(false, true), newRemovalList.getObservableBoxes());
 	}
 
 	public void saveNewRemovalList()
@@ -188,8 +186,24 @@ public class RemovalListController implements UIActionController
 			try
 			{
 				System.out.println("Saving List : " + newRemovalList.getObservableBoxes());
-				if (!newRemovalList.saveToDatabase())
+
+				if (newRemovalList.saveToDatabase())
+				{
+					DatabaseController.clearSearchResults();
+
+					/*
+					 * I would much rather create a new object rather than reset the old one but I can't figure out why
+					 * it doesn't work. When a new removal list object is created the UI new list view never updates
+					 * after that even though I'm refreshing the view after creating the object.
+					 */
+					newRemovalList.reset();
+
+					creationView.refresh();
+				}
+				else
+				{
 					PopupController.error("Removal list saving failed.");
+				}
 			}
 			catch (final NoDatabaseLinkException e)
 			{

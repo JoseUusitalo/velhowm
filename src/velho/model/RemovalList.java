@@ -132,4 +132,14 @@ public class RemovalList
 		}
 		return false;
 	}
+
+	/**
+	 * Resets this removal lists state to Active and clears all boxes from it.
+	 */
+	public void reset()
+	{
+		state = new RemovalListState(1, "Active");
+		boxes.clear();
+		observableBoxes.clear();
+	}
 }
