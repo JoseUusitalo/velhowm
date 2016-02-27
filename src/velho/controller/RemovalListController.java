@@ -1,5 +1,7 @@
 package velho.controller;
 
+import org.apache.log4j.Logger;
+
 import javafx.scene.Node;
 import javafx.scene.layout.BorderPane;
 import velho.model.Manager;
@@ -20,6 +22,16 @@ import velho.view.ViewRemovalListView;
  */
 public class RemovalListController implements UIActionController
 {
+	/**
+	 * Apache log4j logger: System.
+	 */
+	private static final Logger SYSLOG = Logger.getLogger(RemovalListController.class.getName());
+
+	/**
+	 * Apache log4j logger: User.
+	 */
+	private static final Logger USRLOG = Logger.getLogger("userLogger");
+
 	/**
 	 * The management view.
 	 */
@@ -63,21 +75,24 @@ public class RemovalListController implements UIActionController
 	@Override
 	public void createAction(final Object data)
 	{
-		// System.out.println("Controller got from UI: " + data);
+		// SYSLOG.trace("Controller got from UI: " + data);
 	}
 
 	@Override
 	public void updateAction(final Object data)
 	{
-		// System.out.println("Controller got from UI update: " + ((ProductBoxSearchResultRow) data).getBox());
+		// SYSLOG.trace("Controller got from UI update: " + ((ProductBoxSearchResultRow) data).getBox());
 	}
 
 	@Override
 	public void removeAction(final Object data)
 	{
-		System.out.println("Removing from new removal list: " + ((ProductBoxSearchResultRow) data).getBox());
+		USRLOG.debug("Removing from new removal list: " + ((ProductBoxSearchResultRow) data).getBox());
 		if (!newRemovalList.removeProductBox(((ProductBoxSearchResultRow) data).getBox()))
+		{
+			USRLOG.debug("Failed to remove product box from removal list.");
 			PopupController.error("Failed to remove product box from removal list.");
+		}
 	}
 
 	@Override
@@ -85,9 +100,12 @@ public class RemovalListController implements UIActionController
 	{
 		try
 		{
-			System.out.println("Deleting removal list " + data);
+			USRLOG.debug("Deleting removal list " + data);
 			if (!DatabaseController.deleteRemovalListByID(((RemovalList) data).getDatabaseID()))
-				PopupController.error("Deleting removal list failed.");
+			{
+				USRLOG.debug("Failed to deleting removal list.");
+				PopupController.error("Failed to deleting removal list.");
+			}
 		}
 		catch (final NoDatabaseLinkException e)
 		{
@@ -98,15 +116,18 @@ public class RemovalListController implements UIActionController
 	@Override
 	public void addAction(final Object data)
 	{
-		System.out.println("Adding to new removal list: " + ((ProductBoxSearchResultRow) data).getBox());
+		USRLOG.debug("Adding to new removal list: " + ((ProductBoxSearchResultRow) data).getBox());
 		if (!newRemovalList.addProductBox(((ProductBoxSearchResultRow) data).getBox()))
+		{
+			USRLOG.trace("Product box is already on the list.");
 			PopupController.error("That product box is already on the removal list.");
+		}
 	}
 
 	@Override
 	public void viewAction(final Object data)
 	{
-		System.out.println("Viewing removal list " + data);
+		USRLOG.trace("Viewing removal list " + data);
 
 		if (LoginController.userRoleIsGreaterOrEqualTo(new Manager()))
 			managementView.setContent(new ViewRemovalListView((RemovalList) data, this).getView());
@@ -168,8 +189,7 @@ public class RemovalListController implements UIActionController
 	}
 
 	/**
-	 * Changes the removal list management view to the removal list creation
-	 * view.
+	 * Changes the removal list management view to the removal list creation view.
 	 */
 	public void showNewRemovalListView()
 	{
@@ -179,16 +199,16 @@ public class RemovalListController implements UIActionController
 
 		if (managementView.getContent().equals(getRemovalListCreationView()))
 		{
-			System.out.println("Resetting new removal list.");
+			USRLOG.info("Resetting new removal list.");
 			newRemovalList.reset();
 		}
 		else
 		{
-			System.out.println("Setting new removal list view.");
+			SYSLOG.trace("Setting new removal list view.");
 			managementView.setContent(getRemovalListCreationView());
 		}
 
-		System.out.println("Removal list is currently: " + newRemovalList.getObservableBoxes());
+		SYSLOG.trace("Removal list is currently: " + newRemovalList.getObservableBoxes());
 	}
 
 	/**
@@ -201,11 +221,11 @@ public class RemovalListController implements UIActionController
 		{
 			if (browseView == null)
 			{
-				System.out.println("Creating removal list browsing view.");
+				SYSLOG.trace("Creating removal list browsing view.");
 				browseView = ListController.getTableView(this, DatabaseController.getRemovalListDataColumns(), DatabaseController.getObservableRemovalLists());
 			}
 
-			System.out.println("Removal list browsing: " + DatabaseController.getObservableRemovalLists());
+			SYSLOG.trace("Removal list browsing: " + DatabaseController.getObservableRemovalLists());
 		}
 		catch (final NoDatabaseLinkException e)
 		{
@@ -227,14 +247,14 @@ public class RemovalListController implements UIActionController
 
 	public BorderPane getSearchResultsListView()
 	{
-		System.out.println("Getting search result list: " + DatabaseController.getObservableProductSearchResults());
+		SYSLOG.trace("Getting search result list: " + DatabaseController.getObservableProductSearchResults());
 		return (BorderPane) ListController.getTableView(this, DatabaseController.getProductSearchDataColumns(true, false),
 				DatabaseController.getObservableProductSearchResults());
 	}
 
 	public BorderPane getNewRemovalListView()
 	{
-		System.out.println("Getting new removal list: " + newRemovalList.getObservableBoxes());
+		SYSLOG.trace("Getting new removal list: " + newRemovalList.getObservableBoxes());
 
 		return (BorderPane) ListController.getTableView(this, DatabaseController.getProductSearchDataColumns(false, true), newRemovalList.getObservableBoxes());
 	}
@@ -245,7 +265,7 @@ public class RemovalListController implements UIActionController
 		{
 			try
 			{
-				System.out.println("Saving List : " + newRemovalList.getObservableBoxes());
+				SYSLOG.info("Saving Removal List: " + newRemovalList.getObservableBoxes());
 
 				if (newRemovalList.saveToDatabase())
 				{
@@ -278,7 +298,7 @@ public class RemovalListController implements UIActionController
 
 	public void setNewRemovalListState(final RemovalListState newState)
 	{
-		System.out.println("New state is : " + newState);
+		SYSLOG.trace("New state is : " + newState);
 		newRemovalList.setState(newState);
 	}
 
