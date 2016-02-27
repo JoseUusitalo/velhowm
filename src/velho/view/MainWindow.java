@@ -68,16 +68,6 @@ public class MainWindow extends Application
 	public static final boolean SHOW_WINDOWS = true;
 
 	/**
-	 * Print SQL Builder output?
-	 */
-	public static final boolean PRINT_SQL = true;
-
-	/**
-	 * Print messages about caching?
-	 */
-	public static final boolean PRINT_CACHE_MESSAGES = true;
-
-	/**
 	 * The height of the window.
 	 */
 	public static final double WINDOW_HEIGHT = 640;
@@ -157,7 +147,7 @@ public class MainWindow extends Application
 					{
 						SYSLOG.debug("Creating all controllers...");
 
-						DatabaseController.loadData(false);
+						DatabaseController.loadData();
 						debugController = new DebugController();
 						userController = new UserController();
 						listController = new ListController(userController);

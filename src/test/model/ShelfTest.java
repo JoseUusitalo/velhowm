@@ -60,7 +60,7 @@ public class ShelfTest
 			e.printStackTrace();
 		}
 
-		DatabaseController.loadData(true);
+		DatabaseController.loadData();
 
 		try
 		{
@@ -77,7 +77,7 @@ public class ShelfTest
 			System.out.println(emptyShelf_1_0_to_1_1);
 			System.out.println("--Test--");
 		}
-		catch (NoDatabaseLinkException e)
+		catch (final NoDatabaseLinkException e)
 		{
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -95,21 +95,21 @@ public class ShelfTest
 	public final void testCreateInvalid()
 	{
 		@SuppressWarnings("unused")
-		Shelf s = new Shelf(-1, -1, 2, 3);
+		final Shelf s = new Shelf(-1, -1, 2, 3);
 	}
 
 	@Test(expected = IllegalArgumentException.class)
 	public final void testCreateInvalid2()
 	{
 		@SuppressWarnings("unused")
-		Shelf s = new Shelf(1, 1, -2, 3);
+		final Shelf s = new Shelf(1, 1, -2, 3);
 	}
 
 	@Test(expected = IllegalArgumentException.class)
 	public final void testCreateInvalid3()
 	{
 		@SuppressWarnings("unused")
-		Shelf s = new Shelf(0, 1, 2, -3);
+		final Shelf s = new Shelf(0, 1, 2, -3);
 	}
 
 	@Test(expected = IllegalArgumentException.class)
@@ -214,11 +214,11 @@ public class ShelfTest
 	@Test
 	public final void testTokenizeSlotID()
 	{
-		Object[] tokens = Shelf.tokenizeShelfSlotID(SHELF_1_LEVEL_3_SLOT_16);
-		List<Object> expected = new ArrayList<Object>(Arrays.asList("S1", 3, 16));
-		List<Object> actual = new ArrayList<Object>();
+		final Object[] tokens = Shelf.tokenizeShelfSlotID(SHELF_1_LEVEL_3_SLOT_16);
+		final List<Object> expected = new ArrayList<Object>(Arrays.asList("S1", 3, 16));
+		final List<Object> actual = new ArrayList<Object>();
 
-		for (Object value : tokens)
+		for (final Object value : tokens)
 			actual.add(value);
 
 		assertTrue(actual.containsAll(expected));
@@ -228,11 +228,11 @@ public class ShelfTest
 	@Test
 	public final void testTokenizeSlotID2()
 	{
-		Object[] tokens = Shelf.tokenizeShelfSlotID(SHELF_0_LEVEL_1_SLOT_1);
-		List<Object> expected = new ArrayList<Object>(Arrays.asList("S0", 1, 1));
-		List<Object> actual = new ArrayList<Object>();
+		final Object[] tokens = Shelf.tokenizeShelfSlotID(SHELF_0_LEVEL_1_SLOT_1);
+		final List<Object> expected = new ArrayList<Object>(Arrays.asList("S0", 1, 1));
+		final List<Object> actual = new ArrayList<Object>();
 
-		for (Object value : tokens)
+		for (final Object value : tokens)
 			actual.add(value);
 
 		assertTrue(actual.containsAll(expected));

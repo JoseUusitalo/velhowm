@@ -228,7 +228,7 @@ public class LogDatabaseController
 		{
 			if (isLinked())
 			{
-				SYSLOG.debug("Log database linked.");
+				System.out.println("Log database linked.");
 				return true;
 			}
 
@@ -339,7 +339,7 @@ public class LogDatabaseController
 			e.printStackTrace();
 		}
 
-		SYSLOG.debug("Log database initialized.");
+		SYSLOG.info("Log database initialized.");
 		return changed;
 	}
 }
