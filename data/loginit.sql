@@ -18,3 +18,13 @@ CREATE TABLE IF NOT EXISTS `usrlogs`
 
 	PRIMARY KEY (`user_id`,`time`,`logger`)
 ) DEFAULT CHARSET=utf8;
+
+CREATE TABLE IF NOT EXISTS `dblogs`
+(
+	`time` TIMESTAMP NOT NULL,
+	`logger` VARCHAR(1024) NOT NULL,
+	`level` VARCHAR(64) NOT NULL,
+	`message` TEXT NOT NULL,
+
+	PRIMARY KEY (`time`,`logger`)
+) DEFAULT CHARSET=utf8;
