@@ -2,3 +2,6 @@
 /velho.trace.db
 /velho.h2.db
 /velho.lock.db
+/velholog.trace.db
+/velholog.h2.db
+/velholog.lock.db
