@@ -1,5 +1,7 @@
 package velho.controller;
 
+import org.apache.log4j.Logger;
+
 import javafx.stage.Stage;
 import velho.model.exceptions.NoDatabaseLinkException;
 import velho.view.DebugWindow;
@@ -11,6 +13,10 @@ import velho.view.DebugWindow;
  */
 public class DebugController
 {
+	/**
+	 * Apache log4j logger: System.
+	 */
+	private static final Logger SYSLOG = Logger.getLogger(DebugController.class.getName());
 
 	/**
 	 * The {@link DebugWindow}.
@@ -102,20 +108,19 @@ public class DebugController
 	}
 
 	/**
-	 * Result message from the External systems controller to the DebugWindow of the prosegures end result.
+	 * Result message from the External systems controller to the DebugWindow of the procedures end result.
 	 * Still in progress since there are not items in the database.
 	 */
 	public static void resultMessage()
 	{
-
 		final boolean s = ExternalSystemsController.move(0, null, true);
 		if (s == true)
 		{
-			System.out.println("System registered changes");
+			SYSLOG.debug("Product box move successful.");
 		}
 		else
 		{
-			System.out.println("Attempted changes were cancelled");
+			SYSLOG.debug("Product box move failed.");
 		}
 	}
 
