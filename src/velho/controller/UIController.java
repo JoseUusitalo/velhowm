@@ -1,5 +1,7 @@
 package velho.controller;
 
+import org.apache.log4j.Logger;
+
 import javafx.scene.Node;
 import velho.model.enums.Position;
 import velho.model.exceptions.NoDatabaseLinkException;
@@ -13,6 +15,11 @@ import velho.view.MainWindow;
  */
 public class UIController
 {
+	/**
+	 * Apache log4j logger: System.
+	 */
+	private static final Logger SYSLOG = Logger.getLogger(UIController.class.getName());
+
 	/**
 	 * The {@link MainWindow}.
 	 */
@@ -74,7 +81,7 @@ public class UIController
 				mainView.setCenterView(view);
 				break;
 			default:
-				// Impossible.
+				SYSLOG.error("Unknown position '" + position.toString() + "'.");
 		}
 	}
 
@@ -106,7 +113,7 @@ public class UIController
 				mainView.addTab("Product List Search", listController.getProductListSearchView());
 				break;
 			default:
-				System.out.println("Unknown user role.");
+				SYSLOG.error("Unknown user role '" + currentUserRole.getName() + "'.");
 		}
 	}
 
@@ -132,7 +139,7 @@ public class UIController
 				case "Logistician":
 					return listController.getUserListView(DatabaseController.getPublicUserDataColumns(false), DatabaseController.getObservableUsers());
 				default:
-					System.out.println("Unknown user role.");
+					SYSLOG.error("Unknown user role '" + currentUserRole.getName() + "'.");
 			}
 		}
 		catch (final NoDatabaseLinkException e)
