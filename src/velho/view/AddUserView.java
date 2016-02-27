@@ -10,8 +10,6 @@ import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.GridPane;
-import javafx.scene.text.Font;
-import javafx.scene.text.FontWeight;
 import velho.controller.UserController;
 
 /**
@@ -40,7 +38,7 @@ public class AddUserView
 	 * @param mcontroller
 	 * @param rolelist
 	 */
-	public AddUserView(UserController mcontroller, Set<String> rolelist)
+	public AddUserView(final UserController mcontroller, final Set<String> rolelist)
 	{
 		rolenameSet = rolelist;
 		controller = mcontroller;
@@ -49,7 +47,7 @@ public class AddUserView
 
 	/**
 	 * Creates a grid for adding a new user.
-	 * 
+	 *
 	 * @return
 	 */
 	public GridPane getView()
@@ -63,7 +61,7 @@ public class AddUserView
 			grid.setVgap(10);
 
 			Label scenetitle = new Label("Add user info");
-			scenetitle.setFont(Font.font("Tahoma", FontWeight.NORMAL, 20));
+			scenetitle.getStyleClass().add("centered-title");
 			grid.add(scenetitle, 0, 0, 2, 1);
 
 			Label userID = new Label("Badge ID:");
@@ -104,7 +102,7 @@ public class AddUserView
 			createButton.setOnAction(new EventHandler<ActionEvent>()
 			{
 				@Override
-				public void handle(ActionEvent e)
+				public void handle(final ActionEvent e)
 				{
 					controller.createUser(badgeIDField.getText(), pinField.getText(), userFnameField.getText(), userLNameField.getText(), listbox.getValue());
 				}

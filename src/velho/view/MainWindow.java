@@ -3,7 +3,6 @@ package velho.view;
 import javafx.application.Application;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
-import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Group;
 import javafx.scene.Node;
@@ -13,15 +12,8 @@ import javafx.scene.control.Label;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
 import javafx.scene.control.TabPane.TabClosingPolicy;
-import javafx.scene.layout.Background;
-import javafx.scene.layout.BackgroundFill;
-import javafx.scene.layout.Border;
 import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.BorderStroke;
-import javafx.scene.layout.BorderStrokeStyle;
 import javafx.scene.layout.HBox;
-import javafx.scene.paint.Color;
-import javafx.scene.paint.Paint;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
 import velho.controller.DatabaseController;
@@ -203,14 +195,7 @@ public class MainWindow extends Application
 		if (LoginController.checkLogin())
 		{
 			final HBox statusBar = new HBox();
-			statusBar.setAlignment(Pos.CENTER_RIGHT);
-			statusBar.setPadding(new Insets(4.0));
-
-			// TODO: Use CSS.
-			statusBar.setBackground(new Background(new BackgroundFill(Paint.valueOf(Color.LIGHTGRAY.toString()), null, null)));
-			statusBar.setBorder(new Border(
-					new BorderStroke(Paint.valueOf("b5b5b5"), Paint.valueOf(Color.TRANSPARENT.toString()), Paint.valueOf(Color.TRANSPARENT.toString()),
-							Paint.valueOf(Color.TRANSPARENT.toString()), BorderStrokeStyle.SOLID, null, null, null, null, null, null)));
+			statusBar.getStyleClass().add("status-bar");
 
 			final HBox userBar = new HBox(10);
 
@@ -237,7 +222,7 @@ public class MainWindow extends Application
 	}
 
 	/**
-	 * Loads the data from the database and creates the window.
+	 * Creates the window.
 	 */
 	@SuppressWarnings("unused")
 	@Override
@@ -249,10 +234,15 @@ public class MainWindow extends Application
 		}
 		else
 		{
+			setUserAgentStylesheet(STYLESHEET_MODENA);
+
 			primaryStage.setTitle("Velho Warehouse Management");
 			final Group root = new Group();
-			scene = new Scene(root, WINDOW_WIDTH, WINDOW_HEIGHT, Color.WHITE);
+			scene = new Scene(root, WINDOW_WIDTH, WINDOW_HEIGHT);
+			scene.getStylesheets().add(getClass().getResource("velho.css").toExternalForm());
+
 			rootBorderPane = new BorderPane();
+			rootBorderPane.getStyleClass().add("standard-background-color");
 			rootBorderPane.prefHeightProperty().bind(scene.heightProperty());
 			rootBorderPane.prefWidthProperty().bind(scene.widthProperty());
 
