@@ -1,5 +1,7 @@
 package velho.view;
 
+import org.apache.log4j.Logger;
+
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
@@ -29,6 +31,11 @@ import velho.model.RemovalListState;
  */
 public class RemovalListCreationView
 {
+	/**
+	 * Apache log4j logger: System.
+	 */
+	private static final Logger SYSLOG = Logger.getLogger(RemovalListCreationView.class.getName());
+
 	/**
 	 * The root BorderPane for this view.
 	 */
@@ -162,7 +169,7 @@ public class RemovalListCreationView
 	 */
 	public void refresh()
 	{
-		System.out.println("Refreshing removal list creation view.");
+		SYSLOG.trace("Refreshing removal list creation view.");
 		resultList = removalListController.getSearchResultsListView();
 		newList = removalListController.getNewRemovalListView();
 	}
