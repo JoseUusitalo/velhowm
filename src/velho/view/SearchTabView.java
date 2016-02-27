@@ -47,8 +47,6 @@ public class SearchTabView
 			searchPane.setPadding(new Insets(0, 10, 10, 10));
 
 			final HBox buttonsBox = new HBox(10);
-			// TODO: Use CSS.
-			buttonsBox.setBackground(new Background(new BackgroundFill(Paint.valueOf("EEEEEE"), null, null)));
 			buttonsBox.setPadding(new Insets(0, 10, 10, 10));
 
 			final Button printButton = new Button("Print");

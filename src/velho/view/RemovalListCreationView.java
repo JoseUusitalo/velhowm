@@ -9,14 +9,9 @@ import javafx.geometry.Pos;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
-import javafx.scene.layout.Background;
-import javafx.scene.layout.BackgroundFill;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Priority;
-import javafx.scene.paint.Paint;
-import javafx.scene.text.Font;
-import javafx.scene.text.FontWeight;
 import velho.controller.DatabaseController;
 import velho.controller.RemovalListController;
 import velho.controller.SearchController;
@@ -76,13 +71,12 @@ public class RemovalListCreationView
 			bpane.setTop(searchView);
 
 			final GridPane left = new GridPane();
-			// TODO: Use CSS.
-			left.setBackground(new Background(new BackgroundFill(Paint.valueOf("EEEEEE"), null, null)));
 
 			final Label resultsLabel = new Label("Search Results");
+			resultsLabel.getStyleClass().add("centered-title-medium");
+			resultsLabel.setPadding(new Insets(7, 0, 0, 0));
 			resultsLabel.setAlignment(Pos.CENTER);
 			resultsLabel.setMaxWidth(Double.MAX_VALUE);
-			resultsLabel.setFont(Font.font("Tahoma", FontWeight.NORMAL, 20));
 			left.add(resultsLabel, 0, 0);
 
 			resultList = removalListController.getSearchResultsListView();
@@ -94,13 +88,11 @@ public class RemovalListCreationView
 			GridPane.setVgrow(resultList, Priority.ALWAYS);
 
 			final GridPane center = new GridPane();
-			// TODO: Use CSS.
-			center.setBackground(new Background(new BackgroundFill(Paint.valueOf("EEEEEE"), null, null)));
 
 			final Label removalListLabel = new Label("New Removal List");
+			removalListLabel.getStyleClass().add("centered-title-medium");
 			removalListLabel.setAlignment(Pos.CENTER);
 			removalListLabel.setMaxWidth(Double.MAX_VALUE);
-			removalListLabel.setFont(Font.font("Tahoma", FontWeight.NORMAL, 20));
 
 			GridPane.setHgrow(removalListLabel, Priority.ALWAYS);
 
