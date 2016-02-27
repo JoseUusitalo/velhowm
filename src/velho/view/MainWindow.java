@@ -157,7 +157,7 @@ public class MainWindow extends Application
 					{
 						SYSLOG.debug("Creating all controllers...");
 
-						// DatabaseController.loadData(false);
+						DatabaseController.loadData(false);
 						debugController = new DebugController();
 						userController = new UserController();
 						listController = new ListController(userController);
