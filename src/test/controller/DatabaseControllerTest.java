@@ -198,7 +198,7 @@ public class DatabaseControllerTest
 	@Test
 	public final void testRemoveUser() throws NoDatabaseLinkException
 	{
-		DatabaseController.loadData(true);
+		DatabaseController.loadData();
 		assertTrue(DatabaseController.deleteUser(1));
 
 		assertTrue(DatabaseController.initializeDatabase());
@@ -336,7 +336,7 @@ public class DatabaseControllerTest
 	public final void testLoadData() throws NoDatabaseLinkException
 	{
 		DatabaseController.clearAllCaches();
-		DatabaseController.loadData(true);
+		DatabaseController.loadData();
 
 		// Make sure that a removal list was loaded and the product boxes were placed on it.
 		assertEquals(0, DatabaseController.getRemovalListByID(5, true).getSize());
@@ -346,7 +346,7 @@ public class DatabaseControllerTest
 	public final void testInsertRemovalList() throws NoDatabaseLinkException
 	{
 		DatabaseController.clearAllCaches();
-		DatabaseController.loadData(true);
+		DatabaseController.loadData();
 
 		final RemovalList list = new RemovalList();
 		final ProductBox box = DatabaseController.getProductBoxByID(1);

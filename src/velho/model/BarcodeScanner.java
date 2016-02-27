@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import org.apache.log4j.Logger;
+
 import velho.controller.DatabaseController;
 import velho.controller.ExternalSystemsController;
 import velho.model.exceptions.NoDatabaseLinkException;
@@ -16,14 +18,18 @@ import velho.model.exceptions.NoDatabaseLinkException;
 public class BarcodeScanner
 {
 	/**
+	 * Apache log4j logger: System.
+	 */
+	private static final Logger SYSLOG = Logger.getLogger(BarcodeScanner.class.getName());
+
+	/**
 	 * Receives the message from ProductListSeacrh
 	 *
 	 * @param received
 	 */
 	public static void deviceBarcode(final Object received)
 	{
-		System.out.println("Barcode Scanner received data ");
-		System.out.println(received.toString());
+		SYSLOG.debug("Barcode Scanner received data: " + received.toString());
 	}
 
 	/**
@@ -88,16 +94,16 @@ public class BarcodeScanner
 			list = DatabaseController.getProductCodeList();
 			Collections.shuffle(list);
 			shelf = DatabaseController.getRandomShelfSlot();
-			System.out.println("random product " + list.get(0));
-			System.out.println("random shelf slot " + shelf);
+			SYSLOG.trace("Random product: " + list.get(0));
+			SYSLOG.trace("Random shelf slot: " + shelf);
 
 			if (ExternalSystemsController.move(list.get(0), shelf, true))
 			{
-				System.out.println("Success");
+				SYSLOG.debug("Move successful.");
 				return true;
 			}
 
-			System.out.println("Pint Failed");
+			SYSLOG.debug("Move failed.");
 			return false;
 		}
 		catch (final NoDatabaseLinkException e)

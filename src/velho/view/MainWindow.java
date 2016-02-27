@@ -1,5 +1,8 @@
 package velho.view;
 
+import org.apache.log4j.Logger;
+import org.apache.log4j.PropertyConfigurator;
+
 import javafx.application.Application;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
@@ -19,6 +22,7 @@ import javafx.stage.WindowEvent;
 import velho.controller.DatabaseController;
 import velho.controller.DebugController;
 import velho.controller.ListController;
+import velho.controller.LogDatabaseController;
 import velho.controller.LoginController;
 import velho.controller.RemovalListController;
 import velho.controller.SearchController;
@@ -35,6 +39,16 @@ import velho.model.exceptions.NoDatabaseLinkException;
 public class MainWindow extends Application
 {
 	/**
+	 * Relative file path to the Apache log4j logger properties file.
+	 */
+	private static final String LOG4J_PATH = "src/velho/model/log4j.properties";
+
+	/**
+	 * Apache log4j logger: System.
+	 */
+	private static final Logger SYSLOG = Logger.getLogger(MainWindow.class.getName());
+
+	/**
 	 * Enable or disable debug features.
 	 */
 	public static final boolean DEBUG_MODE = true;
@@ -44,16 +58,6 @@ public class MainWindow extends Application
 	 * to make this <code>false</code>.
 	 */
 	public static final boolean SHOW_WINDOWS = true;
-
-	/**
-	 * Print SQL Builder output?
-	 */
-	public static final boolean PRINT_SQL = true;
-
-	/**
-	 * Print messages about caching?
-	 */
-	public static final boolean PRINT_CACHE_MESSAGES = true;
 
 	/**
 	 * The height of the window.
@@ -120,34 +124,55 @@ public class MainWindow extends Application
 	 */
 	public MainWindow()
 	{
-		System.out.println("Running VELHO Warehouse Management.");
+		// Load the logger properties.
+		PropertyConfigurator.configure(LOG4J_PATH);
+
 		try
 		{
-			if (DatabaseController.connectAndInitialize())
+			if (LogDatabaseController.connectAndInitialize())
 			{
-				System.out.println("[MainWindow] Creating all controllers...");
+				SYSLOG.info("Running VELHO Warehouse Management.");
 
-				DatabaseController.loadData(false);
-				debugController = new DebugController();
-				userController = new UserController();
-				listController = new ListController(userController);
-				searchController = new SearchController(listController);
-				removalListController = new RemovalListController(searchController);
-				uiController = new UIController(this, listController, userController, removalListController, searchController);
+				try
+				{
+					if (DatabaseController.connectAndInitialize())
+					{
+						SYSLOG.debug("Creating all controllers...");
 
-				LoginController.setControllers(uiController, debugController);
+						DatabaseController.loadData();
+						debugController = new DebugController();
+						userController = new UserController();
+						listController = new ListController(userController);
+						searchController = new SearchController(listController);
+						removalListController = new RemovalListController(searchController);
+						uiController = new UIController(this, listController, userController, removalListController, searchController);
 
-				System.out.println("[MainWindow] All controllers created.");
+						LoginController.setControllers(uiController, debugController);
+
+						SYSLOG.debug("All controllers created.");
+					}
+					else
+					{
+						SYSLOG.fatal("Failed to connect to database.");
+						SYSLOG.info("Closing application.");
+						System.exit(0);
+					}
+				}
+				catch (ClassNotFoundException | ExistingDatabaseLinkException | NoDatabaseLinkException e1)
+				{
+					e1.printStackTrace();
+				}
 			}
 			else
 			{
-				System.out.println("Closing application.");
+				SYSLOG.fatal("Failed to connect to log database.");
+				SYSLOG.info("Closing application.");
 				System.exit(0);
 			}
 		}
-		catch (ClassNotFoundException | ExistingDatabaseLinkException | NoDatabaseLinkException e1)
+		catch (ClassNotFoundException | ExistingDatabaseLinkException | NoDatabaseLinkException e)
 		{
-			e1.printStackTrace();
+			e.printStackTrace();
 		}
 	}
 
@@ -230,7 +255,7 @@ public class MainWindow extends Application
 	{
 		if (!SHOW_WINDOWS && DEBUG_MODE)
 		{
-			System.out.println("Windows are disabled.");
+			SYSLOG.debug("Windows are disabled.");
 		}
 		else
 		{
@@ -295,7 +320,7 @@ public class MainWindow extends Application
 			if (debugStage != null)
 				debugStage.close();
 		}
-		System.out.println("[MainWindow] Closing windows.");
+
 		try
 		{
 			DatabaseController.unlink();
@@ -304,7 +329,8 @@ public class MainWindow extends Application
 		{
 			// Ignore.
 		}
-		System.out.println("Exit.");
+
+		SYSLOG.info("Exit.");
 	}
 
 	/**

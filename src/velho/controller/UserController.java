@@ -1,5 +1,7 @@
 package velho.controller;
 
+import org.apache.log4j.Logger;
+
 import javafx.scene.Node;
 import velho.model.Administrator;
 import velho.model.Logistician;
@@ -20,6 +22,16 @@ import velho.view.MainWindow;
 public class UserController implements UIActionController
 {
 	/**
+	 * Apache log4j logger: System.
+	 */
+	private static final Logger SYSLOG = Logger.getLogger(UserController.class.getName());
+
+	/**
+	 * Apache log4j logger: User.
+	 */
+	private static final Logger USRLOG = Logger.getLogger("userLogger");
+
+	/**
 	 * The add user view.
 	 */
 	private AddUserView view;
@@ -35,32 +47,46 @@ public class UserController implements UIActionController
 	@Override
 	public void updateAction(final Object data)
 	{
-		System.out.println("Update user: " + data);
+		USRLOG.debug("Update user: " + data);
 	}
 
 	@Override
 	public void removeAction(final Object data)
 	{
-		System.out.println("Remove user: " + data);
+		USRLOG.debug("Remove user: " + data);
 	}
 
 	@Override
 	public void deleteAction(final Object data)
 	{
-		System.out.println("Delete user: " + data);
+		USRLOG.debug("Delete user: " + data);
 		deleteUser((User) data);
 	}
 
 	@Override
 	public void addAction(final Object data)
 	{
-		System.out.println("Add user: " + data);
+		USRLOG.debug("Add user: " + data);
 	}
 
 	@Override
 	public void viewAction(final Object data)
 	{
-		System.out.println("View user: " + data);
+		USRLOG.debug("View user: " + data);
+	}
+
+	@Override
+	public void createAction(final Object data)
+	{
+		// TODO Auto-generated method stub
+		try
+		{
+			throw new Exception("Unimplemented.");
+		}
+		catch (final Exception e)
+		{
+			e.printStackTrace();
+		}
 	}
 
 	/**
@@ -78,22 +104,25 @@ public class UserController implements UIActionController
 		{
 			if (User.validateUserData(badgeID, userPIN, userFirstName, userLastName, userRoleName))
 			{
-				System.out.println(
-						"Badge: " + badgeID + " PIN: " + userPIN + " First Name: " + userFirstName + " Last Name: " + userLastName + " Role: " + userRoleName);
 				final int roleID = DatabaseController.getRoleID(userRoleName);
+
+				// TODO: User accounts related code needs rewriting. This should return the user object.
 
 				if (DatabaseController.insertUser(badgeID, userPIN, userFirstName, userLastName, roleID))
 				{
+					USRLOG.debug("Created a user.");
 					PopupController.info("User created.");
 					return true;
 				}
 
+				SYSLOG.debug("User already exists.");
 				PopupController.info("User already exists. Please make sure that the following criteria are met:\n" + "Every Badge ID must be unique.\n"
 						+ "People with the same first and last name are allowed if their roles are different.\n"
 						+ "The combination of the PIN, first name, and last name must be unique.");
 				return false;
 			}
 
+			SYSLOG.trace("Invalid user data.");
 			PopupController.warning("Invalid user data.");
 		}
 		catch (final NoDatabaseLinkException e)
@@ -111,7 +140,7 @@ public class UserController implements UIActionController
 	 */
 	public boolean deleteUser(final User user)
 	{
-		System.out.println("Attempting to delete: " + user.toString());
+		USRLOG.debug("Attempting to delete: " + user.getFullDetails());
 
 		try
 		{
@@ -123,21 +152,30 @@ public class UserController implements UIActionController
 					if (DatabaseController.deleteUser(user.getDatabaseID()))
 					{
 						LoginController.logout();
-						PopupController.info("User deleted: " + user.getFullDetails());
+						USRLOG.debug("User deleted themselves: " + user.getFullDetails());
+						PopupController.info("Deleted user: " + user.getFullDetails());
 						return true;
 					}
 
+					SYSLOG.trace("Non-existent user: " + user.toString());
 					PopupController.warning("User does not exist in the database.");
-					System.out.println("Non-existent user: " + user.toString());
+					return false;
 				}
 
-				System.out.println("Not removed.");
+				USRLOG.trace("Cancelled self-deletion confirmation.");
 				return false;
 			}
 
-			DatabaseController.deleteUser(user.getDatabaseID());
-			PopupController.info("User removed: " + user.getFullDetails());
-			return true;
+			if (DatabaseController.deleteUser(user.getDatabaseID()))
+			{
+				USRLOG.debug("User removed: " + user.getFullDetails());
+				PopupController.info("User removed: " + user.getFullDetails());
+				return true;
+
+			}
+			SYSLOG.warn("Failed to remove user: " + user.getFullDetails());
+			PopupController.info("Failed to remove user.");
+			return false;
 		}
 		catch (final NoDatabaseLinkException e)
 		{
@@ -198,22 +236,8 @@ public class UserController implements UIActionController
 			case "Logistician":
 				return new Logistician();
 			default:
-				System.out.println("ERROR: Unknown role '" + userRoleName + "'.");
+				SYSLOG.error("Unknown user role '" + userRoleName + "'.");
 				return null;
-		}
-	}
-
-	@Override
-	public void createAction(final Object data)
-	{
-		// TODO Auto-generated method stub
-		try
-		{
-			throw new Exception("Unimplemented.");
-		}
-		catch (final Exception e)
-		{
-			e.printStackTrace();
 		}
 	}
 }
