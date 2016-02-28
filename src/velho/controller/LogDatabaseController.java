@@ -2,14 +2,21 @@ package velho.controller;
 
 import java.io.File;
 import java.sql.Connection;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.h2.jdbcx.JdbcConnectionPool;
 
+import velho.model.enums.DatabaseQueryType;
+import velho.model.enums.DatabaseTable;
 import velho.model.exceptions.ExistingDatabaseLinkException;
 import velho.model.exceptions.NoDatabaseLinkException;
+import velho.view.MainWindow;
 
 /**
  * The H2 logs database controller.
@@ -42,6 +49,186 @@ public class LogDatabaseController
 	 * A pool where database connections are acquired from.
 	 */
 	private static JdbcConnectionPool connectionPool;
+
+	/**
+	 * Runs a database query with the given data.
+	 *
+	 * @param type query command
+	 * @param tableName the {@link DatabaseTable}
+	 * @param columns columns to select (can be <code>null</code>)
+	 * @param where conditions (can be <code>null</code>)
+	 * @return
+	 * <ul>
+	 * <li>if type is {@link DatabaseQueryType#UPDATE} or
+	 * {@link DatabaseQueryType#DELETE}: the number of rows that were
+	 * changed as a result of the query as an {@link Integer}</li>
+	 * <li>if type is {@link DatabaseQueryType#SELECT}: a Set containing
+	 * the selected data</li>
+	 * </ul>
+	 * @throws NoDatabaseLinkException
+	 */
+	private static List<Object> runQuery(final DatabaseQueryType type, final DatabaseTable tableName, final Map<DatabaseTable, String> joinOnValues,
+			final String[] columns, final Map<String, Object> columnValues, final List<String> where) throws NoDatabaseLinkException
+	{
+		final Connection connection = getConnection();
+		Statement statement = null;
+
+		// Most other queries.
+		final List<Object> datalist = new ArrayList<Object>();
+
+		try
+		{
+			ResultSet result = null;
+
+			// Initialize a statement.
+			statement = connection.createStatement();
+
+			statement.execute(DatabaseController.sqlBuilder(type, tableName, joinOnValues, columns, columnValues, where), Statement.RETURN_GENERATED_KEYS);
+
+			switch (type)
+			{
+				case SELECT:
+					result = statement.getResultSet();
+
+					if (columns.length == 1 && columns[0] != "*")
+					{
+						while (result.next())
+							datalist.add(result.getObject(columns[0]));
+					}
+					else
+					{
+						switch (tableName)
+						{
+							case DBLOGS:
+							case SYSLOGS:
+								while (result.next())
+									datalist.add(result.getTimestamp("time") + " [" + result.getString("level") + "] " + result.getString("message"));
+								break;
+
+							case USRLOGS:
+								while (result.next())
+									datalist.add(result.getTimestamp("time") + " [" + result.getString("level") + "] "
+											+ DatabaseController.getUserByID(result.getInt("user_id")).getFullDetails() + ": " + result.getString("message"));
+								break;
+							default:
+								// Close all resources.
+								try
+								{
+									result.close();
+								}
+								catch (final SQLException e)
+								{
+									e.printStackTrace();
+								}
+
+								try
+								{
+									statement.close();
+								}
+								catch (final SQLException e)
+								{
+									e.printStackTrace();
+								}
+
+								try
+								{
+									connection.close();
+								}
+								catch (final SQLException e)
+								{
+									e.printStackTrace();
+								}
+								throw new IllegalArgumentException();
+						}
+					}
+
+					try
+					{
+						result.close();
+					}
+					catch (final SQLException e)
+					{
+						e.printStackTrace();
+					}
+					break;
+				default:
+					// Close all resources.
+					try
+					{
+						statement.close();
+					}
+					catch (final SQLException e)
+					{
+						e.printStackTrace();
+					}
+
+					try
+					{
+						connection.close();
+					}
+					catch (final SQLException e)
+					{
+						e.printStackTrace();
+					}
+					throw new IllegalArgumentException();
+			}
+		}
+		catch (final IllegalStateException e)
+		{
+			// Close all resources.
+			try
+			{
+				if (statement != null)
+					statement.close();
+			}
+			catch (final SQLException e1)
+			{
+				e.printStackTrace();
+			}
+
+			try
+			{
+				connection.close();
+			}
+			catch (final SQLException e2)
+			{
+				e.printStackTrace();
+			}
+
+			// Connection pool has been disposed = no database connection.
+			throw new NoDatabaseLinkException();
+		}
+		catch (final SQLException e)
+		{
+			e.printStackTrace();
+		}
+
+		// Close all resources.
+		try
+		{
+			if (statement != null)
+				statement.close();
+		}
+		catch (final SQLException e)
+		{
+			e.printStackTrace();
+		}
+
+		try
+		{
+			connection.close();
+		}
+		catch (final SQLException e)
+		{
+			e.printStackTrace();
+		}
+
+		return datalist;
+	}
+
+	/*
+	 * -------------------------------- PUBLIC DATABASE METHODS --------------------------------
+	 */
 
 	/**
 	 * Attempts to re-link the database.
@@ -339,7 +526,57 @@ public class LogDatabaseController
 			e.printStackTrace();
 		}
 
-		SYSLOG.info("Log database initialized.");
+		if (changed)
+			SYSLOG.info("Log database initialized.");
+
 		return changed;
+	}
+
+	/*
+	 * -------------------------------- PUBLIC GETTER METHODS --------------------------------
+	 */
+
+	/**
+	 * Gets the full system log.
+	 *
+	 * @return the system log
+	 * @throws NoDatabaseLinkException
+	 */
+	public static ArrayList<Object> getSystemLog() throws NoDatabaseLinkException
+	{
+		final String[] columns = { "time", "level", "message" };
+		final List<String> where = new ArrayList<String>();
+		where.add("level = 'INFO'");
+
+		// If not in debug mode return just the info.
+		if (!MainWindow.DEBUG_MODE)
+			return (ArrayList<Object>) runQuery(DatabaseQueryType.SELECT, DatabaseTable.SYSLOGS, null, columns, null, where);
+
+		// Else get debug too.
+		where.clear();
+		where.add("level = 'INFO' OR level = 'DEBUG'");
+
+		return (ArrayList<Object>) runQuery(DatabaseQueryType.SELECT, DatabaseTable.SYSLOGS, null, columns, null, where);
+	}
+
+	/**
+	 * Gets the full user log with user names.
+	 *
+	 * @return the user log
+	 * @throws NoDatabaseLinkException
+	 */
+	public static ArrayList<Object> getUserLog() throws NoDatabaseLinkException
+	{
+		final String[] columns = { "user_id", "time", "level", "message" };
+		final List<String> where = new ArrayList<String>();
+		where.add("level = 'INFO'");
+
+		if (!MainWindow.DEBUG_MODE)
+			return (ArrayList<Object>) runQuery(DatabaseQueryType.SELECT, DatabaseTable.USRLOGS, null, columns, null, where);
+
+		where.clear();
+		where.add("level = 'INFO' OR level = 'DEBUG'");
+
+		return (ArrayList<Object>) runQuery(DatabaseQueryType.SELECT, DatabaseTable.USRLOGS, null, columns, null, where);
 	}
 }

@@ -45,14 +45,17 @@ public class UIController
 	 */
 	private RemovalListController removalListController;
 
+	private LogController logController;
+
 	public UIController(final MainWindow mainWindow, final ListController listController, final UserController userController,
-			final RemovalListController removalListController, final SearchController searchController)
+			final RemovalListController removalListController, final SearchController searchController, final LogController logController)
 	{
 		this.mainView = mainWindow;
 		this.listController = listController;
 		this.userController = userController;
 		this.removalListController = removalListController;
 		this.searchController = searchController;
+		this.logController = logController;
 	}
 
 	/**
@@ -103,6 +106,7 @@ public class UIController
 			case "Administrator":
 			case "Manager":
 				mainView.addTab("Add User", userController.getView());
+				mainView.addTab("Logs", logController.getView());
 				//$FALL-THROUGH$
 			case "Logistician":
 				mainView.addTab("Removal Lists", removalListController.getView());

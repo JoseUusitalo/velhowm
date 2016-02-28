@@ -4,6 +4,9 @@ import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
 
 import javafx.application.Application;
+import javafx.beans.property.ReadOnlyDoubleProperty;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Pos;
@@ -22,6 +25,7 @@ import javafx.stage.WindowEvent;
 import velho.controller.DatabaseController;
 import velho.controller.DebugController;
 import velho.controller.ListController;
+import velho.controller.LogController;
 import velho.controller.LogDatabaseController;
 import velho.controller.LoginController;
 import velho.controller.RemovalListController;
@@ -68,6 +72,11 @@ public class MainWindow extends Application
 	 * The width of the window.
 	 */
 	public static final double WINDOW_WIDTH = 1024;
+
+	/**
+	 * The current width of the window.
+	 */
+	public static ReadOnlyDoubleProperty WIDTH_PROPERTY;
 
 	/**
 	 * The {@link DebugController}.
@@ -120,6 +129,11 @@ public class MainWindow extends Application
 	private RemovalListController removalListController;
 
 	/**
+	 * The {@link LogController}.
+	 */
+	private LogController logController;
+
+	/**
 	 * The main window constructor.
 	 */
 	public MainWindow()
@@ -131,6 +145,25 @@ public class MainWindow extends Application
 		{
 			if (LogDatabaseController.connectAndInitialize())
 			{
+				if (!DEBUG_MODE)
+				{
+					// This is how we prevent Logisticians from reading logs.
+					// Logs can now only be read through the database access to which can easily be limited.
+					SYSLOG.info("Debug mode not enabled, disabling file and console appenders for all loggers.");
+
+					// Remove console appenders from all system loggers.
+					Logger.getRootLogger().removeAppender("SysConsoleAppender");
+
+					// Remove file appenders from all system loggers.
+					Logger.getRootLogger().removeAppender("SysRollingAppender");
+
+					// Do the same for user and database loggers.
+					Logger.getLogger("userLogger").removeAppender("UsrConsoleAppender");
+					Logger.getLogger("userLogger").removeAppender("UsrRollingAppender");
+					Logger.getLogger("dbLogger").removeAppender("DbConsoleAppender");
+					Logger.getLogger("dbLogger").removeAppender("DbRollingAppender");
+				}
+
 				SYSLOG.info("Running VELHO Warehouse Management.");
 
 				try
@@ -142,10 +175,11 @@ public class MainWindow extends Application
 						DatabaseController.loadData();
 						debugController = new DebugController();
 						userController = new UserController();
+						logController = new LogController();
 						listController = new ListController(userController);
 						searchController = new SearchController(listController);
 						removalListController = new RemovalListController(searchController);
-						uiController = new UIController(this, listController, userController, removalListController, searchController);
+						uiController = new UIController(this, listController, userController, removalListController, searchController, logController);
 
 						LoginController.setControllers(uiController, debugController);
 
@@ -214,6 +248,17 @@ public class MainWindow extends Application
 		{
 			mainTabPane = new TabPane();
 			mainTabPane.setTabClosingPolicy(TabClosingPolicy.UNAVAILABLE);
+
+			mainTabPane.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<Tab>()
+			{
+				@Override
+				public void changed(final ObservableValue<? extends Tab> old, final Tab oldTab, final Tab newTab)
+				{
+					if (newTab.getText() == "Logs")
+						logController.refresh();
+				}
+
+			});
 		}
 
 		// Force log in to see main menu.
@@ -265,6 +310,7 @@ public class MainWindow extends Application
 			final Group root = new Group();
 			scene = new Scene(root, WINDOW_WIDTH, WINDOW_HEIGHT);
 			scene.getStylesheets().add(getClass().getResource("velho.css").toExternalForm());
+			WIDTH_PROPERTY = scene.widthProperty();
 
 			rootBorderPane = new BorderPane();
 			rootBorderPane.getStyleClass().add("standard-background-color");
