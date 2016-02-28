@@ -2117,7 +2117,9 @@ public class DatabaseController
 
 		final boolean changed = (0 != (Integer) runQuery("RUNSCRIPT FROM './data/init.sql';"));
 
-		DBLOG.info("Database initialized.");
+		if (changed)
+			DBLOG.info("Database initialized.");
+
 		return changed;
 	}
 

@@ -339,7 +339,9 @@ public class LogDatabaseController
 			e.printStackTrace();
 		}
 
-		SYSLOG.info("Log database initialized.");
+		if (changed)
+			SYSLOG.info("Log database initialized.");
+
 		return changed;
 	}
 }

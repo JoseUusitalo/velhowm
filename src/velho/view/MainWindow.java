@@ -131,6 +131,25 @@ public class MainWindow extends Application
 		{
 			if (LogDatabaseController.connectAndInitialize())
 			{
+				if (!DEBUG_MODE)
+				{
+					// This is how we prevent Logisticians from reading logs.
+					// Logs can now only be read through the database access to which can easily be limited.
+					SYSLOG.info("Debug mode not enabled, disabling file and console appenders for all loggers.");
+
+					// Remove console appenders from all system loggers.
+					Logger.getRootLogger().removeAppender("SysConsoleAppender");
+
+					// Remove file appenders from all system loggers.
+					Logger.getRootLogger().removeAppender("SysRollingAppender");
+
+					// Do the same for user and database loggers.
+					Logger.getLogger("userLogger").removeAppender("UsrConsoleAppender");
+					Logger.getLogger("userLogger").removeAppender("UsrRollingAppender");
+					Logger.getLogger("dbLogger").removeAppender("DbConsoleAppender");
+					Logger.getLogger("dbLogger").removeAppender("DbRollingAppender");
+
+				}
 				SYSLOG.info("Running VELHO Warehouse Management.");
 
 				try
