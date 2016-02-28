@@ -132,6 +132,9 @@ public class LoginController
 					// Valid credentials.
 					if (currentUser != null)
 					{
+						// Put the user database ID into the MDC thing for log4j.
+						MDC.put("user_id", currentUser.getDatabaseID());
+
 						USRLOG.info(currentUser.toString() + " logged in with PIN.");
 						uiController.showMainMenu(currentUser.getRole());
 						destroyView();
