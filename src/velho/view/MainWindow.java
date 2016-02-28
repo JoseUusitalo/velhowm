@@ -5,6 +5,8 @@ import org.apache.log4j.PropertyConfigurator;
 
 import javafx.application.Application;
 import javafx.beans.property.ReadOnlyDoubleProperty;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Pos;
@@ -160,8 +162,8 @@ public class MainWindow extends Application
 					Logger.getLogger("userLogger").removeAppender("UsrRollingAppender");
 					Logger.getLogger("dbLogger").removeAppender("DbConsoleAppender");
 					Logger.getLogger("dbLogger").removeAppender("DbRollingAppender");
-
 				}
+
 				SYSLOG.info("Running VELHO Warehouse Management.");
 
 				try
@@ -246,6 +248,17 @@ public class MainWindow extends Application
 		{
 			mainTabPane = new TabPane();
 			mainTabPane.setTabClosingPolicy(TabClosingPolicy.UNAVAILABLE);
+
+			mainTabPane.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<Tab>()
+			{
+				@Override
+				public void changed(final ObservableValue<? extends Tab> old, final Tab oldTab, final Tab newTab)
+				{
+					if (newTab.getText() == "Logs")
+						logController.refresh();
+				}
+
+			});
 		}
 
 		// Force log in to see main menu.

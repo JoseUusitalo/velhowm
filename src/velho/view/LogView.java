@@ -83,10 +83,12 @@ public class LogView
 	}
 
 	/**
-	 * Gets the search results list and the current new removal list views again.
+	 * Refreshes the log view.
 	 */
 	public void refresh()
 	{
-		SYSLOG.trace("Refreshing removal list viewing view.");
+		SYSLOG.trace("Refreshing logs view.");
+		syslog = new Text(logController.getSystemLog());
+		usrlog = new Text(logController.getUserLog());
 	}
 }

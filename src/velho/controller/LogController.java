@@ -98,4 +98,12 @@ public class LogController
 
 		return sb.toString();
 	}
+
+	/**
+	 * Refreshes the displayed logs.
+	 */
+	public void refresh()
+	{
+		logView.refresh();
+	}
 }
