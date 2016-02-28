@@ -22,6 +22,7 @@ import org.h2.jdbcx.JdbcConnectionPool;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import velho.model.Administrator;
 import velho.model.Manager;
 import velho.model.Product;
 import velho.model.ProductBox;
@@ -178,141 +179,12 @@ public class DatabaseController
 	}
 
 	/**
-	 * Creates an SQL query out of the given data.
-	 *
-	 * @param type
-	 * query command
-	 * @param tableName
-	 * name of the table
-	 * @param columns
-	 * columns to select (can be <code>null</code>)
-	 * @param where
-	 * conditions (can be <code>null</code>)
-	 * @return an SQL query string
-	 */
-	private static String sqlBuilder(final DatabaseQueryType type, final DatabaseTable tableName, final Map<DatabaseTable, String> joinOnCondition,
-			final String[] columns, final Map<String, Object> columnValues, final List<String> where)
-	{
-		final StringBuilder sb = new StringBuilder();
-
-		// Command
-		sb.append(type.toString());
-		sb.append(" ");
-
-		// Columns
-		if (columns != null)
-		{
-			final int count = columns.length;
-			for (int i = 0; i < count; i++)
-			{
-				sb.append(columns[i]);
-				if (i < count - 1)
-					sb.append(", ");
-			}
-			sb.append(" ");
-		}
-
-		switch (type)
-		{
-			case INSERT:
-				sb.append("INTO ");
-				break;
-			case UPDATE:
-				break;
-			default:
-				sb.append("FROM ");
-				break;
-		}
-
-		// Table name.
-		sb.append(tableName.toString().toLowerCase());
-
-		// Join.
-		if (joinOnCondition != null)
-		{
-			final Iterator<DatabaseTable> it = joinOnCondition.keySet().iterator();
-			DatabaseTable key = null;
-
-			while (it.hasNext())
-			{
-				sb.append(" LEFT JOIN ");
-
-				key = it.next();
-
-				sb.append(key.toString().toLowerCase());
-				sb.append(" ON ");
-				sb.append(joinOnCondition.get(key));
-			}
-		}
-
-		// Insert values.
-		if (columnValues != null)
-		{
-			sb.append(" SET ");
-
-			final Iterator<String> it = columnValues.keySet().iterator();
-			String key = null;
-
-			while (it.hasNext())
-			{
-				key = it.next();
-
-				sb.append(key);
-				sb.append("=");
-
-				final Object value = columnValues.get(key);
-
-				// If value is not Integer or Double do not add apostrophes.
-				if (value instanceof Integer || value instanceof Double)
-				{
-					sb.append(value);
-				}
-				else
-				{
-					sb.append("'");
-					sb.append(value.toString());
-					sb.append("'");
-
-				}
-
-				if (it.hasNext())
-					sb.append(", ");
-			}
-		}
-
-		// Conditionals.
-		if (where != null && where.size() > 0)
-		{
-			sb.append(" WHERE ");
-			final int size = where.size();
-
-			for (int i = 0; i < size; i++)
-			{
-				sb.append(where.get(i));
-
-				if (i < size - 1)
-					sb.append(" AND ");
-			}
-		}
-
-		sb.append(";");
-
-		DBLOG.trace("[SQLBUILDER] " + escape(sb.toString()));
-
-		return sb.toString();
-	}
-
-	/**
 	 * Runs a database query with the given data.
 	 *
-	 * @param type
-	 * query command
-	 * @param tableName
-	 * name of the table
-	 * @param columns
-	 * columns to select (can be <code>null</code>)
-	 * @param where
-	 * conditions (can be <code>null</code>)
+	 * @param type query command
+	 * @param tableName the {@link DatabaseTable}
+	 * @param columns columns to select (can be <code>null</code>)
+	 * @param where conditions (can be <code>null</code>)
 	 * @return
 	 * <ul>
 	 * <li>if type is {@link DatabaseQueryType#UPDATE} or
@@ -829,6 +701,127 @@ public class DatabaseController
 	/*
 	 * -------------------------------- PUBLIC DATABASE METHODS --------------------------------
 	 */
+
+	/**
+	 * Creates an SQL query out of the given data.
+	 *
+	 * @param type query command
+	 * @param tableName name of the table
+	 * @param columns columns to select (can be <code>null</code>)
+	 * @param where conditions (can be <code>null</code>)
+	 * @return an SQL query string
+	 */
+	public static String sqlBuilder(final DatabaseQueryType type, final DatabaseTable tableName, final Map<DatabaseTable, String> joinOnCondition,
+			final String[] columns, final Map<String, Object> columnValues, final List<String> where)
+	{
+		final StringBuilder sb = new StringBuilder();
+
+		// Command
+		sb.append(type.toString());
+		sb.append(" ");
+
+		// Columns
+		if (columns != null)
+		{
+			final int count = columns.length;
+			for (int i = 0; i < count; i++)
+			{
+				sb.append(columns[i]);
+				if (i < count - 1)
+					sb.append(", ");
+			}
+			sb.append(" ");
+		}
+
+		switch (type)
+		{
+			case INSERT:
+				sb.append("INTO ");
+				break;
+			case UPDATE:
+				break;
+			default:
+				sb.append("FROM ");
+				break;
+		}
+
+		// Table name.
+		sb.append(tableName.toString().toLowerCase());
+
+		// Join.
+		if (joinOnCondition != null)
+		{
+			final Iterator<DatabaseTable> it = joinOnCondition.keySet().iterator();
+			DatabaseTable key = null;
+
+			while (it.hasNext())
+			{
+				sb.append(" LEFT JOIN ");
+
+				key = it.next();
+
+				sb.append(key.toString().toLowerCase());
+				sb.append(" ON ");
+				sb.append(joinOnCondition.get(key));
+			}
+		}
+
+		// Insert values.
+		if (columnValues != null)
+		{
+			sb.append(" SET ");
+
+			final Iterator<String> it = columnValues.keySet().iterator();
+			String key = null;
+
+			while (it.hasNext())
+			{
+				key = it.next();
+
+				sb.append(key);
+				sb.append("=");
+
+				final Object value = columnValues.get(key);
+
+				// If value is not Integer or Double do not add apostrophes.
+				if (value instanceof Integer || value instanceof Double)
+				{
+					sb.append(value);
+				}
+				else
+				{
+					sb.append("'");
+					sb.append(value.toString());
+					sb.append("'");
+
+				}
+
+				if (it.hasNext())
+					sb.append(", ");
+			}
+		}
+
+		// Conditionals.
+		if (where != null && where.size() > 0)
+		{
+			sb.append(" WHERE ");
+			final int size = where.size();
+
+			for (int i = 0; i < size; i++)
+			{
+				sb.append(where.get(i));
+
+				if (i < size - 1)
+					sb.append(" AND ");
+			}
+		}
+
+		sb.append(";");
+
+		DBLOG.trace("[SQLBUILDER] " + escape(sb.toString()));
+
+		return sb.toString();
+	}
 
 	/**
 	 * Checks if a database link exists.
@@ -1670,6 +1663,9 @@ public class DatabaseController
 	 */
 	public static User getUserByID(final int id) throws NoDatabaseLinkException
 	{
+		if (id == -1)
+			return new User(-1, "Debug", "Account", new Administrator());
+
 		final String[] columns = { "user_id", "first_name", "last_name", "role" };
 		final List<String> where = new ArrayList<String>();
 		where.add("user_id = " + new Integer(id));
@@ -1975,11 +1971,26 @@ public class DatabaseController
 		return foundProducts;
 	}
 
+	/**
+	 * Searches the database for product boxes with the given conditions.
+	 *
+	 * @param where conditions in SQL format
+	 * @return a list of found product boxes as {@link ProductBoxSearchResultRow} objects
+	 * @throws NoDatabaseLinkException
+	 */
 	public static List<ProductBoxSearchResultRow> searchProductBox(final List<String> where) throws NoDatabaseLinkException
 	{
 		return searchProductBox(where, null);
 	}
 
+	/**
+	 * Searches the database for product boxes with the given conditions and additionally from the given tables.
+	 *
+	 * @param where conditions in SQL format
+	 * @param joins SQL join statements
+	 * @return a list of found product boxes as {@link ProductBoxSearchResultRow} objects
+	 * @throws NoDatabaseLinkException
+	 */
 	public static List<ProductBoxSearchResultRow> searchProductBox(final List<String> where, final Map<DatabaseTable, String> joins)
 			throws NoDatabaseLinkException
 	{
