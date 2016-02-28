@@ -100,12 +100,13 @@ public class RemovalListController implements UIActionController
 	{
 		try
 		{
-			USRLOG.debug("Deleting removal list " + data);
 			if (!DatabaseController.deleteRemovalListByID(((RemovalList) data).getDatabaseID()))
 			{
 				USRLOG.debug("Failed to deleting removal list.");
 				PopupController.error("Failed to deleting removal list.");
 			}
+			else
+				USRLOG.info("Deleted removal list: " + ((RemovalList) data).toString());
 		}
 		catch (final NoDatabaseLinkException e)
 		{
@@ -127,7 +128,7 @@ public class RemovalListController implements UIActionController
 	@Override
 	public void viewAction(final Object data)
 	{
-		USRLOG.trace("Viewing removal list " + data);
+		USRLOG.info("Viewing removal list " + data);
 
 		if (LoginController.userRoleIsGreaterOrEqualTo(new Manager()))
 			managementView.setContent(new ViewRemovalListView((RemovalList) data, this).getView());
@@ -265,11 +266,13 @@ public class RemovalListController implements UIActionController
 		{
 			try
 			{
-				SYSLOG.info("Saving Removal List: " + newRemovalList.getObservableBoxes());
+				SYSLOG.info("Saving Removal List: " + newRemovalList.getBoxes());
 
 				if (newRemovalList.saveToDatabase())
 				{
 					DatabaseController.clearSearchResults();
+
+					USRLOG.info("Created a new Removal List: " + newRemovalList.getBoxes());
 
 					/*
 					 * I would much rather create a new object rather than reset the old one but I can't figure out why
@@ -279,6 +282,7 @@ public class RemovalListController implements UIActionController
 					newRemovalList.reset();
 
 					creationView.refresh();
+
 				}
 				else
 				{

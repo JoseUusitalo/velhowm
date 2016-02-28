@@ -114,6 +114,16 @@ public class RemovalList
 	}
 
 	/**
+	 * Gets the set of actual product boxes in this removal list.
+	 *
+	 * @return the {@link ProductBox} objects in this removal list
+	 */
+	public Set<ProductBox> getBoxes()
+	{
+		return boxes;
+	}
+
+	/**
 	 * Updates the database table with the most recent data on this list.
 	 *
 	 * @return <code>true</code> if update was successfull
