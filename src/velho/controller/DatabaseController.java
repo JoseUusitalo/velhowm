@@ -1050,42 +1050,6 @@ public class DatabaseController
 	}
 
 	/**
-	 * Gets the {@link RemovalListState} object from the given database ID.
-	 *
-	 * @param stateid
-	 * removal list state database ID
-	 * @return the corresponding removal list state object
-	 * @throws NoDatabaseLinkException
-	 */
-	private static RemovalListState getRemovalListStateByID(final int stateid) throws NoDatabaseLinkException
-	{
-		if (!cachedRemovalListStates.containsKey(stateid))
-		{
-			final String[] columns = { "name" };
-			final List<String> where = new ArrayList<String>();
-			where.add("removallist_state_id = " + new Integer(stateid));
-
-			@SuppressWarnings("unchecked")
-			final Set<String> result = (LinkedHashSet<String>) (runQuery(DatabaseQueryType.SELECT, DatabaseTable.REMOVALLIST_STATES, null, columns, null,
-					where));
-
-			if (result.size() == 0)
-				return null;
-
-			final RemovalListState s = new RemovalListState(stateid, result.iterator().next());
-
-			// Store for reuse.
-			DBLOG.trace("Caching: " + s);
-			cachedRemovalListStates.put(s.getDatabaseID(), s);
-
-			return s;
-		}
-
-		DBLOG.trace("Loading RemovalListState " + stateid + " from cache.");
-		return cachedRemovalListStates.get(stateid);
-	}
-
-	/**
 	 * Gets the {@link ProductType} object from the given type ID.
 	 *
 	 * @param typeid
@@ -2034,6 +1998,41 @@ public class DatabaseController
 
 		// Return the data for unit testing.
 		return foundProducts;
+	}
+
+	/**
+	 * Gets the {@link RemovalListState} object from the given database ID.
+	 *
+	 * @param stateid removal list state database ID
+	 * @return the corresponding removal list state object
+	 * @throws NoDatabaseLinkException
+	 */
+	public static RemovalListState getRemovalListStateByID(final int stateid) throws NoDatabaseLinkException
+	{
+		if (!cachedRemovalListStates.containsKey(stateid))
+		{
+			final String[] columns = { "name" };
+			final List<String> where = new ArrayList<String>();
+			where.add("removallist_state_id = " + new Integer(stateid));
+
+			@SuppressWarnings("unchecked")
+			final Set<String> result = (LinkedHashSet<String>) (runQuery(DatabaseQueryType.SELECT, DatabaseTable.REMOVALLIST_STATES, null, columns, null,
+					where));
+
+			if (result.size() == 0)
+				return null;
+
+			final RemovalListState s = new RemovalListState(stateid, result.iterator().next());
+
+			// Store for reuse.
+			DBLOG.trace("Caching: " + s);
+			cachedRemovalListStates.put(s.getDatabaseID(), s);
+
+			return s;
+		}
+
+		DBLOG.trace("Loading RemovalListState " + stateid + " from cache.");
+		return cachedRemovalListStates.get(stateid);
 	}
 
 	/*

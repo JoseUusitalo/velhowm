@@ -18,6 +18,7 @@ import org.junit.runners.Suite.SuiteClasses;
 				ProductBoxSearchResultRowTest.class,
 				ProductCategoryTest.class,
 				ProductTest.class,
+				RemovalListTest.class,
 				ShelfTest.class,
 				UserRoleTest.class,
 				UserTest.class
