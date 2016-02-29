@@ -54,10 +54,13 @@ public class ShelfTest
 			assertTrue(DatabaseController.link());
 			assertTrue(DatabaseController.initializeDatabase());
 		}
-		catch (ClassNotFoundException | ExistingDatabaseLinkException | NoDatabaseLinkException e)
+		catch (ClassNotFoundException | ExistingDatabaseLinkException e)
 		{
-			// TODO Auto-generated catch block
 			e.printStackTrace();
+		}
+		catch (NoDatabaseLinkException e)
+		{
+			DatabaseController.tryReLink();
 		}
 
 		DatabaseController.loadData();
@@ -77,10 +80,9 @@ public class ShelfTest
 			System.out.println(emptyShelf_1_0_to_1_1);
 			System.out.println("--Test--");
 		}
-		catch (final NoDatabaseLinkException e)
+		catch (NoDatabaseLinkException e)
 		{
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			DatabaseController.tryReLink();
 		}
 	}
 

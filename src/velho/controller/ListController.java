@@ -122,7 +122,6 @@ public class ListController
 
 	public Node getProductSearchResultsView()
 	{
-		// TODO: Temporarily showing all products
 		SYSLOG.trace("Getting search results for removal list.");
 		return getProductListView(DatabaseController.getPublicProductDataColumns(true, false), DatabaseController.getObservableProducts());
 	}
