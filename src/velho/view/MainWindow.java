@@ -60,13 +60,12 @@ public class MainWindow extends Application
 	public static final boolean DEBUG_MODE = true;
 
 	/**
-	 * Enable or disable showing windows. DEBUG_MODE must be <code>true</code>
-	 * to make this <code>false</code>.
+	 * Enable or disable showing windows. DEBUG_MODE must be <code>true</code> for this to affect anything.
 	 */
 	public static final boolean SHOW_WINDOWS = true;
 
 	/**
-	 * Enable TRACE level logging.
+	 * Enable TRACE level logging. DEBUG_MODE must be <code>true</code> for this to affect anything.
 	 */
 	public static final boolean SHOW_TRACE = true;
 

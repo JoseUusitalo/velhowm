@@ -1415,7 +1415,6 @@ public class DatabaseController
 			}
 		}
 
-		System.out.println("ret " + resultingBoxes);
 		return resultingBoxes;
 	}
 
