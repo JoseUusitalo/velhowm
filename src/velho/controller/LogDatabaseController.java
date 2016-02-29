@@ -235,7 +235,8 @@ public class LogDatabaseController
 	 */
 	private static void relink()
 	{
-		System.out.println("Attempting to relink log database.");
+		if (MainWindow.DEBUG_MODE)
+			System.out.println("Attempting to relink log database.");
 
 		try
 		{
@@ -291,7 +292,8 @@ public class LogDatabaseController
 		{
 			if (e.getMessage().contains("Database may be already in use"))
 			{
-				System.out.println("Log database is already in use.");
+				if (MainWindow.DEBUG_MODE)
+					System.out.println("Log database is already in use.");
 				PopupController.error("Log database is already in use. Please close the open application.");
 			}
 			else
@@ -386,7 +388,7 @@ public class LogDatabaseController
 		{
 			uri += ";IFEXISTS=TRUE";
 		}
-		else
+		else if (MainWindow.DEBUG_MODE)
 			System.out.println("Log database does not exist, creating a new database.");
 
 		// Create a connection pool.
@@ -415,15 +417,18 @@ public class LogDatabaseController
 		{
 			if (isLinked())
 			{
-				System.out.println("Log database linked.");
+				if (MainWindow.DEBUG_MODE)
+					System.out.println("Log database linked.");
 				return true;
 			}
 
-			System.out.println("Log database linking failed.");
+			if (MainWindow.DEBUG_MODE)
+				System.out.println("Log database linking failed.");
 			return false;
 		}
 
-		System.out.println("Log database creation failed.");
+		if (MainWindow.DEBUG_MODE)
+			System.out.println("Log database creation failed.");
 		return false;
 	}
 
@@ -461,7 +466,8 @@ public class LogDatabaseController
 	 */
 	public static boolean initializeDatabase() throws NoDatabaseLinkException
 	{
-		System.out.println("Initializing log database...");
+		if (MainWindow.DEBUG_MODE)
+			System.out.println("Initializing log database...");
 
 		final Connection connection = getConnection();
 		Statement statement = null;

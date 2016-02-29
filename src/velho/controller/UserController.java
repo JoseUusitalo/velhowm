@@ -78,7 +78,6 @@ public class UserController implements UIActionController
 	@Override
 	public void createAction(final Object data)
 	{
-		// TODO Auto-generated method stub
 		try
 		{
 			throw new Exception("Unimplemented.");
@@ -179,7 +178,7 @@ public class UserController implements UIActionController
 		}
 		catch (final NoDatabaseLinkException e)
 		{
-			e.printStackTrace();
+			DatabaseController.tryReLink();
 		}
 
 		return false;

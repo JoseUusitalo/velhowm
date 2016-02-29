@@ -446,7 +446,7 @@ public class Shelf
 		final int[] tokens = tokenizeAndValidateShelfSlotID(productBox.getShelfSlot());
 
 		final boolean removedFromSlot = slots[tokens[1]][tokens[2]].removeBox(productBox);
-		boolean databaseModified = false;
+		boolean databaseModified = true;
 
 		if (updateDatabase)
 			databaseModified = DatabaseController.removeProductBoxFromShelfSlot(productBox);
@@ -469,17 +469,7 @@ public class Shelf
 	 */
 	public boolean removeFromSlot(final ProductBox productBox) throws IllegalArgumentException, NoDatabaseLinkException
 	{
-		if (productBox == null)
-			return false;
-
-		final int[] tokens = tokenizeAndValidateShelfSlotID(productBox.getShelfSlot());
-
-		final boolean removedFromSlot = slots[tokens[1]][tokens[2]].removeBox(productBox);
-		final boolean databaseModified = DatabaseController.removeProductBoxFromShelfSlot(productBox);
-
-		productBox.setShelfSlot(null);
-
-		return removedFromSlot && databaseModified;
+		return removeFromSlot(productBox, true);
 	}
 
 	/*
@@ -643,17 +633,14 @@ public class Shelf
 		}
 
 		/**
-		 * Attempts to remove the given {@link ProductBox} to this shelf slot.
+		 * Removes the given {@link ProductBox} from this shelf slot.
 		 *
-		 * @param box
-		 * box to remove
-		 * @return <code>true</code> if the box was removed, <code>false</code> if the box was not present
+		 * @param box box to remove
+		 * @return <code>true</code> if the box was removed, <code>false</code> if the box was not present which should
+		 * technically be impossible
 		 */
 		public boolean removeBox(final ProductBox box)
 		{
-			if (!boxes.contains(box))
-				return false;
-
 			return boxes.remove(box);
 		}
 	}

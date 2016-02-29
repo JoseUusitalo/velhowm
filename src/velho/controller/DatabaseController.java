@@ -1050,42 +1050,6 @@ public class DatabaseController
 	}
 
 	/**
-	 * Gets the {@link RemovalListState} object from the given database ID.
-	 *
-	 * @param stateid
-	 * removal list state database ID
-	 * @return the corresponding removal list state object
-	 * @throws NoDatabaseLinkException
-	 */
-	private static RemovalListState getRemovalListStateByID(final int stateid) throws NoDatabaseLinkException
-	{
-		if (!cachedRemovalListStates.containsKey(stateid))
-		{
-			final String[] columns = { "name" };
-			final List<String> where = new ArrayList<String>();
-			where.add("removallist_state_id = " + new Integer(stateid));
-
-			@SuppressWarnings("unchecked")
-			final Set<String> result = (LinkedHashSet<String>) (runQuery(DatabaseQueryType.SELECT, DatabaseTable.REMOVALLIST_STATES, null, columns, null,
-					where));
-
-			if (result.size() == 0)
-				return null;
-
-			final RemovalListState s = new RemovalListState(stateid, result.iterator().next());
-
-			// Store for reuse.
-			DBLOG.trace("Caching: " + s);
-			cachedRemovalListStates.put(s.getDatabaseID(), s);
-
-			return s;
-		}
-
-		DBLOG.trace("Loading RemovalListState " + stateid + " from cache.");
-		return cachedRemovalListStates.get(stateid);
-	}
-
-	/**
 	 * Gets the {@link ProductType} object from the given type ID.
 	 *
 	 * @param typeid
@@ -1228,9 +1192,8 @@ public class DatabaseController
 	/**
 	 * Gets the product box that will expire the soonest.
 	 *
-	 * @param boxes
-	 * boxes to search from
-	 * @return the oldest product box
+	 * @param boxes boxes to search from
+	 * @return the oldest product box, expiration date can be null
 	 */
 	private static ProductBox getOldestProductBox(final List<ProductBox> boxes)
 	{
@@ -1238,6 +1201,10 @@ public class DatabaseController
 
 		for (final ProductBox box : boxes)
 		{
+			// TODO: Support searching for products with no expiration dates.
+			if (oldest.getExpirationDate() == null)
+				oldest = box;
+
 			if (box.getExpirationDate() != null)
 			{
 				// Current box has an expiration date.
@@ -1295,9 +1262,9 @@ public class DatabaseController
 		}
 
 		if (emptyCount == 0)
-			DBLOG.debug("Found " + boxes.size() + " product boxes.");
+			DBLOG.trace("Found " + boxes.size() + " product boxes.");
 		else
-			DBLOG.debug("Found " + boxes.size() + " product boxes of which " + emptyCount + " were empty.");
+			DBLOG.trace("Found " + boxes.size() + " product boxes of which " + emptyCount + " were empty.");
 
 		final StringBuffer sb = new StringBuffer();
 		sb.append("Found product box sizes:");
@@ -1379,32 +1346,34 @@ public class DatabaseController
 			}
 			catch (final IndexOutOfBoundsException e)
 			{
-				if (resultingBoxes.size() == boxes.size())
+				if (wantedProductCount > productCountSum)
 				{
-					// All boxes are in the result. Too bad.
-					DBLOG.trace("Unable to find that many products. Listing all available boxes.");
-					break;
-				}
-				else if (wantedProductCount > productCountSum)
-				{
-					/*
-					 * All boxes are not in the result.
-					 * Still have not reached the wanted product count.
-					 * Restart the loop at one higher index.
-					 * Repeat until either the wanted count is reached or all products have been added to the result.
-					 */
-					DBLOG.trace("Unable to build a product box list of that size from smaller boxes. Going one size larger.");
-					resultingBoxes.clear();
-					productCountSum = 0;
-					wantedWouldBeIndex++;
-					addCountIndex = wantedWouldBeIndex;
-					lookingForLarger = true;
-
-					// FIXME: Infinite loop when looking for more products than are available.
+					if (wantedWouldBeIndex + 1 < boxProductCount.size() - 1)
+					{
+						/*
+						 * All boxes are not yet in the result.
+						 * Still have not reached the wanted product count.
+						 * Restart the loop at one higher index.
+						 * Repeat until either the wanted count is reached or all products have been added to the
+						 * result.
+						 */
+						DBLOG.trace("Unable to build a product box list of that size from smaller boxes. Going one size larger.");
+						resultingBoxes.clear();
+						productCountSum = 0;
+						wantedWouldBeIndex++;
+						addCountIndex = wantedWouldBeIndex;
+						lookingForLarger = true;
+					}
+					else
+					{
+						DBLOG.debug("Unable to find that many products. Listing all available boxes.");
+						break;
+					}
 				}
 				else
 				{
-					DBLOG.warn("Search status | Count: " + productCountSum + " / " + wantedProductCount + " | Would Be Index: " + wantedWouldBeIndex
+					DBLOG.error("Spooky untested code.");
+					DBLOG.error("Search status | Count: " + productCountSum + " / " + wantedProductCount + " | Would Be Index: " + wantedWouldBeIndex
 							+ " | Add Index: " + addCountIndex + " / " + boxProductCount.size());
 				}
 			}
@@ -1499,6 +1468,7 @@ public class DatabaseController
 		cols.put("productBrand", "Brand");
 		cols.put("productCategory", "Category");
 		cols.put("expirationDate", "Expires");
+		cols.put("boxID", "Box ID");
 		cols.put("boxShelfSlot", "Shelf Slot");
 		cols.put("boxProductCount", "Amount");
 
@@ -2031,6 +2001,41 @@ public class DatabaseController
 		return foundProducts;
 	}
 
+	/**
+	 * Gets the {@link RemovalListState} object from the given database ID.
+	 *
+	 * @param stateid removal list state database ID
+	 * @return the corresponding removal list state object
+	 * @throws NoDatabaseLinkException
+	 */
+	public static RemovalListState getRemovalListStateByID(final int stateid) throws NoDatabaseLinkException
+	{
+		if (!cachedRemovalListStates.containsKey(stateid))
+		{
+			final String[] columns = { "name" };
+			final List<String> where = new ArrayList<String>();
+			where.add("removallist_state_id = " + new Integer(stateid));
+
+			@SuppressWarnings("unchecked")
+			final Set<String> result = (LinkedHashSet<String>) (runQuery(DatabaseQueryType.SELECT, DatabaseTable.REMOVALLIST_STATES, null, columns, null,
+					where));
+
+			if (result.size() == 0)
+				return null;
+
+			final RemovalListState s = new RemovalListState(stateid, result.iterator().next());
+
+			// Store for reuse.
+			DBLOG.trace("Caching: " + s);
+			cachedRemovalListStates.put(s.getDatabaseID(), s);
+
+			return s;
+		}
+
+		DBLOG.trace("Loading RemovalListState " + stateid + " from cache.");
+		return cachedRemovalListStates.get(stateid);
+	}
+
 	/*
 	 * -------------------------------- PRIVATE SETTER METHODS --------------------------------
 	 */
@@ -2382,20 +2387,13 @@ public class DatabaseController
 	/**
 	 * Loads data from database into memory.
 	 */
-	public static void loadData()
+	public static void loadData() throws NoDatabaseLinkException
 	{
 		DBLOG.info("Loading data from database...");
 
-		try
-		{
-			loadProductBoxes();
-			loadShelves();
-			loadRemovalLists();
-		}
-		catch (final NoDatabaseLinkException e)
-		{
-			e.printStackTrace();
-		}
+		loadProductBoxes();
+		loadShelves();
+		loadRemovalLists();
 
 		DBLOG.info("Data loaded from database.");
 	}

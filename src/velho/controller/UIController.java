@@ -146,10 +146,9 @@ public class UIController
 					SYSLOG.error("Unknown user role '" + currentUserRole.getName() + "'.");
 			}
 		}
-		catch (final NoDatabaseLinkException e)
+		catch (NoDatabaseLinkException e)
 		{
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			DatabaseController.tryReLink();
 		}
 
 		return null;
