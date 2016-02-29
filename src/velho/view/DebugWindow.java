@@ -103,21 +103,21 @@ public class DebugWindow
 		rootBorderPane.getStyleClass().add("standard-background-color");
 		rootBorderPane.getStyleClass().add("standard-padding-half");
 
-		final ComboBox<String> taskListBox = new ComboBox<String>();
+		final ComboBox<String> roleListBox = new ComboBox<String>();
 
 		grid = new GridPane();
-		grid.setVgap(4);
+		grid.setVgap(5);
 		grid.setHgap(10);
 		grid.add(new Label("User :"), 0, 0);
-		taskListBox.getItems().addAll(rolenameSet);
-		taskListBox.getSelectionModel().selectFirst();
+		roleListBox.getItems().addAll(rolenameSet);
+		roleListBox.getSelectionModel().selectFirst();
 
 		logOutButton.setVisible(false);
 
-		grid.add(taskListBox, 1, 0);
+		grid.add(roleListBox, 1, 0);
 		grid.add(logInButton, 2, 0);
-		grid.add(logOutButton, 3, 0);
-		grid.add(scannerMoveValid, 1, 2);
+		grid.add(logOutButton, 2, 1);
+		grid.add(scannerMoveValid, 1, 1);
 
 		rootBorderPane.setCenter(grid);
 		root.getChildren().add(rootBorderPane);
@@ -127,7 +127,7 @@ public class DebugWindow
 			@Override
 			public void handle(final ActionEvent event)
 			{
-				debugController.login(taskListBox.getValue());
+				debugController.login(roleListBox.getValue());
 			}
 
 		});
