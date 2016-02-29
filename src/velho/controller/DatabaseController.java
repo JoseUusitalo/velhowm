@@ -2387,20 +2387,13 @@ public class DatabaseController
 	/**
 	 * Loads data from database into memory.
 	 */
-	public static void loadData()
+	public static void loadData() throws NoDatabaseLinkException
 	{
 		DBLOG.info("Loading data from database...");
 
-		try
-		{
-			loadProductBoxes();
-			loadShelves();
-			loadRemovalLists();
-		}
-		catch (final NoDatabaseLinkException e)
-		{
-			e.printStackTrace();
-		}
+		loadProductBoxes();
+		loadShelves();
+		loadRemovalLists();
 
 		DBLOG.info("Data loaded from database.");
 	}

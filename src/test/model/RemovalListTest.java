@@ -185,6 +185,6 @@ public class RemovalListTest
 		existinglist.reset();
 
 		assertEquals(0, existinglist.getSize());
-		assertEquals(1, existinglist.getState().getDatabaseID());
+		assertEquals(activeState.getDatabaseID(), existinglist.getState().getDatabaseID());
 	}
 }

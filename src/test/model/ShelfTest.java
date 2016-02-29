@@ -53,6 +53,7 @@ public class ShelfTest
 		{
 			assertTrue(DatabaseController.link());
 			assertTrue(DatabaseController.initializeDatabase());
+			DatabaseController.loadData();
 		}
 		catch (ClassNotFoundException | ExistingDatabaseLinkException e)
 		{
@@ -62,8 +63,6 @@ public class ShelfTest
 		{
 			DatabaseController.tryReLink();
 		}
-
-		DatabaseController.loadData();
 
 		try
 		{
