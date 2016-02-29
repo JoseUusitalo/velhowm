@@ -1228,9 +1228,8 @@ public class DatabaseController
 	/**
 	 * Gets the product box that will expire the soonest.
 	 *
-	 * @param boxes
-	 * boxes to search from
-	 * @return the oldest product box
+	 * @param boxes boxes to search from
+	 * @return the oldest product box, expiration date can be null
 	 */
 	private static ProductBox getOldestProductBox(final List<ProductBox> boxes)
 	{
@@ -1238,6 +1237,10 @@ public class DatabaseController
 
 		for (final ProductBox box : boxes)
 		{
+			// TODO: Support searching for products with no expiration dates.
+			if (oldest.getExpirationDate() == null)
+				oldest = box;
+
 			if (box.getExpirationDate() != null)
 			{
 				// Current box has an expiration date.
@@ -1295,9 +1298,9 @@ public class DatabaseController
 		}
 
 		if (emptyCount == 0)
-			DBLOG.debug("Found " + boxes.size() + " product boxes.");
+			DBLOG.trace("Found " + boxes.size() + " product boxes.");
 		else
-			DBLOG.debug("Found " + boxes.size() + " product boxes of which " + emptyCount + " were empty.");
+			DBLOG.trace("Found " + boxes.size() + " product boxes of which " + emptyCount + " were empty.");
 
 		final StringBuffer sb = new StringBuffer();
 		sb.append("Found product box sizes:");
@@ -1379,37 +1382,40 @@ public class DatabaseController
 			}
 			catch (final IndexOutOfBoundsException e)
 			{
-				if (resultingBoxes.size() == boxes.size())
+				if (wantedProductCount > productCountSum)
 				{
-					// All boxes are in the result. Too bad.
-					DBLOG.trace("Unable to find that many products. Listing all available boxes.");
-					break;
-				}
-				else if (wantedProductCount > productCountSum)
-				{
-					/*
-					 * All boxes are not in the result.
-					 * Still have not reached the wanted product count.
-					 * Restart the loop at one higher index.
-					 * Repeat until either the wanted count is reached or all products have been added to the result.
-					 */
-					DBLOG.trace("Unable to build a product box list of that size from smaller boxes. Going one size larger.");
-					resultingBoxes.clear();
-					productCountSum = 0;
-					wantedWouldBeIndex++;
-					addCountIndex = wantedWouldBeIndex;
-					lookingForLarger = true;
-
-					// FIXME: Infinite loop when looking for more products than are available.
+					if (wantedWouldBeIndex + 1 < boxProductCount.size() - 1)
+					{
+						/*
+						 * All boxes are not yet in the result.
+						 * Still have not reached the wanted product count.
+						 * Restart the loop at one higher index.
+						 * Repeat until either the wanted count is reached or all products have been added to the
+						 * result.
+						 */
+						DBLOG.trace("Unable to build a product box list of that size from smaller boxes. Going one size larger.");
+						resultingBoxes.clear();
+						productCountSum = 0;
+						wantedWouldBeIndex++;
+						addCountIndex = wantedWouldBeIndex;
+						lookingForLarger = true;
+					}
+					else
+					{
+						DBLOG.debug("Unable to find that many products. Listing all available boxes.");
+						break;
+					}
 				}
 				else
 				{
-					DBLOG.warn("Search status | Count: " + productCountSum + " / " + wantedProductCount + " | Would Be Index: " + wantedWouldBeIndex
+					DBLOG.error("Spooky untested code.");
+					DBLOG.error("Search status | Count: " + productCountSum + " / " + wantedProductCount + " | Would Be Index: " + wantedWouldBeIndex
 							+ " | Add Index: " + addCountIndex + " / " + boxProductCount.size());
 				}
 			}
 		}
 
+		System.out.println("ret " + resultingBoxes);
 		return resultingBoxes;
 	}
 
