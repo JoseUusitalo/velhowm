@@ -1,5 +1,7 @@
 package velho.view;
 
+import org.apache.log4j.AppenderSkeleton;
+import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
 
@@ -62,6 +64,11 @@ public class MainWindow extends Application
 	 * to make this <code>false</code>.
 	 */
 	public static final boolean SHOW_WINDOWS = true;
+
+	/**
+	 * Enable TRACE level logging.
+	 */
+	public static final boolean SHOW_TRACE = true;
 
 	/**
 	 * The height of the window.
@@ -162,6 +169,15 @@ public class MainWindow extends Application
 					Logger.getLogger("userLogger").removeAppender("UsrRollingAppender");
 					Logger.getLogger("dbLogger").removeAppender("DbConsoleAppender");
 					Logger.getLogger("dbLogger").removeAppender("DbRollingAppender");
+				}
+				else
+				{
+					if (SHOW_TRACE)
+					{
+						((AppenderSkeleton) Logger.getRootLogger().getAppender("SysConsoleAppender")).setThreshold(Level.TRACE);
+						((AppenderSkeleton) Logger.getLogger("userLogger").getAppender("UsrConsoleAppender")).setThreshold(Level.TRACE);
+						((AppenderSkeleton) Logger.getLogger("dbLogger").getAppender("DbConsoleAppender")).setThreshold(Level.TRACE);
+					}
 				}
 
 				SYSLOG.info("Running VELHO Warehouse Management.");
