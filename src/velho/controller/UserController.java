@@ -178,7 +178,7 @@ public class UserController implements UIActionController
 		}
 		catch (final NoDatabaseLinkException e)
 		{
-			e.printStackTrace();
+			DatabaseController.tryReLink();
 		}
 
 		return false;

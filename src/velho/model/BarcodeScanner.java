@@ -65,7 +65,7 @@ public class BarcodeScanner
 		}
 		catch (final NoDatabaseLinkException e)
 		{
-			e.printStackTrace();
+			DatabaseController.tryReLink();
 		}
 
 		final int maximSize = (int) (Math.random() * (numbers.size() + 1));

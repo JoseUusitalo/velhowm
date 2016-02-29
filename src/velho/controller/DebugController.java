@@ -60,7 +60,7 @@ public class DebugController
 		catch (final NoDatabaseLinkException e)
 		{
 			PopupController.error("Login failed, no database connection.");
-			e.printStackTrace();
+			DatabaseController.tryReLink();
 		}
 	}
 
