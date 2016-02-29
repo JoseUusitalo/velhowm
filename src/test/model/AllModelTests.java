@@ -15,6 +15,7 @@ import org.junit.runners.Suite.SuiteClasses;
 // @formatter:off
 @SuiteClasses({ FreezerTest.class,
 				ProductBoxTest.class,
+				ProductBoxSearchResultRowTest.class,
 				ProductCategoryTest.class,
 				ProductTest.class,
 				ShelfTest.class,
