@@ -38,14 +38,17 @@ public class UIController
 	 */
 	private RemovalListController removalListController;
 
-	public UIController(final MainWindow mainWindow, final ListController listController, final UserController userController,
-			final RemovalListController removalListController, final SearchController searchController)
+	private ProductController productController;
+
+	public UIController(final MainWindow mainWindow, final ListController listController, final UserController userController, final RemovalListController removalListController, final SearchController searchController, final ProductController productController)
 	{
 		this.mainView = mainWindow;
 		this.listController = listController;
 		this.userController = userController;
 		this.removalListController = removalListController;
 		this.searchController = searchController;
+		this.productController = productController;
+
 	}
 
 	/**
@@ -100,10 +103,10 @@ public class UIController
 			case "Logistician":
 				mainView.addTab("Removal Lists", removalListController.getView());
 				mainView.addTab("User List", getUserListView(currentUserRole));
-				mainView.addTab("Product List", listController.getProductListView(DatabaseController.getPublicProductDataColumns(false, false),
-						DatabaseController.getObservableProducts()));
+				mainView.addTab("Product List", listController.getProductListView(DatabaseController.getPublicProductDataColumns(false, false), DatabaseController.getObservableProducts()));
 				mainView.addTab("Search", searchController.getSearchTabView());
 				mainView.addTab("Product List Search", listController.getProductListSearchView());
+				mainView.addTab("Product Edit View", productController.getProductEditView());
 				break;
 			default:
 				System.out.println("Unknown user role.");

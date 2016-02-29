@@ -28,6 +28,7 @@ import velho.controller.DatabaseController;
 import velho.controller.DebugController;
 import velho.controller.ListController;
 import velho.controller.LoginController;
+import velho.controller.ProductController;
 import velho.controller.RemovalListController;
 import velho.controller.SearchController;
 import velho.controller.UIController;
@@ -124,6 +125,11 @@ public class MainWindow extends Application
 	private RemovalListController removalListController;
 
 	/**
+	 * The {@link ProductController}.
+	 */
+	private ProductController productController;
+
+	/**
 	 * The main window constructor.
 	 */
 	public MainWindow()
@@ -138,10 +144,11 @@ public class MainWindow extends Application
 				DatabaseController.loadData(false);
 				debugController = new DebugController();
 				userController = new UserController();
+				productController = new ProductController();
 				listController = new ListController(userController);
 				searchController = new SearchController(listController);
 				removalListController = new RemovalListController(searchController);
-				uiController = new UIController(this, listController, userController, removalListController, searchController);
+				uiController = new UIController(this, listController, userController, removalListController, searchController, productController);
 
 				LoginController.setControllers(uiController, debugController);
 
@@ -173,9 +180,9 @@ public class MainWindow extends Application
 	 * Adds a new tab to the main tab panel.
 	 *
 	 * @param tabName
-	 * name of the tab
+	 *            name of the tab
 	 * @param view
-	 * view to show in the tab
+	 *            view to show in the tab
 	 */
 	public void addTab(final String tabName, final Node view)
 	{
@@ -208,9 +215,7 @@ public class MainWindow extends Application
 
 			// TODO: Use CSS.
 			statusBar.setBackground(new Background(new BackgroundFill(Paint.valueOf(Color.LIGHTGRAY.toString()), null, null)));
-			statusBar.setBorder(new Border(
-					new BorderStroke(Paint.valueOf("b5b5b5"), Paint.valueOf(Color.TRANSPARENT.toString()), Paint.valueOf(Color.TRANSPARENT.toString()),
-							Paint.valueOf(Color.TRANSPARENT.toString()), BorderStrokeStyle.SOLID, null, null, null, null, null, null)));
+			statusBar.setBorder(new Border(new BorderStroke(Paint.valueOf("b5b5b5"), Paint.valueOf(Color.TRANSPARENT.toString()), Paint.valueOf(Color.TRANSPARENT.toString()), Paint.valueOf(Color.TRANSPARENT.toString()), BorderStrokeStyle.SOLID, null, null, null, null, null, null)));
 
 			final HBox userBar = new HBox(10);
 
@@ -294,7 +299,7 @@ public class MainWindow extends Application
 	 * cleanup.
 	 *
 	 * @param primaryStage
-	 * the stage the main window is open in
+	 *            the stage the main window is open in
 	 */
 	protected void shutdown(final Stage primaryStage)
 	{
@@ -321,7 +326,7 @@ public class MainWindow extends Application
 	 * Replaces the top view of the window
 	 *
 	 * @param view
-	 * view to set the top of the window
+	 *            view to set the top of the window
 	 */
 	public void setTopView(final Node view)
 	{
@@ -332,7 +337,7 @@ public class MainWindow extends Application
 	 * Replaces the right side view of the window
 	 *
 	 * @param view
-	 * view to set the right of the window
+	 *            view to set the right of the window
 	 */
 	public void setRightView(final Node view)
 	{
@@ -343,7 +348,7 @@ public class MainWindow extends Application
 	 * Replaces the bottom view of the window
 	 *
 	 * @param view
-	 * view to set the bottom of the window
+	 *            view to set the bottom of the window
 	 */
 	public void setBottomView(final Node view)
 	{
@@ -354,7 +359,7 @@ public class MainWindow extends Application
 	 * Replaces the left side view of the window
 	 *
 	 * @param view
-	 * view to set the l of the window
+	 *            view to set the l of the window
 	 */
 	public void setLeftView(final Node view)
 	{
@@ -365,7 +370,7 @@ public class MainWindow extends Application
 	 * Replaces the center view of the window
 	 *
 	 * @param view
-	 * view to set the middle of the window
+	 *            view to set the middle of the window
 	 */
 	public void setCenterView(final Node view)
 	{
