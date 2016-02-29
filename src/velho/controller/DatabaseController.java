@@ -1468,6 +1468,7 @@ public class DatabaseController
 		cols.put("productBrand", "Brand");
 		cols.put("productCategory", "Category");
 		cols.put("expirationDate", "Expires");
+		cols.put("boxID", "Box ID");
 		cols.put("boxShelfSlot", "Shelf Slot");
 		cols.put("boxProductCount", "Amount");
 
