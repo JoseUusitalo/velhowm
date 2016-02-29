@@ -1,5 +1,8 @@
 package velho.controller;
 
+import org.apache.log4j.Logger;
+import org.apache.log4j.MDC;
+
 import javafx.scene.layout.GridPane;
 import velho.model.User;
 import velho.model.enums.Position;
@@ -11,10 +14,20 @@ import velho.view.MainWindow;
 /**
  * Controls logging users in and out.
  *
- * @author Edward &amp; Jose Uusitalo
+ * @author Jose Uusitalo &amp; Edward
  */
 public class LoginController
 {
+	/**
+	 * Apache log4j logger: System.
+	 */
+	private static final Logger SYSLOG = Logger.getLogger(LoginController.class.getName());
+
+	/**
+	 * Apache log4j logger: User.
+	 */
+	private static final Logger USRLOG = Logger.getLogger("userLogger");
+
 	/**
 	 * User currently logged in.
 	 */
@@ -65,7 +78,7 @@ public class LoginController
 	 */
 	public static void login(final String firstName, final String lastName, final String authenticationString)
 	{
-		System.out.println("Attempting to log in with: " + firstName + " " + lastName + " " + authenticationString);
+		SYSLOG.info("Attempting to log in with: " + firstName + " " + lastName + " " + authenticationString);
 
 		if (firstName.isEmpty() && lastName.isEmpty())
 		{
@@ -78,7 +91,10 @@ public class LoginController
 					// Valid credentials.
 					if (currentUser != null)
 					{
-						System.out.println(currentUser.toString() + " logged in with a badge.");
+						// Put the user database ID into the MDC thing for log4j.
+						MDC.put("user_id", currentUser.getDatabaseID());
+
+						USRLOG.info(currentUser.toString() + " logged in with a badge.");
 						uiController.showMainMenu(currentUser.getRole());
 						destroyView();
 
@@ -90,6 +106,7 @@ public class LoginController
 					}
 					else
 					{
+						SYSLOG.debug("Incorrect Badge ID.");
 						PopupController.warning("Incorrect Badge ID.");
 					}
 				}
@@ -100,6 +117,7 @@ public class LoginController
 			}
 			else
 			{
+				SYSLOG.debug("Invalid Badge ID.");
 				PopupController.warning("Invalid Badge ID.");
 			}
 		}
@@ -114,7 +132,10 @@ public class LoginController
 					// Valid credentials.
 					if (currentUser != null)
 					{
-						System.out.println(currentUser.toString() + " logged in with PIN.");
+						// Put the user database ID into the MDC thing for log4j.
+						MDC.put("user_id", currentUser.getDatabaseID());
+
+						USRLOG.info(currentUser.toString() + " logged in with PIN.");
 						uiController.showMainMenu(currentUser.getRole());
 						destroyView();
 
@@ -126,7 +147,8 @@ public class LoginController
 					}
 					else
 					{
-						PopupController.warning("Incorrect PIN or Names.");
+						SYSLOG.info("Incorrect PIN or Names.");
+						PopupController.warning("Incorrect PIN or names.");
 					}
 				}
 				catch (final NoDatabaseLinkException e)
@@ -136,6 +158,7 @@ public class LoginController
 			}
 			else
 			{
+				SYSLOG.info("Invalid PIN.");
 				PopupController.warning("Invalid PIN.");
 			}
 		}
@@ -151,7 +174,12 @@ public class LoginController
 			debugController.setLogInButton(true);
 			debugController.setLogOutButton(false);
 		}
-		System.out.println(currentUser.toString() + " logged out.");
+
+		USRLOG.info(currentUser.toString() + " logged out.");
+
+		// Remove the user id from the log4j MDC thing.
+		MDC.remove("user_id");
+
 		currentUser = null;
 		uiController.destroyViews();
 		checkLogin();
@@ -171,9 +199,16 @@ public class LoginController
 		{
 			if (DatabaseController.getRoleID(userRoleName) == -1)
 				return false;
+
 			currentUser = UserController.getDebugUser(userRoleName);
+
+			// Put the user database ID into the MDC thing for log4j.
+			MDC.put("user_id", currentUser.getDatabaseID());
+
+			USRLOG.info(currentUser.toString() + " logged in via Debug Window.");
+
 			uiController.showMainMenu(currentUser.getRole());
-			System.out.println(currentUser.toString() + " logged in.");
+
 			return true;
 		}
 
@@ -215,10 +250,13 @@ public class LoginController
 			uiController.setView(Position.CENTER, getView());
 			uiController.setView(Position.BOTTOM, null);
 			uiController.resetMainMenu();
-			System.out.println("Login check failed.");
+			SYSLOG.debug("Login check failed.");
+
 			return false;
 		}
-		System.out.println("Login check passed.");
+
+		SYSLOG.debug("Login check passed.");
+
 		return true;
 	}
 

@@ -1,22 +1,18 @@
 package velho.view;
 
+import org.apache.log4j.Logger;
+
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
-import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
-import javafx.scene.layout.Background;
-import javafx.scene.layout.BackgroundFill;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Priority;
-import javafx.scene.paint.Paint;
-import javafx.scene.text.Font;
-import javafx.scene.text.FontWeight;
 import velho.controller.DatabaseController;
 import velho.controller.ListController;
 import velho.controller.RemovalListController;
@@ -30,6 +26,11 @@ import velho.model.RemovalListState;
  */
 public class ViewRemovalListView
 {
+	/**
+	 * Apache log4j logger: System.
+	 */
+	private static final Logger SYSLOG = Logger.getLogger(ViewRemovalListView.class.getName());
+
 	/**
 	 * The root BorderPane for this view.
 	 */
@@ -66,9 +67,7 @@ public class ViewRemovalListView
 			bpane = new BorderPane();
 
 			final GridPane top = new GridPane();
-			top.setPadding(new Insets(10, 10, 10, 10));
-			// TODO: Use CSS.
-			top.setBackground(new Background(new BackgroundFill(Paint.valueOf("EEEEEE"), null, null)));
+			top.getStyleClass().add("standard-padding");
 
 			final Button browseListsButton = new Button("Browse Removal Lists");
 			browseListsButton.setAlignment(Pos.CENTER_LEFT);
@@ -83,9 +82,9 @@ public class ViewRemovalListView
 			});
 
 			final Label removalListLabel = new Label("Removal List #" + removalList.getDatabaseID());
+			removalListLabel.getStyleClass().add("centered-title-small");
 			removalListLabel.setAlignment(Pos.CENTER);
 			removalListLabel.setMaxWidth(Double.MAX_VALUE);
-			removalListLabel.setFont(Font.font("Tahoma", FontWeight.BOLD, 12));
 			GridPane.setHgrow(removalListLabel, Priority.ALWAYS);
 
 			final ComboBox<Object> removalListState = new ComboBox<Object>();
@@ -131,7 +130,7 @@ public class ViewRemovalListView
 	 */
 	public void refresh()
 	{
-		System.out.println("Refreshing removal list viewing view.");
+		SYSLOG.trace("Refreshing removal list viewing view.");
 		thisList = removalListController.getNewRemovalListView();
 	}
 }

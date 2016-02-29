@@ -1,5 +1,7 @@
 package velho.controller;
 
+import org.apache.log4j.Logger;
+
 import javafx.scene.Node;
 import velho.model.enums.Position;
 import velho.model.exceptions.NoDatabaseLinkException;
@@ -13,6 +15,11 @@ import velho.view.MainWindow;
  */
 public class UIController
 {
+	/**
+	 * Apache log4j logger: System.
+	 */
+	private static final Logger SYSLOG = Logger.getLogger(UIController.class.getName());
+
 	/**
 	 * The {@link MainWindow}.
 	 */
@@ -38,14 +45,17 @@ public class UIController
 	 */
 	private RemovalListController removalListController;
 
+	private LogController logController;
+
 	public UIController(final MainWindow mainWindow, final ListController listController, final UserController userController,
-			final RemovalListController removalListController, final SearchController searchController)
+			final RemovalListController removalListController, final SearchController searchController, final LogController logController)
 	{
 		this.mainView = mainWindow;
 		this.listController = listController;
 		this.userController = userController;
 		this.removalListController = removalListController;
 		this.searchController = searchController;
+		this.logController = logController;
 	}
 
 	/**
@@ -74,7 +84,7 @@ public class UIController
 				mainView.setCenterView(view);
 				break;
 			default:
-				// Impossible.
+				SYSLOG.error("Unknown position '" + position.toString() + "'.");
 		}
 	}
 
@@ -96,6 +106,7 @@ public class UIController
 			case "Administrator":
 			case "Manager":
 				mainView.addTab("Add User", userController.getView());
+				mainView.addTab("Logs", logController.getView());
 				//$FALL-THROUGH$
 			case "Logistician":
 				mainView.addTab("Removal Lists", removalListController.getView());
@@ -106,7 +117,7 @@ public class UIController
 				mainView.addTab("Product List Search", listController.getProductListSearchView());
 				break;
 			default:
-				System.out.println("Unknown user role.");
+				SYSLOG.error("Unknown user role '" + currentUserRole.getName() + "'.");
 		}
 	}
 
@@ -132,13 +143,12 @@ public class UIController
 				case "Logistician":
 					return listController.getUserListView(DatabaseController.getPublicUserDataColumns(false), DatabaseController.getObservableUsers());
 				default:
-					System.out.println("Unknown user role.");
+					SYSLOG.error("Unknown user role '" + currentUserRole.getName() + "'.");
 			}
 		}
-		catch (final NoDatabaseLinkException e)
+		catch (NoDatabaseLinkException e)
 		{
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			DatabaseController.tryReLink();
 		}
 
 		return null;
