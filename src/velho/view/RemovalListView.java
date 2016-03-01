@@ -25,12 +25,12 @@ import velho.model.exceptions.NoDatabaseLinkException;
  *
  * @author Jose Uusitalo
  */
-public class ViewRemovalListView
+public class RemovalListView
 {
 	/**
 	 * Apache log4j logger: System.
 	 */
-	private static final Logger SYSLOG = Logger.getLogger(ViewRemovalListView.class.getName());
+	private static final Logger SYSLOG = Logger.getLogger(RemovalListView.class.getName());
 
 	/**
 	 * The root BorderPane for this view.
@@ -56,7 +56,7 @@ public class ViewRemovalListView
 	 * @param removalList
 	 * @param removalListController
 	 */
-	public ViewRemovalListView(final RemovalList removalList, final RemovalListController removalListController)
+	public RemovalListView(final RemovalList removalList, final RemovalListController removalListController)
 	{
 		this.removalList = removalList;
 		this.removalListController = removalListController;

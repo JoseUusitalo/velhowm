@@ -13,7 +13,7 @@ import velho.model.interfaces.UIActionController;
 import velho.view.GenericTabView;
 import velho.view.RemovalListCreationView;
 import velho.view.RemovalListManagementView;
-import velho.view.ViewRemovalListView;
+import velho.view.RemovalListView;
 
 /**
  * A class for managing {@link RemovalList} objects.
@@ -134,10 +134,10 @@ public class RemovalListController implements UIActionController
 		{
 			if (LoginController.userRoleIsGreaterOrEqualTo(new Manager()))
 
-				managementView.setContent(new ViewRemovalListView((RemovalList) data, this).getView());
+				managementView.setContent(new RemovalListView((RemovalList) data, this).getView());
 
 			else
-				tabView.setView(new ViewRemovalListView((RemovalList) data, this).getView());
+				tabView.setView(new RemovalListView((RemovalList) data, this).getView());
 		}
 		catch (NoDatabaseLinkException e)
 		{
