@@ -30,6 +30,7 @@ import velho.controller.ListController;
 import velho.controller.LogController;
 import velho.controller.LogDatabaseController;
 import velho.controller.LoginController;
+import velho.controller.ManifestController;
 import velho.controller.RemovalListController;
 import velho.controller.SearchController;
 import velho.controller.UIController;
@@ -140,6 +141,11 @@ public class MainWindow extends Application
 	private LogController logController;
 
 	/**
+	 * The {@link ManifestController}.
+	 */
+	private ManifestController manifestController;
+
+	/**
 	 * The main window constructor.
 	 */
 	public MainWindow()
@@ -191,10 +197,12 @@ public class MainWindow extends Application
 						debugController = new DebugController();
 						userController = new UserController();
 						logController = new LogController();
+						manifestController = new ManifestController();
 						listController = new ListController(userController);
 						searchController = new SearchController(listController);
 						removalListController = new RemovalListController(searchController);
-						uiController = new UIController(this, listController, userController, removalListController, searchController, logController);
+						uiController = new UIController(this, listController, userController, removalListController, searchController, logController,
+								manifestController);
 
 						LoginController.setControllers(uiController, debugController);
 

@@ -24,6 +24,8 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import velho.model.Administrator;
 import velho.model.Manager;
+import velho.model.Manifest;
+import velho.model.ManifestState;
 import velho.model.Product;
 import velho.model.ProductBox;
 import velho.model.ProductBoxSearchResultRow;
@@ -118,6 +120,12 @@ public class DatabaseController
 	 */
 	private static ObservableList<Object> observableRemovalListStates = FXCollections.observableArrayList();
 
+	/**
+	 * An observable list of {@link RemovalListState} objects for display in the
+	 * user interface.
+	 */
+	private static ObservableList<Object> observableManifests = FXCollections.observableArrayList();
+
 	/*
 	 * ---- CACHE MAPS ----
 	 */
@@ -161,6 +169,16 @@ public class DatabaseController
 	 * A map of {@link RemovalListState} objects loaded from the database.
 	 */
 	private static Map<Integer, RemovalListState> cachedRemovalListStates = new HashMap<Integer, RemovalListState>();
+
+	/**
+	 * A map of {@link ManifestState} objects loaded from the database.
+	 */
+	private static Map<Integer, ManifestState> cachedManifestStates = new HashMap<Integer, ManifestState>();
+
+	/**
+	 * A map of {@link Manifest} objects loaded from the database.
+	 */
+	private static Map<Integer, Manifest> cachedManifests = new HashMap<Integer, Manifest>();
 
 	/*
 	 * -------------------------------- PRIVATE DATABASE METHODS --------------------------------
@@ -361,7 +379,14 @@ public class DatabaseController
 								while (result.next())
 									dataSet.add(new RemovalList(result.getInt("removallist_id"), getRemovalListStateByID(result.getInt("liststate"))));
 								break;
-							// @formatter:on
+								// @formatter:on
+
+							case MANIFESTS:
+								// @formatter:off
+								while (result.next())
+									dataSet.add(new Manifest(result.getInt("manifest_id"), getManifestStateByID(result.getInt("state")), result.getInt("driver_id"), result.getDate("date_ordered"), result.getDate("date_received")));
+								break;
+								// @formatter:on
 
 							case REMOVALLIST_PRODUCTBOXES:
 								listBoxMap = new HashMap<Integer, ArrayList<Integer>>();
@@ -526,6 +551,8 @@ public class DatabaseController
 					case SHELVES:
 					case REMOVALLISTS:
 					case REMOVALLIST_STATES:
+					case MANIFESTS:
+					case MANIFEST_STATES:
 						return dataSet;
 					case SHELF_PRODUCTBOXES:
 						return shelfBoxMap;
@@ -1387,11 +1414,9 @@ public class DatabaseController
 	 */
 
 	/**
-	 * Gets a map of columns and column names for displaying
-	 * {@link #getPublicUserDataList()} data in a table.
+	 * Gets a map of columns and column names for displaying {@link User} objects in table views.
 	 *
-	 * @return a map where the key is the column value and value is the column
-	 * name
+	 * @return a map where the key is the column value and value is the column name
 	 */
 	public static Map<String, String> getPublicUserDataColumns(final boolean withDeleteColumn)
 	{
@@ -1407,13 +1432,11 @@ public class DatabaseController
 	}
 
 	/**
-	 * Gets a map of columns and column names for displaying
-	 * {@link #getPublicProductDataList()} data in a table.
+	 * Gets a map of columns and column names for displaying {@link Product} objects in table views.
 	 *
-	 * @return a map where the key is the column value and value is the column
-	 * name
+	 * @return a map where the key is the column value and value is the column name
 	 */
-	public static Map<String, String> getPublicProductDataColumns(final boolean withAddColumn, final boolean withDeleteColumn)
+	public static Map<String, String> getProductDataColumns(final boolean withAddColumn, final boolean withDeleteColumn)
 	{
 		final LinkedHashMap<String, String> cols = new LinkedHashMap<String, String>();
 
@@ -1432,11 +1455,9 @@ public class DatabaseController
 	}
 
 	/**
-	 * Gets a map of columns and column names for displaying
-	 * {@link #getPublicProductDataList()} data in a table.
+	 * Gets a map of columns and column names for displaying {@link RemovalList} objects in table views.
 	 *
-	 * @return a map where the key is the column value and value is the column
-	 * name
+	 * @return a map where the key is the column value and value is the column name
 	 */
 	public static Map<String, String> getRemovalListDataColumns()
 	{
@@ -1453,6 +1474,11 @@ public class DatabaseController
 		return cols;
 	}
 
+	/**
+	 * Gets a map of columns and column names for displaying {@link ProductBoxSearchResultRow} objects in table views.
+	 *
+	 * @return a map where the key is the column value and value is the column name
+	 */
 	public static Map<String, String> getProductSearchDataColumns(final boolean withAddColumn, final boolean withRemoveColumn)
 	{
 		final LinkedHashMap<String, String> cols = new LinkedHashMap<String, String>();
@@ -1471,6 +1497,24 @@ public class DatabaseController
 		cols.put("boxID", "Box ID");
 		cols.put("boxShelfSlot", "Shelf Slot");
 		cols.put("boxProductCount", "Amount");
+
+		return cols;
+	}
+
+	/**
+	 * Gets a map of columns and column names for displaying {@link Manifest} objects in table views.
+	 *
+	 * @return a map where the key is the column value and value is the column name
+	 */
+	public static Map<String, String> getManifestDataColumns()
+	{
+		final LinkedHashMap<String, String> cols = new LinkedHashMap<String, String>();
+		cols.put("databaseID", "ID");
+		cols.put("state", "State");
+		cols.put("driverID", "Driver");
+		cols.put("orderedDate", "Ordered");
+		cols.put("receivedDate", "Received");
+		cols.put("viewButton", "View");
 
 		return cols;
 	}
@@ -2036,6 +2080,40 @@ public class DatabaseController
 		return cachedRemovalListStates.get(stateid);
 	}
 
+	/**
+	 * Gets the {@link ManifestState} object from the given database ID.
+	 *
+	 * @param stateid manifest state database ID
+	 * @return the corresponding manifest state object
+	 * @throws NoDatabaseLinkException
+	 */
+	public static ManifestState getManifestStateByID(final int stateid) throws NoDatabaseLinkException
+	{
+		if (!cachedManifestStates.containsKey(stateid))
+		{
+			final String[] columns = { "name" };
+			final List<String> where = new ArrayList<String>();
+			where.add("manifest_state_id = " + new Integer(stateid));
+
+			@SuppressWarnings("unchecked")
+			final Set<String> result = (LinkedHashSet<String>) (runQuery(DatabaseQueryType.SELECT, DatabaseTable.MANIFEST_STATES, null, columns, null, where));
+
+			if (result.size() == 0)
+				return null;
+
+			final ManifestState s = new ManifestState(stateid, result.iterator().next());
+
+			// Store for reuse.
+			DBLOG.trace("Caching: " + s);
+			cachedManifestStates.put(s.getDatabaseID(), s);
+
+			return s;
+		}
+
+		DBLOG.trace("Loading ManifestState " + stateid + " from cache.");
+		return cachedManifestStates.get(stateid);
+	}
+
 	/*
 	 * -------------------------------- PRIVATE SETTER METHODS --------------------------------
 	 */
@@ -2303,6 +2381,7 @@ public class DatabaseController
 	/**
 	 * Updates an existing removal list in the database with the data from the
 	 * given removal list or creates a new one if it doesn't exist.
+	 * A database ID of -1 signifies a brand new {@link RemovalList}.
 	 *
 	 * @param removalList
 	 * new or existing removal list
@@ -2380,6 +2459,46 @@ public class DatabaseController
 		return true;
 	}
 
+	/**
+	 * Updates an existing manifest in the database with the data from the given manifest or creates a new one if it
+	 * doesn't exist.
+	 * A database ID of -1 signifies a brand new {@link Manifest}.
+	 *
+	 * @param removalList new or existing manifest
+	 * @return <code>true</code> if existing data was updated or a new manifest was created in the database
+	 */
+	@SuppressWarnings("unchecked")
+	public static boolean updateManifest(final Manifest manifest) throws NoDatabaseLinkException
+	{
+		int manifestID = manifest.getDatabaseID();
+
+		final Map<String, Object> values = new LinkedHashMap<String, Object>();
+		values.put("state", manifest.getState().getDatabaseID());
+
+		final List<String> where = new ArrayList<String>();
+
+		DatabaseQueryType query;
+
+		// If the manifest does not exist yet, INSERT.
+		if (manifestID < 1)
+			query = DatabaseQueryType.INSERT;
+		else
+		{
+			query = DatabaseQueryType.UPDATE;
+			where.add("manifest_id = " + manifestID);
+		}
+
+		// Insert/Update the manifest
+		Set<Integer> result = (LinkedHashSet<Integer>) runQuery(query, DatabaseTable.MANIFESTS, null, null, values, where);
+
+		if (result.size() == 0)
+			return false;
+
+		// Update the cache.
+		getRemovalListByID(manifestID, false);
+
+		return true;
+	}
 	/*
 	 * -------------------------------- CACHING --------------------------------
 	 */
@@ -2630,6 +2749,40 @@ public class DatabaseController
 		observableRemovalListStates.clear();
 		observableRemovalListStates.addAll(cachedRemovalListStates.values());
 		return observableRemovalListStates;
+	}
+
+	/**
+	 * Loads all {@link Manifest} objects from the database into the cache.
+	 *
+	 * @return an {@link ObservableList} of all manifests
+	 */
+	public static ObservableList<Object> getAllManifests() throws NoDatabaseLinkException
+	{
+		final String[] columns = { "*" };
+
+		@SuppressWarnings("unchecked")
+		final Set<Manifest> result = (LinkedHashSet<Manifest>) (runQuery(DatabaseQueryType.SELECT, DatabaseTable.MANIFESTS, null, columns, null, null));
+
+		if (result.size() == 0)
+			DBLOG.warn("No Manifests present in the database.");
+
+		final Iterator<Manifest> it = result.iterator();
+
+		// Store for reuse.
+		while (it.hasNext())
+		{
+			final Manifest m = it.next();
+
+			DBLOG.trace("Caching: " + m);
+
+			cachedManifests.put(m.getDatabaseID(), m);
+		}
+
+		DBLOG.info("All " + result.size() + " Manifests cached.");
+
+		observableManifests.clear();
+		observableManifests.addAll(cachedManifests.values());
+		return observableManifests;
 	}
 
 	/**

@@ -10,9 +10,9 @@ import velho.model.RemovalList;
 import velho.model.RemovalListState;
 import velho.model.exceptions.NoDatabaseLinkException;
 import velho.model.interfaces.UIActionController;
+import velho.view.GenericTabView;
 import velho.view.RemovalListCreationView;
 import velho.view.RemovalListManagementView;
-import velho.view.RemovalListTabView;
 import velho.view.ViewRemovalListView;
 
 /**
@@ -60,7 +60,7 @@ public class RemovalListController implements UIActionController
 	/**
 	 * The view in the tab itself.
 	 */
-	private RemovalListTabView tabView;
+	private GenericTabView tabView;
 
 	/**
 	 * @param listController
@@ -69,7 +69,7 @@ public class RemovalListController implements UIActionController
 	public RemovalListController(final SearchController searchController)
 	{
 		this.searchController = searchController;
-		tabView = new RemovalListTabView();
+		tabView = new GenericTabView();
 	}
 
 	@Override
@@ -143,9 +143,6 @@ public class RemovalListController implements UIActionController
 	 */
 	public Node getView()
 	{
-		// Create the view.
-		tabView.getView();
-
 		// Managers and greater see the management view.
 		if (LoginController.userRoleIsGreaterOrEqualTo(new Manager()))
 		{
