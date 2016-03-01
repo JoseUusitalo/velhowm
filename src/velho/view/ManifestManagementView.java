@@ -2,10 +2,14 @@ package velho.view;
 
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
+import javafx.geometry.HPos;
+import javafx.geometry.VPos;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.Priority;
 import velho.controller.ManifestController;
 
 /**
@@ -26,9 +30,9 @@ public class ManifestManagementView
 	private ManifestController manifestController;
 
 	/**
-	 * Button for showing all removal lists.
+	 * The header of the view in the tab.
 	 */
-	private Button browseButton;
+	private HBox managementPanel;
 
 	/**
 	 * @param manifestController
@@ -49,11 +53,20 @@ public class ManifestManagementView
 		{
 			bpane = new BorderPane();
 
-			final GridPane managementPanel = new GridPane();
+			managementPanel = new HBox(10);
 			managementPanel.getStyleClass().add("standard-padding");
 
-			browseButton = new Button("Browse Manifests");
-			managementPanel.add(browseButton, 0, 0);
+			Button browseButton = new Button("Browse Manifests");
+			GridPane.setConstraints(browseButton, 0, 0, 1, 1, HPos.LEFT, VPos.CENTER);
+
+			/*
+			 * After nearly an hour of trying to align the two nodes (button and state selector) on separate sides of
+			 * the HBox this was the best and only working solution.
+			 */
+			final HBox spacer = new HBox();
+			HBox.setHgrow(spacer, Priority.ALWAYS);
+
+			managementPanel.getChildren().addAll(browseButton, spacer);
 
 			browseButton.setOnAction(new EventHandler<ActionEvent>()
 			{
@@ -87,20 +100,28 @@ public class ManifestManagementView
 	}
 
 	/**
-	 * Destroys the view.
-	 */
-	public void destroy()
-	{
-		bpane = null;
-	}
-
-	/**
-	 * Sets the visibility of the browse removal lists button.
+	 * Adds the given node to the right end of the management panel.
+	 * Use <code>null</code> to remove the previously placed node.
 	 *
-	 * @param visible <code>true</code> to show the button
+	 * @param node node to add
 	 */
-	public void setBrowseListsButtonVisiblity(final boolean visible)
+	public void setRightNode(final Node node)
 	{
-		browseButton.setVisible(visible);
+		if (node == null)
+		{
+			try
+			{
+				// NOTE: Assumes that the panel only has the browse button and spacer in it permanently.
+				managementPanel.getChildren().remove(2);
+			}
+			catch (IndexOutOfBoundsException e)
+			{
+				// It's fine.
+			}
+		}
+		else
+		{
+			managementPanel.getChildren().add(node);
+		}
 	}
 }

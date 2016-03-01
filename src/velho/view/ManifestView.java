@@ -1,10 +1,18 @@
 package velho.view;
 
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
+import javafx.geometry.Pos;
+import javafx.scene.control.ComboBox;
+import javafx.scene.control.Label;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.HBox;
 import velho.controller.DatabaseController;
 import velho.controller.ListController;
 import velho.controller.ManifestController;
 import velho.model.Manifest;
+import velho.model.ManifestState;
+import velho.model.exceptions.NoDatabaseLinkException;
 
 /**
  * A view showing the data of a single {@link Manifest} object.
@@ -29,10 +37,15 @@ public class ManifestView
 	private Manifest manifest;
 
 	/**
-	 * @param manifestController
-	 * @param manifest
+	 * A combo box showing the {@link ManifestState} of the current open manifest.
 	 */
-	public ManifestView(final ManifestController manifestController, final Manifest manifest)
+	private HBox stateBox;
+
+	/**
+	 * @param manifest
+	 * @param manifestController
+	 */
+	public ManifestView(final Manifest manifest, final ManifestController manifestController)
 	{
 		this.manifestController = manifestController;
 		this.manifest = manifest;
@@ -43,7 +56,7 @@ public class ManifestView
 	 *
 	 * @return the manifest list root border pane
 	 */
-	public BorderPane getView()
+	public BorderPane getView() throws NoDatabaseLinkException
 	{
 		if (bpane == null)
 		{
@@ -52,6 +65,26 @@ public class ManifestView
 			BorderPane boxlist = (BorderPane) ListController.getTableView(manifestController, DatabaseController.getProductSearchDataColumns(false, false),
 					manifest.getObservableBoxes());
 
+			HBox stateBox = new HBox(10);
+			Label stateLabel = new Label("State:");
+			ComboBox<Object> manifestState = new ComboBox<Object>();
+
+			manifestState.getItems().addAll(DatabaseController.getAllManifestStates());
+			manifestState.getSelectionModel().select(manifest.getState());
+
+			stateBox.getChildren().addAll(stateLabel, manifestState);
+			stateBox.setAlignment(Pos.CENTER_RIGHT);
+
+			manifestState.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<Object>()
+			{
+				@Override
+				public void changed(final ObservableValue<?> observableValue, final Object oldValue, final Object newValue)
+				{
+					manifestController.setCurrentManifestState((ManifestState) newValue);
+				}
+			});
+
+			manifestController.showStateSelector(stateBox);
 			bpane.setCenter(boxlist);
 		}
 

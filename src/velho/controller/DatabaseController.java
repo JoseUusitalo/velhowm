@@ -80,51 +80,49 @@ public class DatabaseController
 	 */
 
 	/**
-	 * An observable list of users for display in the user interface.
+	 * An observable list of {@link User} objects for display in the user interface.
 	 */
 	private static ObservableList<Object> observableUsers = FXCollections.observableArrayList();
 
 	/**
-	 * An observable list of {@link Product} objects display in the user
-	 * interface.
+	 * An observable list of {@link Product} objects display in the user interface.
 	 */
 	private static ObservableList<Object> observableProducts = FXCollections.observableArrayList();
 
 	/**
-	 * An observable list of {@link Product} search results for display in the
-	 * user interface.
+	 * An observable list of {@link Product} search results for display in the user interface.
 	 */
 	private static ObservableList<Object> observableProductBoxSearchResults = FXCollections.observableArrayList();
 
 	/**
-	 * An observable list of {@link RemovalList} objects for display in the user
-	 * interface.
+	 * An observable list of {@link RemovalList} objects for display in the user interface.
 	 */
 	private static ObservableList<Object> observableRemovalLists = FXCollections.observableArrayList();
 
 	/**
-	 * An observable list of {@link ProductCategory} objects for display in the
-	 * user interface.
+	 * An observable list of {@link ProductCategory} objects for display in the user interface.
 	 */
 	private static ObservableList<Object> observableProductCategories = FXCollections.observableArrayList();
 
 	/**
-	 * An observable list of {@link ProductBrand} objects for display in the
-	 * user interface.
+	 * An observable list of {@link ProductBrand} objects for display in the user interface.
 	 */
 	private static ObservableList<Object> observableProductBrands = FXCollections.observableArrayList();
 
 	/**
-	 * An observable list of {@link RemovalListState} objects for display in the
-	 * user interface.
+	 * An observable list of {@link RemovalListState} objects for display in the user interface.
 	 */
 	private static ObservableList<Object> observableRemovalListStates = FXCollections.observableArrayList();
 
 	/**
-	 * An observable list of {@link RemovalListState} objects for display in the
-	 * user interface.
+	 * An observable list of {@link RemovalListState} objects for display in the user interface.
 	 */
 	private static ObservableList<Object> observableManifests = FXCollections.observableArrayList();
+
+	/**
+	 * An observable list of {@link ManifestState} objects for display in the user interface.
+	 */
+	private static ObservableList<Object> observableManifestStates = FXCollections.observableArrayList();
 
 	/*
 	 * ---- CACHE MAPS ----
@@ -385,6 +383,11 @@ public class DatabaseController
 
 								break;
 
+							case REMOVALLIST_STATES:
+								while (result.next())
+									dataSet.add(new RemovalListState(result.getInt("removallist_state_id"), result.getString("name")));
+								break;
+
 							case REMOVALLISTS:
 								// @formatter:off
 								while (result.next())
@@ -392,6 +395,11 @@ public class DatabaseController
 																getRemovalListStateByID(result.getInt("liststate"))));
 								break;
 								// @formatter:on
+
+							case MANIFEST_STATES:
+								while (result.next())
+									dataSet.add(new ManifestState(result.getInt("manifest_state_id"), result.getString("name")));
+								break;
 
 							case MANIFESTS:
 								// @formatter:off
@@ -2828,8 +2836,36 @@ public class DatabaseController
 		return observableProductBrands;
 	}
 
-	public static ObservableList<Object> getAllRemovalListStates()
+	/**
+	 * Loads all {@link RemovalListState} objects from the database into the cache.
+	 *
+	 * @return an {@link ObservableList} of all removal list states
+	 */
+	public static ObservableList<Object> getAllRemovalListStates() throws NoDatabaseLinkException
 	{
+		final String[] columns = { "*" };
+
+		@SuppressWarnings("unchecked")
+		final Set<RemovalListState> result = (LinkedHashSet<RemovalListState>) (runQuery(DatabaseQueryType.SELECT, DatabaseTable.REMOVALLIST_STATES, null,
+				columns, null, null));
+
+		if (result.size() == 0)
+			DBLOG.warn("No Removal List States present in the database.");
+
+		final Iterator<RemovalListState> it = result.iterator();
+
+		// Store for reuse.
+		while (it.hasNext())
+		{
+			final RemovalListState s = it.next();
+
+			DBLOG.trace("Caching: " + s);
+
+			cachedRemovalListStates.put(s.getDatabaseID(), s);
+		}
+
+		DBLOG.info("All " + result.size() + " Removal List States cached.");
+
 		observableRemovalListStates.clear();
 		observableRemovalListStates.addAll(cachedRemovalListStates.values());
 		return observableRemovalListStates;
@@ -2902,6 +2938,41 @@ public class DatabaseController
 		}
 
 		DBLOG.debug(boxcount + " ProductBoxes placed on " + manifestBoxes.size() + " Manifests.");
+	}
+
+	/**
+	 * Loads all {@link ManifestState} objects from the database into the cache.
+	 *
+	 * @return an {@link ObservableList} of all manifest states
+	 */
+	public static ObservableList<Object> getAllManifestStates() throws NoDatabaseLinkException
+	{
+		final String[] columns = { "*" };
+
+		@SuppressWarnings("unchecked")
+		final Set<ManifestState> result = (LinkedHashSet<ManifestState>) (runQuery(DatabaseQueryType.SELECT, DatabaseTable.MANIFEST_STATES, null, columns, null,
+				null));
+
+		if (result.size() == 0)
+			DBLOG.warn("No Manifest States present in the database.");
+
+		final Iterator<ManifestState> it = result.iterator();
+
+		// Store for reuse.
+		while (it.hasNext())
+		{
+			final ManifestState s = it.next();
+
+			DBLOG.trace("Caching: " + s);
+
+			cachedManifestStates.put(s.getDatabaseID(), s);
+		}
+
+		DBLOG.info("All " + result.size() + " Removal List States cached.");
+
+		observableManifestStates.clear();
+		observableManifestStates.addAll(cachedManifestStates.values());
+		return observableManifestStates;
 	}
 
 	/**

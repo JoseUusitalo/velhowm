@@ -4,6 +4,7 @@ import org.apache.log4j.Logger;
 
 import javafx.scene.Node;
 import velho.model.Manifest;
+import velho.model.ManifestState;
 import velho.model.exceptions.NoDatabaseLinkException;
 import velho.model.interfaces.UIActionController;
 import velho.view.GenericTabView;
@@ -23,6 +24,11 @@ public class ManifestController implements UIActionController
 	private static final Logger USRLOG = Logger.getLogger("userLogger");
 
 	/**
+	 * Apache log4j logger: System.
+	 */
+	private static final Logger SYSLOG = Logger.getLogger(ManifestController.class.getName());
+
+	/**
 	 * The manifests tab.
 	 */
 	private GenericTabView tabView;
@@ -31,6 +37,8 @@ public class ManifestController implements UIActionController
 	 * The panel in the manifest tab.
 	 */
 	private ManifestManagementView managementView;
+
+	private Manifest currentManifest;
 
 	/**
 	 */
@@ -94,6 +102,7 @@ public class ManifestController implements UIActionController
 		try
 		{
 			managementView.setContent(getBrowseManifestsView());
+			showStateSelector(null);
 		}
 		catch (NoDatabaseLinkException e)
 		{
@@ -108,8 +117,17 @@ public class ManifestController implements UIActionController
 	 */
 	public void showManifestView(final Manifest manifest)
 	{
-		USRLOG.info("Viewing manifest: " + manifest);
-		managementView.setContent(new ManifestView(this, manifest).getView());
+		try
+		{
+			USRLOG.info("Viewing manifest: " + manifest);
+			currentManifest = manifest;
+			managementView.setContent(new ManifestView(manifest, this).getView());
+			// The method showing the combo box state selector is called in the view.
+		}
+		catch (NoDatabaseLinkException e)
+		{
+			DatabaseController.tryReLink();
+		}
 	}
 
 	/**
@@ -130,5 +148,39 @@ public class ManifestController implements UIActionController
 		}
 
 		return tabView.getView();
+	}
+
+	/**
+	 * Changes the state of the manifest currently being viewed.
+	 *
+	 * @param newState the new state of the manifest
+	 */
+	public void setCurrentManifestState(final ManifestState newState)
+	{
+		USRLOG.info(currentManifest + " state changed to " + newState + ".");
+		currentManifest.setState(newState);
+
+		try
+		{
+			if (currentManifest.saveToDatabase())
+				SYSLOG.info("Updated database: " + currentManifest);
+			else
+				SYSLOG.info("Database update failed: " + currentManifest);
+		}
+		catch (NoDatabaseLinkException e)
+		{
+			DatabaseController.tryReLink();
+		}
+	}
+
+	/**
+	 * Adds the manifest state selector to the management panel.
+	 * Use <code>null</code> to remove it.
+	 *
+	 * @param manifestState the manifest state combo box
+	 */
+	public void showStateSelector(final Node stateBox)
+	{
+		managementView.setRightNode(stateBox);
 	}
 }
