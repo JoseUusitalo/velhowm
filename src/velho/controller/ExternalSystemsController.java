@@ -2,8 +2,12 @@ package velho.controller;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
+
+import org.apache.log4j.Logger;
 
 import velho.model.BarcodeScanner;
 import velho.model.Printer;
@@ -17,6 +21,24 @@ import velho.model.exceptions.NoDatabaseLinkException;
  */
 public class ExternalSystemsController
 {
+	/**
+	 * Apache log4j logger: System.
+	 */
+	private static final Logger SYSLOG = Logger.getLogger(ExternalSystemsController.class.getName());
+
+	/**
+	 * The {@link ManifestController}.
+	 */
+	private static ManifestController manifestController;
+
+	/**
+	 * @param manifestController
+	 */
+	public static void setControllers(final ManifestController manifestController)
+	{
+		ExternalSystemsController.manifestController = manifestController;
+	}
+
 	/**
 	 * Prints received list, if list is empty it prints "List is empty." to the user.
 	 *
@@ -163,5 +185,11 @@ public class ExternalSystemsController
 			DebugController.moveResult(productBoxCode, newShelfSlotID, success);
 
 		return success;
+	}
+
+	public static void receiveManifestBarcode(final Set<ProductBox> boxSet, final Date orderDate, final int driverID)
+	{
+		SYSLOG.info("VelhoWM has received a manifest by driver " + driverID + " with " + boxSet.size() + " product boxes.");
+		manifestController.receiveShipment(boxSet, orderDate, driverID);
 	}
 }

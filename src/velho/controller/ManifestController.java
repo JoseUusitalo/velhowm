@@ -1,10 +1,16 @@
 package velho.controller;
 
+import java.time.Instant;
+import java.util.Date;
+import java.util.Set;
+
 import org.apache.log4j.Logger;
 
 import javafx.scene.Node;
+import velho.model.Manager;
 import velho.model.Manifest;
 import velho.model.ManifestState;
+import velho.model.ProductBox;
 import velho.model.exceptions.NoDatabaseLinkException;
 import velho.model.interfaces.UIActionController;
 import velho.view.GenericTabView;
@@ -182,5 +188,41 @@ public class ManifestController implements UIActionController
 	public void showStateSelector(final Node stateBox)
 	{
 		managementView.setRightNode(stateBox);
+	}
+
+	/**
+	 * Processes the set of boxes that barcode scanner built from the barcode of the newly arrived shipment manifest.
+	 *
+	 * @param boxSet set of {@link ProductBox} objects on the physical manifest
+	 */
+	public void receiveShipment(final Set<ProductBox> boxSet, final Date orderDate, final int driverID)
+	{
+		Manifest manifest;
+
+		// TODO: Update the manifest browse view automatically.
+
+		try
+		{
+			manifest = new Manifest(DatabaseController.getManifestStateByID(3), driverID, orderDate, Date.from(Instant.now()));
+			manifest.setProductBoxes(boxSet);
+
+			if (manifest.saveToDatabase())
+			{
+				// If the user is a Manager (but not an Administrator!) show a popup.
+				if (LoginController.userRoleIs(new Manager()))
+				{
+					if (PopupController
+							.confirmation("A shipment has arrived. Please accept or refuse it in the Manifest tab. Would you like to view the manifest now?"))
+					{
+						showManifestView(manifest);
+					}
+				}
+			}
+		}
+		catch (NoDatabaseLinkException e)
+		{
+			DatabaseController.tryReLink();
+		}
+
 	}
 }

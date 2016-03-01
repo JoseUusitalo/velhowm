@@ -64,10 +64,32 @@ public class Manifest
 	/**
 	 * @param databaseID
 	 * @param state
+	 * @param driverID
+	 * @param ordered
+	 * @param received
 	 */
 	public Manifest(final int databaseID, final ManifestState state, final int driverID, final Date ordered, final Date received)
 	{
 		this.databaseID = databaseID;
+		this.state = state;
+		this.driverID = driverID;
+		this.ordered = ordered;
+		this.received = received;
+		this.boxes = new LinkedHashSet<ProductBox>();
+		this.observableBoxes = FXCollections.observableArrayList();
+	}
+
+	/**
+	 * Creates a new manifest with the given data that does not exist in the database.
+	 *
+	 * @param state
+	 * @param driverID
+	 * @param ordered
+	 * @param received
+	 */
+	public Manifest(final ManifestState state, final int driverID, final Date ordered, final Date received)
+	{
+		this.databaseID = -1;
 		this.state = state;
 		this.driverID = driverID;
 		this.ordered = ordered;

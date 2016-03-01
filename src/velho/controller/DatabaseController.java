@@ -5,10 +5,13 @@ import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
@@ -75,6 +78,10 @@ public class DatabaseController
 	 */
 	private static JdbcConnectionPool connectionPool;
 
+	/**
+	 * The date format used by the database.
+	 */
+	private static final SimpleDateFormat H2_DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd");
 	/*
 	 * ---- UI LISTS ----
 	 */
@@ -192,6 +199,17 @@ public class DatabaseController
 	{
 		String escaped = sql.replace("'", "''");
 		return escaped.replace("\"", "\\\"");
+	}
+
+	/**
+	 * Formats the given date into a H2 date string.
+	 *
+	 * @param date date to format
+	 * @return a string that can be inserted into the database
+	 */
+	private static String getH2DateFormat(final Date date)
+	{
+		return H2_DATE_FORMAT.format(date);
 	}
 
 	/**
@@ -1234,41 +1252,6 @@ public class DatabaseController
 	}
 
 	/**
-	 * Gets the {@link Product} object from the given product ID.
-	 *
-	 * @param productid
-	 * product database ID
-	 * @return the corresponding product object
-	 * @throws NoDatabaseLinkException
-	 */
-	private static Product getProductByID(final int productid) throws NoDatabaseLinkException
-	{
-		if (!cachedProducts.containsKey(productid))
-		{
-			final String[] columns = { "*" };
-			final List<String> where = new ArrayList<String>();
-			where.add("product_id = " + new Integer(productid));
-
-			@SuppressWarnings("unchecked")
-			final Set<Object> result = (LinkedHashSet<Object>) (runQuery(DatabaseQueryType.SELECT, DatabaseTable.PRODUCTS, null, columns, null, where));
-
-			if (result.size() == 0)
-				return null;
-
-			final Product p = (Product) result.iterator().next();
-
-			// Store for reuse.
-			DBLOG.trace("Caching: " + p);
-
-			cachedProducts.put(p.getProductID(), p);
-			return p;
-		}
-
-		DBLOG.trace("Loading Product " + productid + " from cache.");
-		return cachedProducts.get(productid);
-	}
-
-	/**
 	 * Gets the product box that will expire the soonest.
 	 *
 	 * @param boxes boxes to search from
@@ -1478,6 +1461,41 @@ public class DatabaseController
 	/*
 	 * -------------------------------- PUBLIC GETTER METHODS --------------------------------
 	 */
+
+	/**
+	 * Gets the {@link Product} object from the given product ID.
+	 *
+	 * @param productid
+	 * product database ID
+	 * @return the corresponding product object
+	 * @throws NoDatabaseLinkException
+	 */
+	public static Product getProductByID(final int productid) throws NoDatabaseLinkException
+	{
+		if (!cachedProducts.containsKey(productid))
+		{
+			final String[] columns = { "*" };
+			final List<String> where = new ArrayList<String>();
+			where.add("product_id = " + new Integer(productid));
+
+			@SuppressWarnings("unchecked")
+			final Set<Object> result = (LinkedHashSet<Object>) (runQuery(DatabaseQueryType.SELECT, DatabaseTable.PRODUCTS, null, columns, null, where));
+
+			if (result.size() == 0)
+				return null;
+
+			final Product p = (Product) result.iterator().next();
+
+			// Store for reuse.
+			DBLOG.trace("Caching: " + p);
+
+			cachedProducts.put(p.getProductID(), p);
+			return p;
+		}
+
+		DBLOG.trace("Loading Product " + productid + " from cache.");
+		return cachedProducts.get(productid);
+	}
 
 	/**
 	 * Gets a map of columns and column names for displaying {@link User} objects in table views.
@@ -1894,7 +1912,10 @@ public class DatabaseController
 				DBLOG.trace("Updating cache: " + m);
 
 			cachedManifests.put(m.getDatabaseID(), m);
-			setContainersToRemovalList(manifestid);
+			setContainersToManifest(manifestid);
+
+			observableManifests.clear();
+			observableManifests.addAll(cachedManifests.values());
 
 			return cachedManifests.get(manifestid);
 		}
@@ -2297,9 +2318,33 @@ public class DatabaseController
 		}
 		else
 			DBLOG.debug("Nothing to place.");
-
 	}
 
+	private static void setContainersToManifest(final int manifestid) throws NoDatabaseLinkException
+	{
+		DBLOG.debug("Placing product boxes on manifest " + manifestid + "...");
+
+		final List<String> where = new ArrayList<String>();
+		where.add("manifest = " + manifestid);
+
+		final String[] columns = { "productbox" };
+		@SuppressWarnings("unchecked")
+		final Set<Integer> manifestBoxes = (LinkedHashSet<Integer>) runQuery(DatabaseQueryType.SELECT, DatabaseTable.MANIFEST_PRODUCTBOXES, null, columns, null,
+				where);
+
+		if (!manifestBoxes.isEmpty())
+		{
+			Set<ProductBox> boxes = new HashSet<ProductBox>();
+			for (final Integer id : manifestBoxes)
+				boxes.add(getProductBoxByID(id));
+
+			cachedManifests.get(manifestid).setProductBoxes(boxes);
+
+			DBLOG.debug("Product boxes placed on manifest " + manifestid + ".");
+		}
+		else
+			DBLOG.debug("Nothing to place.");
+	}
 	/*
 	 * -------------------------------- PUBLIC SETTER METHODS --------------------------------
 	 */
@@ -2586,6 +2631,9 @@ public class DatabaseController
 
 		final Map<String, Object> values = new LinkedHashMap<String, Object>();
 		values.put("state", manifest.getState().getDatabaseID());
+		values.put("driver_id", manifest.getDriverID());
+		values.put("date_ordered", getH2DateFormat(manifest.getOrderedDate()));
+		values.put("date_received", getH2DateFormat(manifest.getReceivedDate()));
 
 		final List<String> where = new ArrayList<String>();
 
@@ -2607,10 +2655,11 @@ public class DatabaseController
 			return false;
 
 		// Update the cache.
-		getRemovalListByID(manifestID, false);
+		getManifestByID(manifestID, false);
 
 		return true;
 	}
+
 	/*
 	 * -------------------------------- CACHING --------------------------------
 	 */

@@ -108,16 +108,13 @@ public class DebugWindow
 		grid = new GridPane();
 		grid.setVgap(5);
 		grid.setHgap(10);
-		grid.add(new Label("User :"), 0, 0);
+
+		Button sendRandomShipmentButton = new Button("Send Random Shipment");
+
 		roleListBox.getItems().addAll(rolenameSet);
 		roleListBox.getSelectionModel().selectFirst();
 
 		logOutButton.setVisible(false);
-
-		grid.add(roleListBox, 1, 0);
-		grid.add(logInButton, 2, 0);
-		grid.add(logOutButton, 2, 1);
-		grid.add(scannerMoveValid, 1, 1);
 
 		rootBorderPane.setCenter(grid);
 		root.getChildren().add(rootBorderPane);
@@ -152,6 +149,24 @@ public class DebugWindow
 				debugController.scannerMoveValid();
 			}
 		});
+
+		sendRandomShipmentButton.setOnAction(new EventHandler<ActionEvent>()
+		{
+
+			@Override
+			public void handle(final ActionEvent event)
+			{
+
+				DebugController.sendRandomShipment();
+			}
+		});
+
+		grid.add(new Label("User :"), 0, 0);
+		grid.add(roleListBox, 1, 0);
+		grid.add(logInButton, 2, 0);
+		grid.add(logOutButton, 2, 1);
+		grid.add(scannerMoveValid, 1, 1);
+		grid.add(sendRandomShipmentButton, 1, 2);
 
 		primaryStage.setScene(scene);
 		primaryStage.show();

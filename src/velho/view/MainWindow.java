@@ -26,6 +26,7 @@ import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
 import velho.controller.DatabaseController;
 import velho.controller.DebugController;
+import velho.controller.ExternalSystemsController;
 import velho.controller.ListController;
 import velho.controller.LogController;
 import velho.controller.LogDatabaseController;
@@ -68,7 +69,7 @@ public class MainWindow extends Application
 	/**
 	 * Enable TRACE level logging. DEBUG_MODE must be <code>true</code> for this to affect anything.
 	 */
-	public static final boolean SHOW_TRACE = false;
+	public static final boolean SHOW_TRACE = true;
 
 	/**
 	 * The height of the window.
@@ -198,6 +199,9 @@ public class MainWindow extends Application
 						userController = new UserController();
 						logController = new LogController();
 						manifestController = new ManifestController();
+
+						ExternalSystemsController.setControllers(manifestController);
+
 						listController = new ListController(userController);
 						searchController = new SearchController(listController);
 						removalListController = new RemovalListController(searchController);
