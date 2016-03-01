@@ -139,6 +139,19 @@ CREATE TABLE IF NOT EXISTS `manifest_states`
 	`name` VARCHAR(128) NOT NULL
 ) DEFAULT CHARSET=utf8;
 
+DROP TABLE IF EXISTS `manifests`;
+CREATE TABLE IF NOT EXISTS `manifests`
+(
+	`manifest_id` INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+	`state` INT UNSIGNED NOT NULL,
+	`driver_id` INT UNSIGNED NOT NULL,
+	`date_ordered` DATE NOT NULL,
+	`date_received` DATE NOT NULL,
+	
+	FOREIGN KEY (`state`) REFERENCES `manifest_states`(`manifest_state_id`),
+	CHECK (`date_received`>=`date_ordered`)
+) DEFAULT CHARSET=utf8;
+
 DROP TABLE IF EXISTS `manifest_productboxes`;
 CREATE TABLE IF NOT EXISTS `manifest_productboxes`
 (
@@ -150,19 +163,6 @@ CREATE TABLE IF NOT EXISTS `manifest_productboxes`
 	PRIMARY KEY (`manifest`,`productbox`)
 ) DEFAULT CHARSET=utf8;
 
-
-DROP TABLE IF EXISTS `manifests`;
-CREATE TABLE IF NOT EXISTS `manifests`
-(
-	`manifest_id` INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
-	`driver_id` INT UNSIGNED NOT NULL,
-	`date_ordered` DATE NOT NULL,
-	`date_received` DATE NOT NULL,
-	`state` INT UNSIGNED NOT NULL,
-	
-	FOREIGN KEY (`state`) REFERENCES `manifest_states`(`manifest_state_id`),
-	CHECK (`date_received`>=`date_ordered`)
-) DEFAULT CHARSET=utf8;
 
 /* ---- EXAMPLE DATA ---- */
 
