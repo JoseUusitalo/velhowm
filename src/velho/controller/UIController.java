@@ -106,7 +106,7 @@ public class UIController
 				mainView.addTab("Product List", listController.getProductListView(DatabaseController.getPublicProductDataColumns(false, false), DatabaseController.getObservableProducts()));
 				mainView.addTab("Search", searchController.getSearchTabView());
 				mainView.addTab("Product List Search", listController.getProductListSearchView());
-				mainView.addTab("Product Edit View", productController.getProductEditView());
+				mainView.addTab("Add Product", productController.getProductEditView());
 				break;
 			default:
 				System.out.println("Unknown user role.");

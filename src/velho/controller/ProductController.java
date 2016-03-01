@@ -1,7 +1,7 @@
 package velho.controller;
 
 import javafx.scene.Node;
-import velho.view.ProductEditView;
+import velho.view.AddProductView;
 
 /**
  * Controls logging users in and out.
@@ -12,9 +12,9 @@ public class ProductController
 {
 
 	/**
-	 * The {@link ProductEditView}.
+	 * The {@link AddProductView}.
 	 */
-	private static ProductEditView productEditView;
+	private static AddProductView addProductView;
 
 	/**
 	 * The {@link UIController}.
@@ -23,12 +23,12 @@ public class ProductController
 
 	public ProductController()
 	{
-		this.productEditView = new ProductEditView(this);
+		this.addProductView = new AddProductView(this);
 	}
 
 	public Node getProductEditView()
 	{
-		return productEditView.getProductView();
+		return addProductView.getProductView();
 	}
 
 }
