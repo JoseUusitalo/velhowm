@@ -1308,6 +1308,20 @@ public class DatabaseController
 		return oldest;
 	}
 
+	/**
+	 * Attempts to find a subset of {@link ProductBox} objects from the given list of product boxes that contain at
+	 * least the wanted number of products.
+	 * The algorithm attempts to find a set of boxes that are the closest match to the given wantedProductCount and will
+	 * only go over this amount by the smallest possible number of products if no suitable product boxes exist in the
+	 * list that would satisfy the wanted product count exactly.
+	 * If the given list of boxes does not contain enough products in total to reach the wanted amount, the entire list
+	 * is returned.
+	 *
+	 * @param boxes list of product box objects to search from
+	 * @param wantedProductCount number of products wanted from the given product boxes
+	 * @return a list of product boxes that either contains at least the wanted number of products, or if there were not
+	 * enough products, the same list that was given
+	 */
 	private static List<ProductBox> getBoxesContainingAtLeastProducts(final List<ProductBox> boxes, final Integer wantedProductCount)
 	{
 		final Map<Integer, List<ProductBox>> boxProductCount = new TreeMap<Integer, List<ProductBox>>();
@@ -2381,6 +2395,13 @@ public class DatabaseController
 		return changed;
 	}
 
+	/**
+	 * Deletes the removal list from the database with the given ID.
+	 *
+	 * @param databaseID ID of the removal list to delete
+	 * @return <code>true</code> if the list was deleted
+	 * @throws NoDatabaseLinkException
+	 */
 	public static boolean deleteRemovalListByID(final int databaseID) throws NoDatabaseLinkException
 	{
 		final List<String> where = new ArrayList<String>();
