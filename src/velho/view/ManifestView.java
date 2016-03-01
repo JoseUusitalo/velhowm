@@ -37,11 +37,6 @@ public class ManifestView
 	private Manifest manifest;
 
 	/**
-	 * A combo box showing the {@link ManifestState} of the current open manifest.
-	 */
-	private HBox stateBox;
-
-	/**
 	 * @param manifest
 	 * @param manifestController
 	 */
@@ -69,7 +64,7 @@ public class ManifestView
 			Label stateLabel = new Label("State:");
 			ComboBox<Object> manifestState = new ComboBox<Object>();
 
-			manifestState.getItems().addAll(DatabaseController.getAllManifestStates());
+			manifestState.getItems().addAll(DatabaseController.getAllManifestStates(manifest.getState()));
 			manifestState.getSelectionModel().select(manifest.getState());
 
 			stateBox.getChildren().addAll(stateLabel, manifestState);

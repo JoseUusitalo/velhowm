@@ -1630,7 +1630,7 @@ public class DatabaseController
 	 * Authenticates a user with the given badge ID string.
 	 * </p>
 	 * <p>
-	 * Warnign: Assumes that the badge ID is techinically valid.
+	 * Warning: Assumes that the badge ID is technically valid.
 	 * </p>
 	 *
 	 * @param badgeID
@@ -1670,7 +1670,7 @@ public class DatabaseController
 	 * Authenticates a user with the given PIN string.
 	 * </p>
 	 * <p>
-	 * Warnign: Assumes that the PIN is techinically valid.
+	 * Warning: Assumes that the PIN is technically valid.
 	 * </p>
 	 *
 	 * @param pin
@@ -2966,7 +2966,7 @@ public class DatabaseController
 	 *
 	 * @return an {@link ObservableList} of all manifest states
 	 */
-	public static ObservableList<Object> getAllManifestStates() throws NoDatabaseLinkException
+	public static ObservableList<Object> getAllManifestStates(final ManifestState currentState) throws NoDatabaseLinkException
 	{
 		final String[] columns = { "*" };
 
@@ -2992,7 +2992,23 @@ public class DatabaseController
 		DBLOG.info("All " + result.size() + " Removal List States cached.");
 
 		observableManifestStates.clear();
-		observableManifestStates.addAll(cachedManifestStates.values());
+
+		/*
+		 * This is the list of states shown in the manifest view that allows the user to change the state of the list.
+		 * Only Managers are allowed accept and reject manifests.
+		 * Logisticians can also see the accepted/rejected state if it is the current state of the manifest.
+		 */
+		for (final ManifestState state : cachedManifestStates.values())
+		{
+			if (state.getName().equals("Accepted") || state.getName().equals("Rejected"))
+			{
+				if (LoginController.userRoleIsGreaterOrEqualTo(new Manager()) || state.compareTo(currentState) == 0)
+					observableManifestStates.add(state);
+			}
+			else
+				observableManifestStates.add(state);
+		}
+
 		return observableManifestStates;
 	}
 
