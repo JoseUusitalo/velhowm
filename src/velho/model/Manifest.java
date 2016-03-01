@@ -4,6 +4,7 @@ import java.sql.Date;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
+import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import velho.controller.DatabaseController;
 import velho.model.exceptions.NoDatabaseLinkException;
@@ -35,10 +36,19 @@ public class Manifest
 	 */
 	private ManifestState state;
 
+	/**
+	 * The ID of the driver who delivered the shipment.
+	 */
 	private int driverID;
 
+	/**
+	 * The data the shipment was ordered.
+	 */
 	private Date ordered;
 
+	/**
+	 * The data the shipment was received.
+	 */
 	private Date received;
 
 	/**
@@ -48,6 +58,7 @@ public class Manifest
 	{
 		this.state = new ManifestState(3, "Received");
 		this.boxes = new LinkedHashSet<ProductBox>();
+		this.observableBoxes = FXCollections.observableArrayList();
 	}
 
 	/**
@@ -62,6 +73,7 @@ public class Manifest
 		this.ordered = ordered;
 		this.received = received;
 		this.boxes = new LinkedHashSet<ProductBox>();
+		this.observableBoxes = FXCollections.observableArrayList();
 	}
 
 	@Override
@@ -159,6 +171,23 @@ public class Manifest
 	public void setState(final ManifestState state)
 	{
 		this.state = state;
+	}
+
+	/**
+	 * Adds the specified {@link ProductBox} objects to this manifest.
+	 *
+	 * @param productBoxes set of boxes to add to this list
+	 * @return <code>true</code> if all boxes were added to this manifest
+	 */
+	public boolean setProductBoxes(final Set<ProductBox> productBoxes)
+	{
+		this.boxes = productBoxes;
+		boolean bswitch = true;
+
+		for (final ProductBox box : productBoxes)
+			bswitch = bswitch && (observableBoxes.add(new ProductBoxSearchResultRow(box)));
+
+		return bswitch;
 	}
 
 	/**

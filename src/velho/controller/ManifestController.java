@@ -7,6 +7,7 @@ import velho.model.Manifest;
 import velho.model.exceptions.NoDatabaseLinkException;
 import velho.model.interfaces.UIActionController;
 import velho.view.GenericTabView;
+import velho.view.ManifestManagementView;
 import velho.view.ManifestView;
 
 /**
@@ -17,14 +18,19 @@ import velho.view.ManifestView;
 public class ManifestController implements UIActionController
 {
 	/**
-	 * Apache log4j logger: System.
+	 * Apache log4j logger: User.
 	 */
-	private static final Logger SYSLOG = Logger.getLogger(ManifestController.class.getName());
+	private static final Logger USRLOG = Logger.getLogger("userLogger");
 
 	/**
 	 * The manifests tab.
 	 */
 	private GenericTabView tabView;
+
+	/**
+	 * The panel in the manifest tab.
+	 */
+	private ManifestManagementView managementView;
 
 	/**
 	 */
@@ -37,23 +43,9 @@ public class ManifestController implements UIActionController
 	 *
 	 * @return a tabular view of all manifests
 	 */
-	public Node getView()
+	public Node getBrowseManifestsView() throws NoDatabaseLinkException
 	{
-		if (tabView == null)
-		{
-			tabView = new GenericTabView();
-			try
-			{
-				tabView.setView(ListController.getTableView(this, DatabaseController.getManifestDataColumns(), DatabaseController.getAllManifests()));
-			}
-			catch (NoDatabaseLinkException e)
-			{
-				DatabaseController.tryReLink();
-				tabView.setView(null);
-			}
-		}
-
-		return tabView.getView();
+		return ListController.getTableView(this, DatabaseController.getManifestDataColumns(), DatabaseController.getAllManifests());
 	}
 
 	@Override
@@ -65,7 +57,7 @@ public class ManifestController implements UIActionController
 	@Override
 	public void updateAction(final Object data)
 	{
-		// TODO Auto-generated method stub
+		System.out.println("UPDATE: " + ((Manifest) data).toString());
 	}
 
 	@Override
@@ -89,6 +81,54 @@ public class ManifestController implements UIActionController
 	@Override
 	public void viewAction(final Object data)
 	{
-		tabView.setView(new ManifestView(this, (Manifest) data).getView());
+		showManifestView((Manifest) data);
+	}
+
+	/**
+	 * Shows a list of all manifests in the manifest tab.
+	 */
+	public void showBrowseManifestsView()
+	{
+		USRLOG.info("Browsing manifests.");
+
+		try
+		{
+			managementView.setContent(getBrowseManifestsView());
+		}
+		catch (NoDatabaseLinkException e)
+		{
+			DatabaseController.tryReLink();
+		}
+	}
+
+	/**
+	 * Shows the data of a single manifest in the manifest tab.
+	 *
+	 * @param manifest {@link Manifest} to show
+	 */
+	public void showManifestView(final Manifest manifest)
+	{
+		USRLOG.info("Viewing manifest: " + manifest);
+		managementView.setContent(new ManifestView(this, manifest).getView());
+	}
+
+	/**
+	 * Gets the manifest tab view.
+	 *
+	 * @return the tab view for manifests
+	 */
+	public Node getView()
+	{
+		if (tabView == null)
+		{
+			tabView = new GenericTabView();
+			managementView = new ManifestManagementView(this);
+			tabView.setView(managementView.getView());
+
+			// Manifest list is shown by default.
+			showBrowseManifestsView();
+		}
+
+		return tabView.getView();
 	}
 }

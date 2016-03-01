@@ -324,23 +324,34 @@ public class DatabaseController
 							case PRODUCTS:
 								// @formatter:off
 								while (result.next())
-									dataSet.add(new Product(result.getInt("product_id"), result.getString("name"), getProductBrandByID(result.getInt("brand")), getProductCategoryByID(result.getInt("category")), result.getInt("popularity")));
+									dataSet.add(new Product(result.getInt("product_id"),
+															result.getString("name"),
+															getProductBrandByID(result.getInt("brand")),
+															getProductCategoryByID(result.getInt("category")),
+															result.getInt("popularity")));
 								break;
-							// @formatter:on
+								// @formatter:on
 
 							case CONTAINERS:
 								// @formatter:off
 								while (result.next())
-									dataSet.add(new ProductBox(result.getInt("container_id"), result.getDate("expiration_date"), result.getInt("max_size"), getProductByID(result.getInt("product")), result.getInt("product_count")));
+									dataSet.add(new ProductBox(result.getInt("container_id"),
+																result.getDate("expiration_date"),
+																result.getInt("max_size"),
+																getProductByID(result.getInt("product")),
+																result.getInt("product_count")));
 								break;
-							// @formatter:on
+								// @formatter:on
 
 							case SHELVES:
 								// @formatter:off
 								while (result.next())
-									dataSet.add(new Shelf(result.getInt("shelf_id"), result.getInt("max_levels"), result.getInt("max_shelfslots_per_level"), result.getInt("max_productboxes_per_shelfslot")));
+									dataSet.add(new Shelf(result.getInt("shelf_id"),
+															result.getInt("max_levels"),
+															result.getInt("max_shelfslots_per_level"),
+															result.getInt("max_productboxes_per_shelfslot")));
 								break;
-							// @formatter:on
+								// @formatter:on
 
 							case SHELF_PRODUCTBOXES:
 								shelfBoxMap = new HashMap<Integer, ArrayList<Integer[]>>();
@@ -377,14 +388,19 @@ public class DatabaseController
 							case REMOVALLISTS:
 								// @formatter:off
 								while (result.next())
-									dataSet.add(new RemovalList(result.getInt("removallist_id"), getRemovalListStateByID(result.getInt("liststate"))));
+									dataSet.add(new RemovalList(result.getInt("removallist_id"),
+																getRemovalListStateByID(result.getInt("liststate"))));
 								break;
 								// @formatter:on
 
 							case MANIFESTS:
 								// @formatter:off
 								while (result.next())
-									dataSet.add(new Manifest(result.getInt("manifest_id"), getManifestStateByID(result.getInt("state")), result.getInt("driver_id"), result.getDate("date_ordered"), result.getDate("date_received")));
+									dataSet.add(new Manifest(result.getInt("manifest_id"),
+																getManifestStateByID(result.getInt("state")),
+																result.getInt("driver_id"),
+																result.getDate("date_ordered"),
+																result.getDate("date_received")));
 								break;
 								// @formatter:on
 
@@ -411,7 +427,31 @@ public class DatabaseController
 										listBoxMap.put(listID, boxIDs);
 									}
 								}
+								break;
 
+							case MANIFEST_PRODUCTBOXES:
+								listBoxMap = new HashMap<Integer, ArrayList<Integer>>();
+								Integer manifestID = null;
+								ArrayList<Integer> pboxIDs = new ArrayList<Integer>();
+
+								while (result.next())
+								{
+									manifestID = result.getInt("manifest");
+
+									// Does this removal list already have boxes in it?
+									if (listBoxMap.containsKey(manifestID))
+									{
+										// Add to the list.
+										listBoxMap.get(manifestID).add(result.getInt("productbox"));
+									}
+									else
+									{
+										// Create a new list and put in the data.
+										pboxIDs = new ArrayList<Integer>();
+										pboxIDs.add(result.getInt("productbox"));
+										listBoxMap.put(manifestID, pboxIDs);
+									}
+								}
 								break;
 							default:
 								// Close all resources.
@@ -557,6 +597,10 @@ public class DatabaseController
 					case SHELF_PRODUCTBOXES:
 						return shelfBoxMap;
 					case REMOVALLIST_PRODUCTBOXES:
+						if (columns.length == 1 && columns[0] != "*")
+							return dataSet;
+						return listBoxMap;
+					case MANIFEST_PRODUCTBOXES:
 						if (columns.length == 1 && columns[0] != "*")
 							return dataSet;
 						return listBoxMap;
@@ -1799,6 +1843,45 @@ public class DatabaseController
 	}
 
 	/**
+	 * Gets the {@link Manifest} object from the given removal list ID.
+	 *
+	 * @param manifestid removal list database ID
+	 * @return the corresponding removal list object
+	 * @throws NoDatabaseLinkException
+	 */
+	public static Manifest getManifestByID(final int manifestid, final boolean getCached) throws NoDatabaseLinkException
+	{
+		if (!cachedManifests.containsKey(manifestid) || !getCached)
+		{
+			final String[] columns = { "*" };
+			final List<String> where = new ArrayList<String>();
+			where.add("manifest_id = " + manifestid);
+
+			@SuppressWarnings("unchecked")
+			final Set<Object> result = (LinkedHashSet<Object>) (runQuery(DatabaseQueryType.SELECT, DatabaseTable.MANIFESTS, null, columns, null, where));
+
+			if (result.size() == 0)
+				return null;
+
+			final Manifest m = (Manifest) result.iterator().next();
+
+			// Store for reuse.
+			if (getCached)
+				DBLOG.trace("Caching: " + m);
+			else
+				DBLOG.trace("Updating cache: " + m);
+
+			cachedManifests.put(m.getDatabaseID(), m);
+			setContainersToRemovalList(manifestid);
+
+			return cachedManifests.get(manifestid);
+		}
+
+		DBLOG.trace("Loading Manifest " + manifestid + " from cache.");
+		return cachedManifests.get(manifestid);
+	}
+
+	/**
 	 * Gets a random valid shelf slot ID string.
 	 *
 	 * @return random valid shelf slot ID string
@@ -2510,9 +2593,9 @@ public class DatabaseController
 	{
 		DBLOG.info("Loading data from database...");
 
-		loadProductBoxes();
-		loadShelves();
-		loadRemovalLists();
+		getAllProductBoxes();
+		getAllShelves();
+		getAllRemovalLists();
 
 		DBLOG.info("Data loaded from database.");
 	}
@@ -2529,7 +2612,7 @@ public class DatabaseController
 	 *
 	 * @throws NoDatabaseLinkException
 	 */
-	private static void loadProductBoxes() throws NoDatabaseLinkException
+	private static void getAllProductBoxes() throws NoDatabaseLinkException
 	{
 		final String[] columns = { "*" };
 		@SuppressWarnings("unchecked")
@@ -2556,7 +2639,7 @@ public class DatabaseController
 	 *
 	 * @throws NoDatabaseLinkException
 	 */
-	private static void loadShelves() throws NoDatabaseLinkException
+	private static void getAllShelves() throws NoDatabaseLinkException
 	{
 		final String[] columns = { "*" };
 		@SuppressWarnings("unchecked")
@@ -2622,8 +2705,9 @@ public class DatabaseController
 	 *
 	 * @throws NoDatabaseLinkException
 	 */
-	private static void loadRemovalLists() throws NoDatabaseLinkException
+	public static void getAllRemovalLists() throws NoDatabaseLinkException
 	{
+		// TODO: CACHE GUARD
 		final String[] columns = { "*" };
 		@SuppressWarnings("unchecked")
 		final Set<RemovalList> result = (Set<RemovalList>) runQuery(DatabaseQueryType.SELECT, DatabaseTable.REMOVALLISTS, null, columns, null, null);
@@ -2780,9 +2864,44 @@ public class DatabaseController
 
 		DBLOG.info("All " + result.size() + " Manifests cached.");
 
+		setAllContainersToAllManifests();
+
 		observableManifests.clear();
 		observableManifests.addAll(cachedManifests.values());
 		return observableManifests;
+	}
+
+	/**
+	 * Places the loaded {@link ProductContainer} objects into
+	 * {@link RemovalList} objects.
+	 *
+	 * @throws NoDatabaseLinkException
+	 */
+	private static void setAllContainersToAllManifests() throws NoDatabaseLinkException
+	{
+		final String[] columns = { "*" };
+		@SuppressWarnings("unchecked")
+		final Map<Integer, ArrayList<Integer>> manifestBoxes = (HashMap<Integer, ArrayList<Integer>>) runQuery(DatabaseQueryType.SELECT,
+				DatabaseTable.MANIFEST_PRODUCTBOXES, null, columns, null, null);
+
+		int boxcount = 0;
+
+		for (final Integer manifestID : manifestBoxes.keySet())
+		{
+			final ArrayList<Integer> boxIDs = manifestBoxes.get(manifestID);
+			boxcount += boxIDs.size();
+
+			// TODO: This bit could be optimized. I'm looping through the same list twice.
+
+			Set<ProductBox> boxes = new LinkedHashSet<ProductBox>();
+
+			for (final Integer id : boxIDs)
+				boxes.add(getProductBoxByID(id));
+
+			getManifestByID(manifestID, true).setProductBoxes(boxes);
+		}
+
+		DBLOG.debug(boxcount + " ProductBoxes placed on " + manifestBoxes.size() + " Manifests.");
 	}
 
 	/**
