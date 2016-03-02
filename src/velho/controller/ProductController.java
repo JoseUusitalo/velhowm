@@ -3,6 +3,8 @@ package velho.controller;
 import org.apache.log4j.Logger;
 
 import javafx.scene.Node;
+import velho.model.Product;
+import velho.model.exceptions.NoDatabaseLinkException;
 import velho.model.interfaces.UIActionController;
 import velho.view.ProductDataView;
 
@@ -27,16 +29,23 @@ public class ProductController implements UIActionController
 	/**
 	 * The view in the tab itself.
 	 */
-	private ProductDataView tabView;
+	private ProductDataView productDataView;
 
 	public ProductController()
 	{
-		tabView = new ProductDataView();
+		productDataView = new ProductDataView(this);
 	}
 
 	public Node getView()
 	{
-		return tabView.getView();
+		try
+		{
+			return productDataView.getView(DatabaseController.getProductByID(1));
+		} catch (NoDatabaseLinkException e)
+		{
+			DatabaseController.tryReLink();
+			return null;
+		}
 	}
 
 	@Override public void createAction(final Object data)
@@ -70,6 +79,12 @@ public class ProductController implements UIActionController
 	@Override public void viewAction(final Object data)
 	{
 		// TODO Auto-generated method stub
+
+	}
+
+	public void editProduct(final Product product)
+	{
+		System.out.println("testi" + product);
 
 	}
 }

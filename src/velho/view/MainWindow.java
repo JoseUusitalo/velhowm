@@ -28,6 +28,7 @@ import velho.controller.ListController;
 import velho.controller.LogController;
 import velho.controller.LogDatabaseController;
 import velho.controller.LoginController;
+import velho.controller.ProductController;
 import velho.controller.RemovalListController;
 import velho.controller.SearchController;
 import velho.controller.UIController;
@@ -121,7 +122,7 @@ public class MainWindow extends Application
 	/**
 	 * The {@link productController}.
 	 */
-	private ListController productController;
+	private ProductController productController;
 
 	/**
 	 * The debug window stage.
@@ -184,7 +185,8 @@ public class MainWindow extends Application
 						listController = new ListController(userController);
 						searchController = new SearchController(listController);
 						removalListController = new RemovalListController(searchController);
-						uiController = new UIController(this, listController, userController, removalListController, searchController, logController);
+						productController = new ProductController();
+						uiController = new UIController(this, listController, userController, removalListController, searchController, logController, productController);
 
 						LoginController.setControllers(uiController, debugController);
 
