@@ -1,5 +1,7 @@
 package velho.controller;
 
+import org.apache.log4j.Logger;
+
 import javafx.scene.Node;
 import velho.model.Product;
 import velho.model.ProductBrand;
@@ -15,6 +17,10 @@ import velho.view.AddProductView;
 public class ProductController
 {
 
+	/**
+	 * Apache log4j logger: System.
+	 */
+	private static final Logger SYSLOG = Logger.getLogger(ProductController.class.getName());
 	/**
 	 * The {@link AddProductView}.
 	 */
@@ -49,10 +55,12 @@ public class ProductController
 		ProductCategory cat = null;
 		if (brand instanceof String)
 		{
+			SYSLOG.trace("creating new brand from " + brand.toString());
 			bran = new ProductBrand((String) brand);
 		}
 		if (category instanceof String)
 		{
+			SYSLOG.trace("creating new category from " + category.toString());
 			try
 			{
 				cat = new ProductCategory((String) category);
@@ -66,10 +74,12 @@ public class ProductController
 		if (brand instanceof ProductBrand)
 		{
 			bran = (ProductBrand) brand;
+			SYSLOG.trace("new brand is " + bran.toString());
 		}
 		if (category instanceof ProductCategory)
 		{
 			cat = (ProductCategory) category;
+			SYSLOG.trace("new product category is " + cat.toString());
 		}
 
 		Product newProduct = new Product(name, bran, cat, popularity);

@@ -73,7 +73,7 @@ public class MainWindow extends Application
 	/**
 	 * Enable TRACE level logging. DEBUG_MODE must be <code>true</code> for this to affect anything.
 	 */
-	public static final boolean SHOW_TRACE = false;
+	public static final boolean SHOW_TRACE = true;
 
 	/**
 	 * The height of the window.

@@ -47,6 +47,7 @@ public class AddProductView
 			mid.add(nameField, 1, 0);
 
 			final ComboBox<Object> brandList = new ComboBox<Object>();
+			// TODO make it so that you dont need to press enter
 			brandList.setPromptText("Brand");
 			brandList.getItems().addAll(DatabaseController.getAllProductBrands());
 			brandList.setMaxWidth(Double.MAX_VALUE);
@@ -55,6 +56,8 @@ public class AddProductView
 			mid.add(brandList, 2, 0);
 
 			final ComboBox<Object> categoryList = new ComboBox<Object>();
+			categoryList.setEditable(true);
+			// TODO make it so that you dont need to press enter
 			categoryList.setPromptText("Category");
 			categoryList.getItems().addAll(DatabaseController.getAllProductCategories());
 			categoryList.setMaxWidth(Double.MAX_VALUE);
