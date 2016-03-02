@@ -1,7 +1,5 @@
 package velho.controller;
 
-import org.apache.log4j.Logger;
-
 import javafx.scene.Node;
 import velho.model.Product;
 import velho.model.exceptions.NoDatabaseLinkException;
@@ -10,22 +8,6 @@ import velho.view.ProductDataView;
 
 public class ProductController implements UIActionController
 {
-
-	/**
-	 * Apache log4j logger: System.
-	 */
-	private static final Logger SYSLOG = Logger.getLogger(ProductController.class.getName());
-
-	/**
-	 * Apache log4j logger: User.
-	 */
-	private static final Logger USRLOG = Logger.getLogger("userLogger");
-
-	/**
-	 * The removal list browsing view.
-	 */
-	private Node browseView;
-
 	/**
 	 * The view in the tab itself.
 	 */
