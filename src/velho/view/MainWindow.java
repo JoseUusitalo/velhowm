@@ -36,6 +36,7 @@ import velho.controller.LogDatabaseController;
 import velho.controller.LoginController;
 import velho.controller.ManifestController;
 import velho.controller.RemovalListController;
+import velho.controller.RemovalPlatformController;
 import velho.controller.SearchController;
 import velho.controller.UIController;
 import velho.controller.UserController;
@@ -155,6 +156,11 @@ public class MainWindow extends Application
 	private ManifestController manifestController;
 
 	/**
+	 * The {@link RemovalPlatformController}.
+	 */
+	private RemovalPlatformController removalPlatformController;
+
+	/**
 	 * The main window constructor.
 	 */
 	public MainWindow()
@@ -203,13 +209,13 @@ public class MainWindow extends Application
 						SYSLOG.debug("Creating all controllers...");
 
 						DatabaseController.loadData();
-						debugController = new DebugController();
 						userController = new UserController();
 						logController = new LogController();
 						manifestController = new ManifestController(this);
+						removalPlatformController = new RemovalPlatformController();
 
 						ExternalSystemsController.setControllers(manifestController);
-
+						debugController = new DebugController(removalPlatformController);
 						listController = new ListController(userController);
 						searchController = new SearchController(listController);
 						removalListController = new RemovalListController(searchController);
