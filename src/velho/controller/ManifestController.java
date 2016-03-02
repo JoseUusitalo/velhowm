@@ -14,6 +14,7 @@ import velho.model.ProductBox;
 import velho.model.exceptions.NoDatabaseLinkException;
 import velho.model.interfaces.UIActionController;
 import velho.view.GenericTabView;
+import velho.view.MainWindow;
 import velho.view.ManifestManagementView;
 import velho.view.ManifestView;
 
@@ -44,12 +45,22 @@ public class ManifestController implements UIActionController
 	 */
 	private ManifestManagementView managementView;
 
+	/**
+	 * The current manifest being shown.
+	 */
 	private Manifest currentManifest;
 
 	/**
+	 * The {@link MainWindow}.
 	 */
-	public ManifestController()
+	private MainWindow mainWindow;
+
+	/**
+	 * @param mainWindow
+	 */
+	public ManifestController(final MainWindow mainWindow)
 	{
+		this.mainWindow = mainWindow;
 	}
 
 	/**
@@ -212,9 +223,10 @@ public class ManifestController implements UIActionController
 				if (LoginController.userRoleIs(new Manager()))
 				{
 					if (PopupController
-							.confirmation("A shipment has arrived. Please accept or refuse it in the Manifest tab. Would you like to view the manifest now?"))
+							.confirmation("A shipment has arrived. Please accept or refuse it in the Manifests tab. Would you like to view the manifest now?"))
 					{
 						showManifestView(manifest);
+						mainWindow.selectTab("Manifests");
 					}
 				}
 			}

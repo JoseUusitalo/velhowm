@@ -1595,6 +1595,7 @@ public class DatabaseController
 		final LinkedHashMap<String, String> cols = new LinkedHashMap<String, String>();
 		cols.put("databaseID", "ID");
 		cols.put("state", "State");
+		cols.put("size", "Boxes");
 		cols.put("driverID", "Driver");
 		cols.put("orderedDate", "Ordered");
 		cols.put("receivedDate", "Received");
