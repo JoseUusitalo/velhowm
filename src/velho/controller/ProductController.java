@@ -1,6 +1,10 @@
 package velho.controller;
 
 import javafx.scene.Node;
+import velho.model.Product;
+import velho.model.ProductBrand;
+import velho.model.ProductCategory;
+import velho.model.exceptions.NoDatabaseLinkException;
 import velho.view.AddProductView;
 
 /**
@@ -28,7 +32,21 @@ public class ProductController
 
 	public Node getProductEditView()
 	{
-		return addProductView.getProductView();
+		try
+		{
+			return addProductView.getProductView();
+		}
+		catch (NoDatabaseLinkException e)
+		{
+			DatabaseController.tryReLink();
+		}
+		return null;
+	}
+
+	public void saveProduct(final String name, final ProductBrand brand, final ProductCategory cat, final int popularity)
+	{
+		Product names = new Product(name, brand, cat, popularity);
+		System.out.println(names.toString());
 	}
 
 }
