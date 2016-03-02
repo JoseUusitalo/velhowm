@@ -18,18 +18,19 @@ import velho.controller.ListController;
 import velho.controller.RemovalListController;
 import velho.model.RemovalList;
 import velho.model.RemovalListState;
+import velho.model.exceptions.NoDatabaseLinkException;
 
 /**
  * View for creating new removal lists
  *
  * @author Jose Uusitalo
  */
-public class ViewRemovalListView
+public class RemovalListView
 {
 	/**
 	 * Apache log4j logger: System.
 	 */
-	private static final Logger SYSLOG = Logger.getLogger(ViewRemovalListView.class.getName());
+	private static final Logger SYSLOG = Logger.getLogger(RemovalListView.class.getName());
 
 	/**
 	 * The root BorderPane for this view.
@@ -46,9 +47,16 @@ public class ViewRemovalListView
 	 */
 	private BorderPane thisList;
 
+	/**
+	 * The {@link RemovalList} to display.
+	 */
 	private RemovalList removalList;
 
-	public ViewRemovalListView(final RemovalList removalList, final RemovalListController removalListController)
+	/**
+	 * @param removalList
+	 * @param removalListController
+	 */
+	public RemovalListView(final RemovalList removalList, final RemovalListController removalListController)
 	{
 		this.removalList = removalList;
 		this.removalListController = removalListController;
@@ -59,9 +67,8 @@ public class ViewRemovalListView
 	 *
 	 * @return the removal list viewing BorderPane
 	 */
-	public BorderPane getView()
+	public BorderPane getView() throws NoDatabaseLinkException
 	{
-
 		if (bpane == null)
 		{
 			bpane = new BorderPane();

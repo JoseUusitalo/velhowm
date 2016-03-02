@@ -4,45 +4,34 @@ import javafx.scene.Node;
 import javafx.scene.layout.BorderPane;
 
 /**
- * A view for handling the contents of the Removal Lists tab in the main menu.
+ * A view for handling the contents of certain tabs in the main menu.
  *
  * @author Jose Uusitalo
  */
-public class RemovalListTabView
+public class GenericTabView
 {
 	/**
 	 * The root BorderPane for this view.
 	 */
 	private BorderPane bPane;
 
-	public RemovalListTabView()
+	public GenericTabView()
 	{
+		bPane = new BorderPane();
 	}
 
 	/**
-	 * Gets the login view.
+	 * Gets the root border pane.
 	 *
-	 * @return the login view BorderPane
+	 * @return the root border pane
 	 */
 	public BorderPane getView()
 	{
-		if (bPane == null)
-		{
-			bPane = new BorderPane();
-		}
 		return bPane;
 	}
 
 	/**
-	 * Destroys the view.
-	 */
-	public void destroy()
-	{
-		bPane = null;
-	}
-
-	/**
-	 * Sets the view in the tab.
+	 * Sets the view in this tab.
 	 *
 	 * @param view new view
 	 */

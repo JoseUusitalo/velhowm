@@ -274,12 +274,26 @@ public class LoginController
 	 * Checks if the currently logged in user's role is greater than or equal to the given role.
 	 *
 	 * @param role role to check against
-	 * @return <code>true</code> if logged in user's role is greater than or equal to the given role
+	 * @return <code>true</code> if logged in user's role is greater than or equal to the given role, <code>false</code>
+	 * if user is not logged in
 	 */
 	public static boolean userRoleIsGreaterOrEqualTo(final UserRole role)
 	{
 		if (isLoggedIn())
 			return currentUser.getRole().compareTo(role) >= 0;
+		return false;
+	}
+
+	/**
+	 * Checks if the currently logged in user's role is the given role.
+	 *
+	 * @param role role to check against
+	 * @return <code>true</code> if logged in user's role is the given role, <code>false</code> if user is not logged in
+	 */
+	public static boolean userRoleIs(final UserRole role)
+	{
+		if (isLoggedIn())
+			return currentUser.getRole().compareTo(role) == 0;
 		return false;
 	}
 }

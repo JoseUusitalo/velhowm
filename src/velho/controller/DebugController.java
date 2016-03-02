@@ -3,6 +3,7 @@ package velho.controller;
 import org.apache.log4j.Logger;
 
 import javafx.stage.Stage;
+import velho.model.BarcodeScanner;
 import velho.model.exceptions.NoDatabaseLinkException;
 import velho.view.DebugWindow;
 
@@ -144,5 +145,10 @@ public class DebugController
 
 		PopupController.info(productCode + " was not moved to " + shelfSlotCode
 				+ " error: If the product was not moved it either does not exist or the shelf does not exist!");
+	}
+
+	public static void sendRandomShipment()
+	{
+		BarcodeScanner.sendRandomShipment();
 	}
 }

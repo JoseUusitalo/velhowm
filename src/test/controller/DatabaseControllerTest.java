@@ -215,7 +215,7 @@ public class DatabaseControllerTest
 		cols.put("category", "Category");
 		cols.put("popularity", "Popularity");
 
-		assertEquals(cols, DatabaseController.getPublicProductDataColumns(false, false));
+		assertEquals(cols, DatabaseController.getProductDataColumns(false, false));
 	}
 
 	@Test
@@ -231,7 +231,7 @@ public class DatabaseControllerTest
 		cols.put("category", "Category");
 		cols.put("popularity", "Popularity");
 
-		assertEquals(cols, DatabaseController.getPublicProductDataColumns(true, true));
+		assertEquals(cols, DatabaseController.getProductDataColumns(true, true));
 	}
 
 	@Test

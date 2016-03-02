@@ -1,5 +1,8 @@
 package velho.view;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.apache.log4j.AppenderSkeleton;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
@@ -26,10 +29,12 @@ import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
 import velho.controller.DatabaseController;
 import velho.controller.DebugController;
+import velho.controller.ExternalSystemsController;
 import velho.controller.ListController;
 import velho.controller.LogController;
 import velho.controller.LogDatabaseController;
 import velho.controller.LoginController;
+import velho.controller.ManifestController;
 import velho.controller.RemovalListController;
 import velho.controller.SearchController;
 import velho.controller.UIController;
@@ -115,6 +120,11 @@ public class MainWindow extends Application
 	private TabPane mainTabPane;
 
 	/**
+	 * The map of tab names and tab objects used for selecting tabs in the tab pane.
+	 */
+	private Map<String, Tab> tabMap;
+
+	/**
 	 * The main scene.
 	 */
 	private Scene scene;
@@ -138,6 +148,11 @@ public class MainWindow extends Application
 	 * The {@link LogController}.
 	 */
 	private LogController logController;
+
+	/**
+	 * The {@link ManifestController}.
+	 */
+	private ManifestController manifestController;
 
 	/**
 	 * The main window constructor.
@@ -191,10 +206,15 @@ public class MainWindow extends Application
 						debugController = new DebugController();
 						userController = new UserController();
 						logController = new LogController();
+						manifestController = new ManifestController(this);
+
+						ExternalSystemsController.setControllers(manifestController);
+
 						listController = new ListController(userController);
 						searchController = new SearchController(listController);
 						removalListController = new RemovalListController(searchController);
-						uiController = new UIController(this, listController, userController, removalListController, searchController, logController);
+						uiController = new UIController(this, listController, userController, removalListController, searchController, logController,
+								manifestController);
 
 						LoginController.setControllers(uiController, debugController);
 
@@ -238,12 +258,10 @@ public class MainWindow extends Application
 	/**
 	 * Adds a new tab to the main tab panel.
 	 *
-	 * @param tabName
-	 * name of the tab
-	 * @param view
-	 * view to show in the tab
+	 * @param tabName name of the tab
+	 * @param view view to show in the tab
 	 */
-	public void addTab(final String tabName, final Node view)
+	public boolean addTab(final String tabName, final Node view)
 	{
 		if (mainTabPane == null)
 			showMainMenu();
@@ -251,7 +269,20 @@ public class MainWindow extends Application
 		final Tab tab = new Tab();
 		tab.setText(tabName);
 		tab.setContent(view);
-		mainTabPane.getTabs().add(tab);
+
+		tabMap.put(tabName, tab);
+		return mainTabPane.getTabs().add(tab);
+	}
+
+	/**
+	 * Forcibly selects the specified tab and changes the view in the main window to that tab.
+	 *
+	 * @param tabName name of the tab
+	 */
+	public void selectTab(final String tabName)
+	{
+		if (mainTabPane != null)
+			mainTabPane.getSelectionModel().select(tabMap.get(tabName));
 	}
 
 	/**
@@ -262,6 +293,7 @@ public class MainWindow extends Application
 		if (mainTabPane == null)
 		{
 			mainTabPane = new TabPane();
+			tabMap = new HashMap<String, Tab>();
 			mainTabPane.setTabClosingPolicy(TabClosingPolicy.UNAVAILABLE);
 
 			mainTabPane.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<Tab>()

@@ -47,8 +47,11 @@ public class UIController
 
 	private LogController logController;
 
+	private ManifestController manifestController;
+
 	public UIController(final MainWindow mainWindow, final ListController listController, final UserController userController,
-			final RemovalListController removalListController, final SearchController searchController, final LogController logController)
+			final RemovalListController removalListController, final SearchController searchController, final LogController logController,
+			final ManifestController manifestController)
 	{
 		this.mainView = mainWindow;
 		this.listController = listController;
@@ -56,6 +59,7 @@ public class UIController
 		this.removalListController = removalListController;
 		this.searchController = searchController;
 		this.logController = logController;
+		this.manifestController = manifestController;
 	}
 
 	/**
@@ -111,10 +115,11 @@ public class UIController
 			case "Logistician":
 				mainView.addTab("Removal Lists", removalListController.getView());
 				mainView.addTab("User List", getUserListView(currentUserRole));
-				mainView.addTab("Product List", listController.getProductListView(DatabaseController.getPublicProductDataColumns(false, false),
-						DatabaseController.getObservableProducts()));
+				mainView.addTab("Product List",
+						listController.getProductListView(DatabaseController.getProductDataColumns(false, false), DatabaseController.getObservableProducts()));
 				mainView.addTab("Search", searchController.getSearchTabView());
 				mainView.addTab("Product List Search", listController.getProductListSearchView());
+				mainView.addTab("Manifests", manifestController.getView());
 				break;
 			default:
 				SYSLOG.error("Unknown user role '" + currentUserRole.getName() + "'.");
