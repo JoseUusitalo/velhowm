@@ -28,7 +28,7 @@ public class RemovalPlatformController
 		{
 			try
 			{
-				this.platform = DatabaseController.getRemovalPlatformByID(0);
+				platform = DatabaseController.getRemovalPlatformByID(1);
 			}
 			catch (NoDatabaseLinkException e)
 			{
@@ -36,7 +36,7 @@ public class RemovalPlatformController
 			}
 		}
 
-		return this.platform;
+		return platform;
 	}
 
 	/**
@@ -57,6 +57,7 @@ public class RemovalPlatformController
 	 */
 	public void modifyFreeSpace(final double percentagePoints)
 	{
+		SYSLOG.debug(getPlatform() + " free space decreased by " + percentagePoints);
 		getPlatform().modifyFreeSpace(percentagePoints);
 		checkWarning();
 	}
@@ -70,8 +71,9 @@ public class RemovalPlatformController
 
 		if (Double.compare(getFreeSpace(), getPlatform().getFreeSpaceLeftWarningPercent()) <= 0)
 		{
-			SYSLOG.info("The removal platform is at or below the warning limit of " + getFreeSpace() + "% full!");
-			PopupController.warning("The removal platform is " + getFreeSpace() + "% full. Please contact the waste disposal services.");
+			SYSLOG.info("The removal platform is at or below the warning limit of " + (int) (100.0 - getFreeSpace() * 100.0) + "% full!");
+			PopupController
+					.warning("The removal platform is " + (int) (100.0 - getFreeSpace() * 100.0) + "% full. Please contact the waste disposal services.");
 		}
 	}
 }

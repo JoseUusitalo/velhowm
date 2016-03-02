@@ -33,6 +33,12 @@ public class RemovalPlatform
 		this.freeSpaceLeftWarningPercent = freeSpaceLeftWarningPercent;
 	}
 
+	@Override
+	public String toString()
+	{
+		return "[" + databaseID + "] Removal Platform: " + freeSpacePercent * 100.0 + "% (" + freeSpaceLeftWarningPercent * 100.0 + "%)";
+	}
+
 	/**
 	 * Gets the database ID of this removal platform.
 	 *
@@ -81,7 +87,7 @@ public class RemovalPlatform
 	 * Changes the amount of free space on this platform by adding or removing the specified percentage points depending
 	 * on its sign.
 	 *
-	 * @param percentagePoints percentage points to modify the free space by
+	 * @param percentagePoints percentage points to modify the free space by [0.0, 1.0]
 	 */
 	public void modifyFreeSpace(final double percentagePoints)
 	{

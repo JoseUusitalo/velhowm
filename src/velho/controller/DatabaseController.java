@@ -189,7 +189,7 @@ public class DatabaseController
 	/**
 	 * A map of {@link RemovalPlatform} objects loaded from the database.
 	 */
-	private static Map<Integer, RemovalPlatform> cachedRemovalPlatforms;
+	private static Map<Integer, RemovalPlatform> cachedRemovalPlatforms = new HashMap<Integer, RemovalPlatform>();
 
 	/*
 	 * -------------------------------- PRIVATE DATABASE METHODS --------------------------------
