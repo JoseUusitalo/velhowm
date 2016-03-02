@@ -13,6 +13,7 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
 import velho.controller.DatabaseController;
 import velho.controller.ProductController;
+import velho.model.Product;
 import velho.model.exceptions.NoDatabaseLinkException;
 
 /**
@@ -25,12 +26,30 @@ public class AddProductView
 {
 	private ProductController productController;
 	private BorderPane bPane;
+	private TextField nameField;
+	private ComboBox<Object> brandList;
+	private ComboBox<Object> categoryList;
+	private Label popularityLabel;
+	private Spinner<Integer> popularity;
+	private Button saveButton;
+
+	/**
+	 * adds the product view
+	 * 
+	 * @param productController
+	 */
 
 	public AddProductView(final ProductController productController)
 	{
 		this.productController = productController;
 	}
 
+	/**
+	 * creates BorderPane
+	 * 
+	 * @return
+	 * @throws NoDatabaseLinkException
+	 */
 	public BorderPane getProductView() throws NoDatabaseLinkException
 	{
 		if (bPane == null)
@@ -40,13 +59,13 @@ public class AddProductView
 
 			final GridPane mid = new GridPane();
 
-			final TextField nameField = new TextField();
+			nameField = new TextField();
 			nameField.setPromptText("Product name");
 			nameField.setPrefWidth(MainWindow.WINDOW_WIDTH / 5);
 			nameField.setMaxWidth(Double.MAX_VALUE);
 			mid.add(nameField, 1, 0);
 
-			final ComboBox<Object> brandList = new ComboBox<Object>();
+			brandList = new ComboBox<Object>();
 			// TODO make it so that you dont need to press enter
 			brandList.setPromptText("Brand");
 			brandList.getItems().addAll(DatabaseController.getAllProductBrands());
@@ -55,7 +74,7 @@ public class AddProductView
 			brandList.setEditable(true);
 			mid.add(brandList, 2, 0);
 
-			final ComboBox<Object> categoryList = new ComboBox<Object>();
+			categoryList = new ComboBox<Object>();
 			categoryList.setEditable(true);
 			// TODO make it so that you dont need to press enter
 			categoryList.setPromptText("Category");
@@ -64,15 +83,15 @@ public class AddProductView
 			categoryList.getSelectionModel().selectFirst();
 			mid.add(categoryList, 3, 0);
 
-			final Label popularityLabel = new Label("Popularity: ");
+			popularityLabel = new Label("Popularity: ");
 			popularityLabel.setAlignment(Pos.CENTER_RIGHT);
 			mid.add(popularityLabel, 4, 0);
 
-			Spinner<Integer> popularity = new Spinner<Integer>();
+			popularity = new Spinner<Integer>();
 			popularity.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(-1, 10000));
 			mid.add(popularity, 5, 0);
 
-			final Button saveButton = new Button("Save");
+			saveButton = new Button("Save");
 
 			saveButton.setOnAction(new EventHandler<ActionEvent>()
 			{
@@ -90,17 +109,21 @@ public class AddProductView
 			mid.getStyleClass().add("standard-padding");
 
 			bPane.setCenter(mid);
+			setData(DatabaseController.getProductByID(1));
 
 		}
 		return bPane;
 	}
 
 	/**
-	 * Destroys the view.
+	 * saves data to database
 	 */
 
-	public void destroy()
+	public void setData(final Product product) throws NoDatabaseLinkException
 	{
-		bPane = null;
+		nameField.setText(product.getName());
+		brandList.getSelectionModel().select(product.getBrand());
+		categoryList.getSelectionModel().select(product.getCategory());
+		popularity.getEditor().setText(String.valueOf(product.getPopularity()));
 	}
 }

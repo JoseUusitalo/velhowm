@@ -31,11 +31,19 @@ public class ProductController
 	 */
 	private static UIController uiController;
 
+	/**
+	 * adds new view
+	 */
 	public ProductController()
 	{
 		this.addProductView = new AddProductView(this);
 	}
 
+	/**
+	 * edits the view
+	 * 
+	 * @return
+	 */
 	public Node getProductEditView()
 	{
 		try
@@ -49,6 +57,14 @@ public class ProductController
 		return null;
 	}
 
+	/**
+	 * saves the new product gets it from database
+	 * 
+	 * @param name
+	 * @param brand
+	 * @param category
+	 * @param popularity
+	 */
 	public void saveProduct(final String name, final Object brand, final Object category, final int popularity)
 	{
 		ProductBrand bran = null;
