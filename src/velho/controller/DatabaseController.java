@@ -2590,18 +2590,17 @@ public class DatabaseController
 		runQuery(DatabaseQueryType.DELETE, DatabaseTable.REMOVALLIST_PRODUCTBOXES, null, null, null, where);
 
 		// Add all boxes to the database.
-		final Iterator<Object> it = removalList.getObservableBoxes().iterator();
 		values.clear();
 		values.put("removallist", listID);
 		values.put("productbox", -1);
 
-		while (it.hasNext())
+		for (final ProductBox box : removalList.getBoxes())
 		{
 			// Remove the previous box ID.
 			values.remove("productbox");
 
 			// Put in the new box ID.
-			values.put("productbox", ((ProductBoxSearchResultRow) it.next()).getBoxID());
+			values.put("productbox", box.getBoxID());
 
 			// Run the query.
 			result = (LinkedHashSet<Integer>) runQuery(DatabaseQueryType.INSERT, DatabaseTable.REMOVALLIST_PRODUCTBOXES, null, null, values, null);
@@ -2621,11 +2620,11 @@ public class DatabaseController
 	 * doesn't exist.
 	 * A database ID of -1 signifies a brand new {@link Manifest}.
 	 *
-	 * @param removalList new or existing manifest
+	 * @param manifest new or existing manifest
 	 * @return <code>true</code> if existing data was updated or a new manifest was created in the database
 	 */
 	@SuppressWarnings("unchecked")
-	public static boolean updateManifest(final Manifest manifest) throws NoDatabaseLinkException
+	public static boolean save(final Manifest manifest) throws NoDatabaseLinkException
 	{
 		int manifestID = manifest.getDatabaseID();
 
@@ -2636,6 +2635,7 @@ public class DatabaseController
 		values.put("date_received", getH2DateFormat(manifest.getReceivedDate()));
 
 		final List<String> where = new ArrayList<String>();
+		int boxid;
 
 		DatabaseQueryType query;
 
@@ -2652,12 +2652,102 @@ public class DatabaseController
 		Set<Integer> result = (LinkedHashSet<Integer>) runQuery(query, DatabaseTable.MANIFESTS, null, null, values, where);
 
 		if (result.size() == 0)
+		{
+			DBLOG.error("Failed to save: " + manifest);
 			return false;
+		}
+
+		// Get the inserted removal list database ID.
+		if (manifestID < 1)
+			manifestID = result.iterator().next();
+
+		where.clear();
+		where.add("manifest = " + manifestID);
+
+		/*
+		 * Delete all boxes from the list in the database.
+		 * We don't really care whether anything was deleted or not, if there was something, it is now deleted.
+		 */
+		runQuery(DatabaseQueryType.DELETE, DatabaseTable.MANIFEST_PRODUCTBOXES, null, null, null, where);
+
+		// Add all boxes to the database.
+		values.clear();
+		values.put("manifest", manifestID);
+		values.put("productbox", -1);
+
+		for (final ProductBox box : manifest.getBoxes())
+		{
+			// Save the box to database.
+			boxid = save(box);
+
+			if (boxid > 0)
+			{
+				// Remove the previous box ID.
+				values.remove("productbox");
+
+				// Put in the new box ID.
+				values.put("productbox", boxid);
+
+				// Run the query.
+				result = (LinkedHashSet<Integer>) runQuery(DatabaseQueryType.INSERT, DatabaseTable.MANIFEST_PRODUCTBOXES, null, null, values, null);
+
+				if (result.size() == 0)
+					return false;
+			}
+		}
 
 		// Update the cache.
-		getManifestByID(manifestID, false);
+		DBLOG.debug(query.toString() + ": " + getManifestByID(manifestID, false));
 
 		return true;
+	}
+
+	/**
+	 * Saves the given {@link ProductBox} object to database either by inserting new data or updating existing data.
+	 *
+	 * @param productbox object to save
+	 * @return the database ID of the inserted object or -1 if saving failed
+	 * @throws NoDatabaseLinkException
+	 */
+	private static int save(final ProductBox productbox) throws NoDatabaseLinkException
+	{
+		final Map<String, Object> values = new LinkedHashMap<String, Object>();
+		values.put("expiration_date", getH2DateFormat(productbox.getExpirationDate()));
+		values.put("product", productbox.getProduct().getProductID());
+		values.put("max_size", productbox.getMaxSize());
+		values.put("product_count", productbox.getProductCount());
+
+		final List<String> where = new ArrayList<String>();
+
+		DatabaseQueryType query;
+		int dbID = productbox.getBoxID();
+
+		// If the object does not exist yet, INSERT.
+		if (dbID < 1)
+			query = DatabaseQueryType.INSERT;
+		else
+		{
+			query = DatabaseQueryType.UPDATE;
+			where.add("container_id = " + dbID);
+		}
+
+		// Insert/Update
+		@SuppressWarnings("unchecked")
+		final Set<Integer> result = (Set<Integer>) runQuery(query, DatabaseTable.CONTAINERS, null, null, values, null);
+
+		if (result.size() == 0)
+		{
+			DBLOG.error("Failed to save: " + productbox);
+			return -1;
+		}
+
+		// Get the inserted database ID (if the given object was inserted instead of updated).
+		if (dbID < 1)
+			dbID = result.iterator().next();
+
+		// Update the cache.
+		DBLOG.debug(query.toString() + ": " + getProductBoxByID(dbID));
+		return dbID;
 	}
 
 	/*

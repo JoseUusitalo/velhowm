@@ -219,6 +219,6 @@ public class Manifest
 	 */
 	public boolean saveToDatabase() throws NoDatabaseLinkException
 	{
-		return DatabaseController.updateManifest(this);
+		return DatabaseController.save(this);
 	}
 }
