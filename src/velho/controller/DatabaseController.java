@@ -37,6 +37,7 @@ import velho.model.ProductCategory;
 import velho.model.ProductType;
 import velho.model.RemovalList;
 import velho.model.RemovalListState;
+import velho.model.RemovalPlatform;
 import velho.model.Shelf;
 import velho.model.User;
 import velho.model.enums.DatabaseQueryType;
@@ -184,6 +185,11 @@ public class DatabaseController
 	 * A map of {@link Manifest} objects loaded from the database.
 	 */
 	private static Map<Integer, Manifest> cachedManifests = new HashMap<Integer, Manifest>();
+
+	/**
+	 * A map of {@link RemovalPlatform} objects loaded from the database.
+	 */
+	private static Map<Integer, RemovalPlatform> cachedRemovalPlatforms;
 
 	/*
 	 * -------------------------------- PRIVATE DATABASE METHODS --------------------------------
@@ -479,6 +485,15 @@ public class DatabaseController
 									}
 								}
 								break;
+
+							case REMOVALPLATFORMS:
+								// @formatter:off
+								while (result.next())
+									dataSet.add(new RemovalPlatform(result.getInt("platform_id"),
+																	result.getDouble("free_space"),
+																	result.getDouble("free_space_warning")));
+								break;
+								// @formatter:on
 							default:
 								// Close all resources.
 								try
@@ -619,6 +634,7 @@ public class DatabaseController
 					case REMOVALLIST_STATES:
 					case MANIFESTS:
 					case MANIFEST_STATES:
+					case REMOVALPLATFORMS:
 						return dataSet;
 					case SHELF_PRODUCTBOXES:
 						return shelfBoxMap;
@@ -636,7 +652,6 @@ public class DatabaseController
 			default:
 				throw new IllegalArgumentException();
 		}
-
 	}
 
 	/**
@@ -2239,6 +2254,34 @@ public class DatabaseController
 
 		DBLOG.trace("Loading ManifestState " + stateid + " from cache.");
 		return cachedManifestStates.get(stateid);
+	}
+
+	public static RemovalPlatform getRemovalPlatformByID(final int platformid) throws NoDatabaseLinkException
+	{
+		if (!cachedRemovalPlatforms.containsKey(platformid))
+		{
+			final String[] columns = { "*" };
+			final List<String> where = new ArrayList<String>();
+			where.add("platform_id = " + new Integer(platformid));
+
+			@SuppressWarnings("unchecked")
+			final Set<RemovalPlatform> result = (LinkedHashSet<RemovalPlatform>) (runQuery(DatabaseQueryType.SELECT, DatabaseTable.REMOVALPLATFORMS, null,
+					columns, null, where));
+
+			if (result.size() == 0)
+				return null;
+
+			final RemovalPlatform r = result.iterator().next();
+
+			// Store for reuse.
+			DBLOG.trace("Caching: " + r);
+			cachedRemovalPlatforms.put(r.getDatabaseID(), r);
+
+			return r;
+		}
+
+		DBLOG.trace("Loading RemovalPlatform " + platformid + " from cache.");
+		return cachedRemovalPlatforms.get(platformid);
 	}
 
 	/*
