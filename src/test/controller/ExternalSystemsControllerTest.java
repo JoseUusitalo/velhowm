@@ -31,7 +31,7 @@ public class ExternalSystemsControllerTest
 	{
 		assertTrue(DatabaseController.link());
 		assertTrue(DatabaseController.initializeDatabase());
-		DatabaseController.loadData(true);
+		DatabaseController.loadData();
 	}
 
 	@AfterClass

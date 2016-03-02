@@ -1,11 +1,19 @@
 package velho.model;
 
+import org.apache.log4j.Logger;
+
+/**
+ * @author Edward
+ */
 public class Printer
 {
+	/**
+	 * Apache log4j logger: System.
+	 */
+	private static final Logger SYSLOG = Logger.getLogger(Printer.class.getName());
+
 	public static void print(final Object data)
 	{
-		System.out.println("Printer received data");
-		System.out.println(data.toString());
+		SYSLOG.debug("Printer received data: " + data.toString());
 	}
-
 }

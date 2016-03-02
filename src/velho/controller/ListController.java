@@ -4,6 +4,8 @@ import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+import org.apache.log4j.Logger;
+
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.collections.ObservableMap;
@@ -23,10 +25,18 @@ import velho.view.ProductListSearch;
 public class ListController
 {
 	/**
+	 * Apache log4j logger: System.
+	 */
+	private static final Logger SYSLOG = Logger.getLogger(ListController.class.getName());
+
+	/**
 	 * The {@link UserController}.
 	 */
 	private UserController userController;
 
+	/**
+	 * @param userController
+	 */
 	public ListController(final UserController userController)
 	{
 		this.userController = userController;
@@ -112,9 +122,8 @@ public class ListController
 
 	public Node getProductSearchResultsView()
 	{
-		// TODO: Temporarily showing all products
-		System.out.println("Getting search results for removal list.");
-		return getProductListView(DatabaseController.getPublicProductDataColumns(true, false), DatabaseController.getObservableProducts());
+		SYSLOG.trace("Getting search results for removal list.");
+		return getProductListView(DatabaseController.getProductDataColumns(true, false), DatabaseController.getObservableProducts());
 	}
 
 	/**
@@ -265,6 +274,6 @@ public class ListController
 	@SuppressWarnings("static-method")
 	public void addData(final Object object)
 	{
-		System.out.println("OBJECT FROM ADD BUTTON: " + object);
+		SYSLOG.trace("OBJECT FROM ADD BUTTON: " + object);
 	}
 }

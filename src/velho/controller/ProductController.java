@@ -18,7 +18,7 @@ public class ProductController
 	/**
 	 * The {@link AddProductView}.
 	 */
-	private static AddProductView addProductView;
+	private AddProductView addProductView;
 
 	/**
 	 * The {@link UIController}.

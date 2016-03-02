@@ -4,12 +4,12 @@ import java.util.Set;
 
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
-import javafx.geometry.Insets;
 import javafx.scene.Group;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
+import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
 import javafx.stage.Stage;
 import velho.controller.DebugController;
@@ -66,7 +66,7 @@ public class DebugWindow
 	 * Sets the value as either true or false to show in the scene.
 	 *
 	 * @param visibility
-	 *            show log in button?
+	 * show log in button?
 	 */
 	public void setLogInButton(final boolean visibility)
 	{
@@ -77,7 +77,7 @@ public class DebugWindow
 	 * sets the value as either true or false to show in the scene.
 	 *
 	 * @param visibility
-	 *            show log in button?
+	 * show log in button?
 	 */
 	public void setLogOutButton(final boolean visibility)
 	{
@@ -88,40 +88,43 @@ public class DebugWindow
 	 * Shows the debug window.
 	 *
 	 * @param primaryStage
-	 *            stage to show the window in
+	 * stage to show the window in
 	 */
 	public void start(final Stage primaryStage)
 	{
 		primaryStage.setTitle("VELHO WM DEBUG");
-		Scene scene = new Scene(new Group(), 300, 150);
-		final ComboBox<String> taskListBox = new ComboBox<String>();
+		Group root = new Group();
+		Scene scene = new Scene(root, 300, 150);
+		scene.getStylesheets().add(getClass().getResource("velho.css").toExternalForm());
+
+		BorderPane rootBorderPane = new BorderPane();
+		rootBorderPane.prefHeightProperty().bind(scene.heightProperty());
+		rootBorderPane.prefWidthProperty().bind(scene.widthProperty());
+		rootBorderPane.getStyleClass().add("standard-background-color");
+		rootBorderPane.getStyleClass().add("standard-padding-half");
+
+		final ComboBox<String> roleListBox = new ComboBox<String>();
 
 		grid = new GridPane();
-		grid.setVgap(4);
+		grid.setVgap(5);
 		grid.setHgap(10);
-		grid.setPadding(new Insets(5, 5, 5, 5));
-		grid.add(new Label("User :"), 0, 0);
-		taskListBox.getItems().addAll(rolenameSet);
-		taskListBox.getSelectionModel().selectFirst();
 
-		grid.add(taskListBox, 1, 0);
+		Button sendRandomShipmentButton = new Button("Send Random Shipment");
+
+		roleListBox.getItems().addAll(rolenameSet);
+		roleListBox.getSelectionModel().selectFirst();
+
 		logOutButton.setVisible(false);
 
-		grid.add(logInButton, 2, 0);
-
-		grid.add(logOutButton, 3, 0);
-
-		grid.add(scannerMoveValid, 1, 2);
-
-		Group root = (Group) scene.getRoot();
-		root.getChildren().add(grid);
+		rootBorderPane.setCenter(grid);
+		root.getChildren().add(rootBorderPane);
 
 		logInButton.setOnAction(new EventHandler<ActionEvent>()
 		{
 			@Override
 			public void handle(final ActionEvent event)
 			{
-				debugController.login(taskListBox.getValue());
+				debugController.login(roleListBox.getValue());
 			}
 
 		});
@@ -146,6 +149,24 @@ public class DebugWindow
 				debugController.scannerMoveValid();
 			}
 		});
+
+		sendRandomShipmentButton.setOnAction(new EventHandler<ActionEvent>()
+		{
+
+			@Override
+			public void handle(final ActionEvent event)
+			{
+
+				DebugController.sendRandomShipment();
+			}
+		});
+
+		grid.add(new Label("User :"), 0, 0);
+		grid.add(roleListBox, 1, 0);
+		grid.add(logInButton, 2, 0);
+		grid.add(logOutButton, 2, 1);
+		grid.add(scannerMoveValid, 1, 1);
+		grid.add(sendRandomShipmentButton, 1, 2);
 
 		primaryStage.setScene(scene);
 		primaryStage.show();

@@ -1,5 +1,7 @@
 package velho.view;
 
+import org.apache.log4j.Logger;
+
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
@@ -9,18 +11,14 @@ import javafx.geometry.Pos;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
-import javafx.scene.layout.Background;
-import javafx.scene.layout.BackgroundFill;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Priority;
-import javafx.scene.paint.Paint;
-import javafx.scene.text.Font;
-import javafx.scene.text.FontWeight;
 import velho.controller.DatabaseController;
 import velho.controller.RemovalListController;
 import velho.controller.SearchController;
 import velho.model.RemovalListState;
+import velho.model.exceptions.NoDatabaseLinkException;
 
 /**
  * View for creating new removal lists
@@ -29,6 +27,11 @@ import velho.model.RemovalListState;
  */
 public class RemovalListCreationView
 {
+	/**
+	 * Apache log4j logger: System.
+	 */
+	private static final Logger SYSLOG = Logger.getLogger(RemovalListCreationView.class.getName());
+
 	/**
 	 * The root BorderPane for this view.
 	 */
@@ -54,6 +57,10 @@ public class RemovalListCreationView
 	 */
 	private BorderPane resultList;
 
+	/**
+	 * @param removalListController
+	 * @param searchController
+	 */
 	public RemovalListCreationView(final RemovalListController removalListController, final SearchController searchController)
 	{
 		this.removalListController = removalListController;
@@ -65,7 +72,7 @@ public class RemovalListCreationView
 	 *
 	 * @return the removal list management BorderPane
 	 */
-	public BorderPane getView()
+	public BorderPane getView() throws NoDatabaseLinkException
 	{
 
 		if (bpane == null)
@@ -76,13 +83,12 @@ public class RemovalListCreationView
 			bpane.setTop(searchView);
 
 			final GridPane left = new GridPane();
-			// TODO: Use CSS.
-			left.setBackground(new Background(new BackgroundFill(Paint.valueOf("EEEEEE"), null, null)));
 
 			final Label resultsLabel = new Label("Search Results");
+			resultsLabel.getStyleClass().add("centered-title-medium");
+			resultsLabel.setPadding(new Insets(7, 0, 0, 0));
 			resultsLabel.setAlignment(Pos.CENTER);
 			resultsLabel.setMaxWidth(Double.MAX_VALUE);
-			resultsLabel.setFont(Font.font("Tahoma", FontWeight.NORMAL, 20));
 			left.add(resultsLabel, 0, 0);
 
 			resultList = removalListController.getSearchResultsListView();
@@ -94,13 +100,11 @@ public class RemovalListCreationView
 			GridPane.setVgrow(resultList, Priority.ALWAYS);
 
 			final GridPane center = new GridPane();
-			// TODO: Use CSS.
-			center.setBackground(new Background(new BackgroundFill(Paint.valueOf("EEEEEE"), null, null)));
 
 			final Label removalListLabel = new Label("New Removal List");
+			removalListLabel.getStyleClass().add("centered-title-medium");
 			removalListLabel.setAlignment(Pos.CENTER);
 			removalListLabel.setMaxWidth(Double.MAX_VALUE);
-			removalListLabel.setFont(Font.font("Tahoma", FontWeight.NORMAL, 20));
 
 			GridPane.setHgrow(removalListLabel, Priority.ALWAYS);
 
@@ -162,7 +166,7 @@ public class RemovalListCreationView
 	 */
 	public void refresh()
 	{
-		System.out.println("Refreshing removal list creation view.");
+		SYSLOG.trace("Refreshing removal list creation view.");
 		resultList = removalListController.getSearchResultsListView();
 		newList = removalListController.getNewRemovalListView();
 	}

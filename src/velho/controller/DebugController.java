@@ -1,6 +1,9 @@
 package velho.controller;
 
+import org.apache.log4j.Logger;
+
 import javafx.stage.Stage;
+import velho.model.BarcodeScanner;
 import velho.model.exceptions.NoDatabaseLinkException;
 import velho.view.DebugWindow;
 
@@ -11,6 +14,10 @@ import velho.view.DebugWindow;
  */
 public class DebugController
 {
+	/**
+	 * Apache log4j logger: System.
+	 */
+	private static final Logger SYSLOG = Logger.getLogger(DebugController.class.getName());
 
 	/**
 	 * The {@link DebugWindow}.
@@ -54,7 +61,7 @@ public class DebugController
 		catch (final NoDatabaseLinkException e)
 		{
 			PopupController.error("Login failed, no database connection.");
-			e.printStackTrace();
+			DatabaseController.tryReLink();
 		}
 	}
 
@@ -102,20 +109,19 @@ public class DebugController
 	}
 
 	/**
-	 * Result message from the External systems controller to the DebugWindow of the prosegures end result.
+	 * Result message from the External systems controller to the DebugWindow of the procedures end result.
 	 * Still in progress since there are not items in the database.
 	 */
 	public static void resultMessage()
 	{
-
 		final boolean s = ExternalSystemsController.move(0, null, true);
 		if (s == true)
 		{
-			System.out.println("System registered changes");
+			SYSLOG.debug("Product box move successful.");
 		}
 		else
 		{
-			System.out.println("Attempted changes were cancelled");
+			SYSLOG.debug("Product box move failed.");
 		}
 	}
 
@@ -139,5 +145,10 @@ public class DebugController
 
 		PopupController.info(productCode + " was not moved to " + shelfSlotCode
 				+ " error: If the product was not moved it either does not exist or the shelf does not exist!");
+	}
+
+	public static void sendRandomShipment()
+	{
+		BarcodeScanner.sendRandomShipment();
 	}
 }

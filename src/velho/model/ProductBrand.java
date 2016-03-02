@@ -18,7 +18,7 @@ public class ProductBrand
 		this.name = name;
 	}
 
-	public ProductBrand(final String brand)
+	public ProductBrand(final String name)
 	{
 		this.databaseID = -1;
 		this.name = name;

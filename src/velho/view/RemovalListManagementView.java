@@ -2,19 +2,13 @@ package velho.view;
 
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
-import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
-import javafx.scene.layout.Background;
-import javafx.scene.layout.BackgroundFill;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Priority;
-import javafx.scene.paint.Paint;
-import javafx.scene.text.Font;
-import javafx.scene.text.FontWeight;
 import velho.controller.RemovalListController;
 
 /**
@@ -46,7 +40,6 @@ public class RemovalListManagementView
 
 	/**
 	 * @param removalListController
-	 * @param listController
 	 */
 	public RemovalListManagementView(final RemovalListController removalListController)
 	{
@@ -65,18 +58,15 @@ public class RemovalListManagementView
 			bpane = new BorderPane();
 
 			final GridPane managementPanel = new GridPane();
-			// TODO: Use CSS.
-			managementPanel.setBackground(new Background(new BackgroundFill(Paint.valueOf("EEEEEE"), null, null)));
-			managementPanel.setPadding(new Insets(10));
+			managementPanel.getStyleClass().add("standard-padding");
 
 			browseListsButton = new Button("Browse Removal Lists");
 			browseListsButton.setAlignment(Pos.CENTER_LEFT);
 			managementPanel.add(browseListsButton, 0, 0);
 
 			final Label removalListManagementLabel = new Label("Removal List Management");
-			removalListManagementLabel.setFont(Font.font("Tahoma", FontWeight.NORMAL, 20));
-			removalListManagementLabel.setPadding(new Insets(10));
-			removalListManagementLabel.setAlignment(Pos.CENTER);
+			removalListManagementLabel.getStyleClass().add("standard-padding");
+			removalListManagementLabel.getStyleClass().add("centered-title");
 			removalListManagementLabel.setMaxWidth(Double.MAX_VALUE);
 			managementPanel.add(removalListManagementLabel, 1, 0);
 			GridPane.setHgrow(removalListManagementLabel, Priority.ALWAYS);

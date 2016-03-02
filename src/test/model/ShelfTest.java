@@ -53,14 +53,16 @@ public class ShelfTest
 		{
 			assertTrue(DatabaseController.link());
 			assertTrue(DatabaseController.initializeDatabase());
+			DatabaseController.loadData();
 		}
-		catch (ClassNotFoundException | ExistingDatabaseLinkException | NoDatabaseLinkException e)
+		catch (ClassNotFoundException | ExistingDatabaseLinkException e)
 		{
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-
-		DatabaseController.loadData(true);
+		catch (NoDatabaseLinkException e)
+		{
+			DatabaseController.tryReLink();
+		}
 
 		try
 		{
@@ -79,8 +81,7 @@ public class ShelfTest
 		}
 		catch (NoDatabaseLinkException e)
 		{
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			DatabaseController.tryReLink();
 		}
 	}
 
@@ -95,21 +96,21 @@ public class ShelfTest
 	public final void testCreateInvalid()
 	{
 		@SuppressWarnings("unused")
-		Shelf s = new Shelf(-1, -1, 2, 3);
+		final Shelf s = new Shelf(-1, -1, 2, 3);
 	}
 
 	@Test(expected = IllegalArgumentException.class)
 	public final void testCreateInvalid2()
 	{
 		@SuppressWarnings("unused")
-		Shelf s = new Shelf(1, 1, -2, 3);
+		final Shelf s = new Shelf(1, 1, -2, 3);
 	}
 
 	@Test(expected = IllegalArgumentException.class)
 	public final void testCreateInvalid3()
 	{
 		@SuppressWarnings("unused")
-		Shelf s = new Shelf(0, 1, 2, -3);
+		final Shelf s = new Shelf(0, 1, 2, -3);
 	}
 
 	@Test(expected = IllegalArgumentException.class)
@@ -160,7 +161,11 @@ public class ShelfTest
 		shelf_FREE_LVL_2.addToSlot(shelf_FREE_LVL_2.getShelfID() + "-2-999999", BOX_2);
 	}
 
-	// MORE TESTS HERE
+	@Test(expected = IllegalArgumentException.class)
+	public final void testAddToSlot_Wrong_ID() throws IllegalArgumentException, NoDatabaseLinkException
+	{
+		shelf_FREE_LVL_2.addToSlot("S" + (SHELF_FREE_LVL_2_ID + 1) + "-2-1", BOX_2);
+	}
 
 	@Test
 	public final void testCoordinatesToShelfSlotID()
@@ -214,11 +219,11 @@ public class ShelfTest
 	@Test
 	public final void testTokenizeSlotID()
 	{
-		Object[] tokens = Shelf.tokenizeShelfSlotID(SHELF_1_LEVEL_3_SLOT_16);
-		List<Object> expected = new ArrayList<Object>(Arrays.asList("S1", 3, 16));
-		List<Object> actual = new ArrayList<Object>();
+		final Object[] tokens = Shelf.tokenizeShelfSlotID(SHELF_1_LEVEL_3_SLOT_16);
+		final List<Object> expected = new ArrayList<Object>(Arrays.asList("S1", 3, 16));
+		final List<Object> actual = new ArrayList<Object>();
 
-		for (Object value : tokens)
+		for (final Object value : tokens)
 			actual.add(value);
 
 		assertTrue(actual.containsAll(expected));
@@ -228,11 +233,11 @@ public class ShelfTest
 	@Test
 	public final void testTokenizeSlotID2()
 	{
-		Object[] tokens = Shelf.tokenizeShelfSlotID(SHELF_0_LEVEL_1_SLOT_1);
-		List<Object> expected = new ArrayList<Object>(Arrays.asList("S0", 1, 1));
-		List<Object> actual = new ArrayList<Object>();
+		final Object[] tokens = Shelf.tokenizeShelfSlotID(SHELF_0_LEVEL_1_SLOT_1);
+		final List<Object> expected = new ArrayList<Object>(Arrays.asList("S0", 1, 1));
+		final List<Object> actual = new ArrayList<Object>();
 
-		for (Object value : tokens)
+		for (final Object value : tokens)
 			actual.add(value);
 
 		assertTrue(actual.containsAll(expected));
@@ -270,6 +275,7 @@ public class ShelfTest
 		final String slotid = shelf_FREE_LVL_2.getShelfID() + "-2-10";
 		assertTrue(shelf_FREE_LVL_2.addToSlot(slotid, BOX_2));
 		assertTrue(shelf_FREE_LVL_2.getShelfSlotBoxes(slotid).contains(BOX_2));
+		assertTrue(DatabaseController.getShelfByID(SHELF_FREE_LVL_2_ID, false).getShelfSlotBoxes(slotid).contains(BOX_2));
 
 		final int oldBoxCount = shelf_FREE_LVL_2.getProductBoxCount();
 		final int oldProductCount = shelf_FREE_LVL_2.getProductCount();
@@ -279,6 +285,32 @@ public class ShelfTest
 		assertFalse(shelf_FREE_LVL_2.getShelfSlotBoxes(slotid).contains(BOX_2));
 		assertEquals(oldBoxCount - 1, shelf_FREE_LVL_2.getProductBoxCount());
 		assertEquals(oldProductCount - BOX_1_2_PRODUCT_COUNT, shelf_FREE_LVL_2.getProductCount());
+		assertFalse(DatabaseController.getShelfByID(SHELF_FREE_LVL_2_ID, false).getShelfSlotBoxes(slotid).contains(BOX_2));
+	}
+
+	@Test
+	public final void testRemoveFromSlot_NoUpdate() throws IllegalArgumentException, NoDatabaseLinkException
+	{
+		final String slotid = shelf_FREE_LVL_2.getShelfID() + "-2-10";
+		assertTrue(shelf_FREE_LVL_2.addToSlot(slotid, BOX_2));
+		assertTrue(shelf_FREE_LVL_2.getShelfSlotBoxes(slotid).contains(BOX_2));
+		assertTrue(DatabaseController.getShelfByID(SHELF_FREE_LVL_2_ID, false).getShelfSlotBoxes(slotid).contains(BOX_2));
+
+		final int oldBoxCount = shelf_FREE_LVL_2.getProductBoxCount();
+		final int oldProductCount = shelf_FREE_LVL_2.getProductCount();
+
+		assertTrue(shelf_FREE_LVL_2.removeFromSlot(BOX_2, false));
+
+		assertFalse(shelf_FREE_LVL_2.getShelfSlotBoxes(slotid).contains(BOX_2));
+		assertEquals(oldBoxCount - 1, shelf_FREE_LVL_2.getProductBoxCount());
+		assertEquals(oldProductCount - BOX_1_2_PRODUCT_COUNT, shelf_FREE_LVL_2.getProductCount());
+		assertTrue(DatabaseController.getShelfByID(SHELF_FREE_LVL_2_ID, false).getShelfSlotBoxes(slotid).contains(BOX_2));
+	}
+
+	@Test
+	public final void testRemoveFromSlot_Null() throws IllegalArgumentException, NoDatabaseLinkException
+	{
+		assertFalse(shelf_FREE_LVL_2.removeFromSlot(null));
 	}
 
 	@Test

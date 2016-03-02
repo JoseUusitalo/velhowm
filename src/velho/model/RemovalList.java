@@ -8,13 +8,36 @@ import javafx.collections.ObservableList;
 import velho.controller.DatabaseController;
 import velho.model.exceptions.NoDatabaseLinkException;
 
+/**
+ * A list of product boxes to be thrown away.
+ *
+ * @author Jose Uusitalo
+ */
 public class RemovalList
 {
+	/**
+	 * The set of {@link ProductBox} objects.
+	 */
 	private Set<ProductBox> boxes;
+
+	/**
+	 * An {@link ObservableList} of {@link ProductBox} objects for display in the user interface.
+	 */
 	private ObservableList<Object> observableBoxes;
+
+	/**
+	 * The database ID of this removal list.
+	 */
 	private int databaseID;
+
+	/**
+	 * The current state of this removal list.
+	 */
 	private RemovalListState state;
 
+	/**
+	 * Creates a new empty removal list in the active state.
+	 */
 	public RemovalList()
 	{
 		this.state = new RemovalListState(1, "Active");
@@ -22,6 +45,10 @@ public class RemovalList
 		this.observableBoxes = FXCollections.observableArrayList();
 	}
 
+	/**
+	 * @param databaseID
+	 * @param state
+	 */
 	public RemovalList(final int databaseID, final RemovalListState state)
 	{
 		this.databaseID = databaseID;
@@ -83,8 +110,17 @@ public class RemovalList
 	 */
 	public ObservableList<Object> getObservableBoxes()
 	{
-		System.out.println("Getting " + observableBoxes);
 		return observableBoxes;
+	}
+
+	/**
+	 * Gets the set of actual product boxes in this removal list.
+	 *
+	 * @return the {@link ProductBox} objects in this removal list
+	 */
+	public Set<ProductBox> getBoxes()
+	{
+		return boxes;
 	}
 
 	/**

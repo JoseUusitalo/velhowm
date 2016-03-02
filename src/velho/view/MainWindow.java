@@ -1,9 +1,19 @@
 package velho.view;
 
+import java.util.HashMap;
+import java.util.Map;
+
+import org.apache.log4j.AppenderSkeleton;
+import org.apache.log4j.Level;
+import org.apache.log4j.Logger;
+import org.apache.log4j.PropertyConfigurator;
+
 import javafx.application.Application;
+import javafx.beans.property.ReadOnlyDoubleProperty;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
-import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Group;
 import javafx.scene.Node;
@@ -13,21 +23,18 @@ import javafx.scene.control.Label;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
 import javafx.scene.control.TabPane.TabClosingPolicy;
-import javafx.scene.layout.Background;
-import javafx.scene.layout.BackgroundFill;
-import javafx.scene.layout.Border;
 import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.BorderStroke;
-import javafx.scene.layout.BorderStrokeStyle;
 import javafx.scene.layout.HBox;
-import javafx.scene.paint.Color;
-import javafx.scene.paint.Paint;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
 import velho.controller.DatabaseController;
 import velho.controller.DebugController;
+import velho.controller.ExternalSystemsController;
 import velho.controller.ListController;
+import velho.controller.LogController;
+import velho.controller.LogDatabaseController;
 import velho.controller.LoginController;
+import velho.controller.ManifestController;
 import velho.controller.ProductController;
 import velho.controller.RemovalListController;
 import velho.controller.SearchController;
@@ -44,25 +51,29 @@ import velho.model.exceptions.NoDatabaseLinkException;
 public class MainWindow extends Application
 {
 	/**
+	 * Relative file path to the Apache log4j logger properties file.
+	 */
+	private static final String LOG4J_PATH = "src/velho/model/log4j.properties";
+
+	/**
+	 * Apache log4j logger: System.
+	 */
+	private static final Logger SYSLOG = Logger.getLogger(MainWindow.class.getName());
+
+	/**
 	 * Enable or disable debug features.
 	 */
 	public static final boolean DEBUG_MODE = true;
 
 	/**
-	 * Enable or disable showing windows. DEBUG_MODE must be <code>true</code>
-	 * to make this <code>false</code>.
+	 * Enable or disable showing windows. DEBUG_MODE must be <code>true</code> for this to affect anything.
 	 */
 	public static final boolean SHOW_WINDOWS = true;
 
 	/**
-	 * Print SQL Builder output?
+	 * Enable TRACE level logging. DEBUG_MODE must be <code>true</code> for this to affect anything.
 	 */
-	public static final boolean PRINT_SQL = true;
-
-	/**
-	 * Print messages about caching?
-	 */
-	public static final boolean PRINT_CACHE_MESSAGES = true;
+	public static final boolean SHOW_TRACE = false;
 
 	/**
 	 * The height of the window.
@@ -73,6 +84,11 @@ public class MainWindow extends Application
 	 * The width of the window.
 	 */
 	public static final double WINDOW_WIDTH = 1024;
+
+	/**
+	 * The current width of the window.
+	 */
+	public static ReadOnlyDoubleProperty WIDTH_PROPERTY;
 
 	/**
 	 * The {@link DebugController}.
@@ -105,6 +121,11 @@ public class MainWindow extends Application
 	private TabPane mainTabPane;
 
 	/**
+	 * The map of tab names and tab objects used for selecting tabs in the tab pane.
+	 */
+	private Map<String, Tab> tabMap;
+
+	/**
 	 * The main scene.
 	 */
 	private Scene scene;
@@ -128,41 +149,104 @@ public class MainWindow extends Application
 	 * The {@link ProductController}.
 	 */
 	private ProductController productController;
+	/**
+	 * The {@link LogController}.
+	 */
+	private LogController logController;
+
+	/**
+	 * The {@link ManifestController}.
+	 */
+	private ManifestController manifestController;
 
 	/**
 	 * The main window constructor.
 	 */
 	public MainWindow()
 	{
-		System.out.println("Running VELHO Warehouse Management.");
+		// Load the logger properties.
+		PropertyConfigurator.configure(LOG4J_PATH);
+
 		try
 		{
-			if (DatabaseController.connectAndInitialize())
+			if (LogDatabaseController.connectAndInitialize())
 			{
-				System.out.println("[MainWindow] Creating all controllers...");
+				if (!DEBUG_MODE)
+				{
+					// This is how we prevent Logisticians from reading logs.
+					// Logs can now only be read through the database access to which can easily be limited.
+					SYSLOG.info("Debug mode not enabled, disabling file and console appenders for all loggers.");
 
-				DatabaseController.loadData(false);
-				debugController = new DebugController();
-				userController = new UserController();
-				productController = new ProductController();
-				listController = new ListController(userController);
-				searchController = new SearchController(listController);
-				removalListController = new RemovalListController(searchController);
-				uiController = new UIController(this, listController, userController, removalListController, searchController, productController);
+					// Remove console appenders from all system loggers.
+					Logger.getRootLogger().removeAppender("SysConsoleAppender");
 
-				LoginController.setControllers(uiController, debugController);
+					// Remove file appenders from all system loggers.
+					Logger.getRootLogger().removeAppender("SysRollingAppender");
 
-				System.out.println("[MainWindow] All controllers created.");
+					// Do the same for user and database loggers.
+					Logger.getLogger("userLogger").removeAppender("UsrConsoleAppender");
+					Logger.getLogger("userLogger").removeAppender("UsrRollingAppender");
+					Logger.getLogger("dbLogger").removeAppender("DbConsoleAppender");
+					Logger.getLogger("dbLogger").removeAppender("DbRollingAppender");
+				}
+				else
+				{
+					if (SHOW_TRACE)
+					{
+						((AppenderSkeleton) Logger.getRootLogger().getAppender("SysConsoleAppender")).setThreshold(Level.TRACE);
+						((AppenderSkeleton) Logger.getLogger("userLogger").getAppender("UsrConsoleAppender")).setThreshold(Level.TRACE);
+						((AppenderSkeleton) Logger.getLogger("dbLogger").getAppender("DbConsoleAppender")).setThreshold(Level.TRACE);
+					}
+				}
+
+				SYSLOG.info("Running VELHO Warehouse Management.");
+
+				try
+				{
+					if (DatabaseController.connectAndInitialize())
+					{
+						SYSLOG.debug("Creating all controllers...");
+
+						DatabaseController.loadData();
+						debugController = new DebugController();
+						userController = new UserController();
+						logController = new LogController();
+						manifestController = new ManifestController(this);
+						productController = new ProductController();
+
+						ExternalSystemsController.setControllers(manifestController);
+
+						listController = new ListController(userController);
+						searchController = new SearchController(listController);
+						removalListController = new RemovalListController(searchController);
+						uiController = new UIController(this, listController, userController, removalListController, searchController, logController, manifestController, productController);
+
+						LoginController.setControllers(uiController, debugController);
+
+						SYSLOG.debug("All controllers created.");
+					}
+					else
+					{
+						SYSLOG.fatal("Failed to connect to database.");
+						SYSLOG.info("Closing application.");
+						System.exit(0);
+					}
+				}
+				catch (ClassNotFoundException | ExistingDatabaseLinkException | NoDatabaseLinkException e1)
+				{
+					e1.printStackTrace();
+				}
 			}
 			else
 			{
-				System.out.println("Closing application.");
+				SYSLOG.fatal("Failed to connect to log database.");
+				SYSLOG.info("Closing application.");
 				System.exit(0);
 			}
 		}
-		catch (ClassNotFoundException | ExistingDatabaseLinkException | NoDatabaseLinkException e1)
+		catch (ClassNotFoundException | ExistingDatabaseLinkException | NoDatabaseLinkException e)
 		{
-			e1.printStackTrace();
+			e.printStackTrace();
 		}
 	}
 
@@ -179,12 +263,10 @@ public class MainWindow extends Application
 	/**
 	 * Adds a new tab to the main tab panel.
 	 *
-	 * @param tabName
-	 *            name of the tab
-	 * @param view
-	 *            view to show in the tab
+	 * @param tabName name of the tab
+	 * @param view view to show in the tab
 	 */
-	public void addTab(final String tabName, final Node view)
+	public boolean addTab(final String tabName, final Node view)
 	{
 		if (mainTabPane == null)
 			showMainMenu();
@@ -192,7 +274,20 @@ public class MainWindow extends Application
 		final Tab tab = new Tab();
 		tab.setText(tabName);
 		tab.setContent(view);
-		mainTabPane.getTabs().add(tab);
+
+		tabMap.put(tabName, tab);
+		return mainTabPane.getTabs().add(tab);
+	}
+
+	/**
+	 * Forcibly selects the specified tab and changes the view in the main window to that tab.
+	 *
+	 * @param tabName name of the tab
+	 */
+	public void selectTab(final String tabName)
+	{
+		if (mainTabPane != null)
+			mainTabPane.getSelectionModel().select(tabMap.get(tabName));
 	}
 
 	/**
@@ -203,19 +298,26 @@ public class MainWindow extends Application
 		if (mainTabPane == null)
 		{
 			mainTabPane = new TabPane();
+			tabMap = new HashMap<String, Tab>();
 			mainTabPane.setTabClosingPolicy(TabClosingPolicy.UNAVAILABLE);
+
+			mainTabPane.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<Tab>()
+			{
+				@Override
+				public void changed(final ObservableValue<? extends Tab> old, final Tab oldTab, final Tab newTab)
+				{
+					if (newTab.getText() == "Logs")
+						logController.refresh();
+				}
+
+			});
 		}
 
 		// Force log in to see main menu.
 		if (LoginController.checkLogin())
 		{
 			final HBox statusBar = new HBox();
-			statusBar.setAlignment(Pos.CENTER_RIGHT);
-			statusBar.setPadding(new Insets(4.0));
-
-			// TODO: Use CSS.
-			statusBar.setBackground(new Background(new BackgroundFill(Paint.valueOf(Color.LIGHTGRAY.toString()), null, null)));
-			statusBar.setBorder(new Border(new BorderStroke(Paint.valueOf("b5b5b5"), Paint.valueOf(Color.TRANSPARENT.toString()), Paint.valueOf(Color.TRANSPARENT.toString()), Paint.valueOf(Color.TRANSPARENT.toString()), BorderStrokeStyle.SOLID, null, null, null, null, null, null)));
+			statusBar.getStyleClass().add("status-bar");
 
 			final HBox userBar = new HBox(10);
 
@@ -242,7 +344,7 @@ public class MainWindow extends Application
 	}
 
 	/**
-	 * Loads the data from the database and creates the window.
+	 * Creates the window.
 	 */
 	@SuppressWarnings("unused")
 	@Override
@@ -250,14 +352,20 @@ public class MainWindow extends Application
 	{
 		if (!SHOW_WINDOWS && DEBUG_MODE)
 		{
-			System.out.println("Windows are disabled.");
+			SYSLOG.debug("Windows are disabled.");
 		}
 		else
 		{
+			setUserAgentStylesheet(STYLESHEET_MODENA);
+
 			primaryStage.setTitle("Velho Warehouse Management");
 			final Group root = new Group();
-			scene = new Scene(root, WINDOW_WIDTH, WINDOW_HEIGHT, Color.WHITE);
+			scene = new Scene(root, WINDOW_WIDTH, WINDOW_HEIGHT);
+			scene.getStylesheets().add(getClass().getResource("velho.css").toExternalForm());
+			WIDTH_PROPERTY = scene.widthProperty();
+
 			rootBorderPane = new BorderPane();
+			rootBorderPane.getStyleClass().add("standard-background-color");
 			rootBorderPane.prefHeightProperty().bind(scene.heightProperty());
 			rootBorderPane.prefWidthProperty().bind(scene.widthProperty());
 
@@ -310,7 +418,7 @@ public class MainWindow extends Application
 			if (debugStage != null)
 				debugStage.close();
 		}
-		System.out.println("[MainWindow] Closing windows.");
+
 		try
 		{
 			DatabaseController.unlink();
@@ -319,7 +427,8 @@ public class MainWindow extends Application
 		{
 			// Ignore.
 		}
-		System.out.println("Exit.");
+
+		SYSLOG.info("Exit.");
 	}
 
 	/**

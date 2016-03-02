@@ -6,17 +6,28 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.log4j.Logger;
+
 import javafx.scene.Node;
 import velho.model.ProductBrand;
 import velho.model.ProductCategory;
 import velho.model.enums.DatabaseTable;
 import velho.model.exceptions.NoDatabaseLinkException;
-import velho.view.MainWindow;
 import velho.view.SearchTabView;
 import velho.view.SearchView;
 
+/**
+ * A class handling searching the database for data.
+ *
+ * @author Jose Uusitalo &amp; Joona
+ */
 public class SearchController
 {
+	/**
+	 * Apache log4j logger: System.
+	 */
+	private static final Logger SYSLOG = Logger.getLogger(SearchController.class.getName());
+
 	private SearchTabView searchTabView;
 
 	private ListController listController;
@@ -35,7 +46,6 @@ public class SearchController
 
 		if (nameField != null && !nameField.isEmpty())
 		{
-			System.out.println(nameField.isEmpty());
 			where.add("products.name = '" + nameField + "'");
 		}
 
@@ -84,13 +94,11 @@ public class SearchController
 				default:
 					break;
 			}
-			if (MainWindow.DEBUG_MODE)
-				System.out.println("[SearchController] " + limits + " Conditions: " + where.toString());
+			SYSLOG.debug(limits + " Conditions: " + where.toString());
 		}
 		else
 		{
-			if (MainWindow.DEBUG_MODE)
-				System.out.println("[SearchController] Conditions: " + where.toString());
+			SYSLOG.debug("Conditions: " + where.toString());
 		}
 
 		try
@@ -136,7 +144,7 @@ public class SearchController
 
 	public Node getResultsView()
 	{
-		System.out.println("Getting search results for removal list.");
+		SYSLOG.trace("Getting search results for removal list.");
 		return listController.getProductListView(DatabaseController.getProductSearchDataColumns(false, false),
 				DatabaseController.getObservableProductSearchResults());
 	}

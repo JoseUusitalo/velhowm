@@ -5,13 +5,10 @@ import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
-import javafx.scene.layout.Background;
-import javafx.scene.layout.BackgroundFill;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
-import javafx.scene.paint.Paint;
 import velho.controller.DatabaseController;
 import velho.controller.ExternalSystemsController;
 import velho.controller.SearchController;
@@ -40,15 +37,13 @@ public class SearchTabView
 		if (bPane == null)
 		{
 			final VBox top = new VBox();
-			top.setBackground(new Background(new BackgroundFill(Paint.valueOf("EEEEEE"), null, null)));
+			top.getStyleClass().add("standard-background-color");
 
 			bPane = new BorderPane();
 			final GridPane searchPane = (GridPane) searchController.getSearchView();
 			searchPane.setPadding(new Insets(0, 10, 10, 10));
 
 			final HBox buttonsBox = new HBox(10);
-			// TODO: Use CSS.
-			buttonsBox.setBackground(new Background(new BackgroundFill(Paint.valueOf("EEEEEE"), null, null)));
 			buttonsBox.setPadding(new Insets(0, 10, 10, 10));
 
 			final Button printButton = new Button("Print");
@@ -81,6 +76,7 @@ public class SearchTabView
 
 			top.getChildren().addAll(searchPane, buttonsBox);
 
+			bPane.setTop(top);
 			bPane.setCenter(searchController.getResultsView());
 
 		}
