@@ -168,7 +168,7 @@ CREATE TABLE IF NOT EXISTS `removalplatforms`
 (
 	`platform_id` INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
 	`free_space` DOUBLE NOT NULL DEFAULT 1.0,
-	`free_space_warning` DOUBLE NOT NULL DEFAULT 0.95,
+	`free_space_warning` DOUBLE NOT NULL DEFAULT 0.10,
 ) DEFAULT CHARSET=utf8;
 
 /* ---- EXAMPLE DATA ---- */
@@ -335,4 +335,4 @@ INSERT INTO `manifest_productboxes` SET `manifest`=4, `productbox`=38;
 INSERT INTO `manifest_productboxes` SET `manifest`=4, `productbox`=39;
 
 /* The removal platform, only one is supported for now. */
-INSERT INTO `removal_plaforms` SET `platform_id`=1;
+INSERT INTO `removalplatforms` SET `platform_id`=1;
