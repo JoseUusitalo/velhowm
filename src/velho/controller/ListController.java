@@ -8,6 +8,7 @@ import org.apache.log4j.Logger;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.collections.ObservableMap;
 import javafx.collections.ObservableSet;
 import javafx.scene.Node;
 import velho.model.User;
@@ -86,8 +87,7 @@ public class ListController
 	public Node getProductListSearchView()
 	{
 		final ProductListSearch searchView = new ProductListSearch(this);
-		final ListView listView = new ListView(null, DatabaseController.getProductSearchDataColumns(false, false),
-				DatabaseController.getObservableProductSearchResults());
+		final ListView listView = new ListView(null, DatabaseController.getProductSearchDataColumns(false, false), DatabaseController.getObservableProductSearchResults());
 
 		return searchView.getView(listView.getView());
 	}
@@ -195,6 +195,7 @@ public class ListController
 	 * <p>
 	 * <code>&lt;an integer&gt; : &lt;product ID or name&gt;</code>
 	 * </p>
+	 * 
 	 * @param line String to parse
 	 * @return an object array where the first element is the integer and the second element is the product name
 	 */

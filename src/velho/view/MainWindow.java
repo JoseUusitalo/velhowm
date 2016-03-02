@@ -35,6 +35,7 @@ import velho.controller.LogController;
 import velho.controller.LogDatabaseController;
 import velho.controller.LoginController;
 import velho.controller.ManifestController;
+import velho.controller.ProductController;
 import velho.controller.RemovalListController;
 import velho.controller.SearchController;
 import velho.controller.UIController;
@@ -72,7 +73,7 @@ public class MainWindow extends Application
 	/**
 	 * Enable TRACE level logging. DEBUG_MODE must be <code>true</code> for this to affect anything.
 	 */
-	public static final boolean SHOW_TRACE = false;
+	public static final boolean SHOW_TRACE = true;
 
 	/**
 	 * The height of the window.
@@ -145,6 +146,10 @@ public class MainWindow extends Application
 	private RemovalListController removalListController;
 
 	/**
+	 * The {@link ProductController}.
+	 */
+	private ProductController productController;
+	/**
 	 * The {@link LogController}.
 	 */
 	private LogController logController;
@@ -207,14 +212,14 @@ public class MainWindow extends Application
 						userController = new UserController();
 						logController = new LogController();
 						manifestController = new ManifestController(this);
+						productController = new ProductController();
 
 						ExternalSystemsController.setControllers(manifestController);
 
 						listController = new ListController(userController);
 						searchController = new SearchController(listController);
 						removalListController = new RemovalListController(searchController);
-						uiController = new UIController(this, listController, userController, removalListController, searchController, logController,
-								manifestController);
+						uiController = new UIController(this, listController, userController, removalListController, searchController, logController, manifestController, productController);
 
 						LoginController.setControllers(uiController, debugController);
 
@@ -402,7 +407,7 @@ public class MainWindow extends Application
 	 * cleanup.
 	 *
 	 * @param primaryStage
-	 * the stage the main window is open in
+	 *            the stage the main window is open in
 	 */
 	protected void shutdown(final Stage primaryStage)
 	{
@@ -430,7 +435,7 @@ public class MainWindow extends Application
 	 * Replaces the top view of the window
 	 *
 	 * @param view
-	 * view to set the top of the window
+	 *            view to set the top of the window
 	 */
 	public void setTopView(final Node view)
 	{
@@ -441,7 +446,7 @@ public class MainWindow extends Application
 	 * Replaces the right side view of the window
 	 *
 	 * @param view
-	 * view to set the right of the window
+	 *            view to set the right of the window
 	 */
 	public void setRightView(final Node view)
 	{
@@ -452,7 +457,7 @@ public class MainWindow extends Application
 	 * Replaces the bottom view of the window
 	 *
 	 * @param view
-	 * view to set the bottom of the window
+	 *            view to set the bottom of the window
 	 */
 	public void setBottomView(final Node view)
 	{
@@ -463,7 +468,7 @@ public class MainWindow extends Application
 	 * Replaces the left side view of the window
 	 *
 	 * @param view
-	 * view to set the l of the window
+	 *            view to set the l of the window
 	 */
 	public void setLeftView(final Node view)
 	{
@@ -474,7 +479,7 @@ public class MainWindow extends Application
 	 * Replaces the center view of the window
 	 *
 	 * @param view
-	 * view to set the middle of the window
+	 *            view to set the middle of the window
 	 */
 	public void setCenterView(final Node view)
 	{
