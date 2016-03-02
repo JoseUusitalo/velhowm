@@ -36,6 +36,11 @@ public class UIController
 	private ListController listController;
 
 	/**
+	 * The {@link ProductController}.
+	 */
+	private ProductController productController;
+
+	/**
 	 * The {@link SearchController}.
 	 */
 	private SearchController searchController;
@@ -45,13 +50,14 @@ public class UIController
 	 */
 	private RemovalListController removalListController;
 
+	/**
+	 * The {@link LogController}.
+	 */
 	private LogController logController;
 
 	private ManifestController manifestController;
 
-	public UIController(final MainWindow mainWindow, final ListController listController, final UserController userController,
-			final RemovalListController removalListController, final SearchController searchController, final LogController logController,
-			final ManifestController manifestController)
+	public UIController(final MainWindow mainWindow, final ListController listController, final UserController userController, final RemovalListController removalListController, final SearchController searchController, final LogController logController, final ManifestController manifestController, final ProductController productController)
 	{
 		this.mainView = mainWindow;
 		this.listController = listController;
@@ -60,13 +66,16 @@ public class UIController
 		this.searchController = searchController;
 		this.logController = logController;
 		this.manifestController = manifestController;
+		this.productController = productController;
 	}
 
 	/**
 	 * Shows a view in the main window.
 	 *
-	 * @param position {@link Position} to show the view in
-	 * @param view view to show
+	 * @param position
+	 *            {@link Position} to show the view in
+	 * @param view
+	 *            view to show
 	 */
 	public void setView(final Position position, final Node view)
 	{
@@ -95,7 +104,8 @@ public class UIController
 	/**
 	 * Shows the main menu as seen by the specified role.
 	 *
-	 * @param currentUserRole {@link UserRole} viewing the main menu
+	 * @param currentUserRole
+	 *            {@link UserRole} viewing the main menu
 	 */
 	public void showMainMenu(final UserRole currentUserRole)
 	{
@@ -115,11 +125,11 @@ public class UIController
 			case "Logistician":
 				mainView.addTab("Removal Lists", removalListController.getView());
 				mainView.addTab("User List", getUserListView(currentUserRole));
-				mainView.addTab("Product List",
-						listController.getProductListView(DatabaseController.getProductDataColumns(false, false), DatabaseController.getObservableProducts()));
+				mainView.addTab("Product List", listController.getProductListView(DatabaseController.getProductDataColumns(false, false), DatabaseController.getObservableProducts()));
 				mainView.addTab("Search", searchController.getSearchTabView());
 				mainView.addTab("Product List Search", listController.getProductListSearchView());
 				mainView.addTab("Manifests", manifestController.getView());
+				mainView.addTab("Product Data View", productController.getView());
 				break;
 			default:
 				SYSLOG.error("Unknown user role '" + currentUserRole.getName() + "'.");
@@ -130,7 +140,8 @@ public class UIController
 	 * Creates the user list view. The list contents change depending on who is
 	 * logged in.
 	 *
-	 * @param currentUserRole the role of the user who is currently logged in
+	 * @param currentUserRole
+	 *            the role of the user who is currently logged in
 	 * @return the user list view
 	 */
 	private Node getUserListView(final UserRole currentUserRole)
@@ -150,13 +161,13 @@ public class UIController
 				default:
 					SYSLOG.error("Unknown user role '" + currentUserRole.getName() + "'.");
 			}
-		}
-		catch (NoDatabaseLinkException e)
+		} catch (NoDatabaseLinkException e)
 		{
 			DatabaseController.tryReLink();
 		}
 
 		return null;
+
 	}
 
 	/**
