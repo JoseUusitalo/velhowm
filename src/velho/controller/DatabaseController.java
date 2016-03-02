@@ -2944,11 +2944,33 @@ public class DatabaseController
 	/**
 	 * Loads all {@link Manifest} objects from the database into the cache.
 	 *
+	 * @param getCached Get all manifests from the cache instead of rebuilding the cache from the database but only if
+	 * the cache contains all the manifests that are in the database. Be aware that the cached manifest data may not be
+	 * up to date.
 	 * @return an {@link ObservableList} of all manifests
 	 */
-	public static ObservableList<Object> getAllManifests() throws NoDatabaseLinkException
+	public static ObservableList<Object> getAllManifests(final boolean getCached) throws NoDatabaseLinkException
 	{
-		final String[] columns = { "*" };
+		String[] columns = new String[1];
+
+		if (getCached)
+		{
+			columns[0] = "manifest_id";
+
+			@SuppressWarnings("unchecked")
+			Set<Integer> result = (LinkedHashSet<Integer>) (runQuery(DatabaseQueryType.SELECT, DatabaseTable.MANIFESTS, null, columns, null, null));
+
+			// Check if all manifests have been cached by their ID.
+			if (cachedManifests.keySet().containsAll(result))
+			{
+				DBLOG.debug("Returning all cached manifests.");
+				return observableManifests;
+			}
+
+			DBLOG.debug("Unable to return all cached manifests, cached IDs do not match.");
+		}
+
+		columns[0] = "*";
 
 		@SuppressWarnings("unchecked")
 		final Set<Manifest> result = (LinkedHashSet<Manifest>) (runQuery(DatabaseQueryType.SELECT, DatabaseTable.MANIFESTS, null, columns, null, null));
@@ -3013,11 +3035,33 @@ public class DatabaseController
 	/**
 	 * Loads all {@link ManifestState} objects from the database into the cache.
 	 *
+	 * @param getCached Get all manifest states from the cache instead of rebuilding the cache from the database but
+	 * only if the cache contains all the manifest states that are in the database. Be aware that the cached manifest
+	 * state data may not be up to date.
 	 * @return an {@link ObservableList} of all manifest states
 	 */
-	public static ObservableList<Object> getAllManifestStates(final ManifestState currentState) throws NoDatabaseLinkException
+	public static ObservableList<Object> getAllManifestStates(final boolean getCached, final ManifestState currentState) throws NoDatabaseLinkException
 	{
-		final String[] columns = { "*" };
+		String[] columns = new String[1];
+
+		if (getCached)
+		{
+			columns[0] = "manifest_state_id";
+
+			@SuppressWarnings("unchecked")
+			Set<Integer> result = (LinkedHashSet<Integer>) (runQuery(DatabaseQueryType.SELECT, DatabaseTable.MANIFEST_STATES, null, columns, null, null));
+
+			// Check if all manifest states have been cached by their ID.
+			if (cachedManifestStates.keySet().containsAll(result))
+			{
+				DBLOG.debug("Returning all cached manifest states.");
+				return observableManifestStates;
+			}
+
+			DBLOG.debug("Unable to return all cached manifest states, cached IDs do not match.");
+		}
+
+		columns[0] = "*";
 
 		@SuppressWarnings("unchecked")
 		final Set<ManifestState> result = (LinkedHashSet<ManifestState>) (runQuery(DatabaseQueryType.SELECT, DatabaseTable.MANIFEST_STATES, null, columns, null,

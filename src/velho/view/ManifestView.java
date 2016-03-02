@@ -64,7 +64,7 @@ public class ManifestView
 			Label stateLabel = new Label("State:");
 			ComboBox<Object> manifestState = new ComboBox<Object>();
 
-			manifestState.getItems().addAll(DatabaseController.getAllManifestStates(manifest.getState()));
+			manifestState.getItems().addAll(DatabaseController.getAllManifestStates(true, manifest.getState()));
 			manifestState.getSelectionModel().select(manifest.getState());
 
 			stateBox.getChildren().addAll(stateLabel, manifestState);

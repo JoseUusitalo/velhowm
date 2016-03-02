@@ -59,7 +59,7 @@ public class ManifestController implements UIActionController
 	 */
 	public Node getBrowseManifestsView() throws NoDatabaseLinkException
 	{
-		return ListController.getTableView(this, DatabaseController.getManifestDataColumns(), DatabaseController.getAllManifests());
+		return ListController.getTableView(this, DatabaseController.getManifestDataColumns(), DatabaseController.getAllManifests(false));
 	}
 
 	@Override
