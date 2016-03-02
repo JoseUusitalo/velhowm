@@ -43,10 +43,37 @@ public class ProductController
 		return null;
 	}
 
-	public void saveProduct(final String name, final ProductBrand brand, final ProductCategory cat, final int popularity)
+	public void saveProduct(final String name, final Object brand, final Object category, final int popularity)
 	{
-		Product names = new Product(name, brand, cat, popularity);
-		System.out.println(names.toString());
+		ProductBrand bran = null;
+		ProductCategory cat = null;
+		if (brand instanceof String)
+		{
+			bran = new ProductBrand((String) brand);
+		}
+		if (category instanceof String)
+		{
+			try
+			{
+				cat = new ProductCategory((String) category);
+			}
+			catch (NoDatabaseLinkException e)
+			{
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+		if (brand instanceof ProductBrand)
+		{
+			bran = (ProductBrand) brand;
+		}
+		if (category instanceof ProductCategory)
+		{
+			cat = (ProductCategory) category;
+		}
+
+		Product newProduct = new Product(name, bran, cat, popularity);
+		System.out.println(newProduct.toString());
 	}
 
 }

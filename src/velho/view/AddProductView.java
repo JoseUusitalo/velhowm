@@ -13,8 +13,6 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
 import velho.controller.DatabaseController;
 import velho.controller.ProductController;
-import velho.model.ProductBrand;
-import velho.model.ProductCategory;
 import velho.model.exceptions.NoDatabaseLinkException;
 
 /**
@@ -53,6 +51,7 @@ public class AddProductView
 			brandList.getItems().addAll(DatabaseController.getAllProductBrands());
 			brandList.setMaxWidth(Double.MAX_VALUE);
 			brandList.getSelectionModel().selectFirst();
+			brandList.setEditable(true);
 			mid.add(brandList, 2, 0);
 
 			final ComboBox<Object> categoryList = new ComboBox<Object>();
@@ -77,7 +76,9 @@ public class AddProductView
 				@Override
 				public void handle(final ActionEvent event)
 				{
-					productController.saveProduct(nameField.getText(), (ProductBrand) brandList.getSelectionModel().getSelectedItem(), (ProductCategory) categoryList.getSelectionModel().getSelectedItem(), popularity.getValue().intValue());
+					Object brand = brandList.valueProperty().getValue();
+					Object category = categoryList.valueProperty().getValue();
+					productController.saveProduct(nameField.getText(), brand, category, popularity.getValue().intValue());
 				}
 			});
 			mid.add(saveButton, 6, 0);
