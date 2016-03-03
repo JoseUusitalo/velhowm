@@ -38,16 +38,21 @@ public class RemovalListTest
 	{
 		try
 		{
-			assertTrue(DatabaseController.link());
+			if (!DatabaseController.isLinked())
+				assertTrue(DatabaseController.link());
 			assertTrue(DatabaseController.initializeDatabase());
 		}
-		catch (ClassNotFoundException | ExistingDatabaseLinkException e)
+		catch (ClassNotFoundException e0)
 		{
-			e.printStackTrace();
+			e0.printStackTrace();
 		}
-		catch (NoDatabaseLinkException e)
+		catch (NoDatabaseLinkException e1)
 		{
 			DatabaseController.tryReLink();
+		}
+		catch (ExistingDatabaseLinkException e2)
+		{
+			// Ignore.
 		}
 
 		box1 = DatabaseController.getProductBoxByID(1);
