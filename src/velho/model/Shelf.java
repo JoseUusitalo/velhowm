@@ -6,6 +6,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
+import org.apache.log4j.Logger;
+
 import velho.controller.DatabaseController;
 import velho.model.exceptions.NoDatabaseLinkException;
 
@@ -16,6 +18,11 @@ import velho.model.exceptions.NoDatabaseLinkException;
  */
 public class Shelf
 {
+	/**
+	 * Apache log4j logger: System.
+	 */
+	private static final Logger SYSLOG = Logger.getLogger(Shelf.class.getName());
+
 	/**
 	 * The identifier of a shelf in IDs.
 	 */
@@ -392,12 +399,14 @@ public class Shelf
 		final int[] tokens = tokenizeAndValidateShelfSlotID(shelfSlotID);
 
 		final boolean addedToSlot = slots[tokens[1]][tokens[2]].addBox(productBox);
-		boolean databaseModified = false;
+		boolean databaseModified = !updateDatabase;
 
 		if (updateDatabase)
 			databaseModified = DatabaseController.addProductBoxToShelfSlot(productBox, shelfSlotID);
 
 		productBox.setShelfSlot(shelfSlotID);
+
+		SYSLOG.trace("Added: " + addedToSlot + " Database Modified: " + databaseModified);
 
 		return addedToSlot && databaseModified;
 	}
