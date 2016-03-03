@@ -114,6 +114,10 @@ public class ProductController implements UIActionController
 
 		Product newProduct = new Product(name, bran, cat, popularity);
 		System.out.println(newProduct.toString());
+
+		DatabaseController.save(newProduct);
+
+		productManagementView.setView(new ProductDataView(this).getView(newProduct));
 	}
 
 	@Override
@@ -154,13 +158,20 @@ public class ProductController implements UIActionController
 	public void viewAction(final Object data)
 	{
 		productManagementView.setView(new ProductDataView(this).getView(((Product) data)));
-		System.out.println(((Product) data).toString());
-
 	}
 
 	public void editProduct(final Product product)
 	{
-		System.out.println("testi" + product);
+		try
+		{
+			productManagementView.setView(addProductView.getProductView());
+			addProductView.setData(product);
+		}
+		catch (NoDatabaseLinkException e)
+		{
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 
 	}
 
