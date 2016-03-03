@@ -73,7 +73,7 @@ public class MainWindow extends Application
 	/**
 	 * Enable TRACE level logging. DEBUG_MODE must be <code>true</code> for this to affect anything.
 	 */
-	public static final boolean SHOW_TRACE = false;
+	public static final boolean SHOW_TRACE = true;
 
 	/**
 	 * The height of the window.
@@ -220,7 +220,7 @@ public class MainWindow extends Application
 						searchController = new SearchController(listController);
 						removalListController = new RemovalListController(searchController);
 						uiController = new UIController(this, listController, userController, removalListController, searchController, logController,
-								manifestController);
+								manifestController, removalPlatformController);
 
 						LoginController.setControllers(uiController, debugController);
 

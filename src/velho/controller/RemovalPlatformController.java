@@ -63,17 +63,22 @@ public class RemovalPlatformController
 	}
 
 	/**
-	 * Checks if the removal platform free space is equal to or below the set warning limit.
+	 * Checks if the removal platform free space is equal to or below the set warning limit and displays a warning
+	 * message.
 	 */
-	private void checkWarning()
+	public void checkWarning()
 	{
 		SYSLOG.trace("Checking for removal platform fullness.");
 
 		if (Double.compare(getFreeSpace(), getPlatform().getFreeSpaceLeftWarningPercent()) <= 0)
 		{
-			SYSLOG.info("The removal platform is at or below the warning limit of " + (int) (100.0 - getFreeSpace() * 100.0) + "% full!");
-			PopupController
-					.warning("The removal platform is " + (int) (100.0 - getFreeSpace() * 100.0) + "% full. Please contact the waste disposal services.");
+			SYSLOG.info("The removal platform is " + (int) (100.0 - getFreeSpace() * 100.0) + " / "
+					+ (int) (100.0 - getPlatform().getFreeSpaceLeftWarningPercent() * 100.0) + "% full!");
+
+			// Warning is only showed when logged in.
+			if (LoginController.isLoggedIn())
+				PopupController
+						.warning("The removal platform is " + (int) (100.0 - getFreeSpace() * 100.0) + "% full. Please contact the waste disposal services.");
 		}
 	}
 }

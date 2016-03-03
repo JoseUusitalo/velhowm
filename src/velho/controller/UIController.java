@@ -45,13 +45,24 @@ public class UIController
 	 */
 	private RemovalListController removalListController;
 
+	/**
+	 * The {@link LogController}.
+	 */
 	private LogController logController;
 
+	/**
+	 * The {@link ManifestController}.
+	 */
 	private ManifestController manifestController;
+
+	/**
+	 * The {@link RemovalPlatformController}.
+	 */
+	private RemovalPlatformController removalPlatformController;
 
 	public UIController(final MainWindow mainWindow, final ListController listController, final UserController userController,
 			final RemovalListController removalListController, final SearchController searchController, final LogController logController,
-			final ManifestController manifestController)
+			final ManifestController manifestController, final RemovalPlatformController removalPlatformController)
 	{
 		this.mainView = mainWindow;
 		this.listController = listController;
@@ -60,6 +71,7 @@ public class UIController
 		this.searchController = searchController;
 		this.logController = logController;
 		this.manifestController = manifestController;
+		this.removalPlatformController = removalPlatformController;
 	}
 
 	/**
@@ -124,6 +136,9 @@ public class UIController
 			default:
 				SYSLOG.error("Unknown user role '" + currentUserRole.getName() + "'.");
 		}
+
+		// Check the state the of the removal platform when the main menu is shown after user has logged in.
+		removalPlatformController.checkWarning();
 	}
 
 	/**
