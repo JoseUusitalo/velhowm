@@ -48,6 +48,15 @@ public class Product
 		this.popularity = popularity;
 	}
 
+	public Product(final String name, final ProductBrand brand, final ProductCategory category, final int popularity)
+	{
+		this.productID = -1;
+		this.name = name;
+		this.brand = brand;
+		this.category = category;
+		this.popularity = popularity;
+	}
+
 	@Override
 	public String toString()
 	{

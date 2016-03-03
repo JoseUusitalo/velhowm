@@ -195,6 +195,7 @@ public class ListController
 	 * <p>
 	 * <code>&lt;an integer&gt; : &lt;product ID or name&gt;</code>
 	 * </p>
+	 *
 	 * @param line String to parse
 	 * @return an object array where the first element is the integer and the second element is the product name
 	 */

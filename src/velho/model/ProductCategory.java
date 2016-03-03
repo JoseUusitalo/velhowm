@@ -1,20 +1,23 @@
 package velho.model;
 
+import velho.controller.DatabaseController;
+import velho.model.exceptions.NoDatabaseLinkException;
+
 /**
  * The ProductCategory class.
- * 
+ *
  * @author Joona &amp; Jose Uusitalo
  */
 public class ProductCategory
 {
 	/**
 	 * The product category name.
-	 * 
+	 *
 	 */
 	private String name;
 	/**
 	 * The product category type.
-	 * 
+	 *
 	 */
 	private ProductType type;
 
@@ -27,7 +30,7 @@ public class ProductCategory
 	 * @param name
 	 * @param type
 	 */
-	public ProductCategory(int databaseID, String name, ProductType type)
+	public ProductCategory(final int databaseID, final String name, final ProductType type)
 	{
 		this.databaseID = databaseID;
 		this.type = type;
@@ -39,6 +42,13 @@ public class ProductCategory
 		}
 	}
 
+	public ProductCategory(final String name) throws NoDatabaseLinkException
+	{
+		this.databaseID = -1;
+		this.type = DatabaseController.getProductTypeByID(1); // TODO WRITE allow changeging type
+		this.name = name;
+	}
+
 	@Override
 	public String toString()
 	{
@@ -47,9 +57,9 @@ public class ProductCategory
 
 	/**
 	 * Gets the product category name.
-	 * 
+	 *
 	 * @return the product category name.
-	 * 
+	 *
 	 */
 	public String getName()
 	{
@@ -58,9 +68,9 @@ public class ProductCategory
 
 	/**
 	 * Gets the product category type.
-	 * 
+	 *
 	 * @return the product category type.
-	 * 
+	 *
 	 */
 	public ProductType getType()
 	{
@@ -69,7 +79,7 @@ public class ProductCategory
 
 	/**
 	 * Gets the database ID of this category.
-	 * 
+	 *
 	 * @return the database id
 	 */
 	public int getDatabaseID()

@@ -85,22 +85,34 @@ public class BarcodeScanner
 
 	/**
 	 * Validates the order to move the product/box/items.
-	 *
+	 * Edit now it does not bruteforce the box into a full shelf.
+	 * 
 	 * @return Either a true or a false, if there is room in the shelf or no room.
 	 */
 	public static boolean scannerMoveValid()
 	{
+		SYSLOG.info("Moving a box.");
 
 		List<Integer> list = null;
 		String shelf = null;
 
+		Object[] tokens;
+
 		try
 		{
-			list = DatabaseController.getProductCodeList();
-			Collections.shuffle(list);
-			shelf = DatabaseController.getRandomShelfSlot();
-			SYSLOG.trace("Random product: " + list.get(0));
-			SYSLOG.trace("Random shelf slot: " + shelf);
+			Shelf shelfObj = null;
+			do
+			{
+				list = DatabaseController.getProductCodeList();
+				Collections.shuffle(list);
+				shelf = DatabaseController.getRandomShelfSlot();
+				tokens = Shelf.tokenizeShelfSlotID(shelf);
+				int derp = Integer.parseInt(((String) tokens[0]).substring(1));
+				SYSLOG.debug("Adding random product: " + list.get(0));
+				SYSLOG.debug("To random shelf slot: " + shelf);
+				shelfObj = DatabaseController.getShelfByID(derp, true);
+			}
+			while (shelfObj.slotHasFreeSpace(shelf) == false);
 
 			if (ExternalSystemsController.move(list.get(0), shelf, true))
 			{

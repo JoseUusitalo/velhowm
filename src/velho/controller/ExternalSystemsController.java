@@ -85,7 +85,7 @@ public class ExternalSystemsController
 	}
 
 	/**
-	 * Sends signal to barcode scanner
+	 * Sends signal to barcode scanner.
 	 *
 	 * @param received
 	 */
@@ -147,6 +147,9 @@ public class ExternalSystemsController
 			newShelf = DatabaseController.getShelfByID(newShelfID, true);
 			boxToMove = DatabaseController.getProductBoxByID(productBoxCode);
 
+			SYSLOG.debug("Moving box: " + boxToMove);
+			SYSLOG.debug("To shelf: " + newShelfID);
+
 			if (boxToMove == null)
 			{
 				return false;
@@ -160,6 +163,8 @@ public class ExternalSystemsController
 			oldShelfIDString = (String) Shelf.tokenizeShelfSlotID(boxToMove.getShelfSlot())[0];
 			oldShelfID = Integer.parseInt(oldShelfIDString.substring(1));
 			oldShelf = DatabaseController.getShelfByID(oldShelfID, true);
+
+			SYSLOG.debug("From shelf: " + oldShelf);
 
 			if (oldShelf == null)
 			{
@@ -187,6 +192,13 @@ public class ExternalSystemsController
 		return success;
 	}
 
+	/**
+	 * Receives the manifested barcode.
+	 * 
+	 * @param boxSet
+	 * @param orderDate
+	 * @param driverID
+	 */
 	public static void receiveManifestBarcode(final Set<ProductBox> boxSet, final Date orderDate, final int driverID)
 	{
 		SYSLOG.info("VelhoWM has received a manifest by driver " + driverID + " with " + boxSet.size() + " product boxes.");

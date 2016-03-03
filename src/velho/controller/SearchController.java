@@ -46,7 +46,14 @@ public class SearchController
 
 		if (nameField != null && !nameField.isEmpty())
 		{
-			where.add("products.name = '" + nameField + "'");
+			try
+			{
+				where.add("products.product_id = '" + Integer.parseInt(nameField) + "'");
+			}
+			catch (NumberFormatException e)
+			{
+				where.add("products.name LIKE '%" + nameField.replace('*', '%') + "%'");
+			}
 		}
 
 		if (productCountField != null && productCountField >= 0)
@@ -94,11 +101,11 @@ public class SearchController
 				default:
 					break;
 			}
-			SYSLOG.debug(limits + " Conditions: " + where.toString());
+			SYSLOG.debug(limits + " Conditions: " + DatabaseController.escape(where.toString()));
 		}
 		else
 		{
-			SYSLOG.debug("Conditions: " + where.toString());
+			SYSLOG.debug("Conditions: " + DatabaseController.escape(where.toString()));
 		}
 
 		try

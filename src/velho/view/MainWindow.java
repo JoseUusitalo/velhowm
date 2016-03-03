@@ -24,7 +24,9 @@ import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
 import javafx.scene.control.TabPane.TabClosingPolicy;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.Priority;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
 import velho.controller.DatabaseController;
@@ -37,6 +39,7 @@ import velho.controller.LoginController;
 import velho.controller.ManifestController;
 import velho.controller.ProductController;
 import velho.controller.RemovalListController;
+import velho.controller.RemovalPlatformController;
 import velho.controller.SearchController;
 import velho.controller.UIController;
 import velho.controller.UserController;
@@ -66,16 +69,14 @@ public class MainWindow extends Application
 	public static final boolean DEBUG_MODE = true;
 
 	/**
-	 * Enable or disable showing windows. DEBUG_MODE must be <code>true</code>
-	 * for this to affect anything.
+	 * Enable or disable showing windows. DEBUG_MODE must be <code>true</code> for this to affect anything.
 	 */
 	public static final boolean SHOW_WINDOWS = true;
 
 	/**
-	 * Enable TRACE level logging. DEBUG_MODE must be <code>true</code> for this
-	 * to affect anything.
+	 * Enable TRACE level logging. DEBUG_MODE must be <code>true</code> for this to affect anything.
 	 */
-	public static final boolean SHOW_TRACE = false;
+	public static final boolean SHOW_TRACE = true;
 
 	/**
 	 * The height of the window.
@@ -86,11 +87,6 @@ public class MainWindow extends Application
 	 * The width of the window.
 	 */
 	public static final double WINDOW_WIDTH = 1024;
-
-	/**
-	 * The current width of the window.
-	 */
-	public static ReadOnlyDoubleProperty WIDTH_PROPERTY;
 
 	/**
 	 * The {@link DebugController}.
@@ -113,40 +109,9 @@ public class MainWindow extends Application
 	private static UIController uiController;
 
 	/**
-	 * The root layout of the main window.
-	 */
-	private BorderPane rootBorderPane;
-
-	/**
-	 * The main menu tab panel.
-	 */
-	private TabPane mainTabPane;
-
-	/**
-	 * The map of tab names and tab objects used for selecting tabs in the tab
-	 * pane.
-	 */
-	private Map<String, Tab> tabMap;
-
-	/**
-	 * The main scene.
-	 */
-	private Scene scene;
-
-	/**
 	 * The {@link ListController}.
 	 */
 	private ListController listController;
-
-	/**
-	 * The {@link productController}.
-	 */
-	private ProductController productController;
-
-	/**
-	 * The debug window stage.
-	 */
-	private Stage debugStage;
 
 	/**
 	 * The {@link RemovalListController}.
@@ -162,6 +127,51 @@ public class MainWindow extends Application
 	 * The {@link ManifestController}.
 	 */
 	private ManifestController manifestController;
+
+	/**
+	 * The {@link RemovalPlatformController}.
+	 */
+	private RemovalPlatformController removalPlatformController;
+
+	/**
+	 * The current width of the window.
+	 */
+	public static ReadOnlyDoubleProperty WIDTH_PROPERTY;
+
+	/**
+	 * The root layout of the main window.
+	 */
+	private BorderPane rootBorderPane;
+
+	/**
+	 * The main menu tab panel.
+	 */
+	private TabPane mainTabPane;
+
+	/**
+	 * The map of tab names and tab objects used for selecting tabs in the tab pane.
+	 */
+	private Map<String, Tab> tabMap;
+
+	/**
+	 * The main scene.
+	 */
+	private Scene scene;
+
+	/**
+	 * The debug window stage.
+	 */
+	private Stage debugStage;
+
+	/**
+	 * The {@link ProductController}.
+	 */
+	private ProductController productController;
+
+	/**
+	 * A label showing the status of the removal platform.
+	 */
+	private Label removalPlatformStatus;
 
 	/**
 	 * The main window constructor.
@@ -212,18 +222,19 @@ public class MainWindow extends Application
 						SYSLOG.debug("Creating all controllers...");
 
 						DatabaseController.loadData();
-						debugController = new DebugController();
 						userController = new UserController();
 						logController = new LogController();
+
 						manifestController = new ManifestController(this);
+						productController = new ProductController();
 
 						ExternalSystemsController.setControllers(manifestController);
-
+						removalPlatformController = new RemovalPlatformController(this);
+						debugController = new DebugController(removalPlatformController);
 						listController = new ListController(userController);
 						searchController = new SearchController(listController);
 						removalListController = new RemovalListController(searchController);
-						productController = new ProductController();
-						uiController = new UIController(this, listController, userController, removalListController, searchController, logController, manifestController, productController);
+						uiController = new UIController(this, listController, userController, removalListController, searchController, logController, manifestController, productController, removalPlatformController);
 
 						LoginController.setControllers(uiController, debugController);
 
@@ -235,7 +246,8 @@ public class MainWindow extends Application
 						SYSLOG.info("Closing application.");
 						System.exit(0);
 					}
-				} catch (ClassNotFoundException | ExistingDatabaseLinkException | NoDatabaseLinkException e1)
+				}
+				catch (ClassNotFoundException | ExistingDatabaseLinkException | NoDatabaseLinkException e1)
 				{
 					e1.printStackTrace();
 				}
@@ -246,7 +258,8 @@ public class MainWindow extends Application
 				SYSLOG.info("Closing application.");
 				System.exit(0);
 			}
-		} catch (ClassNotFoundException | ExistingDatabaseLinkException | NoDatabaseLinkException e)
+		}
+		catch (ClassNotFoundException | ExistingDatabaseLinkException | NoDatabaseLinkException e)
 		{
 			e.printStackTrace();
 		}
@@ -265,15 +278,8 @@ public class MainWindow extends Application
 	/**
 	 * Adds a new tab to the main tab panel.
 	 *
-	 * <<<<<<< HEAD
-	 * @param tabName
-	 *            name of the tab
-	 * @param view
-	 *            view to show in the tab =======
-	 * @param tabName
-	 *            name of the tab
-	 * @param view
-	 *            view to show in the tab >>>>>>> refs/heads/productview
+	 * @param tabName name of the tab
+	 * @param view view to show in the tab
 	 */
 	public boolean addTab(final String tabName, final Node view)
 	{
@@ -289,11 +295,9 @@ public class MainWindow extends Application
 	}
 
 	/**
-	 * Forcibly selects the specified tab and changes the view in the main
-	 * window to that tab.
+	 * Forcibly selects the specified tab and changes the view in the main window to that tab.
 	 *
-	 * @param tabName
-	 *            name of the tab
+	 * @param tabName name of the tab
 	 */
 	public void selectTab(final String tabName)
 	{
@@ -314,7 +318,8 @@ public class MainWindow extends Application
 
 			mainTabPane.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<Tab>()
 			{
-				@Override public void changed(final ObservableValue<? extends Tab> old, final Tab oldTab, final Tab newTab)
+				@Override
+				public void changed(final ObservableValue<? extends Tab> old, final Tab oldTab, final Tab newTab)
 				{
 					if (newTab.getText() == "Logs")
 						logController.refresh();
@@ -326,27 +331,34 @@ public class MainWindow extends Application
 		// Force log in to see main menu.
 		if (LoginController.checkLogin())
 		{
-			final HBox statusBar = new HBox();
+			final GridPane statusBar = new GridPane();
 			statusBar.getStyleClass().add("status-bar");
 
-			final HBox userBar = new HBox(10);
+			final HBox platformStatus = new HBox(3);
+			final Label removalPlatform = new Label("Removal Platform:");
+			removalPlatformStatus = new Label();
+			platformStatus.getChildren().addAll(removalPlatform, removalPlatformStatus);
+			platformStatus.setAlignment(Pos.CENTER_LEFT);
 
+			final HBox userStatus = new HBox(10);
 			final Label userName = new Label("Hello, " + LoginController.getCurrentUser().getRoleName() + " " + LoginController.getCurrentUser().getFullName());
 			final Button logoutButton = new Button("Log Out");
 			logoutButton.setPrefHeight(5.0);
+			userStatus.getChildren().addAll(userName, logoutButton);
+			userStatus.setAlignment(Pos.CENTER_RIGHT);
 
 			logoutButton.setOnAction(new EventHandler<ActionEvent>()
 			{
-				@Override public void handle(final ActionEvent event)
+				@Override
+				public void handle(final ActionEvent event)
 				{
 					LoginController.logout();
 				}
 			});
 
-			userBar.getChildren().addAll(userName, logoutButton);
-			userBar.setAlignment(Pos.CENTER_RIGHT);
-
-			statusBar.getChildren().add(userBar);
+			statusBar.add(platformStatus, 0, 0);
+			statusBar.add(userStatus, 1, 0);
+			GridPane.setHgrow(platformStatus, Priority.ALWAYS);
 			rootBorderPane.setBottom(statusBar);
 		}
 		rootBorderPane.setCenter(mainTabPane);
@@ -355,7 +367,9 @@ public class MainWindow extends Application
 	/**
 	 * Creates the window.
 	 */
-	@SuppressWarnings("unused") @Override public void start(final Stage primaryStage)
+	@SuppressWarnings("unused")
+	@Override
+	public void start(final Stage primaryStage)
 	{
 		if (!SHOW_WINDOWS && DEBUG_MODE)
 		{
@@ -390,7 +404,8 @@ public class MainWindow extends Application
 
 				debugStage.setOnCloseRequest(new EventHandler<WindowEvent>()
 				{
-					@Override public void handle(final WindowEvent event)
+					@Override
+					public void handle(final WindowEvent event)
 					{
 						shutdown(primaryStage);
 					}
@@ -399,7 +414,8 @@ public class MainWindow extends Application
 
 			primaryStage.setOnCloseRequest(new EventHandler<WindowEvent>()
 			{
-				@Override public void handle(final WindowEvent event)
+				@Override
+				public void handle(final WindowEvent event)
 				{
 					shutdown(primaryStage);
 				}
@@ -408,11 +424,9 @@ public class MainWindow extends Application
 	}
 
 	/**
-	 * A method called to shut down the software and perform any necessary
-	 * cleanup.
+	 * A method called to shut down the software and perform any necessary cleanup.
 	 *
-	 * @param primaryStage
-	 *            the stage the main window is open in
+	 * @param primaryStage the stage the main window is open in
 	 */
 	protected void shutdown(final Stage primaryStage)
 	{
@@ -427,7 +441,8 @@ public class MainWindow extends Application
 		try
 		{
 			DatabaseController.unlink();
-		} catch (final NoDatabaseLinkException e)
+		}
+		catch (final NoDatabaseLinkException e)
 		{
 			// Ignore.
 		}
@@ -436,10 +451,9 @@ public class MainWindow extends Application
 	}
 
 	/**
-	 * Replaces the top view of the window
+	 * Replaces the top view of the window.
 	 *
-	 * @param view
-	 *            view to set the top of the window
+	 * @param view is a view to be set to the top of the window
 	 */
 	public void setTopView(final Node view)
 	{
@@ -447,10 +461,9 @@ public class MainWindow extends Application
 	}
 
 	/**
-	 * Replaces the right side view of the window
+	 * Replaces the right side view of the window.
 	 *
-	 * @param view
-	 *            view to set the right of the window
+	 * @param view a view to be set to the right of the window
 	 */
 	public void setRightView(final Node view)
 	{
@@ -458,10 +471,9 @@ public class MainWindow extends Application
 	}
 
 	/**
-	 * Replaces the bottom view of the window
+	 * Replaces the bottom view of the window.
 	 *
-	 * @param view
-	 *            view to set the bottom of the window
+	 * @param view a view to set the bottom of the window
 	 */
 	public void setBottomView(final Node view)
 	{
@@ -469,10 +481,9 @@ public class MainWindow extends Application
 	}
 
 	/**
-	 * Replaces the left side view of the window
+	 * Replaces the left side view of the window.
 	 *
-	 * @param view
-	 *            view to set the l of the window
+	 * @param view a view to set the l of the window
 	 */
 	public void setLeftView(final Node view)
 	{
@@ -480,14 +491,23 @@ public class MainWindow extends Application
 	}
 
 	/**
-	 * Replaces the center view of the window
+	 * Replaces the center view of the window.
 	 *
-	 * @param view
-	 *            view to set the middle of the window
+	 * @param view a view to set the middle of the window
 	 */
 	public void setCenterView(final Node view)
 	{
 		rootBorderPane.setCenter(view);
+	}
+
+	/**
+	 * Updates the label in the status bar that shows how full the removal platform is.
+	 *
+	 * @param percent percentage as text
+	 */
+	public void setRemovalPlatformFullPercent(final String percent)
+	{
+		removalPlatformStatus.setText(percent + "%");
 	}
 
 	/**
