@@ -208,17 +208,6 @@ public class DatabaseController
 	}
 
 	/**
-	 * Formats the given date into a H2 date string.
-	 *
-	 * @param date date to format
-	 * @return a string that can be inserted into the database
-	 */
-	private static String getH2DateFormat(final Date date)
-	{
-		return H2_DATE_FORMAT.format(date);
-	}
-
-	/**
 	 * Runs a database query with the given data.
 	 *
 	 * @param type query command
@@ -813,6 +802,17 @@ public class DatabaseController
 	/*
 	 * -------------------------------- PUBLIC DATABASE METHODS --------------------------------
 	 */
+
+	/**
+	 * Formats the given date into a H2 date string.
+	 *
+	 * @param date date to format
+	 * @return a string that can be inserted into the database
+	 */
+	public static String getH2DateFormat(final Date date)
+	{
+		return H2_DATE_FORMAT.format(date);
+	}
 
 	/**
 	 * Creates an SQL query out of the given data.

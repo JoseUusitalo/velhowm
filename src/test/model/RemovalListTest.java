@@ -64,6 +64,7 @@ public class RemovalListTest
 		}
 		catch (NoDatabaseLinkException e)
 		{
+			// Ignore.
 		}
 	}
 
@@ -82,8 +83,13 @@ public class RemovalListTest
 	@Test
 	public final void testGetSize()
 	{
-		assertEquals(0, newlist.getSize());
 		assertEquals(3, existinglist.getSize());
+	}
+
+	@Test
+	public final void testGetSize_New()
+	{
+		assertEquals(0, newlist.getSize());
 	}
 
 	@Test

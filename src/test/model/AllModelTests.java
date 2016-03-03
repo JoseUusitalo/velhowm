@@ -14,6 +14,7 @@ import org.junit.runners.Suite.SuiteClasses;
 @RunWith(Suite.class)
 // @formatter:off
 @SuiteClasses({ FreezerTest.class,
+				ManifestTest.class,
 				ProductBoxTest.class,
 				ProductBoxSearchResultRowTest.class,
 				ProductCategoryTest.class,
