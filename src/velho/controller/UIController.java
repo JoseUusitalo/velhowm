@@ -125,11 +125,10 @@ public class UIController
 			case "Logistician":
 				mainView.addTab("Removal Lists", removalListController.getView());
 				mainView.addTab("User List", getUserListView(currentUserRole));
-				mainView.addTab("Product List", listController.getProductListView(DatabaseController.getProductDataColumns(false, false), DatabaseController.getObservableProducts()));
+				mainView.addTab("Product List", productController.getTabView());
 				mainView.addTab("Search", searchController.getSearchTabView());
 				mainView.addTab("Product List Search", listController.getProductListSearchView());
 				mainView.addTab("Manifests", manifestController.getView());
-				mainView.addTab("Product Data View", productController.getView());
 				break;
 			default:
 				SYSLOG.error("Unknown user role '" + currentUserRole.getName() + "'.");
@@ -161,7 +160,8 @@ public class UIController
 				default:
 					SYSLOG.error("Unknown user role '" + currentUserRole.getName() + "'.");
 			}
-		} catch (NoDatabaseLinkException e)
+		}
+		catch (NoDatabaseLinkException e)
 		{
 			DatabaseController.tryReLink();
 		}

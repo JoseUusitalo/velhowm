@@ -2,8 +2,8 @@ package velho.controller;
 
 import javafx.scene.Node;
 import velho.model.Product;
-import velho.model.exceptions.NoDatabaseLinkException;
 import velho.model.interfaces.UIActionController;
+import velho.view.GenericTabView;
 import velho.view.ProductDataView;
 
 public class ProductController implements UIActionController
@@ -11,56 +11,59 @@ public class ProductController implements UIActionController
 	/**
 	 * The view in the tab itself.
 	 */
-	private ProductDataView productDataView;
+	private GenericTabView productManagementView;
 
 	public ProductController()
 	{
-		productDataView = new ProductDataView(this);
+		productManagementView = new GenericTabView();
+		showList();
 	}
 
-	public Node getView()
+	public Node getTabView()
 	{
-		try
-		{
-			return productDataView.getView(DatabaseController.getProductByID(1));
-		} catch (NoDatabaseLinkException e)
-		{
-			DatabaseController.tryReLink();
-			return null;
-		}
+
+		return productManagementView.getView();
 	}
 
-	@Override public void createAction(final Object data)
+	@Override
+	public void createAction(final Object data)
 	{
 		// SYSLOG.trace("Controller got from UI: " + data);
 	}
 
-	@Override public void updateAction(final Object data)
+	@Override
+	public void updateAction(final Object data)
 	{
-		// SYSLOG.trace("Controller got from UI update: " + ((ProductBoxSearchResultRow) data).getBox());
+		// SYSLOG.trace("Controller got from UI update: " +
+		// ((ProductBoxSearchResultRow) data).getBox());
 	}
 
-	@Override public void addAction(final Object data)
+	@Override
+	public void addAction(final Object data)
 	{
 		// TODO Auto-generated method stub
 
 	}
 
-	@Override public void removeAction(final Object data)
+	@Override
+	public void removeAction(final Object data)
 	{
 		// TODO Auto-generated method stub
 
 	}
 
-	@Override public void deleteAction(final Object data)
+	@Override
+	public void deleteAction(final Object data)
 	{
 		// TODO Auto-generated method stub
 
 	}
 
-	@Override public void viewAction(final Object data)
+	@Override
+	public void viewAction(final Object data)
 	{
-		// TODO Auto-generated method stub
+		productManagementView.setView(new ProductDataView(this).getView(((Product) data)));
+		System.out.println(((Product) data).toString());
 
 	}
 
@@ -68,5 +71,10 @@ public class ProductController implements UIActionController
 	{
 		System.out.println("testi" + product);
 
+	}
+
+	public void showList()
+	{
+		productManagementView.setView(ListController.getTableView(this, DatabaseController.getProductDataColumns(false, false), DatabaseController.getObservableProducts()));
 	}
 }

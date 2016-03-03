@@ -196,7 +196,8 @@ public class DatabaseController
 	private static Map<Integer, Manifest> cachedManifests = new HashMap<Integer, Manifest>();
 
 	/*
-	 * -------------------------------- PRIVATE DATABASE METHODS --------------------------------
+	 * -------------------------------- PRIVATE DATABASE METHODS
+	 * --------------------------------
 	 */
 
 	/**
@@ -273,11 +274,13 @@ public class DatabaseController
 				case UPDATE:
 					if (statement.getUpdateCount() > 0)
 					{
-						// Get the database rows that were created or an empty set if none were created.
+						// Get the database rows that were created or an empty
+						// set if none were created.
 						result = statement.getGeneratedKeys();
 						if (result != null)
 						{
-							// This is silly. Why isn't there an easier way to get the number of rows in a ResultSet?
+							// This is silly. Why isn't there an easier way to
+							// get the number of rows in a ResultSet?
 							result.last();
 							final int rowCount = result.getRow();
 							result.beforeFirst();
@@ -285,15 +288,18 @@ public class DatabaseController
 							if (rowCount == 0)
 							{
 								/*
-								 * A successfull DELETE statement does not return anything but we need /something/ in
+								 * A successfull DELETE statement does not
+								 * return anything but we need /something/ in
 								 * the dataSet.
 								 */
 								dataSet.add(true);
 							}
 							else
 							{
-								// INSERT and UPDATE statements return the updated/inserted rows.
-								// Get all the IDs of the rows that were updated.
+								// INSERT and UPDATE statements return the
+								// updated/inserted rows.
+								// Get all the IDs of the rows that were
+								// updated.
 								while (result.next())
 									dataSet.add(result.getInt(1));
 							}
@@ -303,7 +309,8 @@ public class DatabaseController
 						{
 							if (result != null)
 								result.close();
-						} catch (final SQLException e)
+						}
+						catch (final SQLException e)
 						{
 							e.printStackTrace();
 						}
@@ -393,7 +400,8 @@ public class DatabaseController
 									}
 									else
 									{
-										// Create a new list and put in the data.
+										// Create a new list and put in the
+										// data.
 										list = new ArrayList<Integer[]>();
 										list.add(coords);
 										shelfBoxMap.put(shelfID, list);
@@ -435,7 +443,8 @@ public class DatabaseController
 								{
 									listID = result.getInt("removallist");
 
-									// Does this removal list already have boxes in it?
+									// Does this removal list already have boxes
+									// in it?
 									if (listBoxMap.containsKey(listID))
 									{
 										// Add to the list.
@@ -443,7 +452,8 @@ public class DatabaseController
 									}
 									else
 									{
-										// Create a new list and put in the data.
+										// Create a new list and put in the
+										// data.
 										boxIDs = new ArrayList<Integer>();
 										boxIDs.add(result.getInt("productbox"));
 										listBoxMap.put(listID, boxIDs);
@@ -460,7 +470,8 @@ public class DatabaseController
 								{
 									manifestID = result.getInt("manifest");
 
-									// Does this removal list already have boxes in it?
+									// Does this removal list already have boxes
+									// in it?
 									if (listBoxMap.containsKey(manifestID))
 									{
 										// Add to the list.
@@ -468,7 +479,8 @@ public class DatabaseController
 									}
 									else
 									{
-										// Create a new list and put in the data.
+										// Create a new list and put in the
+										// data.
 										pboxIDs = new ArrayList<Integer>();
 										pboxIDs.add(result.getInt("productbox"));
 										listBoxMap.put(manifestID, pboxIDs);
@@ -480,7 +492,8 @@ public class DatabaseController
 								try
 								{
 									result.close();
-								} catch (final SQLException e)
+								}
+								catch (final SQLException e)
 								{
 									e.printStackTrace();
 								}
@@ -488,7 +501,8 @@ public class DatabaseController
 								try
 								{
 									statement.close();
-								} catch (final SQLException e)
+								}
+								catch (final SQLException e)
 								{
 									e.printStackTrace();
 								}
@@ -496,7 +510,8 @@ public class DatabaseController
 								try
 								{
 									connection.close();
-								} catch (final SQLException e)
+								}
+								catch (final SQLException e)
 								{
 									e.printStackTrace();
 								}
@@ -507,7 +522,8 @@ public class DatabaseController
 					try
 					{
 						result.close();
-					} catch (final SQLException e)
+					}
+					catch (final SQLException e)
 					{
 						e.printStackTrace();
 					}
@@ -517,7 +533,8 @@ public class DatabaseController
 					try
 					{
 						statement.close();
-					} catch (final SQLException e)
+					}
+					catch (final SQLException e)
 					{
 						e.printStackTrace();
 					}
@@ -525,20 +542,23 @@ public class DatabaseController
 					try
 					{
 						connection.close();
-					} catch (final SQLException e)
+					}
+					catch (final SQLException e)
 					{
 						e.printStackTrace();
 					}
 					throw new IllegalArgumentException();
 			}
-		} catch (final IllegalStateException e)
+		}
+		catch (final IllegalStateException e)
 		{
 			// Close all resources.
 			try
 			{
 				if (statement != null)
 					statement.close();
-			} catch (final SQLException e1)
+			}
+			catch (final SQLException e1)
 			{
 				e.printStackTrace();
 			}
@@ -546,19 +566,22 @@ public class DatabaseController
 			try
 			{
 				connection.close();
-			} catch (final SQLException e2)
+			}
+			catch (final SQLException e2)
 			{
 				e.printStackTrace();
 			}
 
 			// Connection pool has been disposed = no database connection.
 			throw new NoDatabaseLinkException();
-		} catch (final SQLException e)
+		}
+		catch (final SQLException e)
 		{
 			if (!e.toString().contains("Unique index or primary key violation"))
 				e.printStackTrace();
 
-			// If it was a UNIQUE constraint violation, continue normally as those are handled separately.
+			// If it was a UNIQUE constraint violation, continue normally as
+			// those are handled separately.
 			DBLOG.error("Silently ignored an SQL UNIQUE constraint violation. Begin message:");
 			DBLOG.error(e.getMessage());
 			DBLOG.error("End of message.");
@@ -569,7 +592,8 @@ public class DatabaseController
 		{
 			if (statement != null)
 				statement.close();
-		} catch (final SQLException e)
+		}
+		catch (final SQLException e)
 		{
 			e.printStackTrace();
 		}
@@ -577,7 +601,8 @@ public class DatabaseController
 		try
 		{
 			connection.close();
-		} catch (final SQLException e)
+		}
+		catch (final SQLException e)
 		{
 			e.printStackTrace();
 		}
@@ -647,7 +672,8 @@ public class DatabaseController
 			statement.execute(sql);
 
 			changed = new Integer(statement.getUpdateCount());
-		} catch (final IllegalStateException e)
+		}
+		catch (final IllegalStateException e)
 		{
 			// Close all resources.
 
@@ -655,7 +681,8 @@ public class DatabaseController
 			{
 				if (statement != null)
 					statement.close();
-			} catch (final SQLException e1)
+			}
+			catch (final SQLException e1)
 			{
 				e.printStackTrace();
 			}
@@ -663,19 +690,22 @@ public class DatabaseController
 			try
 			{
 				connection.close();
-			} catch (final SQLException e2)
+			}
+			catch (final SQLException e2)
 			{
 				e.printStackTrace();
 			}
 
 			// Connection pool has been disposed = no database connection.
 			throw new NoDatabaseLinkException();
-		} catch (final SQLException e)
+		}
+		catch (final SQLException e)
 		{
 			if (!e.toString().contains("Unique index or primary key violation"))
 				e.printStackTrace();
 
-			// If it was a UNIQUE constraint violation, continue normally as those are handled separately.
+			// If it was a UNIQUE constraint violation, continue normally as
+			// those are handled separately.
 			DBLOG.error("Silently ignored an SQL UNIQUE constraint violation. Begin message:");
 			DBLOG.error(e.getMessage());
 			DBLOG.error("End of message.");
@@ -686,7 +716,8 @@ public class DatabaseController
 		{
 			if (statement != null)
 				statement.close();
-		} catch (final SQLException e)
+		}
+		catch (final SQLException e)
 		{
 			e.printStackTrace();
 		}
@@ -694,7 +725,8 @@ public class DatabaseController
 		try
 		{
 			connection.close();
-		} catch (final SQLException e)
+		}
+		catch (final SQLException e)
 		{
 			e.printStackTrace();
 		}
@@ -712,7 +744,8 @@ public class DatabaseController
 		{
 			// Just in case.
 			unlink();
-		} catch (final NoDatabaseLinkException e)
+		}
+		catch (final NoDatabaseLinkException e)
 		{
 			// Do nothing. This is expected.
 		}
@@ -720,10 +753,12 @@ public class DatabaseController
 		try
 		{
 			link();
-		} catch (final ClassNotFoundException e)
+		}
+		catch (final ClassNotFoundException e)
 		{
 			e.printStackTrace();
-		} catch (final ExistingDatabaseLinkException e)
+		}
+		catch (final ExistingDatabaseLinkException e)
 		{
 			e.printStackTrace();
 		}
@@ -754,7 +789,8 @@ public class DatabaseController
 		try
 		{
 			connection = connectionPool.getConnection();
-		} catch (final SQLException e)
+		}
+		catch (final SQLException e)
 		{
 			if (e.getMessage().contains("Database may be already in use"))
 			{
@@ -770,7 +806,8 @@ public class DatabaseController
 	}
 
 	/*
-	 * -------------------------------- PUBLIC DATABASE METHODS --------------------------------
+	 * -------------------------------- PUBLIC DATABASE METHODS
+	 * --------------------------------
 	 */
 
 	/**
@@ -927,7 +964,8 @@ public class DatabaseController
 		{
 			// Just in case.
 			unlink();
-		} catch (final NoDatabaseLinkException e)
+		}
+		catch (final NoDatabaseLinkException e)
 		{
 			// Do nothing. This is expected.
 		}
@@ -935,10 +973,12 @@ public class DatabaseController
 		try
 		{
 			link();
-		} catch (final ClassNotFoundException e)
+		}
+		catch (final ClassNotFoundException e)
 		{
 			e.printStackTrace();
-		} catch (final ExistingDatabaseLinkException e)
+		}
+		catch (final ExistingDatabaseLinkException e)
 		{
 			e.printStackTrace();
 		}
@@ -967,7 +1007,8 @@ public class DatabaseController
 		String uri = DB_URI;
 
 		/*
-		 * If the database does not exists, it will be created with the connection pool.
+		 * If the database does not exists, it will be created with the
+		 * connection pool.
 		 * Otherwise add this check after the URI for extra security.
 		 */
 		if (databaseExists())
@@ -980,7 +1021,8 @@ public class DatabaseController
 		// Create a connection pool.
 		connectionPool = JdbcConnectionPool.create(uri, USERNAME, "@_Vry $ECURE pword2");
 
-		// Try getting a connection. If the database does not exist, it is created.
+		// Try getting a connection. If the database does not exist, it is
+		// created.
 		try
 		{
 			final Connection c = getConnection();
@@ -989,10 +1031,12 @@ public class DatabaseController
 				return false;
 
 			c.close();
-		} catch (final NoDatabaseLinkException e)
+		}
+		catch (final NoDatabaseLinkException e)
 		{
 			e.printStackTrace();
-		} catch (final SQLException e)
+		}
+		catch (final SQLException e)
 		{
 			e.printStackTrace();
 		}
@@ -1040,7 +1084,8 @@ public class DatabaseController
 	}
 
 	/*
-	 * -------------------------------- PRIVATE GETTER METHODS --------------------------------
+	 * -------------------------------- PRIVATE GETTER METHODS
+	 * --------------------------------
 	 */
 
 	/**
@@ -1053,12 +1098,12 @@ public class DatabaseController
 	 */
 	private static UserRole getRoleByID(final int roleid) throws NoDatabaseLinkException
 	{
-		final String[] columns =
-		{ "name" };
+		final String[] columns = { "name" };
 		final List<String> where = new ArrayList<String>();
 		where.add("role_id = " + new Integer(roleid));
 
-		@SuppressWarnings("unchecked") final Set<String> result = (LinkedHashSet<String>) (runQuery(DatabaseQueryType.SELECT, DatabaseTable.ROLES, null, columns, null, where));
+		@SuppressWarnings("unchecked")
+		final Set<String> result = (LinkedHashSet<String>) (runQuery(DatabaseQueryType.SELECT, DatabaseTable.ROLES, null, columns, null, where));
 
 		if (result.size() == 0)
 			return null;
@@ -1074,15 +1119,16 @@ public class DatabaseController
 	 * @return the corresponding product object
 	 * @throws NoDatabaseLinkException
 	 */
-	@SuppressWarnings("unused") private static List<ProductBox> getProductBoxesByProductName(final List<String> where) throws NoDatabaseLinkException
+	@SuppressWarnings("unused")
+	private static List<ProductBox> getProductBoxesByProductName(final List<String> where) throws NoDatabaseLinkException
 	{
-		final String[] columns =
-		{ "containers.container_id" };
+		final String[] columns = { "containers.container_id" };
 
 		final Map<DatabaseTable, String> join = new LinkedHashMap<DatabaseTable, String>();
 		join.put(DatabaseTable.PRODUCTS, "containers.product = products.product_id");
 
-		@SuppressWarnings("unchecked") final Set<Integer> result = (LinkedHashSet<Integer>) (runQuery(DatabaseQueryType.SELECT, DatabaseTable.CONTAINERS, join, columns, null, where));
+		@SuppressWarnings("unchecked")
+		final Set<Integer> result = (LinkedHashSet<Integer>) (runQuery(DatabaseQueryType.SELECT, DatabaseTable.CONTAINERS, join, columns, null, where));
 
 		final List<ProductBox> boxes = new ArrayList<ProductBox>();
 		final Iterator<Integer> it = result.iterator();
@@ -1103,10 +1149,10 @@ public class DatabaseController
 	 */
 	private static List<ProductBox> getProductBoxesByProductID(final List<String> where) throws NoDatabaseLinkException
 	{
-		final String[] columns =
-		{ "container_id" };
+		final String[] columns = { "container_id" };
 
-		@SuppressWarnings("unchecked") final Set<Integer> result = (LinkedHashSet<Integer>) (runQuery(DatabaseQueryType.SELECT, DatabaseTable.CONTAINERS, null, columns, null, where));
+		@SuppressWarnings("unchecked")
+		final Set<Integer> result = (LinkedHashSet<Integer>) (runQuery(DatabaseQueryType.SELECT, DatabaseTable.CONTAINERS, null, columns, null, where));
 
 		final List<ProductBox> boxes = new ArrayList<ProductBox>();
 		final Iterator<Integer> it = result.iterator();
@@ -1129,12 +1175,12 @@ public class DatabaseController
 	{
 		if (!cachedRemovalListStates.containsKey(stateid))
 		{
-			final String[] columns =
-			{ "name" };
+			final String[] columns = { "name" };
 			final List<String> where = new ArrayList<String>();
 			where.add("removallist_state_id = " + new Integer(stateid));
 
-			@SuppressWarnings("unchecked") final Set<String> result = (LinkedHashSet<String>) (runQuery(DatabaseQueryType.SELECT, DatabaseTable.REMOVALLIST_STATES, null, columns, null, where));
+			@SuppressWarnings("unchecked")
+			final Set<String> result = (LinkedHashSet<String>) (runQuery(DatabaseQueryType.SELECT, DatabaseTable.REMOVALLIST_STATES, null, columns, null, where));
 
 			if (result.size() == 0)
 				return null;
@@ -1164,12 +1210,12 @@ public class DatabaseController
 	{
 		if (!cachedProductTypes.containsKey(typeid))
 		{
-			final String[] columns =
-			{ "name" };
+			final String[] columns = { "name" };
 			final List<String> where = new ArrayList<String>();
 			where.add("type_id = " + new Integer(typeid));
 
-			@SuppressWarnings("unchecked") final Set<String> result = (LinkedHashSet<String>) (runQuery(DatabaseQueryType.SELECT, DatabaseTable.TYPES, null, columns, null, where));
+			@SuppressWarnings("unchecked")
+			final Set<String> result = (LinkedHashSet<String>) (runQuery(DatabaseQueryType.SELECT, DatabaseTable.TYPES, null, columns, null, where));
 
 			if (result.size() == 0)
 				return null;
@@ -1199,12 +1245,12 @@ public class DatabaseController
 	{
 		if (!cachedProductCategories.containsKey(categoryid))
 		{
-			final String[] columns =
-			{ "category_id", "name", "type" };
+			final String[] columns = { "category_id", "name", "type" };
 			final List<String> where = new ArrayList<String>();
 			where.add("category_id = " + new Integer(categoryid));
 
-			@SuppressWarnings("unchecked") final Set<Object> result = (LinkedHashSet<Object>) (runQuery(DatabaseQueryType.SELECT, DatabaseTable.CATEGORIES, null, columns, null, where));
+			@SuppressWarnings("unchecked")
+			final Set<Object> result = (LinkedHashSet<Object>) (runQuery(DatabaseQueryType.SELECT, DatabaseTable.CATEGORIES, null, columns, null, where));
 
 			if (result.size() == 0)
 				return null;
@@ -1234,12 +1280,12 @@ public class DatabaseController
 	{
 		if (!cachedProductBrands.containsKey(brandid))
 		{
-			final String[] columns =
-			{ "name" };
+			final String[] columns = { "name" };
 			final List<String> where = new ArrayList<String>();
 			where.add("brand_id = " + new Integer(brandid));
 
-			@SuppressWarnings("unchecked") final Set<String> result = (LinkedHashSet<String>) (runQuery(DatabaseQueryType.SELECT, DatabaseTable.BRANDS, null, columns, null, where));
+			@SuppressWarnings("unchecked")
+			final Set<String> result = (LinkedHashSet<String>) (runQuery(DatabaseQueryType.SELECT, DatabaseTable.BRANDS, null, columns, null, where));
 
 			if (result.size() == 0)
 				return null;
@@ -1365,19 +1411,22 @@ public class DatabaseController
 		Integer[] boxSizeArray = new Integer[boxProductCount.size()];
 		boxSizeArray = boxProductCount.keySet().toArray(boxSizeArray);
 
-		// Find the index at which the wantedProductCount Integer would be in, if it were in the array.
+		// Find the index at which the wantedProductCount Integer would be in,
+		// if it were in the array.
 		wantedWouldBeIndex = -Arrays.binarySearch(boxSizeArray, wantedProductCount) - 1;
 		addCountIndex = wantedWouldBeIndex;
 
 		if (MainWindow.DEBUG_MODE)
 			DBLOG.trace("Wanted box of size " + wantedProductCount + " would have been at index " + wantedWouldBeIndex + ".");
 
-		// Keep adding boxes to the foundProducts until we reach the wanted product count.
+		// Keep adding boxes to the foundProducts until we reach the wanted
+		// product count.
 		while (productCountSum < wantedProductCount)
 		{
 			DBLOG.trace("Search status | Count: " + productCountSum + " / " + wantedProductCount + " | Would Be Index: " + wantedWouldBeIndex + " | Add Index: " + addCountIndex + " / " + boxProductCount.size());
 
-			// Looking for too few products, show the smallest box of that product instead.
+			// Looking for too few products, show the smallest box of that
+			// product instead.
 			if (wantedWouldBeIndex == 0)
 				addCountIndex++;
 
@@ -1392,7 +1441,8 @@ public class DatabaseController
 
 				for (final ProductBox box : nextSmallestBoxes)
 				{
-					// Does adding this box to the set still keep the product counter under the wanted amount?
+					// Does adding this box to the set still keep the product
+					// counter under the wanted amount?
 					// OR does a box that small not exist?
 					if (wantedWouldBeIndex == 0 || addCountIndex == 0 || ((productCountSum + box.getProductCount() <= wantedProductCount)))
 					{
@@ -1407,7 +1457,8 @@ public class DatabaseController
 					}
 					else if (lookingForLarger)
 					{
-						// Allow going over the wanted size limit if looking for a larger box.
+						// Allow going over the wanted size limit if looking for
+						// a larger box.
 						// Add up the product count.
 						productCountSum += box.getProductCount();
 
@@ -1429,7 +1480,8 @@ public class DatabaseController
 						break;
 					}
 				}
-			} catch (final IndexOutOfBoundsException e)
+			}
+			catch (final IndexOutOfBoundsException e)
 			{
 				if (wantedProductCount > productCountSum)
 				{
@@ -1439,7 +1491,8 @@ public class DatabaseController
 						 * All boxes are not yet in the result.
 						 * Still have not reached the wanted product count.
 						 * Restart the loop at one higher index.
-						 * Repeat until either the wanted count is reached or all products have been added to the
+						 * Repeat until either the wanted count is reached or
+						 * all products have been added to the
 						 * result.
 						 */
 						DBLOG.trace("Unable to build a product box list of that size from smaller boxes. Going one size larger.");
@@ -1467,7 +1520,8 @@ public class DatabaseController
 	}
 
 	/*
-	 * -------------------------------- PUBLIC GETTER METHODS --------------------------------
+	 * -------------------------------- PUBLIC GETTER METHODS
+	 * --------------------------------
 	 */
 
 	/**
@@ -1482,12 +1536,12 @@ public class DatabaseController
 	{
 		if (!cachedProducts.containsKey(productid))
 		{
-			final String[] columns =
-			{ "*" };
+			final String[] columns = { "*" };
 			final List<String> where = new ArrayList<String>();
 			where.add("product_id = " + new Integer(productid));
 
-			@SuppressWarnings("unchecked") final Set<Object> result = (LinkedHashSet<Object>) (runQuery(DatabaseQueryType.SELECT, DatabaseTable.PRODUCTS, null, columns, null, where));
+			@SuppressWarnings("unchecked")
+			final Set<Object> result = (LinkedHashSet<Object>) (runQuery(DatabaseQueryType.SELECT, DatabaseTable.PRODUCTS, null, columns, null, where));
 
 			if (result.size() == 0)
 				return null;
@@ -1529,11 +1583,7 @@ public class DatabaseController
 	 * Gets a map of columns and column names for displaying {@link Product}
 	 * objects in table views.
 	 *
-	 * <<<<<<< HEAD
 	 * @return a map where the key is the column value and value is the column
-	 *         name =======
-	 * @return a map where the key is the column value and value is the column
-	 *         name >>>>>>> refs/heads/productview
 	 */
 	public static Map<String, String> getProductDataColumns(final boolean withAddColumn, final boolean withDeleteColumn)
 	{
@@ -1545,10 +1595,12 @@ public class DatabaseController
 		if (withDeleteColumn)
 			cols.put("deleteButton", "Delete");
 
+		cols.put("productID", "ID");
 		cols.put("name", "Name");
 		cols.put("brand", "Brand");
 		cols.put("category", "Category");
 		cols.put("popularity", "Popularity");
+		cols.put("viewButton", "View");
 
 		return cols;
 	}
@@ -1557,11 +1609,7 @@ public class DatabaseController
 	 * Gets a map of columns and column names for displaying {@link RemovalList}
 	 * objects in table views.
 	 *
-	 * <<<<<<< HEAD
 	 * @return a map where the key is the column value and value is the column
-	 *         name =======
-	 * @return a map where the key is the column value and value is the column
-	 *         name >>>>>>> refs/heads/productview
 	 */
 	public static Map<String, String> getRemovalListDataColumns()
 	{
@@ -1638,12 +1686,12 @@ public class DatabaseController
 	 */
 	public static int getRoleID(final String roleName) throws NoDatabaseLinkException
 	{
-		final String[] columns =
-		{ "role_id" };
+		final String[] columns = { "role_id" };
 		final List<String> where = new ArrayList<String>();
 		where.add("name = '" + roleName + "'");
 
-		@SuppressWarnings("unchecked") final Set<Integer> result = (LinkedHashSet<Integer>) (runQuery(DatabaseQueryType.SELECT, DatabaseTable.ROLES, null, columns, null, where));
+		@SuppressWarnings("unchecked")
+		final Set<Integer> result = (LinkedHashSet<Integer>) (runQuery(DatabaseQueryType.SELECT, DatabaseTable.ROLES, null, columns, null, where));
 
 		if (result.size() == 0)
 			return -1;
@@ -1660,10 +1708,10 @@ public class DatabaseController
 	 */
 	public static Set<String> getUserRoleNames() throws NoDatabaseLinkException
 	{
-		final String[] columns =
-		{ "name" };
+		final String[] columns = { "name" };
 
-		@SuppressWarnings("unchecked") final Set<String> result = (LinkedHashSet<String>) (runQuery(DatabaseQueryType.SELECT, DatabaseTable.ROLES, null, columns, null, null));
+		@SuppressWarnings("unchecked")
+		final Set<String> result = (LinkedHashSet<String>) (runQuery(DatabaseQueryType.SELECT, DatabaseTable.ROLES, null, columns, null, null));
 
 		return result;
 	}
@@ -1688,18 +1736,19 @@ public class DatabaseController
 		try
 		{
 			Integer.parseInt(badgeID);
-		} catch (final NumberFormatException e)
+		}
+		catch (final NumberFormatException e)
 		{
 			// Although badge IDs are stored as string, they are still numbers.
 			return null;
 		}
 
-		final String[] columns =
-		{ "user_id", "first_name", "last_name", "role" };
+		final String[] columns = { "user_id", "first_name", "last_name", "role" };
 		final List<String> where = new ArrayList<String>();
 		where.add("badge_id = " + badgeID);
 
-		@SuppressWarnings("unchecked") final Set<User> result = (LinkedHashSet<User>) (runQuery(DatabaseQueryType.SELECT, DatabaseTable.USERS, null, columns, null, where));
+		@SuppressWarnings("unchecked")
+		final Set<User> result = (LinkedHashSet<User>) (runQuery(DatabaseQueryType.SELECT, DatabaseTable.USERS, null, columns, null, where));
 
 		if (result.size() == 0)
 			return null;
@@ -1724,14 +1773,14 @@ public class DatabaseController
 	 */
 	public static User authenticatePIN(final String firstName, final String lastName, final String pin) throws NoDatabaseLinkException
 	{
-		final String[] columns =
-		{ "user_id", "first_name", "last_name", "role" };
+		final String[] columns = { "user_id", "first_name", "last_name", "role" };
 		final List<String> where = new ArrayList<String>();
 		where.add("first_name = '" + firstName + "'");
 		where.add("last_name = '" + lastName + "'");
 		where.add("pin = " + pin);
 
-		@SuppressWarnings("unchecked") final Set<User> result = (LinkedHashSet<User>) (runQuery(DatabaseQueryType.SELECT, DatabaseTable.USERS, null, columns, null, where));
+		@SuppressWarnings("unchecked")
+		final Set<User> result = (LinkedHashSet<User>) (runQuery(DatabaseQueryType.SELECT, DatabaseTable.USERS, null, columns, null, where));
 
 		if (result.size() == 0)
 			return null;
@@ -1751,12 +1800,12 @@ public class DatabaseController
 	{
 		if (!cachedProductBoxes.containsKey(productboxid))
 		{
-			final String[] columns =
-			{ "*" };
+			final String[] columns = { "*" };
 			final List<String> where = new ArrayList<String>();
 			where.add("container_id = " + new Integer(productboxid));
 
-			@SuppressWarnings("unchecked") final Set<ProductBox> result = (LinkedHashSet<ProductBox>) (runQuery(DatabaseQueryType.SELECT, DatabaseTable.CONTAINERS, null, columns, null, where));
+			@SuppressWarnings("unchecked")
+			final Set<ProductBox> result = (LinkedHashSet<ProductBox>) (runQuery(DatabaseQueryType.SELECT, DatabaseTable.CONTAINERS, null, columns, null, where));
 
 			if (result.size() == 0)
 				return null;
@@ -1787,12 +1836,12 @@ public class DatabaseController
 		if (id == -1)
 			return new User(-1, "Debug", "Account", new Administrator());
 
-		final String[] columns =
-		{ "user_id", "first_name", "last_name", "role" };
+		final String[] columns = { "user_id", "first_name", "last_name", "role" };
 		final List<String> where = new ArrayList<String>();
 		where.add("user_id = " + new Integer(id));
 
-		@SuppressWarnings("unchecked") final Set<User> result = (LinkedHashSet<User>) (runQuery(DatabaseQueryType.SELECT, DatabaseTable.USERS, null, columns, null, where));
+		@SuppressWarnings("unchecked")
+		final Set<User> result = (LinkedHashSet<User>) (runQuery(DatabaseQueryType.SELECT, DatabaseTable.USERS, null, columns, null, where));
 
 		if (result.size() == 0)
 			return null;
@@ -1811,12 +1860,12 @@ public class DatabaseController
 	 */
 	public static int getProductIDFromName(final String name) throws NoDatabaseLinkException
 	{
-		final String[] columns =
-		{ "product_id" };
+		final String[] columns = { "product_id" };
 		final List<String> where = new ArrayList<String>();
 		where.add("name = '" + name + "'");
 
-		@SuppressWarnings("unchecked") final Set<Integer> result = (LinkedHashSet<Integer>) (runQuery(DatabaseQueryType.SELECT, DatabaseTable.PRODUCTS, null, columns, null, where));
+		@SuppressWarnings("unchecked")
+		final Set<Integer> result = (LinkedHashSet<Integer>) (runQuery(DatabaseQueryType.SELECT, DatabaseTable.PRODUCTS, null, columns, null, where));
 
 		if (result.size() == 0)
 			return -1;
@@ -1837,12 +1886,12 @@ public class DatabaseController
 	{
 		if (!cachedShelves.containsKey(shelfid) || !getCached)
 		{
-			final String[] columns =
-			{ "*" };
+			final String[] columns = { "*" };
 			final List<String> where = new ArrayList<String>();
 			where.add("shelf_id = " + new Integer(shelfid));
 
-			@SuppressWarnings("unchecked") final Set<Object> result = (LinkedHashSet<Object>) (runQuery(DatabaseQueryType.SELECT, DatabaseTable.SHELVES, null, columns, null, where));
+			@SuppressWarnings("unchecked")
+			final Set<Object> result = (LinkedHashSet<Object>) (runQuery(DatabaseQueryType.SELECT, DatabaseTable.SHELVES, null, columns, null, where));
 
 			if (result.size() == 0)
 				return null;
@@ -1877,12 +1926,12 @@ public class DatabaseController
 	{
 		if (!cachedRemovalLists.containsKey(listid) || !getCached)
 		{
-			final String[] columns =
-			{ "*" };
+			final String[] columns = { "*" };
 			final List<String> where = new ArrayList<String>();
 			where.add("removallist_id = " + listid);
 
-			@SuppressWarnings("unchecked") final Set<Object> result = (LinkedHashSet<Object>) (runQuery(DatabaseQueryType.SELECT, DatabaseTable.REMOVALLISTS, null, columns, null, where));
+			@SuppressWarnings("unchecked")
+			final Set<Object> result = (LinkedHashSet<Object>) (runQuery(DatabaseQueryType.SELECT, DatabaseTable.REMOVALLISTS, null, columns, null, where));
 
 			if (result.size() == 0)
 				return null;
@@ -1917,12 +1966,12 @@ public class DatabaseController
 	{
 		if (!cachedManifests.containsKey(manifestid) || !getCached)
 		{
-			final String[] columns =
-			{ "*" };
+			final String[] columns = { "*" };
 			final List<String> where = new ArrayList<String>();
 			where.add("manifest_id = " + manifestid);
 
-			@SuppressWarnings("unchecked") final Set<Object> result = (LinkedHashSet<Object>) (runQuery(DatabaseQueryType.SELECT, DatabaseTable.MANIFESTS, null, columns, null, where));
+			@SuppressWarnings("unchecked")
+			final Set<Object> result = (LinkedHashSet<Object>) (runQuery(DatabaseQueryType.SELECT, DatabaseTable.MANIFESTS, null, columns, null, where));
 
 			if (result.size() == 0)
 				return null;
@@ -1955,10 +2004,10 @@ public class DatabaseController
 	 */
 	public static String getRandomShelfSlot() throws NoDatabaseLinkException
 	{
-		final String[] columns =
-		{ "shelf_id" };
+		final String[] columns = { "shelf_id" };
 
-		@SuppressWarnings("unchecked") final Set<Integer> result = (LinkedHashSet<Integer>) (runQuery(DatabaseQueryType.SELECT, DatabaseTable.SHELVES, null, columns, null, null));
+		@SuppressWarnings("unchecked")
+		final Set<Integer> result = (LinkedHashSet<Integer>) (runQuery(DatabaseQueryType.SELECT, DatabaseTable.SHELVES, null, columns, null, null));
 
 		final List<Integer> list = new ArrayList<Integer>(result);
 
@@ -1978,10 +2027,10 @@ public class DatabaseController
 	 */
 	public static List<Integer> getProductCodeList() throws NoDatabaseLinkException
 	{
-		final String[] columns =
-		{ "product_id" };
+		final String[] columns = { "product_id" };
 
-		@SuppressWarnings("unchecked") final Set<Integer> result = (LinkedHashSet<Integer>) (runQuery(DatabaseQueryType.SELECT, DatabaseTable.PRODUCTS, null, columns, null, null));
+		@SuppressWarnings("unchecked")
+		final Set<Integer> result = (LinkedHashSet<Integer>) (runQuery(DatabaseQueryType.SELECT, DatabaseTable.PRODUCTS, null, columns, null, null));
 		final List<Integer> ints = new ArrayList<Integer>();
 		ints.addAll(result);
 		return ints;
@@ -2016,10 +2065,10 @@ public class DatabaseController
 	 */
 	public static ObservableList<Object> getObservableRemovalLists() throws NoDatabaseLinkException
 	{
-		final String[] columns =
-		{ "*" };
+		final String[] columns = { "*" };
 
-		@SuppressWarnings("unchecked") final Set<RemovalList> result = (LinkedHashSet<RemovalList>) (runQuery(DatabaseQueryType.SELECT, DatabaseTable.REMOVALLISTS, null, columns, null, null));
+		@SuppressWarnings("unchecked")
+		final Set<RemovalList> result = (LinkedHashSet<RemovalList>) (runQuery(DatabaseQueryType.SELECT, DatabaseTable.REMOVALLISTS, null, columns, null, null));
 
 		final Iterator<RemovalList> it = result.iterator();
 
@@ -2054,10 +2103,10 @@ public class DatabaseController
 	 */
 	public static ObservableList<Object> getObservableUsers() throws NoDatabaseLinkException
 	{
-		final String[] columns =
-		{ "user_id", "first_name", "last_name", "role" };
+		final String[] columns = { "user_id", "first_name", "last_name", "role" };
 
-		@SuppressWarnings("unchecked") final Set<User> result = (LinkedHashSet<User>) (runQuery(DatabaseQueryType.SELECT, DatabaseTable.USERS, null, columns, null, null));
+		@SuppressWarnings("unchecked")
+		final Set<User> result = (LinkedHashSet<User>) (runQuery(DatabaseQueryType.SELECT, DatabaseTable.USERS, null, columns, null, null));
 
 		final Iterator<User> it = result.iterator();
 
@@ -2106,13 +2155,15 @@ public class DatabaseController
 				if (MainWindow.DEBUG_MODE)
 					DBLOG.debug("Unable to find a product box with the wanted size of " + wantedProductCount + ". Looking from multiple boxes.");
 
-				// Remove the product count condition and find all product boxes with the wanted product ID.
+				// Remove the product count condition and find all product boxes
+				// with the wanted product ID.
 				where.remove(1);
 				boxes = getBoxesContainingAtLeastProducts(getProductBoxesByProductID(where), wantedProductCount);
 			}
 			else if (boxes.size() > 1)
 			{
-				// If found multiple boxes with the exact size, select one that will expire the soonest.
+				// If found multiple boxes with the exact size, select one that
+				// will expire the soonest.
 				final ProductBox oldest = getOldestProductBox(boxes);
 
 				boxes.clear();
@@ -2167,8 +2218,7 @@ public class DatabaseController
 		if (MainWindow.DEBUG_MODE)
 			DBLOG.debug("Searching for a product box where: " + where);
 
-		final String[] columns =
-		{ "*" };
+		final String[] columns = { "*" };
 
 		final Map<DatabaseTable, String> join = new LinkedHashMap<DatabaseTable, String>();
 		join.put(DatabaseTable.PRODUCTS, "containers.product = products.product_id");
@@ -2176,7 +2226,8 @@ public class DatabaseController
 		if (joins != null)
 			join.putAll(joins);
 
-		@SuppressWarnings("unchecked") final Set<ProductBox> result = (LinkedHashSet<ProductBox>) (runQuery(DatabaseQueryType.SELECT, DatabaseTable.CONTAINERS, join, columns, null, where));
+		@SuppressWarnings("unchecked")
+		final Set<ProductBox> result = (LinkedHashSet<ProductBox>) (runQuery(DatabaseQueryType.SELECT, DatabaseTable.CONTAINERS, join, columns, null, where));
 
 		for (final ProductBox box : result)
 		{
@@ -2211,12 +2262,12 @@ public class DatabaseController
 	{
 		if (!cachedManifestStates.containsKey(stateid))
 		{
-			final String[] columns =
-			{ "name" };
+			final String[] columns = { "name" };
 			final List<String> where = new ArrayList<String>();
 			where.add("manifest_state_id = " + new Integer(stateid));
 
-			@SuppressWarnings("unchecked") final Set<String> result = (LinkedHashSet<String>) (runQuery(DatabaseQueryType.SELECT, DatabaseTable.MANIFEST_STATES, null, columns, null, where));
+			@SuppressWarnings("unchecked")
+			final Set<String> result = (LinkedHashSet<String>) (runQuery(DatabaseQueryType.SELECT, DatabaseTable.MANIFEST_STATES, null, columns, null, where));
 
 			if (result.size() == 0)
 				return null;
@@ -2235,7 +2286,8 @@ public class DatabaseController
 	}
 
 	/*
-	 * -------------------------------- PRIVATE SETTER METHODS --------------------------------
+	 * -------------------------------- PRIVATE SETTER METHODS
+	 * --------------------------------
 	 */
 
 	/**
@@ -2248,15 +2300,15 @@ public class DatabaseController
 	{
 		DBLOG.debug("Placing product boxes on shelf " + shelfid + "...");
 
-		final String[] columns =
-		{ "*" };
+		final String[] columns = { "*" };
 
 		final List<String> where = new ArrayList<String>();
 		where.add("shelf = " + shelfid);
 
 		final Shelf shelf = getShelfByID(shelfid, true);
 
-		@SuppressWarnings("unchecked") final Map<Integer, ArrayList<Integer[]>> shelfBoxMap = (HashMap<Integer, ArrayList<Integer[]>>) runQuery(DatabaseQueryType.SELECT, DatabaseTable.SHELF_PRODUCTBOXES, null, columns, null, where);
+		@SuppressWarnings("unchecked")
+		final Map<Integer, ArrayList<Integer[]>> shelfBoxMap = (HashMap<Integer, ArrayList<Integer[]>>) runQuery(DatabaseQueryType.SELECT, DatabaseTable.SHELF_PRODUCTBOXES, null, columns, null, where);
 
 		// If the shelf is not empty.
 		if (!shelfBoxMap.isEmpty())
@@ -2297,9 +2349,9 @@ public class DatabaseController
 		final List<String> where = new ArrayList<String>();
 		where.add("removallist = " + listid);
 
-		final String[] columns =
-		{ "productbox" };
-		@SuppressWarnings("unchecked") final Set<Integer> removalListBoxes = (LinkedHashSet<Integer>) runQuery(DatabaseQueryType.SELECT, DatabaseTable.REMOVALLIST_PRODUCTBOXES, null, columns, null, where);
+		final String[] columns = { "productbox" };
+		@SuppressWarnings("unchecked")
+		final Set<Integer> removalListBoxes = (LinkedHashSet<Integer>) runQuery(DatabaseQueryType.SELECT, DatabaseTable.REMOVALLIST_PRODUCTBOXES, null, columns, null, where);
 
 		if (!removalListBoxes.isEmpty())
 		{
@@ -2319,9 +2371,9 @@ public class DatabaseController
 		final List<String> where = new ArrayList<String>();
 		where.add("manifest = " + manifestid);
 
-		final String[] columns =
-		{ "productbox" };
-		@SuppressWarnings("unchecked") final Set<Integer> manifestBoxes = (LinkedHashSet<Integer>) runQuery(DatabaseQueryType.SELECT, DatabaseTable.MANIFEST_PRODUCTBOXES, null, columns, null, where);
+		final String[] columns = { "productbox" };
+		@SuppressWarnings("unchecked")
+		final Set<Integer> manifestBoxes = (LinkedHashSet<Integer>) runQuery(DatabaseQueryType.SELECT, DatabaseTable.MANIFEST_PRODUCTBOXES, null, columns, null, where);
 
 		if (!manifestBoxes.isEmpty())
 		{
@@ -2337,7 +2389,8 @@ public class DatabaseController
 			DBLOG.debug("Nothing to place.");
 	}
 	/*
-	 * -------------------------------- PUBLIC SETTER METHODS --------------------------------
+	 * -------------------------------- PUBLIC SETTER METHODS
+	 * --------------------------------
 	 */
 
 	/**
@@ -2395,7 +2448,8 @@ public class DatabaseController
 		values.put("last_name", lastName);
 		values.put("role", roleID);
 
-		@SuppressWarnings("unchecked") final boolean changed = (0 < ((Set<Integer>) runQuery(DatabaseQueryType.INSERT, DatabaseTable.USERS, null, null, values, null)).size());
+		@SuppressWarnings("unchecked")
+		final boolean changed = (0 < ((Set<Integer>) runQuery(DatabaseQueryType.INSERT, DatabaseTable.USERS, null, null, values, null)).size());
 
 		// Update the user list displayed in the UI after adding a new user.
 		if (changed)
@@ -2419,7 +2473,8 @@ public class DatabaseController
 		final List<String> where = new ArrayList<String>();
 		where.add("user_id = " + new Integer(databaseID));
 
-		@SuppressWarnings("unchecked") final boolean changed = (0 < ((Set<Integer>) (runQuery(DatabaseQueryType.DELETE, DatabaseTable.USERS, null, null, null, where))).size());
+		@SuppressWarnings("unchecked")
+		final boolean changed = (0 < ((Set<Integer>) (runQuery(DatabaseQueryType.DELETE, DatabaseTable.USERS, null, null, null, where))).size());
 
 		// Update the user list displayed in the UI if database changed.
 		if (changed)
@@ -2448,7 +2503,8 @@ public class DatabaseController
 		where.clear();
 		where.add("removallist_id = " + databaseID);
 
-		@SuppressWarnings("unchecked") final boolean changed = (0 < ((Set<Integer>) (runQuery(DatabaseQueryType.DELETE, DatabaseTable.REMOVALLISTS, null, null, null, where))).size());
+		@SuppressWarnings("unchecked")
+		final boolean changed = (0 < ((Set<Integer>) (runQuery(DatabaseQueryType.DELETE, DatabaseTable.REMOVALLISTS, null, null, null, where))).size());
 
 		// Update the user list displayed in the UI if database changed.
 		if (changed)
@@ -2464,7 +2520,8 @@ public class DatabaseController
 	 *            product box to update in the database
 	 * @return <code>true</code> if the database was updated
 	 */
-	@SuppressWarnings("unchecked") public static boolean addProductBoxToShelfSlot(final ProductBox productBox, final String shelfSlotID) throws NoDatabaseLinkException
+	@SuppressWarnings("unchecked")
+	public static boolean addProductBoxToShelfSlot(final ProductBox productBox, final String shelfSlotID) throws NoDatabaseLinkException
 	{
 		final Object[] tokens = Shelf.tokenizeShelfSlotID(shelfSlotID);
 		final int shelfID = Integer.parseInt(((String) tokens[0]).substring(1));
@@ -2509,7 +2566,8 @@ public class DatabaseController
 		final List<String> where = new ArrayList<String>();
 		where.add("productbox = " + productBox.getBoxID());
 
-		@SuppressWarnings("unchecked") final boolean changed = (0 < ((LinkedHashSet<Object>) runQuery(DatabaseQueryType.DELETE, DatabaseTable.SHELF_PRODUCTBOXES, null, null, null, where)).size());
+		@SuppressWarnings("unchecked")
+		final boolean changed = (0 < ((LinkedHashSet<Object>) runQuery(DatabaseQueryType.DELETE, DatabaseTable.SHELF_PRODUCTBOXES, null, null, null, where)).size());
 
 		final Object[] tokens = Shelf.tokenizeShelfSlotID(productBox.getShelfSlot());
 
@@ -2530,7 +2588,8 @@ public class DatabaseController
 	 * @return <code>true</code> if existing data was updated or a new removal
 	 *         list was created in the database
 	 */
-	@SuppressWarnings("unchecked") public static boolean updateRemovalList(final RemovalList removalList) throws NoDatabaseLinkException
+	@SuppressWarnings("unchecked")
+	public static boolean updateRemovalList(final RemovalList removalList) throws NoDatabaseLinkException
 	{
 		int listID = removalList.getDatabaseID();
 
@@ -2569,7 +2628,8 @@ public class DatabaseController
 
 		/*
 		 * Delete all boxes from the list in the database.
-		 * We don't really care whether anything was deleted or not, if there was something, it is now deleted.
+		 * We don't really care whether anything was deleted or not, if there
+		 * was something, it is now deleted.
 		 */
 		runQuery(DatabaseQueryType.DELETE, DatabaseTable.REMOVALLIST_PRODUCTBOXES, null, null, null, where);
 
@@ -2609,7 +2669,8 @@ public class DatabaseController
 	 * @return <code>true</code> if existing data was updated or a new manifest
 	 *         was created in the database
 	 */
-	@SuppressWarnings("unchecked") public static boolean save(final Manifest manifest) throws NoDatabaseLinkException
+	@SuppressWarnings("unchecked")
+	public static boolean save(final Manifest manifest) throws NoDatabaseLinkException
 	{
 		int manifestID = manifest.getDatabaseID();
 
@@ -2651,7 +2712,8 @@ public class DatabaseController
 
 		/*
 		 * Delete all boxes from the list in the database.
-		 * We don't really care whether anything was deleted or not, if there was something, it is now deleted.
+		 * We don't really care whether anything was deleted or not, if there
+		 * was something, it is now deleted.
 		 */
 		runQuery(DatabaseQueryType.DELETE, DatabaseTable.MANIFEST_PRODUCTBOXES, null, null, null, where);
 
@@ -2719,7 +2781,8 @@ public class DatabaseController
 		}
 
 		// Insert/Update
-		@SuppressWarnings("unchecked") final Set<Integer> result = (Set<Integer>) runQuery(query, DatabaseTable.CONTAINERS, null, null, values, null);
+		@SuppressWarnings("unchecked")
+		final Set<Integer> result = (Set<Integer>) runQuery(query, DatabaseTable.CONTAINERS, null, null, values, null);
 
 		if (result.size() == 0)
 		{
@@ -2727,7 +2790,8 @@ public class DatabaseController
 			return -1;
 		}
 
-		// Get the inserted database ID (if the given object was inserted instead of updated).
+		// Get the inserted database ID (if the given object was inserted
+		// instead of updated).
 		if (dbID < 1)
 			dbID = result.iterator().next();
 
@@ -2768,9 +2832,9 @@ public class DatabaseController
 	 */
 	private static void getAllProductBoxes() throws NoDatabaseLinkException
 	{
-		final String[] columns =
-		{ "*" };
-		@SuppressWarnings("unchecked") final Set<ProductBox> result = (Set<ProductBox>) runQuery(DatabaseQueryType.SELECT, DatabaseTable.CONTAINERS, null, columns, null, null);
+		final String[] columns = { "*" };
+		@SuppressWarnings("unchecked")
+		final Set<ProductBox> result = (Set<ProductBox>) runQuery(DatabaseQueryType.SELECT, DatabaseTable.CONTAINERS, null, columns, null, null);
 
 		final Iterator<ProductBox> it = result.iterator();
 
@@ -2795,9 +2859,9 @@ public class DatabaseController
 	 */
 	private static void getAllShelves() throws NoDatabaseLinkException
 	{
-		final String[] columns =
-		{ "*" };
-		@SuppressWarnings("unchecked") final Set<Shelf> result = (Set<Shelf>) runQuery(DatabaseQueryType.SELECT, DatabaseTable.SHELVES, null, columns, null, null);
+		final String[] columns = { "*" };
+		@SuppressWarnings("unchecked")
+		final Set<Shelf> result = (Set<Shelf>) runQuery(DatabaseQueryType.SELECT, DatabaseTable.SHELVES, null, columns, null, null);
 
 		final Iterator<Shelf> it = result.iterator();
 		// Store for reuse.
@@ -2821,9 +2885,9 @@ public class DatabaseController
 	 */
 	private static void setAllContainersToAllShelves() throws NoDatabaseLinkException
 	{
-		final String[] columns =
-		{ "*" };
-		@SuppressWarnings("unchecked") final Map<Integer, ArrayList<Integer[]>> shelfBoxMap = (HashMap<Integer, ArrayList<Integer[]>>) runQuery(DatabaseQueryType.SELECT, DatabaseTable.SHELF_PRODUCTBOXES, null, columns, null, null);
+		final String[] columns = { "*" };
+		@SuppressWarnings("unchecked")
+		final Map<Integer, ArrayList<Integer[]>> shelfBoxMap = (HashMap<Integer, ArrayList<Integer[]>>) runQuery(DatabaseQueryType.SELECT, DatabaseTable.SHELF_PRODUCTBOXES, null, columns, null, null);
 
 		int boxcount = 0;
 
@@ -2838,7 +2902,8 @@ public class DatabaseController
 				{
 					if (cachedProductBoxes.containsKey(data[0]))
 					{
-						// Do not update the database as this method loads the data from the database into objects.
+						// Do not update the database as this method loads the
+						// data from the database into objects.
 						cachedShelves.get(shelfID).addToSlot(Shelf.coordinatesToShelfSlotID(shelfID, data[1] + 1, data[2], true), cachedProductBoxes.get(data[0]), false);
 					}
 				}
@@ -2860,9 +2925,9 @@ public class DatabaseController
 	public static void getAllRemovalLists() throws NoDatabaseLinkException
 	{
 		// TODO: CACHE GUARD
-		final String[] columns =
-		{ "*" };
-		@SuppressWarnings("unchecked") final Set<RemovalList> result = (Set<RemovalList>) runQuery(DatabaseQueryType.SELECT, DatabaseTable.REMOVALLISTS, null, columns, null, null);
+		final String[] columns = { "*" };
+		@SuppressWarnings("unchecked")
+		final Set<RemovalList> result = (Set<RemovalList>) runQuery(DatabaseQueryType.SELECT, DatabaseTable.REMOVALLISTS, null, columns, null, null);
 
 		final Iterator<RemovalList> it = result.iterator();
 
@@ -2887,9 +2952,9 @@ public class DatabaseController
 	 */
 	private static void setAllContainersToAllRemovalLists() throws NoDatabaseLinkException
 	{
-		final String[] columns =
-		{ "*" };
-		@SuppressWarnings("unchecked") final Map<Integer, ArrayList<Integer>> removalListBoxes = (HashMap<Integer, ArrayList<Integer>>) runQuery(DatabaseQueryType.SELECT, DatabaseTable.REMOVALLIST_PRODUCTBOXES, null, columns, null, null);
+		final String[] columns = { "*" };
+		@SuppressWarnings("unchecked")
+		final Map<Integer, ArrayList<Integer>> removalListBoxes = (HashMap<Integer, ArrayList<Integer>>) runQuery(DatabaseQueryType.SELECT, DatabaseTable.REMOVALLIST_PRODUCTBOXES, null, columns, null, null);
 
 		int boxcount = 0;
 
@@ -2900,7 +2965,8 @@ public class DatabaseController
 
 			for (final Integer id : boxIDs)
 			{
-				// Do not update the database as this method loads the data from the database into objects.
+				// Do not update the database as this method loads the data from
+				// the database into objects.
 				getRemovalListByID(removalListID, true).addProductBox(getProductBoxByID(id));
 			}
 		}
@@ -2916,10 +2982,10 @@ public class DatabaseController
 	 */
 	public static ObservableList<Object> getAllProductCategories() throws NoDatabaseLinkException
 	{
-		final String[] columns =
-		{ "*" };
+		final String[] columns = { "*" };
 
-		@SuppressWarnings("unchecked") final Set<ProductCategory> result = (LinkedHashSet<ProductCategory>) (runQuery(DatabaseQueryType.SELECT, DatabaseTable.CATEGORIES, null, columns, null, null));
+		@SuppressWarnings("unchecked")
+		final Set<ProductCategory> result = (LinkedHashSet<ProductCategory>) (runQuery(DatabaseQueryType.SELECT, DatabaseTable.CATEGORIES, null, columns, null, null));
 
 		if (result.size() == 0)
 			DBLOG.warn("No Product Categories present in the database.");
@@ -2951,10 +3017,10 @@ public class DatabaseController
 	 */
 	public static ObservableList<Object> getAllProductBrands() throws NoDatabaseLinkException
 	{
-		final String[] columns =
-		{ "*" };
+		final String[] columns = { "*" };
 
-		@SuppressWarnings("unchecked") final Set<ProductBrand> result = (LinkedHashSet<ProductBrand>) (runQuery(DatabaseQueryType.SELECT, DatabaseTable.BRANDS, null, columns, null, null));
+		@SuppressWarnings("unchecked")
+		final Set<ProductBrand> result = (LinkedHashSet<ProductBrand>) (runQuery(DatabaseQueryType.SELECT, DatabaseTable.BRANDS, null, columns, null, null));
 
 		if (result.size() == 0)
 			DBLOG.warn("No Product Brands present in the database.");
@@ -2986,10 +3052,10 @@ public class DatabaseController
 	 */
 	public static ObservableList<Object> getAllRemovalListStates() throws NoDatabaseLinkException
 	{
-		final String[] columns =
-		{ "*" };
+		final String[] columns = { "*" };
 
-		@SuppressWarnings("unchecked") final Set<RemovalListState> result = (LinkedHashSet<RemovalListState>) (runQuery(DatabaseQueryType.SELECT, DatabaseTable.REMOVALLIST_STATES, null, columns, null, null));
+		@SuppressWarnings("unchecked")
+		final Set<RemovalListState> result = (LinkedHashSet<RemovalListState>) (runQuery(DatabaseQueryType.SELECT, DatabaseTable.REMOVALLIST_STATES, null, columns, null, null));
 
 		if (result.size() == 0)
 			DBLOG.warn("No Removal List States present in the database.");
@@ -3031,7 +3097,8 @@ public class DatabaseController
 		{
 			columns[0] = "manifest_id";
 
-			@SuppressWarnings("unchecked") Set<Integer> result = (LinkedHashSet<Integer>) (runQuery(DatabaseQueryType.SELECT, DatabaseTable.MANIFESTS, null, columns, null, null));
+			@SuppressWarnings("unchecked")
+			Set<Integer> result = (LinkedHashSet<Integer>) (runQuery(DatabaseQueryType.SELECT, DatabaseTable.MANIFESTS, null, columns, null, null));
 
 			// Check if all manifests have been cached by their ID.
 			if (cachedManifests.keySet().containsAll(result))
@@ -3045,7 +3112,8 @@ public class DatabaseController
 
 		columns[0] = "*";
 
-		@SuppressWarnings("unchecked") final Set<Manifest> result = (LinkedHashSet<Manifest>) (runQuery(DatabaseQueryType.SELECT, DatabaseTable.MANIFESTS, null, columns, null, null));
+		@SuppressWarnings("unchecked")
+		final Set<Manifest> result = (LinkedHashSet<Manifest>) (runQuery(DatabaseQueryType.SELECT, DatabaseTable.MANIFESTS, null, columns, null, null));
 
 		if (result.size() == 0)
 			DBLOG.warn("No Manifests present in the database.");
@@ -3079,9 +3147,9 @@ public class DatabaseController
 	 */
 	private static void setAllContainersToAllManifests() throws NoDatabaseLinkException
 	{
-		final String[] columns =
-		{ "*" };
-		@SuppressWarnings("unchecked") final Map<Integer, ArrayList<Integer>> manifestBoxes = (HashMap<Integer, ArrayList<Integer>>) runQuery(DatabaseQueryType.SELECT, DatabaseTable.MANIFEST_PRODUCTBOXES, null, columns, null, null);
+		final String[] columns = { "*" };
+		@SuppressWarnings("unchecked")
+		final Map<Integer, ArrayList<Integer>> manifestBoxes = (HashMap<Integer, ArrayList<Integer>>) runQuery(DatabaseQueryType.SELECT, DatabaseTable.MANIFEST_PRODUCTBOXES, null, columns, null, null);
 
 		int boxcount = 0;
 
@@ -3090,7 +3158,8 @@ public class DatabaseController
 			final ArrayList<Integer> boxIDs = manifestBoxes.get(manifestID);
 			boxcount += boxIDs.size();
 
-			// TODO: This bit could be optimized. I'm looping through the same list twice.
+			// TODO: This bit could be optimized. I'm looping through the same
+			// list twice.
 
 			Set<ProductBox> boxes = new LinkedHashSet<ProductBox>();
 
@@ -3121,7 +3190,8 @@ public class DatabaseController
 		{
 			columns[0] = "manifest_state_id";
 
-			@SuppressWarnings("unchecked") Set<Integer> result = (LinkedHashSet<Integer>) (runQuery(DatabaseQueryType.SELECT, DatabaseTable.MANIFEST_STATES, null, columns, null, null));
+			@SuppressWarnings("unchecked")
+			Set<Integer> result = (LinkedHashSet<Integer>) (runQuery(DatabaseQueryType.SELECT, DatabaseTable.MANIFEST_STATES, null, columns, null, null));
 
 			// Check if all manifest states have been cached by their ID.
 			if (cachedManifestStates.keySet().containsAll(result))
@@ -3135,7 +3205,8 @@ public class DatabaseController
 
 		columns[0] = "*";
 
-		@SuppressWarnings("unchecked") final Set<ManifestState> result = (LinkedHashSet<ManifestState>) (runQuery(DatabaseQueryType.SELECT, DatabaseTable.MANIFEST_STATES, null, columns, null, null));
+		@SuppressWarnings("unchecked")
+		final Set<ManifestState> result = (LinkedHashSet<ManifestState>) (runQuery(DatabaseQueryType.SELECT, DatabaseTable.MANIFEST_STATES, null, columns, null, null));
 
 		if (result.size() == 0)
 			DBLOG.warn("No Manifest States present in the database.");
@@ -3157,9 +3228,11 @@ public class DatabaseController
 		observableManifestStates.clear();
 
 		/*
-		 * This is the list of states shown in the manifest view that allows the user to change the state of the list.
+		 * This is the list of states shown in the manifest view that allows the
+		 * user to change the state of the list.
 		 * Only Managers are allowed accept and reject manifests.
-		 * Logisticians can also see the accepted/rejected state if it is the current state of the manifest.
+		 * Logisticians can also see the accepted/rejected state if it is the
+		 * current state of the manifest.
 		 */
 		for (final ManifestState state : cachedManifestStates.values())
 		{

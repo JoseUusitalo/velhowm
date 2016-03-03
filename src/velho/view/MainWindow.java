@@ -265,15 +265,10 @@ public class MainWindow extends Application
 	/**
 	 * Adds a new tab to the main tab panel.
 	 *
-	 * <<<<<<< HEAD
 	 * @param tabName
 	 *            name of the tab
 	 * @param view
-	 *            view to show in the tab =======
-	 * @param tabName
-	 *            name of the tab
-	 * @param view
-	 *            view to show in the tab >>>>>>> refs/heads/productview
+	 *            view to show in the tab
 	 */
 	public boolean addTab(final String tabName, final Node view)
 	{
