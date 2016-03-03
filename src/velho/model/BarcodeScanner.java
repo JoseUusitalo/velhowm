@@ -85,7 +85,8 @@ public class BarcodeScanner
 
 	/**
 	 * Validates the order to move the product/box/items.
-	 *
+	 * Edit now it does not bruteforce the box into a full shelf.
+	 * 
 	 * @return Either a true or a false, if there is room in the shelf or no room.
 	 */
 	public static boolean scannerMoveValid()
