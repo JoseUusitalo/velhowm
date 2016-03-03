@@ -94,13 +94,18 @@ public class BarcodeScanner
 		List<Integer> list = null;
 		String shelf = null;
 
+		Object[] tokens;
+
 		try
 		{
 			list = DatabaseController.getProductCodeList();
 			Collections.shuffle(list);
 			shelf = DatabaseController.getRandomShelfSlot();
+			tokens = Shelf.tokenizeShelfSlotID(shelf);
+			int derp = Integer.parseInt(((String) tokens[0]).substring(1));
 			SYSLOG.trace("Random product: " + list.get(0));
 			SYSLOG.trace("Random shelf slot: " + shelf);
+			SYSLOG.trace(DatabaseController.getShelfByID(derp, true).toString());
 
 			if (ExternalSystemsController.move(list.get(0), shelf, true))
 			{
