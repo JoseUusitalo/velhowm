@@ -147,6 +147,9 @@ public class ExternalSystemsController
 			newShelf = DatabaseController.getShelfByID(newShelfID, true);
 			boxToMove = DatabaseController.getProductBoxByID(productBoxCode);
 
+			SYSLOG.debug("Moving box: " + boxToMove);
+			SYSLOG.debug("To shelf: " + newShelfID);
+
 			if (boxToMove == null)
 			{
 				return false;
@@ -160,6 +163,8 @@ public class ExternalSystemsController
 			oldShelfIDString = (String) Shelf.tokenizeShelfSlotID(boxToMove.getShelfSlot())[0];
 			oldShelfID = Integer.parseInt(oldShelfIDString.substring(1));
 			oldShelf = DatabaseController.getShelfByID(oldShelfID, true);
+
+			SYSLOG.debug("From shelf: " + oldShelf);
 
 			if (oldShelf == null)
 			{

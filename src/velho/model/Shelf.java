@@ -368,6 +368,19 @@ public class Shelf
 	}
 
 	/**
+	 * Checks if the given slot has free space.
+	 *
+	 * @param shelfSlotID the slot ID
+	 * @return <code>true</code> if the slot has free space
+	 */
+	public boolean slotHasFreeSpace(final String shelfSlotID)
+	{
+		final int[] tokens = tokenizeAndValidateShelfSlotID(shelfSlotID);
+
+		return slots[tokens[1]][tokens[2]].hasFreeSpace();
+	}
+
+	/**
 	 * Gets the specified {@link ShelfSlot}.
 	 *
 	 * @param shelfSlotID
