@@ -1093,8 +1093,7 @@ public class DatabaseController
 	/**
 	 * Gets the {@link Product} object from the given product name.
 	 *
-	 * @param name
-	 *            the exact product name
+	 * @param name the exact product name
 	 * @return the corresponding product object
 	 * @throws NoDatabaseLinkException
 	 */
@@ -1120,8 +1119,7 @@ public class DatabaseController
 	/**
 	 * Gets the {@link Product} object from the given product name.
 	 *
-	 * @param name
-	 *            the exact product name
+	 * @param name the exact product name
 	 * @return the corresponding product object
 	 * @throws NoDatabaseLinkException
 	 */
@@ -1143,8 +1141,7 @@ public class DatabaseController
 	/**
 	 * Gets the {@link ProductType} object from the given type ID.
 	 *
-	 * @param typeid
-	 *            product type database ID
+	 * @param typeid product type database ID
 	 * @return the corresponding product type object
 	 * @throws NoDatabaseLinkException
 	 */
@@ -1177,8 +1174,7 @@ public class DatabaseController
 	/**
 	 * Gets the {@link ProductCategory} object from the given category ID.
 	 *
-	 * @param categoryid
-	 *            product category database ID
+	 * @param categoryid product category database ID
 	 * @return the corresponding product category object
 	 * @throws NoDatabaseLinkException
 	 */
@@ -1211,8 +1207,7 @@ public class DatabaseController
 	/**
 	 * Gets the {@link ProductBrand} object from the given brand ID.
 	 *
-	 * @param brandid
-	 *            product brand database ID
+	 * @param brandid product brand database ID
 	 * @return the corresponding product brand object
 	 * @throws NoDatabaseLinkException
 	 */
@@ -1454,8 +1449,7 @@ public class DatabaseController
 	/**
 	 * Gets the {@link Product} object from the given product ID.
 	 *
-	 * @param productid
-	 *            product database ID
+	 * @param productid product database ID
 	 * @return the corresponding product object
 	 * @throws NoDatabaseLinkException
 	 */
@@ -1595,8 +1589,7 @@ public class DatabaseController
 	/**
 	 * Gets the database ID of the given user role name.
 	 *
-	 * @param roleName
-	 *            the name of the role
+	 * @param roleName the name of the role
 	 * @return the database ID of the given role (a value greater than 0) or
 	 *         <code>-1</code> if the role does not exist in the database
 	 */
@@ -1638,8 +1631,7 @@ public class DatabaseController
 	 * Warning: Assumes that the badge ID is technically valid.
 	 * </p>
 	 *
-	 * @param badgeID
-	 *            a badge ID string
+	 * @param badgeID a badge ID string
 	 * @return a {@link User} object representing the authenticated user or
 	 *         <code>null</code> for invalid credentials
 	 * @throws NoDatabaseLinkException
@@ -1677,8 +1669,7 @@ public class DatabaseController
 	 * Warning: Assumes that the PIN is technically valid.
 	 * </p>
 	 *
-	 * @param pin
-	 *            a PIN string
+	 * @param pin is a PIN string
 	 * @return a {@link User} object representing the authenticated user or
 	 *         <code>null</code> for invalid credentials
 	 * @throws NoDatabaseLinkException
@@ -1703,8 +1694,7 @@ public class DatabaseController
 	/**
 	 * Gets the {@link Product} object from the given product ID.
 	 *
-	 * @param productid
-	 *            product database ID
+	 * @param productid product database ID
 	 * @return the corresponding product object
 	 * @throws NoDatabaseLinkException
 	 */
@@ -1737,8 +1727,7 @@ public class DatabaseController
 	/**
 	 * Gets user data by their database ID.
 	 *
-	 * @param id
-	 *            database ID of the user
+	 * @param id database ID of the user
 	 * @return a {@link User} object or <code>null</code> if a user with that ID
 	 *         was not found
 	 */
@@ -1763,8 +1752,7 @@ public class DatabaseController
 	/**
 	 * Gets the product ID by its name.
 	 *
-	 * @param name
-	 *            unique name of the product
+	 * @param name unique name of the product
 	 * @return the database ID of the product or <code>-1</code> if the product
 	 *         is not present in the database
 	 */
@@ -1786,8 +1774,7 @@ public class DatabaseController
 	/**
 	 * Gets the {@link Shelf} object from the given shelf ID.
 	 *
-	 * @param shelfid
-	 *            shelf database ID
+	 * @param shelfid shelf database ID
 	 * @return the corresponding shelf object
 	 * @throws NoDatabaseLinkException
 	 */
@@ -1825,8 +1812,7 @@ public class DatabaseController
 	/**
 	 * Gets the {@link RemovalList} object from the given removal list ID.
 	 *
-	 * @param listid
-	 *            removal list database ID
+	 * @param listid removal list database ID
 	 * @return the corresponding removal list object
 	 * @throws NoDatabaseLinkException
 	 */
@@ -2022,8 +2008,7 @@ public class DatabaseController
 	/**
 	 * Searches the database for product boxes of the specified size.
 	 *
-	 * @param productData
-	 *            a map of data to search for where the key is the product box
+	 * @param productData a map of data to search for where the key is the product box
 	 *            database ID and the value is the number of products
 	 * @throws NoDatabaseLinkException
 	 */
@@ -2259,8 +2244,7 @@ public class DatabaseController
 	/**
 	 * Places the correct product boxes in the cached removal list.
 	 *
-	 * @param listid
-	 *            removal list to place product boxes into
+	 * @param listid removal list to place product boxes into
 	 * @throws NoDatabaseLinkException
 	 */
 	private static void setContainersToRemovalList(final int listid) throws NoDatabaseLinkException
@@ -2380,8 +2364,7 @@ public class DatabaseController
 	 * a result of the call, updates the {@link ObservableList} of user data
 	 * shown in the UI.
 	 *
-	 * @param databaseID
-	 *            the database ID of the user to delete
+	 * @param databaseID the database ID of the user to delete
 	 * @return <code>true</code> if user was deleted
 	 * @throws NoDatabaseLinkException
 	 */
@@ -2430,8 +2413,7 @@ public class DatabaseController
 	/**
 	 * Adds the given product box to the shelf slot it specifies.
 	 *
-	 * @param productBox
-	 *            product box to update in the database
+	 * @param productBox product box to update in the database
 	 * @return <code>true</code> if the database was updated
 	 */
 	@SuppressWarnings("unchecked")
@@ -2472,8 +2454,7 @@ public class DatabaseController
 	/**
 	 * Removes the given product box from it's shelf slot.
 	 *
-	 * @param productBox
-	 *            product box to remove from it's shelf slot
+	 * @param productBox product box to remove from it's shelf slot
 	 */
 	public static boolean removeProductBoxFromShelfSlot(final ProductBox productBox) throws NoDatabaseLinkException
 	{
@@ -2496,8 +2477,7 @@ public class DatabaseController
 	 * given removal list or creates a new one if it doesn't exist.
 	 * A database ID of -1 signifies a brand new {@link RemovalList}.
 	 *
-	 * @param removalList
-	 *            new or existing removal list
+	 * @param removalList new or existing removal list
 	 * @return <code>true</code> if existing data was updated or a new removal
 	 *         list was created in the database
 	 */
@@ -2978,8 +2958,7 @@ public class DatabaseController
 	 *
 	 * @param getCached Get all manifests from the cache instead of rebuilding the cache from the database but only if
 	 *            the cache contains all the manifests that are in the database. Be aware that the cached manifest data
-	 *            may not be
-	 *            up to date.
+	 *            may not be up to date.
 	 * @return an {@link ObservableList} of all manifests
 	 */
 	public static ObservableList<Object> getAllManifests(final boolean getCached) throws NoDatabaseLinkException

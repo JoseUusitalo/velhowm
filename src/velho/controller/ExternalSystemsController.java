@@ -85,7 +85,7 @@ public class ExternalSystemsController
 	}
 
 	/**
-	 * Sends signal to barcode scanner
+	 * Sends signal to barcode scanner.
 	 *
 	 * @param received
 	 */
@@ -187,6 +187,13 @@ public class ExternalSystemsController
 		return success;
 	}
 
+	/**
+	 * Receives the manifested barcode.
+	 * 
+	 * @param boxSet
+	 * @param orderDate
+	 * @param driverID
+	 */
 	public static void receiveManifestBarcode(final Set<ProductBox> boxSet, final Date orderDate, final int driverID)
 	{
 		SYSLOG.info("VelhoWM has received a manifest by driver " + driverID + " with " + boxSet.size() + " product boxes.");

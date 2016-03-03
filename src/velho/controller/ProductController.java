@@ -32,7 +32,7 @@ public class ProductController
 	private static UIController uiController;
 
 	/**
-	 * adds new view
+	 * Adds new view.
 	 */
 	public ProductController()
 	{
@@ -40,9 +40,9 @@ public class ProductController
 	}
 
 	/**
-	 * edits the view
-	 * 
-	 * @return
+	 * Edits the view.
+	 *
+	 * @return null
 	 */
 	public Node getProductEditView()
 	{
@@ -58,12 +58,12 @@ public class ProductController
 	}
 
 	/**
-	 * saves the new product gets it from database
-	 * 
-	 * @param name
-	 * @param brand
-	 * @param category
-	 * @param popularity
+	 * Saves the new product gets it from database.
+	 *
+	 * @param name of product
+	 * @param brand of product
+	 * @param category of product
+	 * @param popularity of product
 	 */
 	public void saveProduct(final String name, final Object brand, final Object category, final int popularity)
 	{

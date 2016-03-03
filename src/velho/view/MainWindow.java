@@ -403,11 +403,9 @@ public class MainWindow extends Application
 	}
 
 	/**
-	 * A method called to shut down the software and perform any necessary
-	 * cleanup.
+	 * A method called to shut down the software and perform any necessary cleanup.
 	 *
-	 * @param primaryStage
-	 *            the stage the main window is open in
+	 * @param primaryStage the stage the main window is open in
 	 */
 	protected void shutdown(final Stage primaryStage)
 	{
@@ -432,10 +430,9 @@ public class MainWindow extends Application
 	}
 
 	/**
-	 * Replaces the top view of the window
+	 * Replaces the top view of the window.
 	 *
-	 * @param view
-	 *            view to set the top of the window
+	 * @param view is a view to be set to the top of the window
 	 */
 	public void setTopView(final Node view)
 	{
@@ -443,10 +440,9 @@ public class MainWindow extends Application
 	}
 
 	/**
-	 * Replaces the right side view of the window
+	 * Replaces the right side view of the window.
 	 *
-	 * @param view
-	 *            view to set the right of the window
+	 * @param view a view to be set to the right of the window
 	 */
 	public void setRightView(final Node view)
 	{
@@ -454,10 +450,9 @@ public class MainWindow extends Application
 	}
 
 	/**
-	 * Replaces the bottom view of the window
+	 * Replaces the bottom view of the window.
 	 *
-	 * @param view
-	 *            view to set the bottom of the window
+	 * @param view a view to set the bottom of the window
 	 */
 	public void setBottomView(final Node view)
 	{
@@ -465,10 +460,9 @@ public class MainWindow extends Application
 	}
 
 	/**
-	 * Replaces the left side view of the window
+	 * Replaces the left side view of the window.
 	 *
-	 * @param view
-	 *            view to set the l of the window
+	 * @param view a view to set the l of the window
 	 */
 	public void setLeftView(final Node view)
 	{
@@ -476,10 +470,9 @@ public class MainWindow extends Application
 	}
 
 	/**
-	 * Replaces the center view of the window
+	 * Replaces the center view of the window.
 	 *
-	 * @param view
-	 *            view to set the middle of the window
+	 * @param view a view to set the middle of the window
 	 */
 	public void setCenterView(final Node view)
 	{

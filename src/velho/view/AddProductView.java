@@ -34,9 +34,10 @@ public class AddProductView
 	private Button saveButton;
 
 	/**
-	 * adds the product view
-	 * 
-	 * @param productController
+	 * Adds the product view.
+	 * Has to be manually inputed in the UIController at "switch (currentUserRole.getName())".
+	 *
+	 * @param productController makes it view able
 	 */
 
 	public AddProductView(final ProductController productController)
@@ -45,10 +46,10 @@ public class AddProductView
 	}
 
 	/**
-	 * creates BorderPane
-	 * 
-	 * @return
-	 * @throws NoDatabaseLinkException
+	 * Creates BorderPane for the get Add Product tab.
+	 *
+	 * @return the bPane
+	 * @throws NoDatabaseLinkException to get the data
 	 */
 	public BorderPane getProductView() throws NoDatabaseLinkException
 	{
@@ -89,10 +90,14 @@ public class AddProductView
 
 			popularity = new Spinner<Integer>();
 			popularity.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(-1, 10000));
+			popularity.setEditable(true);
 			mid.add(popularity, 5, 0);
 
 			saveButton = new Button("Save");
 
+			/**
+			 * Handles the button press event.
+			 */
 			saveButton.setOnAction(new EventHandler<ActionEvent>()
 			{
 				@Override
@@ -116,7 +121,7 @@ public class AddProductView
 	}
 
 	/**
-	 * saves data to database
+	 * Saves data to database.
 	 */
 
 	public void setData(final Product product) throws NoDatabaseLinkException
