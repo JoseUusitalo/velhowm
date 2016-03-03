@@ -45,19 +45,20 @@ public class UIController
 	 */
 	private RemovalListController removalListController;
 
+	private ProductController productController;
+
 	private LogController logController;
 
 	private ManifestController manifestController;
 
-	public UIController(final MainWindow mainWindow, final ListController listController, final UserController userController,
-			final RemovalListController removalListController, final SearchController searchController, final LogController logController,
-			final ManifestController manifestController)
+	public UIController(final MainWindow mainWindow, final ListController listController, final UserController userController, final RemovalListController removalListController, final SearchController searchController, final LogController logController, final ManifestController manifestController, final ProductController productController)
 	{
 		this.mainView = mainWindow;
 		this.listController = listController;
 		this.userController = userController;
 		this.removalListController = removalListController;
 		this.searchController = searchController;
+		this.productController = productController;
 		this.logController = logController;
 		this.manifestController = manifestController;
 	}
@@ -115,10 +116,10 @@ public class UIController
 			case "Logistician":
 				mainView.addTab("Removal Lists", removalListController.getView());
 				mainView.addTab("User List", getUserListView(currentUserRole));
-				mainView.addTab("Product List",
-						listController.getProductListView(DatabaseController.getProductDataColumns(false, false), DatabaseController.getObservableProducts()));
+				mainView.addTab("Product List", listController.getProductListView(DatabaseController.getProductDataColumns(false, false), DatabaseController.getObservableProducts()));
 				mainView.addTab("Search", searchController.getSearchTabView());
 				mainView.addTab("Product List Search", listController.getProductListSearchView());
+				mainView.addTab("Add Product", productController.getProductEditView());
 				mainView.addTab("Manifests", manifestController.getView());
 				break;
 			default:
