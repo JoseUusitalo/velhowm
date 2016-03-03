@@ -116,9 +116,6 @@ public class AddProductView
 				}
 			};
 
-			// note: use KeyEvent.KEY_PRESSED, because KeyEvent.KEY_TYPED is to late, spinners
-			// SpinnerValueFactory reached new value before key released an SpinnerValueFactory will
-			// throw an exception
 			popularity.getEditor().addEventHandler(KeyEvent.KEY_RELEASED, enterKeyEventHandler);
 
 			saveButton = new Button("Save");
