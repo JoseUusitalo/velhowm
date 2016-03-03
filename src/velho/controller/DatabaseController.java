@@ -3359,4 +3359,10 @@ public class DatabaseController
 		DBLOG.info("Clearing search results.");
 		observableProductBoxSearchResults.clear();
 	}
+
+	public static void save(final Product newProduct)
+	{
+		// TODO Auto-generated method stub
+
+	}
 }
