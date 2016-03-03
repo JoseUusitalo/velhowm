@@ -190,18 +190,6 @@ public class DatabaseController
 	 */
 
 	/**
-	 * Escapes all single and double quotes in the given string.
-	 *
-	 * @param sql string to escape
-	 * @return escaped string
-	 */
-	private static String escape(final String sql)
-	{
-		String escaped = sql.replace("'", "''");
-		return escaped.replace("\"", "\\\"");
-	}
-
-	/**
 	 * Formats the given date into a H2 date string.
 	 *
 	 * @param date date to format
@@ -798,6 +786,18 @@ public class DatabaseController
 	/*
 	 * -------------------------------- PUBLIC DATABASE METHODS --------------------------------
 	 */
+
+	/**
+	 * Escapes all single and double quotes in the given string.
+	 *
+	 * @param sql string to escape
+	 * @return escaped string
+	 */
+	public static String escape(final String sql)
+	{
+		String escaped = sql.replace("'", "''");
+		return escaped.replace("\"", "\\\"");
+	}
 
 	/**
 	 * Creates an SQL query out of the given data.
@@ -2138,7 +2138,7 @@ public class DatabaseController
 		final List<ProductBoxSearchResultRow> foundProducts = FXCollections.observableArrayList();
 
 		if (MainWindow.DEBUG_MODE)
-			DBLOG.debug("Searching for a product box where: " + where);
+			DBLOG.debug("Searching for a product box where: " + escape(where.toString()));
 
 		final String[] columns = { "*" };
 
