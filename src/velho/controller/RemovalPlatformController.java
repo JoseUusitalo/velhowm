@@ -4,6 +4,7 @@ import org.apache.log4j.Logger;
 
 import velho.model.RemovalPlatform;
 import velho.model.exceptions.NoDatabaseLinkException;
+import velho.view.MainWindow;
 
 public class RemovalPlatformController
 {
@@ -16,6 +17,19 @@ public class RemovalPlatformController
 	 * The system only supports one removal platform for now.
 	 */
 	private RemovalPlatform platform;
+
+	/**
+	 * The {@link MainWindow}.
+	 */
+	private MainWindow mainWindow;
+
+	/**
+	 * @param mainWindow
+	 */
+	public RemovalPlatformController(final MainWindow mainWindow)
+	{
+		this.mainWindow = mainWindow;
+	}
 
 	/**
 	 * Gets the only removal platform currently supported by the system.
@@ -70,15 +84,17 @@ public class RemovalPlatformController
 	{
 		SYSLOG.trace("Checking for removal platform fullness.");
 
+		final int percentFull = (int) (100.0 - getFreeSpace() * 100.0);
+
+		mainWindow.setRemovalPlatformFullPercent(String.valueOf(percentFull));
+
 		if (Double.compare(getFreeSpace(), getPlatform().getFreeSpaceLeftWarningPercent()) <= 0)
 		{
-			SYSLOG.info("The removal platform is " + (int) (100.0 - getFreeSpace() * 100.0) + " / "
-					+ (int) (100.0 - getPlatform().getFreeSpaceLeftWarningPercent() * 100.0) + "% full!");
+			SYSLOG.info("The removal platform is " + percentFull + " / " + (int) (100.0 - getPlatform().getFreeSpaceLeftWarningPercent() * 100.0) + "% full!");
 
 			// Warning is only showed when logged in.
 			if (LoginController.isLoggedIn())
-				PopupController
-						.warning("The removal platform is " + (int) (100.0 - getFreeSpace() * 100.0) + "% full. Please contact the waste disposal services.");
+				PopupController.warning("The removal platform is " + percentFull + "% full. Please contact the waste disposal services.");
 		}
 	}
 }
