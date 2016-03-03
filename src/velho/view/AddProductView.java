@@ -35,7 +35,7 @@ public class AddProductView
 
 	/**
 	 * adds the product view
-	 * 
+	 *
 	 * @param productController
 	 */
 
@@ -46,7 +46,7 @@ public class AddProductView
 
 	/**
 	 * creates BorderPane
-	 * 
+	 *
 	 * @return
 	 * @throws NoDatabaseLinkException
 	 */
@@ -119,7 +119,7 @@ public class AddProductView
 	 * saves data to database
 	 */
 
-	public void setData(final Product product) throws NoDatabaseLinkException
+	public void setData(final Product product)
 	{
 		nameField.setText(product.getName());
 		brandList.getSelectionModel().select(product.getBrand());
