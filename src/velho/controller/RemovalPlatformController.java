@@ -42,7 +42,7 @@ public class RemovalPlatformController
 		{
 			try
 			{
-				platform = DatabaseController.getRemovalPlatformByID(1);
+				platform = DatabaseController.getRemovalPlatformByID(1, true);
 			}
 			catch (NoDatabaseLinkException e)
 			{
@@ -67,12 +67,21 @@ public class RemovalPlatformController
 	 * Changes the amount of free space on the platform by adding or removing the specified percentage points depending
 	 * on its sign.
 	 *
-	 * @param modifyBy
+	 * @param percentagePoints percentage points to modify by [0.0, 1.0]
 	 */
 	public void modifyFreeSpace(final double percentagePoints)
 	{
-		SYSLOG.debug(getPlatform() + " free space decreased by " + percentagePoints);
-		getPlatform().modifyFreeSpace(percentagePoints);
+		try
+		{
+			SYSLOG.debug(getPlatform() + " free space decreased by " + percentagePoints);
+			getPlatform().modifyFreeSpace(percentagePoints);
+
+			DatabaseController.save(getPlatform());
+		}
+		catch (NoDatabaseLinkException e)
+		{
+			DatabaseController.tryReLink();
+		}
 		checkWarning();
 	}
 

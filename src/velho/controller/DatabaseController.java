@@ -2256,9 +2256,9 @@ public class DatabaseController
 		return cachedManifestStates.get(stateid);
 	}
 
-	public static RemovalPlatform getRemovalPlatformByID(final int platformid) throws NoDatabaseLinkException
+	public static RemovalPlatform getRemovalPlatformByID(final int platformid, final boolean getCached) throws NoDatabaseLinkException
 	{
-		if (!cachedRemovalPlatforms.containsKey(platformid))
+		if (!cachedRemovalPlatforms.containsKey(platformid) || !getCached)
 		{
 			final String[] columns = { "*" };
 			final List<String> where = new ArrayList<String>();
@@ -2274,9 +2274,12 @@ public class DatabaseController
 			final RemovalPlatform r = result.iterator().next();
 
 			// Store for reuse.
-			DBLOG.trace("Caching: " + r);
-			cachedRemovalPlatforms.put(r.getDatabaseID(), r);
+			if (getCached)
+				DBLOG.trace("Caching: " + r);
+			else
+				DBLOG.trace("Updating cache: " + r);
 
+			cachedRemovalPlatforms.put(r.getDatabaseID(), r);
 			return r;
 		}
 
@@ -2792,6 +2795,52 @@ public class DatabaseController
 		// Update the cache.
 		DBLOG.debug(query.toString() + ": " + getProductBoxByID(dbID));
 		return dbID;
+	}
+
+	/**
+	 * Updates an existing removal platform in the database with the data from the given removal platform or creates a
+	 * new one if it doesn't exist.
+	 * A database ID of -1 signifies a brand new {@link RemovalPlatform}.
+	 *
+	 * @param manifest new or existing removal platform
+	 * @return <code>true</code> if existing data was updated or a new manifest was created in the database
+	 */
+	@SuppressWarnings("unchecked")
+	public static boolean save(final RemovalPlatform platform) throws NoDatabaseLinkException
+	{
+		int platformID = platform.getDatabaseID();
+
+		final Map<String, Object> values = new LinkedHashMap<String, Object>();
+		values.put("platform_id", platform.getDatabaseID());
+		values.put("free_space", platform.getFreeSpacePercent());
+		values.put("free_space_warning", platform.getFreeSpaceLeftWarningPercent());
+
+		final List<String> where = new ArrayList<String>();
+
+		DatabaseQueryType query;
+
+		// If the object does not exist yet, INSERT.
+		if (platformID < 1)
+			query = DatabaseQueryType.INSERT;
+		else
+		{
+			query = DatabaseQueryType.UPDATE;
+			where.add("platform_id = " + platformID);
+		}
+
+		// Insert/Update the object
+		Set<Integer> result = (LinkedHashSet<Integer>) runQuery(query, DatabaseTable.REMOVALPLATFORMS, null, null, values, where);
+
+		if (result.size() == 0)
+		{
+			DBLOG.error("Failed to save: " + platform);
+			return false;
+		}
+
+		// Update the cache.
+		DBLOG.debug(query.toString() + ": " + getRemovalPlatformByID(platformID, false));
+
+		return true;
 	}
 
 	/*

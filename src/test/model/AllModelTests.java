@@ -20,6 +20,7 @@ import org.junit.runners.Suite.SuiteClasses;
 				ProductCategoryTest.class,
 				ProductTest.class,
 				RemovalListTest.class,
+				RemovalPlatformTest.class,
 				ShelfTest.class,
 				UserRoleTest.class,
 				UserTest.class

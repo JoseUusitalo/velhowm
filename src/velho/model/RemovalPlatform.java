@@ -25,6 +25,7 @@ public class RemovalPlatform
 	/**
 	 * @param databaseID
 	 * @param freeSpacePercent
+	 * @param freeSpaceLeftWarningPercent
 	 */
 	public RemovalPlatform(final int databaseID, final double freeSpacePercent, final double freeSpaceLeftWarningPercent)
 	{
@@ -92,5 +93,13 @@ public class RemovalPlatform
 	public void modifyFreeSpace(final double percentagePoints)
 	{
 		this.freeSpacePercent += percentagePoints;
+	}
+
+	/**
+	 * Call this method when the removal platform has been emptied.
+	 */
+	public void empty()
+	{
+		this.freeSpacePercent = 1.0;
 	}
 }
