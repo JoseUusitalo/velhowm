@@ -91,6 +91,7 @@ public class BarcodeScanner
 	 */
 	public static boolean scannerMoveValid()
 	{
+		SYSLOG.info("Moving a box.");
 
 		List<Integer> list = null;
 		String shelf = null;
@@ -107,12 +108,11 @@ public class BarcodeScanner
 				shelf = DatabaseController.getRandomShelfSlot();
 				tokens = Shelf.tokenizeShelfSlotID(shelf);
 				int derp = Integer.parseInt(((String) tokens[0]).substring(1));
-				SYSLOG.trace("Random product: " + list.get(0));
-				SYSLOG.trace("Random shelf slot: " + shelf);
-				SYSLOG.trace(DatabaseController.getShelfByID(derp, true).toString());
+				SYSLOG.debug("Adding random product: " + list.get(0));
+				SYSLOG.debug("To random shelf slot: " + shelf);
 				shelfObj = DatabaseController.getShelfByID(derp, true);
 			}
-			while (shelfObj.hasFreeSpace() == false);
+			while (shelfObj.slotHasFreeSpace(shelf) == false);
 
 			if (ExternalSystemsController.move(list.get(0), shelf, true))
 			{

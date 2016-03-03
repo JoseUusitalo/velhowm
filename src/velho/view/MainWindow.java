@@ -24,7 +24,9 @@ import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
 import javafx.scene.control.TabPane.TabClosingPolicy;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.Priority;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
 import velho.controller.DatabaseController;
@@ -37,6 +39,7 @@ import velho.controller.LoginController;
 import velho.controller.ManifestController;
 import velho.controller.ProductController;
 import velho.controller.RemovalListController;
+import velho.controller.RemovalPlatformController;
 import velho.controller.SearchController;
 import velho.controller.UIController;
 import velho.controller.UserController;
@@ -86,11 +89,6 @@ public class MainWindow extends Application
 	public static final double WINDOW_WIDTH = 1024;
 
 	/**
-	 * The current width of the window.
-	 */
-	public static ReadOnlyDoubleProperty WIDTH_PROPERTY;
-
-	/**
 	 * The {@link DebugController}.
 	 */
 	private static DebugController debugController;
@@ -109,6 +107,36 @@ public class MainWindow extends Application
 	 * The {@link UIController}.
 	 */
 	private static UIController uiController;
+
+	/**
+	 * The {@link ListController}.
+	 */
+	private ListController listController;
+
+	/**
+	 * The {@link RemovalListController}.
+	 */
+	private RemovalListController removalListController;
+
+	/**
+	 * The {@link LogController}.
+	 */
+	private LogController logController;
+
+	/**
+	 * The {@link ManifestController}.
+	 */
+	private ManifestController manifestController;
+
+	/**
+	 * The {@link RemovalPlatformController}.
+	 */
+	private RemovalPlatformController removalPlatformController;
+
+	/**
+	 * The current width of the window.
+	 */
+	public static ReadOnlyDoubleProperty WIDTH_PROPERTY;
 
 	/**
 	 * The root layout of the main window.
@@ -131,33 +159,19 @@ public class MainWindow extends Application
 	private Scene scene;
 
 	/**
-	 * The {@link ListController}.
-	 */
-	private ListController listController;
-
-	/**
 	 * The debug window stage.
 	 */
 	private Stage debugStage;
 
 	/**
-	 * The {@link RemovalListController}.
-	 */
-	private RemovalListController removalListController;
-
-	/**
 	 * The {@link ProductController}.
 	 */
 	private ProductController productController;
-	/**
-	 * The {@link LogController}.
-	 */
-	private LogController logController;
 
 	/**
-	 * The {@link ManifestController}.
+	 * A label showing the status of the removal platform.
 	 */
-	private ManifestController manifestController;
+	private Label removalPlatformStatus;
 
 	/**
 	 * The main window constructor.
@@ -208,18 +222,19 @@ public class MainWindow extends Application
 						SYSLOG.debug("Creating all controllers...");
 
 						DatabaseController.loadData();
-						debugController = new DebugController();
 						userController = new UserController();
 						logController = new LogController();
+
 						manifestController = new ManifestController(this);
 						productController = new ProductController();
 
 						ExternalSystemsController.setControllers(manifestController);
-
+						removalPlatformController = new RemovalPlatformController(this);
+						debugController = new DebugController(removalPlatformController);
 						listController = new ListController(userController);
 						searchController = new SearchController(listController);
 						removalListController = new RemovalListController(searchController);
-						uiController = new UIController(this, listController, userController, removalListController, searchController, logController, manifestController, productController);
+						uiController = new UIController(this, listController, userController, removalListController, searchController, logController, manifestController, productController, removalPlatformController);
 
 						LoginController.setControllers(uiController, debugController);
 
@@ -316,14 +331,21 @@ public class MainWindow extends Application
 		// Force log in to see main menu.
 		if (LoginController.checkLogin())
 		{
-			final HBox statusBar = new HBox();
+			final GridPane statusBar = new GridPane();
 			statusBar.getStyleClass().add("status-bar");
 
-			final HBox userBar = new HBox(10);
+			final HBox platformStatus = new HBox(3);
+			final Label removalPlatform = new Label("Removal Platform:");
+			removalPlatformStatus = new Label();
+			platformStatus.getChildren().addAll(removalPlatform, removalPlatformStatus);
+			platformStatus.setAlignment(Pos.CENTER_LEFT);
 
+			final HBox userStatus = new HBox(10);
 			final Label userName = new Label("Hello, " + LoginController.getCurrentUser().getRoleName() + " " + LoginController.getCurrentUser().getFullName());
 			final Button logoutButton = new Button("Log Out");
 			logoutButton.setPrefHeight(5.0);
+			userStatus.getChildren().addAll(userName, logoutButton);
+			userStatus.setAlignment(Pos.CENTER_RIGHT);
 
 			logoutButton.setOnAction(new EventHandler<ActionEvent>()
 			{
@@ -334,10 +356,9 @@ public class MainWindow extends Application
 				}
 			});
 
-			userBar.getChildren().addAll(userName, logoutButton);
-			userBar.setAlignment(Pos.CENTER_RIGHT);
-
-			statusBar.getChildren().add(userBar);
+			statusBar.add(platformStatus, 0, 0);
+			statusBar.add(userStatus, 1, 0);
+			GridPane.setHgrow(platformStatus, Priority.ALWAYS);
 			rootBorderPane.setBottom(statusBar);
 		}
 		rootBorderPane.setCenter(mainTabPane);
@@ -477,6 +498,16 @@ public class MainWindow extends Application
 	public void setCenterView(final Node view)
 	{
 		rootBorderPane.setCenter(view);
+	}
+
+	/**
+	 * Updates the label in the status bar that shows how full the removal platform is.
+	 *
+	 * @param percent percentage as text
+	 */
+	public void setRemovalPlatformFullPercent(final String percent)
+	{
+		removalPlatformStatus.setText(percent + "%");
 	}
 
 	/**

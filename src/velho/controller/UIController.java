@@ -45,13 +45,29 @@ public class UIController
 	 */
 	private RemovalListController removalListController;
 
+	/**
+	 * The {@link ProductController}.
+	 */
 	private ProductController productController;
 
+	/**
+	 * The {@link LogController}.
+	 */
 	private LogController logController;
 
+	/**
+	 * The {@link ManifestController}.
+	 */
 	private ManifestController manifestController;
 
-	public UIController(final MainWindow mainWindow, final ListController listController, final UserController userController, final RemovalListController removalListController, final SearchController searchController, final LogController logController, final ManifestController manifestController, final ProductController productController)
+	/**
+	 * The {@link RemovalPlatformController}.
+	 */
+	private RemovalPlatformController removalPlatformController;
+
+	public UIController(final MainWindow mainWindow, final ListController listController, final UserController userController,
+			final RemovalListController removalListController, final SearchController searchController, final LogController logController,
+			final ManifestController manifestController, final ProductController productController, final RemovalPlatformController removalPlatformController)
 	{
 		this.mainView = mainWindow;
 		this.listController = listController;
@@ -61,6 +77,7 @@ public class UIController
 		this.productController = productController;
 		this.logController = logController;
 		this.manifestController = manifestController;
+		this.removalPlatformController = removalPlatformController;
 	}
 
 	/**
@@ -116,7 +133,8 @@ public class UIController
 			case "Logistician":
 				mainView.addTab("Removal Lists", removalListController.getView());
 				mainView.addTab("User List", getUserListView(currentUserRole));
-				mainView.addTab("Product List", listController.getProductListView(DatabaseController.getProductDataColumns(false, false), DatabaseController.getObservableProducts()));
+				mainView.addTab("Product List",
+						listController.getProductListView(DatabaseController.getProductDataColumns(false, false), DatabaseController.getObservableProducts()));
 				mainView.addTab("Search", searchController.getSearchTabView());
 				mainView.addTab("Product List Search", listController.getProductListSearchView());
 				mainView.addTab("Add Product", productController.getProductEditView());
@@ -125,6 +143,9 @@ public class UIController
 			default:
 				SYSLOG.error("Unknown user role '" + currentUserRole.getName() + "'.");
 		}
+
+		// Check the state the of the removal platform when the main menu is shown after user has logged in.
+		removalPlatformController.checkWarning();
 	}
 
 	/**

@@ -1,5 +1,7 @@
 package velho.controller;
 
+import java.util.Random;
+
 import org.apache.log4j.Logger;
 
 import javafx.stage.Stage;
@@ -25,12 +27,22 @@ public class DebugController
 	private DebugWindow view;
 
 	/**
-	 * @param loginController
-	 * @param debugView
+	 * The {@link RemovalPlatformController}.
+	 */
+	private RemovalPlatformController removalPlatformController;
+
+	/**
+	 * A pseudo-random number generator.
+	 */
+	private Random r = new Random();
+
+	/**
+	 * @param removalPlatformController
 	 * @throws NoDatabaseLinkException
 	 */
-	public DebugController() throws NoDatabaseLinkException
+	public DebugController(final RemovalPlatformController removalPlatformController) throws NoDatabaseLinkException
 	{
+		this.removalPlatformController = removalPlatformController;
 		view = new DebugWindow(this, DatabaseController.getUserRoleNames());
 	}
 
@@ -147,8 +159,19 @@ public class DebugController
 				+ " error: If the product was not moved it either does not exist or the shelf does not exist!");
 	}
 
+	/**
+	 * Sends a randomized shipment to the warehouse.
+	 */
 	public static void sendRandomShipment()
 	{
 		BarcodeScanner.sendRandomShipment();
+	}
+
+	/**
+	 * Fills up the removal platform controller randomly by [0.1, 0.25] percentage points.
+	 */
+	public void fillUpPlatform()
+	{
+		removalPlatformController.modifyFreeSpace(-1.0 * ((r.nextDouble() * 0.15 + 0.2) - 0.1));
 	}
 }

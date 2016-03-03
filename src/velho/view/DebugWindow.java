@@ -8,7 +8,6 @@ import javafx.scene.Group;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
-import javafx.scene.control.Label;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
 import javafx.stage.Stage;
@@ -109,15 +108,14 @@ public class DebugWindow
 		grid.setVgap(5);
 		grid.setHgap(10);
 
-		Button sendRandomShipmentButton = new Button("Send Random Shipment");
-
 		roleListBox.getItems().addAll(rolenameSet);
 		roleListBox.getSelectionModel().selectFirst();
 
 		logOutButton.setVisible(false);
 
-		rootBorderPane.setCenter(grid);
-		root.getChildren().add(rootBorderPane);
+		Button sendRandomShipmentButton = new Button("Send Random Shipment");
+
+		Button fillUpPlatformButton = new Button("Fill Up Removal Platform");
 
 		logInButton.setOnAction(new EventHandler<ActionEvent>()
 		{
@@ -152,21 +150,31 @@ public class DebugWindow
 
 		sendRandomShipmentButton.setOnAction(new EventHandler<ActionEvent>()
 		{
-
 			@Override
 			public void handle(final ActionEvent event)
 			{
-
 				DebugController.sendRandomShipment();
 			}
 		});
 
-		grid.add(new Label("User :"), 0, 0);
-		grid.add(roleListBox, 1, 0);
-		grid.add(logInButton, 2, 0);
-		grid.add(logOutButton, 2, 1);
-		grid.add(scannerMoveValid, 1, 1);
-		grid.add(sendRandomShipmentButton, 1, 2);
+		fillUpPlatformButton.setOnAction(new EventHandler<ActionEvent>()
+		{
+			@Override
+			public void handle(final ActionEvent event)
+			{
+				debugController.fillUpPlatform();
+			}
+		});
+
+		grid.add(roleListBox, 0, 0);
+		grid.add(logInButton, 1, 0);
+		grid.add(logOutButton, 1, 1);
+		grid.add(scannerMoveValid, 0, 1);
+		grid.add(sendRandomShipmentButton, 0, 2);
+		grid.add(fillUpPlatformButton, 0, 3);
+
+		rootBorderPane.setCenter(grid);
+		root.getChildren().add(rootBorderPane);
 
 		primaryStage.setScene(scene);
 		primaryStage.show();

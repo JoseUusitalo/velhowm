@@ -56,6 +56,7 @@ public class Manifest
 	 */
 	public Manifest()
 	{
+		this.databaseID = -1;
 		this.state = new ManifestState(3, "Received");
 		this.boxes = new LinkedHashSet<ProductBox>();
 		this.observableBoxes = FXCollections.observableArrayList();

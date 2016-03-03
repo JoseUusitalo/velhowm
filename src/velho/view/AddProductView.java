@@ -124,7 +124,7 @@ public class AddProductView
 	 * Saves data to database.
 	 */
 
-	public void setData(final Product product) throws NoDatabaseLinkException
+	public void setData(final Product product)
 	{
 		nameField.setText(product.getName());
 		brandList.getSelectionModel().select(product.getBrand());

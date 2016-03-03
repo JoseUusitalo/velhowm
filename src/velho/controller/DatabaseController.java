@@ -38,6 +38,7 @@ import velho.model.ProductContainer;
 import velho.model.ProductType;
 import velho.model.RemovalList;
 import velho.model.RemovalListState;
+import velho.model.RemovalPlatform;
 import velho.model.Shelf;
 import velho.model.User;
 import velho.model.enums.DatabaseQueryType;
@@ -186,20 +187,14 @@ public class DatabaseController
 	 */
 	private static Map<Integer, Manifest> cachedManifests = new HashMap<Integer, Manifest>();
 
+	/**
+	 * A map of {@link RemovalPlatform} objects loaded from the database.
+	 */
+	private static Map<Integer, RemovalPlatform> cachedRemovalPlatforms = new HashMap<Integer, RemovalPlatform>();
+
 	/*
 	 * -------------------------------- PRIVATE DATABASE METHODS --------------------------------
 	 */
-
-	/**
-	 * Formats the given date into a H2 date string.
-	 *
-	 * @param date date to format
-	 * @return a string that can be inserted into the database
-	 */
-	private static String getH2DateFormat(final Date date)
-	{
-		return H2_DATE_FORMAT.format(date);
-	}
 
 	/**
 	 * Runs a database query with the given data.
@@ -465,6 +460,15 @@ public class DatabaseController
 									}
 								}
 								break;
+
+							case REMOVALPLATFORMS:
+								// @formatter:off
+								while (result.next())
+									dataSet.add(new RemovalPlatform(result.getInt("platform_id"),
+																	result.getDouble("free_space"),
+																	result.getDouble("free_space_warning")));
+								break;
+								// @formatter:on
 							default:
 								// Close all resources.
 								try
@@ -605,6 +609,7 @@ public class DatabaseController
 					case REMOVALLIST_STATES:
 					case MANIFESTS:
 					case MANIFEST_STATES:
+					case REMOVALPLATFORMS:
 						return dataSet;
 					case SHELF_PRODUCTBOXES:
 						return shelfBoxMap;
@@ -622,7 +627,6 @@ public class DatabaseController
 			default:
 				throw new IllegalArgumentException();
 		}
-
 	}
 
 	/**
@@ -784,6 +788,17 @@ public class DatabaseController
 	/*
 	 * -------------------------------- PUBLIC DATABASE METHODS --------------------------------
 	 */
+
+	/**
+	 * Formats the given date into a H2 date string.
+	 *
+	 * @param date date to format
+	 * @return a string that can be inserted into the database
+	 */
+	public static String getH2DateFormat(final Date date)
+	{
+		return H2_DATE_FORMAT.format(date);
+	}
 
 	/**
 	 * Escapes all single and double quotes in the given string.
@@ -2193,6 +2208,35 @@ public class DatabaseController
 		return cachedManifestStates.get(stateid);
 	}
 
+	public static RemovalPlatform getRemovalPlatformByID(final int platformid, final boolean getCached) throws NoDatabaseLinkException
+	{
+		if (!cachedRemovalPlatforms.containsKey(platformid) || !getCached)
+		{
+			final String[] columns = { "*" };
+			final List<String> where = new ArrayList<String>();
+			where.add("platform_id = " + new Integer(platformid));
+
+			@SuppressWarnings("unchecked") final Set<RemovalPlatform> result = (LinkedHashSet<RemovalPlatform>) (runQuery(DatabaseQueryType.SELECT, DatabaseTable.REMOVALPLATFORMS, null, columns, null, where));
+
+			if (result.size() == 0)
+				return null;
+
+			final RemovalPlatform r = result.iterator().next();
+
+			// Store for reuse.
+			if (getCached)
+				DBLOG.trace("Caching: " + r);
+			else
+				DBLOG.trace("Updating cache: " + r);
+
+			cachedRemovalPlatforms.put(r.getDatabaseID(), r);
+			return r;
+		}
+
+		DBLOG.trace("Loading RemovalPlatform " + platformid + " from cache.");
+		return cachedRemovalPlatforms.get(platformid);
+	}
+
 	/*
 	 * -------------------------------- PRIVATE SETTER METHODS --------------------------------
 	 */
@@ -2214,6 +2258,8 @@ public class DatabaseController
 
 		final Shelf shelf = getShelfByID(shelfid, true);
 
+		DBLOG.trace(shelf);
+
 		@SuppressWarnings("unchecked") final Map<Integer, ArrayList<Integer[]>> shelfBoxMap = (HashMap<Integer, ArrayList<Integer[]>>) runQuery(DatabaseQueryType.SELECT, DatabaseTable.SHELF_PRODUCTBOXES, null, columns, null, where);
 
 		// If the shelf is not empty.
@@ -2228,9 +2274,13 @@ public class DatabaseController
 			{
 				box = getProductBoxByID(data[0]);
 
+				DBLOG.trace("Placing box: " + box.toString());
+				DBLOG.trace("Box: " + data[0] + " Slf: " + shelfid + " Lvl: " + data[1] + " Slt: " + data[2]);
+
 				// data[1] is the level index
 				shelfSlotID = Shelf.coordinatesToShelfSlotID(shelfid, data[1] + 1, data[2], true);
-				shelf.addToSlot(shelfSlotID, box, false);
+				DBLOG.trace("Placed: " + shelf.addToSlot(shelfSlotID, box, false));
+				DBLOG.trace(shelf);
 			}
 
 			DBLOG.debug("Product boxes placed on shelf " + shelfid + ".");
@@ -2685,6 +2735,52 @@ public class DatabaseController
 		return dbID;
 	}
 
+	/**
+	 * Updates an existing removal platform in the database with the data from the given removal platform or creates a
+	 * new one if it doesn't exist.
+	 * A database ID of -1 signifies a brand new {@link RemovalPlatform}.
+	 *
+	 * @param manifest new or existing removal platform
+	 * @return <code>true</code> if existing data was updated or a new manifest was created in the database
+	 */
+	@SuppressWarnings("unchecked")
+	public static boolean save(final RemovalPlatform platform) throws NoDatabaseLinkException
+	{
+		int platformID = platform.getDatabaseID();
+
+		final Map<String, Object> values = new LinkedHashMap<String, Object>();
+		values.put("platform_id", platform.getDatabaseID());
+		values.put("free_space", platform.getFreeSpacePercent());
+		values.put("free_space_warning", platform.getFreeSpaceLeftWarningPercent());
+
+		final List<String> where = new ArrayList<String>();
+
+		DatabaseQueryType query;
+
+		// If the object does not exist yet, INSERT.
+		if (platformID < 1)
+			query = DatabaseQueryType.INSERT;
+		else
+		{
+			query = DatabaseQueryType.UPDATE;
+			where.add("platform_id = " + platformID);
+		}
+
+		// Insert/Update the object
+		Set<Integer> result = (LinkedHashSet<Integer>) runQuery(query, DatabaseTable.REMOVALPLATFORMS, null, null, values, where);
+
+		if (result.size() == 0)
+		{
+			DBLOG.error("Failed to save: " + platform);
+			return false;
+		}
+
+		// Update the cache.
+		DBLOG.debug(query.toString() + ": " + getRemovalPlatformByID(platformID, false));
+
+		return true;
+	}
+
 	/*
 	 * -------------------------------- CACHING --------------------------------
 	 */
@@ -2772,6 +2868,9 @@ public class DatabaseController
 		@SuppressWarnings("unchecked") final Map<Integer, ArrayList<Integer[]>> shelfBoxMap = (HashMap<Integer, ArrayList<Integer[]>>) runQuery(DatabaseQueryType.SELECT, DatabaseTable.SHELF_PRODUCTBOXES, null, columns, null, null);
 
 		int boxcount = 0;
+		Shelf shelf;
+		ProductBox box;
+		String slot;
 
 		for (final Integer shelfID : shelfBoxMap.keySet())
 		{
@@ -2784,8 +2883,16 @@ public class DatabaseController
 				{
 					if (cachedProductBoxes.containsKey(data[0]))
 					{
+						shelf = cachedShelves.get(shelfID);
+						box = cachedProductBoxes.get(data[0]);
+						slot = Shelf.coordinatesToShelfSlotID(shelfID, data[1] + 1, data[2], true);
+
+						DBLOG.trace("Adding: " + box);
+						DBLOG.trace("To: " + shelf);
+						DBLOG.trace("Into: " + slot);
 						// Do not update the database as this method loads the data from the database into objects.
-						cachedShelves.get(shelfID).addToSlot(Shelf.coordinatesToShelfSlotID(shelfID, data[1] + 1, data[2], true), cachedProductBoxes.get(data[0]), false);
+						DBLOG.trace("Added: " + shelf.addToSlot(slot, box, false));
+						DBLOG.trace("Result: " + shelf);
 					}
 				}
 			}
