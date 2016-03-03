@@ -9,6 +9,7 @@ import velho.model.ProductCategory;
 import velho.model.exceptions.NoDatabaseLinkException;
 import velho.model.interfaces.UIActionController;
 import velho.view.AddProductView;
+import velho.view.GenericTabView;
 import velho.view.ProductDataView;
 
 /**
@@ -18,7 +19,6 @@ import velho.view.ProductDataView;
  */
 public class ProductController implements UIActionController
 {
-
 	/**
 	 * Apache log4j logger: System.
 	 */
@@ -36,7 +36,7 @@ public class ProductController implements UIActionController
 	/**
 	 * The view in the tab itself.
 	 */
-	private ProductDataView productDataView;
+	private GenericTabView productManagementView;
 
 	/**
 	 * Adds new view.
@@ -44,20 +44,13 @@ public class ProductController implements UIActionController
 	public ProductController()
 	{
 		this.addProductView = new AddProductView(this);
-		productDataView = new ProductDataView(this);
+		productManagementView = new GenericTabView();
+		showList();
 	}
 
-	public Node getView()
+	public Node getTabView()
 	{
-		try
-		{
-			return productDataView.getView(DatabaseController.getProductByID(1));
-		}
-		catch (NoDatabaseLinkException e)
-		{
-			DatabaseController.tryReLink();
-			return null;
-		}
+		return productManagementView.getView();
 	}
 
 	/**
@@ -160,7 +153,8 @@ public class ProductController implements UIActionController
 	@Override
 	public void viewAction(final Object data)
 	{
-		// TODO Auto-generated method stub
+		productManagementView.setView(new ProductDataView(this).getView(((Product) data)));
+		System.out.println(((Product) data).toString());
 
 	}
 
@@ -168,5 +162,10 @@ public class ProductController implements UIActionController
 	{
 		System.out.println("testi" + product);
 
+	}
+
+	public void showList()
+	{
+		productManagementView.setView(ListController.getTableView(this, DatabaseController.getProductDataColumns(false, false), DatabaseController.getObservableProducts()));
 	}
 }

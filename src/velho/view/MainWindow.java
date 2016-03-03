@@ -69,12 +69,14 @@ public class MainWindow extends Application
 	public static final boolean DEBUG_MODE = true;
 
 	/**
-	 * Enable or disable showing windows. DEBUG_MODE must be <code>true</code> for this to affect anything.
+	 * Enable or disable showing windows. DEBUG_MODE must be <code>true</code>
+	 * for this to affect anything.
 	 */
 	public static final boolean SHOW_WINDOWS = true;
 
 	/**
-	 * Enable TRACE level logging. DEBUG_MODE must be <code>true</code> for this to affect anything.
+	 * Enable TRACE level logging. DEBUG_MODE must be <code>true</code> for this
+	 * to affect anything.
 	 */
 	public static final boolean SHOW_TRACE = true;
 
@@ -149,7 +151,8 @@ public class MainWindow extends Application
 	private TabPane mainTabPane;
 
 	/**
-	 * The map of tab names and tab objects used for selecting tabs in the tab pane.
+	 * The map of tab names and tab objects used for selecting tabs in the tab
+	 * pane.
 	 */
 	private Map<String, Tab> tabMap;
 
@@ -188,7 +191,8 @@ public class MainWindow extends Application
 				if (!DEBUG_MODE)
 				{
 					// This is how we prevent Logisticians from reading logs.
-					// Logs can now only be read through the database access to which can easily be limited.
+					// Logs can now only be read through the database access to
+					// which can easily be limited.
 					SYSLOG.info("Debug mode not enabled, disabling file and console appenders for all loggers.");
 
 					// Remove console appenders from all system loggers.
@@ -295,7 +299,8 @@ public class MainWindow extends Application
 	}
 
 	/**
-	 * Forcibly selects the specified tab and changes the view in the main window to that tab.
+	 * Forcibly selects the specified tab and changes the view in the main
+	 * window to that tab.
 	 *
 	 * @param tabName name of the tab
 	 */
@@ -424,7 +429,8 @@ public class MainWindow extends Application
 	}
 
 	/**
-	 * A method called to shut down the software and perform any necessary cleanup.
+	 * A method called to shut down the software and perform any necessary
+	 * cleanup.
 	 *
 	 * @param primaryStage the stage the main window is open in
 	 */
@@ -501,7 +507,8 @@ public class MainWindow extends Application
 	}
 
 	/**
-	 * Updates the label in the status bar that shows how full the removal platform is.
+	 * Updates the label in the status bar that shows how full the removal
+	 * platform is.
 	 *
 	 * @param percent percentage as text
 	 */

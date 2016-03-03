@@ -64,13 +64,29 @@ public class ProductDataView
 
 			Button editButton = new Button("Edit");
 			editButton.setMaxWidth(Double.MAX_VALUE);
+			editButton.setAlignment(Pos.CENTER);
 			grid.add(editButton, 1, 5);
 
 			editButton.setOnAction(new EventHandler<ActionEvent>()
 			{
-				@Override public void handle(final ActionEvent event)
+				@Override
+				public void handle(final ActionEvent event)
 				{
 					controller.editProduct(product);
+				}
+			});
+
+			Button backButton = new Button("Back");
+			backButton.setMaxWidth(Double.MAX_VALUE);
+			backButton.setAlignment(Pos.CENTER);
+			grid.add(backButton, 0, 5);
+
+			backButton.setOnAction(new EventHandler<ActionEvent>()
+			{
+				@Override
+				public void handle(final ActionEvent event)
+				{
+					controller.showList();
 				}
 			});
 		}

@@ -8,6 +8,7 @@ import org.apache.log4j.Logger;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.collections.ObservableMap;
 import javafx.collections.ObservableSet;
 import javafx.scene.Node;
 import velho.model.User;
@@ -44,8 +45,10 @@ public class ListController
 	/**
 	 * Gets a new table view.
 	 *
-	 * @param columnMap a map of column values and names
-	 * @param dataList the {@link ObservableList} of data to show
+	 * @param columnMap
+	 *            a map of column values and names
+	 * @param dataList
+	 *            the {@link ObservableList} of data to show
 	 * @return a new table view
 	 */
 	public Node getUserListView(final Map<String, String> columnMap, final ObservableList<Object> dataList)
@@ -57,8 +60,10 @@ public class ListController
 	/**
 	 * Gets a new table view.
 	 *
-	 * @param columnMap a map of column values and names
-	 * @param dataMap the {@link ObservableMap} of data to show
+	 * @param columnMap
+	 *            a map of column values and names
+	 * @param dataMap
+	 *            the {@link ObservableMap} of data to show
 	 * @return a new table view
 	 */
 	@SuppressWarnings("static-method")
@@ -71,7 +76,8 @@ public class ListController
 	/**
 	 * Attemps to remove a user from the database.
 	 *
-	 * @param databaseID database ID of the user to remove
+	 * @param databaseID
+	 *            database ID of the user to remove
 	 */
 	public void removeUser(final User user)
 	{
@@ -86,17 +92,19 @@ public class ListController
 	public Node getProductListSearchView()
 	{
 		final ProductListSearch searchView = new ProductListSearch(this);
-		final ListView listView = new ListView(null, DatabaseController.getProductSearchDataColumns(false, false),
-				DatabaseController.getObservableProductSearchResults());
+		final ListView listView = new ListView(null, DatabaseController.getProductSearchDataColumns(false, false), DatabaseController.getObservableProductSearchResults());
 
 		return searchView.getView(listView.getView());
 	}
 
 	/**
-	 * Gets a view for displaying tabular data with the specified columns and data.
+	 * Gets a view for displaying tabular data with the specified columns and
+	 * data.
 	 *
-	 * @param columnMap map of columns and their values
-	 * @param data data to display
+	 * @param columnMap
+	 *            map of columns and their values
+	 * @param data
+	 *            data to display
 	 * @return a table view of the given data
 	 */
 	public static Node getTableView(final UIActionController parentController, final Map<String, String> columnMap, final ObservableList<Object> data)
@@ -106,10 +114,13 @@ public class ListController
 	}
 
 	/**
-	 * Gets a view for displaying tabular data with the specified columns and data.
+	 * Gets a view for displaying tabular data with the specified columns and
+	 * data.
 	 *
-	 * @param columnMap map of columns and their values
-	 * @param data data to display
+	 * @param columnMap
+	 *            map of columns and their values
+	 * @param data
+	 *            data to display
 	 * @return a table view of the given data
 	 */
 	public static Node getTableView(final UIActionController parentController, final Map<String, String> columnMap, final ObservableSet<Object> data)
@@ -129,7 +140,8 @@ public class ListController
 	/**
 	 * Searches the database for the given products.
 	 *
-	 * @param products a string of product names or IDs (one per line)
+	 * @param products
+	 *            a string of product names or IDs (one per line)
 	 * @return
 	 */
 	@SuppressWarnings("static-method")
@@ -164,7 +176,8 @@ public class ListController
 					}
 				}
 
-				// If the product already exists, add the new count to the previous count.
+				// If the product already exists, add the new count to the
+				// previous count.
 				if (productID_BoxSize.containsKey(productID))
 				{
 					productID_BoxSize.put(productID, productID_BoxSize.get(productID) + ((int) countName[0]));
@@ -197,7 +210,8 @@ public class ListController
 	 * </p>
 	 *
 	 * @param line String to parse
-	 * @return an object array where the first element is the integer and the second element is the product name
+	 * @return an object array where the first element is the integer and the
+	 *         second element is the product name
 	 */
 	public static Object[] parseProductLine(final String line)
 	{
@@ -251,7 +265,8 @@ public class ListController
 				if (start == i)
 				{
 					// Left trim spaces from the first element.
-					// This assumes that no product name can begin with a space character.
+					// This assumes that no product name can begin with a space
+					// character.
 					sb.append(possibleProductAndCount[i].replaceAll("^\\s+", ""));
 				}
 				else
@@ -267,9 +282,11 @@ public class ListController
 	}
 
 	/**
-	 * Performs an add action for the given data depending on the type of the object.
+	 * Performs an add action for the given data depending on the type of the
+	 * object.
 	 *
-	 * @param object data to process
+	 * @param object
+	 *            data to process
 	 */
 	@SuppressWarnings("static-method")
 	public void addData(final Object object)

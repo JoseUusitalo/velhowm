@@ -81,7 +81,8 @@ public class RemovalListController implements UIActionController
 	@Override
 	public void updateAction(final Object data)
 	{
-		// SYSLOG.trace("Controller got from UI update: " + ((ProductBoxSearchResultRow) data).getBox());
+		// SYSLOG.trace("Controller got from UI update: " +
+		// ((ProductBoxSearchResultRow) data).getBox());
 	}
 
 	@Override
@@ -170,8 +171,7 @@ public class RemovalListController implements UIActionController
 			try
 			{
 				if (browseView == null)
-					browseView = ListController.getTableView(this, DatabaseController.getRemovalListDataColumns(),
-							DatabaseController.getObservableRemovalLists());
+					browseView = ListController.getTableView(this, DatabaseController.getRemovalListDataColumns(), DatabaseController.getObservableRemovalLists());
 			}
 			catch (final NoDatabaseLinkException e)
 			{
@@ -196,7 +196,8 @@ public class RemovalListController implements UIActionController
 	}
 
 	/**
-	 * Changes the removal list management view to the removal list creation view.
+	 * Changes the removal list management view to the removal list creation
+	 * view.
 	 */
 	public void showNewRemovalListView()
 	{
@@ -226,7 +227,8 @@ public class RemovalListController implements UIActionController
 	}
 
 	/**
-	 * Changes the removal list management view to the removal list browsing view for Managers and greater.
+	 * Changes the removal list management view to the removal list browsing
+	 * view for Managers and greater.
 	 * Other see the plain browsing view.
 	 */
 	public void showBrowseRemovalListsView()
@@ -262,8 +264,7 @@ public class RemovalListController implements UIActionController
 	public BorderPane getSearchResultsListView()
 	{
 		SYSLOG.trace("Getting search result list: " + DatabaseController.getObservableProductSearchResults());
-		return (BorderPane) ListController.getTableView(this, DatabaseController.getProductSearchDataColumns(true, false),
-				DatabaseController.getObservableProductSearchResults());
+		return (BorderPane) ListController.getTableView(this, DatabaseController.getProductSearchDataColumns(true, false), DatabaseController.getObservableProductSearchResults());
 	}
 
 	public BorderPane getNewRemovalListView()
@@ -288,9 +289,12 @@ public class RemovalListController implements UIActionController
 					USRLOG.info("Created a new Removal List: " + newRemovalList.getBoxes());
 
 					/*
-					 * I would much rather create a new object rather than reset the old one but I can't figure out why
-					 * it doesn't work. When a new removal list object is created the UI new list view never updates
-					 * after that even though I'm refreshing the view after creating the object.
+					 * I would much rather create a new object rather than reset
+					 * the old one but I can't figure out why
+					 * it doesn't work. When a new removal list object is
+					 * created the UI new list view never updates
+					 * after that even though I'm refreshing the view after
+					 * creating the object.
 					 */
 					newRemovalList.reset();
 
