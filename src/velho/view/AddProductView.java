@@ -9,6 +9,7 @@ import javafx.scene.control.Label;
 import javafx.scene.control.Spinner;
 import javafx.scene.control.SpinnerValueFactory;
 import javafx.scene.control.TextField;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
 import velho.controller.DatabaseController;
@@ -89,9 +90,36 @@ public class AddProductView
 			mid.add(popularityLabel, 4, 0);
 
 			popularity = new Spinner<Integer>();
-			popularity.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(-1, 10000));
+			// popularity.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(-1, 10000));
 			popularity.setEditable(true);
+			popularity.getEditor().getTextFormatter();
 			mid.add(popularity, 5, 0);
+
+			popularity.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(-1, 10000, Integer.parseInt("-1")));
+			popularity.setEditable(true);
+
+			EventHandler<KeyEvent> keyboardHandler;
+
+			keyboardHandler = new EventHandler<KeyEvent>()
+			{
+				@Override
+				public void handle(final KeyEvent event)
+				{
+					try
+					{
+						if (Integer.parseInt(popularity.getEditor().textProperty().get()) < -1)
+						{
+							throw new NumberFormatException();
+						}
+					}
+					catch (NumberFormatException e)
+					{
+						popularity.getEditor().textProperty().set("-1");
+					}
+				}
+			};
+
+			popularity.getEditor().addEventHandler(KeyEvent.KEY_RELEASED, keyboardHandler);
 
 			saveButton = new Button("Save");
 
