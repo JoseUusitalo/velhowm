@@ -98,16 +98,19 @@ public class AddProductView
 			popularity.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(-1, 10000, Integer.parseInt("-1")));
 			popularity.setEditable(true);
 
-			EventHandler<KeyEvent> enterKeyEventHandler;
+			EventHandler<KeyEvent> keyboardHandler;
 
-			enterKeyEventHandler = new EventHandler<KeyEvent>()
+			keyboardHandler = new EventHandler<KeyEvent>()
 			{
 				@Override
 				public void handle(final KeyEvent event)
 				{
 					try
 					{
-						Integer.parseInt(popularity.getEditor().textProperty().get());
+						if (Integer.parseInt(popularity.getEditor().textProperty().get()) < -1)
+						{
+							throw new NumberFormatException();
+						}
 					}
 					catch (NumberFormatException e)
 					{
@@ -116,7 +119,7 @@ public class AddProductView
 				}
 			};
 
-			popularity.getEditor().addEventHandler(KeyEvent.KEY_RELEASED, enterKeyEventHandler);
+			popularity.getEditor().addEventHandler(KeyEvent.KEY_RELEASED, keyboardHandler);
 
 			saveButton = new Button("Save");
 
