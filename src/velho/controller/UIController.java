@@ -65,7 +65,9 @@ public class UIController
 	 */
 	private RemovalPlatformController removalPlatformController;
 
-	public UIController(final MainWindow mainWindow, final ListController listController, final UserController userController, final RemovalListController removalListController, final SearchController searchController, final LogController logController, final ManifestController manifestController, final ProductController productController, final RemovalPlatformController removalPlatformController)
+	public UIController(final MainWindow mainWindow, final ListController listController, final UserController userController,
+			final RemovalListController removalListController, final SearchController searchController, final LogController logController,
+			final ManifestController manifestController, final ProductController productController, final RemovalPlatformController removalPlatformController)
 	{
 		this.mainView = mainWindow;
 		this.listController = listController;
@@ -134,7 +136,6 @@ public class UIController
 				mainView.addTab("Product List", productController.getTabView());
 				mainView.addTab("Search", searchController.getSearchTabView());
 				mainView.addTab("Product List Search", listController.getProductListSearchView());
-				mainView.addTab("Add Product", productController.getProductEditView());
 				mainView.addTab("Manifests", manifestController.getView());
 				break;
 			default:

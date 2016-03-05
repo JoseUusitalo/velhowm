@@ -43,7 +43,8 @@ public class SearchView
 	 * @param allProductBrands
 	 * @param allProductCategories
 	 */
-	public SearchView(final SearchController searchController, final String limits, final ObservableList<Object> productBrands, final ObservableList<Object> productCategories)
+	public SearchView(final SearchController searchController, final String limits, final ObservableList<Object> productBrands,
+			final ObservableList<Object> productCategories)
 	{
 		this.searchController = searchController;
 		this.limits = limits;
@@ -85,9 +86,7 @@ public class SearchView
 			productCountField.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(-1, 10000, Integer.parseInt("-1")));
 			productCountField.setEditable(true);
 
-			EventHandler<KeyEvent> keyboardHandler;
-
-			keyboardHandler = new EventHandler<KeyEvent>()
+			final EventHandler<KeyEvent> keyboardHandler = new EventHandler<KeyEvent>()
 			{
 				@Override
 				public void handle(final KeyEvent event)
@@ -119,9 +118,7 @@ public class SearchView
 			popularityField.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(-1, 10000, Integer.parseInt("-1")));
 			popularityField.setEditable(true);
 
-			EventHandler<KeyEvent> keyboardHandler2;
-
-			keyboardHandler2 = new EventHandler<KeyEvent>()
+			final EventHandler<KeyEvent> keyboardHandler2 = new EventHandler<KeyEvent>()
 			{
 				@Override
 				public void handle(final KeyEvent event)
@@ -196,13 +193,10 @@ public class SearchView
 					{
 						// Although badge IDs are stored as string, they are still numbers.
 					}
-					searchController.productSearch(limits, nameField.getText(), productCountField.getValue(), popularityField.getValue(), brandbox.getValue(), categorybox.getValue(), dpStart.getValue(), dpEnd.getValue());
-					// System.out.println(nameField.getText() + " " + productCountField.getEditor() + " " +
-					// popularityField.getEditor() + " " + brandbox.getValue() + " " + categorybox.getValue() + " " +
-					// dpStart.getValue() + " " + dpEnd.getValue());
+					searchController.productSearch(limits, nameField.getText(), productCountField.getValue(), popularityField.getValue(), brandbox.getValue(),
+							categorybox.getValue(), dpStart.getValue(), dpEnd.getValue());
 				}
 			});
-			// GridPane.setTop(grid);
 		}
 
 		return grid;

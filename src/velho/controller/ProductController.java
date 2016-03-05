@@ -29,11 +29,6 @@ public class ProductController implements UIActionController
 	private AddProductView addProductView;
 
 	/**
-	 * The {@link UIController}.
-	 */
-	private static UIController uiController;
-
-	/**
 	 * The view in the tab itself.
 	 */
 	private GenericTabView productManagementView;
@@ -177,6 +172,7 @@ public class ProductController implements UIActionController
 
 	public void showList()
 	{
-		productManagementView.setView(ListController.getTableView(this, DatabaseController.getProductDataColumns(false, false), DatabaseController.getObservableProducts()));
+		productManagementView
+				.setView(ListController.getTableView(this, DatabaseController.getProductDataColumns(false, false), DatabaseController.getObservableProducts()));
 	}
 }
