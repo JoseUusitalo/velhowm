@@ -31,21 +31,32 @@ public class ProductController implements UIActionController
 	/**
 	 * The view in the tab itself.
 	 */
-	private GenericTabView productManagementView;
+	private GenericTabView listTab;
 
 	/**
-	 * Adds new view.
+	 * The {@link UIController}.
 	 */
-	public ProductController()
+	private UIController uiController;
+
+	/**
+	 * @see #setControllers(UIController)
+	 */
+	public ProductController(final UIController uiController)
 	{
-		this.addProductView = new AddProductView(this);
-		productManagementView = new GenericTabView();
+		this.uiController = uiController;
+		this.addProductView = new AddProductView(this, uiController);
+		listTab = new GenericTabView();
 		showList();
 	}
 
+	/**
+	 * Gets the view in the product list tab.
+	 *
+	 * @return the product list tab view
+	 */
 	public Node getTabView()
 	{
-		return productManagementView.getView();
+		return listTab.getView();
 	}
 
 	/**
@@ -57,7 +68,7 @@ public class ProductController implements UIActionController
 	{
 		try
 		{
-			return addProductView.getProductView();
+			return addProductView.getView(true);
 		}
 		catch (NoDatabaseLinkException e)
 		{
@@ -74,7 +85,8 @@ public class ProductController implements UIActionController
 	 * @param category of product
 	 * @param popularity of product
 	 */
-	public void saveProduct(final int databaseID, final String name, final Object brand, final Object category, final int popularity)
+	@SuppressWarnings("static-method")
+	public Product saveProduct(final int databaseID, final String name, final Object brand, final Object category, final int popularity)
 	{
 		ProductBrand bran = null;
 		ProductCategory cat = null;
@@ -113,16 +125,78 @@ public class ProductController implements UIActionController
 
 		try
 		{
-			if (DatabaseController.save(newProduct) > 0)
-				productManagementView.setView(new ProductDataView(this).getView(newProduct));
+			final int dbID = DatabaseController.save(newProduct);
 
-			else
+			if (dbID < 0)
+			{
 				PopupController.error("Failed to save product data!");
+				return null;
+			}
+
+			return DatabaseController.getProductByID(dbID, true);
 		}
 		catch (NoDatabaseLinkException e)
 		{
 			DatabaseController.tryReLink();
 		}
+
+		return null;
+	}
+
+	/**
+	 * Changes the view in the product list tab to the edit view.
+	 *
+	 * @param product {@link Product} to edit
+	 */
+	public void editProduct(final Product product)
+	{
+		try
+		{
+			listTab.setView(addProductView.getView(true));
+			addProductView.setViewData(product);
+		}
+		catch (NoDatabaseLinkException e)
+		{
+			DatabaseController.tryReLink();
+		}
+	}
+
+	public Node getAddProductView()
+	{
+		try
+		{
+			return new AddProductView(this, uiController).getView(false);
+		}
+		catch (NoDatabaseLinkException e)
+		{
+			DatabaseController.tryReLink();
+			return null;
+		}
+	}
+
+	/**
+	 * Changes the view in the product list tab to the list.
+	 */
+	public void showList()
+	{
+		try
+		{
+			listTab.setView(ListController.getTableView(this, DatabaseController.getProductDataColumns(false, false), DatabaseController.getAllProducts()));
+		}
+		catch (NoDatabaseLinkException e)
+		{
+			listTab.setView(null);
+			DatabaseController.tryReLink();
+		}
+	}
+
+	/**
+	 * Changes the view in the product list tab to display the data from the given product.
+	 * @param product
+	 */
+	public void showProductView(final Product product)
+	{
+		listTab.setView(new ProductDataView(this).getView(product));
 	}
 
 	@Override
@@ -162,35 +236,6 @@ public class ProductController implements UIActionController
 	@Override
 	public void viewAction(final Object data)
 	{
-		productManagementView.setView(new ProductDataView(this).getView(((Product) data)));
-	}
-
-	public void editProduct(final Product product)
-	{
-		try
-		{
-			productManagementView.setView(addProductView.getProductView());
-			addProductView.setData(product);
-		}
-		catch (NoDatabaseLinkException e)
-		{
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-
-	}
-
-	public void showList()
-	{
-		try
-		{
-			productManagementView
-					.setView(ListController.getTableView(this, DatabaseController.getProductDataColumns(false, false), DatabaseController.getAllProducts()));
-		}
-		catch (NoDatabaseLinkException e)
-		{
-			productManagementView.setView(null);
-			DatabaseController.tryReLink();
-		}
+		listTab.setView(new ProductDataView(this).getView(((Product) data)));
 	}
 }

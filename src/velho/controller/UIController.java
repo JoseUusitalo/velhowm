@@ -65,7 +65,7 @@ public class UIController
 	 */
 	private RemovalPlatformController removalPlatformController;
 
-	public UIController(final MainWindow mainWindow, final ListController listController, final UserController userController,
+	public void setControllers(final MainWindow mainWindow, final ListController listController, final UserController userController,
 			final RemovalListController removalListController, final SearchController searchController, final LogController logController,
 			final ManifestController manifestController, final ProductController productController, final RemovalPlatformController removalPlatformController)
 	{
@@ -131,12 +131,13 @@ public class UIController
 				mainView.addTab("Logs", logController.getView());
 				//$FALL-THROUGH$
 			case "Logistician":
-				mainView.addTab("Removal Lists", removalListController.getView());
-				mainView.addTab("User List", getUserListView(currentUserRole));
-				mainView.addTab("Product List", productController.getTabView());
 				mainView.addTab("Search", searchController.getSearchTabView());
 				mainView.addTab("Product List Search", listController.getProductListSearchView());
 				mainView.addTab("Manifests", manifestController.getView());
+				mainView.addTab("Removal Lists", removalListController.getView());
+				mainView.addTab("Add Product", productController.getAddProductView());
+				mainView.addTab("Product List", productController.getTabView());
+				mainView.addTab("User List", getUserListView(currentUserRole));
 				break;
 			default:
 				SYSLOG.error("Unknown user role '" + currentUserRole.getName() + "'.");
@@ -195,5 +196,16 @@ public class UIController
 	{
 		mainView.destroy();
 		userController.destroyView();
+	}
+
+	/**
+	 * Forcibly selects the specified tab and changes the view in the main
+	 * window to that tab.
+	 *
+	 * @param tabName name of the tab
+	 */
+	public void selectTab(final String tabName)
+	{
+		mainView.selectTab(tabName);
 	}
 }
