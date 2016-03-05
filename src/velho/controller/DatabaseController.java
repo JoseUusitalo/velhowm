@@ -2914,6 +2914,10 @@ public class DatabaseController
 		// Update the cache.
 		DBLOG.debug(query.toString() + ": " + getProductByID(dbID, false));
 
+		// Update the observable list.
+		observableProducts.clear();
+		observableProducts.addAll(cachedProducts.values());
+
 		return dbID;
 	}
 
