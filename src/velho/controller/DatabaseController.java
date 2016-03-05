@@ -2423,8 +2423,7 @@ public class DatabaseController
 			DBLOG.debug("Nothing to place.");
 	}
 	/*
-	 * -------------------------------- PUBLIC SETTER METHODS
-	 * --------------------------------
+	 * -------------------------------- PUBLIC SETTER METHODS --------------------------------
 	 */
 
 	/**
@@ -2454,16 +2453,11 @@ public class DatabaseController
 	 * Warning: Assumes that given data is valid.
 	 * </p>
 	 *
-	 * @param badgeID
-	 * badge ID of the user
-	 * @param pin
-	 * PIN of the user
-	 * @param firstName
-	 * first name of the user
-	 * @param lastName
-	 * last name of the user
-	 * @param roleID
-	 * the ID of the role of the user
+	 * @param badgeID badge ID of the user
+	 * @param pin PIN of the user
+	 * @param firstName first name of the user
+	 * @param lastName last name of the user
+	 * @param roleID the ID of the role of the user
 	 * @return <code>true</code> if user was added
 	 * @throws NoDatabaseLinkException
 	 * when database link was lost
@@ -2610,6 +2604,10 @@ public class DatabaseController
 		return changed;
 	}
 
+	/*
+	 * -------------------------------- SAVING DATA --------------------------------
+	 */
+
 	/**
 	 * Updates an existing removal list in the database with the data from the
 	 * given removal list or creates a new one if it doesn't exist.
@@ -2620,42 +2618,44 @@ public class DatabaseController
 	 * list was created in the database
 	 */
 	@SuppressWarnings("unchecked")
-	public static boolean updateRemovalList(final RemovalList removalList) throws NoDatabaseLinkException
+	public static int save(final RemovalList removalList) throws NoDatabaseLinkException
 	{
-		int listID = removalList.getDatabaseID();
-
 		final Map<String, Object> values = new LinkedHashMap<String, Object>();
 		values.put("liststate", removalList.getState().getDatabaseID());
 
 		final List<String> where = new ArrayList<String>();
 
 		DatabaseQueryType query;
+		int dbID = removalList.getDatabaseID();
 
 		// If the removal list does not exist yet, INSERT.
-		if (listID < 1)
+		if (dbID < 1)
 			query = DatabaseQueryType.INSERT;
 		else
 		{
 			query = DatabaseQueryType.UPDATE;
-			where.add("removallist_id = " + listID);
+			where.add("removallist_id = " + dbID);
 		}
 
 		// Insert/Update the list itself
 		Set<Integer> result = (LinkedHashSet<Integer>) runQuery(query, DatabaseTable.REMOVALLISTS, null, null, values, where);
 
 		if (result.size() == 0)
-			return false;
+		{
+			DBLOG.error("Failed to save: " + removalList);
+			return -1;
+		}
 
-		// Get the inserted removal list database ID.
-		if (listID < 1)
-			listID = result.iterator().next();
+		// Get the inserted database ID (if the given object was inserted instead of updated).
+		if (dbID < 1)
+			dbID = result.iterator().next();
 
 		// If the removallist_id was added previously, remove it.
 		if (!where.isEmpty())
 			where.clear();
 
 		// Even if multiple rows were changed, they all have the same ID.
-		where.add("removallist = " + listID);
+		where.add("removallist = " + dbID);
 
 		/*
 		 * Delete all boxes from the list in the database.
@@ -2666,7 +2666,7 @@ public class DatabaseController
 
 		// Add all boxes to the database.
 		values.clear();
-		values.put("removallist", listID);
+		values.put("removallist", dbID);
 		values.put("productbox", -1);
 
 		for (final ProductBox box : removalList.getBoxes())
@@ -2681,29 +2681,29 @@ public class DatabaseController
 			result = (LinkedHashSet<Integer>) runQuery(DatabaseQueryType.INSERT, DatabaseTable.REMOVALLIST_PRODUCTBOXES, null, null, values, null);
 
 			if (result.size() == 0)
-				return false;
+			{
+				DBLOG.error("Failed to save: " + removalList);
+				return -1;
+			}
 		}
 
 		// Update the cache.
-		getRemovalListByID(listID, false);
+		DBLOG.debug(query.toString() + ": " + getRemovalListByID(dbID, false));
 
-		return true;
+		return dbID;
 	}
 
 	/**
-	 * Updates an existing manifest in the database with the data from the given
-	 * manifest or creates a new one if it
+	 * Updates an existing manifest in the database with the data from the given manifest or creates a new one if it
 	 * doesn't exist.
 	 * A database ID of -1 signifies a brand new {@link Manifest}.
 	 *
 	 * @param manifest new or existing manifest
-	 * @return <code>true</code> if existing data was updated or a new manifest
-	 * was created in the database
+	 * @return the database ID of the inserted object or -1 if saving failed
 	 */
 	@SuppressWarnings("unchecked")
-	public static boolean save(final Manifest manifest) throws NoDatabaseLinkException
+	public static int save(final Manifest manifest) throws NoDatabaseLinkException
 	{
-		int manifestID = manifest.getDatabaseID();
 
 		final Map<String, Object> values = new LinkedHashMap<String, Object>();
 		values.put("state", manifest.getState().getDatabaseID());
@@ -2715,14 +2715,15 @@ public class DatabaseController
 		int boxid;
 
 		DatabaseQueryType query;
+		int dbID = manifest.getDatabaseID();
 
 		// If the manifest does not exist yet, INSERT.
-		if (manifestID < 1)
+		if (dbID < 1)
 			query = DatabaseQueryType.INSERT;
 		else
 		{
 			query = DatabaseQueryType.UPDATE;
-			where.add("manifest_id = " + manifestID);
+			where.add("manifest_id = " + dbID);
 		}
 
 		// Insert/Update the manifest
@@ -2731,15 +2732,15 @@ public class DatabaseController
 		if (result.size() == 0)
 		{
 			DBLOG.error("Failed to save: " + manifest);
-			return false;
+			return -1;
 		}
 
-		// Get the inserted removal list database ID.
-		if (manifestID < 1)
-			manifestID = result.iterator().next();
+		// Get the inserted database ID (if the given object was inserted instead of updated).
+		if (dbID < 1)
+			dbID = result.iterator().next();
 
 		where.clear();
-		where.add("manifest = " + manifestID);
+		where.add("manifest = " + dbID);
 
 		/*
 		 * Delete all boxes from the list in the database.
@@ -2750,7 +2751,7 @@ public class DatabaseController
 
 		// Add all boxes to the database.
 		values.clear();
-		values.put("manifest", manifestID);
+		values.put("manifest", dbID);
 		values.put("productbox", -1);
 
 		for (final ProductBox box : manifest.getBoxes())
@@ -2770,19 +2771,23 @@ public class DatabaseController
 				result = (LinkedHashSet<Integer>) runQuery(DatabaseQueryType.INSERT, DatabaseTable.MANIFEST_PRODUCTBOXES, null, null, values, null);
 
 				if (result.size() == 0)
-					return false;
+				{
+					DBLOG.error("Failed to save: " + manifest);
+					return -1;
+				}
 			}
 		}
 
 		// Update the cache.
-		DBLOG.debug(query.toString() + ": " + getManifestByID(manifestID, false));
+		DBLOG.debug(query.toString() + ": " + getManifestByID(dbID, false));
 
-		return true;
+		return dbID;
 	}
 
 	/**
-	 * Saves the given {@link ProductBox} object to database either by inserting
-	 * new data or updating existing data.
+	 * Updates an existing product box in the database with the data from the given product box or creates a new one if
+	 * it doesn't exist.
+	 * A database ID of -1 signifies a brand new {@link ProductBox}.
 	 *
 	 * @param productbox object to save
 	 * @return the database ID of the inserted object or -1 if saving failed
@@ -2827,6 +2832,7 @@ public class DatabaseController
 
 		// Update the cache.
 		DBLOG.debug(query.toString() + ": " + getProductBoxByID(dbID));
+
 		return dbID;
 	}
 
@@ -2876,6 +2882,12 @@ public class DatabaseController
 		DBLOG.debug(query.toString() + ": " + getRemovalPlatformByID(platformID, false));
 
 		return true;
+	}
+
+	public static void save(final Product newProduct)
+	{
+		// TODO Auto-generated method stub
+
 	}
 
 	/*
@@ -3379,11 +3391,5 @@ public class DatabaseController
 	{
 		DBLOG.info("Clearing search results.");
 		observableProductBoxSearchResults.clear();
-	}
-
-	public static void save(final Product newProduct)
-	{
-		// TODO Auto-generated method stub
-
 	}
 }

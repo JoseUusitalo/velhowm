@@ -171,7 +171,8 @@ public class RemovalListController implements UIActionController
 			try
 			{
 				if (browseView == null)
-					browseView = ListController.getTableView(this, DatabaseController.getRemovalListDataColumns(), DatabaseController.getObservableRemovalLists());
+					browseView = ListController.getTableView(this, DatabaseController.getRemovalListDataColumns(),
+							DatabaseController.getObservableRemovalLists());
 			}
 			catch (final NoDatabaseLinkException e)
 			{
@@ -264,7 +265,8 @@ public class RemovalListController implements UIActionController
 	public BorderPane getSearchResultsListView()
 	{
 		SYSLOG.trace("Getting search result list: " + DatabaseController.getObservableProductSearchResults());
-		return (BorderPane) ListController.getTableView(this, DatabaseController.getProductSearchDataColumns(true, false), DatabaseController.getObservableProductSearchResults());
+		return (BorderPane) ListController.getTableView(this, DatabaseController.getProductSearchDataColumns(true, false),
+				DatabaseController.getObservableProductSearchResults());
 	}
 
 	public BorderPane getNewRemovalListView()
@@ -282,7 +284,7 @@ public class RemovalListController implements UIActionController
 			{
 				SYSLOG.info("Saving Removal List: " + newRemovalList.getBoxes());
 
-				if (newRemovalList.saveToDatabase())
+				if (DatabaseController.save(newRemovalList) > 0)
 				{
 					DatabaseController.clearSearchResults();
 
@@ -330,7 +332,7 @@ public class RemovalListController implements UIActionController
 
 		try
 		{
-			if (!DatabaseController.updateRemovalList(removalList))
+			if (DatabaseController.save(removalList) < 0)
 				PopupController.error("Unable to save removal list state.");
 		}
 		catch (final NoDatabaseLinkException e)

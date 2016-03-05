@@ -127,7 +127,7 @@ public class ManifestTest
 
 		// Check that the method worked.
 		assertEquals(newState, existingManifest.getState());
-		assertTrue(existingManifest.saveToDatabase());
+		assertTrue(DatabaseController.save(existingManifest) > 0);
 
 		// Cache was updated
 		assertEquals(newState, DatabaseController.getManifestByID(existingManifest.getDatabaseID(), true).getState());

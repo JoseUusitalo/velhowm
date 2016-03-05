@@ -354,7 +354,7 @@ public class DatabaseControllerTest
 		final ProductBox box = DatabaseController.getProductBoxByID(1);
 		list.addProductBox(box);
 
-		assertTrue(DatabaseController.updateRemovalList(list));
+		assertTrue(DatabaseController.save(list) > 0);
 		final ObservableList<Object> obsboxes = DatabaseController.getRemovalListByID(6, true).getObservableBoxes();
 		final List<ProductBox> boxes = new ArrayList<ProductBox>();
 		final Iterator<Object> it = obsboxes.iterator();

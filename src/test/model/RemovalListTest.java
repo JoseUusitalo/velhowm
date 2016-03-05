@@ -115,7 +115,7 @@ public class RemovalListTest
 
 		// Check that the method worked.
 		assertEquals(newState, existinglist.getState());
-		assertTrue(existinglist.saveToDatabase());
+		assertTrue(DatabaseController.save(existinglist) > 0);
 
 		// Cache was updated
 		assertEquals(newState, DatabaseController.getRemovalListByID(existinglist.getDatabaseID(), true).getState());
@@ -153,7 +153,7 @@ public class RemovalListTest
 		assertEquals(3, existinglist.getSize());
 		assertTrue(existinglist.removeProductBox(first));
 		assertEquals(2, existinglist.getSize());
-		assertTrue(existinglist.saveToDatabase());
+		assertTrue(DatabaseController.save(existinglist) > 0);
 		assertEquals(2, DatabaseController.getRemovalListByID(existinglist.getDatabaseID(), false).getSize());
 	}
 
