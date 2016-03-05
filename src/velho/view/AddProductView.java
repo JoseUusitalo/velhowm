@@ -27,6 +27,7 @@ public class AddProductView
 {
 	private ProductController productController;
 	private BorderPane bPane;
+	private Spinner<Integer> databaseID;
 	private TextField nameField;
 	private ComboBox<Object> brandList;
 	private ComboBox<Object> categoryList;
@@ -58,6 +59,9 @@ public class AddProductView
 
 			final GridPane grid = new GridPane();
 
+			databaseID = new Spinner<Integer>();
+			databaseID.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(-1, Integer.MAX_VALUE, Integer.parseInt("-1")));
+
 			nameField = new TextField();
 			nameField.setPromptText("Product name");
 			nameField.setPrefWidth(MainWindow.WINDOW_WIDTH / 5);
@@ -88,9 +92,6 @@ public class AddProductView
 
 			popularity = new Spinner<Integer>();
 			// popularity.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(-1, 10000));
-			popularity.setEditable(true);
-			popularity.getEditor().getTextFormatter();
-			grid.add(popularity, 5, 0);
 
 			popularity.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(-1, 10000, Integer.parseInt("-1")));
 			popularity.setEditable(true);
@@ -115,6 +116,7 @@ public class AddProductView
 			};
 
 			popularity.getEditor().addEventHandler(KeyEvent.KEY_RELEASED, keyboardHandler);
+			grid.add(popularity, 5, 0);
 
 			final Button cancelButton = new Button("Cancel");
 
@@ -126,7 +128,6 @@ public class AddProductView
 					productController.showList();
 				}
 			});
-
 			grid.add(cancelButton, 6, 0);
 
 			Button saveButton = new Button("Save");
@@ -138,7 +139,9 @@ public class AddProductView
 				{
 					Object brand = brandList.valueProperty().getValue();
 					Object category = categoryList.valueProperty().getValue();
-					productController.saveProduct(nameField.getText(), brand, category, popularity.getValue().intValue());
+
+					productController.saveProduct(databaseID.getValueFactory().getValue().intValue(), nameField.getText(), brand, category,
+							popularity.getValue().intValue());
 				}
 			});
 			grid.add(saveButton, 7, 0);
@@ -157,9 +160,10 @@ public class AddProductView
 
 	public void setData(final Product product)
 	{
+		databaseID.getValueFactory().setValue(product.getProductID());
 		nameField.setText(product.getName());
 		brandList.getSelectionModel().select(product.getBrand());
 		categoryList.getSelectionModel().select(product.getCategory());
-		popularity.getEditor().setText(String.valueOf(product.getPopularity()));
+		popularity.getValueFactory().setValue(product.getPopularity());
 	}
 }

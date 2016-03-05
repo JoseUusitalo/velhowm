@@ -74,10 +74,11 @@ public class ProductController implements UIActionController
 	 * @param category of product
 	 * @param popularity of product
 	 */
-	public void saveProduct(final String name, final Object brand, final Object category, final int popularity)
+	public void saveProduct(final int databaseID, final String name, final Object brand, final Object category, final int popularity)
 	{
 		ProductBrand bran = null;
 		ProductCategory cat = null;
+
 		if (brand instanceof String)
 		{
 			SYSLOG.trace("creating new brand from " + brand.toString());
@@ -107,7 +108,7 @@ public class ProductController implements UIActionController
 			SYSLOG.trace("new product category is " + cat.toString());
 		}
 
-		Product newProduct = new Product(name, bran, cat, popularity);
+		Product newProduct = new Product(databaseID, name, bran, cat, popularity);
 		System.out.println(newProduct.toString());
 
 		try
