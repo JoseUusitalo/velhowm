@@ -134,7 +134,7 @@ public class ListController
 	public Node getProductSearchResultsView()
 	{
 		SYSLOG.trace("Getting search results for removal list.");
-		return getProductListView(DatabaseController.getProductDataColumns(true, false), DatabaseController.getObservableProducts());
+		return getProductListView(DatabaseController.getProductDataColumns(true, false), DatabaseController.getObservableProductSearchResults());
 	}
 
 	/**

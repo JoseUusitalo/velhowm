@@ -86,7 +86,7 @@ public class BarcodeScanner
 	/**
 	 * Validates the order to move the product/box/items.
 	 * Edit now it does not bruteforce the box into a full shelf.
-	 * 
+	 *
 	 * @return Either a true or a false, if there is room in the shelf or no room.
 	 */
 	public static boolean scannerMoveValid()
@@ -170,7 +170,7 @@ public class BarcodeScanner
 				boxSet.add(new ProductBox(	-1,
 											randomDate,
 											maxSize,
-											DatabaseController.getProductByID(productIDs.get(i % uniqueProducts)), // Make sure that the index doesn't go over the number of unique products in the database.
+											DatabaseController.getProductByID(productIDs.get(i % uniqueProducts), true), // Make sure that the index doesn't go over the number of unique products in the database.
 											productCount));
 				// @formatter:on
 			}

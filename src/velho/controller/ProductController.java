@@ -110,9 +110,18 @@ public class ProductController implements UIActionController
 		Product newProduct = new Product(name, bran, cat, popularity);
 		System.out.println(newProduct.toString());
 
-		DatabaseController.save(newProduct);
+		try
+		{
+			if (DatabaseController.save(newProduct) > 0)
+				productManagementView.setView(new ProductDataView(this).getView(newProduct));
 
-		productManagementView.setView(new ProductDataView(this).getView(newProduct));
+			else
+				PopupController.error("Failed to save product data!");
+		}
+		catch (NoDatabaseLinkException e)
+		{
+			DatabaseController.tryReLink();
+		}
 	}
 
 	@Override
@@ -172,7 +181,15 @@ public class ProductController implements UIActionController
 
 	public void showList()
 	{
-		productManagementView
-				.setView(ListController.getTableView(this, DatabaseController.getProductDataColumns(false, false), DatabaseController.getObservableProducts()));
+		try
+		{
+			productManagementView
+					.setView(ListController.getTableView(this, DatabaseController.getProductDataColumns(false, false), DatabaseController.getAllProducts()));
+		}
+		catch (NoDatabaseLinkException e)
+		{
+			productManagementView.setView(null);
+			DatabaseController.tryReLink();
+		}
 	}
 }
