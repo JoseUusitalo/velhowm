@@ -30,9 +30,7 @@ public class AddProductView
 	private TextField nameField;
 	private ComboBox<Object> brandList;
 	private ComboBox<Object> categoryList;
-	private Label popularityLabel;
 	private Spinner<Integer> popularity;
-	private Button saveButton;
 
 	/**
 	 * Adds the product view.
@@ -56,16 +54,15 @@ public class AddProductView
 	{
 		if (bPane == null)
 		{
-
 			bPane = new BorderPane();
 
-			final GridPane mid = new GridPane();
+			final GridPane grid = new GridPane();
 
 			nameField = new TextField();
 			nameField.setPromptText("Product name");
 			nameField.setPrefWidth(MainWindow.WINDOW_WIDTH / 5);
 			nameField.setMaxWidth(Double.MAX_VALUE);
-			mid.add(nameField, 1, 0);
+			grid.add(nameField, 1, 0);
 
 			brandList = new ComboBox<Object>();
 			// TODO make it so that you dont need to press enter
@@ -74,7 +71,7 @@ public class AddProductView
 			brandList.setMaxWidth(Double.MAX_VALUE);
 			brandList.getSelectionModel().selectFirst();
 			brandList.setEditable(true);
-			mid.add(brandList, 2, 0);
+			grid.add(brandList, 2, 0);
 
 			categoryList = new ComboBox<Object>();
 			categoryList.setEditable(true);
@@ -83,24 +80,22 @@ public class AddProductView
 			categoryList.getItems().addAll(DatabaseController.getAllProductCategories());
 			categoryList.setMaxWidth(Double.MAX_VALUE);
 			categoryList.getSelectionModel().selectFirst();
-			mid.add(categoryList, 3, 0);
+			grid.add(categoryList, 3, 0);
 
-			popularityLabel = new Label("Popularity: ");
+			Label popularityLabel = new Label("Popularity: ");
 			popularityLabel.setAlignment(Pos.CENTER_RIGHT);
-			mid.add(popularityLabel, 4, 0);
+			grid.add(popularityLabel, 4, 0);
 
 			popularity = new Spinner<Integer>();
 			// popularity.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(-1, 10000));
 			popularity.setEditable(true);
 			popularity.getEditor().getTextFormatter();
-			mid.add(popularity, 5, 0);
+			grid.add(popularity, 5, 0);
 
 			popularity.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(-1, 10000, Integer.parseInt("-1")));
 			popularity.setEditable(true);
 
-			EventHandler<KeyEvent> keyboardHandler;
-
-			keyboardHandler = new EventHandler<KeyEvent>()
+			final EventHandler<KeyEvent> keyboardHandler = new EventHandler<KeyEvent>()
 			{
 				@Override
 				public void handle(final KeyEvent event)
@@ -121,11 +116,21 @@ public class AddProductView
 
 			popularity.getEditor().addEventHandler(KeyEvent.KEY_RELEASED, keyboardHandler);
 
-			saveButton = new Button("Save");
+			final Button cancelButton = new Button("Cancel");
 
-			/**
-			 * Handles the button press event.
-			 */
+			cancelButton.setOnAction(new EventHandler<ActionEvent>()
+			{
+				@Override
+				public void handle(final ActionEvent event)
+				{
+					productController.showList();
+				}
+			});
+
+			grid.add(cancelButton, 6, 0);
+
+			Button saveButton = new Button("Save");
+
 			saveButton.setOnAction(new EventHandler<ActionEvent>()
 			{
 				@Override
@@ -136,14 +141,12 @@ public class AddProductView
 					productController.saveProduct(nameField.getText(), brand, category, popularity.getValue().intValue());
 				}
 			});
-			mid.add(saveButton, 6, 0);
+			grid.add(saveButton, 7, 0);
 
-			mid.setHgap(10);
-			mid.getStyleClass().add("standard-padding");
+			grid.setHgap(10);
+			grid.getStyleClass().add("standard-padding");
 
-			bPane.setCenter(mid);
-			setData(DatabaseController.getProductByID(1));
-
+			bPane.setCenter(grid);
 		}
 		return bPane;
 	}
