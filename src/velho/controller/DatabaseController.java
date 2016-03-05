@@ -2807,7 +2807,7 @@ public class DatabaseController
 
 		// Insert/Update
 		@SuppressWarnings("unchecked")
-		final Set<Integer> result = (Set<Integer>) runQuery(query, DatabaseTable.CONTAINERS, null, null, values, null);
+		final Set<Integer> result = (Set<Integer>) runQuery(query, DatabaseTable.CONTAINERS, null, null, values, where);
 
 		if (result.size() == 0)
 		{
@@ -2898,7 +2898,7 @@ public class DatabaseController
 
 		// Insert/Update
 		@SuppressWarnings("unchecked")
-		final Set<Integer> result = (Set<Integer>) runQuery(query, DatabaseTable.PRODUCTS, null, null, values, null);
+		final Set<Integer> result = (Set<Integer>) runQuery(query, DatabaseTable.PRODUCTS, null, null, values, where);
 
 		if (result.size() == 0)
 		{
