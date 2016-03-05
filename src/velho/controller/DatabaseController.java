@@ -338,7 +338,7 @@ public class DatabaseController
 							case PRODUCTS:
 								// @formatter:off
 								while (result.next())
-									dataSet.add(new Product(result.getInt("product_id"), result.getString("name"), getProductBrandByID(result.getInt("brand")), getProductCategoryByID(result.getInt("category")), result.getInt("popularity")));
+									dataSet.add(new Product(result.getInt("product_id"), result.getString("name"), getProductBrandByID(result.getInt("brand"), true), getProductCategoryByID(result.getInt("category"), true), result.getInt("popularity")));
 								break;
 							// @formatter:on
 
@@ -1168,108 +1168,6 @@ public class DatabaseController
 	}
 
 	/**
-	 * Gets the {@link ProductType} object from the given type ID.
-	 *
-	 * @param typeid product type database ID
-	 * @return the corresponding product type object
-	 * @throws NoDatabaseLinkException
-	 */
-	public static ProductType getProductTypeByID(final int typeid) throws NoDatabaseLinkException
-	{
-		if (!cachedProductTypes.containsKey(typeid))
-		{
-			final String[] columns = { "name" };
-			final List<String> where = new ArrayList<String>();
-			where.add("type_id = " + new Integer(typeid));
-
-			@SuppressWarnings("unchecked")
-			final Set<String> result = (LinkedHashSet<String>) (runQuery(DatabaseQueryType.SELECT, DatabaseTable.TYPES, null, columns, null, where));
-
-			if (result.size() == 0)
-				return null;
-
-			final ProductType p = new ProductType(typeid, result.iterator().next());
-
-			// Store for reuse.
-			DBLOG.trace("Caching: " + p);
-			cachedProductTypes.put(p.getDatabaseID(), p);
-
-			return p;
-		}
-
-		DBLOG.trace("Loading ProductType " + typeid + " from cache.");
-		return cachedProductTypes.get(typeid);
-	}
-
-	/**
-	 * Gets the {@link ProductCategory} object from the given category ID.
-	 *
-	 * @param categoryid product category database ID
-	 * @return the corresponding product category object
-	 * @throws NoDatabaseLinkException
-	 */
-	private static ProductCategory getProductCategoryByID(final int categoryid) throws NoDatabaseLinkException
-	{
-		if (!cachedProductCategories.containsKey(categoryid))
-		{
-			final String[] columns = { "category_id", "name", "type" };
-			final List<String> where = new ArrayList<String>();
-			where.add("category_id = " + new Integer(categoryid));
-
-			@SuppressWarnings("unchecked")
-			final Set<Object> result = (LinkedHashSet<Object>) (runQuery(DatabaseQueryType.SELECT, DatabaseTable.CATEGORIES, null, columns, null, where));
-
-			if (result.size() == 0)
-				return null;
-
-			final ProductCategory p = (ProductCategory) result.iterator().next();
-
-			// Store for reuse.
-			DBLOG.trace("Caching: " + p);
-
-			cachedProductCategories.put(p.getDatabaseID(), p);
-			return p;
-		}
-
-		DBLOG.trace("Loading ProductCategory " + categoryid + " from cache.");
-		return cachedProductCategories.get(categoryid);
-	}
-
-	/**
-	 * Gets the {@link ProductBrand} object from the given brand ID.
-	 *
-	 * @param brandid product brand database ID
-	 * @return the corresponding product brand object
-	 * @throws NoDatabaseLinkException
-	 */
-	private static ProductBrand getProductBrandByID(final int brandid) throws NoDatabaseLinkException
-	{
-		if (!cachedProductBrands.containsKey(brandid))
-		{
-			final String[] columns = { "name" };
-			final List<String> where = new ArrayList<String>();
-			where.add("brand_id = " + new Integer(brandid));
-
-			@SuppressWarnings("unchecked")
-			final Set<String> result = (LinkedHashSet<String>) (runQuery(DatabaseQueryType.SELECT, DatabaseTable.BRANDS, null, columns, null, where));
-
-			if (result.size() == 0)
-				return null;
-
-			final ProductBrand p = new ProductBrand(brandid, result.iterator().next());
-
-			// Store for reuse.
-			DBLOG.trace("Caching: " + p);
-
-			cachedProductBrands.put(p.getDatabaseID(), p);
-			return p;
-		}
-
-		DBLOG.trace("Loading ProductBrand " + brandid + " from cache.");
-		return cachedProductBrands.get(brandid);
-	}
-
-	/**
 	 * Gets the product box that will expire the soonest.
 	 *
 	 * @param boxes boxes to search from
@@ -1609,6 +1507,114 @@ public class DatabaseController
 		cols.put("viewButton", "View");
 
 		return cols;
+	}
+
+	/**
+	 * Gets the {@link ProductType} object from the given type ID.
+	 *
+	 * @param typeid product type database ID
+	 * @return the corresponding product type object
+	 * @throws NoDatabaseLinkException
+	 */
+	public static ProductType getProductTypeByID(final int typeid) throws NoDatabaseLinkException
+	{
+		if (!cachedProductTypes.containsKey(typeid))
+		{
+			final String[] columns = { "name" };
+			final List<String> where = new ArrayList<String>();
+			where.add("type_id = " + new Integer(typeid));
+
+			@SuppressWarnings("unchecked")
+			final Set<String> result = (LinkedHashSet<String>) (runQuery(DatabaseQueryType.SELECT, DatabaseTable.TYPES, null, columns, null, where));
+
+			if (result.size() == 0)
+				return null;
+
+			final ProductType p = new ProductType(typeid, result.iterator().next());
+
+			// Store for reuse.
+			DBLOG.trace("Caching: " + p);
+			cachedProductTypes.put(p.getDatabaseID(), p);
+
+			return p;
+		}
+
+		DBLOG.trace("Loading ProductType " + typeid + " from cache.");
+		return cachedProductTypes.get(typeid);
+	}
+
+	/**
+	 * Gets the {@link ProductCategory} object from the given category ID.
+	 *
+	 * @param categoryid product category database ID
+	 * @return the corresponding product category object
+	 * @throws NoDatabaseLinkException
+	 */
+	public static ProductCategory getProductCategoryByID(final int categoryid, final boolean getCached) throws NoDatabaseLinkException
+	{
+		if (!cachedProductCategories.containsKey(categoryid) || !getCached)
+		{
+			final String[] columns = { "category_id", "name", "type" };
+			final List<String> where = new ArrayList<String>();
+			where.add("category_id = " + new Integer(categoryid));
+
+			@SuppressWarnings("unchecked")
+			final Set<Object> result = (LinkedHashSet<Object>) (runQuery(DatabaseQueryType.SELECT, DatabaseTable.CATEGORIES, null, columns, null, where));
+
+			if (result.size() == 0)
+				return null;
+
+			final ProductCategory p = (ProductCategory) result.iterator().next();
+
+			// Store for reuse.
+			if (getCached)
+				DBLOG.trace("Caching: " + p);
+			else
+				DBLOG.trace("Updating cache: " + p);
+
+			cachedProductCategories.put(p.getDatabaseID(), p);
+			return p;
+		}
+
+		DBLOG.trace("Loading ProductCategory " + categoryid + " from cache.");
+		return cachedProductCategories.get(categoryid);
+	}
+
+	/**
+	 * Gets the {@link ProductBrand} object from the given brand ID.
+	 *
+	 * @param brandid product brand database ID
+	 * @return the corresponding product brand object
+	 * @throws NoDatabaseLinkException
+	 */
+	public static ProductBrand getProductBrandByID(final int brandid, final boolean getCached) throws NoDatabaseLinkException
+	{
+		if (!cachedProductBrands.containsKey(brandid) || !getCached)
+		{
+			final String[] columns = { "name" };
+			final List<String> where = new ArrayList<String>();
+			where.add("brand_id = " + new Integer(brandid));
+
+			@SuppressWarnings("unchecked")
+			final Set<String> result = (LinkedHashSet<String>) (runQuery(DatabaseQueryType.SELECT, DatabaseTable.BRANDS, null, columns, null, where));
+
+			if (result.size() == 0)
+				return null;
+
+			final ProductBrand p = new ProductBrand(brandid, result.iterator().next());
+
+			// Store for reuse.
+			if (getCached)
+				DBLOG.trace("Caching: " + p);
+			else
+				DBLOG.trace("Updating cache: " + p);
+
+			cachedProductBrands.put(p.getDatabaseID(), p);
+			return p;
+		}
+
+		DBLOG.trace("Loading ProductBrand " + brandid + " from cache.");
+		return cachedProductBrands.get(brandid);
 	}
 
 	/**
@@ -2832,8 +2838,8 @@ public class DatabaseController
 	 * new one if it doesn't exist.
 	 * A database ID of -1 signifies a brand new {@link RemovalPlatform}.
 	 *
-	 * @param manifest new or existing removal platform
-	 * @return <code>true</code> if existing data was updated or a new manifest
+	 * @param platform new or existing removal platform
+	 * @return <code>true</code> if existing data was updated or a new removal platform
 	 * was created in the database
 	 */
 	@SuppressWarnings("unchecked")
@@ -2874,6 +2880,16 @@ public class DatabaseController
 		return true;
 	}
 
+	/**
+	 * Updates an existing product in the database with the data from
+	 * the given product or creates a
+	 * new one if it doesn't exist.
+	 * A database ID of -1 signifies a brand new {@link Product}.
+	 *
+	 * @param product new or existing product
+	 * @return <code>true</code> if existing data was updated or a new product
+	 * was created in the database
+	 */
 	public static int save(final Product product) throws NoDatabaseLinkException
 	{
 		final Map<String, Object> values = new LinkedHashMap<String, Object>();
@@ -2917,6 +2933,113 @@ public class DatabaseController
 		// Update the observable list.
 		observableProducts.clear();
 		observableProducts.addAll(cachedProducts.values());
+
+		return dbID;
+	}
+
+	/**
+	 * Updates an existing product brand in the database with the data from
+	 * the given product brand or creates a new one if it doesn't exist.
+	 * A database ID of -1 signifies a brand new {@link ProductBrand}.
+	 *
+	 * @param brand new or existing product brand
+	 * @return <code>true</code> if existing data was updated or a new product brand
+	 * was created in the database
+	 */
+	public static int save(final ProductBrand brand) throws NoDatabaseLinkException
+	{
+		final Map<String, Object> values = new LinkedHashMap<String, Object>();
+		values.put("name", brand.getName());
+
+		final List<String> where = new ArrayList<String>();
+
+		DatabaseQueryType query;
+		int dbID = brand.getDatabaseID();
+
+		// If the object does not exist yet, INSERT.
+		if (dbID < 1)
+			query = DatabaseQueryType.INSERT;
+		else
+		{
+			query = DatabaseQueryType.UPDATE;
+			where.add("brand_id = " + dbID);
+		}
+
+		// Insert/Update
+		@SuppressWarnings("unchecked")
+		final Set<Integer> result = (Set<Integer>) runQuery(query, DatabaseTable.BRANDS, null, null, values, where);
+
+		if (result.size() == 0)
+		{
+			DBLOG.error("Failed to save: " + brand);
+			return -1;
+		}
+
+		// Get the inserted database ID (if the given object was inserted
+		// instead of updated).
+		if (dbID < 1)
+			dbID = result.iterator().next();
+
+		// Update the cache.
+		DBLOG.debug(query.toString() + ": " + getProductBrandByID(dbID, false));
+
+		// Update the observable list.
+		observableProductBrands.clear();
+		observableProductBrands.addAll(cachedProductBrands.values());
+
+		return dbID;
+	}
+
+	/**
+	 * Updates an existing product brand in the database with the data from
+	 * the given product brand or creates a new one if it doesn't exist.
+	 * A database ID of -1 signifies a brand new {@link ProductBrand}.
+	 *
+	 * @param brand new or existing product brand
+	 * @return <code>true</code> if existing data was updated or a new product brand
+	 * was created in the database
+	 */
+	public static int save(final ProductCategory category) throws NoDatabaseLinkException
+	{
+		final Map<String, Object> values = new LinkedHashMap<String, Object>();
+		values.put("name", category.getName());
+		values.put("type", category.getType().getDatabaseID());
+
+		final List<String> where = new ArrayList<String>();
+
+		DatabaseQueryType query;
+		int dbID = category.getDatabaseID();
+
+		// If the object does not exist yet, INSERT.
+		if (dbID < 1)
+			query = DatabaseQueryType.INSERT;
+		else
+		{
+			query = DatabaseQueryType.UPDATE;
+			where.add("category_id = " + dbID);
+		}
+
+		// Insert/Update
+		@SuppressWarnings("unchecked")
+		final Set<Integer> result = (Set<Integer>) runQuery(query, DatabaseTable.CATEGORIES, null, null, values, where);
+
+		if (result.size() == 0)
+		{
+			DBLOG.error("Failed to save: " + category);
+			return -1;
+		}
+
+		// Get the inserted database ID (if the given object was inserted
+		// instead of updated).
+		if (dbID < 1)
+			dbID = result.iterator().next();
+
+		// Update the cache.
+		DBLOG.debug(query.toString() + ": " + getProductCategoryByID(dbID, false));
+
+		// Update the observable list.
+		observableProductCategories.clear();
+		observableProductCategories.addAll(cachedProductCategories.values());
 
 		return dbID;
 	}

@@ -90,30 +90,39 @@ public class ProductController implements UIActionController
 	{
 		ProductBrand bran = null;
 		ProductCategory cat = null;
+		try
+		{
+			if (brand instanceof String)
+			{
+				SYSLOG.trace("creating new brand from " + brand.toString());
 
-		if (brand instanceof String)
-		{
-			SYSLOG.trace("creating new brand from " + brand.toString());
-			bran = new ProductBrand((String) brand);
-		}
-		if (category instanceof String)
-		{
-			SYSLOG.trace("creating new category from " + category.toString());
-			try
-			{
-				cat = new ProductCategory((String) category);
+				bran = DatabaseController.getProductBrandByID(DatabaseController.save(new ProductBrand((String) brand)), true);
 			}
-			catch (NoDatabaseLinkException e)
+
+			if (category instanceof String)
 			{
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+				SYSLOG.trace("creating new category from " + category.toString());
+				try
+				{
+					cat = DatabaseController.getProductCategoryByID(DatabaseController.save(new ProductCategory((String) category)), true);
+				}
+				catch (NoDatabaseLinkException e)
+				{
+					DatabaseController.tryReLink();
+				}
 			}
 		}
+		catch (NoDatabaseLinkException e)
+		{
+			DatabaseController.tryReLink();
+		}
+
 		if (brand instanceof ProductBrand)
 		{
 			bran = (ProductBrand) brand;
 			SYSLOG.trace("new brand is " + bran.toString());
 		}
+
 		if (category instanceof ProductCategory)
 		{
 			cat = (ProductCategory) category;
