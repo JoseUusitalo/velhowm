@@ -17,6 +17,8 @@ import velho.model.Shelf;
 import velho.model.exceptions.NoDatabaseLinkException;
 
 /**
+ * Controller handling the communication with systems outside the Velho Warehouse Management.
+ *
  * @author Edward &amp; Jose Uusitalo
  */
 public class ExternalSystemsController
@@ -40,9 +42,9 @@ public class ExternalSystemsController
 	}
 
 	/**
-	 * Prints received list, if list is empty it prints "List is empty." to the user.
+	 * Attempts to print the received data, if the data is empty it shows "List is empty." to the user.
 	 *
-	 * @param data
+	 * @param data data to print
 	 */
 	@SuppressWarnings("unchecked")
 	public static void sendDataToPrinter(final Object data)
@@ -87,12 +89,11 @@ public class ExternalSystemsController
 	/**
 	 * Sends signal to barcode scanner.
 	 *
-	 * @param received
+	 * @param data data to send
 	 */
 	@SuppressWarnings("unchecked")
 	public static void sendDataToBarcodeScanner(final Object data)
 	{
-
 		if (data instanceof Collection)
 		{
 			final Collection<Object> dataList = (Collection<Object>) data;
@@ -123,11 +124,12 @@ public class ExternalSystemsController
 	}
 
 	/**
-	 * Moves the box from the shelf in question.
+	 * Moves the specified box to the given shelf.
 	 *
-	 * @param productBoxCode the code that the Box posses.
-	 * @param newShelfSlotID the Boxes former shelf id that it modifies.
-	 * @return either a true or false, true when the prosses was compleated. False if not.
+	 * @param productBoxCode the database ID of the box to move
+	 * @param newShelfSlotID the ID of the shelf slot to move the box to
+	 * @param showPopup show popup messages about failure/success?
+	 * @return <code>true</code> if the box was moved successfully
 	 */
 	public static boolean move(final int productBoxCode, final String newShelfSlotID, final boolean showPopup)
 	{
@@ -143,7 +145,6 @@ public class ExternalSystemsController
 
 		try
 		{
-
 			newShelf = DatabaseController.getShelfByID(newShelfID, true);
 			boxToMove = DatabaseController.getProductBoxByID(productBoxCode);
 
@@ -179,7 +180,6 @@ public class ExternalSystemsController
 			{
 				return false;
 			}
-
 		}
 		catch (final NoDatabaseLinkException e)
 		{
@@ -193,11 +193,11 @@ public class ExternalSystemsController
 	}
 
 	/**
-	 * Receives the manifested barcode.
-	 * 
-	 * @param boxSet
-	 * @param orderDate
-	 * @param driverID
+	 * Receives the data read from a manifest barcode.
+	 *
+	 * @param boxSet a set of boxes on the manifest
+	 * @param orderDate the date the manifest was ordered
+	 * @param driverID the ID of the driver who delivered the boxes
 	 */
 	public static void receiveManifestBarcode(final Set<ProductBox> boxSet, final Date orderDate, final int driverID)
 	{
