@@ -32,7 +32,6 @@ import javafx.stage.WindowEvent;
 import velho.controller.DatabaseController;
 import velho.controller.DebugController;
 import velho.controller.ExternalSystemsController;
-import velho.controller.ListController;
 import velho.controller.LogController;
 import velho.controller.LogDatabaseController;
 import velho.controller.LoginController;
@@ -109,11 +108,6 @@ public class MainWindow extends Application
 	 * The {@link UIController}.
 	 */
 	private static UIController uiController;
-
-	/**
-	 * The {@link ListController}.
-	 */
-	private ListController listController;
 
 	/**
 	 * The {@link RemovalListController}.
@@ -234,8 +228,7 @@ public class MainWindow extends Application
 						productController = new ProductController(uiController);
 						removalPlatformController = new RemovalPlatformController(this);
 						debugController = new DebugController(removalPlatformController);
-						listController = new ListController(userController);
-						searchController = new SearchController(listController);
+						searchController = new SearchController(productController);
 						removalListController = new RemovalListController(searchController);
 
 						ExternalSystemsController.setControllers(manifestController);
@@ -243,7 +236,6 @@ public class MainWindow extends Application
 
 						//@formatter:off
 						uiController.setControllers(this,
-													listController,
 													userController,
 													removalListController,
 													searchController,

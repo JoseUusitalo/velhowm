@@ -12,18 +12,17 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 import velho.controller.DatabaseController;
-import velho.controller.ListController;
+import velho.controller.SearchController;
 import velho.model.exceptions.ExistingDatabaseLinkException;
 import velho.model.exceptions.NoDatabaseLinkException;
 
 /**
- * Tests for the {@link ListController} class.
+ * Tests for the {@link SearchController} class.
  *
  * @author Jose Uusitalo
  */
-
 @SuppressWarnings("static-method")
-public class ListControllerTest
+public class SearchControllerTest
 {
 	private static final Integer PRODUCT_1 = new Integer(1);
 	private static final Integer PRODUCT_2 = new Integer(2);
@@ -32,7 +31,7 @@ public class ListControllerTest
 	private static final String PRODUCT_TWO_COLONS = "A Very Long Product Name: With Two: Colons";
 	private static final String PRODUCT_WITH_COLON = "Product Name: With a Single Colon";
 
-	private ListController listController = new ListController(null);
+	private SearchController searchController = new SearchController(null);
 
 	@BeforeClass
 	public static final void initializeDatabase() throws ClassNotFoundException, ExistingDatabaseLinkException, NoDatabaseLinkException
@@ -62,7 +61,7 @@ public class ListControllerTest
 							+ PRODUCT_4 + "\n";
 		// @formatter:on
 
-		final Map<Integer, Integer> actual = listController.searchByProductList(string);
+		final Map<Integer, Integer> actual = searchController.searchByProductList(string);
 		DatabaseController.unlink();
 
 		assertEquals(expected, actual);
@@ -80,7 +79,7 @@ public class ListControllerTest
 							+ "3: " + PRODUCT_1 + "\n"
 							+ "4: " + PRODUCT_1 + "\n";
 		// @formatter:on
-		final Map<Integer, Integer> actual = listController.searchByProductList(string);
+		final Map<Integer, Integer> actual = searchController.searchByProductList(string);
 		DatabaseController.unlink();
 
 		assertEquals(expected, actual);
@@ -98,7 +97,7 @@ public class ListControllerTest
 							+ "    3: " + PRODUCT_1 + "\n"
 							+ "   4   : " + PRODUCT_1 + "\n";
 		// @formatter:on
-		final Map<Integer, Integer> actual = listController.searchByProductList(string);
+		final Map<Integer, Integer> actual = searchController.searchByProductList(string);
 		DatabaseController.unlink();
 
 		assertEquals(expected, actual);
@@ -117,7 +116,7 @@ public class ListControllerTest
 							+ "\n"
 							+ PRODUCT_2;
 		// @formatter:on
-		final Map<Integer, Integer> actual = listController.searchByProductList(string);
+		final Map<Integer, Integer> actual = searchController.searchByProductList(string);
 		DatabaseController.unlink();
 
 		assertEquals(expected, actual);
@@ -136,7 +135,7 @@ public class ListControllerTest
 							+ " \n"
 							+ PRODUCT_2;
 		// @formatter:on
-		final Map<Integer, Integer> actual = listController.searchByProductList(string);
+		final Map<Integer, Integer> actual = searchController.searchByProductList(string);
 		DatabaseController.unlink();
 
 		assertEquals(expected, actual);
@@ -156,7 +155,7 @@ public class ListControllerTest
 							+ PRODUCT_2;
 		// @formatter:on
 
-		final Map<Integer, Integer> actual = listController.searchByProductList(string);
+		final Map<Integer, Integer> actual = searchController.searchByProductList(string);
 		DatabaseController.unlink();
 
 		assertEquals(expected, actual);
@@ -175,7 +174,7 @@ public class ListControllerTest
 							+ "         12:        \n"
 							+ "2: " + PRODUCT_2 + "           ";
 		// @formatter:on
-		final Map<Integer, Integer> actual = listController.searchByProductList(string);
+		final Map<Integer, Integer> actual = searchController.searchByProductList(string);
 
 		DatabaseController.unlink();
 
@@ -189,7 +188,7 @@ public class ListControllerTest
 		expected[0] = 1;
 		expected[1] = "Product: A Colon!";
 
-		final Object[] actual = ListController.parseProductLine("Product: A Colon!    ");
+		final Object[] actual = SearchController.parseProductLine("Product: A Colon!    ");
 		DatabaseController.unlink();
 
 		System.out.println("Expected:\t" + Arrays.asList(expected));
@@ -204,7 +203,7 @@ public class ListControllerTest
 		expected[0] = 10;
 		expected[1] = PRODUCT_WITH_COLON;
 
-		final Object[] actual = ListController.parseProductLine("   10   :   " + PRODUCT_WITH_COLON);
+		final Object[] actual = SearchController.parseProductLine("   10   :   " + PRODUCT_WITH_COLON);
 		DatabaseController.unlink();
 
 		System.out.println("Expected:\t" + Arrays.asList(expected));
@@ -219,7 +218,7 @@ public class ListControllerTest
 		expected[0] = 1;
 		expected[1] = PRODUCT_TWO_COLONS;
 
-		final Object[] actual = ListController.parseProductLine("     " + PRODUCT_TWO_COLONS);
+		final Object[] actual = SearchController.parseProductLine("     " + PRODUCT_TWO_COLONS);
 		DatabaseController.unlink();
 
 		System.out.println("Expected:\t" + Arrays.asList(expected));

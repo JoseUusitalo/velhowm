@@ -13,6 +13,8 @@ import velho.model.ProductBrand;
 import velho.model.ProductCategory;
 import velho.model.enums.DatabaseTable;
 import velho.model.exceptions.NoDatabaseLinkException;
+import velho.view.ListView;
+import velho.view.ProductListSearch;
 import velho.view.SearchTabView;
 import velho.view.SearchView;
 
@@ -28,62 +30,84 @@ public class SearchController
 	 */
 	private static final Logger SYSLOG = Logger.getLogger(SearchController.class.getName());
 
+	/**
+	 * The view in the tab itself.
+	 */
 	private SearchTabView searchTabView;
 
-	private ListController listController;
+	/**
+	 * The {@link ProductController}.
+	 */
+	private ProductController productController;
 
-	public SearchController(final ListController listController)
+	/**
+	 * @param productController
+	 */
+	public SearchController(final ProductController productController)
 	{
-		this.listController = listController;
+		this.productController = productController;
 		this.searchTabView = new SearchTabView(this);
 	}
 
+	/**
+	 * Searches the database with the given arguments.
+	 * Setting any value to <code>null</code> will not include it in the search.
+	 *
+	 * @param limits internal string representing the search target
+	 * @param name the name of the product
+	 * @param productCount how many products of this type of find in the product boxes
+	 * @param popularity how popular the product is
+	 * @param brand the {@link ProductBrand}
+	 * @param category the {@link ProductCategory}
+	 * @param expiresStart the expiration date range start
+	 * @param expiresEnd the expiration date range end
+	 */
 	@SuppressWarnings("static-method")
-	public void productSearch(final String limits, final String nameField, final Integer productCountField, final Integer popularityField,
-			final Object productBrand, final Object productCategory, final LocalDate localDate, final LocalDate localDate2)
+	public void productSearch(final String limits, final String name, final Integer productCount, final Integer popularity, final Object brand,
+			final Object category, final LocalDate expiresStart, final LocalDate expiresEnd)
 	{
 		final List<String> where = new ArrayList<String>();
 
-		if (nameField != null && !nameField.isEmpty())
+		if (name != null && !name.isEmpty())
 		{
 			try
 			{
-				where.add("products.product_id = '" + Integer.parseInt(nameField) + "'");
+				where.add("products.product_id = '" + Integer.parseInt(name) + "'");
 			}
 			catch (NumberFormatException e)
 			{
-				where.add("products.name LIKE '%" + nameField.replace('*', '%') + "%'");
+				where.add("products.name LIKE '%" + name.replace('*', '%') + "%'");
 			}
 		}
 
-		if (productCountField != null && productCountField >= 0)
+		if (productCount != null && productCount >= 0)
 		{
-			where.add("containers.product_count = " + productCountField.intValue());
+			where.add("containers.product_count = " + productCount.intValue());
 		}
 
-		if (popularityField != null && popularityField >= 0)
+		if (popularity != null && popularity >= 0)
 		{
-			where.add("products.popularity = " + popularityField.intValue());
+			where.add("products.popularity = " + popularity.intValue());
 		}
 
-		if (productBrand != null)
+		if (brand != null)
 		{
-			where.add("products.brand = " + ((ProductBrand) productBrand).getDatabaseID());
+			where.add("products.brand = " + ((ProductBrand) brand).getDatabaseID());
 		}
 
-		if (productCategory != null)
+		if (category != null)
 		{
-			where.add("products.category = " + ((ProductCategory) productCategory).getDatabaseID());
+			where.add("products.category = " + ((ProductCategory) category).getDatabaseID());
 		}
 
-		if (localDate != null)
+		if (expiresStart != null)
 		{
-			where.add("containers.expiration_date >= '" + localDate + "'");
+			where.add("containers.expiration_date >= '" + expiresStart + "'");
 		}
 
-		if (localDate2 != null)
+		if (expiresEnd != null)
 		{
-			where.add("containers.expiration_date <= '" + localDate2 + "'");
+			where.add("containers.expiration_date <= '" + expiresEnd + "'");
 		}
 
 		final Map<DatabaseTable, String> joins = new LinkedHashMap<DatabaseTable, String>();
@@ -118,6 +142,11 @@ public class SearchController
 		}
 	}
 
+	/**
+	 * Gets the search view.
+	 *
+	 * @return the search view
+	 */
 	public Node getSearchView()
 	{
 		try
@@ -131,6 +160,12 @@ public class SearchController
 		}
 	}
 
+	/**
+	 * Gets a specific type of search view.
+	 *
+	 * @param limits an internal string representing the type of search view to create
+	 * @return the search view
+	 */
 	public Node getSearchView(final String limits)
 	{
 		try
@@ -144,15 +179,182 @@ public class SearchController
 		}
 	}
 
+	/**
+	 * Gets the view in the search tab.
+	 *
+	 * @return the tab view
+	 */
 	public Node getSearchTabView()
 	{
 		return searchTabView.getView();
 	}
 
+	/**
+	 * Gets the view for displaying search results.
+	 *
+	 * @return the search results view
+	 */
 	public Node getResultsView()
 	{
 		SYSLOG.trace("Getting search results for removal list.");
-		return listController.getProductListView(DatabaseController.getProductSearchDataColumns(false, false),
+		return ListController.getTableView(productController, DatabaseController.getProductSearchDataColumns(false, false),
 				DatabaseController.getObservableProductSearchResults());
+	}
+
+	/**
+	 * Gets the view for searching for multiple products at once.
+	 *
+	 * @return product list search view
+	 */
+	public Node getProductListSearchView()
+	{
+		final ProductListSearch searchView = new ProductListSearch(this);
+		final ListView listView = new ListView(null, DatabaseController.getProductSearchDataColumns(false, false),
+				DatabaseController.getObservableProductSearchResults());
+
+		return searchView.getView(listView.getView());
+	}
+
+	/**
+	 * Searches the database for the given products.
+	 *
+	 * @param products a string of product names or IDs (one per line)
+	 * @return A map of product ID and box sizes processed from the given list of products. (Used only in unit testing.)
+	 */
+	@SuppressWarnings("static-method")
+	public Map<Integer, Integer> searchByProductList(final String products)
+	{
+		final String[] productStringLines = products.split("\n");
+		final Map<Integer, Integer> productID_BoxSize = new LinkedHashMap<Integer, Integer>();
+		Integer productID = -1;
+		Object[] countName = null;
+
+		// Convert lines to a map.
+		for (final String line : productStringLines)
+		{
+			countName = parseProductLine(line);
+
+			if (!((String) countName[1]).isEmpty())
+			{
+				// Convert all names to IDs for easier processing.
+				try
+				{
+					productID = Integer.parseInt((String) countName[1]);
+				}
+				catch (final NumberFormatException e)
+				{
+					try
+					{
+						productID = DatabaseController.getProductIDFromName((String) countName[1]);
+					}
+					catch (final NoDatabaseLinkException e1)
+					{
+						DatabaseController.tryReLink();
+					}
+				}
+
+				// If the product already exists, add the new count to the
+				// previous count.
+				if (productID_BoxSize.containsKey(productID))
+				{
+					productID_BoxSize.put(productID, productID_BoxSize.get(productID) + ((int) countName[0]));
+				}
+				else
+				{
+					productID_BoxSize.put(productID, (int) countName[0]);
+				}
+			}
+		}
+
+		// Search the database for the products.
+		try
+		{
+			DatabaseController.searchProductBoxByDataList(productID_BoxSize);
+		}
+		catch (final NoDatabaseLinkException e)
+		{
+			DatabaseController.tryReLink();
+		}
+
+		// Return the data for unit testing.
+		return productID_BoxSize;
+	}
+
+	/**
+	 * Parses a line of product information in the format:
+	 * <p>
+	 * <code>&lt;an integer&gt; : &lt;product ID or name&gt;</code>
+	 * </p>
+	 *
+	 * @param line String to parse
+	 * @return an object array where the first element is the integer and the
+	 * second element is the product name
+	 */
+	public static Object[] parseProductLine(final String line)
+	{
+		final Object[] countName = new Object[2];
+		countName[0] = 1;
+
+		// Count first, then product string.
+		final String[] possibleProductAndCount = line.split(":");
+
+		if (possibleProductAndCount.length == 1)
+		{
+			// Example: 'Product A'
+			countName[1] = possibleProductAndCount[0].trim();
+		}
+		else if (possibleProductAndCount.length == 2)
+		{
+			// Example: '15: Product B'
+			// Example: 'Product C: Long Name'
+			try
+			{
+				countName[0] = Integer.valueOf(possibleProductAndCount[0].trim());
+				countName[1] = possibleProductAndCount[1].trim();
+			}
+			catch (final NumberFormatException e)
+			{
+				// Count remains 1.
+				countName[1] = (possibleProductAndCount[0] + ":" + possibleProductAndCount[1]).trim();
+			}
+		}
+		else
+		{
+			// Example: '90: Product C: The Better Version'
+			// Example: 'Product D: Cool 'n Stuff: Too Many Colons Version'
+			int start = 0;
+			try
+			{
+				countName[0] = Integer.valueOf(possibleProductAndCount[0].trim());
+				start = 1;
+			}
+			catch (final NumberFormatException e)
+			{
+				// Count remains 1.
+			}
+
+			// Rebuild the product string.
+			final StringBuffer sb = new StringBuffer();
+			final int length = possibleProductAndCount.length;
+
+			for (int i = start; i < length; i++)
+			{
+				if (start == i)
+				{
+					// Left trim spaces from the first element.
+					// This assumes that no product name can begin with a space
+					// character.
+					sb.append(possibleProductAndCount[i].replaceAll("^\\s+", ""));
+				}
+				else
+					sb.append(possibleProductAndCount[i]);
+
+				if (i < length - 1)
+					sb.append(":");
+			}
+			countName[1] = sb.toString();
+		}
+
+		return countName;
 	}
 }

@@ -23,6 +23,7 @@ public class ProductController implements UIActionController
 	 * Apache log4j logger: System.
 	 */
 	private static final Logger SYSLOG = Logger.getLogger(ProductController.class.getName());
+
 	/**
 	 * The {@link AddProductView}.
 	 */
@@ -39,7 +40,7 @@ public class ProductController implements UIActionController
 	private UIController uiController;
 
 	/**
-	 * @see #setControllers(UIController)
+	 * @param uiController
 	 */
 	public ProductController(final UIController uiController)
 	{
@@ -60,9 +61,9 @@ public class ProductController implements UIActionController
 	}
 
 	/**
-	 * Edits the view.
+	 * Gets the product editing view.
 	 *
-	 * @return null
+	 * @return the product editing view
 	 */
 	public Node getProductEditView()
 	{
@@ -78,12 +79,13 @@ public class ProductController implements UIActionController
 	}
 
 	/**
-	 * Saves the new product gets it from database.
+	 * Saves the new or existing product to database and returns the updated object.
 	 *
-	 * @param name of product
-	 * @param brand of product
-	 * @param category of product
-	 * @param popularity of product
+	 * @param databaseID database ID of the product (<code>-1</code> for a new one)
+	 * @param name name of the of product
+	 * @param brand brand of the product
+	 * @param category category of the product
+	 * @param popularity popularity of the product
 	 */
 	@SuppressWarnings("static-method")
 	public Product saveProduct(final int databaseID, final String name, final Object brand, final Object category, final int popularity)
@@ -170,6 +172,11 @@ public class ProductController implements UIActionController
 		}
 	}
 
+	/**
+	 * Gets the view for creating new products.
+	 *
+	 * @return the product creation view
+	 */
 	public Node getAddProductView()
 	{
 		try
@@ -201,11 +208,23 @@ public class ProductController implements UIActionController
 
 	/**
 	 * Changes the view in the product list tab to display the data from the given product.
-	 * @param product
+	 *
+	 * @param product product to display
 	 */
 	public void showProductView(final Product product)
 	{
 		listTab.setView(new ProductDataView(this).getView(product));
+	}
+
+	/**
+	 * Gets a list of product search results.
+	 *
+	 * @return a view with the search results
+	 */
+	public Node getProductSearchResultsView()
+	{
+		SYSLOG.trace("Getting search results for product list.");
+		return ListController.getTableView(this, DatabaseController.getProductDataColumns(true, false), DatabaseController.getObservableProductSearchResults());
 	}
 
 	@Override
