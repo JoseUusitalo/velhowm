@@ -207,13 +207,15 @@ public class DatabaseControllerTest
 	@Test
 	public final void testGetPublicProductDataColumns()
 	{
-		// This test is worhtless but it exists to improve coverage.
+		// This test is worthless but it exists to improve coverage.
 
 		final LinkedHashMap<String, String> cols = new LinkedHashMap<String, String>();
+		cols.put("productID", "ID");
 		cols.put("name", "Name");
 		cols.put("brand", "Brand");
 		cols.put("category", "Category");
 		cols.put("popularity", "Popularity");
+		cols.put("viewButton", "");
 
 		assertEquals(cols, DatabaseController.getProductDataColumns(false, false));
 	}
@@ -221,15 +223,17 @@ public class DatabaseControllerTest
 	@Test
 	public final void testGetPublicProductDataColumns2()
 	{
-		// This test is worhtless but it exists to improve coverage.
+		// This test is worthless but it exists to improve coverage.
 
 		final LinkedHashMap<String, String> cols = new LinkedHashMap<String, String>();
 		cols.put("addButton", "Add");
 		cols.put("deleteButton", "Delete");
+		cols.put("productID", "ID");
 		cols.put("name", "Name");
 		cols.put("brand", "Brand");
 		cols.put("category", "Category");
 		cols.put("popularity", "Popularity");
+		cols.put("viewButton", "");
 
 		assertEquals(cols, DatabaseController.getProductDataColumns(true, true));
 	}
