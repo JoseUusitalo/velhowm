@@ -5,8 +5,6 @@ import java.util.Set;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import velho.controller.DatabaseController;
-import velho.model.exceptions.NoDatabaseLinkException;
 
 /**
  * A list of product boxes to be thrown away.
@@ -121,16 +119,6 @@ public class RemovalList
 	public Set<ProductBox> getBoxes()
 	{
 		return boxes;
-	}
-
-	/**
-	 * Updates the database table with the most recent data on this list.
-	 *
-	 * @return <code>true</code> if update was successfull
-	 */
-	public boolean saveToDatabase() throws NoDatabaseLinkException
-	{
-		return DatabaseController.updateRemovalList(this);
 	}
 
 	/**

@@ -6,8 +6,6 @@ import java.util.Set;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import velho.controller.DatabaseController;
-import velho.model.exceptions.NoDatabaseLinkException;
 
 /**
  * A list of {@link ProductBox} objects that have been delivered to the warehouse from somewhere else.
@@ -211,15 +209,5 @@ public class Manifest
 			bswitch = bswitch && (observableBoxes.add(new ProductBoxSearchResultRow(box)));
 
 		return bswitch;
-	}
-
-	/**
-	 * Updates the database table with the most recent data on this list.
-	 *
-	 * @return <code>true</code> if update was succesfull
-	 */
-	public boolean saveToDatabase() throws NoDatabaseLinkException
-	{
-		return DatabaseController.save(this);
 	}
 }

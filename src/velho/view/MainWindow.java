@@ -226,21 +226,32 @@ public class MainWindow extends Application
 						SYSLOG.debug("Creating all controllers...");
 
 						DatabaseController.loadData();
+						uiController = new UIController();
 						userController = new UserController();
 						logController = new LogController();
 
 						manifestController = new ManifestController(this);
-						productController = new ProductController();
-
-						ExternalSystemsController.setControllers(manifestController);
+						productController = new ProductController(uiController);
 						removalPlatformController = new RemovalPlatformController(this);
 						debugController = new DebugController(removalPlatformController);
 						listController = new ListController(userController);
 						searchController = new SearchController(listController);
 						removalListController = new RemovalListController(searchController);
-						uiController = new UIController(this, listController, userController, removalListController, searchController, logController, manifestController, productController, removalPlatformController);
 
+						ExternalSystemsController.setControllers(manifestController);
 						LoginController.setControllers(uiController, debugController);
+
+						//@formatter:off
+						uiController.setControllers(this,
+													listController,
+													userController,
+													removalListController,
+													searchController,
+													logController,
+													manifestController,
+													productController,
+													removalPlatformController);
+						//@formatter:on
 
 						SYSLOG.debug("All controllers created.");
 					}
@@ -326,8 +337,15 @@ public class MainWindow extends Application
 				@Override
 				public void changed(final ObservableValue<? extends Tab> old, final Tab oldTab, final Tab newTab)
 				{
-					if (newTab.getText() == "Logs")
-						logController.refresh();
+					// Perform an action whenever the tab changes.
+					switch (newTab.getText())
+					{
+						case "Logs":
+							logController.refresh();
+							break;
+						default:
+							// Do nothing.
+					}
 				}
 
 			});

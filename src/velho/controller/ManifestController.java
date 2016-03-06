@@ -179,7 +179,7 @@ public class ManifestController implements UIActionController
 
 		try
 		{
-			if (currentManifest.saveToDatabase())
+			if (DatabaseController.save(currentManifest) > 0)
 				SYSLOG.info("Updated database: " + currentManifest);
 			else
 				SYSLOG.info("Database update failed: " + currentManifest);
@@ -217,7 +217,7 @@ public class ManifestController implements UIActionController
 			manifest = new Manifest(DatabaseController.getManifestStateByID(3), driverID, orderDate, Date.from(Instant.now()));
 			manifest.setProductBoxes(boxSet);
 
-			if (manifest.saveToDatabase())
+			if (DatabaseController.save(manifest) > 0)
 			{
 				// If the user is a Manager (but not an Administrator!) show a popup.
 				if (LoginController.userRoleIs(new Manager()))
