@@ -9,9 +9,13 @@ import velho.model.exceptions.NoDatabaseLinkException;
 import velho.view.LogView;
 import velho.view.MainWindow;
 
+/**
+ * A class for controlling viwing logs.
+ *
+ * @author Jose Uusitalo
+ */
 public class LogController
 {
-
 	/**
 	 * Apache log4j logger: System.
 	 */

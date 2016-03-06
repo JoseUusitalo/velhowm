@@ -72,80 +72,6 @@ public class RemovalListController implements UIActionController
 		tabView = new GenericTabView();
 	}
 
-	@Override
-	public void createAction(final Object data)
-	{
-		// SYSLOG.trace("Controller got from UI: " + data);
-	}
-
-	@Override
-	public void updateAction(final Object data)
-	{
-		// SYSLOG.trace("Controller got from UI update: " +
-		// ((ProductBoxSearchResultRow) data).getBox());
-	}
-
-	@Override
-	public void removeAction(final Object data)
-	{
-		USRLOG.debug("Removing from new removal list: " + ((ProductBoxSearchResultRow) data).getBox());
-		if (!newRemovalList.removeProductBox(((ProductBoxSearchResultRow) data).getBox()))
-		{
-			USRLOG.debug("Failed to remove product box from removal list.");
-			PopupController.error("Failed to remove product box from removal list.");
-		}
-	}
-
-	@Override
-	public void deleteAction(final Object data)
-	{
-		try
-		{
-			if (!DatabaseController.deleteRemovalListByID(((RemovalList) data).getDatabaseID()))
-			{
-				USRLOG.debug("Failed to deleting removal list.");
-				PopupController.error("Failed to deleting removal list.");
-			}
-			else
-				USRLOG.info("Deleted removal list: " + ((RemovalList) data).toString());
-		}
-		catch (final NoDatabaseLinkException e)
-		{
-			DatabaseController.tryReLink();
-		}
-	}
-
-	@Override
-	public void addAction(final Object data)
-	{
-		USRLOG.debug("Adding to new removal list: " + ((ProductBoxSearchResultRow) data).getBox());
-		if (!newRemovalList.addProductBox(((ProductBoxSearchResultRow) data).getBox()))
-		{
-			USRLOG.trace("Product box is already on the list.");
-			PopupController.error("That product box is already on the removal list.");
-		}
-	}
-
-	@Override
-	public void viewAction(final Object data)
-	{
-		USRLOG.info("Viewing removal list " + data);
-
-		try
-		{
-			if (LoginController.userRoleIsGreaterOrEqualTo(new Manager()))
-
-				managementView.setContent(new RemovalListView((RemovalList) data, this).getView());
-
-			else
-				tabView.setView(new RemovalListView((RemovalList) data, this).getView());
-		}
-		catch (NoDatabaseLinkException e)
-		{
-			DatabaseController.tryReLink();
-		}
-	}
-
 	/**
 	 * Gets the view for managing and viewing existing removal lists.
 	 *
@@ -228,8 +154,7 @@ public class RemovalListController implements UIActionController
 	}
 
 	/**
-	 * Changes the removal list management view to the removal list browsing
-	 * view for Managers and greater.
+	 * Changes the removal list management view to the removal list browsing view for Managers and greater.
 	 * Other see the plain browsing view.
 	 */
 	public void showBrowseRemovalListsView()
@@ -262,6 +187,11 @@ public class RemovalListController implements UIActionController
 		}
 	}
 
+	/**
+	 * Gets a view showing the search results for adding/removing product boxes to/from a new removal list.
+	 *
+	 * @return the search results
+	 */
 	public BorderPane getSearchResultsListView()
 	{
 		SYSLOG.trace("Getting search result list: " + DatabaseController.getObservableProductSearchResults());
@@ -269,6 +199,11 @@ public class RemovalListController implements UIActionController
 				DatabaseController.getObservableProductSearchResults());
 	}
 
+	/**
+	 * Gets the view for creating a new removal list.
+	 *
+	 * @return the view for creating a new removal list
+	 */
 	public BorderPane getNewRemovalListView()
 	{
 		SYSLOG.trace("Getting new removal list: " + newRemovalList.getObservableBoxes());
@@ -276,6 +211,9 @@ public class RemovalListController implements UIActionController
 		return (BorderPane) ListController.getTableView(this, DatabaseController.getProductSearchDataColumns(false, true), newRemovalList.getObservableBoxes());
 	}
 
+	/**
+	 * Saves the new removal list.
+	 */
 	public void saveNewRemovalList()
 	{
 		if (newRemovalList.getObservableBoxes().size() > 0)
@@ -291,17 +229,14 @@ public class RemovalListController implements UIActionController
 					USRLOG.info("Created a new Removal List: " + newRemovalList.getBoxes());
 
 					/*
-					 * I would much rather create a new object rather than reset
-					 * the old one but I can't figure out why
-					 * it doesn't work. When a new removal list object is
-					 * created the UI new list view never updates
-					 * after that even though I'm refreshing the view after
-					 * creating the object.
+					 * I would much rather create a new object rather than reset the old one but I can't figure out why
+					 * it doesn't work.
+					 * When a new removal list object is created the UI new list view never updates after that even
+					 * though I'm refreshing the view after creating the object.
 					 */
 					newRemovalList.reset();
 
 					creationView.refresh();
-
 				}
 				else
 				{
@@ -319,12 +254,23 @@ public class RemovalListController implements UIActionController
 		}
 	}
 
+	/**
+	 * Changes the new removal list state.
+	 *
+	 * @param newState the new {@link RemovalListState}
+	 */
 	public void setNewRemovalListState(final RemovalListState newState)
 	{
 		SYSLOG.trace("New state is : " + newState);
 		newRemovalList.setState(newState);
 	}
 
+	/**
+	 * Changes the state of the specified removal list.
+	 *
+	 * @param removalList the {@link RemovalList} to modify
+	 * @param newState the new {@link RemovalListState}
+	 */
 	@SuppressWarnings("static-method")
 	public void updateRemovalListState(final RemovalList removalList, final RemovalListState state)
 	{
@@ -336,6 +282,80 @@ public class RemovalListController implements UIActionController
 				PopupController.error("Unable to save removal list state.");
 		}
 		catch (final NoDatabaseLinkException e)
+		{
+			DatabaseController.tryReLink();
+		}
+	}
+
+	@Override
+	public void createAction(final Object data)
+	{
+		// SYSLOG.trace("Controller got from UI: " + data);
+	}
+
+	@Override
+	public void updateAction(final Object data)
+	{
+		// SYSLOG.trace("Controller got from UI update: " +
+		// ((ProductBoxSearchResultRow) data).getBox());
+	}
+
+	@Override
+	public void removeAction(final Object data)
+	{
+		USRLOG.debug("Removing from new removal list: " + ((ProductBoxSearchResultRow) data).getBox());
+		if (!newRemovalList.removeProductBox(((ProductBoxSearchResultRow) data).getBox()))
+		{
+			USRLOG.debug("Failed to remove product box from removal list.");
+			PopupController.error("Failed to remove product box from removal list.");
+		}
+	}
+
+	@Override
+	public void deleteAction(final Object data)
+	{
+		try
+		{
+			if (!DatabaseController.deleteRemovalListByID(((RemovalList) data).getDatabaseID()))
+			{
+				USRLOG.debug("Failed to deleting removal list.");
+				PopupController.error("Failed to deleting removal list.");
+			}
+			else
+				USRLOG.info("Deleted removal list: " + ((RemovalList) data).toString());
+		}
+		catch (final NoDatabaseLinkException e)
+		{
+			DatabaseController.tryReLink();
+		}
+	}
+
+	@Override
+	public void addAction(final Object data)
+	{
+		USRLOG.debug("Adding to new removal list: " + ((ProductBoxSearchResultRow) data).getBox());
+		if (!newRemovalList.addProductBox(((ProductBoxSearchResultRow) data).getBox()))
+		{
+			USRLOG.trace("Product box is already on the list.");
+			PopupController.error("That product box is already on the removal list.");
+		}
+	}
+
+	@Override
+	public void viewAction(final Object data)
+	{
+		USRLOG.info("Viewing removal list " + data);
+
+		try
+		{
+			if (LoginController.userRoleIsGreaterOrEqualTo(new Manager()))
+
+				managementView.setContent(new RemovalListView((RemovalList) data, this).getView());
+
+			else
+				tabView.setView(new RemovalListView((RemovalList) data, this).getView());
+		}
+		catch (NoDatabaseLinkException e)
 		{
 			DatabaseController.tryReLink();
 		}

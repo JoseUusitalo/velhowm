@@ -6,6 +6,11 @@ import velho.model.RemovalPlatform;
 import velho.model.exceptions.NoDatabaseLinkException;
 import velho.view.MainWindow;
 
+/**
+ * Controller handling the {@link RemovalPlatform}.
+ *
+ * @author Jose Uusitalo
+ */
 public class RemovalPlatformController
 {
 	/**

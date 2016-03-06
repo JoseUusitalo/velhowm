@@ -13,9 +13,9 @@ import velho.view.GenericTabView;
 import velho.view.ProductDataView;
 
 /**
- * Controls logging users in and out.
+ * Controller for handling {@link Product} objects
  *
- * @author Edward &amp; Jose Uusitalo
+ * @author Jose Uusitalo &amp; Edward
  */
 public class ProductController implements UIActionController
 {
@@ -23,6 +23,11 @@ public class ProductController implements UIActionController
 	 * Apache log4j logger: System.
 	 */
 	private static final Logger SYSLOG = Logger.getLogger(ProductController.class.getName());
+
+	/**
+	 * Apache log4j logger: User.
+	 */
+	private static final Logger USRLOG = Logger.getLogger("userLogger");
 
 	/**
 	 * The {@link AddProductView}.
@@ -258,12 +263,12 @@ public class ProductController implements UIActionController
 	public void deleteAction(final Object data)
 	{
 		// TODO Auto-generated method stub
-
 	}
 
 	@Override
 	public void viewAction(final Object data)
 	{
+		USRLOG.info("Viewing: " + ((Product) data).toString());
 		listTab.setView(new ProductDataView(this).getView(((Product) data)));
 	}
 }

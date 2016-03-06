@@ -73,42 +73,6 @@ public class ManifestController implements UIActionController
 		return ListController.getTableView(this, DatabaseController.getManifestDataColumns(), DatabaseController.getAllManifests(false));
 	}
 
-	@Override
-	public void createAction(final Object data)
-	{
-		// TODO Auto-generated method stub
-	}
-
-	@Override
-	public void updateAction(final Object data)
-	{
-		System.out.println("UPDATE: " + ((Manifest) data).toString());
-	}
-
-	@Override
-	public void addAction(final Object data)
-	{
-		// TODO Auto-generated method stub
-	}
-
-	@Override
-	public void removeAction(final Object data)
-	{
-		// TODO Auto-generated method stub
-	}
-
-	@Override
-	public void deleteAction(final Object data)
-	{
-		// TODO Auto-generated method stub
-	}
-
-	@Override
-	public void viewAction(final Object data)
-	{
-		showManifestView((Manifest) data);
-	}
-
 	/**
 	 * Shows a list of all manifests in the manifest tab.
 	 */
@@ -236,5 +200,41 @@ public class ManifestController implements UIActionController
 			DatabaseController.tryReLink();
 		}
 
+	}
+
+	@Override
+	public void createAction(final Object data)
+	{
+		// TODO Auto-generated method stub
+	}
+
+	@Override
+	public void updateAction(final Object data)
+	{
+		System.out.println("UPDATE: " + ((Manifest) data).toString());
+	}
+
+	@Override
+	public void addAction(final Object data)
+	{
+		// TODO Auto-generated method stub
+	}
+
+	@Override
+	public void removeAction(final Object data)
+	{
+		// TODO Auto-generated method stub
+	}
+
+	@Override
+	public void deleteAction(final Object data)
+	{
+		// TODO Auto-generated method stub
+	}
+
+	@Override
+	public void viewAction(final Object data)
+	{
+		showManifestView((Manifest) data);
 	}
 }
