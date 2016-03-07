@@ -30,38 +30,41 @@ public class AddProductView
 	 * The product controller.
 	 */
 	private ProductController productController;
+
 	/**
 	 * The border panel.
 	 */
 	private BorderPane bPane;
 
+	/**
+	 * The hidden database ID spinner.
+	 */
 	private Spinner<Integer> databaseID;
 
 	/**
 	 * A text field.
 	 */
 	private TextField nameField;
+
 	/**
 	 * A combobox for brand list.
 	 */
 	private ComboBox<Object> brandList;
+
 	/**
 	 * A combobox for category list.
 	 */
 	private ComboBox<Object> categoryList;
-	/**
-	 * A label for product popularity.
-	 */
-	private Label popularityLabel;
+
 	/**
 	 * A spinner that shows the product popularity.
 	 */
 	private Spinner<Integer> popularity;
-	private UIController uiController;
+
 	/**
-	 * The "save" button.
+	 * The {@link UIController}.
 	 */
-	private Button saveButton;
+	private UIController uiController;
 
 	/**
 	 * Adds the product view.
@@ -104,17 +107,24 @@ public class AddProductView
 			brandList.setPromptText("Brand");
 			brandList.getItems().addAll(DatabaseController.getAllProductBrands());
 			brandList.setMaxWidth(Double.MAX_VALUE);
-			brandList.setEditable(true);
+
+			// TODO: Fix coombobox selection mechanic breaking on the second try because the selection is converted from
+			// object to string.
+			// brandList.setEditable(true);
+
 			brandList.getSelectionModel().selectFirst();
 			grid.add(brandList, 2, 0);
 
 			categoryList = new ComboBox<Object>();
-			categoryList.setEditable(true);
 			// TODO make it so that you dont need to press enter
 			categoryList.setPromptText("Category");
 			categoryList.getItems().addAll(DatabaseController.getAllProductCategories());
 			categoryList.setMaxWidth(Double.MAX_VALUE);
-			categoryList.setEditable(true);
+
+			// TODO: Fix coombobox selection mechanic breaking on the second try because the selection is converted from
+			// object to string.
+			// categoryList.setEditable(true);
+
 			categoryList.getSelectionModel().selectFirst();
 			grid.add(categoryList, 3, 0);
 
@@ -174,7 +184,8 @@ public class AddProductView
 					Object brand = brandList.valueProperty().getValue();
 					Object category = categoryList.valueProperty().getValue();
 
-					final Product newProduct = productController.saveProduct(databaseID.getValueFactory().getValue().intValue(), nameField.getText(), brand, category, popularity.getValue().intValue());
+					final Product newProduct = productController.saveProduct(databaseID.getValueFactory().getValue().intValue(), nameField.getText(), brand,
+							category, popularity.getValue().intValue());
 
 					if (editProduct)
 						productController.showProductView(newProduct);
