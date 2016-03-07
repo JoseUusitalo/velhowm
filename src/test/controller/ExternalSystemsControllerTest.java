@@ -62,7 +62,6 @@ public class ExternalSystemsControllerTest
 
 		assertFalse(oldShelf.getShelfSlotBoxes(oldShelfSlot).contains(box));
 		assertTrue(newShelf.getShelfSlotBoxes(newShelfSlot).contains(box));
-
 	}
 
 	@Test

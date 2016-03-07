@@ -40,7 +40,6 @@ public class RemovalListManagementView
 
 	/**
 	 * @param removalListController
-	 * @param listController
 	 */
 	public RemovalListManagementView(final RemovalListController removalListController)
 	{

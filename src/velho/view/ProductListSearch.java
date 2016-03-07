@@ -12,7 +12,7 @@ import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import velho.controller.DatabaseController;
 import velho.controller.ExternalSystemsController;
-import velho.controller.ListController;
+import velho.controller.SearchController;
 
 /**
  * A view for searching multiple products at once.
@@ -27,13 +27,13 @@ public class ProductListSearch
 	private BorderPane pane;
 
 	/**
-	 * The {@link ListController}.
+	 * The {@link SearchController}.
 	 */
-	private ListController listController;
+	private SearchController searchController;
 
-	public ProductListSearch(final ListController listController)
+	public ProductListSearch(final SearchController searchController)
 	{
-		this.listController = listController;
+		this.searchController = searchController;
 	}
 
 	/**
@@ -51,7 +51,9 @@ public class ProductListSearch
 			Button sendToScannerButton = new Button("Send to Scanner ");
 
 			final TextArea textArea = new TextArea();
-			textArea.setPromptText("Please type one product code or name per line. " + "To Search for multiple products of the same type, type the number of products you want and a colon before the product name or ID. " + "Empty lines and redundant spaces are ignored.");
+			textArea.setPromptText("Please type one product code or name per line. "
+					+ "To Search for multiple products of the same type, type the number of products you want and a colon before the product name or ID. "
+					+ "Empty lines and redundant spaces are ignored.");
 			textArea.setPrefWidth(MainWindow.WINDOW_WIDTH / 5);
 			printButton.setMaxWidth(Double.MAX_VALUE);
 			printButton.setAlignment(Pos.CENTER);
@@ -60,7 +62,8 @@ public class ProductListSearch
 
 			printButton.setOnAction(new EventHandler<ActionEvent>()
 			{
-				@Override public void handle(final ActionEvent event)
+				@Override
+				public void handle(final ActionEvent event)
 				{
 					ExternalSystemsController.sendDataToPrinter(DatabaseController.getObservableProductSearchResults());
 				}
@@ -68,7 +71,8 @@ public class ProductListSearch
 
 			sendToScannerButton.setOnAction(new EventHandler<ActionEvent>()
 			{
-				@Override public void handle(final ActionEvent event)
+				@Override
+				public void handle(final ActionEvent event)
 				{
 					ExternalSystemsController.sendDataToBarcodeScanner(DatabaseController.getObservableProductSearchResults());
 				}
@@ -80,11 +84,12 @@ public class ProductListSearch
 
 			textArea.setOnKeyReleased(new EventHandler<KeyEvent>()
 			{
-				@Override public void handle(final KeyEvent event)
+				@Override
+				public void handle(final KeyEvent event)
 				{
 					if (event.getCode() == KeyCode.ENTER)
 					{
-						listController.searchByProductList(textArea.getText());
+						searchController.searchByProductList(textArea.getText());
 					}
 				}
 			});

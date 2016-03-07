@@ -99,6 +99,9 @@ public class AddUserView
 			Button createButton = new Button("Create user");
 			grid.add(createButton, 0, 6);
 
+			/**
+			 * Handles the button press event.
+			 */
 			createButton.setOnAction(new EventHandler<ActionEvent>()
 			{
 				@Override

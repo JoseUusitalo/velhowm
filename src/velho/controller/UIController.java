@@ -31,11 +31,6 @@ public class UIController
 	private UserController userController;
 
 	/**
-	 * The {@link ListController}.
-	 */
-	private ListController listController;
-
-	/**
 	 * The {@link SearchController}.
 	 */
 	private SearchController searchController;
@@ -45,17 +40,48 @@ public class UIController
 	 */
 	private RemovalListController removalListController;
 
+	/**
+	 * The {@link ProductController}.
+	 */
+	private ProductController productController;
+
+	/**
+	 * The {@link LogController}.
+	 */
 	private LogController logController;
 
-	public UIController(final MainWindow mainWindow, final ListController listController, final UserController userController,
-			final RemovalListController removalListController, final SearchController searchController, final LogController logController)
+	/**
+	 * The {@link ManifestController}.
+	 */
+	private ManifestController manifestController;
+
+	/**
+	 * The {@link RemovalPlatformController}.
+	 */
+	private RemovalPlatformController removalPlatformController;
+
+	/**
+	 * @param mainWindow
+	 * @param userController
+	 * @param removalListController
+	 * @param searchController
+	 * @param logController
+	 * @param manifestController
+	 * @param productController
+	 * @param removalPlatformController
+	 */
+	public void setControllers(final MainWindow mainWindow, final UserController userController, final RemovalListController removalListController,
+			final SearchController searchController, final LogController logController, final ManifestController manifestController,
+			final ProductController productController, final RemovalPlatformController removalPlatformController)
 	{
 		this.mainView = mainWindow;
-		this.listController = listController;
 		this.userController = userController;
 		this.removalListController = removalListController;
 		this.searchController = searchController;
+		this.productController = productController;
 		this.logController = logController;
+		this.manifestController = manifestController;
+		this.removalPlatformController = removalPlatformController;
 	}
 
 	/**
@@ -98,7 +124,7 @@ public class UIController
 		mainView.showMainMenu();
 
 		/*
-		 * What is shown in the UI depends on your role.
+		 * What is shown in the tabs depends on your role.
 		 */
 
 		switch (currentUserRole.getName())
@@ -109,21 +135,26 @@ public class UIController
 				mainView.addTab("Logs", logController.getView());
 				//$FALL-THROUGH$
 			case "Logistician":
-				mainView.addTab("Removal Lists", removalListController.getView());
-				mainView.addTab("User List", getUserListView(currentUserRole));
-				mainView.addTab("Product List", listController.getProductListView(DatabaseController.getPublicProductDataColumns(false, false),
-						DatabaseController.getObservableProducts()));
 				mainView.addTab("Search", searchController.getSearchTabView());
-				mainView.addTab("Product List Search", listController.getProductListSearchView());
+				mainView.addTab("Product List Search", searchController.getProductListSearchView());
+				mainView.addTab("Manifests", manifestController.getView());
+				mainView.addTab("Removal Lists", removalListController.getView());
+				mainView.addTab("Add Product", productController.getAddProductView());
+				mainView.addTab("Product List", productController.getTabView());
+				mainView.addTab("User List", getUserListView(currentUserRole));
 				break;
 			default:
 				SYSLOG.error("Unknown user role '" + currentUserRole.getName() + "'.");
 		}
+
+		/*
+		 * Check the state the of the removal platform when the main menu is shown after user has logged in.
+		 */
+		removalPlatformController.checkWarning();
 	}
 
 	/**
-	 * Creates the user list view. The list contents change depending on who is
-	 * logged in.
+	 * Creates the user list view. The list contents change depending on who is logged in.
 	 *
 	 * @param currentUserRole the role of the user who is currently logged in
 	 * @return the user list view
@@ -139,9 +170,11 @@ public class UIController
 			{
 				case "Administrator":
 				case "Manager":
-					return listController.getUserListView(DatabaseController.getPublicUserDataColumns(true), DatabaseController.getObservableUsers());
+					return ListController.getTableView(userController, DatabaseController.getPublicUserDataColumns(true),
+							DatabaseController.getObservableUsers());
 				case "Logistician":
-					return listController.getUserListView(DatabaseController.getPublicUserDataColumns(false), DatabaseController.getObservableUsers());
+					return ListController.getTableView(userController, DatabaseController.getPublicUserDataColumns(true),
+							DatabaseController.getObservableUsers());
 				default:
 					SYSLOG.error("Unknown user role '" + currentUserRole.getName() + "'.");
 			}
@@ -167,7 +200,20 @@ public class UIController
 	 */
 	public void destroyViews()
 	{
+		// TODO: We need to destroy all of the views.
+
 		mainView.destroy();
 		userController.destroyView();
+	}
+
+	/**
+	 * Forcibly selects the specified tab and changes the view in the main
+	 * window to that tab.
+	 *
+	 * @param tabName name of the tab
+	 */
+	public void selectTab(final String tabName)
+	{
+		mainView.selectTab(tabName);
 	}
 }

@@ -38,16 +38,21 @@ public class RemovalListTest
 	{
 		try
 		{
-			assertTrue(DatabaseController.link());
+			if (!DatabaseController.isLinked())
+				assertTrue(DatabaseController.link());
 			assertTrue(DatabaseController.initializeDatabase());
 		}
-		catch (ClassNotFoundException | ExistingDatabaseLinkException e)
+		catch (ClassNotFoundException e0)
 		{
-			e.printStackTrace();
+			e0.printStackTrace();
 		}
-		catch (NoDatabaseLinkException e)
+		catch (NoDatabaseLinkException e1)
 		{
 			DatabaseController.tryReLink();
+		}
+		catch (ExistingDatabaseLinkException e2)
+		{
+			// Ignore.
 		}
 
 		box1 = DatabaseController.getProductBoxByID(1);
@@ -64,6 +69,7 @@ public class RemovalListTest
 		}
 		catch (NoDatabaseLinkException e)
 		{
+			// Ignore.
 		}
 	}
 
@@ -82,8 +88,13 @@ public class RemovalListTest
 	@Test
 	public final void testGetSize()
 	{
-		assertEquals(0, newlist.getSize());
 		assertEquals(3, existinglist.getSize());
+	}
+
+	@Test
+	public final void testGetSize_New()
+	{
+		assertEquals(0, newlist.getSize());
 	}
 
 	@Test
@@ -104,7 +115,7 @@ public class RemovalListTest
 
 		// Check that the method worked.
 		assertEquals(newState, existinglist.getState());
-		assertTrue(existinglist.saveToDatabase());
+		assertTrue(DatabaseController.save(existinglist) > 0);
 
 		// Cache was updated
 		assertEquals(newState, DatabaseController.getRemovalListByID(existinglist.getDatabaseID(), true).getState());
@@ -142,7 +153,7 @@ public class RemovalListTest
 		assertEquals(3, existinglist.getSize());
 		assertTrue(existinglist.removeProductBox(first));
 		assertEquals(2, existinglist.getSize());
-		assertTrue(existinglist.saveToDatabase());
+		assertTrue(DatabaseController.save(existinglist) > 0);
 		assertEquals(2, DatabaseController.getRemovalListByID(existinglist.getDatabaseID(), false).getSize());
 	}
 

@@ -11,6 +11,7 @@ import javafx.scene.control.Label;
 import javafx.scene.control.Spinner;
 import javafx.scene.control.SpinnerValueFactory;
 import javafx.scene.control.TextField;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.GridPane;
 import velho.controller.SearchController;
 
@@ -75,19 +76,70 @@ public class SearchView
 
 			final Label popularitySpinnerLabel = new Label("Product Popularity: ");
 			popularitySpinnerLabel.setAlignment(Pos.CENTER);
-			grid.add(popularitySpinnerLabel, 2, 2, 1, 1);
+			// grid.add(popularitySpinnerLabel, 2, 2, 1, 1);
 
 			final Spinner<Integer> productCountField = new Spinner<Integer>();
-			productCountField.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(-1, 10000));
+			// productCountField.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(-1, 10000));
 			productCountField.setEditable(true);
 			productCountField.setPrefWidth(75.0);
+
+			productCountField.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(-1, 10000, Integer.parseInt("-1")));
+			productCountField.setEditable(true);
+
+			final EventHandler<KeyEvent> keyboardHandler = new EventHandler<KeyEvent>()
+			{
+				@Override
+				public void handle(final KeyEvent event)
+				{
+					try
+					{
+						if (Integer.parseInt(productCountField.getEditor().textProperty().get()) < -1)
+						{
+							throw new NumberFormatException();
+						}
+
+					}
+					catch (NumberFormatException e)
+					{
+						productCountField.getEditor().textProperty().set("-1");
+					}
+				}
+			};
+
+			productCountField.getEditor().addEventHandler(KeyEvent.KEY_RELEASED, keyboardHandler);
+
 			grid.add(productCountField, 3, 1, 1, 1);
 
 			final Spinner<Integer> popularityField = new Spinner<Integer>();
-			popularityField.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(-1, 10000));
+			// popularityField.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(-1, 10000));
 			popularityField.setEditable(true);
 			popularityField.setPrefWidth(75.0);
-			grid.add(popularityField, 3, 2, 1, 1);
+
+			popularityField.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(-1, 10000, Integer.parseInt("-1")));
+			popularityField.setEditable(true);
+
+			final EventHandler<KeyEvent> keyboardHandler2 = new EventHandler<KeyEvent>()
+			{
+				@Override
+				public void handle(final KeyEvent event)
+				{
+					try
+					{
+						if (Integer.parseInt(popularityField.getEditor().textProperty().get()) < -1)
+						{
+							throw new NumberFormatException();
+						}
+					}
+					catch (NumberFormatException e)
+					{
+						popularityField.getEditor().textProperty().set("-1");
+					}
+				}
+			};
+
+			popularityField.getEditor().addEventHandler(KeyEvent.KEY_RELEASED, keyboardHandler2);
+
+			// grid.add(popularityField, 3, 2, 1, 1);
 
 			final ComboBox<Object> brandbox = new ComboBox<Object>();
 			brandbox.getItems().add(null);
@@ -143,12 +195,8 @@ public class SearchView
 					}
 					searchController.productSearch(limits, nameField.getText(), productCountField.getValue(), popularityField.getValue(), brandbox.getValue(),
 							categorybox.getValue(), dpStart.getValue(), dpEnd.getValue());
-					// System.out.println(nameField.getText() + " " + productCountField.getEditor() + " " +
-					// popularityField.getEditor() + " " + brandbox.getValue() + " " + categorybox.getValue() + " " +
-					// dpStart.getValue() + " " + dpEnd.getValue());
 				}
 			});
-			// GridPane.setTop(grid);
 		}
 
 		return grid;

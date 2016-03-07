@@ -1,23 +1,22 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <project name="VelhoWM" basedir="." default="use">
-	<!-- Modified Eclipse generated file. -->
 	<description>Group #1 Project: Velho Warehouse Management</description>
 	<property name="target" value="1.8"/>
 	<property name="source" value="1.8"/>
-    <property name="junit.output.dir" value="junit"/>
 	<property name="src" location="src"/>
 	<property name="classes" location="bin"/>
+	<property name="main-class" value="velho.view.MainWindow"/>
 
 	<path id="velho.classpath">
         <pathelement location="bin"/>
-        <pathelement location="lib/java8/junit.jar"/>
-        <pathelement location="lib/java8/org.hamcrest.core_1.3.0.v201303031735.jar"/>
-        <pathelement location="lib/java8/org.eclipse.fx.ide.css.jfx8_2.0.0.201506111511.jar"/>
+        <pathelement location="lib/eclipse/junit.jar"/>
+        <pathelement location="lib/eclipse/org.hamcrest.core_1.3.0.v201303031735.jar"/>
+        <pathelement location="lib/eclipse/org.eclipse.fx.ide.css.jfx8_2.0.0.201506111511.jar"/>
         <pathelement location="lib/h2-1.4.191.jar"/>
         <pathelement location="lib/apache-log4j-1.2.17/log4j-1.2.17.jar"/>
     </path>
-	
-	<target name="init">
+
+	<target name="init" description="make the classes folder">
 		<tstamp/>
 		<mkdir dir="${classes}"/>
 	</target>
@@ -28,16 +27,20 @@
             <classpath refid="velho.classpath"/>
         </javac>
 	</target>
-	
+
 	<target name="jar" depends="compile" description="make the jar">
 		<jar destfile="VelhoWM_${DSTAMP}.jar" basedir="${classes}">
 			<manifest>
-				<attribute name="Main-Class" value="velho.view.MainWindow"/>
+				<attribute name="Main-Class" value="${main-class}"/>
 			</manifest>
 		</jar>
 	</target>
-	
-	<target name="use" depends="jar" description ="use the task">
-		<java jar ="VelhoWM_${DSTAMP}.jar" fork="true"/>
+
+	<target name="use" depends="jar" description="use the task">
+		<java classname="${main-class}" fork="true">
+		  <classpath>
+		    <path refid="velho.classpath"/>
+		  </classpath>
+		</java>
 	</target>
 </project>

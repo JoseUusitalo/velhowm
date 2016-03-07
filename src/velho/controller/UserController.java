@@ -44,50 +44,6 @@ public class UserController implements UIActionController
 		view = new AddUserView(this, DatabaseController.getUserRoleNames());
 	}
 
-	@Override
-	public void updateAction(final Object data)
-	{
-		USRLOG.debug("Update user: " + data);
-	}
-
-	@Override
-	public void removeAction(final Object data)
-	{
-		USRLOG.debug("Remove user: " + data);
-	}
-
-	@Override
-	public void deleteAction(final Object data)
-	{
-		USRLOG.debug("Delete user: " + data);
-		deleteUser((User) data);
-	}
-
-	@Override
-	public void addAction(final Object data)
-	{
-		USRLOG.debug("Add user: " + data);
-	}
-
-	@Override
-	public void viewAction(final Object data)
-	{
-		USRLOG.debug("View user: " + data);
-	}
-
-	@Override
-	public void createAction(final Object data)
-	{
-		try
-		{
-			throw new Exception("Unimplemented.");
-		}
-		catch (final Exception e)
-		{
-			e.printStackTrace();
-		}
-	}
-
 	/**
 	 * Attempts to add a new user to the database.
 	 *
@@ -211,9 +167,7 @@ public class UserController implements UIActionController
 	public static User getDebugUser(final String userRoleName)
 	{
 		if (MainWindow.DEBUG_MODE)
-		{
 			return new User(-1, "Debug", "Account", stringToRole(userRoleName));
-		}
 
 		return null;
 	}
@@ -238,5 +192,42 @@ public class UserController implements UIActionController
 				SYSLOG.error("Unknown user role '" + userRoleName + "'.");
 				return null;
 		}
+	}
+
+	@Override
+	public void updateAction(final Object data)
+	{
+		// USRLOG.debug("Update user: " + data);
+	}
+
+	@Override
+	public void removeAction(final Object data)
+	{
+		// USRLOG.debug("Remove user: " + data);
+	}
+
+	@Override
+	public void deleteAction(final Object data)
+	{
+		USRLOG.debug("Delete user: " + data);
+		deleteUser((User) data);
+	}
+
+	@Override
+	public void addAction(final Object data)
+	{
+		// USRLOG.debug("Add user: " + data);
+	}
+
+	@Override
+	public void viewAction(final Object data)
+	{
+		// USRLOG.debug("View user: " + data);
+	}
+
+	@Override
+	public void createAction(final Object data)
+	{
+		// USRLOG.debug("Create user: " + data);
 	}
 }

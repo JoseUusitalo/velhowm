@@ -8,7 +8,6 @@ import javafx.scene.Group;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
-import javafx.scene.control.Label;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
 import javafx.stage.Stage;
@@ -27,12 +26,13 @@ public class DebugWindow
 	private Button logInButton = new Button("Log In");
 
 	/**
-	 * Button has been tagged logOutButton and named as "Log Out" on the scene
+	 * Button has been tagged logOutButton and named as "Log Out" on the scene.
 	 */
 	public Button logOutButton = new Button("Log Out");
 
 	/**
-	 * Button has been tagged scannerMoveValid and named as "Scanner Move Valid" on the scene.
+	 * Button has been tagged scannerMoveValid and named as "Scanner Move Valid"
+	 * on the scene.
 	 */
 	public Button scannerMoveValid = new Button("Scanner Move Valid");
 
@@ -66,7 +66,6 @@ public class DebugWindow
 	 * Sets the value as either true or false to show in the scene.
 	 *
 	 * @param visibility
-	 * show log in button?
 	 */
 	public void setLogInButton(final boolean visibility)
 	{
@@ -77,7 +76,6 @@ public class DebugWindow
 	 * sets the value as either true or false to show in the scene.
 	 *
 	 * @param visibility
-	 * show log in button?
 	 */
 	public void setLogOutButton(final boolean visibility)
 	{
@@ -88,7 +86,6 @@ public class DebugWindow
 	 * Shows the debug window.
 	 *
 	 * @param primaryStage
-	 * stage to show the window in
 	 */
 	public void start(final Stage primaryStage)
 	{
@@ -108,19 +105,16 @@ public class DebugWindow
 		grid = new GridPane();
 		grid.setVgap(5);
 		grid.setHgap(10);
-		grid.add(new Label("User :"), 0, 0);
+
 		roleListBox.getItems().addAll(rolenameSet);
 		roleListBox.getSelectionModel().selectFirst();
 
 		logOutButton.setVisible(false);
 
-		grid.add(roleListBox, 1, 0);
-		grid.add(logInButton, 2, 0);
-		grid.add(logOutButton, 2, 1);
-		grid.add(scannerMoveValid, 1, 1);
+		Button sendRandomShipmentButton = new Button("Send Random Shipment");
 
-		rootBorderPane.setCenter(grid);
-		root.getChildren().add(rootBorderPane);
+		final Button fillUpPlatformButton = new Button("Fill Up Removal Platform");
+		final Button emptyPlatformButton = new Button("Empty");
 
 		logInButton.setOnAction(new EventHandler<ActionEvent>()
 		{
@@ -152,6 +146,44 @@ public class DebugWindow
 				debugController.scannerMoveValid();
 			}
 		});
+
+		sendRandomShipmentButton.setOnAction(new EventHandler<ActionEvent>()
+		{
+			@Override
+			public void handle(final ActionEvent event)
+			{
+				DebugController.sendRandomShipment();
+			}
+		});
+
+		fillUpPlatformButton.setOnAction(new EventHandler<ActionEvent>()
+		{
+			@Override
+			public void handle(final ActionEvent event)
+			{
+				debugController.fillUpPlatform();
+			}
+		});
+
+		emptyPlatformButton.setOnAction(new EventHandler<ActionEvent>()
+		{
+			@Override
+			public void handle(final ActionEvent event)
+			{
+				debugController.emptyPlatform();
+			}
+		});
+
+		grid.add(roleListBox, 0, 0);
+		grid.add(logInButton, 1, 0);
+		grid.add(logOutButton, 1, 1);
+		grid.add(scannerMoveValid, 0, 1);
+		grid.add(sendRandomShipmentButton, 0, 2);
+		grid.add(fillUpPlatformButton, 0, 3);
+		grid.add(emptyPlatformButton, 1, 3);
+
+		rootBorderPane.setCenter(grid);
+		root.getChildren().add(rootBorderPane);
 
 		primaryStage.setScene(scene);
 		primaryStage.show();

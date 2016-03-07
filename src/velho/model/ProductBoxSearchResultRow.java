@@ -1,5 +1,7 @@
 package velho.model;
 
+import java.util.Date;
+
 /**
  * A table row object containing the necessary data for display in search lists.
  *
@@ -99,5 +101,15 @@ public class ProductBoxSearchResultRow
 	public int getBoxID()
 	{
 		return box.getBoxID();
+	}
+
+	/**
+	 * Gets the expiration date of the products in the product box.
+	 *
+	 * @return the expiration date of the product box
+	 */
+	public Date getExpirationDate()
+	{
+		return box.getExpirationDate();
 	}
 }

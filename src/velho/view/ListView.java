@@ -44,6 +44,9 @@ public class ListView
 	 */
 	private Map<String, String> columnNames;
 
+	/**
+	 * Parent controller.
+	 */
 	private UIActionController parentController;
 
 	/**
@@ -208,7 +211,7 @@ public class ListView
 
 		/**
 		 * @param text
-		 * button text
+		 *            button text
 		 */
 		private TableCellDeleteButton(final UIActionController parentController, final String text)
 		{
@@ -216,17 +219,24 @@ public class ListView
 			button = new Button(text);
 			button.setFont(new Font(12));
 
+			/**
+			 * Handles the button press event.
+			 */
 			button.setOnAction(new EventHandler<ActionEvent>()
 			{
 				@Override
 				public void handle(final ActionEvent t)
 				{
-					// Get selected object and send information to parent controller.
+					// Get selected object and send information to parent
+					// controller.
 					controller.deleteAction(TableCellDeleteButton.this.getTableView().getItems().get(TableCellDeleteButton.this.getIndex()));
 				}
 			});
 		}
 
+		/**
+		 *
+		 */
 		@Override
 		protected void updateItem(final String string, final boolean empty)
 		{
@@ -241,7 +251,8 @@ public class ListView
 				{
 					// Permission check.
 
-					// Show delete button for users that have a lower or equal role than current user.
+					// Show delete button for users that have a lower or equal
+					// role than current user.
 					if (((User) rowObject).getRole().compareTo(LoginController.getCurrentUser().getRole()) <= 0)
 						setGraphic(button);
 				}
@@ -274,7 +285,7 @@ public class ListView
 
 		/**
 		 * @param text
-		 * button text
+		 *            button text
 		 */
 		private TableCellAddButton(final UIActionController parentController, final String text)
 		{

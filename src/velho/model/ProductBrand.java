@@ -12,9 +12,15 @@ public class ProductBrand
 	 * @param databaseID
 	 * @param name
 	 */
-	public ProductBrand(int databaseID, String name)
+	public ProductBrand(final int databaseID, final String name)
 	{
 		this.databaseID = databaseID;
+		this.name = name;
+	}
+
+	public ProductBrand(final String name)
+	{
+		this.databaseID = -1;
 		this.name = name;
 	}
 
@@ -26,7 +32,7 @@ public class ProductBrand
 
 	/**
 	 * Gets the name of this product brand.
-	 * 
+	 *
 	 * @return the name of this product brand
 	 */
 	public String getName()
@@ -36,7 +42,7 @@ public class ProductBrand
 
 	/**
 	 * Gets the database ID of this product brand.
-	 * 
+	 *
 	 * @return the database ID of this product brand
 	 */
 	public int getDatabaseID()
