@@ -9,11 +9,11 @@ import java.util.Map;
 import org.apache.log4j.Logger;
 
 import javafx.scene.Node;
+import javafx.scene.layout.BorderPane;
 import velho.model.ProductBrand;
 import velho.model.ProductCategory;
 import velho.model.enums.DatabaseTable;
 import velho.model.exceptions.NoDatabaseLinkException;
-import velho.view.ListView;
 import velho.view.ProductListSearch;
 import velho.view.SearchTabView;
 import velho.view.SearchView;
@@ -196,9 +196,11 @@ public class SearchController
 	 */
 	public Node getResultsView()
 	{
-		SYSLOG.trace("Getting search results for removal list.");
-		return ListController.getTableView(productController, DatabaseController.getProductSearchDataColumns(false, false),
-				DatabaseController.getObservableProductSearchResults());
+		//@formatter:off
+		return ListController.getTableView(productController,
+										   DatabaseController.getProductSearchDataColumns(false, false),
+										   DatabaseController.getObservableProductSearchResults());
+		//@formatter:on
 	}
 
 	/**
@@ -209,10 +211,11 @@ public class SearchController
 	public Node getProductListSearchView()
 	{
 		final ProductListSearch searchView = new ProductListSearch(this);
-		final ListView listView = new ListView(null, DatabaseController.getProductSearchDataColumns(false, false),
-				DatabaseController.getObservableProductSearchResults());
-
-		return searchView.getView(listView.getView());
+		//@formatter:off
+		return searchView.getView((BorderPane) ListController.getTableView(productController,
+										  								   DatabaseController.getProductSearchDataColumns(false, false),
+										  								   DatabaseController.getObservableProductSearchResults()));
+		//@formatter:on
 	}
 
 	/**

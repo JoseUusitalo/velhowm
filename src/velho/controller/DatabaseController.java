@@ -346,6 +346,7 @@ public class DatabaseController
 								// @formatter:off
 								while (result.next())
 									dataSet.add(new ProductBox(result.getInt("container_id"), result.getDate("expiration_date"), result.getInt("max_size"), getProductByID(result.getInt("product"), true), result.getInt("product_count")));
+								// FIXME: Containers are not set to their respective shelves!
 								break;
 							// @formatter:on
 
@@ -2136,7 +2137,7 @@ public class DatabaseController
 		// Remove nulls.
 		foundProducts.removeAll(Collections.singleton(null));
 
-		DBLOG.debug("Updating product box search results.");
+		DBLOG.debug("Updating product box list search results.");
 		observableProductBoxSearchResults.clear();
 		observableProductBoxSearchResults.addAll(foundProducts);
 
