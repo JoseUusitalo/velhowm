@@ -17,29 +17,53 @@ import velho.model.Product;
 import velho.model.exceptions.NoDatabaseLinkException;
 
 /**
- * Creates tab for "Product Edit View"
+ * Creates tab for "Product Edit View".
  *
  * @author Edward
  *
  */
 public class AddProductView
 {
+	/**
+	 * The product controller.
+	 */
 	private ProductController productController;
+	/**
+	 * The border panel.
+	 */
 	private BorderPane bPane;
+	/**
+	 * A text field.
+	 */
 	private TextField nameField;
+	/**
+	 * A combobox for brand list.
+	 */
 	private ComboBox<Object> brandList;
+	/**
+	 * A combobox for category list.
+	 */
 	private ComboBox<Object> categoryList;
+	/**
+	 * A label for product popularity.
+	 */
 	private Label popularityLabel;
+	/**
+	 * A spinner that shows the product popularity.
+	 */
 	private Spinner<Integer> popularity;
+	/**
+	 * The "save" button.
+	 */
 	private Button saveButton;
 
 	/**
 	 * Adds the product view.
-	 * Has to be manually inputed in the UIController at "switch (currentUserRole.getName())".
+	 * Has to be manually inputed in the UIController at
+	 * "switch (currentUserRole.getName())".
 	 *
 	 * @param productController makes it view able
 	 */
-
 	public AddProductView(final ProductController productController)
 	{
 		this.productController = productController;
