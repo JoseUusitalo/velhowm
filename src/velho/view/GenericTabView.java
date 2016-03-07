@@ -15,6 +15,9 @@ public class GenericTabView
 	 */
 	private BorderPane bPane;
 
+	/**
+	 * Defines the bPane border panel for this class.
+	 */
 	public GenericTabView()
 	{
 		bPane = new BorderPane();

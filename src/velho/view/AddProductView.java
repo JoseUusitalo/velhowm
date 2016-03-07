@@ -19,29 +19,57 @@ import velho.model.Product;
 import velho.model.exceptions.NoDatabaseLinkException;
 
 /**
- * Creates tab for "Product Edit View"
+ * Creates tab for "Product Edit View".
  *
  * @author Edward
  *
  */
 public class AddProductView
 {
+	/**
+	 * The product controller.
+	 */
 	private ProductController productController;
+	/**
+	 * The border panel.
+	 */
 	private BorderPane bPane;
+
 	private Spinner<Integer> databaseID;
+
+	/**
+	 * A text field.
+	 */
 	private TextField nameField;
+	/**
+	 * A combobox for brand list.
+	 */
 	private ComboBox<Object> brandList;
+	/**
+	 * A combobox for category list.
+	 */
 	private ComboBox<Object> categoryList;
+	/**
+	 * A label for product popularity.
+	 */
+	private Label popularityLabel;
+	/**
+	 * A spinner that shows the product popularity.
+	 */
 	private Spinner<Integer> popularity;
 	private UIController uiController;
+	/**
+	 * The "save" button.
+	 */
+	private Button saveButton;
 
 	/**
 	 * Adds the product view.
-	 * Has to be manually inputed in the UIController at "switch (currentUserRole.getName())".
+	 * Has to be manually inputed in the UIController at
+	 * "switch (currentUserRole.getName())".
 	 *
 	 * @param productController makes it view able
 	 */
-
 	public AddProductView(final ProductController productController, final UIController uiController)
 	{
 		this.productController = productController;
@@ -95,7 +123,8 @@ public class AddProductView
 			grid.add(popularityLabel, 4, 0);
 
 			popularity = new Spinner<Integer>();
-			// popularity.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(-1, 10000));
+			// popularity.setValueFactory(new
+			// SpinnerValueFactory.IntegerSpinnerValueFactory(-1, 10000));
 
 			popularity.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(-1, 10000, Integer.parseInt("-1")));
 			popularity.setEditable(true);
@@ -145,8 +174,7 @@ public class AddProductView
 					Object brand = brandList.valueProperty().getValue();
 					Object category = categoryList.valueProperty().getValue();
 
-					final Product newProduct = productController.saveProduct(databaseID.getValueFactory().getValue().intValue(), nameField.getText(), brand,
-							category, popularity.getValue().intValue());
+					final Product newProduct = productController.saveProduct(databaseID.getValueFactory().getValue().intValue(), nameField.getText(), brand, category, popularity.getValue().intValue());
 
 					if (editProduct)
 						productController.showProductView(newProduct);

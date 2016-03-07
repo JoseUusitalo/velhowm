@@ -26,12 +26,13 @@ public class DebugWindow
 	private Button logInButton = new Button("Log In");
 
 	/**
-	 * Button has been tagged logOutButton and named as "Log Out" on the scene
+	 * Button has been tagged logOutButton and named as "Log Out" on the scene.
 	 */
 	public Button logOutButton = new Button("Log Out");
 
 	/**
-	 * Button has been tagged scannerMoveValid and named as "Scanner Move Valid" on the scene.
+	 * Button has been tagged scannerMoveValid and named as "Scanner Move Valid"
+	 * on the scene.
 	 */
 	public Button scannerMoveValid = new Button("Scanner Move Valid");
 
@@ -65,7 +66,6 @@ public class DebugWindow
 	 * Sets the value as either true or false to show in the scene.
 	 *
 	 * @param visibility
-	 * show log in button?
 	 */
 	public void setLogInButton(final boolean visibility)
 	{
@@ -76,7 +76,6 @@ public class DebugWindow
 	 * sets the value as either true or false to show in the scene.
 	 *
 	 * @param visibility
-	 * show log in button?
 	 */
 	public void setLogOutButton(final boolean visibility)
 	{
@@ -87,7 +86,6 @@ public class DebugWindow
 	 * Shows the debug window.
 	 *
 	 * @param primaryStage
-	 * stage to show the window in
 	 */
 	public void start(final Stage primaryStage)
 	{
@@ -127,6 +125,9 @@ public class DebugWindow
 
 		});
 
+		/**
+		 * Handles the logOut button press event.
+		 */
 		logOutButton.setOnAction(new EventHandler<ActionEvent>()
 		{
 			@Override
@@ -137,6 +138,9 @@ public class DebugWindow
 			}
 		});
 
+		/**
+		 * Handles scanner's move action.
+		 */
 		scannerMoveValid.setOnAction(new EventHandler<ActionEvent>()
 		{
 
@@ -148,6 +152,9 @@ public class DebugWindow
 			}
 		});
 
+		/**
+		 * Handles the sending of random shipments.
+		 */
 		sendRandomShipmentButton.setOnAction(new EventHandler<ActionEvent>()
 		{
 			@Override
@@ -157,6 +164,9 @@ public class DebugWindow
 			}
 		});
 
+		/**
+		 * Handler for button's fillUpPlatform action.
+		 */
 		fillUpPlatformButton.setOnAction(new EventHandler<ActionEvent>()
 		{
 			@Override
