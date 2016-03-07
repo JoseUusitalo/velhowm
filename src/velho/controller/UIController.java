@@ -200,6 +200,8 @@ public class UIController
 	 */
 	public void destroyViews()
 	{
+		// TODO: We need to destroy all of the views.
+
 		mainView.destroy();
 		userController.destroyView();
 	}
