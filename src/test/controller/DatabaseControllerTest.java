@@ -214,7 +214,7 @@ public class DatabaseControllerTest
 		cols.put("name", "Name");
 		cols.put("brand", "Brand");
 		cols.put("category", "Category");
-		cols.put("popularity", "Popularity");
+		// cols.put("popularity", "Popularity");
 		cols.put("viewButton", "");
 
 		assertEquals(cols, DatabaseController.getProductDataColumns(false, false));
@@ -232,7 +232,7 @@ public class DatabaseControllerTest
 		cols.put("name", "Name");
 		cols.put("brand", "Brand");
 		cols.put("category", "Category");
-		cols.put("popularity", "Popularity");
+		// cols.put("popularity", "Popularity");
 		cols.put("viewButton", "");
 
 		assertEquals(cols, DatabaseController.getProductDataColumns(true, true));

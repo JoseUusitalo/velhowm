@@ -76,7 +76,7 @@ public class SearchView
 
 			final Label popularitySpinnerLabel = new Label("Product Popularity: ");
 			popularitySpinnerLabel.setAlignment(Pos.CENTER);
-			grid.add(popularitySpinnerLabel, 2, 2, 1, 1);
+			// grid.add(popularitySpinnerLabel, 2, 2, 1, 1);
 
 			final Spinner<Integer> productCountField = new Spinner<Integer>();
 			// productCountField.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(-1, 10000));
@@ -139,7 +139,7 @@ public class SearchView
 
 			popularityField.getEditor().addEventHandler(KeyEvent.KEY_RELEASED, keyboardHandler2);
 
-			grid.add(popularityField, 3, 2, 1, 1);
+			// grid.add(popularityField, 3, 2, 1, 1);
 
 			final ComboBox<Object> brandbox = new ComboBox<Object>();
 			brandbox.getItems().add(null);

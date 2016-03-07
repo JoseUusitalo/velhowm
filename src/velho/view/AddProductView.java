@@ -130,7 +130,7 @@ public class AddProductView
 
 			Label popularityLabel = new Label("Popularity: ");
 			popularityLabel.setAlignment(Pos.CENTER_RIGHT);
-			grid.add(popularityLabel, 4, 0);
+			// grid.add(popularityLabel, 4, 0);
 
 			popularity = new Spinner<Integer>();
 			// popularity.setValueFactory(new
@@ -159,7 +159,7 @@ public class AddProductView
 			};
 
 			popularity.getEditor().addEventHandler(KeyEvent.KEY_RELEASED, keyboardHandler);
-			grid.add(popularity, 5, 0);
+			// grid.add(popularity, 5, 0);
 
 			final Button cancelButton = new Button("Back to List");
 
@@ -172,7 +172,7 @@ public class AddProductView
 					uiController.selectTab("Product List");
 				}
 			});
-			grid.add(cancelButton, 7, 0);
+			grid.add(cancelButton, 6, 0);
 
 			Button saveButton = new Button("Save");
 
@@ -191,7 +191,7 @@ public class AddProductView
 						productController.showProductView(newProduct);
 				}
 			});
-			grid.add(saveButton, 6, 0);
+			grid.add(saveButton, 5, 0);
 
 			grid.setHgap(10);
 			grid.getStyleClass().add("standard-padding");

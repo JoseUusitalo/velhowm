@@ -1431,7 +1431,7 @@ public class DatabaseController
 		cols.put("name", "Name");
 		cols.put("brand", "Brand");
 		cols.put("category", "Category");
-		cols.put("popularity", "Popularity");
+		// cols.put("popularity", "Popularity");
 		cols.put("viewButton", "");
 
 		return cols;

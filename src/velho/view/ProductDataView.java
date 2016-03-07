@@ -48,7 +48,7 @@ public class ProductDataView
 			grid.add(productCategory, 0, 3);
 
 			Label productPopularity = new Label("Popularity: ");
-			grid.add(productPopularity, 0, 4);
+			// grid.add(productPopularity, 0, 4);
 
 			Label productIDValue = new Label(String.valueOf(product.getProductID()));
 			grid.add(productIDValue, 1, 1);
@@ -60,7 +60,7 @@ public class ProductDataView
 			grid.add(productCategoryValue, 1, 3);
 
 			Label productPopularityValue = new Label(String.valueOf(product.getPopularity()));
-			grid.add(productPopularityValue, 1, 4);
+			// grid.add(productPopularityValue, 1, 4);
 
 			Button editButton = new Button("Edit");
 			editButton.setMaxWidth(Double.MAX_VALUE);
