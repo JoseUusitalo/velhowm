@@ -569,7 +569,7 @@ public class DatabaseController
 			// If it was a UNIQUE constraint violation, continue normally as
 			// those are handled separately.
 			DBLOG.error("Silently ignored an SQL UNIQUE constraint violation. Begin message:");
-			DBLOG.error(e.getMessage());
+			DBLOG.error(escape(e.getMessage()));
 			DBLOG.error("End of message.");
 		}
 
@@ -693,7 +693,7 @@ public class DatabaseController
 			// If it was a UNIQUE constraint violation, continue normally as
 			// those are handled separately.
 			DBLOG.error("Silently ignored an SQL UNIQUE constraint violation. Begin message:");
-			DBLOG.error(e.getMessage());
+			DBLOG.error(escape(e.getMessage()));
 			DBLOG.error("End of message.");
 		}
 
