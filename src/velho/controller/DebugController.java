@@ -171,4 +171,12 @@ public class DebugController
 	{
 		removalPlatformController.modifyFreeSpace(-1.0 * ((r.nextDouble() * 0.15 + 0.2) - 0.1));
 	}
+
+	/**
+	 * Empties the removal platform.
+	 */
+	public void emptyPlatform()
+	{
+		removalPlatformController.emptyPlatform();
+	}
 }

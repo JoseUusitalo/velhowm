@@ -111,4 +111,14 @@ public class RemovalPlatformController
 				PopupController.warning("The removal platform is " + percentFull + "% full. Please contact the waste disposal services.");
 		}
 	}
+
+	/**
+	 * Empties the removal platform.
+	 */
+	public void emptyPlatform()
+	{
+		SYSLOG.info("Removal platform emptied.");
+		getPlatform().empty();
+		checkWarning();
+	}
 }

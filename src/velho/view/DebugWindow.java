@@ -113,7 +113,8 @@ public class DebugWindow
 
 		Button sendRandomShipmentButton = new Button("Send Random Shipment");
 
-		Button fillUpPlatformButton = new Button("Fill Up Removal Platform");
+		final Button fillUpPlatformButton = new Button("Fill Up Removal Platform");
+		final Button emptyPlatformButton = new Button("Empty");
 
 		logInButton.setOnAction(new EventHandler<ActionEvent>()
 		{
@@ -125,9 +126,6 @@ public class DebugWindow
 
 		});
 
-		/**
-		 * Handles the logOut button press event.
-		 */
 		logOutButton.setOnAction(new EventHandler<ActionEvent>()
 		{
 			@Override
@@ -138,9 +136,6 @@ public class DebugWindow
 			}
 		});
 
-		/**
-		 * Handles scanner's move action.
-		 */
 		scannerMoveValid.setOnAction(new EventHandler<ActionEvent>()
 		{
 
@@ -152,9 +147,6 @@ public class DebugWindow
 			}
 		});
 
-		/**
-		 * Handles the sending of random shipments.
-		 */
 		sendRandomShipmentButton.setOnAction(new EventHandler<ActionEvent>()
 		{
 			@Override
@@ -164,9 +156,6 @@ public class DebugWindow
 			}
 		});
 
-		/**
-		 * Handler for button's fillUpPlatform action.
-		 */
 		fillUpPlatformButton.setOnAction(new EventHandler<ActionEvent>()
 		{
 			@Override
@@ -176,12 +165,22 @@ public class DebugWindow
 			}
 		});
 
+		emptyPlatformButton.setOnAction(new EventHandler<ActionEvent>()
+		{
+			@Override
+			public void handle(final ActionEvent event)
+			{
+				debugController.emptyPlatform();
+			}
+		});
+
 		grid.add(roleListBox, 0, 0);
 		grid.add(logInButton, 1, 0);
 		grid.add(logOutButton, 1, 1);
 		grid.add(scannerMoveValid, 0, 1);
 		grid.add(sendRandomShipmentButton, 0, 2);
 		grid.add(fillUpPlatformButton, 0, 3);
+		grid.add(emptyPlatformButton, 1, 3);
 
 		rootBorderPane.setCenter(grid);
 		root.getChildren().add(rootBorderPane);
