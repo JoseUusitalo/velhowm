@@ -205,7 +205,7 @@ public class ManifestController implements UIActionController
 	@Override
 	public void createAction(final Object data)
 	{
-		// TODO Auto-generated method stub
+		throw new UnsupportedOperationException();
 	}
 
 	@Override
@@ -217,19 +217,19 @@ public class ManifestController implements UIActionController
 	@Override
 	public void addAction(final Object data)
 	{
-		// TODO Auto-generated method stub
+		throw new UnsupportedOperationException();
 	}
 
 	@Override
 	public void removeAction(final Object data)
 	{
-		// TODO Auto-generated method stub
+		throw new UnsupportedOperationException();
 	}
 
 	@Override
 	public void deleteAction(final Object data)
 	{
-		// TODO Auto-generated method stub
+		throw new UnsupportedOperationException();
 	}
 
 	@Override

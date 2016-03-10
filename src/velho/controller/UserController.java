@@ -197,13 +197,13 @@ public class UserController implements UIActionController
 	@Override
 	public void updateAction(final Object data)
 	{
-		// USRLOG.debug("Update user: " + data);
+		throw new UnsupportedOperationException();
 	}
 
 	@Override
 	public void removeAction(final Object data)
 	{
-		// USRLOG.debug("Remove user: " + data);
+		throw new UnsupportedOperationException();
 	}
 
 	@Override
@@ -216,18 +216,18 @@ public class UserController implements UIActionController
 	@Override
 	public void addAction(final Object data)
 	{
-		// USRLOG.debug("Add user: " + data);
+		throw new UnsupportedOperationException();
 	}
 
 	@Override
 	public void viewAction(final Object data)
 	{
-		// USRLOG.debug("View user: " + data);
+		throw new UnsupportedOperationException();
 	}
 
 	@Override
 	public void createAction(final Object data)
 	{
-		// USRLOG.debug("Create user: " + data);
+		throw new UnsupportedOperationException();
 	}
 }

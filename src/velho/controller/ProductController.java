@@ -235,34 +235,31 @@ public class ProductController implements UIActionController
 	@Override
 	public void createAction(final Object data)
 	{
-		// SYSLOG.trace("Controller got from UI: " + data);
+		throw new UnsupportedOperationException();
 	}
 
 	@Override
 	public void updateAction(final Object data)
 	{
-		// SYSLOG.trace("Controller got from UI update: " +
-		// ((ProductBoxSearchResultRow) data).getBox());
+		throw new UnsupportedOperationException();
 	}
 
 	@Override
 	public void addAction(final Object data)
 	{
-		// TODO Auto-generated method stub
-
+		throw new UnsupportedOperationException();
 	}
 
 	@Override
 	public void removeAction(final Object data)
 	{
-		// TODO Auto-generated method stub
-
+		throw new UnsupportedOperationException();
 	}
 
 	@Override
 	public void deleteAction(final Object data)
 	{
-		// TODO Auto-generated method stub
+		throw new UnsupportedOperationException();
 	}
 
 	@Override

@@ -290,14 +290,13 @@ public class RemovalListController implements UIActionController
 	@Override
 	public void createAction(final Object data)
 	{
-		// SYSLOG.trace("Controller got from UI: " + data);
+		throw new UnsupportedOperationException();
 	}
 
 	@Override
 	public void updateAction(final Object data)
 	{
-		// SYSLOG.trace("Controller got from UI update: " +
-		// ((ProductBoxSearchResultRow) data).getBox());
+		throw new UnsupportedOperationException();
 	}
 
 	@Override
