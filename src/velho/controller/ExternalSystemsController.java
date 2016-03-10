@@ -186,8 +186,15 @@ public class ExternalSystemsController
 			DatabaseController.tryReLink();
 
 		}
+
 		if (showPopup)
-			DebugController.moveResult(productBoxCode, newShelfSlotID, success);
+		{
+			if (success)
+				PopupController.info(productBoxCode + " was moved to " + newShelfSlotID + ".");
+			else
+				PopupController.error(
+						productBoxCode + " was not moved to " + newShelfSlotID + ". Either the product box or the shelf does not exist in the database!");
+		}
 
 		return success;
 	}
