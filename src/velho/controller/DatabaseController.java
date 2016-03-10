@@ -40,6 +40,7 @@ import velho.model.RemovalListState;
 import velho.model.RemovalPlatform;
 import velho.model.Shelf;
 import velho.model.User;
+import velho.model.enums.DatabaseFileState;
 import velho.model.enums.DatabaseQueryType;
 import velho.model.enums.DatabaseTable;
 import velho.model.exceptions.ExistingDatabaseLinkException;
@@ -1003,7 +1004,7 @@ public class DatabaseController
 	 * @throws ExistingDatabaseLinkException
 	 * when a database link already exists
 	 */
-	public static boolean link() throws ClassNotFoundException, ExistingDatabaseLinkException
+	public static DatabaseFileState link() throws ClassNotFoundException, ExistingDatabaseLinkException
 	{
 		if (connectionPool != null)
 			throw new ExistingDatabaseLinkException();
@@ -1012,6 +1013,7 @@ public class DatabaseController
 		Class.forName("org.h2.Driver");
 
 		String uri = DB_URI;
+		DatabaseFileState state = null;
 
 		/*
 		 * If the database does not exists, it will be created with the
@@ -1020,10 +1022,14 @@ public class DatabaseController
 		 */
 		if (databaseExists())
 		{
+			state = DatabaseFileState.EXISTING;
 			uri += ";IFEXISTS=TRUE";
 		}
 		else
+		{
+			state = DatabaseFileState.DOES_NOT_EXIST;
 			DBLOG.info("Database does not exist, creating a new database.");
+		}
 
 		// Create a connection pool.
 		connectionPool = JdbcConnectionPool.create(uri, USERNAME, "@_Vry $ECURE pword2");
@@ -1034,10 +1040,8 @@ public class DatabaseController
 		{
 			final Connection c = getConnection();
 
-			if (c == null)
-				return false;
-
-			c.close();
+			if (c != null)
+				c.close();
 		}
 		catch (final NoDatabaseLinkException e)
 		{
@@ -1050,18 +1054,18 @@ public class DatabaseController
 
 		if (databaseExists())
 		{
+			if (state == DatabaseFileState.DOES_NOT_EXIST)
+				state = DatabaseFileState.CREATED;
+
 			if (isLinked())
-			{
 				DBLOG.info("Database linked.");
-				return true;
-			}
-
-			DBLOG.info("Database linking failed.");
-			return false;
+			else
+				DBLOG.info("Database linking failed.");
 		}
+		else
+			DBLOG.info("Database creation failed.");
 
-		DBLOG.info("Database creation failed.");
-		return false;
+		return state;
 	}
 
 	/**
@@ -1087,7 +1091,23 @@ public class DatabaseController
 	 */
 	public static boolean connectAndInitialize() throws ClassNotFoundException, ExistingDatabaseLinkException, NoDatabaseLinkException
 	{
-		return DatabaseController.link() && DatabaseController.initializeDatabase();
+		final DatabaseFileState state = link();
+		boolean initialized = true;
+
+		switch (state)
+		{
+			case DOES_NOT_EXIST:
+				return false;
+			case CREATED:
+				// Only initialize the database if it does not exist.
+				initialized = initializeDatabase();
+				break;
+			case EXISTING:
+			default:
+				// Do nothing, database is ready to use.
+		}
+
+		return isLinked() && initialized;
 	}
 
 	/*

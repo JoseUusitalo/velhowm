@@ -24,6 +24,7 @@ import velho.model.ProductBox;
 import velho.model.ProductBoxSearchResultRow;
 import velho.model.RemovalList;
 import velho.model.User;
+import velho.model.enums.DatabaseFileState;
 import velho.model.exceptions.ExistingDatabaseLinkException;
 import velho.model.exceptions.NoDatabaseLinkException;
 
@@ -38,7 +39,7 @@ public class DatabaseControllerTest
 	@BeforeClass
 	public final static void connectAndInitializeDatabase() throws ClassNotFoundException, NoDatabaseLinkException, ExistingDatabaseLinkException
 	{
-		assertTrue(DatabaseController.link());
+		assertTrue(DatabaseController.link() != DatabaseFileState.DOES_NOT_EXIST);
 		assertTrue(DatabaseController.initializeDatabase());
 	}
 

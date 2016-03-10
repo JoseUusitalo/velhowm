@@ -12,6 +12,7 @@ import java.util.Map;
 import org.apache.log4j.Logger;
 import org.h2.jdbcx.JdbcConnectionPool;
 
+import velho.model.enums.DatabaseFileState;
 import velho.model.enums.DatabaseQueryType;
 import velho.model.enums.DatabaseTable;
 import velho.model.exceptions.ExistingDatabaseLinkException;
@@ -370,7 +371,7 @@ public class LogDatabaseController
 	 * @throws ExistingDatabaseLinkException
 	 * when a database link already exists
 	 */
-	public static boolean link() throws ClassNotFoundException, ExistingDatabaseLinkException
+	public static DatabaseFileState link() throws ClassNotFoundException, ExistingDatabaseLinkException
 	{
 		if (connectionPool != null)
 			throw new ExistingDatabaseLinkException();
@@ -379,6 +380,7 @@ public class LogDatabaseController
 		Class.forName("org.h2.Driver");
 
 		String uri = DB_URI;
+		DatabaseFileState state = null;
 
 		/*
 		 * If the database does not exists, it will be created with the connection pool.
@@ -386,10 +388,16 @@ public class LogDatabaseController
 		 */
 		if (databaseExists())
 		{
+			state = DatabaseFileState.EXISTING;
 			uri += ";IFEXISTS=TRUE";
 		}
-		else if (MainWindow.DEBUG_MODE)
-			System.out.println("Log database does not exist, creating a new database.");
+		else
+		{
+			state = DatabaseFileState.DOES_NOT_EXIST;
+			// We obviously can't use the logger before the log database exists.
+			if (MainWindow.DEBUG_MODE)
+				System.out.println("Log database does not exist, creating a new database.");
+		}
 
 		// Create a connection pool.
 		connectionPool = JdbcConnectionPool.create(uri, USERNAME, "gottaKeepEmL0G5safe");
@@ -399,10 +407,8 @@ public class LogDatabaseController
 		{
 			final Connection c = getConnection();
 
-			if (c == null)
-				return false;
-
-			c.close();
+			if (c != null)
+				c.close();
 		}
 		catch (final NoDatabaseLinkException e)
 		{
@@ -415,21 +421,27 @@ public class LogDatabaseController
 
 		if (databaseExists())
 		{
+			if (state == DatabaseFileState.DOES_NOT_EXIST)
+				state = DatabaseFileState.CREATED;
+
 			if (isLinked())
 			{
 				if (MainWindow.DEBUG_MODE)
 					System.out.println("Log database linked.");
-				return true;
 			}
-
+			else
+			{
+				if (MainWindow.DEBUG_MODE)
+					System.out.println("Log database linking failed.");
+			}
+		}
+		else
+		{
 			if (MainWindow.DEBUG_MODE)
-				System.out.println("Log database linking failed.");
-			return false;
+				System.out.println("Log database creation failed.");
 		}
 
-		if (MainWindow.DEBUG_MODE)
-			System.out.println("Log database creation failed.");
-		return false;
+		return state;
 	}
 
 	/**
@@ -455,7 +467,23 @@ public class LogDatabaseController
 	 */
 	public static boolean connectAndInitialize() throws ClassNotFoundException, ExistingDatabaseLinkException, NoDatabaseLinkException
 	{
-		return LogDatabaseController.link() && LogDatabaseController.initializeDatabase();
+		final DatabaseFileState state = link();
+		boolean initialized = true;
+
+		switch (state)
+		{
+			case DOES_NOT_EXIST:
+				return false;
+			case CREATED:
+				// Only initialize the database if it does not exist.
+				initialized = initializeDatabase();
+				break;
+			case EXISTING:
+			default:
+				// Do nothing, database is ready to use.
+		}
+
+		return isLinked() && initialized;
 	}
 
 	/**

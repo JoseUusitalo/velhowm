@@ -9,6 +9,7 @@ import org.junit.Test;
 
 import velho.controller.DatabaseController;
 import velho.model.RemovalPlatform;
+import velho.model.enums.DatabaseFileState;
 import velho.model.exceptions.ExistingDatabaseLinkException;
 import velho.model.exceptions.NoDatabaseLinkException;
 
@@ -28,7 +29,7 @@ public class RemovalPlatformTest
 		try
 		{
 			if (!DatabaseController.isLinked())
-				assertTrue(DatabaseController.link());
+				assertTrue(DatabaseController.link() != DatabaseFileState.DOES_NOT_EXIST);
 
 			assertTrue(DatabaseController.initializeDatabase());
 		}

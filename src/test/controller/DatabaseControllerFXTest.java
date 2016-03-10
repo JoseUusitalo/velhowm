@@ -10,6 +10,7 @@ import org.junit.Test;
 
 import velho.controller.DatabaseController;
 import velho.model.JavaFXThreadingRule;
+import velho.model.enums.DatabaseFileState;
 import velho.model.exceptions.ExistingDatabaseLinkException;
 import velho.model.exceptions.NoDatabaseLinkException;
 
@@ -27,7 +28,7 @@ public class DatabaseControllerFXTest
 	@Before
 	public final void connectAndInitializeDatabase() throws ClassNotFoundException, NoDatabaseLinkException, ExistingDatabaseLinkException
 	{
-		assertTrue(DatabaseController.link());
+		assertTrue(DatabaseController.link() != DatabaseFileState.DOES_NOT_EXIST);
 		assertTrue(DatabaseController.initializeDatabase());
 	}
 
