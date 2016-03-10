@@ -174,8 +174,6 @@ public class ManifestController implements UIActionController
 	{
 		Manifest manifest;
 
-		// TODO: Update the manifest browse view automatically.
-
 		try
 		{
 			manifest = new Manifest(DatabaseController.getManifestStateByID(3), driverID, orderDate, Date.from(Instant.now()));

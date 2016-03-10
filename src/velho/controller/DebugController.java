@@ -2,8 +2,6 @@ package velho.controller;
 
 import java.util.Random;
 
-import org.apache.log4j.Logger;
-
 import javafx.stage.Stage;
 import velho.model.BarcodeScanner;
 import velho.model.exceptions.NoDatabaseLinkException;
@@ -16,11 +14,6 @@ import velho.view.DebugWindow;
  */
 public class DebugController
 {
-	/**
-	 * Apache log4j logger: System.
-	 */
-	private static final Logger SYSLOG = Logger.getLogger(DebugController.class.getName());
-
 	/**
 	 * The {@link DebugWindow}.
 	 */
@@ -115,24 +108,6 @@ public class DebugController
 	public void scannerMoveValid()
 	{
 		ExternalSystemsController.scannerMoveValid();
-	}
-
-	/**
-	 * Result message from the External systems controller to the DebugWindow of the procedures end result.
-	 */
-	public static void resultMessage()
-	{
-		// TODO: Figure out what this does.
-
-		final boolean s = ExternalSystemsController.move(0, null, true);
-		if (s == true)
-		{
-			SYSLOG.debug("Product box move successful.");
-		}
-		else
-		{
-			SYSLOG.debug("Product box move failed.");
-		}
 	}
 
 	/**

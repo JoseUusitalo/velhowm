@@ -108,8 +108,10 @@ public class AddProductView
 			brandList.getItems().addAll(DatabaseController.getAllProductBrands());
 			brandList.setMaxWidth(Double.MAX_VALUE);
 
-			// TODO: Fix coombobox selection mechanic breaking on the second try because the selection is converted from
-			// object to string.
+			/*
+			 * TODO: Fix combobox selection mechanic breaking on the second try because the selection is converted from
+			 * object to string.
+			 */
 			// brandList.setEditable(true);
 
 			brandList.getSelectionModel().selectFirst();
@@ -121,8 +123,10 @@ public class AddProductView
 			categoryList.getItems().addAll(DatabaseController.getAllProductCategories());
 			categoryList.setMaxWidth(Double.MAX_VALUE);
 
-			// TODO: Fix coombobox selection mechanic breaking on the second try because the selection is converted from
-			// object to string.
+			/*
+			 * TODO: Fix combobox selection mechanic breaking on the second try because the selection is converted from
+			 * object to string.
+			 */
 			// categoryList.setEditable(true);
 
 			categoryList.getSelectionModel().selectFirst();
