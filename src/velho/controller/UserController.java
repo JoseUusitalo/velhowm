@@ -3,12 +3,12 @@ package velho.controller;
 import org.apache.log4j.Logger;
 
 import javafx.scene.Node;
+import velho.controller.interfaces.UIActionController;
 import velho.model.Administrator;
 import velho.model.Logistician;
 import velho.model.Manager;
 import velho.model.User;
 import velho.model.exceptions.NoDatabaseLinkException;
-import velho.model.interfaces.UIActionController;
 import velho.model.interfaces.UserRole;
 import velho.view.AddUserView;
 import velho.view.MainWindow;

@@ -7,12 +7,12 @@ import java.util.Set;
 import org.apache.log4j.Logger;
 
 import javafx.scene.Node;
+import velho.controller.interfaces.UIActionController;
 import velho.model.Manager;
 import velho.model.Manifest;
 import velho.model.ManifestState;
 import velho.model.ProductBox;
 import velho.model.exceptions.NoDatabaseLinkException;
-import velho.model.interfaces.UIActionController;
 import velho.view.GenericTabView;
 import velho.view.MainWindow;
 import velho.view.ManifestManagementView;

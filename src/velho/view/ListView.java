@@ -19,8 +19,8 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.text.Font;
 import javafx.util.Callback;
 import velho.controller.LoginController;
+import velho.controller.interfaces.UIActionController;
 import velho.model.User;
-import velho.model.interfaces.UIActionController;
 
 /**
  * A class for creating lists and tables of data.

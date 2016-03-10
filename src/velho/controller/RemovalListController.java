@@ -4,12 +4,12 @@ import org.apache.log4j.Logger;
 
 import javafx.scene.Node;
 import javafx.scene.layout.BorderPane;
+import velho.controller.interfaces.UIActionController;
 import velho.model.Manager;
 import velho.model.ProductBoxSearchResultRow;
 import velho.model.RemovalList;
 import velho.model.RemovalListState;
 import velho.model.exceptions.NoDatabaseLinkException;
-import velho.model.interfaces.UIActionController;
 import velho.view.GenericTabView;
 import velho.view.RemovalListCreationView;
 import velho.view.RemovalListManagementView;

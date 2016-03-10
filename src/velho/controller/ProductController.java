@@ -3,11 +3,11 @@ package velho.controller;
 import org.apache.log4j.Logger;
 
 import javafx.scene.Node;
+import velho.controller.interfaces.UIActionController;
 import velho.model.Product;
 import velho.model.ProductBrand;
 import velho.model.ProductCategory;
 import velho.model.exceptions.NoDatabaseLinkException;
-import velho.model.interfaces.UIActionController;
 import velho.view.AddProductView;
 import velho.view.GenericTabView;
 import velho.view.ProductDataView;
