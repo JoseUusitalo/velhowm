@@ -18,7 +18,7 @@ import velho.model.exceptions.NoDatabaseLinkException;
 /**
  * Created to scan newly arrived product boxes. This class creates product boxes into the system.
  *
- * @author Edward
+ * @author Edward Puustinen
  */
 public class BarcodeScanner
 {

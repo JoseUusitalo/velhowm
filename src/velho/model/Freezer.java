@@ -5,7 +5,7 @@ import java.util.Date;
 /**
  * The freezer class.
  *
- * @author Joona &amp; Jose Uusitalo
+ * @author Joona Silvennoinen &amp; Jose Uusitalo
  */
 public class Freezer extends ProductContainer
 {

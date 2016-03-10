@@ -15,7 +15,7 @@ import velho.controller.UserController;
 /**
  * The add user view class.
  *
- * @author Joona
+ * @author Joona Silvennoinen
  */
 public class AddUserView
 {

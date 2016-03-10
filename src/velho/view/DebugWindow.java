@@ -16,7 +16,7 @@ import velho.controller.DebugController;
 /**
  * A window with various debug features.
  *
- * @author Edward
+ * @author Edward Puustinen
  */
 public class DebugWindow
 {

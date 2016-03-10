@@ -48,7 +48,7 @@ import velho.model.exceptions.NoDatabaseLinkException;
 /**
  * The main window and class for Velho Warehouse Management.
  *
- * @author Jose Uusitalo &amp; Joona
+ * @author Jose Uusitalo &amp; Joona Silvennoinen
  */
 public class MainWindow extends Application
 {

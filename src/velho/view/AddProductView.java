@@ -21,7 +21,7 @@ import velho.model.exceptions.NoDatabaseLinkException;
 /**
  * Creates tab for "Product Edit View".
  *
- * @author Edward
+ * @author Edward Puustinen
  *
  */
 public class AddProductView

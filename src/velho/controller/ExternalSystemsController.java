@@ -19,7 +19,7 @@ import velho.model.exceptions.NoDatabaseLinkException;
 /**
  * Controller handling the communication with systems outside the Velho Warehouse Management.
  *
- * @author Edward &amp; Jose Uusitalo
+ * @author Edward Puustinen &amp; Jose Uusitalo
  */
 public class ExternalSystemsController
 {

@@ -15,7 +15,7 @@ import velho.view.ProductDataView;
 /**
  * Controller for handling {@link Product} objects
  *
- * @author Jose Uusitalo &amp; Edward
+ * @author Jose Uusitalo &amp; Edward Puustinen
  */
 public class ProductController implements UIActionController
 {

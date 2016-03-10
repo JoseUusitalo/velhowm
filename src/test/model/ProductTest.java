@@ -14,7 +14,7 @@ import velho.model.ProductType;
 /**
  * Tests for the {@link Product} class.
  *
- * @author Joona
+ * @author Joona Silvennoinen
  */
 public class ProductTest
 {

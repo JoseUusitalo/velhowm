@@ -6,7 +6,7 @@ import velho.model.interfaces.UserRole;
  * This this is the manager role.
  * Note: this class has a natural ordering that is inconsistent with equals.
  *
- * @author Jose Uusitalo &amp; Edward
+ * @author Jose Uusitalo &amp; Edward Puustinen
  */
 public class Manager implements UserRole
 {

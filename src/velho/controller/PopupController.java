@@ -9,7 +9,7 @@ import javafx.scene.control.ButtonType;
 /**
  * A controller for popup alerts.
  *
- * @author Joona
+ * @author Joona Silvennoinen
  */
 public class PopupController
 {

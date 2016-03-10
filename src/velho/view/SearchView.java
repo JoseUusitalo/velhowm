@@ -17,7 +17,7 @@ import velho.controller.SearchController;
 
 /**
  *
- * @author Joona &amp; Jose Uusitalo
+ * @author Joona Silvennoinen &amp; Jose Uusitalo
  */
 public class SearchView
 {

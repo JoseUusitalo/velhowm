@@ -15,7 +15,7 @@ import velho.model.ProductType;
 /**
  * Tests for the {@link Freezer} class.
  *
- * @author Joona
+ * @author Joona Silvennoinen
  */
 public class FreezerTest
 {

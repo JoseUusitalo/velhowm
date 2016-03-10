@@ -10,7 +10,7 @@ import velho.view.DebugWindow;
 /**
  * Various debugging features.
  *
- * @author Edward &amp; Jose Uusitalo
+ * @author Edward Puustinen &amp; Jose Uusitalo
  */
 public class DebugController
 {

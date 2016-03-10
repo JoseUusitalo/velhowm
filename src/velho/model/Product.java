@@ -3,7 +3,7 @@ package velho.model;
 /**
  * The Product class.
  *
- * @author Joona &amp; Jose Uusitalo
+ * @author Joona Silvennoinen &amp; Jose Uusitalo
  */
 public class Product
 {

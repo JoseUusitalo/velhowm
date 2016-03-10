@@ -3,7 +3,7 @@ package velho.model;
 import java.util.Date;
 
 /**
- * @author Joona &amp; Jose Uusitalo
+ * @author Joona Silvennoinen &amp; Jose Uusitalo
  */
 public abstract class ProductContainer
 {

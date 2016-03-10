@@ -1,7 +1,7 @@
 package velho.model.interfaces;
 
 /**
- * @author Edward
+ * @author Edward Puustinen
  */
 public interface UserRole extends Comparable<UserRole>
 {

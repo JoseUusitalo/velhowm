@@ -25,7 +25,7 @@ import velho.model.User;
 /**
  * A class for creating lists and tables of data.
  *
- * @author Jose Uusitalo &amp; Joona
+ * @author Jose Uusitalo &amp; Joona Silvennoinen
  */
 public class ListView
 {

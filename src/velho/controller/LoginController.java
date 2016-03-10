@@ -14,7 +14,7 @@ import velho.view.MainWindow;
 /**
  * Controls logging users in and out.
  *
- * @author Jose Uusitalo &amp; Edward
+ * @author Jose Uusitalo &amp; Edward Puustinen
  */
 public class LoginController
 {

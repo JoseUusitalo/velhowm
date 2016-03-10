@@ -16,7 +16,7 @@ import velho.view.MainWindow;
 /**
  * A controller for managing users.
  *
- * @author Jose Uusitalo &amp; Joona
+ * @author Jose Uusitalo &amp; Joona Silvennoinen
  */
 @SuppressWarnings("static-method")
 public class UserController implements UIActionController
