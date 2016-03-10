@@ -34,10 +34,10 @@ public class Product
 
 	/**
 	 * @param name
-	 * @param productID
+	 * @param databaseID
 	 * @param brand
 	 * @param category
-	 *
+	 * @param popularity
 	 */
 	public Product(final int databaseID, final String name, final ProductBrand brand, final ProductCategory category, final int popularity)
 	{

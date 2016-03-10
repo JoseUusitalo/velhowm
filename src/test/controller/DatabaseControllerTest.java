@@ -29,7 +29,7 @@ import velho.model.exceptions.ExistingDatabaseLinkException;
 import velho.model.exceptions.NoDatabaseLinkException;
 
 /**
- * Tests for the {@link velho.controller.Database} class.
+ * Tests for the {@link DatabaseController} class.
  *
  * @author Jose Uusitalo
  */

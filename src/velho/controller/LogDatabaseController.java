@@ -320,9 +320,8 @@ public class LogDatabaseController
 	}
 
 	/**
-	 * Checks if a database link exists and throws a
-	 * {@link NoDatabaseConnectionException} exception if it doesn't. To be used
-	 * when a database link must exist.
+	 * Checks if a database link exists and throws a {@link NoDatabaseLinkException} exception if it doesn't.
+	 * To be used when a database link must exist.
 	 */
 	public static void checkLink() throws NoDatabaseLinkException
 	{
@@ -490,7 +489,7 @@ public class LogDatabaseController
 	 * Initializes the database.
 	 *
 	 * @return <code>true</code> if database changed as a result of this call
-	 * @throws NoDatabaseConnectionException
+	 * @throws NoDatabaseLinkException
 	 */
 	public static boolean initializeDatabase() throws NoDatabaseLinkException
 	{

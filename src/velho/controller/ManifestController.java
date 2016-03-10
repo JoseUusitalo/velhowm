@@ -158,7 +158,7 @@ public class ManifestController implements UIActionController
 	 * Adds the manifest state selector to the management panel.
 	 * Use <code>null</code> to remove it.
 	 *
-	 * @param manifestState the manifest state combo box
+	 * @param stateBox the manifest state combo box
 	 */
 	public void showStateSelector(final Node stateBox)
 	{

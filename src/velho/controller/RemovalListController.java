@@ -63,7 +63,6 @@ public class RemovalListController implements UIActionController
 	private GenericTabView tabView;
 
 	/**
-	 * @param listController
 	 * @param searchController
 	 */
 	public RemovalListController(final SearchController searchController)
@@ -269,7 +268,7 @@ public class RemovalListController implements UIActionController
 	 * Changes the state of the specified removal list.
 	 *
 	 * @param removalList the {@link RemovalList} to modify
-	 * @param newState the new {@link RemovalListState}
+	 * @param state the new {@link RemovalListState}
 	 */
 	@SuppressWarnings("static-method")
 	public void updateRemovalListState(final RemovalList removalList, final RemovalListState state)

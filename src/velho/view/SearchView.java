@@ -38,10 +38,10 @@ public class SearchView
 	}
 
 	/**
-	 * @param searchController2
+	 * @param searchController
 	 * @param limits
-	 * @param allProductBrands
-	 * @param allProductCategories
+	 * @param productBrands
+	 * @param productCategories
 	 */
 	public SearchView(final SearchController searchController, final String limits, final ObservableList<Object> productBrands,
 			final ObservableList<Object> productCategories)

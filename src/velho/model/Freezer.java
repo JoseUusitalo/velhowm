@@ -15,7 +15,6 @@ public class Freezer extends ProductContainer
 	 * @param maxSize
 	 * @param product
 	 * @param productCount
-	 * @param category
 	 */
 	public Freezer(final int freezerID, final Date expirationDate, final int maxSize, final Product product, final int productCount)
 	{

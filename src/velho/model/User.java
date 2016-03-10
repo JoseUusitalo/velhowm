@@ -58,7 +58,6 @@ public class User
 
 	/**
 	 * @param databaseID
-	 * @param badgeID
 	 * @param firstName
 	 * @param lastName
 	 * @param role
@@ -112,8 +111,10 @@ public class User
 	}
 
 	/**
-	 * Returns the user data in the following format:
+	 * Gets the user data in the following format:
 	 * <code>firstname lastname (rolename)</code>
+	 *
+	 * @return the full user data
 	 */
 	public String getFullDetails()
 	{
@@ -164,8 +165,10 @@ public class User
 	 * @param pin the pin string used to log in to the system if no RFID badge ID is provided
 	 * @param firstName the first name of the user
 	 * @param lastName the last name of the user
-	 * @param role the name of the role of the user
+	 * @param roleName the name of the role of the user
+	 *
 	 * @return <code>true</code> if given information is valid
+	 * @throws NoDatabaseLinkException
 	 */
 	public static boolean validateUserData(final String badgeID, final String pin, final String firstName, final String lastName, final String roleName)
 			throws NoDatabaseLinkException

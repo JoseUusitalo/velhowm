@@ -27,6 +27,7 @@ public class ProductCategory
 	private int databaseID;
 
 	/**
+	 * @param databaseID
 	 * @param name
 	 * @param type
 	 */

@@ -67,11 +67,8 @@ public class AddProductView
 	private UIController uiController;
 
 	/**
-	 * Adds the product view.
-	 * Has to be manually inputed in the UIController at
-	 * "switch (currentUserRole.getName())".
-	 *
-	 * @param productController makes it view able
+	 * @param productController
+	 * @param uiController
 	 */
 	public AddProductView(final ProductController productController, final UIController uiController)
 	{
@@ -81,6 +78,8 @@ public class AddProductView
 
 	/**
 	 * Creates BorderPane for the get Add Product tab.
+	 *
+	 * @param editProduct the product to modify
 	 *
 	 * @return the bPane
 	 * @throws NoDatabaseLinkException to get the data
@@ -207,8 +206,9 @@ public class AddProductView
 
 	/**
 	 * Saves data to database.
+	 *
+	 * @param product the product to view
 	 */
-
 	public void setViewData(final Product product)
 	{
 		databaseID.getValueFactory().setValue(product.getProductID());

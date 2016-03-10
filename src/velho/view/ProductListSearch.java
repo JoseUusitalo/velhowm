@@ -39,6 +39,7 @@ public class ProductListSearch
 	/**
 	 * Gets the product list search view.
 	 *
+	 * @param list the view of the search results
 	 * @return a search view for searching multiple products at once
 	 */
 	public BorderPane getView(final BorderPane list)

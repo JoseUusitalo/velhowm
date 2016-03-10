@@ -212,6 +212,7 @@ public class DatabaseController
 	 * @param type query command
 	 * @param tableName the {@link DatabaseTable}
 	 * @param columns columns to select (can be <code>null</code>)
+	 * @param columnValues values to set to the specified columns
 	 * @param where conditions (can be <code>null</code>)
 	 * @return
 	 * <ul>
@@ -826,7 +827,9 @@ public class DatabaseController
 	 *
 	 * @param type query command
 	 * @param tableName name of the table
+	 * @param joinOnCondition join tables according to this condition
 	 * @param columns columns to select (can be <code>null</code>)
+	 * @param columnValues values to set to the specified columns
 	 * @param where conditions (can be <code>null</code>)
 	 * @return an SQL query string
 	 */
@@ -954,8 +957,10 @@ public class DatabaseController
 
 	/**
 	 * Checks if a database link exists and throws a
-	 * {@link NoDatabaseConnectionException} exception if it doesn't. To be used
+	 * {@link NoDatabaseLinkException} exception if it doesn't. To be used
 	 * when a database link must exist.
+	 *
+	 * @throws NoDatabaseLinkException
 	 */
 	public static void checkLink() throws NoDatabaseLinkException
 	{
@@ -1088,6 +1093,11 @@ public class DatabaseController
 
 	/**
 	 * Links and initializes the database.
+	 *
+	 * @return <code>true</code> if database is linked, initialized, and ready to use
+	 * @throws ClassNotFoundException
+	 * @throws ExistingDatabaseLinkException}
+	 * @throws NoDatabaseLinkException
 	 */
 	public static boolean connectAndInitialize() throws ClassNotFoundException, ExistingDatabaseLinkException, NoDatabaseLinkException
 	{
@@ -1415,6 +1425,8 @@ public class DatabaseController
 	 * Gets a map of columns and column names for displaying {@link User}
 	 * objects in table views.
 	 *
+	 * @param withDeleteColumn get the delete button column?
+	 *
 	 * @return a map where the key is the column value and value is the column
 	 * name
 	 */
@@ -1434,6 +1446,9 @@ public class DatabaseController
 	/**
 	 * Gets a map of columns and column names for displaying {@link Product}
 	 * objects in table views.
+	 *
+	 * @param withAddColumn get the add button column?
+	 * @param withDeleteColumn get the delete button column?
 	 *
 	 * @return a map where the key is the column value and value is the column
 	 * name
@@ -1483,6 +1498,9 @@ public class DatabaseController
 	/**
 	 * Gets a map of columns and column names for displaying
 	 * {@link ProductBoxSearchResultRow} objects in table views.
+	 *
+	 * @param withAddColumn get the add button column?
+	 * @param withRemoveColumn get the remove button column?
 	 *
 	 * @return a map where the key is the column value and value is the column
 	 * name
@@ -1568,6 +1586,8 @@ public class DatabaseController
 	 * Gets the {@link ProductCategory} object from the given category ID.
 	 *
 	 * @param categoryid product category database ID
+	 * @param getCached Get all product categories from the cache instead of rebuilding the cache from the database but
+	 * only if the cached category IDs match the ones in the database.
 	 * @return the corresponding product category object
 	 * @throws NoDatabaseLinkException
 	 */
@@ -1605,6 +1625,8 @@ public class DatabaseController
 	 * Gets the {@link ProductBrand} object from the given brand ID.
 	 *
 	 * @param brandid product brand database ID
+	 * @param getCached Get all product brands from the cache instead of rebuilding the cache from the database but only
+	 * if the cached brand IDs match the ones in the database.
 	 * @return the corresponding product brand object
 	 * @throws NoDatabaseLinkException
 	 */
@@ -1643,7 +1665,8 @@ public class DatabaseController
 	 *
 	 * @param roleName the name of the role
 	 * @return the database ID of the given role (a value greater than 0) or
-	 * <code>-1</code> if the role does not exist in the database
+	 * <code>-1</code> if the role does not exist in the database'
+	 * @throws NoDatabaseLinkException
 	 */
 	public static int getRoleID(final String roleName) throws NoDatabaseLinkException
 	{
@@ -1689,7 +1712,7 @@ public class DatabaseController
 	 * @return a {@link User} object representing the authenticated user or
 	 * <code>null</code> for invalid credentials
 	 * @throws NoDatabaseLinkException
-	 * @see {@link User#isValidBadgeID(String)}
+	 * @see User#isValidBadgeID(String)
 	 */
 	public static User authenticateBadgeID(final String badgeID) throws NoDatabaseLinkException
 	{
@@ -1728,7 +1751,7 @@ public class DatabaseController
 	 * @return a {@link User} object representing the authenticated user or
 	 * <code>null</code> for invalid credentials
 	 * @throws NoDatabaseLinkException
-	 * @see {@link User#isValidPIN(String)}
+	 * @see User#isValidPIN(String)
 	 */
 	public static User authenticatePIN(final String firstName, final String lastName, final String pin) throws NoDatabaseLinkException
 	{
@@ -1787,7 +1810,7 @@ public class DatabaseController
 	/**
 	 * Gets the {@link Product} object from the given product ID.
 	 *
-	 * @param productid product database ID
+	 * @param productboxid product database ID
 	 * @return the corresponding product object
 	 * @throws NoDatabaseLinkException
 	 */
@@ -2447,7 +2470,7 @@ public class DatabaseController
 	 * Initializes the database.
 	 *
 	 * @return <code>true</code> if database changed as a result of this call
-	 * @throws NoDatabaseConnectionException
+	 * @throws NoDatabaseLinkException
 	 */
 	public static boolean initializeDatabase() throws NoDatabaseLinkException
 	{
@@ -3016,7 +3039,7 @@ public class DatabaseController
 	 * the given product brand or creates a new one if it doesn't exist.
 	 * A database ID of -1 signifies a brand new {@link ProductBrand}.
 	 *
-	 * @param brand new or existing product brand
+	 * @param category new or existing product brand
 	 * @return <code>true</code> if existing data was updated or a new product brand
 	 * was created in the database
 	 */

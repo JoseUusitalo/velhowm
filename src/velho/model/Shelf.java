@@ -107,10 +107,9 @@ public class Shelf
 	 * <li>Index 2: is the slot ID Integer in the shelf</li>
 	 * </ul>
 	 *
-	 * @param slotID
+	 * @param shelfSlotID the shelf slot ID string to tokenize
 	 * @return an array of integers
-	 * @throws IllegalArgumentException
-	 * if the given shelf slot ID was invalid
+	 * @throws IllegalArgumentException if the given shelf slot ID was invalid
 	 */
 	public static Object[] tokenizeShelfSlotID(final String shelfSlotID) throws IllegalArgumentException
 	{
@@ -405,6 +404,8 @@ public class Shelf
 	 * update the database?
 	 * @return <code>true</code> if box was added to the slot, <code>false</code> if the slot ID is not in this shelf,
 	 * or the slot did not have enough free space
+	 * @throws IllegalArgumentException
+	 * @throws NoDatabaseLinkException
 	 */
 	public boolean addToSlot(final String shelfSlotID, final ProductBox productBox, final boolean updateDatabase)
 			throws IllegalArgumentException, NoDatabaseLinkException
@@ -434,6 +435,8 @@ public class Shelf
 	 * box to add
 	 * @return <code>true</code> if box was added to the slot, <code>false</code> if the slot ID is not in this shelf,
 	 * or the slot did not have enough free space
+	 * @throws IllegalArgumentException
+	 * @throws NoDatabaseLinkException
 	 */
 	public boolean addToSlot(final String shelfSlotID, final ProductBox productBox) throws IllegalArgumentException, NoDatabaseLinkException
 	{
@@ -451,14 +454,12 @@ public class Shelf
 	/**
 	 * Attempts to remove the given {@link ProductBox} from the {@link ShelfSlot} specified by the slot ID.
 	 *
-	 * @param shelfSlotID
-	 * ID of the shelf slot
-	 * @param productBox
-	 * box to remove
-	 * @param updateDatabase
-	 * update the database?
+	 * @param productBox box to remove
+	 * @param updateDatabase update the database?
 	 * @return <code>true</code> if box was added to the slot, <code>false</code> if the slot ID is not in this shelf,
 	 * or the slot did not have the specified box
+	 * @throws IllegalArgumentException
+	 * @throws NoDatabaseLinkException
 	 */
 	public boolean removeFromSlot(final ProductBox productBox, final boolean updateDatabase) throws IllegalArgumentException, NoDatabaseLinkException
 	{
@@ -482,12 +483,12 @@ public class Shelf
 	 * Attempts to remove the given {@link ProductBox} from the {@link ShelfSlot} specified by the slot ID.
 	 * Updates to the database.
 	 *
-	 * @param shelfSlotID
-	 * ID of the shelf slot
-	 * @param productBox
-	 * box to remove
+	 * @param productBox box to remove
+	 *
 	 * @return <code>true</code> if box was added to the slot, <code>false</code> if the slot ID is not in this shelf,
 	 * or the slot did not have the specified box
+	 * @throws IllegalArgumentException
+	 * @throws NoDatabaseLinkException
 	 */
 	public boolean removeFromSlot(final ProductBox productBox) throws IllegalArgumentException, NoDatabaseLinkException
 	{
@@ -550,7 +551,6 @@ public class Shelf
 
 		/*
 		 * Compares the ID of this shelf slot to the given one.
-		 *
 		 * @Override
 		 * public int compareTo(final ShelfSlot s)
 		 * {
@@ -571,9 +571,7 @@ public class Shelf
 
 		/*
 		 * The ID of the shelf this shelf slot is in.
-		 *
 		 * @return the ID of the parent shelf
-		 *
 		 * public int getShelfID()
 		 * {
 		 * return shelfID;
@@ -582,9 +580,7 @@ public class Shelf
 
 		/*
 		 * Gets the maximum number of boxes this shelf slot can contain.
-		 *
 		 * @return the maximum number of boxes this shelf slot can contain
-		 *
 		 * public int getMaxBoxCount()
 		 * {
 		 * return maxBoxCount;
@@ -610,9 +606,7 @@ public class Shelf
 
 		/*
 		 * Gets the set of {@link ProductBox}es in this shelf slot.
-		 *
 		 * @return the set of boxes
-		 *
 		 * public Set<ProductBox> getBoxes()
 		 * {
 		 * return boxes;

@@ -47,10 +47,10 @@ public class UserController implements UIActionController
 	/**
 	 * Attempts to add a new user to the database.
 	 *
-	 * @param userID user's badge id number
+	 * @param badgeID user's badge id number
 	 * @param userFirstName user's first name
 	 * @param userLastName user's last name
-	 * @param userRole user's role in the company
+	 * @param userRoleName user's role in the company
 	 */
 	public boolean createUser(final String badgeID, final String userPIN, final String userFirstName, final String userLastName, final String userRoleName)
 	{

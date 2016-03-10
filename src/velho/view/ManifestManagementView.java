@@ -85,6 +85,8 @@ public class ManifestManagementView
 
 	/**
 	 * Sets the view below the management pane.
+	 *
+	 * @param view the new center view
 	 */
 	public void setContent(final Node view)
 	{
@@ -93,6 +95,8 @@ public class ManifestManagementView
 
 	/**
 	 * Gets the view below the management pane.
+	 *
+	 * @return the center node
 	 */
 	public Node getContent()
 	{

@@ -287,6 +287,8 @@ public class MainWindow extends Application
 	 *
 	 * @param tabName name of the tab
 	 * @param view view to show in the tab
+	 *
+	 * @return <code>true</code> if tab was added
 	 */
 	public boolean addTab(final String tabName, final Node view)
 	{
