@@ -209,7 +209,7 @@ public class ManifestController implements UIActionController
 	@Override
 	public void updateAction(final Object data)
 	{
-		System.out.println("UPDATE: " + ((Manifest) data).toString());
+		throw new UnsupportedOperationException();
 	}
 
 	@Override
