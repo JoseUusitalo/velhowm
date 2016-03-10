@@ -3058,7 +3058,7 @@ public class DatabaseController
 
 		getAllProductBoxes();
 		getAllShelves();
-		getAllRemovalLists();
+		getAllRemovalLists(false);
 
 		DBLOG.info("Data loaded from database.");
 	}
@@ -3162,8 +3162,9 @@ public class DatabaseController
 			final ArrayList<Integer> boxIDs = manifestBoxes.get(manifestID);
 			boxcount += boxIDs.size();
 
-			// TODO: This bit could be optimized. I'm looping through the same
-			// list twice.
+			/*
+			 * TODO: This bit could be optimized. I'm looping through the same list twice.
+			 */
 
 			Set<ProductBox> boxes = new LinkedHashSet<ProductBox>();
 
@@ -3236,18 +3237,35 @@ public class DatabaseController
 	}
 
 	/**
-	 * Loads the following objects into memory:
-	 * <ul>
-	 * <li>{@link RemovalListState}</li>
-	 * <li>{@link RemovalList}</li>
-	 * </ul>
+	 * Loads all {@link RemovalList} and {@link RemovalListState} objects from the database into the cache.
 	 *
-	 * @throws NoDatabaseLinkException
+	 * @param getCached Get all removal lists from the cache instead of rebuilding the cache from the database but only
+	 * if the cached removal list IDs match the ones in the database.
+	 * Be aware that the cached data may not be up to date.
+	 * @return an {@link ObservableList} of all removal lists
 	 */
-	public static void getAllRemovalLists() throws NoDatabaseLinkException
+	public static ObservableList<Object> getAllRemovalLists(final boolean getCached) throws NoDatabaseLinkException
 	{
-		// TODO: CACHE GUARD
-		final String[] columns = { "*" };
+		String[] columns = new String[1];
+
+		if (getCached)
+		{
+			columns[0] = "removallist_id";
+
+			@SuppressWarnings("unchecked")
+			Set<Integer> result = (LinkedHashSet<Integer>) (runQuery(DatabaseQueryType.SELECT, DatabaseTable.REMOVALLISTS, null, columns, null, null));
+
+			// Check if all manifests have been cached by their ID.
+			if (cachedRemovalLists.keySet().containsAll(result))
+			{
+				DBLOG.debug("Returning all cached RemovalLists.");
+				return observableRemovalLists;
+			}
+
+			DBLOG.debug("Unable to return all cached RemovalLists, cached IDs do not match.");
+		}
+
+		columns[0] = "*";
 		@SuppressWarnings("unchecked")
 		final Set<RemovalList> result = (Set<RemovalList>) runQuery(DatabaseQueryType.SELECT, DatabaseTable.REMOVALLISTS, null, columns, null, null);
 
@@ -3264,6 +3282,10 @@ public class DatabaseController
 		DBLOG.info("All " + result.size() + " RemovalLists cached.");
 
 		setAllContainersToAllRemovalLists();
+
+		observableRemovalLists.clear();
+		observableRemovalLists.addAll(cachedRemovalLists.values());
+		return observableRemovalLists;
 	}
 
 	/**
@@ -3410,11 +3432,9 @@ public class DatabaseController
 	/**
 	 * Loads all {@link Manifest} objects from the database into the cache.
 	 *
-	 * @param getCached Get all manifests from the cache instead of rebuilding
-	 * the cache from the database but only if
-	 * the cache contains all the manifests that are in the database.
-	 * Be aware that the cached manifest data
-	 * may not be up to date.
+	 * @param getCached Get all manifests from the cache instead of rebuilding the cache from the database but only if
+	 * the cached manifest IDs match the ones in the database.
+	 * Be aware that the cached data may not be up to date.
 	 * @return an {@link ObservableList} of all manifests
 	 */
 	public static ObservableList<Object> getAllManifests(final boolean getCached) throws NoDatabaseLinkException
