@@ -1,4 +1,4 @@
-package velho.model.interfaces;
+package velho.controller.interfaces;
 
 /**
  * Controllers that can handle actions performed in the UI that modify objects in memory or in the database.

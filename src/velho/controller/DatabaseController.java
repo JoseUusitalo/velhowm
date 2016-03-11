@@ -40,6 +40,7 @@ import velho.model.RemovalListState;
 import velho.model.RemovalPlatform;
 import velho.model.Shelf;
 import velho.model.User;
+import velho.model.enums.DatabaseFileState;
 import velho.model.enums.DatabaseQueryType;
 import velho.model.enums.DatabaseTable;
 import velho.model.exceptions.ExistingDatabaseLinkException;
@@ -211,6 +212,7 @@ public class DatabaseController
 	 * @param type query command
 	 * @param tableName the {@link DatabaseTable}
 	 * @param columns columns to select (can be <code>null</code>)
+	 * @param columnValues values to set to the specified columns
 	 * @param where conditions (can be <code>null</code>)
 	 * @return
 	 * <ul>
@@ -825,7 +827,9 @@ public class DatabaseController
 	 *
 	 * @param type query command
 	 * @param tableName name of the table
+	 * @param joinOnCondition join tables according to this condition
 	 * @param columns columns to select (can be <code>null</code>)
+	 * @param columnValues values to set to the specified columns
 	 * @param where conditions (can be <code>null</code>)
 	 * @return an SQL query string
 	 */
@@ -953,8 +957,10 @@ public class DatabaseController
 
 	/**
 	 * Checks if a database link exists and throws a
-	 * {@link NoDatabaseConnectionException} exception if it doesn't. To be used
+	 * {@link NoDatabaseLinkException} exception if it doesn't. To be used
 	 * when a database link must exist.
+	 *
+	 * @throws NoDatabaseLinkException
 	 */
 	public static void checkLink() throws NoDatabaseLinkException
 	{
@@ -1003,7 +1009,7 @@ public class DatabaseController
 	 * @throws ExistingDatabaseLinkException
 	 * when a database link already exists
 	 */
-	public static boolean link() throws ClassNotFoundException, ExistingDatabaseLinkException
+	public static DatabaseFileState link() throws ClassNotFoundException, ExistingDatabaseLinkException
 	{
 		if (connectionPool != null)
 			throw new ExistingDatabaseLinkException();
@@ -1012,6 +1018,7 @@ public class DatabaseController
 		Class.forName("org.h2.Driver");
 
 		String uri = DB_URI;
+		DatabaseFileState state = null;
 
 		/*
 		 * If the database does not exists, it will be created with the
@@ -1020,10 +1027,14 @@ public class DatabaseController
 		 */
 		if (databaseExists())
 		{
+			state = DatabaseFileState.EXISTING;
 			uri += ";IFEXISTS=TRUE";
 		}
 		else
+		{
+			state = DatabaseFileState.DOES_NOT_EXIST;
 			DBLOG.info("Database does not exist, creating a new database.");
+		}
 
 		// Create a connection pool.
 		connectionPool = JdbcConnectionPool.create(uri, USERNAME, "@_Vry $ECURE pword2");
@@ -1034,10 +1045,8 @@ public class DatabaseController
 		{
 			final Connection c = getConnection();
 
-			if (c == null)
-				return false;
-
-			c.close();
+			if (c != null)
+				c.close();
 		}
 		catch (final NoDatabaseLinkException e)
 		{
@@ -1050,18 +1059,18 @@ public class DatabaseController
 
 		if (databaseExists())
 		{
+			if (state == DatabaseFileState.DOES_NOT_EXIST)
+				state = DatabaseFileState.CREATED;
+
 			if (isLinked())
-			{
 				DBLOG.info("Database linked.");
-				return true;
-			}
-
-			DBLOG.info("Database linking failed.");
-			return false;
+			else
+				DBLOG.info("Database linking failed.");
 		}
+		else
+			DBLOG.info("Database creation failed.");
 
-		DBLOG.info("Database creation failed.");
-		return false;
+		return state;
 	}
 
 	/**
@@ -1084,10 +1093,31 @@ public class DatabaseController
 
 	/**
 	 * Links and initializes the database.
+	 *
+	 * @return <code>true</code> if database is linked, initialized, and ready to use
+	 * @throws ClassNotFoundException
+	 * @throws ExistingDatabaseLinkException}
+	 * @throws NoDatabaseLinkException
 	 */
 	public static boolean connectAndInitialize() throws ClassNotFoundException, ExistingDatabaseLinkException, NoDatabaseLinkException
 	{
-		return DatabaseController.link() && DatabaseController.initializeDatabase();
+		final DatabaseFileState state = link();
+		boolean initialized = true;
+
+		switch (state)
+		{
+			case DOES_NOT_EXIST:
+				return false;
+			case CREATED:
+				// Only initialize the database if it does not exist.
+				initialized = initializeDatabase();
+				break;
+			case EXISTING:
+			default:
+				// Do nothing, database is ready to use.
+		}
+
+		return isLinked() && initialized;
 	}
 
 	/*
@@ -1395,6 +1425,8 @@ public class DatabaseController
 	 * Gets a map of columns and column names for displaying {@link User}
 	 * objects in table views.
 	 *
+	 * @param withDeleteColumn get the delete button column?
+	 *
 	 * @return a map where the key is the column value and value is the column
 	 * name
 	 */
@@ -1414,6 +1446,9 @@ public class DatabaseController
 	/**
 	 * Gets a map of columns and column names for displaying {@link Product}
 	 * objects in table views.
+	 *
+	 * @param withAddColumn get the add button column?
+	 * @param withDeleteColumn get the delete button column?
 	 *
 	 * @return a map where the key is the column value and value is the column
 	 * name
@@ -1463,6 +1498,9 @@ public class DatabaseController
 	/**
 	 * Gets a map of columns and column names for displaying
 	 * {@link ProductBoxSearchResultRow} objects in table views.
+	 *
+	 * @param withAddColumn get the add button column?
+	 * @param withRemoveColumn get the remove button column?
 	 *
 	 * @return a map where the key is the column value and value is the column
 	 * name
@@ -1548,6 +1586,8 @@ public class DatabaseController
 	 * Gets the {@link ProductCategory} object from the given category ID.
 	 *
 	 * @param categoryid product category database ID
+	 * @param getCached Get all product categories from the cache instead of rebuilding the cache from the database but
+	 * only if the cached category IDs match the ones in the database.
 	 * @return the corresponding product category object
 	 * @throws NoDatabaseLinkException
 	 */
@@ -1585,6 +1625,8 @@ public class DatabaseController
 	 * Gets the {@link ProductBrand} object from the given brand ID.
 	 *
 	 * @param brandid product brand database ID
+	 * @param getCached Get all product brands from the cache instead of rebuilding the cache from the database but only
+	 * if the cached brand IDs match the ones in the database.
 	 * @return the corresponding product brand object
 	 * @throws NoDatabaseLinkException
 	 */
@@ -1623,7 +1665,8 @@ public class DatabaseController
 	 *
 	 * @param roleName the name of the role
 	 * @return the database ID of the given role (a value greater than 0) or
-	 * <code>-1</code> if the role does not exist in the database
+	 * <code>-1</code> if the role does not exist in the database'
+	 * @throws NoDatabaseLinkException
 	 */
 	public static int getRoleID(final String roleName) throws NoDatabaseLinkException
 	{
@@ -1669,7 +1712,7 @@ public class DatabaseController
 	 * @return a {@link User} object representing the authenticated user or
 	 * <code>null</code> for invalid credentials
 	 * @throws NoDatabaseLinkException
-	 * @see {@link User#isValidBadgeID(String)}
+	 * @see User#isValidBadgeID(String)
 	 */
 	public static User authenticateBadgeID(final String badgeID) throws NoDatabaseLinkException
 	{
@@ -1708,7 +1751,7 @@ public class DatabaseController
 	 * @return a {@link User} object representing the authenticated user or
 	 * <code>null</code> for invalid credentials
 	 * @throws NoDatabaseLinkException
-	 * @see {@link User#isValidPIN(String)}
+	 * @see User#isValidPIN(String)
 	 */
 	public static User authenticatePIN(final String firstName, final String lastName, final String pin) throws NoDatabaseLinkException
 	{
@@ -1767,7 +1810,7 @@ public class DatabaseController
 	/**
 	 * Gets the {@link Product} object from the given product ID.
 	 *
-	 * @param productid product database ID
+	 * @param productboxid product database ID
 	 * @return the corresponding product object
 	 * @throws NoDatabaseLinkException
 	 */
@@ -2427,7 +2470,7 @@ public class DatabaseController
 	 * Initializes the database.
 	 *
 	 * @return <code>true</code> if database changed as a result of this call
-	 * @throws NoDatabaseConnectionException
+	 * @throws NoDatabaseLinkException
 	 */
 	public static boolean initializeDatabase() throws NoDatabaseLinkException
 	{
@@ -2996,7 +3039,7 @@ public class DatabaseController
 	 * the given product brand or creates a new one if it doesn't exist.
 	 * A database ID of -1 signifies a brand new {@link ProductBrand}.
 	 *
-	 * @param brand new or existing product brand
+	 * @param category new or existing product brand
 	 * @return <code>true</code> if existing data was updated or a new product brand
 	 * was created in the database
 	 */
@@ -3058,7 +3101,7 @@ public class DatabaseController
 
 		getAllProductBoxes();
 		getAllShelves();
-		getAllRemovalLists();
+		getAllRemovalLists(false);
 
 		DBLOG.info("Data loaded from database.");
 	}
@@ -3162,8 +3205,9 @@ public class DatabaseController
 			final ArrayList<Integer> boxIDs = manifestBoxes.get(manifestID);
 			boxcount += boxIDs.size();
 
-			// TODO: This bit could be optimized. I'm looping through the same
-			// list twice.
+			/*
+			 * TODO: This bit could be optimized. I'm looping through the same list twice.
+			 */
 
 			Set<ProductBox> boxes = new LinkedHashSet<ProductBox>();
 
@@ -3236,18 +3280,35 @@ public class DatabaseController
 	}
 
 	/**
-	 * Loads the following objects into memory:
-	 * <ul>
-	 * <li>{@link RemovalListState}</li>
-	 * <li>{@link RemovalList}</li>
-	 * </ul>
+	 * Loads all {@link RemovalList} and {@link RemovalListState} objects from the database into the cache.
 	 *
-	 * @throws NoDatabaseLinkException
+	 * @param getCached Get all removal lists from the cache instead of rebuilding the cache from the database but only
+	 * if the cached removal list IDs match the ones in the database.
+	 * Be aware that the cached data may not be up to date.
+	 * @return an {@link ObservableList} of all removal lists
 	 */
-	public static void getAllRemovalLists() throws NoDatabaseLinkException
+	public static ObservableList<Object> getAllRemovalLists(final boolean getCached) throws NoDatabaseLinkException
 	{
-		// TODO: CACHE GUARD
-		final String[] columns = { "*" };
+		String[] columns = new String[1];
+
+		if (getCached)
+		{
+			columns[0] = "removallist_id";
+
+			@SuppressWarnings("unchecked")
+			Set<Integer> result = (LinkedHashSet<Integer>) (runQuery(DatabaseQueryType.SELECT, DatabaseTable.REMOVALLISTS, null, columns, null, null));
+
+			// Check if all manifests have been cached by their ID.
+			if (cachedRemovalLists.keySet().containsAll(result))
+			{
+				DBLOG.debug("Returning all cached RemovalLists.");
+				return observableRemovalLists;
+			}
+
+			DBLOG.debug("Unable to return all cached RemovalLists, cached IDs do not match.");
+		}
+
+		columns[0] = "*";
 		@SuppressWarnings("unchecked")
 		final Set<RemovalList> result = (Set<RemovalList>) runQuery(DatabaseQueryType.SELECT, DatabaseTable.REMOVALLISTS, null, columns, null, null);
 
@@ -3264,6 +3325,10 @@ public class DatabaseController
 		DBLOG.info("All " + result.size() + " RemovalLists cached.");
 
 		setAllContainersToAllRemovalLists();
+
+		observableRemovalLists.clear();
+		observableRemovalLists.addAll(cachedRemovalLists.values());
+		return observableRemovalLists;
 	}
 
 	/**
@@ -3410,11 +3475,9 @@ public class DatabaseController
 	/**
 	 * Loads all {@link Manifest} objects from the database into the cache.
 	 *
-	 * @param getCached Get all manifests from the cache instead of rebuilding
-	 * the cache from the database but only if
-	 * the cache contains all the manifests that are in the database.
-	 * Be aware that the cached manifest data
-	 * may not be up to date.
+	 * @param getCached Get all manifests from the cache instead of rebuilding the cache from the database but only if
+	 * the cached manifest IDs match the ones in the database.
+	 * Be aware that the cached data may not be up to date.
 	 * @return an {@link ObservableList} of all manifests
 	 */
 	public static ObservableList<Object> getAllManifests(final boolean getCached) throws NoDatabaseLinkException

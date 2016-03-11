@@ -66,6 +66,7 @@ public class RemovalListView
 	 * Gets the removal list viewing view.
 	 *
 	 * @return the removal list viewing BorderPane
+	 * @throws NoDatabaseLinkException
 	 */
 	public BorderPane getView() throws NoDatabaseLinkException
 	{

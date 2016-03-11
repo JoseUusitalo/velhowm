@@ -2,7 +2,7 @@ package velho.model;
 
 /**
  * A class representing the type of the product.
- * 
+ *
  * @author Jose Uusitalo
  */
 public class ProductType
@@ -18,8 +18,8 @@ public class ProductType
 	private String name;
 
 	/**
+	 * @param databaseID
 	 * @param name
-	 * @param type
 	 */
 	public ProductType(final int databaseID, final String name)
 	{
@@ -40,7 +40,7 @@ public class ProductType
 
 	/**
 	 * Gets the database ID of this category.
-	 * 
+	 *
 	 * @return the database id
 	 */
 	public int getDatabaseID()

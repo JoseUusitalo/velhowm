@@ -18,7 +18,7 @@ import velho.model.exceptions.NoDatabaseLinkException;
 /**
  * Created to scan newly arrived product boxes. This class creates product boxes into the system.
  *
- * @author Edward
+ * @author Edward Puustinen
  */
 public class BarcodeScanner
 {
@@ -30,7 +30,7 @@ public class BarcodeScanner
 	/**
 	 * Receives the message from ProductListSeacrh
 	 *
-	 * @param received
+	 * @param received received data
 	 */
 	public static void deviceBarcode(final Object received)
 	{
@@ -59,8 +59,10 @@ public class BarcodeScanner
 
 	/**
 	 * Returns random product code from ProductCodeList.
+	 *
+	 * @return a list of random product IDs
 	 */
-	public static int generateProductList()
+	public static List<Integer> generateProductList()
 	{
 
 		List<Integer> numbers = new ArrayList<Integer>();
@@ -80,7 +82,7 @@ public class BarcodeScanner
 			numbers.add((int) (Math.random() * 99999999 + 1));
 		}
 		Collections.shuffle(numbers);
-		return numbers.get(maximSize);
+		return numbers;
 	}
 
 	/**

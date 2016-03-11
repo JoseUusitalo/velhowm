@@ -10,7 +10,7 @@ import velho.model.ProductType;
 /**
  * Tests for the {@link ProductCategory} class.
  * 
- * @author Joona
+ * @author Joona Silvennoinen
  */
 @SuppressWarnings("static-method")
 public class ProductCategoryTest

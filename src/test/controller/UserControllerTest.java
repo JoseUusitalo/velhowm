@@ -6,13 +6,11 @@ import static org.junit.Assert.fail;
 
 import org.junit.After;
 import org.junit.Before;
-import org.junit.Rule;
 import org.junit.Test;
 
 import javafx.collections.ObservableList;
 import velho.controller.DatabaseController;
 import velho.controller.UserController;
-import velho.model.JavaFXThreadingRule;
 import velho.model.User;
 import velho.model.exceptions.ExistingDatabaseLinkException;
 import velho.model.exceptions.NoDatabaseLinkException;
@@ -25,9 +23,6 @@ import velho.model.exceptions.NoDatabaseLinkException;
 @SuppressWarnings("static-method")
 public class UserControllerTest
 {
-	@Rule
-	public JavaFXThreadingRule javafxRule = new JavaFXThreadingRule();
-
 	private static UserController controller;
 
 	private final String VALID_BADGE_ID = "99955999";
@@ -61,13 +56,9 @@ public class UserControllerTest
 	}
 
 	/*
-	 *
 	 * IMPORTANT NOTE ABOUT TESTING.
-	 *
 	 * THE DATABASE MUST BE UNLINKED IMMEDIATELY AFTER YOU HAVE FINISHED USING IT.
-	 *
 	 * IF A TEST FAILS AND THE DATABASE CONNECTION IS STILL LINKED, ALL FURTHER ATTEMPTS TO LINK AGAIN WILL FAIL.
-	 *
 	 */
 
 	@Test

@@ -9,14 +9,14 @@ import javafx.scene.control.ButtonType;
 /**
  * A controller for popup alerts.
  *
- * @author Joona
+ * @author Joona Silvennoinen
  */
 public class PopupController
 {
 	/**
 	 * Displays a popup alert with the given message asking the user a yes/no question.
 	 *
-	 * @param stage the message to show
+	 * @param msg the message to show
 	 */
 	public static boolean confirmation(final String msg)
 	{
@@ -32,7 +32,7 @@ public class PopupController
 	/**
 	 * Displays a popup alert with the given message.
 	 *
-	 * @param stage the message to show
+	 * @param msg the message to show
 	 */
 	public static void info(final String msg)
 	{
@@ -49,7 +49,7 @@ public class PopupController
 	 *
 	 * @param msg the message to show
 	 */
-	public static void warning(String msg)
+	public static void warning(final String msg)
 	{
 		Alert alert = new Alert(AlertType.WARNING);
 		alert.setTitle("Warning");
@@ -64,7 +64,7 @@ public class PopupController
 	 *
 	 * @param msg the message to show
 	 */
-	public static void error(String msg)
+	public static void error(final String msg)
 	{
 		Alert alert = new Alert(AlertType.ERROR);
 		alert.setTitle("Error");

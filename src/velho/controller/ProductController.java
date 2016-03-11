@@ -3,11 +3,11 @@ package velho.controller;
 import org.apache.log4j.Logger;
 
 import javafx.scene.Node;
+import velho.controller.interfaces.UIActionController;
 import velho.model.Product;
 import velho.model.ProductBrand;
 import velho.model.ProductCategory;
 import velho.model.exceptions.NoDatabaseLinkException;
-import velho.model.interfaces.UIActionController;
 import velho.view.AddProductView;
 import velho.view.GenericTabView;
 import velho.view.ProductDataView;
@@ -15,7 +15,7 @@ import velho.view.ProductDataView;
 /**
  * Controller for handling {@link Product} objects
  *
- * @author Jose Uusitalo &amp; Edward
+ * @author Jose Uusitalo &amp; Edward Puustinen
  */
 public class ProductController implements UIActionController
 {
@@ -235,34 +235,31 @@ public class ProductController implements UIActionController
 	@Override
 	public void createAction(final Object data)
 	{
-		// SYSLOG.trace("Controller got from UI: " + data);
+		throw new UnsupportedOperationException();
 	}
 
 	@Override
 	public void updateAction(final Object data)
 	{
-		// SYSLOG.trace("Controller got from UI update: " +
-		// ((ProductBoxSearchResultRow) data).getBox());
+		throw new UnsupportedOperationException();
 	}
 
 	@Override
 	public void addAction(final Object data)
 	{
-		// TODO Auto-generated method stub
-
+		throw new UnsupportedOperationException();
 	}
 
 	@Override
 	public void removeAction(final Object data)
 	{
-		// TODO Auto-generated method stub
-
+		throw new UnsupportedOperationException();
 	}
 
 	@Override
 	public void deleteAction(final Object data)
 	{
-		// TODO Auto-generated method stub
+		throw new UnsupportedOperationException();
 	}
 
 	@Override

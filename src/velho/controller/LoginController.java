@@ -14,7 +14,7 @@ import velho.view.MainWindow;
 /**
  * Controls logging users in and out.
  *
- * @author Jose Uusitalo &amp; Edward
+ * @author Jose Uusitalo &amp; Edward Puustinen
  */
 public class LoginController
 {
@@ -72,9 +72,7 @@ public class LoginController
 	/**
 	 * This will "identify" the user and allow access to the system.
 	 *
-	 * @param authentication
-	 * is set at LoginView for authentication
-	 * @return as true
+	 * @param authenticationString is set at LoginView for authentication
 	 */
 	public static void login(final String firstName, final String lastName, final String authenticationString)
 	{

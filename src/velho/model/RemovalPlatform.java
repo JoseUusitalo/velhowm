@@ -77,7 +77,7 @@ public class RemovalPlatform
 	 * Should the free space on the platform drop to below or equal to the percentage, a warning will be displayed in
 	 * the UI.
 	 *
-	 * @param freeSpaceLeft a percentage
+	 * @param freeSpaceLeftPercent a percentage
 	 */
 	public void setFreeSpaceWarningPercent(final double freeSpaceLeftPercent)
 	{

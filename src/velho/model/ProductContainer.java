@@ -3,7 +3,7 @@ package velho.model;
 import java.util.Date;
 
 /**
- * @author Joona &amp; Jose Uusitalo
+ * @author Joona Silvennoinen &amp; Jose Uusitalo
  */
 public abstract class ProductContainer
 {
@@ -100,7 +100,7 @@ public abstract class ProductContainer
 	/**
 	 * Removes products from a product box.
 	 *
-	 * @param productCount
+	 * @param count number of products to remove
 	 * @return true or false.
 	 */
 	public boolean removeProduct(final int count)
@@ -120,7 +120,7 @@ public abstract class ProductContainer
 	/**
 	 * Adds product to the product box.
 	 *
-	 * @param productCount
+	 * @param count
 	 * @return true or false.
 	 */
 	public boolean addProduct(final int count)
@@ -155,6 +155,8 @@ public abstract class ProductContainer
 
 	/**
 	 * Sets the shelf slot ID of this product container
+	 *
+	 * @param shelfSlot the new shelf slot ID string
 	 */
 	public void setShelfSlot(final String shelfSlot)
 	{

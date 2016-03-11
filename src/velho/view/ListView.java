@@ -19,13 +19,13 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.text.Font;
 import javafx.util.Callback;
 import velho.controller.LoginController;
+import velho.controller.interfaces.UIActionController;
 import velho.model.User;
-import velho.model.interfaces.UIActionController;
 
 /**
  * A class for creating lists and tables of data.
  *
- * @author Jose Uusitalo &amp; Joona
+ * @author Jose Uusitalo &amp; Joona Silvennoinen
  */
 public class ListView
 {
@@ -50,6 +50,7 @@ public class ListView
 	private UIActionController parentController;
 
 	/**
+	 * @param parentController
 	 * @param columnMap
 	 * @param datalist
 	 */
@@ -211,7 +212,7 @@ public class ListView
 
 		/**
 		 * @param text
-		 *            button text
+		 * button text
 		 */
 		private TableCellDeleteButton(final UIActionController parentController, final String text)
 		{
@@ -285,7 +286,7 @@ public class ListView
 
 		/**
 		 * @param text
-		 *            button text
+		 * button text
 		 */
 		private TableCellAddButton(final UIActionController parentController, final String text)
 		{

@@ -3,7 +3,7 @@ package velho.model;
 import org.apache.log4j.Logger;
 
 /**
- * @author Edward
+ * @author Edward Puustinen
  */
 public class Printer
 {

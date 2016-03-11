@@ -17,6 +17,7 @@ import velho.controller.DatabaseController;
 import velho.model.Manifest;
 import velho.model.ManifestState;
 import velho.model.ProductBox;
+import velho.model.enums.DatabaseFileState;
 import velho.model.exceptions.ExistingDatabaseLinkException;
 import velho.model.exceptions.NoDatabaseLinkException;
 
@@ -37,7 +38,7 @@ public class ManifestTest
 		try
 		{
 			if (!DatabaseController.isLinked())
-				assertTrue(DatabaseController.link());
+				assertTrue(DatabaseController.link() != DatabaseFileState.DOES_NOT_EXIST);
 
 			assertTrue(DatabaseController.initializeDatabase());
 		}

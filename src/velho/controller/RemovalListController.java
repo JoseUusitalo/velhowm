@@ -4,12 +4,12 @@ import org.apache.log4j.Logger;
 
 import javafx.scene.Node;
 import javafx.scene.layout.BorderPane;
+import velho.controller.interfaces.UIActionController;
 import velho.model.Manager;
 import velho.model.ProductBoxSearchResultRow;
 import velho.model.RemovalList;
 import velho.model.RemovalListState;
 import velho.model.exceptions.NoDatabaseLinkException;
-import velho.model.interfaces.UIActionController;
 import velho.view.GenericTabView;
 import velho.view.RemovalListCreationView;
 import velho.view.RemovalListManagementView;
@@ -63,7 +63,6 @@ public class RemovalListController implements UIActionController
 	private GenericTabView tabView;
 
 	/**
-	 * @param listController
 	 * @param searchController
 	 */
 	public RemovalListController(final SearchController searchController)
@@ -269,7 +268,7 @@ public class RemovalListController implements UIActionController
 	 * Changes the state of the specified removal list.
 	 *
 	 * @param removalList the {@link RemovalList} to modify
-	 * @param newState the new {@link RemovalListState}
+	 * @param state the new {@link RemovalListState}
 	 */
 	@SuppressWarnings("static-method")
 	public void updateRemovalListState(final RemovalList removalList, final RemovalListState state)
@@ -290,14 +289,13 @@ public class RemovalListController implements UIActionController
 	@Override
 	public void createAction(final Object data)
 	{
-		// SYSLOG.trace("Controller got from UI: " + data);
+		throw new UnsupportedOperationException();
 	}
 
 	@Override
 	public void updateAction(final Object data)
 	{
-		// SYSLOG.trace("Controller got from UI update: " +
-		// ((ProductBoxSearchResultRow) data).getBox());
+		throw new UnsupportedOperationException();
 	}
 
 	@Override

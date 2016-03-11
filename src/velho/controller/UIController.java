@@ -173,7 +173,7 @@ public class UIController
 					return ListController.getTableView(userController, DatabaseController.getPublicUserDataColumns(true),
 							DatabaseController.getObservableUsers());
 				case "Logistician":
-					return ListController.getTableView(userController, DatabaseController.getPublicUserDataColumns(true),
+					return ListController.getTableView(userController, DatabaseController.getPublicUserDataColumns(false),
 							DatabaseController.getObservableUsers());
 				default:
 					SYSLOG.error("Unknown user role '" + currentUserRole.getName() + "'.");

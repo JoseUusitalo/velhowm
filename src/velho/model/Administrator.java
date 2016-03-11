@@ -6,7 +6,7 @@ import velho.model.interfaces.UserRole;
  * This is the administrator user role.
  * Note: this class has a natural ordering that is inconsistent with equals.
  *
- * @author Jose Uusitalo &amp; Edward
+ * @author Jose Uusitalo &amp; Edward Puustinen
  */
 public class Administrator implements UserRole
 {

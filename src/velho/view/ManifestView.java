@@ -50,6 +50,7 @@ public class ManifestView
 	 * Gets the manifest list view.
 	 *
 	 * @return the manifest list root border pane
+	 * @throws NoDatabaseLinkException
 	 */
 	public BorderPane getView() throws NoDatabaseLinkException
 	{

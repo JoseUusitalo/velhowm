@@ -11,6 +11,7 @@ import velho.controller.DatabaseController;
 import velho.controller.ExternalSystemsController;
 import velho.model.ProductBox;
 import velho.model.Shelf;
+import velho.model.enums.DatabaseFileState;
 import velho.model.exceptions.ExistingDatabaseLinkException;
 import velho.model.exceptions.NoDatabaseLinkException;
 
@@ -29,7 +30,7 @@ public class ExternalSystemsControllerTest
 	@BeforeClass
 	public final static void connectAndInitializeDatabase() throws ClassNotFoundException, NoDatabaseLinkException, ExistingDatabaseLinkException
 	{
-		assertTrue(DatabaseController.link());
+		assertTrue(DatabaseController.link() != DatabaseFileState.DOES_NOT_EXIST);
 		assertTrue(DatabaseController.initializeDatabase());
 		DatabaseController.loadData();
 	}

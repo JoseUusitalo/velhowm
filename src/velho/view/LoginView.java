@@ -13,7 +13,7 @@ import velho.controller.LoginController;
 /**
  * Allows the users to log in to the system.
  *
- * @author Jose Uusitalo &amp; Edward
+ * @author Jose Uusitalo &amp; Edward Puustinen
  */
 public class LoginView
 {

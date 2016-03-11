@@ -6,7 +6,7 @@ import velho.model.exceptions.NoDatabaseLinkException;
 /**
  * The ProductCategory class.
  *
- * @author Joona &amp; Jose Uusitalo
+ * @author Joona Silvennoinen &amp; Jose Uusitalo
  */
 public class ProductCategory
 {
@@ -27,6 +27,7 @@ public class ProductCategory
 	private int databaseID;
 
 	/**
+	 * @param databaseID
 	 * @param name
 	 * @param type
 	 */

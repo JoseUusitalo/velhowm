@@ -19,7 +19,7 @@ import velho.model.exceptions.NoDatabaseLinkException;
 /**
  * Controller handling the communication with systems outside the Velho Warehouse Management.
  *
- * @author Edward &amp; Jose Uusitalo
+ * @author Edward Puustinen &amp; Jose Uusitalo
  */
 public class ExternalSystemsController
 {
@@ -186,8 +186,15 @@ public class ExternalSystemsController
 			DatabaseController.tryReLink();
 
 		}
+
 		if (showPopup)
-			DebugController.moveResult(productBoxCode, newShelfSlotID, success);
+		{
+			if (success)
+				PopupController.info(productBoxCode + " was moved to " + newShelfSlotID + ".");
+			else
+				PopupController.error(
+						productBoxCode + " was not moved to " + newShelfSlotID + ". Either the product box or the shelf does not exist in the database!");
+		}
 
 		return success;
 	}

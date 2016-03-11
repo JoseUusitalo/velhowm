@@ -7,7 +7,7 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.collections.ObservableSet;
 import javafx.scene.Node;
-import velho.model.interfaces.UIActionController;
+import velho.controller.interfaces.UIActionController;
 import velho.view.ListView;
 
 /**

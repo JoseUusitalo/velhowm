@@ -101,6 +101,8 @@ public class RemovalListManagementView
 
 	/**
 	 * Sets the view below the management pane.
+	 *
+	 * @param view the view to set to the center
 	 */
 	public void setContent(final Node view)
 	{
@@ -109,6 +111,7 @@ public class RemovalListManagementView
 
 	/**
 	 * Gets the view below the management pane.
+	 * @return the center view
 	 */
 	public Node getContent()
 	{

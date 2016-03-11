@@ -18,6 +18,7 @@ import velho.controller.DatabaseController;
 import velho.model.ProductBox;
 import velho.model.RemovalList;
 import velho.model.RemovalListState;
+import velho.model.enums.DatabaseFileState;
 import velho.model.exceptions.ExistingDatabaseLinkException;
 import velho.model.exceptions.NoDatabaseLinkException;
 
@@ -39,7 +40,7 @@ public class RemovalListTest
 		try
 		{
 			if (!DatabaseController.isLinked())
-				assertTrue(DatabaseController.link());
+				assertTrue(DatabaseController.link() != DatabaseFileState.DOES_NOT_EXIST);
 			assertTrue(DatabaseController.initializeDatabase());
 		}
 		catch (ClassNotFoundException e0)

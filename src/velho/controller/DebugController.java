@@ -2,8 +2,6 @@ package velho.controller;
 
 import java.util.Random;
 
-import org.apache.log4j.Logger;
-
 import javafx.stage.Stage;
 import velho.model.BarcodeScanner;
 import velho.model.exceptions.NoDatabaseLinkException;
@@ -12,15 +10,10 @@ import velho.view.DebugWindow;
 /**
  * Various debugging features.
  *
- * @author Edward &amp; Jose Uusitalo
+ * @author Edward Puustinen &amp; Jose Uusitalo
  */
 public class DebugController
 {
-	/**
-	 * Apache log4j logger: System.
-	 */
-	private static final Logger SYSLOG = Logger.getLogger(DebugController.class.getName());
-
 	/**
 	 * The {@link DebugWindow}.
 	 */
@@ -115,45 +108,6 @@ public class DebugController
 	public void scannerMoveValid()
 	{
 		ExternalSystemsController.scannerMoveValid();
-	}
-
-	/**
-	 * Result message from the External systems controller to the DebugWindow of the procedures end result.
-	 */
-	public static void resultMessage()
-	{
-		// TODO: Figure out what this does.
-
-		final boolean s = ExternalSystemsController.move(0, null, true);
-		if (s == true)
-		{
-			SYSLOG.debug("Product box move successful.");
-		}
-		else
-		{
-			SYSLOG.debug("Product box move failed.");
-		}
-	}
-
-	/**
-	 * moveResult what currently sends the message and informs the DebugWindow of current events.
-	 *
-	 * @param productCode is the code the the product identifies with
-	 * @param shelfSlotCode is the code for the Shelf slot where the product resides in
-	 * @param success is actually a true that prints a message to the DebugWindow
-	 */
-	public static void moveResult(final int productCode, final String shelfSlotCode, final boolean success)
-	{
-		// TODO: Figure out what this does.
-
-		if (success == true)
-		{
-			PopupController.info(productCode + " was moved to " + shelfSlotCode + ": " + success);
-			return;
-		}
-
-		PopupController.info(productCode + " was not moved to " + shelfSlotCode
-				+ " error: If the product was not moved it either does not exist or the shelf does not exist!");
 	}
 
 	/**

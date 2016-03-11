@@ -7,12 +7,12 @@ import java.util.Set;
 import org.apache.log4j.Logger;
 
 import javafx.scene.Node;
+import velho.controller.interfaces.UIActionController;
 import velho.model.Manager;
 import velho.model.Manifest;
 import velho.model.ManifestState;
 import velho.model.ProductBox;
 import velho.model.exceptions.NoDatabaseLinkException;
-import velho.model.interfaces.UIActionController;
 import velho.view.GenericTabView;
 import velho.view.MainWindow;
 import velho.view.ManifestManagementView;
@@ -158,7 +158,7 @@ public class ManifestController implements UIActionController
 	 * Adds the manifest state selector to the management panel.
 	 * Use <code>null</code> to remove it.
 	 *
-	 * @param manifestState the manifest state combo box
+	 * @param stateBox the manifest state combo box
 	 */
 	public void showStateSelector(final Node stateBox)
 	{
@@ -173,8 +173,6 @@ public class ManifestController implements UIActionController
 	public void receiveShipment(final Set<ProductBox> boxSet, final Date orderDate, final int driverID)
 	{
 		Manifest manifest;
-
-		// TODO: Update the manifest browse view automatically.
 
 		try
 		{
@@ -205,31 +203,31 @@ public class ManifestController implements UIActionController
 	@Override
 	public void createAction(final Object data)
 	{
-		// TODO Auto-generated method stub
+		throw new UnsupportedOperationException();
 	}
 
 	@Override
 	public void updateAction(final Object data)
 	{
-		System.out.println("UPDATE: " + ((Manifest) data).toString());
+		throw new UnsupportedOperationException();
 	}
 
 	@Override
 	public void addAction(final Object data)
 	{
-		// TODO Auto-generated method stub
+		throw new UnsupportedOperationException();
 	}
 
 	@Override
 	public void removeAction(final Object data)
 	{
-		// TODO Auto-generated method stub
+		throw new UnsupportedOperationException();
 	}
 
 	@Override
 	public void deleteAction(final Object data)
 	{
-		// TODO Auto-generated method stub
+		throw new UnsupportedOperationException();
 	}
 
 	@Override

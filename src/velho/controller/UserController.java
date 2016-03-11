@@ -3,12 +3,12 @@ package velho.controller;
 import org.apache.log4j.Logger;
 
 import javafx.scene.Node;
+import velho.controller.interfaces.UIActionController;
 import velho.model.Administrator;
 import velho.model.Logistician;
 import velho.model.Manager;
 import velho.model.User;
 import velho.model.exceptions.NoDatabaseLinkException;
-import velho.model.interfaces.UIActionController;
 import velho.model.interfaces.UserRole;
 import velho.view.AddUserView;
 import velho.view.MainWindow;
@@ -16,7 +16,7 @@ import velho.view.MainWindow;
 /**
  * A controller for managing users.
  *
- * @author Jose Uusitalo &amp; Joona
+ * @author Jose Uusitalo &amp; Joona Silvennoinen
  */
 @SuppressWarnings("static-method")
 public class UserController implements UIActionController
@@ -47,10 +47,10 @@ public class UserController implements UIActionController
 	/**
 	 * Attempts to add a new user to the database.
 	 *
-	 * @param userID user's badge id number
+	 * @param badgeID user's badge id number
 	 * @param userFirstName user's first name
 	 * @param userLastName user's last name
-	 * @param userRole user's role in the company
+	 * @param userRoleName user's role in the company
 	 */
 	public boolean createUser(final String badgeID, final String userPIN, final String userFirstName, final String userLastName, final String userRoleName)
 	{
@@ -197,13 +197,13 @@ public class UserController implements UIActionController
 	@Override
 	public void updateAction(final Object data)
 	{
-		// USRLOG.debug("Update user: " + data);
+		throw new UnsupportedOperationException();
 	}
 
 	@Override
 	public void removeAction(final Object data)
 	{
-		// USRLOG.debug("Remove user: " + data);
+		throw new UnsupportedOperationException();
 	}
 
 	@Override
@@ -216,18 +216,18 @@ public class UserController implements UIActionController
 	@Override
 	public void addAction(final Object data)
 	{
-		// USRLOG.debug("Add user: " + data);
+		throw new UnsupportedOperationException();
 	}
 
 	@Override
 	public void viewAction(final Object data)
 	{
-		// USRLOG.debug("View user: " + data);
+		throw new UnsupportedOperationException();
 	}
 
 	@Override
 	public void createAction(final Object data)
 	{
-		// USRLOG.debug("Create user: " + data);
+		throw new UnsupportedOperationException();
 	}
 }

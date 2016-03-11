@@ -21,7 +21,7 @@ import velho.view.SearchView;
 /**
  * A class handling searching the database for data.
  *
- * @author Jose Uusitalo &amp; Joona
+ * @author Jose Uusitalo &amp; Joona Silvennoinen
  */
 public class SearchController
 {

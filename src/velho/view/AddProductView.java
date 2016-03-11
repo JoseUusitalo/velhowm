@@ -21,7 +21,7 @@ import velho.model.exceptions.NoDatabaseLinkException;
 /**
  * Creates tab for "Product Edit View".
  *
- * @author Edward
+ * @author Edward Puustinen
  *
  */
 public class AddProductView
@@ -67,11 +67,8 @@ public class AddProductView
 	private UIController uiController;
 
 	/**
-	 * Adds the product view.
-	 * Has to be manually inputed in the UIController at
-	 * "switch (currentUserRole.getName())".
-	 *
-	 * @param productController makes it view able
+	 * @param productController
+	 * @param uiController
 	 */
 	public AddProductView(final ProductController productController, final UIController uiController)
 	{
@@ -81,6 +78,8 @@ public class AddProductView
 
 	/**
 	 * Creates BorderPane for the get Add Product tab.
+	 *
+	 * @param editProduct the product to modify
 	 *
 	 * @return the bPane
 	 * @throws NoDatabaseLinkException to get the data
@@ -108,8 +107,10 @@ public class AddProductView
 			brandList.getItems().addAll(DatabaseController.getAllProductBrands());
 			brandList.setMaxWidth(Double.MAX_VALUE);
 
-			// TODO: Fix coombobox selection mechanic breaking on the second try because the selection is converted from
-			// object to string.
+			/*
+			 * TODO: Fix combobox selection mechanic breaking on the second try because the selection is converted from
+			 * object to string.
+			 */
 			// brandList.setEditable(true);
 
 			brandList.getSelectionModel().selectFirst();
@@ -121,8 +122,10 @@ public class AddProductView
 			categoryList.getItems().addAll(DatabaseController.getAllProductCategories());
 			categoryList.setMaxWidth(Double.MAX_VALUE);
 
-			// TODO: Fix coombobox selection mechanic breaking on the second try because the selection is converted from
-			// object to string.
+			/*
+			 * TODO: Fix combobox selection mechanic breaking on the second try because the selection is converted from
+			 * object to string.
+			 */
 			// categoryList.setEditable(true);
 
 			categoryList.getSelectionModel().selectFirst();
@@ -203,8 +206,9 @@ public class AddProductView
 
 	/**
 	 * Saves data to database.
+	 *
+	 * @param product the product to view
 	 */
-
 	public void setViewData(final Product product)
 	{
 		databaseID.getValueFactory().setValue(product.getProductID());
