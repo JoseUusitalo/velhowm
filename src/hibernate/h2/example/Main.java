@@ -1,6 +1,5 @@
 package hibernate.h2.example;
 
-import java.io.File;
 import java.util.List;
 
 import org.hibernate.Session;
@@ -12,10 +11,8 @@ public class Main
 
 	public static void main(final String[] args)
 	{
-		User user = new User(1, "Levi");
+		User user = new User(2, "Levi2");
 
-		System.out.println(new File("hibernate.cfg.xml").exists());
-		System.out.println(new File("hibernate.cfg.xml").getAbsolutePath());
 		SessionFactory sessionFactory = new Configuration().configure("hibernate.cfg.xml").buildSessionFactory();
 		Session session = sessionFactory.openSession();
 
@@ -27,6 +24,7 @@ public class Main
 		session = sessionFactory.openSession();
 		session.beginTransaction();
 		List result = session.createQuery("from User").list();
+		System.out.println("---------------------------------------------------------------------------");
 		for (User event : (List<User>) result)
 		{
 			System.out.println(event.getName());
