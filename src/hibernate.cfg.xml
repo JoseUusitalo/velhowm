@@ -16,9 +16,12 @@
 		<property name="hibernate.connection.password">@_Vry $ECURE pword2</property>
 
         <property name="connection.pool_size">1</property>
-        <property name="show_sql">false</property>
+        <property name="show_sql">true</property>
         <property name="hbm2ddl.auto">update</property>
 
-        <mapping class="velho.model.ProductBrand"/>
+        <mapping resource="com/vaannila/student/Student.hbm.xml"/>
+        <mapping resource="com/vaannila/student/Address.hbm.xml"/>
+        <mapping resource="velho/model/ProductType.hbm.xml"/>
+        <mapping resource="velho/model/ProductCategory.hbm.xml"/>
 	</session-factory>
 </hibernate-configuration>

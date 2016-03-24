@@ -1,30 +1,26 @@
 package velho.model;
 
-import velho.controller.DatabaseController;
-import velho.model.exceptions.NoDatabaseLinkException;
-
 /**
- * The ProductCategory class.
+ * A class describing the category of a {@link Product}.
  *
  * @author Joona Silvennoinen &amp; Jose Uusitalo
  */
 public class ProductCategory
 {
 	/**
-	 * The product category name.
-	 *
-	 */
-	private String name;
-	/**
-	 * The product category type.
-	 *
-	 */
-	private ProductType type;
-
-	/**
 	 * The database ID of this product category.
 	 */
 	private int databaseID;
+
+	/**
+	 * The product category name.
+	 */
+	private String name;
+
+	/**
+	 * The product category type.
+	 */
+	private ProductType type;
 
 	/**
 	 * @param databaseID
@@ -36,46 +32,41 @@ public class ProductCategory
 		this.databaseID = databaseID;
 		this.type = type;
 		this.name = name;
-
-		if (this.type == null)
-		{
-			throw new IllegalArgumentException();
-		}
 	}
 
-	public ProductCategory(final String name) throws NoDatabaseLinkException
+	/**
+	 * @param name
+	 * @param type
+	 */
+	public ProductCategory(final String name, final ProductType type)
 	{
-		this.databaseID = -1;
-		this.type = DatabaseController.getProductTypeByID(1); // TODO WRITE allow changeging type
 		this.name = name;
+		this.type = type;
 	}
 
+	/**
+	 * @param name
+	 */
+	public ProductCategory(final String name)
+	{
+		this.name = name;
+		this.type = null;
+	}
+
+	/**
+	 */
+	public ProductCategory()
+	{
+		// For Hibernate.
+	}
+
+	/**
+	 * @return the name of this category and its type
+	 */
 	@Override
 	public String toString()
 	{
 		return name + " (" + type + ")";
-	}
-
-	/**
-	 * Gets the product category name.
-	 *
-	 * @return the product category name.
-	 *
-	 */
-	public String getName()
-	{
-		return name;
-	}
-
-	/**
-	 * Gets the product category type.
-	 *
-	 * @return the product category type.
-	 *
-	 */
-	public ProductType getType()
-	{
-		return type;
 	}
 
 	/**
@@ -86,5 +77,49 @@ public class ProductCategory
 	public int getDatabaseID()
 	{
 		return databaseID;
+	}
+
+	/**
+	 * Gets the product category name.
+	 *
+	 * @return the product category name.
+	 */
+	public String getName()
+	{
+		return name;
+	}
+
+	/**
+	 * Gets the product category type.
+	 *
+	 * @return the product category type.
+	 */
+	public ProductType getType()
+	{
+		return type;
+	}
+
+	/**
+	 * Sets a new datbase ID for this product category.
+	 */
+	public void setDatabaseID(final int id)
+	{
+		databaseID = id;
+	}
+
+	/**
+	 * Sets a new name for this product category.
+	 */
+	public void setName(final String name)
+	{
+		this.name = name;
+	}
+
+	/**
+	 * Sets a new type for this product category.
+	 */
+	public void setType(final ProductType type)
+	{
+		this.type = type;
 	}
 }
