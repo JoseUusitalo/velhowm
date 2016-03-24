@@ -12,6 +12,7 @@ import javafx.application.Application;
 import javafx.beans.property.ReadOnlyDoubleProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
+import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Pos;
@@ -248,6 +249,13 @@ public class MainWindow extends Application
 						//@formatter:on
 
 						SYSLOG.debug("All controllers created.");
+
+						System.out.println("aaaaaaaaaaaaaaaaaaaa");
+
+						ObservableList asd = DatabaseController.getAllProductCategories();
+
+						for (Object a : asd)
+							System.out.println(a);
 					}
 					else
 					{

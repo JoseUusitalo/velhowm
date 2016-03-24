@@ -22,6 +22,7 @@ import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
 import org.h2.jdbcx.JdbcConnectionPool;
+import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 
@@ -88,7 +89,10 @@ public class DatabaseController
 	 */
 	private static final SimpleDateFormat H2_DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd");
 
-	private static final SessionFactory sessionFactory = HibernateSessionFactory.getSessionFactory();
+	/**
+	 * The Hibernate session factory.
+	 */
+	private static final SessionFactory sessionFactory = HibernateSessionFactory.getInstance();
 
 	/*
 	 * ---- UI LISTS ----
@@ -3372,23 +3376,31 @@ public class DatabaseController
 	}
 
 	/**
-	 * Loads all {@link ProductCategory} objects from the database into the
-	 * cache.
+	 * Loads all {@link ProductCategory} objects from the database into memory.
 	 *
 	 * @return an {@link ObservableList} of all product categories
 	 */
-	public static ObservableList<Object> getAllProductCategories() throws NoDatabaseLinkException
+	@SuppressWarnings("unchecked")
+	public static ObservableList<Object> getAllProductCategories()
 	{
 		final Session session = sessionFactory.openSession();
 		session.beginTransaction();
 
-		@SuppressWarnings("unchecked")
 		final List<ProductCategory> result = session.createQuery("from ProductCategory").list();
+
+		try
+		{
+			session.getTransaction().commit();
+		}
+		catch (HibernateException e)
+		{
+			session.getTransaction().rollback();
+		}
+
+		session.close();
+
 		observableProductCategories.clear();
 		observableProductCategories.addAll(result);
-
-		session.getTransaction().commit();
-		session.close();
 
 		return observableProductCategories;
 	}

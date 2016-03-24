@@ -1,11 +1,5 @@
 package velho.model;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.Table;
-
 /**
  * A brand associated with a {@link Product}.
  *
@@ -93,5 +87,4 @@ public class ProductBrand
 	{
 		this.name = name;
 	}
-
 }
