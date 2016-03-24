@@ -5,9 +5,15 @@
 <hibernate-mapping>
 	<class name="velho.model.ProductType" table="TYPES">
 		<meta attribute="class-description">A class representing the type of the product.</meta>
+
 		<id name="databaseID" type="int" column="type_id">
 			<generator class="native" />
 		</id>
-		<property name="name" column="NAME" type="string" unique="true" not-null="true"/>
+
+		<property	name="name"
+					column="NAME"
+					type="string"
+					unique="true"
+					not-null="true"/>
 	</class>
 </hibernate-mapping>

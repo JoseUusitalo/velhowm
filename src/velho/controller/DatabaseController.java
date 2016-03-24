@@ -22,10 +22,13 @@ import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
 import org.h2.jdbcx.JdbcConnectionPool;
+import org.hibernate.Session;
+import org.hibernate.SessionFactory;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import velho.model.Administrator;
+import velho.model.HibernateSessionFactory;
 import velho.model.Manager;
 import velho.model.Manifest;
 import velho.model.ManifestState;
@@ -84,6 +87,9 @@ public class DatabaseController
 	 * The date format used by the database.
 	 */
 	private static final SimpleDateFormat H2_DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd");
+
+	private static final SessionFactory sessionFactory = HibernateSessionFactory.getSessionFactory();
+
 	/*
 	 * ---- UI LISTS ----
 	 */
@@ -3373,31 +3379,16 @@ public class DatabaseController
 	 */
 	public static ObservableList<Object> getAllProductCategories() throws NoDatabaseLinkException
 	{
-		final String[] columns = { "*" };
+		final Session session = sessionFactory.openSession();
+		session.beginTransaction();
 
 		@SuppressWarnings("unchecked")
-		final Set<ProductCategory> result = (LinkedHashSet<ProductCategory>) (runQuery(DatabaseQueryType.SELECT, DatabaseTable.CATEGORIES, null, columns, null,
-				null));
-
-		if (result.size() == 0)
-			DBLOG.warn("No Product Categories present in the database.");
-
-		final Iterator<ProductCategory> it = result.iterator();
-
-		// Store for reuse.
-		while (it.hasNext())
-		{
-			final ProductCategory p = it.next();
-
-			DBLOG.trace("Caching: " + p);
-
-			cachedProductCategories.put(p.getDatabaseID(), p);
-		}
-
-		DBLOG.info("All " + result.size() + " Product Categories cached.");
-
+		final List<ProductCategory> result = session.createQuery("from ProductCategory").list();
 		observableProductCategories.clear();
-		observableProductCategories.addAll(cachedProductCategories.values());
+		observableProductCategories.addAll(result);
+
+		session.getTransaction().commit();
+		session.close();
 
 		return observableProductCategories;
 	}

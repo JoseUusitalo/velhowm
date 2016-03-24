@@ -19,8 +19,6 @@
         <property name="show_sql">true</property>
         <property name="hbm2ddl.auto">update</property>
 
-        <mapping resource="com/vaannila/student/Student.hbm.xml"/>
-        <mapping resource="com/vaannila/student/Address.hbm.xml"/>
         <mapping resource="velho/model/ProductType.hbm.xml"/>
         <mapping resource="velho/model/ProductCategory.hbm.xml"/>
 	</session-factory>

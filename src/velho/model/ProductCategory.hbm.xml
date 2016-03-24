@@ -5,10 +5,24 @@
 <hibernate-mapping>
 	<class name="velho.model.ProductCategory" table="CATEGORIES">
 		<meta attribute="class-description">A class describing the category of a Product.</meta>
+
 		<id name="databaseID" type="int" column="category_id">
 			<generator class="native" />
 		</id>
-		<property name="name" column="NAME" type="string" unique="true" not-null="true"/>
-        <many-to-one name="type" class="velho.model.ProductType" column="type" cascade="all" not-null="true" />
+
+		<property	name="name"
+					column="NAME"
+					type="string"
+					unique="true"
+					not-null="true"/>
+
+		<!-- Cascade changes. Use "select" eager fetching. -->
+        <many-to-one	name="type"
+        				class="velho.model.ProductType"
+        				column="type"
+        				not-null="true"
+        				cascade="all"
+        				fetch="select"
+        				lazy="false"/>
 	</class>
 </hibernate-mapping>

@@ -219,6 +219,8 @@ public class MainWindow extends Application
 					{
 						SYSLOG.debug("Creating all controllers...");
 
+						// FIXME: Convert all controllers to use the singleton pattern.
+
 						DatabaseController.loadData();
 						uiController = new UIController();
 						userController = new UserController();
