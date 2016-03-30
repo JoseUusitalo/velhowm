@@ -3099,8 +3099,38 @@ public class DatabaseController
 	}
 
 	/*
-	 * -------------------------------- CACHING --------------------------------
+	 * -------------------------------- GETTERS --------------------------------
 	 */
+
+	/**
+	 * Loads all objects of the specified type from the database into memory.
+	 *
+	 * @param className the name of the Java class of the objects to get
+	 * @return a list of objects
+	 * @throws HibernateException when the query failed to commit and has been rolled back
+	 */
+	@SuppressWarnings("unchecked")
+	private static List<Object> getAll(final String className) throws HibernateException
+	{
+		final Session session = sessionFactory.openSession();
+		session.beginTransaction();
+
+		final List<Object> result = session.createQuery("from " + className).list();
+
+		try
+		{
+			session.getTransaction().commit();
+			session.close();
+		}
+		catch (final HibernateException e)
+		{
+			session.getTransaction().rollback();
+			session.close();
+			throw new HibernateException("Failed to commit.");
+		}
+
+		return result;
+	}
 
 	/**
 	 * Loads data from database into memory.
@@ -3379,28 +3409,12 @@ public class DatabaseController
 	 * Loads all {@link ProductCategory} objects from the database into memory.
 	 *
 	 * @return an {@link ObservableList} of all product categories
+	 * @throws HibernateException when the query failed to commit and has been rolled back
 	 */
-	@SuppressWarnings("unchecked")
-	public static ObservableList<Object> getAllProductCategories()
+	public static ObservableList<Object> getAllProductCategories() throws HibernateException
 	{
-		final Session session = sessionFactory.openSession();
-		session.beginTransaction();
-
-		final List<ProductCategory> result = session.createQuery("from ProductCategory").list();
-
-		try
-		{
-			session.getTransaction().commit();
-		}
-		catch (HibernateException e)
-		{
-			session.getTransaction().rollback();
-		}
-
-		session.close();
-
 		observableProductCategories.clear();
-		observableProductCategories.addAll(result);
+		observableProductCategories.addAll(getAll("ProductCategory"));
 
 		return observableProductCategories;
 	}
