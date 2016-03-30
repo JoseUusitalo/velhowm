@@ -72,15 +72,7 @@ public class ProductController implements UIActionController
 	 */
 	public Node getProductEditView()
 	{
-		try
-		{
-			return addProductView.getView(true);
-		}
-		catch (NoDatabaseLinkException e)
-		{
-			DatabaseController.tryReLink();
-		}
-		return null;
+		return addProductView.getView(true);
 	}
 
 	/**
@@ -166,15 +158,8 @@ public class ProductController implements UIActionController
 	 */
 	public void editProduct(final Product product)
 	{
-		try
-		{
-			listTab.setView(addProductView.getView(true));
-			addProductView.setViewData(product);
-		}
-		catch (NoDatabaseLinkException e)
-		{
-			DatabaseController.tryReLink();
-		}
+		listTab.setView(addProductView.getView(true));
+		addProductView.setViewData(product);
 	}
 
 	/**
@@ -184,15 +169,7 @@ public class ProductController implements UIActionController
 	 */
 	public Node getAddProductView()
 	{
-		try
-		{
-			return new AddProductView(this, uiController).getView(false);
-		}
-		catch (NoDatabaseLinkException e)
-		{
-			DatabaseController.tryReLink();
-			return null;
-		}
+		return new AddProductView(this, uiController).getView(false);
 	}
 
 	/**
@@ -200,15 +177,7 @@ public class ProductController implements UIActionController
 	 */
 	public void showList()
 	{
-		try
-		{
-			listTab.setView(ListController.getTableView(this, DatabaseController.getProductDataColumns(false, false), DatabaseController.getAllProducts()));
-		}
-		catch (NoDatabaseLinkException e)
-		{
-			listTab.setView(null);
-			DatabaseController.tryReLink();
-		}
+		listTab.setView(ListController.getTableView(this, DatabaseController.getProductDataColumns(false, false), DatabaseController.getAllProducts()));
 	}
 
 	/**

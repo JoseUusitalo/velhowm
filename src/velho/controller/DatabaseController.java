@@ -105,7 +105,7 @@ public class DatabaseController
 	private static ObservableList<Object> observableUsers = FXCollections.observableArrayList();
 
 	/**
-	 * An observable list of {@link Product} objects display in the user
+	 * An observable list of {@link Product} objects for display in the user
 	 * interface.
 	 */
 	private static ObservableList<Object> observableProducts = FXCollections.observableArrayList();
@@ -115,6 +115,12 @@ public class DatabaseController
 	 * user interface.
 	 */
 	private static ObservableList<Object> observableProductBoxSearchResults = FXCollections.observableArrayList();
+
+	/**
+	 * An observable list of {@link ProductBox} objects for display in the
+	 * user interface.
+	 */
+	private static ObservableList<Object> observableProductBoxes = FXCollections.observableArrayList();
 
 	/**
 	 * An observable list of {@link RemovalList} objects for display in the user
@@ -159,61 +165,71 @@ public class DatabaseController
 	/**
 	 * A map of {@link ProductBrand} objects loaded from the database.
 	 */
+	@Deprecated
 	private static Map<Integer, ProductBrand> cachedProductBrands = new HashMap<Integer, ProductBrand>();
 
 	/**
 	 * A map of {@link ProductType} objects loaded from the database.
 	 */
+	@Deprecated
 	private static Map<Integer, ProductType> cachedProductTypes = new HashMap<Integer, ProductType>();
 
 	/**
 	 * A map of {@link ProductCategory} objects loaded from the database.
 	 */
+	@Deprecated
 	private static Map<Integer, ProductCategory> cachedProductCategories = new HashMap<Integer, ProductCategory>();
 
 	/**
 	 * A map of {@link Product} objects loaded from the database.
 	 */
+	@Deprecated
 	private static Map<Integer, Product> cachedProducts = new HashMap<Integer, Product>();
 
 	/**
 	 * A map of {@link ProductContainer} objects loaded from the database.
 	 */
+	@Deprecated
 	private static Map<Integer, ProductBox> cachedProductBoxes = new HashMap<Integer, ProductBox>();
 
 	/**
 	 * A map of {@link Shelf} objects loaded from the database.
 	 */
+	@Deprecated
 	private static Map<Integer, Shelf> cachedShelves = new HashMap<Integer, Shelf>();
 
 	/**
 	 * A map of {@link RemovalList} objects loaded from the database.
 	 */
+	@Deprecated
 	private static Map<Integer, RemovalList> cachedRemovalLists = new HashMap<Integer, RemovalList>();
 
 	/**
 	 * A map of {@link RemovalListState} objects loaded from the database.
 	 */
+	@Deprecated
 	private static Map<Integer, RemovalListState> cachedRemovalListStates = new HashMap<Integer, RemovalListState>();
 
 	/**
 	 * A map of {@link ManifestState} objects loaded from the database.
 	 */
+	@Deprecated
 	private static Map<Integer, ManifestState> cachedManifestStates = new HashMap<Integer, ManifestState>();
 
 	/**
 	 * A map of {@link Manifest} objects loaded from the database.
 	 */
+	@Deprecated
 	private static Map<Integer, Manifest> cachedManifests = new HashMap<Integer, Manifest>();
 
 	/**
 	 * A map of {@link RemovalPlatform} objects loaded from the database.
 	 */
+	@Deprecated
 	private static Map<Integer, RemovalPlatform> cachedRemovalPlatforms = new HashMap<Integer, RemovalPlatform>();
 
 	/*
-	 * -------------------------------- PRIVATE DATABASE METHODS
-	 * --------------------------------
+	 * -------------------------------- PRIVATE DATABASE METHODS --------------------------------
 	 */
 
 	/**
@@ -3135,8 +3151,10 @@ public class DatabaseController
 	/**
 	 * Loads data from database into memory.
 	 */
+	@Deprecated
 	public static void loadData() throws NoDatabaseLinkException
 	{
+		// TODO: Get rid of this.
 		DBLOG.info("Loading data from database...");
 
 		getAllProductBoxes();
@@ -3152,8 +3170,10 @@ public class DatabaseController
 	 *
 	 * @throws NoDatabaseLinkException
 	 */
+	@Deprecated
 	private static void setAllContainersToAllShelves() throws NoDatabaseLinkException
 	{
+		// TODO: Get rid of this.
 		final String[] columns = { "*" };
 		@SuppressWarnings("unchecked")
 		final Map<Integer, ArrayList<Integer[]>> shelfBoxMap = (HashMap<Integer, ArrayList<Integer[]>>) runQuery(DatabaseQueryType.SELECT,
@@ -3200,8 +3220,10 @@ public class DatabaseController
 	 *
 	 * @throws NoDatabaseLinkException
 	 */
+	@Deprecated
 	private static void setAllContainersToAllRemovalLists() throws NoDatabaseLinkException
 	{
+		// TODO: Get rid of this.
 		final String[] columns = { "*" };
 		@SuppressWarnings("unchecked")
 		final Map<Integer, ArrayList<Integer>> removalListBoxes = (HashMap<Integer, ArrayList<Integer>>) runQuery(DatabaseQueryType.SELECT,
@@ -3231,8 +3253,10 @@ public class DatabaseController
 	 *
 	 * @throws NoDatabaseLinkException
 	 */
+	@Deprecated
 	private static void setAllContainersToAllManifests() throws NoDatabaseLinkException
 	{
+		// TODO: Get rid of this.
 		final String[] columns = { "*" };
 		@SuppressWarnings("unchecked")
 		final Map<Integer, ArrayList<Integer>> manifestBoxes = (HashMap<Integer, ArrayList<Integer>>) runQuery(DatabaseQueryType.SELECT,
@@ -3261,7 +3285,8 @@ public class DatabaseController
 	}
 
 	/**
-	 * Loads the following objects into memory:
+	 * Loads all {@link ProductBox} objects from the database into memory.
+	 * Additionally loads the following objects into memory:
 	 * <ul>
 	 * <li>{@link ProductBrand}</li>
 	 * <li>{@link ProductType}</li>
@@ -3270,25 +3295,14 @@ public class DatabaseController
 	 * <li>{@link ProductContainer}</li>
 	 * </ul>
 	 *
-	 * @throws NoDatabaseLinkException
+	 * @return a list of products in the database currently on shelves
+	 * @throws HibernateException when the query failed to commit and has been rolled back
 	 */
-	private static void getAllProductBoxes() throws NoDatabaseLinkException
+	public static ObservableList<Object> getAllProductBoxes() throws HibernateException
 	{
-		final String[] columns = { "*" };
-		@SuppressWarnings("unchecked")
-		final Set<ProductBox> result = (Set<ProductBox>) runQuery(DatabaseQueryType.SELECT, DatabaseTable.CONTAINERS, null, columns, null, null);
-
-		final Iterator<ProductBox> it = result.iterator();
-
-		// Store for reuse.
-		while (it.hasNext())
-		{
-			final ProductBox p = it.next();
-			DBLOG.trace("Caching: " + p);
-			cachedProductBoxes.put(p.getDatabaseID(), p);
-		}
-
-		DBLOG.info("All " + result.size() + " ProductBoxes cached.");
+		observableProductBoxes.clear();
+		observableProductBoxes.addAll(getAll("ProductBox"));
+		return observableProductBoxes;
 	}
 
 	/**
@@ -3372,36 +3386,15 @@ public class DatabaseController
 	}
 
 	/**
-	 * Gets an {@link ObservableList} of product data in shelves.
+	 * Loads all {@link Product} objects from the database into memory.
 	 *
 	 * @return a list of products in the database currently on shelves
+	 * @throws HibernateException when the query failed to commit and has been rolled back
 	 */
-	public static ObservableList<Object> getAllProducts() throws NoDatabaseLinkException
+	public static ObservableList<Object> getAllProducts() throws HibernateException
 	{
-		final String[] columns = { "*" };
-
-		@SuppressWarnings("unchecked")
-		final Set<Product> result = (LinkedHashSet<Product>) (runQuery(DatabaseQueryType.SELECT, DatabaseTable.PRODUCTS, null, columns, null, null));
-
-		if (result.size() == 0)
-			DBLOG.warn("No Products present in the database.");
-
-		final Iterator<Product> it = result.iterator();
-
-		// Store for reuse.
-		while (it.hasNext())
-		{
-			final Product p = it.next();
-
-			DBLOG.trace("Caching: " + p);
-
-			cachedProducts.put(p.getDatabaseID(), p);
-		}
-
-		DBLOG.info("All " + result.size() + " Product Brands cached.");
-
 		observableProducts.clear();
-		observableProducts.addAll(cachedProducts.values());
+		observableProducts.addAll(getAll("Product"));
 		return observableProducts;
 	}
 
@@ -3420,36 +3413,17 @@ public class DatabaseController
 	}
 
 	/**
-	 * Loads all {@link ProductBrand} objects from the database into the cache.
+	 * Loads all {@link ProductBrand} objects from the database into memory.
 	 *
 	 * @return an {@link ObservableList} of all product brands
+	 * @throws HibernateException when the query failed to commit and has been rolled back
 	 */
-	public static ObservableList<Object> getAllProductBrands() throws NoDatabaseLinkException
+	public static ObservableList<Object> getAllProductBrands() throws HibernateException
 	{
-		final String[] columns = { "*" };
-
-		@SuppressWarnings("unchecked")
-		final Set<ProductBrand> result = (LinkedHashSet<ProductBrand>) (runQuery(DatabaseQueryType.SELECT, DatabaseTable.BRANDS, null, columns, null, null));
-
-		if (result.size() == 0)
-			DBLOG.warn("No Product Brands present in the database.");
-
-		final Iterator<ProductBrand> it = result.iterator();
-
-		// Store for reuse.
-		while (it.hasNext())
-		{
-			final ProductBrand p = it.next();
-
-			DBLOG.trace("Caching: " + p);
-
-			cachedProductBrands.put(p.getDatabaseID(), p);
-		}
-
-		DBLOG.info("All " + result.size() + " Product Brands cached.");
+		// TODO: Can this return a list of ProductBrand objects? Will the JavaFX lists still work?
 
 		observableProductBrands.clear();
-		observableProductBrands.addAll(cachedProductBrands.values());
+		observableProductBrands.addAll(getAll("ProductBrand"));
 		return observableProductBrands;
 	}
 
@@ -3628,8 +3602,10 @@ public class DatabaseController
 	/**
 	 * Clears all cached data.
 	 */
+	@Deprecated
 	public static void clearAllCaches()
 	{
+		// TODO: Get rid of this.
 		DBLOG.info("Clearing all cached data.");
 		cachedProductBoxes.clear();
 		cachedProductBrands.clear();
@@ -3648,8 +3624,10 @@ public class DatabaseController
 	 * @return a map of cached removal lists where the key is the database ID
 	 * and the value is the object
 	 */
+	@Deprecated
 	public static Map<Integer, RemovalList> getCachedRemovalLists()
 	{
+		// TODO: Get rid of this.
 		return cachedRemovalLists;
 	}
 

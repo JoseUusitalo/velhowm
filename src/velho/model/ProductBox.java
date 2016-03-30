@@ -27,6 +27,13 @@ public class ProductBox extends ProductContainer
 		}
 	}
 
+	/**
+	 */
+	public ProductBox()
+	{
+		// For Hibernate.
+	}
+
 	@Override
 	public String toString()
 	{

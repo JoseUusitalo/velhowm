@@ -16,7 +16,6 @@ import velho.controller.DatabaseController;
 import velho.controller.ProductController;
 import velho.controller.UIController;
 import velho.model.Product;
-import velho.model.exceptions.NoDatabaseLinkException;
 
 /**
  * Creates tab for "Product Edit View".
@@ -84,7 +83,7 @@ public class AddProductView
 	 * @return the bPane
 	 * @throws NoDatabaseLinkException to get the data
 	 */
-	public BorderPane getView(final boolean editProduct) throws NoDatabaseLinkException
+	public BorderPane getView(final boolean editProduct)
 	{
 		if (bPane == null)
 		{

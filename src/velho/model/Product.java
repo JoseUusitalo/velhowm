@@ -57,6 +57,13 @@ public class Product
 		this.popularity = popularity;
 	}
 
+	/**
+	 */
+	public Product()
+	{
+		// For Hibernate.
+	}
+
 	@Override
 	public String toString()
 	{
