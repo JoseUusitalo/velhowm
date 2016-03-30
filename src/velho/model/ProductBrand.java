@@ -32,8 +32,7 @@ public class ProductBrand
 	 */
 	public ProductBrand(final String name)
 	{
-		this.databaseID = -1;
-		this.name = name;
+		this(-1, name);
 	}
 
 	/**

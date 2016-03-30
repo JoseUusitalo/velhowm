@@ -40,8 +40,7 @@ public class ProductCategory
 	 */
 	public ProductCategory(final String name, final ProductType type)
 	{
-		this.name = name;
-		this.type = type;
+		this(-1, name, type);
 	}
 
 	/**
@@ -49,8 +48,7 @@ public class ProductCategory
 	 */
 	public ProductCategory(final String name)
 	{
-		this.name = name;
-		this.type = null;
+		this(-1, name, null);
 	}
 
 	/**

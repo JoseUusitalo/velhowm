@@ -18,21 +18,21 @@ public class ProductType
 	private String name;
 
 	/**
-	 * @param name
-	 */
-	public ProductType(final String name)
-	{
-		this.name = name;
-	}
-
-	/**
 	 * @param databaseID
 	 * @param name
 	 */
 	public ProductType(final int databaseID, final String name)
 	{
-		this(name);
+		this.name = name;
 		this.databaseID = databaseID;
+	}
+
+	/**
+	 * @param name
+	 */
+	public ProductType(final String name)
+	{
+		this(-1, name);
 	}
 
 	/**
