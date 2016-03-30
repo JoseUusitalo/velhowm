@@ -1,34 +1,34 @@
 package velho.model;
 
 /**
- * The Product class.
+ * A class representing a generic product of any type, shape, or size.
  *
  * @author Joona Silvennoinen &amp; Jose Uusitalo
  */
 public class Product
 {
 	/**
-	 * The name of the product.
+	 * The database ID of this product.
+	 */
+	private int databaseID;
+
+	/**
+	 * The name of this product.
 	 */
 	private String name;
 
 	/**
-	 * The ID of the product.
-	 */
-	private int productID;
-
-	/**
-	 * The brand of the product.
+	 * The brand of this product.
 	 */
 	private ProductBrand brand;
 
 	/**
-	 * The category of the product.
+	 * The category of this product.
 	 */
 	private ProductCategory category;
 
 	/**
-	 * Popularity of the product.
+	 * Popularity of this product.
 	 */
 	private int popularity;
 
@@ -41,7 +41,7 @@ public class Product
 	 */
 	public Product(final int databaseID, final String name, final ProductBrand brand, final ProductCategory category, final int popularity)
 	{
-		this.productID = databaseID;
+		this.databaseID = databaseID;
 		this.name = name;
 		this.brand = brand;
 		this.category = category;
@@ -50,7 +50,7 @@ public class Product
 
 	public Product(final String name, final ProductBrand brand, final ProductCategory category, final int popularity)
 	{
-		this.productID = -1;
+		this.databaseID = -1;
 		this.name = name;
 		this.brand = brand;
 		this.category = category;
@@ -60,14 +60,13 @@ public class Product
 	@Override
 	public String toString()
 	{
-		return "[" + productID + "] " + name + " (" + brand + " / " + category + "), Popularity: " + popularity;
+		return "[" + databaseID + "] " + name + " (" + brand + " / " + category + "), Popularity: " + popularity;
 	}
 
 	/**
-	 * Gets the popularity of the product.
+	 * Gets the popularity of this product.
 	 *
-	 * @return the popularity of the product.
-	 *
+	 * @return the popularity of this product
 	 */
 	public int getPopularity()
 	{
@@ -77,8 +76,7 @@ public class Product
 	/**
 	 * Sets the popularity value.
 	 *
-	 * @param popularity
-	 *
+	 * @param popularity the new popularity value
 	 */
 	public void setPopularity(final int popularity)
 	{
@@ -86,10 +84,9 @@ public class Product
 	}
 
 	/**
-	 * Gets the name of the product.
+	 * Gets the name of this product.
 	 *
-	 * @return the name of the product.
-	 *
+	 * @return the name of this product
 	 */
 	public String getName()
 	{
@@ -97,21 +94,39 @@ public class Product
 	}
 
 	/**
-	 * Gets the ID of the product.
+	 * Sets the name of this product.
 	 *
-	 * @return the ID of the product.
-	 *
+	 * @param name the new name of this product
 	 */
-	public int getProductID()
+	public void setName(final String name)
 	{
-		return productID;
+		this.name = name;
 	}
 
 	/**
-	 * Gets the brand of the product.
+	 * Gets the database ID of this product.
 	 *
-	 * @return the brand of the product.
+	 * @return the database ID of this product
+	 */
+	public int getDatabaseID()
+	{
+		return databaseID;
+	}
+
+	/**
+	 * Sets the database ID of this product.
 	 *
+	 * @param id the new database ID of this product
+	 */
+	public void setDatabaseID(final int id)
+	{
+		databaseID = id;
+	}
+
+	/**
+	 * Gets the brand of this product.
+	 *
+	 * @return the brand of this product
 	 */
 	public ProductBrand getBrand()
 	{
@@ -119,14 +134,32 @@ public class Product
 	}
 
 	/**
-	 * Gets the category of the product.
+	 * Sets the brand of this product.
 	 *
-	 * @return the category of the product.
+	 * @param brand the new brand of this product
+	 */
+	public void setBrand(final ProductBrand brand)
+	{
+		this.brand = brand;
+	}
+
+	/**
+	 * Gets the category of this product.
 	 *
+	 * @return the category of this product
 	 */
 	public ProductCategory getCategory()
 	{
 		return category;
 	}
 
+	/**
+	 * Sets the category of this product.
+	 *
+	 * @param category the new category of this product
+	 */
+	public void setCategory(final ProductCategory category)
+	{
+		this.category = category;
+	}
 }

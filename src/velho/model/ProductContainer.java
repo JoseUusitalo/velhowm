@@ -3,27 +3,32 @@ package velho.model;
 import java.util.Date;
 
 /**
+ * An abstract container that can hold any number of {@link Product} objects.
+ *
  * @author Joona Silvennoinen &amp; Jose Uusitalo
  */
 public abstract class ProductContainer
 {
 	/**
-	 * The expiration date of the product.
+	 * The ID of the product box.
+	 */
+	protected int databaseID;
+
+	/**
+	 * The expiration date of the products in this container.
 	 */
 	private Date expirationDate;
 
 	/**
-	 * The maximum size of the product box.
+	 * The maximum size of this product box.
 	 */
 	protected int maxSize;
-	/**
-	 * The ID of the product box.
-	 */
-	protected int databaseID;
+
 	/**
 	 * The product.
 	 */
 	protected Product product;
+
 	/**
 	 * The number of products in the product box.
 	 */
@@ -54,13 +59,20 @@ public abstract class ProductContainer
 		this.productCount = productCount;
 	}
 
+	/**
+	 */
+	public ProductContainer()
+	{
+		// For Hibernate.
+	}
+
 	@Override
 	public abstract String toString();
 
 	/**
-	 * Gets the maximum size of the product box.
+	 * Gets the maximum size of the product container.
 	 *
-	 * @return the maximum size of the product box.
+	 * @return the maximum size of the product container.
 	 */
 	public int getMaxSize()
 	{
@@ -68,19 +80,37 @@ public abstract class ProductContainer
 	}
 
 	/**
-	 * Gets the ID of the product box.
+	 * Sets the maximum number of product this product container can hold
 	 *
-	 * @return the ID of the product box.
+	 * @param maxSize the maximum size of this product container
 	 */
-	public int getBoxID()
+	public void setMaxSize(final int maxSize)
+	{
+		this.maxSize = maxSize;
+	}
+
+	/**
+	 * Gets the ID of the product container.
+	 *
+	 * @return the ID of the product container.
+	 */
+	public int getDatabaseID()
 	{
 		return databaseID;
 	}
 
 	/**
-	 * Gets the product of the product box.
+	 * Assigns a new database ID for this product container.
+	 */
+	public void setDatabaseID(final int id)
+	{
+		databaseID = id;
+	}
+
+	/**
+	 * Gets the product of this product container.
 	 *
-	 * @return the product of the product box.
+	 * @return the product of this product container.
 	 */
 	public Product getProduct()
 	{
@@ -88,9 +118,19 @@ public abstract class ProductContainer
 	}
 
 	/**
-	 * Gets the number of products in the product box.
+	 * Sets the product of this product container.
 	 *
-	 * @return the number of products in the products box.
+	 * @param product the new product of this product container
+	 */
+	public void setProduct(final Product product)
+	{
+		this.product = product;
+	}
+
+	/**
+	 * Gets the number of products in this product container.
+	 *
+	 * @return the number of products in the products container.
 	 */
 	public int getProductCount()
 	{
@@ -98,7 +138,17 @@ public abstract class ProductContainer
 	}
 
 	/**
-	 * Removes products from a product box.
+	 * Sets the number of products in this product container.
+	 *
+	 * @param count the new product count
+	 */
+	public void setProductCount(final int count)
+	{
+		productCount = count;
+	}
+
+	/**
+	 * Removes products from this product container.
 	 *
 	 * @param count number of products to remove
 	 * @return true or false.
@@ -118,7 +168,7 @@ public abstract class ProductContainer
 	}
 
 	/**
-	 * Adds product to the product box.
+	 * Adds product to this product container.
 	 *
 	 * @param count
 	 * @return true or false.
@@ -141,6 +191,16 @@ public abstract class ProductContainer
 	public ProductType getBoxType()
 	{
 		return product.getCategory().getType();
+	}
+
+	/**
+	 * Sets the type of the products in this product container.
+	 *
+	 * @param type the new product type
+	 */
+	public void setBoxType(final ProductType type)
+	{
+		product.getCategory().setType(type);
 	}
 
 	/**
@@ -171,5 +231,15 @@ public abstract class ProductContainer
 	public Date getExpirationDate()
 	{
 		return expirationDate;
+	}
+
+	/**
+	 * Sets the expiration date of the products in this product container.
+	 *
+	 * @param date the new expiration date
+	 */
+	public void setExpirationDate(final Date date)
+	{
+		expirationDate = date;
 	}
 }

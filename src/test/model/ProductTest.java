@@ -52,7 +52,7 @@ public class ProductTest
 	@Test
 	public void testGetProductID()
 	{
-		assertEquals(id, product.getProductID());
+		assertEquals(id, product.getDatabaseID());
 	}
 
 	@Test

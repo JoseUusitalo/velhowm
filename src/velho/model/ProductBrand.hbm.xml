@@ -3,11 +3,11 @@
  "-//Hibernate/Hibernate Mapping DTD//EN"
  "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
 <hibernate-mapping>
-	<class name="velho.model.ProductType" table="TYPES">
-		<meta attribute="class-description">A class representing the type of the product.</meta>
+	<class name="velho.model.ProductBrand" table="BRANDS">
+		<meta attribute="class-description">A brand associated with a Product.</meta>
 
 		<id name="databaseID"
-			column="type_id"
+			column="brand_id"
 			type="int">
 			<generator class="native" />
 		</id>

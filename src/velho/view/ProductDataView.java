@@ -50,7 +50,7 @@ public class ProductDataView
 			// Label productPopularity = new Label("Popularity: ");
 			// grid.add(productPopularity, 0, 4);
 
-			Label productIDValue = new Label(String.valueOf(product.getProductID()));
+			Label productIDValue = new Label(String.valueOf(product.getDatabaseID()));
 			grid.add(productIDValue, 1, 1);
 
 			Label productBrandValue = new Label(product.getBrand().getName());

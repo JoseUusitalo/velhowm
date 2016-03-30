@@ -73,7 +73,7 @@ public class ProductBoxSearchResultRowTest
 	@Test
 	public final void testGetProductID()
 	{
-		assertEquals(box.getProduct().getProductID(), row.getProductID());
+		assertEquals(box.getProduct().getDatabaseID(), row.getProductID());
 	}
 
 	@Test
@@ -91,6 +91,6 @@ public class ProductBoxSearchResultRowTest
 	@Test
 	public final void testGetBoxID()
 	{
-		assertEquals(box.getBoxID(), row.getBoxID());
+		assertEquals(box.getDatabaseID(), row.getBoxID());
 	}
 }

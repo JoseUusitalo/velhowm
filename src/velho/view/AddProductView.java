@@ -211,7 +211,7 @@ public class AddProductView
 	 */
 	public void setViewData(final Product product)
 	{
-		databaseID.getValueFactory().setValue(product.getProductID());
+		databaseID.getValueFactory().setValue(product.getDatabaseID());
 		nameField.setText(product.getName());
 		brandList.getSelectionModel().select(product.getBrand());
 		categoryList.getSelectionModel().select(product.getCategory());

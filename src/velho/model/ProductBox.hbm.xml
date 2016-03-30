@@ -3,27 +3,34 @@
  "-//Hibernate/Hibernate Mapping DTD//EN"
  "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
 <hibernate-mapping>
-	<class name="velho.model.ProductCategory" table="CATEGORIES">
-		<meta attribute="class-description">A class describing the category of a Product.</meta>
+	<class name="velho.model.ProductContainer" table="CONTAINERS">
+		<meta attribute="class-description">A container that can hold any number of Product objects.</meta>
 
 		<id name="databaseID"
-			column="category_id"
+			column="container_id"
 			type="int">
 			<generator class="native" />
 		</id>
 
-		<property	name="name"
-					column="name"
-					type="string"
-					unique="true"
+		<property	name="expirationDate"
+					column="expiration_date"
+					type="date" />
+		
+		<property	name="maxSize"
+					column="max_size"
+					type="int"
 					not-null="true" />
+		
+		<property name="productCount" type="int">
+			<column name="product_count" not-null="true" default="0" />
+		</property>		
 
 		<!-- Many-to-one: This object can have one referenced object, the referenced object can be referenced from many objects.  
 			 Cascade changes.
 			 "Select" eager fetching: load the referenced object when this object is loaded. -->
-		<many-to-one	name="type"
-						class="velho.model.ProductType"
-						column="type"
+		<many-to-one	name="product"
+						class="velho.model.Product"
+						column="product"
 						not-null="true"
 						cascade="all"
 						fetch="select"

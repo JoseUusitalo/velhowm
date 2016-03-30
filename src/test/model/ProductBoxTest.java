@@ -92,7 +92,7 @@ public class ProductBoxTest
 	@Test
 	public void testGetBoxID()
 	{
-		assertEquals(id1, box.getBoxID());
+		assertEquals(id1, box.getDatabaseID());
 	}
 
 	@Test

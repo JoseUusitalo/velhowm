@@ -65,11 +65,10 @@ CREATE TABLE IF NOT EXISTS `containers`
 	`container_id` INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
 	`expiration_date` DATE NULL,
 	`product` INT UNSIGNED NOT NULL,
-	`max_size` INT NOT NULL,
+	`max_size` INT UNSIGNED NOT NULL,
 	`product_count` INT UNSIGNED NOT NULL DEFAULT 0,
 
-	FOREIGN KEY (`product`) REFERENCES `products`(`product_id`),
-	CHECK (`max_size`>0)
+	FOREIGN KEY (`product`) REFERENCES `products`(`product_id`)
 ) DEFAULT CHARSET=utf8;
 
 DROP TABLE IF EXISTS `freezer_products`;

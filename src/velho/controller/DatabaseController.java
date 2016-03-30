@@ -1809,7 +1809,7 @@ public class DatabaseController
 			else
 				DBLOG.trace("Updating cache: " + p);
 
-			cachedProducts.put(p.getProductID(), p);
+			cachedProducts.put(p.getDatabaseID(), p);
 			return p;
 		}
 
@@ -1843,7 +1843,7 @@ public class DatabaseController
 
 			// Store for reuse.
 			DBLOG.trace("Caching: " + p);
-			cachedProductBoxes.put(p.getBoxID(), p);
+			cachedProductBoxes.put(p.getDatabaseID(), p);
 
 			return p;
 		}
@@ -2242,12 +2242,12 @@ public class DatabaseController
 
 		for (final ProductBox box : result)
 		{
-			if (!cachedProductBoxes.containsKey(box.getBoxID()))
+			if (!cachedProductBoxes.containsKey(box.getDatabaseID()))
 			{
 				// Store for reuse.
 				DBLOG.trace("Caching: " + box);
 
-				cachedProductBoxes.put(box.getBoxID(), box);
+				cachedProductBoxes.put(box.getDatabaseID(), box);
 			}
 
 			foundProducts.add(new ProductBoxSearchResultRow(box));
@@ -2612,7 +2612,7 @@ public class DatabaseController
 		if (productBox.getShelfSlot() == null)
 		{
 			values.put("shelf", shelfID);
-			values.put("productbox", productBox.getBoxID());
+			values.put("productbox", productBox.getDatabaseID());
 			changed = (0 < ((LinkedHashSet<Object>) runQuery(DatabaseQueryType.INSERT, DatabaseTable.SHELF_PRODUCTBOXES, null, null, values, null)).size());
 		}
 		else
@@ -2620,7 +2620,7 @@ public class DatabaseController
 			// Otherwise UPDATE.
 
 			final List<String> where = new ArrayList<String>();
-			where.add("productbox = " + productBox.getBoxID());
+			where.add("productbox = " + productBox.getDatabaseID());
 			changed = (0 < ((LinkedHashSet<Object>) runQuery(DatabaseQueryType.UPDATE, DatabaseTable.SHELF_PRODUCTBOXES, null, null, values, where)).size());
 		}
 
@@ -2639,7 +2639,7 @@ public class DatabaseController
 	public static boolean removeProductBoxFromShelfSlot(final ProductBox productBox) throws NoDatabaseLinkException
 	{
 		final List<String> where = new ArrayList<String>();
-		where.add("productbox = " + productBox.getBoxID());
+		where.add("productbox = " + productBox.getDatabaseID());
 
 		@SuppressWarnings("unchecked")
 		final boolean changed = (0 < ((LinkedHashSet<Object>) runQuery(DatabaseQueryType.DELETE, DatabaseTable.SHELF_PRODUCTBOXES, null, null, null, where))
@@ -2725,7 +2725,7 @@ public class DatabaseController
 			values.remove("productbox");
 
 			// Put in the new box ID.
-			values.put("productbox", box.getBoxID());
+			values.put("productbox", box.getDatabaseID());
 
 			// Run the query.
 			result = (LinkedHashSet<Integer>) runQuery(DatabaseQueryType.INSERT, DatabaseTable.REMOVALLIST_PRODUCTBOXES, null, null, values, null);
@@ -2847,14 +2847,14 @@ public class DatabaseController
 	{
 		final Map<String, Object> values = new LinkedHashMap<String, Object>();
 		values.put("expiration_date", getH2DateFormat(productbox.getExpirationDate()));
-		values.put("product", productbox.getProduct().getProductID());
+		values.put("product", productbox.getProduct().getDatabaseID());
 		values.put("max_size", productbox.getMaxSize());
 		values.put("product_count", productbox.getProductCount());
 
 		final List<String> where = new ArrayList<String>();
 
 		DatabaseQueryType query;
-		int dbID = productbox.getBoxID();
+		int dbID = productbox.getDatabaseID();
 
 		// If the object does not exist yet, INSERT.
 		if (dbID < 1)
@@ -2955,7 +2955,7 @@ public class DatabaseController
 		final List<String> where = new ArrayList<String>();
 
 		DatabaseQueryType query;
-		int dbID = product.getProductID();
+		int dbID = product.getDatabaseID();
 
 		// If the object does not exist yet, INSERT.
 		if (dbID < 1)
@@ -3285,7 +3285,7 @@ public class DatabaseController
 		{
 			final ProductBox p = it.next();
 			DBLOG.trace("Caching: " + p);
-			cachedProductBoxes.put(p.getBoxID(), p);
+			cachedProductBoxes.put(p.getDatabaseID(), p);
 		}
 
 		DBLOG.info("All " + result.size() + " ProductBoxes cached.");
@@ -3395,7 +3395,7 @@ public class DatabaseController
 
 			DBLOG.trace("Caching: " + p);
 
-			cachedProducts.put(p.getProductID(), p);
+			cachedProducts.put(p.getDatabaseID(), p);
 		}
 
 		DBLOG.info("All " + result.size() + " Product Brands cached.");
