@@ -25,5 +25,8 @@
 		<mapping resource="velho/model/ProductCategory.hbm.xml"/>
 		<mapping resource="velho/model/ProductContainer.hbm.xml"/>
 		<mapping resource="velho/model/ProductType.hbm.xml"/>
+		
+		<mapping resource="velho/model/RemovalList.hbm.xml"/>
+		<mapping resource="velho/model/RemovalListState.hbm.xml"/>
 	</session-factory>
 </hibernate-configuration>

@@ -14,6 +14,11 @@ import javafx.collections.ObservableList;
 public class RemovalList
 {
 	/**
+	 * The database ID of this removal list.
+	 */
+	private int databaseID;
+
+	/**
 	 * The set of {@link ProductBox} objects.
 	 */
 	private Set<ProductBox> boxes;
@@ -22,11 +27,6 @@ public class RemovalList
 	 * An {@link ObservableList} of {@link ProductBox} objects for display in the user interface.
 	 */
 	private ObservableList<Object> observableBoxes;
-
-	/**
-	 * The database ID of this removal list.
-	 */
-	private int databaseID;
 
 	/**
 	 * The current state of this removal list.
@@ -62,13 +62,23 @@ public class RemovalList
 	}
 
 	/**
-	 * The database ID of this removal list.
+	 * Gets the database ID of this removal list.
 	 *
 	 * @return the database ID of this list
 	 */
 	public int getDatabaseID()
 	{
 		return databaseID;
+	}
+
+	/**
+	 * Sets the database ID of this removal list.
+	 *
+	 * @param id the new database ID of this list
+	 */
+	public void setDatabaseID(final int id)
+	{
+		databaseID = id;
 	}
 
 	/**
@@ -103,11 +113,15 @@ public class RemovalList
 
 	/**
 	 * Gets the contents of this removal list.
+	 * Rebuilds the list on every method call by looping through the set of boxes.
 	 *
 	 * @return the {@link ProductBoxSearchResultRow} objects on this list
 	 */
 	public ObservableList<Object> getObservableBoxes()
 	{
+		observableBoxes.clear();
+		boxes.forEach((final ProductBox box) -> observableBoxes.add(new ProductBoxSearchResultRow(box)));
+
 		return observableBoxes;
 	}
 
@@ -122,6 +136,16 @@ public class RemovalList
 	}
 
 	/**
+	 * Sets the set of actual product boxes in this removal list.
+	 *
+	 * @param boxes the set of boxes on this removal list
+	 */
+	public void setBoxes(final Set<ProductBox> boxes)
+	{
+		this.boxes = boxes;
+	}
+
+	/**
 	 * Adds a {@link ProductBox} on this removal list.
 	 *
 	 * @param productBox box to add to this list
@@ -130,9 +154,8 @@ public class RemovalList
 	public boolean addProductBox(final ProductBox productBox)
 	{
 		if (boxes.add(productBox))
-		{
 			return observableBoxes.add(new ProductBoxSearchResultRow(productBox));
-		}
+
 		return false;
 	}
 
@@ -154,6 +177,7 @@ public class RemovalList
 				}
 			}
 		}
+
 		return false;
 	}
 

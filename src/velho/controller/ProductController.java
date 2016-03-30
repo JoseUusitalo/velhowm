@@ -141,7 +141,7 @@ public class ProductController implements UIActionController
 				return null;
 			}
 
-			return DatabaseController.getProductByID(dbID, true);
+			return DatabaseController.getProductByID(dbID);
 		}
 		catch (NoDatabaseLinkException e)
 		{

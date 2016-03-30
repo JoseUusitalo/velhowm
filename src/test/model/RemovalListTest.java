@@ -58,7 +58,7 @@ public class RemovalListTest
 
 		box1 = DatabaseController.getProductBoxByID(1);
 		newlist = new RemovalList();
-		existinglist = DatabaseController.getRemovalListByID(1, false);
+		existinglist = DatabaseController.getRemovalListByID(1);
 	}
 
 	@After
@@ -99,7 +99,7 @@ public class RemovalListTest
 	}
 
 	@Test
-	public final void testGetState() throws NoDatabaseLinkException
+	public final void testGetState()
 	{
 		assertEquals(DatabaseController.getRemovalListStateByID(1).getDatabaseID(), newlist.getState().getDatabaseID());
 	}
@@ -119,10 +119,10 @@ public class RemovalListTest
 		assertTrue(DatabaseController.save(existinglist) > 0);
 
 		// Cache was updated
-		assertEquals(newState, DatabaseController.getRemovalListByID(existinglist.getDatabaseID(), true).getState());
+		assertEquals(newState, DatabaseController.getRemovalListByID(existinglist.getDatabaseID()).getState());
 
 		// Database was updated.
-		assertEquals(newState, DatabaseController.getRemovalListByID(existinglist.getDatabaseID(), false).getState());
+		assertEquals(newState, DatabaseController.getRemovalListByID(existinglist.getDatabaseID()).getState());
 	}
 
 	@Test
@@ -139,7 +139,7 @@ public class RemovalListTest
 	}
 
 	@Test
-	public final void testGetBoxes() throws NoDatabaseLinkException
+	public final void testGetBoxes()
 	{
 		final Set<ProductBox> set = new HashSet<ProductBox>(
 				Arrays.asList(DatabaseController.getProductBoxByID(24), DatabaseController.getProductBoxByID(25), DatabaseController.getProductBoxByID(26)));
@@ -155,7 +155,7 @@ public class RemovalListTest
 		assertTrue(existinglist.removeProductBox(first));
 		assertEquals(2, existinglist.getSize());
 		assertTrue(DatabaseController.save(existinglist) > 0);
-		assertEquals(2, DatabaseController.getRemovalListByID(existinglist.getDatabaseID(), false).getSize());
+		assertEquals(2, DatabaseController.getRemovalListByID(existinglist.getDatabaseID()).getSize());
 	}
 
 	@Test
@@ -184,7 +184,7 @@ public class RemovalListTest
 	}
 
 	@Test
-	public final void testReset() throws NoDatabaseLinkException
+	public final void testReset()
 	{
 		RemovalListState activeState = DatabaseController.getRemovalListStateByID(1);
 		RemovalListState finishedState = DatabaseController.getRemovalListStateByID(3);

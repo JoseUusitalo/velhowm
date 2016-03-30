@@ -290,7 +290,7 @@ public class DatabaseControllerTest
 	}
 
 	@Test
-	public final void testGetProductBoxByID_Invalid() throws NoDatabaseLinkException
+	public final void testGetProductBoxByID_Invalid()
 	{
 		assertEquals(null, DatabaseController.getProductBoxByID(-1));
 	}
@@ -302,34 +302,34 @@ public class DatabaseControllerTest
 	}
 
 	@Test
-	public final void testGetRemovalListByID_Invalid_Cached() throws NoDatabaseLinkException
+	public final void testGetRemovalListByID_Invalid_Cached()
 	{
-		assertEquals(null, DatabaseController.getRemovalListByID(-1, true));
+		assertEquals(null, DatabaseController.getRemovalListByID(-1));
 	}
 
 	@Test
-	public final void testGetRemovalListByID_Invalid_ForceLoad() throws NoDatabaseLinkException
+	public final void testGetRemovalListByID_Invalid_ForceLoad()
 	{
-		assertEquals(null, DatabaseController.getRemovalListByID(-1, false));
+		assertEquals(null, DatabaseController.getRemovalListByID(-1));
 	}
 
 	@Test
-	public final void testGetRemovalListByID_ForceLoad() throws NoDatabaseLinkException
+	public final void testGetRemovalListByID_ForceLoad()
 	{
-		assertEquals("[1] Active: 3 boxes", DatabaseController.getRemovalListByID(1, false).toString());
+		assertEquals("[1] Active: 3 boxes", DatabaseController.getRemovalListByID(1).toString());
 	}
 
 	@Test
-	public final void testGetRemovalListByID_Cached() throws NoDatabaseLinkException
+	public final void testGetRemovalListByID_Cached()
 	{
-		assertEquals("[1] Active: 3 boxes", DatabaseController.getRemovalListByID(1, true).toString());
+		assertEquals("[1] Active: 3 boxes", DatabaseController.getRemovalListByID(1).toString());
 	}
 
 	@Test
-	public final void testGetRemovalListByID_LoadAndCache() throws NoDatabaseLinkException
+	public final void testGetRemovalListByID_LoadAndCache()
 	{
 		DatabaseController.clearAllCaches();
-		assertEquals("[1] Active: 3 boxes", DatabaseController.getRemovalListByID(1, true).toString());
+		assertEquals("[1] Active: 3 boxes", DatabaseController.getRemovalListByID(1).toString());
 	}
 
 	@Test
@@ -346,7 +346,7 @@ public class DatabaseControllerTest
 		DatabaseController.loadData();
 
 		// Make sure that a removal list was loaded and the product boxes were placed on it.
-		assertEquals(0, DatabaseController.getRemovalListByID(5, true).getSize());
+		assertEquals(0, DatabaseController.getRemovalListByID(5).getSize());
 	}
 
 	@Test
@@ -360,7 +360,7 @@ public class DatabaseControllerTest
 		list.addProductBox(box);
 
 		assertTrue(DatabaseController.save(list) > 0);
-		final ObservableList<Object> obsboxes = DatabaseController.getRemovalListByID(6, true).getObservableBoxes();
+		final ObservableList<Object> obsboxes = DatabaseController.getRemovalListByID(6).getObservableBoxes();
 		final List<ProductBox> boxes = new ArrayList<ProductBox>();
 		final Iterator<Object> it = obsboxes.iterator();
 

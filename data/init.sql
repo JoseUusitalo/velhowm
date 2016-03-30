@@ -108,7 +108,7 @@ DROP TABLE IF EXISTS `removallist_states`;
 CREATE TABLE IF NOT EXISTS `removallist_states`
 (
 	`removallist_state_id` INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
-	`name` VARCHAR(128) NOT NULL
+	`name` VARCHAR(128) UNIQUE NOT NULL
 ) DEFAULT CHARSET=utf8;
 
 DROP TABLE IF EXISTS `removallists`;

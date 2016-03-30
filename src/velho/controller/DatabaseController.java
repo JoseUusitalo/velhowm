@@ -373,7 +373,7 @@ public class DatabaseController
 							case CONTAINERS:
 								// @formatter:off
 								while (result.next())
-									dataSet.add(new ProductBox(result.getInt("container_id"), result.getDate("expiration_date"), result.getInt("max_size"), getProductByID(result.getInt("product"), true), result.getInt("product_count")));
+									dataSet.add(new ProductBox(result.getInt("container_id"), result.getDate("expiration_date"), result.getInt("max_size"), getProductByID(result.getInt("product")), result.getInt("product_count")));
 								// FIXME: Containers are not set to their respective shelves!
 								break;
 							// @formatter:on
@@ -1152,6 +1152,39 @@ public class DatabaseController
 	 */
 
 	/**
+	 * Gets an object from the database with the given database ID.
+	 *
+	 * @param className the name of the class of the object
+	 * @param idColumnName the name of the database ID column
+	 * @param databaseID the database ID of the object
+	 * @return the corresponding object
+	 * @throws HibernateException when the query failed to commit and has been rolled back
+	 */
+	private static Object getByID(final String className, final String idColumnName, final int databaseID) throws HibernateException
+	{
+		final Session session = sessionFactory.openSession();
+		session.beginTransaction();
+
+		@SuppressWarnings("unchecked")
+		final List<RemovalList> result = session.createQuery("from " + className + " where " + idColumnName + " = :id").setParameter("id", databaseID).list();
+
+		try
+		{
+			session.getTransaction().commit();
+			session.close();
+		}
+		catch (final HibernateException e)
+		{
+			session.getTransaction().rollback();
+			session.close();
+			throw new HibernateException("Failed to commit.");
+		}
+
+		// Only one result should be returned by the query.
+		return result.get(0);
+	}
+
+	/**
 	 * Gets the {@link UserRole} object from the given role ID.
 	 *
 	 * @param roleid
@@ -1797,75 +1830,27 @@ public class DatabaseController
 	}
 
 	/**
-	 * Gets the {@link Product} object from the given product ID.
+	 * Gets the {@link Product} object from the database with the given ID.
 	 *
-	 * @param productid product database ID
+	 * @param id the product database ID
 	 * @return the corresponding product object
-	 * @throws NoDatabaseLinkException
+	 * @throws HibernateException when the query failed to commit and has been rolled back
 	 */
-	public static Product getProductByID(final int productid, final boolean getCached) throws NoDatabaseLinkException
+	public static Product getProductByID(final int id) throws HibernateException
 	{
-		if (!cachedProducts.containsKey(productid) || !getCached)
-		{
-			final String[] columns = { "*" };
-			final List<String> where = new ArrayList<String>();
-			where.add("product_id = " + new Integer(productid));
-
-			@SuppressWarnings("unchecked")
-			final Set<Object> result = (LinkedHashSet<Object>) (runQuery(DatabaseQueryType.SELECT, DatabaseTable.PRODUCTS, null, columns, null, where));
-
-			if (result.size() == 0)
-				return null;
-
-			final Product p = (Product) result.iterator().next();
-
-			// Store for reuse.
-			if (getCached)
-				DBLOG.trace("Caching: " + p);
-			else
-				DBLOG.trace("Updating cache: " + p);
-
-			cachedProducts.put(p.getDatabaseID(), p);
-			return p;
-		}
-
-		DBLOG.trace("Loading Product " + productid + " from cache.");
-		return cachedProducts.get(productid);
+		return (Product) getByID("Product", "product_id", id);
 	}
 
 	/**
-	 * Gets the {@link Product} object from the given product ID.
+	 * Gets the {@link ProductBox} object from the database with the given ID.
 	 *
-	 * @param productboxid product database ID
-	 * @return the corresponding product object
-	 * @throws NoDatabaseLinkException
+	 * @param id the product box database ID
+	 * @return the corresponding product box object
+	 * @throws HibernateException when the query failed to commit and has been rolled back
 	 */
-	public static ProductBox getProductBoxByID(final int productboxid) throws NoDatabaseLinkException
+	public static ProductBox getProductBoxByID(final int id) throws HibernateException
 	{
-		if (!cachedProductBoxes.containsKey(productboxid))
-		{
-			final String[] columns = { "*" };
-			final List<String> where = new ArrayList<String>();
-			where.add("container_id = " + new Integer(productboxid));
-
-			@SuppressWarnings("unchecked")
-			final Set<ProductBox> result = (LinkedHashSet<ProductBox>) (runQuery(DatabaseQueryType.SELECT, DatabaseTable.CONTAINERS, null, columns, null,
-					where));
-
-			if (result.size() == 0)
-				return null;
-
-			final ProductBox p = result.iterator().next();
-
-			// Store for reuse.
-			DBLOG.trace("Caching: " + p);
-			cachedProductBoxes.put(p.getDatabaseID(), p);
-
-			return p;
-		}
-
-		DBLOG.trace("Loading ProductBox " + productboxid + " from cache.");
-		return cachedProductBoxes.get(productboxid);
+		return (ProductBox) getByID("ProductBox", "container_id", id);
 	}
 
 	/**
@@ -1957,42 +1942,15 @@ public class DatabaseController
 	}
 
 	/**
-	 * Gets the {@link RemovalList} object from the given removal list ID.
+	 * Gets the {@link RemovalList} object from the database with the given ID.
 	 *
-	 * @param listid removal list database ID
+	 * @param id the removal list database ID
 	 * @return the corresponding removal list object
-	 * @throws NoDatabaseLinkException
+	 * @throws HibernateException when the query failed to commit and has been rolled back
 	 */
-	public static RemovalList getRemovalListByID(final int listid, final boolean getCached) throws NoDatabaseLinkException
+	public static RemovalList getRemovalListByID(final int id) throws HibernateException
 	{
-		if (!cachedRemovalLists.containsKey(listid) || !getCached)
-		{
-			final String[] columns = { "*" };
-			final List<String> where = new ArrayList<String>();
-			where.add("removallist_id = " + listid);
-
-			@SuppressWarnings("unchecked")
-			final Set<Object> result = (LinkedHashSet<Object>) (runQuery(DatabaseQueryType.SELECT, DatabaseTable.REMOVALLISTS, null, columns, null, where));
-
-			if (result.size() == 0)
-				return null;
-
-			final RemovalList r = (RemovalList) result.iterator().next();
-
-			// Store for reuse.
-			if (getCached)
-				DBLOG.trace("Caching: " + r);
-			else
-				DBLOG.trace("Updating cache: " + r);
-
-			cachedRemovalLists.put(r.getDatabaseID(), r);
-			setContainersToRemovalList(listid);
-
-			return cachedRemovalLists.get(listid);
-		}
-
-		DBLOG.trace("Loading RemovalList " + listid + " from cache.");
-		return cachedRemovalLists.get(listid);
+		return (RemovalList) getByID("RemovalList", "removallist_id", id);
 	}
 
 	/**
@@ -2278,38 +2236,15 @@ public class DatabaseController
 	}
 
 	/**
-	 * Gets the {@link RemovalListState} object from the given database ID.
+	 * Gets the {@link RemovalListState} object from the database with the given ID.
 	 *
-	 * @param stateid removal list state database ID
+	 * @param id the removal list state database ID
 	 * @return the corresponding removal list state object
-	 * @throws NoDatabaseLinkException
+	 * @throws HibernateException when the query failed to commit and has been rolled back
 	 */
-	public static RemovalListState getRemovalListStateByID(final int stateid) throws NoDatabaseLinkException
+	public static RemovalListState getRemovalListStateByID(final int id) throws HibernateException
 	{
-		if (!cachedRemovalListStates.containsKey(stateid))
-		{
-			final String[] columns = { "name" };
-			final List<String> where = new ArrayList<String>();
-			where.add("removallist_state_id = " + new Integer(stateid));
-
-			@SuppressWarnings("unchecked")
-			final Set<String> result = (LinkedHashSet<String>) (runQuery(DatabaseQueryType.SELECT, DatabaseTable.REMOVALLIST_STATES, null, columns, null,
-					where));
-
-			if (result.size() == 0)
-				return null;
-
-			final RemovalListState s = new RemovalListState(stateid, result.iterator().next());
-
-			// Store for reuse.
-			DBLOG.trace("Caching: " + s);
-			cachedRemovalListStates.put(s.getDatabaseID(), s);
-
-			return s;
-		}
-
-		DBLOG.trace("Loading RemovalListState " + stateid + " from cache.");
-		return cachedRemovalListStates.get(stateid);
+		return (RemovalListState) getByID("RemovalListState", "removallist_state_id", id);
 	}
 
 	/**
@@ -2378,8 +2313,7 @@ public class DatabaseController
 	}
 
 	/*
-	 * -------------------------------- PRIVATE SETTER METHODS
-	 * --------------------------------
+	 * -------------------------------- PRIVATE SETTER METHODS --------------------------------
 	 */
 
 	/**
@@ -2440,6 +2374,7 @@ public class DatabaseController
 	 * @param listid removal list to place product boxes into
 	 * @throws NoDatabaseLinkException
 	 */
+	@Deprecated
 	private static void setContainersToRemovalList(final int listid) throws NoDatabaseLinkException
 	{
 		DBLOG.debug("Placing product boxes on removal list " + listid + "...");
@@ -2754,7 +2689,7 @@ public class DatabaseController
 		}
 
 		// Update the cache.
-		DBLOG.debug(query.toString() + ": " + getRemovalListByID(dbID, false));
+		DBLOG.debug(query.toString() + ": " + getRemovalListByID(dbID));
 
 		return dbID;
 	}
@@ -2998,7 +2933,7 @@ public class DatabaseController
 			dbID = result.iterator().next();
 
 		// Update the cache.
-		DBLOG.debug(query.toString() + ": " + getProductByID(dbID, false));
+		DBLOG.debug(query.toString() + ": " + getProductByID(dbID));
 
 		// Update the observable list.
 		observableProducts.clear();
@@ -3145,6 +3080,8 @@ public class DatabaseController
 			throw new HibernateException("Failed to commit.");
 		}
 
+		DBLOG.debug("Loaded all " + className + " objects.");
+
 		return result;
 	}
 
@@ -3157,9 +3094,9 @@ public class DatabaseController
 		// TODO: Get rid of this.
 		DBLOG.info("Loading data from database...");
 
-		getAllProductBoxes();
+		// getAllProductBoxes();
 		getAllShelves();
-		getAllRemovalLists(false);
+		// getAllRemovalLists();
 
 		DBLOG.info("Data loaded from database.");
 	}
@@ -3240,7 +3177,7 @@ public class DatabaseController
 			{
 				// Do not update the database as this method loads the data from
 				// the database into objects.
-				getRemovalListByID(removalListID, true).addProductBox(getProductBoxByID(id));
+				getRemovalListByID(removalListID).addProductBox(getProductBoxByID(id));
 			}
 		}
 
@@ -3341,47 +3278,10 @@ public class DatabaseController
 	 * Be aware that the cached data may not be up to date.
 	 * @return an {@link ObservableList} of all removal lists
 	 */
-	public static ObservableList<Object> getAllRemovalLists(final boolean getCached) throws NoDatabaseLinkException
+	public static ObservableList<Object> getAllRemovalLists() throws HibernateException
 	{
-		String[] columns = new String[1];
-
-		if (getCached)
-		{
-			columns[0] = "removallist_id";
-
-			@SuppressWarnings("unchecked")
-			Set<Integer> result = (LinkedHashSet<Integer>) (runQuery(DatabaseQueryType.SELECT, DatabaseTable.REMOVALLISTS, null, columns, null, null));
-
-			// Check if all manifests have been cached by their ID.
-			if (cachedRemovalLists.keySet().containsAll(result))
-			{
-				DBLOG.debug("Returning all cached RemovalLists.");
-				return observableRemovalLists;
-			}
-
-			DBLOG.debug("Unable to return all cached RemovalLists, cached IDs do not match.");
-		}
-
-		columns[0] = "*";
-		@SuppressWarnings("unchecked")
-		final Set<RemovalList> result = (Set<RemovalList>) runQuery(DatabaseQueryType.SELECT, DatabaseTable.REMOVALLISTS, null, columns, null, null);
-
-		final Iterator<RemovalList> it = result.iterator();
-
-		// Store for reuse.
-		while (it.hasNext())
-		{
-			final RemovalList r = it.next();
-			DBLOG.trace("Caching: " + r);
-			cachedRemovalLists.put(r.getDatabaseID(), r);
-		}
-
-		DBLOG.info("All " + result.size() + " RemovalLists cached.");
-
-		setAllContainersToAllRemovalLists();
-
 		observableRemovalLists.clear();
-		observableRemovalLists.addAll(cachedRemovalLists.values());
+		observableRemovalLists.addAll(getAll("RemovalList"));
 		return observableRemovalLists;
 	}
 
@@ -3428,38 +3328,14 @@ public class DatabaseController
 	}
 
 	/**
-	 * Loads all {@link RemovalListState} objects from the database into the
-	 * cache.
+	 * Loads all {@link RemovalListState} objects from the database into memory.
 	 *
 	 * @return an {@link ObservableList} of all removal list states
 	 */
-	public static ObservableList<Object> getAllRemovalListStates() throws NoDatabaseLinkException
+	public static ObservableList<Object> getAllRemovalListStates()
 	{
-		final String[] columns = { "*" };
-
-		@SuppressWarnings("unchecked")
-		final Set<RemovalListState> result = (LinkedHashSet<RemovalListState>) (runQuery(DatabaseQueryType.SELECT, DatabaseTable.REMOVALLIST_STATES, null,
-				columns, null, null));
-
-		if (result.size() == 0)
-			DBLOG.warn("No Removal List States present in the database.");
-
-		final Iterator<RemovalListState> it = result.iterator();
-
-		// Store for reuse.
-		while (it.hasNext())
-		{
-			final RemovalListState s = it.next();
-
-			DBLOG.trace("Caching: " + s);
-
-			cachedRemovalListStates.put(s.getDatabaseID(), s);
-		}
-
-		DBLOG.info("All " + result.size() + " Removal List States cached.");
-
 		observableRemovalListStates.clear();
-		observableRemovalListStates.addAll(cachedRemovalListStates.values());
+		observableRemovalListStates.addAll(getAll("RemovalListState"));
 		return observableRemovalListStates;
 	}
 

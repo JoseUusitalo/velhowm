@@ -138,7 +138,7 @@ public class ManifestTest
 	}
 
 	@Test
-	public final void testGetBoxes() throws NoDatabaseLinkException
+	public final void testGetBoxes()
 	{
 		final Set<ProductBox> set = new HashSet<ProductBox>(
 				Arrays.asList(DatabaseController.getProductBoxByID(35), DatabaseController.getProductBoxByID(36), DatabaseController.getProductBoxByID(37)));

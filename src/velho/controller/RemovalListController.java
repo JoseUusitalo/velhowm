@@ -115,7 +115,7 @@ public class RemovalListController implements UIActionController
 	 *
 	 * @return view for creating new removal lists
 	 */
-	private Node getRemovalListCreationView() throws NoDatabaseLinkException
+	private Node getRemovalListCreationView()
 	{
 		managementView.setBrowseListsButtonVisiblity(true);
 		return creationView.getView();
@@ -127,29 +127,22 @@ public class RemovalListController implements UIActionController
 	 */
 	public void showNewRemovalListView()
 	{
-		try
-		{
-			// Create a new removal list if it does not exist.
-			if (newRemovalList == null)
-				newRemovalList = new RemovalList();
+		// Create a new removal list if it does not exist.
+		if (newRemovalList == null)
+			newRemovalList = new RemovalList();
 
-			if (managementView.getContent().equals(getRemovalListCreationView()))
-			{
-				USRLOG.info("Resetting new removal list.");
-				newRemovalList.reset();
-			}
-			else
-			{
-				SYSLOG.trace("Setting new removal list view.");
-				managementView.setContent(getRemovalListCreationView());
-			}
-
-			SYSLOG.trace("Removal list is currently: " + newRemovalList.getObservableBoxes());
-		}
-		catch (NoDatabaseLinkException e)
+		if (managementView.getContent().equals(getRemovalListCreationView()))
 		{
-			DatabaseController.tryReLink();
+			USRLOG.info("Resetting new removal list.");
+			newRemovalList.reset();
 		}
+		else
+		{
+			SYSLOG.trace("Setting new removal list view.");
+			managementView.setContent(getRemovalListCreationView());
+		}
+
+		SYSLOG.trace("Removal list is currently: " + newRemovalList.getObservableBoxes());
 	}
 
 	/**
@@ -158,20 +151,13 @@ public class RemovalListController implements UIActionController
 	 */
 	public void showBrowseRemovalListsView()
 	{
-		try
+		if (browseView == null)
 		{
-			if (browseView == null)
-			{
-				SYSLOG.trace("Creating removal list browsing view.");
-				browseView = ListController.getTableView(this, DatabaseController.getRemovalListDataColumns(), DatabaseController.getObservableRemovalLists());
-			}
+			SYSLOG.trace("Creating removal list browsing view.");
+			browseView = ListController.getTableView(this, DatabaseController.getRemovalListDataColumns(), DatabaseController.getAllRemovalLists());
+		}
 
-			SYSLOG.trace("Removal list browsing: " + DatabaseController.getObservableRemovalLists());
-		}
-		catch (final NoDatabaseLinkException e)
-		{
-			DatabaseController.tryReLink();
-		}
+		SYSLOG.trace("Removal list browsing: " + DatabaseController.getAllRemovalLists());
 
 		// Managers and greater see the management view.
 		if (LoginController.userRoleIsGreaterOrEqualTo(new Manager()))
@@ -344,18 +330,9 @@ public class RemovalListController implements UIActionController
 	{
 		USRLOG.info("Viewing removal list " + data);
 
-		try
-		{
-			if (LoginController.userRoleIsGreaterOrEqualTo(new Manager()))
-
-				managementView.setContent(new RemovalListView((RemovalList) data, this).getView());
-
-			else
-				tabView.setView(new RemovalListView((RemovalList) data, this).getView());
-		}
-		catch (NoDatabaseLinkException e)
-		{
-			DatabaseController.tryReLink();
-		}
+		if (LoginController.userRoleIsGreaterOrEqualTo(new Manager()))
+			managementView.setContent(new RemovalListView((RemovalList) data, this).getView());
+		else
+			tabView.setView(new RemovalListView((RemovalList) data, this).getView());
 	}
 }
