@@ -9,8 +9,8 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 import velho.controller.DatabaseController;
-import velho.model.Manager;
 import velho.model.User;
+import velho.model.enums.UserRole;
 import velho.model.exceptions.ExistingDatabaseLinkException;
 import velho.model.exceptions.NoDatabaseLinkException;
 
@@ -38,7 +38,7 @@ public class UserTest
 	private final String VALID_ROLE_NAME = "Manager";
 	private final String INVALID_ROLE_NAME = "Worker";
 
-	private final User user = new User(-1, "f", "l", new Manager());
+	private final User user = new User(-1, "f", "l", UserRole.MANAGER);
 
 	@BeforeClass
 	public final static void linkDatabase() throws ClassNotFoundException, NoDatabaseLinkException, ExistingDatabaseLinkException

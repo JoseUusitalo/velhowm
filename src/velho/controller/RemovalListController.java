@@ -5,10 +5,10 @@ import org.apache.log4j.Logger;
 import javafx.scene.Node;
 import javafx.scene.layout.BorderPane;
 import velho.controller.interfaces.UIActionController;
-import velho.model.Manager;
 import velho.model.ProductBoxSearchResultRow;
 import velho.model.RemovalList;
 import velho.model.RemovalListState;
+import velho.model.enums.UserRole;
 import velho.model.exceptions.NoDatabaseLinkException;
 import velho.view.GenericTabView;
 import velho.view.RemovalListCreationView;
@@ -79,7 +79,7 @@ public class RemovalListController implements UIActionController
 	public Node getView()
 	{
 		// Managers and greater see the management view.
-		if (LoginController.userRoleIsGreaterOrEqualTo(new Manager()))
+		if (LoginController.userRoleIsGreaterOrEqualTo(UserRole.MANAGER))
 		{
 			managementView = new RemovalListManagementView(this);
 			creationView = new RemovalListCreationView(this, this.searchController);
@@ -160,7 +160,7 @@ public class RemovalListController implements UIActionController
 		SYSLOG.trace("Removal list browsing: " + DatabaseController.getAllRemovalLists());
 
 		// Managers and greater see the management view.
-		if (LoginController.userRoleIsGreaterOrEqualTo(new Manager()))
+		if (LoginController.userRoleIsGreaterOrEqualTo(UserRole.MANAGER))
 		{
 			managementView.setBrowseListsButtonVisiblity(false);
 			managementView.setContent(browseView);
@@ -330,7 +330,7 @@ public class RemovalListController implements UIActionController
 	{
 		USRLOG.info("Viewing removal list " + data);
 
-		if (LoginController.userRoleIsGreaterOrEqualTo(new Manager()))
+		if (LoginController.userRoleIsGreaterOrEqualTo(UserRole.MANAGER))
 			managementView.setContent(new RemovalListView((RemovalList) data, this).getView());
 		else
 			tabView.setView(new RemovalListView((RemovalList) data, this).getView());

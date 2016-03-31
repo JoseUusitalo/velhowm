@@ -28,9 +28,7 @@ import org.hibernate.SessionFactory;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import velho.model.Administrator;
 import velho.model.HibernateSessionFactory;
-import velho.model.Manager;
 import velho.model.Manifest;
 import velho.model.ManifestState;
 import velho.model.Product;
@@ -47,9 +45,9 @@ import velho.model.User;
 import velho.model.enums.DatabaseFileState;
 import velho.model.enums.DatabaseQueryType;
 import velho.model.enums.DatabaseTable;
+import velho.model.enums.UserRole;
 import velho.model.exceptions.ExistingDatabaseLinkException;
 import velho.model.exceptions.NoDatabaseLinkException;
-import velho.model.interfaces.UserRole;
 import velho.view.MainWindow;
 
 /**
@@ -1184,26 +1182,22 @@ public class DatabaseController
 	}
 
 	/**
-	 * Gets the {@link UserRole} object from the given role ID.
+	 * Gets the {@link UserRole} object according to the given ID.
 	 *
-	 * @param roleid
-	 * role database ID
-	 * @return the corresponding user role object
-	 * @throws NoDatabaseLinkException
+	 * @param id the ordinal of the role
+	 * @return the corresponding user role object or <code>null</code> if role as not found
 	 */
-	private static UserRole getRoleByID(final int roleid) throws NoDatabaseLinkException
+	private static UserRole getRoleByID(final int id)
 	{
-		final String[] columns = { "name" };
-		final List<String> where = new ArrayList<String>();
-		where.add("role_id = " + new Integer(roleid));
+		// TODO: Find a way to put the roles into the database.
 
-		@SuppressWarnings("unchecked")
-		final Set<String> result = (LinkedHashSet<String>) (runQuery(DatabaseQueryType.SELECT, DatabaseTable.ROLES, null, columns, null, where));
+		for (final UserRole role : UserRole.values())
+		{
+			if (role.ordinal() == id)
+				return role;
+		}
 
-		if (result.size() == 0)
-			return null;
-
-		return UserController.stringToRole(result.iterator().next());
+		return null;
 	}
 
 	/**
@@ -1547,7 +1541,7 @@ public class DatabaseController
 		cols.put("viewButton", "View");
 
 		// Only managers and administrators can delete lists.
-		if (LoginController.getCurrentUser().getRole().compareTo(new Manager()) >= 0)
+		if (LoginController.getCurrentUser().getRole().compareTo(UserRole.MANAGER) >= 0)
 			cols.put("deleteButton", "Delete");
 
 		return cols;
@@ -1743,19 +1737,23 @@ public class DatabaseController
 	}
 
 	/**
-	 * Gets a set of user role names in the database.
+	 * Gets a set of user role names.
 	 *
 	 * @return a set of user role names
-	 * @throws NoDatabaseLinkException
 	 */
-	public static Set<String> getUserRoleNames() throws NoDatabaseLinkException
+	public static Set<String> getUserRoleNames()
 	{
-		final String[] columns = { "name" };
+		// TODO: Use database.
 
-		@SuppressWarnings("unchecked")
-		final Set<String> result = (LinkedHashSet<String>) (runQuery(DatabaseQueryType.SELECT, DatabaseTable.ROLES, null, columns, null, null));
+		final UserRole[] roles = UserRole.values();
+		final Set<String> names = new LinkedHashSet<String>();
 
-		return result;
+		for (final UserRole role : roles)
+		{
+			names.add(role.getName());
+		}
+
+		return names;
 	}
 
 	/**
@@ -1853,29 +1851,25 @@ public class DatabaseController
 	}
 
 	/**
-	 * Gets user data by their database ID.
+	 * Gets the {@link User} object from the database with the given ID.
 	 *
-	 * @param id database ID of the user
-	 * @return a {@link User} object or <code>null</code> if a user with that ID
-	 * was not found
+	 * @param id the user database ID
+	 * @return the corresponding user object or <code>null</code> if a user with that ID does not exist
+	 * @throws HibernateException when the query failed to commit and has been rolled back
 	 */
-	public static User getUserByID(final int id) throws NoDatabaseLinkException
+	public static User getUserByID(final int id) throws HibernateException
 	{
-		if (id == -1)
-			return new User(-1, "Debug", "Account", new Administrator());
+		// Debug account ID?
+		if (id < 0)
+			return LoginController.getCurrentUser();
 
-		final String[] columns = { "user_id", "first_name", "last_name", "role" };
-		final List<String> where = new ArrayList<String>();
-		where.add("user_id = " + new Integer(id));
+		final Session session = sessionFactory.openSession();
 
-		@SuppressWarnings("unchecked")
-		final Set<User> result = (LinkedHashSet<User>) (runQuery(DatabaseQueryType.SELECT, DatabaseTable.USERS, null, columns, null, where));
+		final User user = session.get(User.class, id);
 
-		if (result.size() == 0)
-			return null;
+		session.close();
 
-		// Only one result as IDs are unique.
-		return result.iterator().next();
+		return user;
 	}
 
 	/**
@@ -3297,6 +3291,7 @@ public class DatabaseController
 	 */
 	public static ObservableList<Object> getAllManifests(final boolean getCached) throws NoDatabaseLinkException
 	{
+		// TODO: Hibernate.
 		String[] columns = new String[1];
 
 		if (getCached)
@@ -3358,6 +3353,7 @@ public class DatabaseController
 	 */
 	public static ObservableList<Object> getAllManifestStates(final boolean getCached, final ManifestState currentState) throws NoDatabaseLinkException
 	{
+		// TODO: Hibernate.
 		String[] columns = new String[1];
 
 		if (getCached)
@@ -3413,7 +3409,7 @@ public class DatabaseController
 		{
 			if (state.getName().equals("Accepted") || state.getName().equals("Rejected"))
 			{
-				if (LoginController.userRoleIsGreaterOrEqualTo(new Manager()) || state.compareTo(currentState) == 0)
+				if (LoginController.userRoleIsGreaterOrEqualTo(UserRole.MANAGER) || state.compareTo(currentState) == 0)
 					observableManifestStates.add(state);
 			}
 			else

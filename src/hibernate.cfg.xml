@@ -32,5 +32,7 @@
 		
 		<mapping resource="velho/model/RemovalList.hbm.xml" />
 		<mapping resource="velho/model/RemovalListState.hbm.xml" />
+		
+		<mapping resource="velho/model/User.hbm.xml" />
 	</session-factory>
 </hibernate-configuration>

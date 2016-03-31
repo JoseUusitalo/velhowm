@@ -92,9 +92,9 @@ public class DatabaseControllerTest
 	}
 
 	@Test
-	public final void testGetUserRoleNames() throws NoDatabaseLinkException
+	public final void testGetUserRoleNames()
 	{
-		final Set<String> names = new HashSet<String>(Arrays.asList("Manager", "Logistician", "Administrator"));
+		final Set<String> names = new HashSet<String>(Arrays.asList("Manager", "Guest", "Logistician", "Administrator"));
 
 		assertTrue(DatabaseController.getUserRoleNames().containsAll(names));
 	}
@@ -184,7 +184,7 @@ public class DatabaseControllerTest
 	}
 
 	@Test
-	public final void testGetUserByID() throws NoDatabaseLinkException
+	public final void testGetUserByID()
 	{
 		assertEquals(null, DatabaseController.getUserByID(-128));
 	}

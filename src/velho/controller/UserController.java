@@ -4,12 +4,9 @@ import org.apache.log4j.Logger;
 
 import javafx.scene.Node;
 import velho.controller.interfaces.UIActionController;
-import velho.model.Administrator;
-import velho.model.Logistician;
-import velho.model.Manager;
 import velho.model.User;
+import velho.model.enums.UserRole;
 import velho.model.exceptions.NoDatabaseLinkException;
-import velho.model.interfaces.UserRole;
 import velho.view.AddUserView;
 import velho.view.MainWindow;
 
@@ -39,7 +36,7 @@ public class UserController implements UIActionController
 	/**
 	 * @throws NoDatabaseLinkException
 	 */
-	public UserController() throws NoDatabaseLinkException
+	public UserController()
 	{
 		view = new AddUserView(this, DatabaseController.getUserRoleNames());
 	}
@@ -161,13 +158,13 @@ public class UserController implements UIActionController
 	/**
 	 * Creates the temporary debug user for logging in through the debug window.
 	 *
-	 * @param userRoleName role to create the user as
+	 * @param role the role to create the user as
 	 * @return a {@link User} object or <code>null</code> if {@link MainWindow#DEBUG_MODE} is <code>false</code>
 	 */
-	public static User getDebugUser(final String userRoleName)
+	public static User getDebugUser(final UserRole role)
 	{
 		if (MainWindow.DEBUG_MODE)
-			return new User(-1, "Debug", "Account", stringToRole(userRoleName));
+			return new User(-1, "Debug", "Account", role);
 
 		return null;
 	}
@@ -178,16 +175,17 @@ public class UserController implements UIActionController
 	 * @param userRoleName name of the user role to convert to an object
 	 * @return a {@link UserRole} object
 	 */
+	@Deprecated
 	public static UserRole stringToRole(final String userRoleName)
 	{
 		switch (userRoleName)
 		{
 			case "Administrator":
-				return new Administrator();
+				return UserRole.ADMINISTRATOR;
 			case "Manager":
-				return new Manager();
+				return UserRole.MANAGER;
 			case "Logistician":
-				return new Logistician();
+				return UserRole.LOGISTICIAN;
 			default:
 				SYSLOG.error("Unknown user role '" + userRoleName + "'.");
 				return null;

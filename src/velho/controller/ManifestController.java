@@ -8,10 +8,10 @@ import org.apache.log4j.Logger;
 
 import javafx.scene.Node;
 import velho.controller.interfaces.UIActionController;
-import velho.model.Manager;
 import velho.model.Manifest;
 import velho.model.ManifestState;
 import velho.model.ProductBox;
+import velho.model.enums.UserRole;
 import velho.model.exceptions.NoDatabaseLinkException;
 import velho.view.GenericTabView;
 import velho.view.MainWindow;
@@ -182,7 +182,7 @@ public class ManifestController implements UIActionController
 			if (DatabaseController.save(manifest) > 0)
 			{
 				// If the user is a Manager (but not an Administrator!) show a popup.
-				if (LoginController.userRoleIs(new Manager()))
+				if (LoginController.userRoleIs(UserRole.MANAGER))
 				{
 					if (PopupController
 							.confirmation("A shipment has arrived. Please accept or refuse it in the Manifests tab. Would you like to view the manifest now?"))
