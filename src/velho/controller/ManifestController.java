@@ -68,9 +68,9 @@ public class ManifestController implements UIActionController
 	 *
 	 * @return a tabular view of all manifests
 	 */
-	public Node getBrowseManifestsView() throws NoDatabaseLinkException
+	public Node getBrowseManifestsView()
 	{
-		return ListController.getTableView(this, DatabaseController.getManifestDataColumns(), DatabaseController.getAllManifests(false));
+		return ListController.getTableView(this, DatabaseController.getManifestDataColumns(), DatabaseController.getAllManifests());
 	}
 
 	/**
@@ -80,15 +80,8 @@ public class ManifestController implements UIActionController
 	{
 		USRLOG.info("Browsing manifests.");
 
-		try
-		{
-			managementView.setContent(getBrowseManifestsView());
-			showStateSelector(null);
-		}
-		catch (NoDatabaseLinkException e)
-		{
-			DatabaseController.tryReLink();
-		}
+		managementView.setContent(getBrowseManifestsView());
+		showStateSelector(null);
 	}
 
 	/**
@@ -98,17 +91,10 @@ public class ManifestController implements UIActionController
 	 */
 	public void showManifestView(final Manifest manifest)
 	{
-		try
-		{
-			USRLOG.info("Viewing manifest: " + manifest);
-			currentManifest = manifest;
-			managementView.setContent(new ManifestView(manifest, this).getView());
-			// The method showing the combo box state selector is called in the view.
-		}
-		catch (NoDatabaseLinkException e)
-		{
-			DatabaseController.tryReLink();
-		}
+		USRLOG.info("Viewing manifest: " + manifest);
+		currentManifest = manifest;
+		managementView.setContent(new ManifestView(manifest, this).getView());
+		// The method showing the combo box state selector is called in the view.
 	}
 
 	/**

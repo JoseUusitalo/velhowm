@@ -3282,119 +3282,27 @@ public class DatabaseController
 	}
 
 	/**
-	 * Loads all {@link Manifest} objects from the database into the cache.
+	 * Loads all {@link Manifest} objects from the database into memory.
 	 *
-	 * @param getCached Get all manifests from the cache instead of rebuilding the cache from the database but only if
-	 * the cached manifest IDs match the ones in the database.
-	 * Be aware that the cached data may not be up to date.
 	 * @return an {@link ObservableList} of all manifests
 	 */
-	public static ObservableList<Object> getAllManifests(final boolean getCached) throws NoDatabaseLinkException
+	public static ObservableList<Object> getAllManifests()
 	{
-		// TODO: Hibernate.
-		String[] columns = new String[1];
-
-		if (getCached)
-		{
-			columns[0] = "manifest_id";
-
-			@SuppressWarnings("unchecked")
-			Set<Integer> result = (LinkedHashSet<Integer>) (runQuery(DatabaseQueryType.SELECT, DatabaseTable.MANIFESTS, null, columns, null, null));
-
-			// Check if all manifests have been cached by their ID.
-			if (cachedManifests.keySet().containsAll(result))
-			{
-				DBLOG.debug("Returning all cached manifests.");
-				return observableManifests;
-			}
-
-			DBLOG.debug("Unable to return all cached manifests, cached IDs do not match.");
-		}
-
-		columns[0] = "*";
-
-		@SuppressWarnings("unchecked")
-		final Set<Manifest> result = (LinkedHashSet<Manifest>) (runQuery(DatabaseQueryType.SELECT, DatabaseTable.MANIFESTS, null, columns, null, null));
-
-		if (result.size() == 0)
-			DBLOG.warn("No Manifests present in the database.");
-
-		final Iterator<Manifest> it = result.iterator();
-
-		// Store for reuse.
-		while (it.hasNext())
-		{
-			final Manifest m = it.next();
-
-			DBLOG.trace("Caching: " + m);
-
-			cachedManifests.put(m.getDatabaseID(), m);
-		}
-
-		DBLOG.info("All " + result.size() + " Manifests cached.");
-
-		setAllContainersToAllManifests();
-
 		observableManifests.clear();
-		observableManifests.addAll(cachedManifests.values());
+		observableManifests.addAll(getAll("Manifest"));
 		return observableManifests;
 	}
 
 	/**
-	 * Loads all {@link ManifestState} objects from the database into the cache.
+	 * Gets an observable list of manifest states for changing a manifest's state.
+	 * The list consists of states the currently logged in user is allowed to use in addition to the current state of
+	 * the manifest regardless of whether the user is allowed to use it or not.
 	 *
-	 * @param getCached Get all manifest states from the cache instead of
-	 * rebuilding the cache from the database but
-	 * only if the cache contains all the manifest states that are in
-	 * the database. Be aware that the cached
-	 * manifest
-	 * state data may not be up to date.
-	 * @return an {@link ObservableList} of all manifest states
+	 * @return an {@link ObservableList} of manifest states
 	 */
-	public static ObservableList<Object> getAllManifestStates(final boolean getCached, final ManifestState currentState) throws NoDatabaseLinkException
+	public static ObservableList<Object> getManifestStateChangeList(final ManifestState currentState)
 	{
-		// TODO: Hibernate.
-		String[] columns = new String[1];
-
-		if (getCached)
-		{
-			columns[0] = "manifest_state_id";
-
-			@SuppressWarnings("unchecked")
-			Set<Integer> result = (LinkedHashSet<Integer>) (runQuery(DatabaseQueryType.SELECT, DatabaseTable.MANIFEST_STATES, null, columns, null, null));
-
-			// Check if all manifest states have been cached by their ID.
-			if (cachedManifestStates.keySet().containsAll(result))
-			{
-				DBLOG.debug("Returning all cached manifest states.");
-				return observableManifestStates;
-			}
-
-			DBLOG.debug("Unable to return all cached manifest states, cached IDs do not match.");
-		}
-
-		columns[0] = "*";
-
-		@SuppressWarnings("unchecked")
-		final Set<ManifestState> result = (LinkedHashSet<ManifestState>) (runQuery(DatabaseQueryType.SELECT, DatabaseTable.MANIFEST_STATES, null, columns, null,
-				null));
-
-		if (result.size() == 0)
-			DBLOG.warn("No Manifest States present in the database.");
-
-		final Iterator<ManifestState> it = result.iterator();
-
-		// Store for reuse.
-		while (it.hasNext())
-		{
-			final ManifestState s = it.next();
-
-			DBLOG.trace("Caching: " + s);
-
-			cachedManifestStates.put(s.getDatabaseID(), s);
-		}
-
-		DBLOG.info("All " + result.size() + " Removal List States cached.");
+		final List<Object> states = getAll("ManifestState");
 
 		observableManifestStates.clear();
 
@@ -3405,11 +3313,11 @@ public class DatabaseController
 		 * Logisticians can also see the accepted/rejected state if it is the
 		 * current state of the manifest.
 		 */
-		for (final ManifestState state : cachedManifestStates.values())
+		for (final Object state : states)
 		{
-			if (state.getName().equals("Accepted") || state.getName().equals("Rejected"))
+			if (((ManifestState) state).getName().equals("Accepted") || ((ManifestState) state).getName().equals("Rejected"))
 			{
-				if (LoginController.userRoleIsGreaterOrEqualTo(UserRole.MANAGER) || state.compareTo(currentState) == 0)
+				if (LoginController.userRoleIsGreaterOrEqualTo(UserRole.MANAGER) || ((ManifestState) state).compareTo(currentState) == 0)
 					observableManifestStates.add(state);
 			}
 			else
