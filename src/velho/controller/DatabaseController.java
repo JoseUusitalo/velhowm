@@ -1147,8 +1147,7 @@ public class DatabaseController
 	}
 
 	/*
-	 * -------------------------------- PRIVATE GETTER METHODS
-	 * --------------------------------
+	 * -------------------------------- PRIVATE GETTER METHODS --------------------------------
 	 */
 
 	/**
@@ -1954,45 +1953,15 @@ public class DatabaseController
 	}
 
 	/**
-	 * Gets the {@link Manifest} object from the given removal list ID.
+	 * Gets the {@link Manifest} object from the database with the given ID.
 	 *
-	 * @param manifestid removal list database ID
-	 * @return the corresponding removal list object
-	 * @throws NoDatabaseLinkException
+	 * @param id the manifest database ID
+	 * @return the corresponding manifest object
+	 * @throws HibernateException when the query failed to commit and has been rolled back
 	 */
-	public static Manifest getManifestByID(final int manifestid, final boolean getCached) throws NoDatabaseLinkException
+	public static Manifest getManifestByID(final int id) throws HibernateException
 	{
-		if (!cachedManifests.containsKey(manifestid) || !getCached)
-		{
-			final String[] columns = { "*" };
-			final List<String> where = new ArrayList<String>();
-			where.add("manifest_id = " + manifestid);
-
-			@SuppressWarnings("unchecked")
-			final Set<Object> result = (LinkedHashSet<Object>) (runQuery(DatabaseQueryType.SELECT, DatabaseTable.MANIFESTS, null, columns, null, where));
-
-			if (result.size() == 0)
-				return null;
-
-			final Manifest m = (Manifest) result.iterator().next();
-
-			// Store for reuse.
-			if (getCached)
-				DBLOG.trace("Caching: " + m);
-			else
-				DBLOG.trace("Updating cache: " + m);
-
-			cachedManifests.put(m.getDatabaseID(), m);
-			setContainersToManifest(manifestid);
-
-			observableManifests.clear();
-			observableManifests.addAll(cachedManifests.values());
-
-			return cachedManifests.get(manifestid);
-		}
-
-		DBLOG.trace("Loading Manifest " + manifestid + " from cache.");
-		return cachedManifests.get(manifestid);
+		return (Manifest) getByID("Manifest", "manifest_id", id);
 	}
 
 	/**
@@ -2248,37 +2217,15 @@ public class DatabaseController
 	}
 
 	/**
-	 * Gets the {@link ManifestState} object from the given database ID.
+	 * Gets the {@link ManifestState} object from the database with the given ID.
 	 *
-	 * @param stateid manifest state database ID
+	 * @param id the manifest state database ID
 	 * @return the corresponding manifest state object
-	 * @throws NoDatabaseLinkException
+	 * @throws HibernateException when the query failed to commit and has been rolled back
 	 */
-	public static ManifestState getManifestStateByID(final int stateid) throws NoDatabaseLinkException
+	public static ManifestState getManifestStateByID(final int id) throws HibernateException
 	{
-		if (!cachedManifestStates.containsKey(stateid))
-		{
-			final String[] columns = { "name" };
-			final List<String> where = new ArrayList<String>();
-			where.add("manifest_state_id = " + new Integer(stateid));
-
-			@SuppressWarnings("unchecked")
-			final Set<String> result = (LinkedHashSet<String>) (runQuery(DatabaseQueryType.SELECT, DatabaseTable.MANIFEST_STATES, null, columns, null, where));
-
-			if (result.size() == 0)
-				return null;
-
-			final ManifestState s = new ManifestState(stateid, result.iterator().next());
-
-			// Store for reuse.
-			DBLOG.trace("Caching: " + s);
-			cachedManifestStates.put(s.getDatabaseID(), s);
-
-			return s;
-		}
-
-		DBLOG.trace("Loading ManifestState " + stateid + " from cache.");
-		return cachedManifestStates.get(stateid);
+		return (ManifestState) getByID("ManifestState", "manifest_state_id", id);
 	}
 
 	public static RemovalPlatform getRemovalPlatformByID(final int platformid, final boolean getCached) throws NoDatabaseLinkException
@@ -2398,6 +2345,7 @@ public class DatabaseController
 			DBLOG.debug("Nothing to place.");
 	}
 
+	@Deprecated
 	private static void setContainersToManifest(final int manifestid) throws NoDatabaseLinkException
 	{
 		DBLOG.debug("Placing product boxes on manifest " + manifestid + "...");
@@ -2416,7 +2364,7 @@ public class DatabaseController
 			for (final Integer id : manifestBoxes)
 				boxes.add(getProductBoxByID(id));
 
-			cachedManifests.get(manifestid).setProductBoxes(boxes);
+			cachedManifests.get(manifestid).setBoxes(boxes);
 
 			DBLOG.debug("Product boxes placed on manifest " + manifestid + ".");
 		}
@@ -2780,7 +2728,7 @@ public class DatabaseController
 		}
 
 		// Update the cache.
-		DBLOG.debug(query.toString() + ": " + getManifestByID(dbID, false));
+		DBLOG.debug(query.toString() + ": " + getManifestByID(dbID));
 
 		return dbID;
 	}
@@ -3215,7 +3163,7 @@ public class DatabaseController
 			for (final Integer id : boxIDs)
 				boxes.add(getProductBoxByID(id));
 
-			getManifestByID(manifestID, true).setProductBoxes(boxes);
+			getManifestByID(manifestID).setBoxes(boxes);
 		}
 
 		DBLOG.debug(boxcount + " ProductBoxes placed on " + manifestBoxes.size() + " Manifests.");

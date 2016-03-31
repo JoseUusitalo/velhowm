@@ -52,7 +52,7 @@ public class ManifestTest
 		}
 
 		newManifest = new Manifest();
-		existingManifest = DatabaseController.getManifestByID(2, false);
+		existingManifest = DatabaseController.getManifestByID(2);
 	}
 
 	@After
@@ -105,13 +105,13 @@ public class ManifestTest
 	}
 
 	@Test
-	public final void testGetState() throws NoDatabaseLinkException
+	public final void testGetState()
 	{
 		assertEquals(DatabaseController.getManifestStateByID(1).getDatabaseID(), existingManifest.getState().getDatabaseID());
 	}
 
 	@Test
-	public final void testGetState_New() throws NoDatabaseLinkException
+	public final void testGetState_New()
 	{
 		assertEquals(DatabaseController.getManifestStateByID(3).getDatabaseID(), newManifest.getState().getDatabaseID());
 	}
@@ -131,10 +131,10 @@ public class ManifestTest
 		assertTrue(DatabaseController.save(existingManifest) > 0);
 
 		// Cache was updated
-		assertEquals(newState, DatabaseController.getManifestByID(existingManifest.getDatabaseID(), true).getState());
+		assertEquals(newState, DatabaseController.getManifestByID(existingManifest.getDatabaseID()).getState());
 
 		// Database was updated.
-		assertEquals(newState, DatabaseController.getManifestByID(existingManifest.getDatabaseID(), false).getState());
+		assertEquals(newState, DatabaseController.getManifestByID(existingManifest.getDatabaseID()).getState());
 	}
 
 	@Test

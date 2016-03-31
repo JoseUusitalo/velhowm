@@ -143,9 +143,9 @@ CREATE TABLE IF NOT EXISTS `manifests`
 (
 	`manifest_id` INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
 	`state` INT UNSIGNED NOT NULL,
-	`driver_id` INT UNSIGNED NOT NULL,
-	`date_ordered` DATE NOT NULL,
-	`date_received` DATE NOT NULL,
+	`driver_id` INT UNSIGNED,
+	`date_ordered` DATE,
+	`date_received` DATE,
 
 	FOREIGN KEY (`state`) REFERENCES `manifest_states`(`manifest_state_id`),
 	CHECK (`date_received`>=`date_ordered`)

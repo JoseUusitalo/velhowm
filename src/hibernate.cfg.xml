@@ -19,14 +19,18 @@
 		<property name="show_sql">true</property>
 		<property name="hbm2ddl.auto">update</property>
 		
-		<mapping resource="velho/model/Product.hbm.xml"/>
-		<mapping resource="velho/model/ProductBox.hbm.xml"/>
-		<mapping resource="velho/model/ProductBrand.hbm.xml"/>
-		<mapping resource="velho/model/ProductCategory.hbm.xml"/>
-		<mapping resource="velho/model/ProductContainer.hbm.xml"/>
-		<mapping resource="velho/model/ProductType.hbm.xml"/>
+		<!-- Mappings -->
+		<mapping resource="velho/model/Manifest.hbm.xml" />
+		<mapping resource="velho/model/ManifestState.hbm.xml" />
 		
-		<mapping resource="velho/model/RemovalList.hbm.xml"/>
-		<mapping resource="velho/model/RemovalListState.hbm.xml"/>
+		<mapping resource="velho/model/Product.hbm.xml" />
+		<mapping resource="velho/model/ProductBox.hbm.xml" />
+		<mapping resource="velho/model/ProductBrand.hbm.xml" />
+		<mapping resource="velho/model/ProductCategory.hbm.xml" />
+		<mapping resource="velho/model/ProductContainer.hbm.xml" />
+		<mapping resource="velho/model/ProductType.hbm.xml" />
+		
+		<mapping resource="velho/model/RemovalList.hbm.xml" />
+		<mapping resource="velho/model/RemovalListState.hbm.xml" />
 	</session-factory>
 </hibernate-configuration>

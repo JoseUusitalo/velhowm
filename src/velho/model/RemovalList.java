@@ -34,16 +34,6 @@ public class RemovalList
 	private RemovalListState state;
 
 	/**
-	 * Creates a new empty removal list in the active state.
-	 */
-	public RemovalList()
-	{
-		this.state = new RemovalListState(1, "Active");
-		this.boxes = new LinkedHashSet<ProductBox>();
-		this.observableBoxes = FXCollections.observableArrayList();
-	}
-
-	/**
 	 * @param databaseID
 	 * @param state
 	 */
@@ -51,6 +41,16 @@ public class RemovalList
 	{
 		this.databaseID = databaseID;
 		this.state = state;
+		this.boxes = new LinkedHashSet<ProductBox>();
+		this.observableBoxes = FXCollections.observableArrayList();
+	}
+
+	/**
+	 * Creates a new empty removal list in the active state.
+	 */
+	public RemovalList()
+	{
+		this.state = new RemovalListState(1, "Active");
 		this.boxes = new LinkedHashSet<ProductBox>();
 		this.observableBoxes = FXCollections.observableArrayList();
 	}

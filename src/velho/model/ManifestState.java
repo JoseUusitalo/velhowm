@@ -27,10 +27,37 @@ public class ManifestState implements Comparable<ManifestState>
 		this.name = name;
 	}
 
+	/**
+	 */
+	public ManifestState()
+	{
+		// For Hibernate.
+	}
+
 	@Override
 	public String toString()
 	{
 		return name;
+	}
+
+	/**
+	 * Gets the database ID of this manifest state.
+	 *
+	 * @return the database ID of this manifest state
+	 */
+	public int getDatabaseID()
+	{
+		return databaseID;
+	}
+
+	/**
+	 * Sets the database ID of this manifest state.
+	 *
+	 * @param databaseID the new database ID for this manifest state
+	 */
+	public void setDatabaseID(final int id)
+	{
+		databaseID = id;
 	}
 
 	/**
@@ -44,13 +71,13 @@ public class ManifestState implements Comparable<ManifestState>
 	}
 
 	/**
-	 * Gets the database ID of this manifest state.
+	 * Sets the name of this manifest state.
 	 *
-	 * @return the database ID of this manifest state
+	 * @param name the new name of this manifest state
 	 */
-	public int getDatabaseID()
+	public void setName(final String name)
 	{
-		return databaseID;
+		this.name = name;
 	}
 
 	@Override
