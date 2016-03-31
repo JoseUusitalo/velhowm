@@ -1,6 +1,6 @@
 package velho.view;
 
-import java.util.Set;
+import java.util.List;
 
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
@@ -50,15 +50,15 @@ public class DebugWindow
 	/**
 	 * rolenameSet is a Set for the unique values in the code.
 	 */
-	private Set<UserRole> roles;
+	private List<UserRole> roles;
 
 	/**
 	 * @param debugController
 	 * @param rolelist
 	 */
-	public DebugWindow(final DebugController debugController, final Set<UserRole> roleset)
+	public DebugWindow(final DebugController debugController, final List<UserRole> userRoles)
 	{
-		roles = roleset;
+		roles = userRoles;
 		this.debugController = debugController;
 		grid = null;
 	}

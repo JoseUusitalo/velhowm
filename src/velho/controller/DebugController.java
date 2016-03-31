@@ -1,9 +1,10 @@
 package velho.controller;
 
+import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.LinkedHashSet;
+import java.util.Collections;
+import java.util.List;
 import java.util.Random;
-import java.util.Set;
 
 import javafx.stage.Stage;
 import velho.model.BarcodeScanner;
@@ -39,8 +40,15 @@ public class DebugController
 	public DebugController(final RemovalPlatformController removalPlatformController)
 	{
 		this.removalPlatformController = removalPlatformController;
-		Set<UserRole> roles = new LinkedHashSet<UserRole>();
+		List<UserRole> roles = new ArrayList<UserRole>();
 		roles.addAll(Arrays.asList(UserRole.values()));
+
+		/*
+		 * Reverse the roles so administrator is first.
+		 * This makes testing faster.
+		 */
+		Collections.reverse(roles);
+
 		view = new DebugWindow(this, roles);
 	}
 
