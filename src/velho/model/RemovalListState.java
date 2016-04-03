@@ -5,7 +5,7 @@ package velho.model;
  *
  * @author Jose Uusitalo
  */
-public class RemovalListState
+public class RemovalListState implements Comparable<RemovalListState>
 {
 	/**
 	 * The database ID.
@@ -38,6 +38,26 @@ public class RemovalListState
 	public String toString()
 	{
 		return name;
+	}
+
+	@Override
+	public boolean equals(final Object o)
+	{
+		if (!(o instanceof RemovalListState))
+			return false;
+
+		final RemovalListState rls = (RemovalListState) o;
+
+		if (this.getDatabaseID() <= 0)
+			return this == rls;
+
+		return this.getDatabaseID() == rls.getDatabaseID();
+	}
+
+	@Override
+	public int compareTo(final RemovalListState state)
+	{
+		return this.getDatabaseID() - state.getDatabaseID();
 	}
 
 	/**
