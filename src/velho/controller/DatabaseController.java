@@ -1167,11 +1167,14 @@ public class DatabaseController
 	 * @param className the name of the class of the object
 	 * @param idColumnName the name of the database ID column
 	 * @param databaseID the database ID of the object
-	 * @return the corresponding object
+	 * @return the corresponding object or <code>null</code> for invalid ID
 	 * @throws HibernateException when the query failed to commit and has been rolled back
 	 */
 	private static Object getByID(final String className, final String idColumnName, final int databaseID) throws HibernateException
 	{
+		if (databaseID < 1)
+			return null;
+
 		final Session session = sessionFactory.openSession();
 		session.beginTransaction();
 
@@ -1198,7 +1201,7 @@ public class DatabaseController
 	 * Gets the {@link UserRole} object according to the given ID.
 	 *
 	 * @param id the ordinal of the role
-	 * @return the corresponding user role object or <code>null</code> if role as not found
+	 * @return the corresponding user role object or <code>null</code> if role was not found
 	 */
 	private static UserRole getRoleByID(final int id)
 	{
@@ -1527,7 +1530,7 @@ public class DatabaseController
 	 * Gets the {@link ProductType} object from the given type ID.
 	 *
 	 * @param typeid product type database ID
-	 * @return the corresponding product type object
+	 * @return the corresponding product type object or <code>null</code> for invalid ID
 	 * @throws NoDatabaseLinkException
 	 */
 	public static ProductType getProductTypeByID(final int typeid) throws NoDatabaseLinkException
@@ -1563,7 +1566,7 @@ public class DatabaseController
 	 * @param categoryid product category database ID
 	 * @param getCached Get all product categories from the cache instead of rebuilding the cache from the database but
 	 * only if the cached category IDs match the ones in the database.
-	 * @return the corresponding product category object
+	 * @return the corresponding product category object or <code>null</code> for invalid ID
 	 * @throws NoDatabaseLinkException
 	 */
 	public static ProductCategory getProductCategoryByID(final int categoryid, final boolean getCached) throws NoDatabaseLinkException
@@ -1602,7 +1605,7 @@ public class DatabaseController
 	 * @param brandid product brand database ID
 	 * @param getCached Get all product brands from the cache instead of rebuilding the cache from the database but only
 	 * if the cached brand IDs match the ones in the database.
-	 * @return the corresponding product brand object
+	 * @return the corresponding product brand object or <code>null</code> for invalid ID
 	 * @throws NoDatabaseLinkException
 	 */
 	public static ProductBrand getProductBrandByID(final int brandid, final boolean getCached) throws NoDatabaseLinkException
@@ -1753,7 +1756,7 @@ public class DatabaseController
 	 * Gets the {@link Product} object from the database with the given ID.
 	 *
 	 * @param id the product database ID
-	 * @return the corresponding product object
+	 * @return the corresponding product object or <code>null</code> for invalid ID
 	 * @throws HibernateException when the query failed to commit and has been rolled back
 	 */
 	public static Product getProductByID(final int id) throws HibernateException
@@ -1765,7 +1768,7 @@ public class DatabaseController
 	 * Gets the {@link ProductBox} object from the database with the given ID.
 	 *
 	 * @param id the product box database ID
-	 * @return the corresponding product box object
+	 * @return the corresponding product box object or <code>null</code> for invalid ID
 	 * @throws HibernateException when the query failed to commit and has been rolled back
 	 */
 	public static ProductBox getProductBoxByID(final int id) throws HibernateException
@@ -1776,8 +1779,9 @@ public class DatabaseController
 	/**
 	 * Gets the {@link User} object from the database with the given ID.
 	 *
-	 * @param id the user database ID
-	 * @return the corresponding user object or <code>null</code> if a user with that ID does not exist
+	 * @param id the user database ID (use a negative number to denote a debug account)
+	 * @return the corresponding user object, <code>null</code> if a user with that ID does not exist, or the currently
+	 * logged in user (i.e. debug user) if the ID was negative
 	 * @throws HibernateException when the query failed to commit and has been rolled back
 	 */
 	public static User getUserByID(final int id) throws HibernateException
@@ -1822,7 +1826,7 @@ public class DatabaseController
 	 * Gets the {@link Shelf} object from the given shelf ID.
 	 *
 	 * @param shelfid shelf database ID
-	 * @return the corresponding shelf object
+	 * @return the corresponding shelf object or <code>null</code> for invalid ID
 	 * @throws NoDatabaseLinkException
 	 */
 	public static Shelf getShelfByID(final int shelfid, final boolean getCached) throws NoDatabaseLinkException
@@ -1861,7 +1865,7 @@ public class DatabaseController
 	 * Gets the {@link RemovalList} object from the database with the given ID.
 	 *
 	 * @param id the removal list database ID
-	 * @return the corresponding removal list object
+	 * @return the corresponding removal list object or <code>null</code> for invalid ID
 	 * @throws HibernateException when the query failed to commit and has been rolled back
 	 */
 	public static RemovalList getRemovalListByID(final int id) throws HibernateException
@@ -1873,7 +1877,7 @@ public class DatabaseController
 	 * Gets the {@link Manifest} object from the database with the given ID.
 	 *
 	 * @param id the manifest database ID
-	 * @return the corresponding manifest object
+	 * @return the corresponding manifest object or <code>null</code> for invalid ID
 	 * @throws HibernateException when the query failed to commit and has been rolled back
 	 */
 	public static Manifest getManifestByID(final int id) throws HibernateException
@@ -2156,7 +2160,7 @@ public class DatabaseController
 	 * Gets the {@link RemovalListState} object from the database with the given ID.
 	 *
 	 * @param id the removal list state database ID
-	 * @return the corresponding removal list state object
+	 * @return the corresponding removal list state object or <code>null</code> for invalid ID
 	 * @throws HibernateException when the query failed to commit and has been rolled back
 	 */
 	public static RemovalListState getRemovalListStateByID(final int id) throws HibernateException
@@ -2168,7 +2172,7 @@ public class DatabaseController
 	 * Gets the {@link ManifestState} object from the database with the given ID.
 	 *
 	 * @param id the manifest state database ID
-	 * @return the corresponding manifest state object
+	 * @return the corresponding manifest state object or <code>null</code> for invalid ID
 	 * @throws HibernateException when the query failed to commit and has been rolled back
 	 */
 	public static ManifestState getManifestStateByID(final int id) throws HibernateException

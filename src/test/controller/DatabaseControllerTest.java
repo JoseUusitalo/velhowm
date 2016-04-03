@@ -302,18 +302,6 @@ public class DatabaseControllerTest
 	}
 
 	@Test
-	public final void testGetRemovalListByID_Invalid_Cached()
-	{
-		assertEquals(null, DatabaseController.getRemovalListByID(-1));
-	}
-
-	@Test
-	public final void testGetRemovalListByID_Invalid_ForceLoad()
-	{
-		assertEquals(null, DatabaseController.getRemovalListByID(-1));
-	}
-
-	@Test
 	public final void testGetRemovalListByID_ForceLoad()
 	{
 		assertEquals("[1] Active: 3 boxes", DatabaseController.getRemovalListByID(1).toString());
