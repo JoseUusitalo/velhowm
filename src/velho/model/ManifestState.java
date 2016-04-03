@@ -40,6 +40,26 @@ public class ManifestState implements Comparable<ManifestState>
 		return name;
 	}
 
+	@Override
+	public boolean equals(final Object o)
+	{
+		if (!(o instanceof ManifestState))
+			return false;
+
+		final ManifestState ms = (ManifestState) o;
+
+		if (this.getDatabaseID() <= 0)
+			return this == ms;
+
+		return this.getDatabaseID() == ms.getDatabaseID();
+	}
+
+	@Override
+	public int compareTo(final ManifestState state)
+	{
+		return this.getDatabaseID() - state.getDatabaseID();
+	}
+
 	/**
 	 * Gets the database ID of this manifest state.
 	 *
@@ -78,20 +98,5 @@ public class ManifestState implements Comparable<ManifestState>
 	public void setName(final String name)
 	{
 		this.name = name;
-	}
-
-	@Override
-	public int compareTo(final ManifestState state)
-	{
-		/*
-		 * NOTE: Assumes that the manifest states are created in the priority order in the database!
-		 * Priority order:
-		 * 1: Stored (Boxes on shelves.)
-		 * 2: Accepted (Boxes can be moved to shelves.)
-		 * 3: Received (Waiting for Manager approval.)
-		 * 4: Rejected (Boxes waiting to be discharged.)
-		 * 5: Discharged (Boxes have been moved out of the warehouse.)
-		 */
-		return databaseID - state.getDatabaseID();
 	}
 }

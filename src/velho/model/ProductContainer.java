@@ -7,7 +7,7 @@ import java.util.Date;
  *
  * @author Joona Silvennoinen &amp; Jose Uusitalo
  */
-public abstract class ProductContainer
+public abstract class ProductContainer implements Comparable<ProductContainer>
 {
 	/**
 	 * The ID of the product box.
@@ -68,6 +68,26 @@ public abstract class ProductContainer
 
 	@Override
 	public abstract String toString();
+
+	@Override
+	public boolean equals(final Object o)
+	{
+		if (!(o instanceof ProductContainer))
+			return false;
+
+		final ProductContainer c = (ProductContainer) o;
+
+		if (this.getDatabaseID() <= 0)
+			return this == c;
+
+		return this.getDatabaseID() == c.getDatabaseID();
+	}
+
+	@Override
+	public int compareTo(final ProductContainer c)
+	{
+		return this.getDatabaseID() - c.getDatabaseID();
+	}
 
 	/**
 	 * Gets the maximum size of the product container.
