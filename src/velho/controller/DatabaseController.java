@@ -2506,105 +2506,20 @@ public class DatabaseController
 	 */
 
 	/**
-	 * Updates an existing removal list in the database with the data from the
-	 * given removal list or creates a new one if it doesn't exist.
-	 * A database ID of -1 signifies a brand new {@link RemovalList}.
+	 * Creates a new or updates an existing object depending on whether the given object exists in the database.
 	 *
-	 * @param removalList new or existing removal list
-	 * @return <code>true</code> if existing data was updated or a new removal
-	 * list was created in the database
-	 */
-	@SuppressWarnings("unchecked")
-	public static int save(final RemovalList removalList) throws NoDatabaseLinkException
-	{
-		final Map<String, Object> values = new LinkedHashMap<String, Object>();
-		values.put("liststate", removalList.getState().getDatabaseID());
-
-		final List<String> where = new ArrayList<String>();
-
-		DatabaseQueryType query;
-		int dbID = removalList.getDatabaseID();
-
-		// If the removal list does not exist yet, INSERT.
-		if (dbID < 1)
-			query = DatabaseQueryType.INSERT;
-		else
-		{
-			query = DatabaseQueryType.UPDATE;
-			where.add("removallist_id = " + dbID);
-		}
-
-		// Insert/Update the list itself
-		Set<Integer> result = (LinkedHashSet<Integer>) runQuery(query, DatabaseTable.REMOVALLISTS, null, null, values, where);
-
-		if (result.size() == 0)
-		{
-			DBLOG.error("Failed to save: " + removalList);
-			return -1;
-		}
-
-		// Get the inserted database ID (if the given object was inserted instead of updated).
-		if (dbID < 1)
-			dbID = result.iterator().next();
-
-		// If the removallist_id was added previously, remove it.
-		if (!where.isEmpty())
-			where.clear();
-
-		// Even if multiple rows were changed, they all have the same ID.
-		where.add("removallist = " + dbID);
-
-		/*
-		 * Delete all boxes from the list in the database.
-		 * We don't really care whether anything was deleted or not, if there
-		 * was something, it is now deleted.
-		 */
-		runQuery(DatabaseQueryType.DELETE, DatabaseTable.REMOVALLIST_PRODUCTBOXES, null, null, null, where);
-
-		// Add all boxes to the database.
-		values.clear();
-		values.put("removallist", dbID);
-		values.put("productbox", -1);
-
-		for (final ProductBox box : removalList.getBoxes())
-		{
-			// Remove the previous box ID.
-			values.remove("productbox");
-
-			// Put in the new box ID.
-			values.put("productbox", box.getDatabaseID());
-
-			// Run the query.
-			result = (LinkedHashSet<Integer>) runQuery(DatabaseQueryType.INSERT, DatabaseTable.REMOVALLIST_PRODUCTBOXES, null, null, values, null);
-
-			if (result.size() == 0)
-			{
-				DBLOG.error("Failed to save: " + removalList);
-				return -1;
-			}
-		}
-
-		// Update the cache.
-		DBLOG.debug(query.toString() + ": " + getRemovalListByID(dbID));
-
-		return dbID;
-	}
-
-	/**
-	 * Creates a new or updates an existing manifest depending on whether the given object exists in the database.
-	 *
-	 * @param manifest new or existing manifest
+	 * @param object new or existing object in the database
 	 * @return the database ID of the inserted or updated object
 	 * @throws HibernateException when data was not saved
 	 */
-	public static int save(final Manifest manifest)
+	public static int save(final RemovalList object)
 	{
 		// TODO: Generalize when all tests have been updated to manually rollback.
 
 		final Session session = sessionFactory.openSession();
 		final Transaction transaction = session.beginTransaction();
 
-		session.saveOrUpdate(manifest);
+		session.saveOrUpdate(object);
 
 		try
 		{
@@ -2618,9 +2533,42 @@ public class DatabaseController
 			throw new HibernateException("Failed to commit.");
 		}
 
-		DBLOG.debug("Saved/Updated: " + manifest);
+		DBLOG.debug("Saved/Updated: " + object);
 
-		return manifest.getDatabaseID();
+		return object.getDatabaseID();
+	}
+
+	/**
+	 * Creates a new or updates an existing object depending on whether the given object exists in the database.
+	 *
+	 * @param object new or existing object in the database
+	 * @return the database ID of the inserted or updated object
+	 * @throws HibernateException when data was not saved
+	 */
+	public static int save(final Manifest object)
+	{
+		// TODO: Generalize when all tests have been updated to manually rollback.
+
+		final Session session = sessionFactory.openSession();
+		final Transaction transaction = session.beginTransaction();
+
+		session.saveOrUpdate(object);
+
+		try
+		{
+			transaction.commit();
+			session.close();
+		}
+		catch (final HibernateException e)
+		{
+			transaction.rollback();
+			session.close();
+			throw new HibernateException("Failed to commit.");
+		}
+
+		DBLOG.debug("Saved/Updated: " + object);
+
+		return object.getDatabaseID();
 	}
 
 	/**

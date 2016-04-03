@@ -79,7 +79,6 @@ public class ManifestTest
 	@Test
 	public final void testSetState_SaveToDatabase()
 	{
-		System.out.println(existingManifest);
 		final int oldID = existingManifest.getDatabaseID();
 		final ManifestState oldState = existingManifest.getState();
 		final ManifestState newState = DatabaseController.getManifestStateByID(2);
@@ -94,6 +93,8 @@ public class ManifestTest
 		// Save.
 		final int saveID = DatabaseController.save(existingManifest);
 		assertTrue(saveID > 0);
+
+		// Check that that the object was updated, not inserted.
 		assertEquals(saveID, oldID);
 
 		// Database was updated.
