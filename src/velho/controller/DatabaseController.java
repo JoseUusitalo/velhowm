@@ -248,6 +248,7 @@ public class DatabaseController
 	 * </ul>
 	 * @throws NoDatabaseLinkException
 	 */
+	@Deprecated
 	private static Object runQuery(final DatabaseQueryType type, final DatabaseTable tableName, final Map<DatabaseTable, String> joinOnValues,
 			final String[] columns, final Map<String, Object> columnValues, final List<String> where) throws NoDatabaseLinkException
 	{
@@ -669,6 +670,7 @@ public class DatabaseController
 	 * @return an Object containing the appropriate data
 	 * @throws NoDatabaseLinkException
 	 */
+	@Deprecated
 	private static Object runQuery(final String sql) throws NoDatabaseLinkException
 	{
 		final Connection connection = getConnection();
@@ -750,6 +752,7 @@ public class DatabaseController
 	/**
 	 * Attempts to re-link the database.
 	 */
+	@Deprecated
 	private static void relink()
 	{
 		DBLOG.info("Attempting to relink database.");
@@ -794,6 +797,7 @@ public class DatabaseController
 	 *
 	 * @return a database connection
 	 */
+	@Deprecated
 	private static Connection getConnection() throws NoDatabaseLinkException
 	{
 		checkLink();
@@ -819,8 +823,7 @@ public class DatabaseController
 	}
 
 	/*
-	 * -------------------------------- PUBLIC DATABASE METHODS
-	 * --------------------------------
+	 * -------------------------------- PUBLIC DATABASE METHODS --------------------------------
 	 */
 
 	/**
@@ -840,6 +843,7 @@ public class DatabaseController
 	 * @param sql string to escape
 	 * @return escaped string
 	 */
+	@Deprecated
 	public static String escape(final String sql)
 	{
 		String escaped = sql.replace("'", "''");
@@ -857,6 +861,7 @@ public class DatabaseController
 	 * @param where conditions (can be <code>null</code>)
 	 * @return an SQL query string
 	 */
+	@Deprecated
 	public static String sqlBuilder(final DatabaseQueryType type, final DatabaseTable tableName, final Map<DatabaseTable, String> joinOnCondition,
 			final String[] columns, final Map<String, Object> columnValues, final List<String> where)
 	{
@@ -974,6 +979,7 @@ public class DatabaseController
 	 *
 	 * @return <code>true</code> if a database link exists
 	 */
+	@Deprecated
 	public static boolean isLinked()
 	{
 		return connectionPool != null;
@@ -986,6 +992,7 @@ public class DatabaseController
 	 *
 	 * @throws NoDatabaseLinkException
 	 */
+	@Deprecated
 	public static void checkLink() throws NoDatabaseLinkException
 	{
 		if (connectionPool == null)
@@ -995,6 +1002,7 @@ public class DatabaseController
 	/**
 	 * Attempts to re-link the database.
 	 */
+	@Deprecated
 	public static void tryReLink()
 	{
 		try
@@ -1033,6 +1041,7 @@ public class DatabaseController
 	 * @throws ExistingDatabaseLinkException
 	 * when a database link already exists
 	 */
+	@Deprecated
 	public static DatabaseFileState link() throws ClassNotFoundException, ExistingDatabaseLinkException
 	{
 		if (connectionPool != null)
@@ -1105,6 +1114,7 @@ public class DatabaseController
 	 * when attempting unlink a database when no database link
 	 * exists
 	 */
+	@Deprecated
 	public static void unlink() throws NoDatabaseLinkException
 	{
 		if (connectionPool == null)
@@ -1125,6 +1135,8 @@ public class DatabaseController
 	 */
 	public static boolean connectAndInitialize() throws ClassNotFoundException, ExistingDatabaseLinkException, NoDatabaseLinkException
 	{
+		// TODO: Remove connection part, only do initialization.
+
 		final DatabaseFileState state = link();
 		boolean initialized = true;
 
@@ -1198,96 +1210,6 @@ public class DatabaseController
 		}
 
 		return null;
-	}
-
-	/**
-	 * Gets the {@link Product} object from the given product name.
-	 *
-	 * @param name the exact product name
-	 * @return the corresponding product object
-	 * @throws NoDatabaseLinkException
-	 */
-	@SuppressWarnings("unused")
-	private static List<ProductBox> getProductBoxesByProductName(final List<String> where) throws NoDatabaseLinkException
-	{
-		final String[] columns = { "containers.container_id" };
-
-		final Map<DatabaseTable, String> join = new LinkedHashMap<DatabaseTable, String>();
-		join.put(DatabaseTable.PRODUCTS, "containers.product = products.product_id");
-
-		@SuppressWarnings("unchecked")
-		final Set<Integer> result = (LinkedHashSet<Integer>) (runQuery(DatabaseQueryType.SELECT, DatabaseTable.CONTAINERS, join, columns, null, where));
-
-		final List<ProductBox> boxes = new ArrayList<ProductBox>();
-		final Iterator<Integer> it = result.iterator();
-
-		while (it.hasNext())
-			boxes.add(getProductBoxByID(it.next()));
-
-		return boxes;
-	}
-
-	/**
-	 * Gets the {@link Product} object from the given product name.
-	 *
-	 * @param name the exact product name
-	 * @return the corresponding product object
-	 * @throws NoDatabaseLinkException
-	 */
-	private static List<ProductBox> getProductBoxesByProductID(final List<String> where) throws NoDatabaseLinkException
-	{
-		final String[] columns = { "container_id" };
-
-		@SuppressWarnings("unchecked")
-		final Set<Integer> result = (LinkedHashSet<Integer>) (runQuery(DatabaseQueryType.SELECT, DatabaseTable.CONTAINERS, null, columns, null, where));
-
-		final List<ProductBox> boxes = new ArrayList<ProductBox>();
-		final Iterator<Integer> it = result.iterator();
-
-		while (it.hasNext())
-			boxes.add(getProductBoxByID(it.next()));
-
-		return boxes;
-	}
-
-	/**
-	 * Gets the product box that will expire the soonest.
-	 *
-	 * @param boxes boxes to search from
-	 * @return the oldest product box, expiration date can be null
-	 */
-	private static ProductBox getOldestProductBox(final List<ProductBox> boxes)
-	{
-		ProductBox oldest = boxes.get(0);
-
-		for (final ProductBox box : boxes)
-		{
-			// TODO: Support searching for products with no expiration dates.
-			if (oldest.getExpirationDate() == null)
-				oldest = box;
-
-			if (box.getExpirationDate() != null)
-			{
-				// Current box has an expiration date.
-				if (box.getExpirationDate() != null)
-				{
-					// Oldest box has an expiration date.
-					if (box.getExpirationDate().before(oldest.getExpirationDate()))
-					{
-						// Current box expires first.
-						oldest = box;
-					}
-				}
-				else
-				{
-					// Current box expires first.
-					oldest = box;
-				}
-			}
-			// Else current box does not have an expiration date.
-		}
-
-		return oldest;
 	}
 
 	/**
@@ -2076,28 +1998,33 @@ public class DatabaseController
 	 * database ID and the value is the number of products
 	 * @throws NoDatabaseLinkException
 	 */
-	public static List<ProductBoxSearchResultRow> searchProductBoxByDataList(final Map<Integer, Integer> productData) throws NoDatabaseLinkException
+	@SuppressWarnings("unchecked")
+	public static List<ProductBoxSearchResultRow> searchProductBoxByDataList(final Map<Integer, Integer> productData)
 	{
 		final List<ProductBoxSearchResultRow> foundProducts = FXCollections.observableArrayList();
-
-		List<String> where = null;
 		Integer wantedProductCount = null;
 		List<ProductBox> boxes = null;
+
+		final Session session = sessionFactory.openSession();
 
 		// For every unique string representing a product.
 		for (final Integer productID : productData.keySet())
 		{
 			boxes = new ArrayList<ProductBox>();
-			where = new ArrayList<String>();
 			wantedProductCount = productData.get(productID);
 
 			DBLOG.debug("Looking for [" + productID + "] of size " + wantedProductCount);
-			where.add("product = " + productID);
 
 			// First look for an exact amount.
-			where.add("product_count = " + wantedProductCount);
-
-			boxes = getProductBoxesByProductID(where);
+			// @formatter:off
+			boxes = session.createQuery("from ProductBox as pb"
+									  + " where pb.product.databaseID = :id"
+									  + " and pb.productCount = :count"
+									  + " order by pb.expirationDate asc")
+				   	   	   .setParameter("id", productID)
+				   	   	   .setParameter("count", wantedProductCount)
+				   	   	   .list();
+			// @formatter:on
 
 			// Couldn't find a box with exactly the number of products wanted.
 			if (boxes.isEmpty())
@@ -2105,16 +2032,40 @@ public class DatabaseController
 				if (MainWindow.DEBUG_MODE)
 					DBLOG.debug("Unable to find a product box with the wanted size of " + wantedProductCount + ". Looking from multiple boxes.");
 
-				// Remove the product count condition and find all product boxes
-				// with the wanted product ID.
-				where.remove(1);
-				boxes = getBoxesContainingAtLeastProducts(getProductBoxesByProductID(where), wantedProductCount);
+				/*
+				 * Remove the product count condition and find all product boxes with the wanted product ID.
+				 * This could be done with the getByID() private method but since we already have a session open and
+				 * more importantly this query is done in a loop, it is faster to do it here.
+				 */
+				// @formatter:off
+				boxes = session.createQuery("from ProductBox as pb"
+										  + " where pb.product.databaseID = :id"
+										  + " order by pb.expirationDate asc")
+						   	   .setParameter("id", productID)
+						   	   .list();
+				// @formatter:on
+
+				System.out.println("boxes---------------------------");
+				for (ProductBox b : boxes)
+					System.out.println(b.getExpirationDate());
+				boxes = getBoxesContainingAtLeastProducts(boxes, wantedProductCount);
 			}
 			else if (boxes.size() > 1)
 			{
-				// If found multiple boxes with the exact size, select one that
-				// will expire the soonest.
-				final ProductBox oldest = getOldestProductBox(boxes);
+				/*
+				 * If multiple boxes are found with the exact wanted size, select one that will expire the soonest which
+				 * is the first result with a non-null expiration date.
+				 */
+				ProductBox oldest = null;
+
+				for (final ProductBox b : boxes)
+				{
+					if (b.getExpirationDate() != null)
+					{
+						oldest = b;
+						break;
+					}
+				}
 
 				boxes.clear();
 				boxes.add(oldest);
@@ -2123,6 +2074,8 @@ public class DatabaseController
 			for (final ProductBox box : boxes)
 				foundProducts.add(new ProductBoxSearchResultRow(box));
 		}
+
+		session.close();
 
 		// Remove nulls.
 		foundProducts.removeAll(Collections.singleton(null));

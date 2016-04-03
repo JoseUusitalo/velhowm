@@ -254,14 +254,7 @@ public class SearchController
 		}
 
 		// Search the database for the products.
-		try
-		{
-			DatabaseController.searchProductBoxByDataList(productID_BoxSize);
-		}
-		catch (final NoDatabaseLinkException e)
-		{
-			DatabaseController.tryReLink();
-		}
+		DatabaseController.searchProductBoxByDataList(productID_BoxSize);
 
 		// Return the data for unit testing.
 		return productID_BoxSize;
