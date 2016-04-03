@@ -140,9 +140,15 @@ public class RemovalList
 	 *
 	 * @param boxes the set of boxes on this removal list
 	 */
-	public void setBoxes(final Set<ProductBox> boxes)
+	public boolean setBoxes(final Set<ProductBox> boxes)
 	{
 		this.boxes = boxes;
+		boolean bswitch = true;
+
+		for (final ProductBox box : boxes)
+			bswitch = bswitch && (observableBoxes.add(new ProductBoxSearchResultRow(box)));
+
+		return bswitch;
 	}
 
 	/**
