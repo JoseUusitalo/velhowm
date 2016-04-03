@@ -138,6 +138,8 @@ public class UIController
 				mainView.addTab("Manifests", manifestController.getView());
 				mainView.addTab("Removal Lists", removalListController.getView());
 				mainView.addTab("Add Product", productController.getAddStuffView());
+				mainView.addTab("Add Product Category", productController.getAddStuffView());
+				mainView.addTab("Add Brand", productController.getAddStuffView());
 				mainView.addTab("Product List", productController.getTabView());
 				mainView.addTab("User List", getUserListView(currentUserRole));
 				break;

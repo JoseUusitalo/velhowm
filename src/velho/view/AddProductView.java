@@ -13,6 +13,7 @@ import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
 import velho.controller.DatabaseController;
+import velho.controller.ExternalSystemsController;
 import velho.controller.ProductController;
 import velho.controller.UIController;
 import velho.model.Product;
@@ -106,6 +107,19 @@ public class AddProductView
 			brandList.setPromptText("Brand");
 			brandList.getItems().addAll(DatabaseController.getAllProductBrands());
 			brandList.setMaxWidth(Double.MAX_VALUE);
+			grid.add(brandList, 2, 0);
+
+			Button saveingButton = new Button("Save");
+			saveingButton.setMaxWidth(Double.MAX_VALUE);
+			saveingButton.setAlignment(Pos.CENTER);
+			saveingButton.setOnAction(new EventHandler<ActionEvent>()
+			{
+				@Override
+				public void handle(final ActionEvent event)
+				{
+					ExternalSystemsController.sendDataToPrinter(DatabaseController.getObservableProductSearchResults());
+				}
+			});
 
 			/*
 			 * TODO: Fix combobox selection mechanic breaking on the second try because the selection is converted from
@@ -187,8 +201,7 @@ public class AddProductView
 					Object brand = brandList.valueProperty().getValue();
 					Object category = categoryList.valueProperty().getValue();
 
-					final Product newProduct = productController.saveProduct(databaseID.getValueFactory().getValue().intValue(), nameField.getText(), brand,
-							category, popularity.getValue().intValue());
+					final Product newProduct = productController.saveProduct(databaseID.getValueFactory().getValue().intValue(), nameField.getText(), brand, category, popularity.getValue().intValue());
 
 					if (editProduct)
 						productController.showProductView(newProduct);
