@@ -12,7 +12,6 @@ import velho.model.Manifest;
 import velho.model.ManifestState;
 import velho.model.ProductBox;
 import velho.model.enums.UserRole;
-import velho.model.exceptions.NoDatabaseLinkException;
 import velho.view.GenericTabView;
 import velho.view.MainWindow;
 import velho.view.ManifestManagementView;
@@ -127,17 +126,10 @@ public class ManifestController implements UIActionController
 		USRLOG.info(currentManifest + " state changed to " + newState + ".");
 		currentManifest.setState(newState);
 
-		try
-		{
-			if (DatabaseController.save(currentManifest) > 0)
-				SYSLOG.info("Updated database: " + currentManifest);
-			else
-				SYSLOG.info("Database update failed: " + currentManifest);
-		}
-		catch (NoDatabaseLinkException e)
-		{
-			DatabaseController.tryReLink();
-		}
+		if (DatabaseController.save(currentManifest) > 0)
+			SYSLOG.info("Updated database: " + currentManifest);
+		else
+			SYSLOG.info("Database update failed: " + currentManifest);
 	}
 
 	/**
@@ -160,28 +152,21 @@ public class ManifestController implements UIActionController
 	{
 		Manifest manifest;
 
-		try
-		{
-			manifest = new Manifest(DatabaseController.getManifestStateByID(3), driverID, orderDate, Date.from(Instant.now()));
-			manifest.setBoxes(boxSet);
+		manifest = new Manifest(DatabaseController.getManifestStateByID(3), driverID, orderDate, Date.from(Instant.now()));
+		manifest.setBoxes(boxSet);
 
-			if (DatabaseController.save(manifest) > 0)
+		if (DatabaseController.save(manifest) > 0)
+		{
+			// If the user is a Manager (but not an Administrator!) show a popup.
+			if (LoginController.userRoleIs(UserRole.MANAGER))
 			{
-				// If the user is a Manager (but not an Administrator!) show a popup.
-				if (LoginController.userRoleIs(UserRole.MANAGER))
+				if (PopupController
+						.confirmation("A shipment has arrived. Please accept or refuse it in the Manifests tab. Would you like to view the manifest now?"))
 				{
-					if (PopupController
-							.confirmation("A shipment has arrived. Please accept or refuse it in the Manifests tab. Would you like to view the manifest now?"))
-					{
-						showManifestView(manifest);
-						mainWindow.selectTab("Manifests");
-					}
+					showManifestView(manifest);
+					mainWindow.selectTab("Manifests");
 				}
 			}
-		}
-		catch (NoDatabaseLinkException e)
-		{
-			DatabaseController.tryReLink();
 		}
 
 	}

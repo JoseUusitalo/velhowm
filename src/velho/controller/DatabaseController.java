@@ -25,6 +25,7 @@ import org.h2.jdbcx.JdbcConnectionPool;
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
+import org.hibernate.Transaction;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -2590,94 +2591,36 @@ public class DatabaseController
 	}
 
 	/**
-	 * Updates an existing manifest in the database with the data from the given manifest or creates a new one if it
-	 * doesn't exist.
-	 * A database ID of -1 signifies a brand new {@link Manifest}.
+	 * Creates a new or updates an existing manifest depending on whether the given object exists in the database.
 	 *
 	 * @param manifest new or existing manifest
-	 * @return the database ID of the inserted object or -1 if saving failed
+	 * @return the database ID of the inserted or updated object
+	 * @throws HibernateException when data was not saved
 	 */
-	@SuppressWarnings("unchecked")
-	public static int save(final Manifest manifest) throws NoDatabaseLinkException
+	public static int save(final Manifest manifest)
 	{
+		// TODO: Generalize when all tests have been updated to manually rollback.
 
-		final Map<String, Object> values = new LinkedHashMap<String, Object>();
-		values.put("state", manifest.getState().getDatabaseID());
-		values.put("driver_id", manifest.getDriverID());
-		values.put("date_ordered", getH2DateFormat(manifest.getOrderedDate()));
-		values.put("date_received", getH2DateFormat(manifest.getReceivedDate()));
+		final Session session = sessionFactory.openSession();
+		final Transaction transaction = session.beginTransaction();
 
-		final List<String> where = new ArrayList<String>();
-		int boxid;
+		session.saveOrUpdate(manifest);
 
-		DatabaseQueryType query;
-		int dbID = manifest.getDatabaseID();
-
-		// If the manifest does not exist yet, INSERT.
-		if (dbID < 1)
-			query = DatabaseQueryType.INSERT;
-		else
+		try
 		{
-			query = DatabaseQueryType.UPDATE;
-			where.add("manifest_id = " + dbID);
+			transaction.commit();
+			session.close();
+		}
+		catch (final HibernateException e)
+		{
+			transaction.rollback();
+			session.close();
+			throw new HibernateException("Failed to commit.");
 		}
 
-		// Insert/Update the manifest
-		Set<Integer> result = (LinkedHashSet<Integer>) runQuery(query, DatabaseTable.MANIFESTS, null, null, values, where);
+		DBLOG.debug("Saved/Updated: " + manifest);
 
-		if (result.size() == 0)
-		{
-			DBLOG.error("Failed to save: " + manifest);
-			return -1;
-		}
-
-		// Get the inserted database ID (if the given object was inserted instead of updated).
-		if (dbID < 1)
-			dbID = result.iterator().next();
-
-		where.clear();
-		where.add("manifest = " + dbID);
-
-		/*
-		 * Delete all boxes from the list in the database.
-		 * We don't really care whether anything was deleted or not, if there
-		 * was something, it is now deleted.
-		 */
-		runQuery(DatabaseQueryType.DELETE, DatabaseTable.MANIFEST_PRODUCTBOXES, null, null, null, where);
-
-		// Add all boxes to the database.
-		values.clear();
-		values.put("manifest", dbID);
-		values.put("productbox", -1);
-
-		for (final ProductBox box : manifest.getBoxes())
-		{
-			// Save the box to database.
-			boxid = save(box);
-
-			if (boxid > 0)
-			{
-				// Remove the previous box ID.
-				values.remove("productbox");
-
-				// Put in the new box ID.
-				values.put("productbox", boxid);
-
-				// Run the query.
-				result = (LinkedHashSet<Integer>) runQuery(DatabaseQueryType.INSERT, DatabaseTable.MANIFEST_PRODUCTBOXES, null, null, values, null);
-
-				if (result.size() == 0)
-				{
-					DBLOG.error("Failed to save: " + manifest);
-					return -1;
-				}
-			}
-		}
-
-		// Update the cache.
-		DBLOG.debug(query.toString() + ": " + getManifestByID(dbID));
-
-		return dbID;
+		return manifest.getDatabaseID();
 	}
 
 	/**
