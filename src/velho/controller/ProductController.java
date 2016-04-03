@@ -35,7 +35,7 @@ public class ProductController implements UIActionController
 	private AddProductView addProductView;
 
 	/**
-	 * The view in the tab itself.
+	 * The tab view for the product list view.
 	 */
 	private GenericTabView listTab;
 
@@ -45,6 +45,11 @@ public class ProductController implements UIActionController
 	private UIController uiController;
 
 	/**
+	 * The tab view for creating new objects and saving them to the list view.
+	 */
+	private GenericTabView addTab;
+
+	/**
 	 * @param uiController
 	 */
 	public ProductController(final UIController uiController)
@@ -52,6 +57,7 @@ public class ProductController implements UIActionController
 		this.uiController = uiController;
 		this.addProductView = new AddProductView(this, uiController);
 		listTab = new GenericTabView();
+		addTab = new GenericTabView();
 		showList();
 	}
 
@@ -212,6 +218,22 @@ public class ProductController implements UIActionController
 	}
 
 	/**
+	 * Changes the view in the product add/edit list tab to the list.
+	 */
+	public void showCreatingListView()
+	{
+		try
+		{
+			addTab.setView(ListController.getTableView(this, DatabaseController.getProductDataColumns(false, false), DatabaseController.getAllProducts()));
+		}
+		catch (NoDatabaseLinkException e)
+		{
+			addTab.setView(null);
+			DatabaseController.tryReLink();
+		}
+	}
+
+	/**
 	 * Changes the view in the product list tab to display the data from the given product.
 	 *
 	 * @param product product to display
@@ -267,5 +289,10 @@ public class ProductController implements UIActionController
 	{
 		USRLOG.info("Viewing: " + ((Product) data).toString());
 		listTab.setView(new ProductDataView(this).getView(((Product) data)));
+	}
+
+	public Node getAddStuffView()
+	{
+		return addTab.getView();
 	}
 }

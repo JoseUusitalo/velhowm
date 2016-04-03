@@ -70,9 +70,7 @@ public class UIController
 	 * @param productController
 	 * @param removalPlatformController
 	 */
-	public void setControllers(final MainWindow mainWindow, final UserController userController, final RemovalListController removalListController,
-			final SearchController searchController, final LogController logController, final ManifestController manifestController,
-			final ProductController productController, final RemovalPlatformController removalPlatformController)
+	public void setControllers(final MainWindow mainWindow, final UserController userController, final RemovalListController removalListController, final SearchController searchController, final LogController logController, final ManifestController manifestController, final ProductController productController, final RemovalPlatformController removalPlatformController)
 	{
 		this.mainView = mainWindow;
 		this.userController = userController;
@@ -139,7 +137,7 @@ public class UIController
 				mainView.addTab("Product List Search", searchController.getProductListSearchView());
 				mainView.addTab("Manifests", manifestController.getView());
 				mainView.addTab("Removal Lists", removalListController.getView());
-				mainView.addTab("Add Product", productController.getAddProductView());
+				mainView.addTab("Add Product", productController.getAddStuffView());
 				mainView.addTab("Product List", productController.getTabView());
 				mainView.addTab("User List", getUserListView(currentUserRole));
 				break;
@@ -170,11 +168,9 @@ public class UIController
 			{
 				case "Administrator":
 				case "Manager":
-					return ListController.getTableView(userController, DatabaseController.getPublicUserDataColumns(true),
-							DatabaseController.getObservableUsers());
+					return ListController.getTableView(userController, DatabaseController.getPublicUserDataColumns(true), DatabaseController.getObservableUsers());
 				case "Logistician":
-					return ListController.getTableView(userController, DatabaseController.getPublicUserDataColumns(false),
-							DatabaseController.getObservableUsers());
+					return ListController.getTableView(userController, DatabaseController.getPublicUserDataColumns(false), DatabaseController.getObservableUsers());
 				default:
 					SYSLOG.error("Unknown user role '" + currentUserRole.getName() + "'.");
 			}
