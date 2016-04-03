@@ -16,7 +16,7 @@ import velho.model.exceptions.NoDatabaseLinkException;
  *
  * @author Jose Uusitalo
  */
-public class Shelf
+public class Shelf implements Comparable<Shelf>
 {
 	/**
 	 * Apache log4j logger: System.
@@ -237,6 +237,26 @@ public class Shelf
 	{
 		return "[" + shelfID + "] Lvls: " + getLevelCount() + ", Slt/Lvl: " + slots[0].length + ", Box/Slt: " + slots[0][0].maxBoxCount + ", Boxs: "
 				+ getProductBoxCount() + ", Slts: " + getShelfSlotCount() + ", Free: " + getFreeShelfSlots().size();
+	}
+
+	@Override
+	public boolean equals(final Object o)
+	{
+		if (!(o instanceof Shelf))
+			return false;
+
+		final Shelf s = (Shelf) o;
+
+		if (this.getDatabaseID() <= 0)
+			return this == s;
+
+		return this.getDatabaseID() == s.getDatabaseID();
+	}
+
+	@Override
+	public int compareTo(final Shelf shelf)
+	{
+		return this.getDatabaseID() - shelf.getDatabaseID();
 	}
 
 	/**
@@ -504,7 +524,7 @@ public class Shelf
 	 *
 	 * @author Jose Uusitalo
 	 */
-	class ShelfSlot
+	class ShelfSlot implements Comparable<ShelfSlot>
 	{
 		/**
 		 * A separator string between values in shelf slot IDs.
@@ -549,14 +569,22 @@ public class Shelf
 			boxes = new HashSet<ProductBox>();
 		}
 
-		/*
-		 * Compares the ID of this shelf slot to the given one.
-		 * @Override
-		 * public int compareTo(final ShelfSlot s)
-		 * {
-		 * return getSlotID().compareToIgnoreCase(s.getSlotID());
-		 * }
-		 */
+		@Override
+		public boolean equals(final Object o)
+		{
+			if (!(o instanceof ShelfSlot))
+				return false;
+
+			final ShelfSlot ss = (ShelfSlot) o;
+
+			return this.getSlotID().equals(ss.getSlotID());
+		}
+
+		@Override
+		public int compareTo(final ShelfSlot slot)
+		{
+			return getSlotID().compareToIgnoreCase(slot.getSlotID());
+		}
 
 		/**
 		 * The ID of this shelf slot in the following format:

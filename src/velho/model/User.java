@@ -9,7 +9,7 @@ import velho.model.exceptions.NoDatabaseLinkException;
  *
  * @author Jose Uusitalo
  */
-public class User
+public class User implements Comparable<User>
 {
 	/**
 	 * The maximum number of characters a first or last name may have.
@@ -189,6 +189,26 @@ public class User
 	public String toString()
 	{
 		return firstName + " " + lastName + " [" + role.toString() + " | " + databaseID + "]";
+	}
+
+	@Override
+	public boolean equals(final Object o)
+	{
+		if (!(o instanceof User))
+			return false;
+
+		final User u = (User) o;
+
+		if (this.getDatabaseID() <= 0)
+			return this == u;
+
+		return this.getDatabaseID() == u.getDatabaseID();
+	}
+
+	@Override
+	public int compareTo(final User user)
+	{
+		return this.getFullName().compareToIgnoreCase(user.getFullName());
 	}
 
 	/**

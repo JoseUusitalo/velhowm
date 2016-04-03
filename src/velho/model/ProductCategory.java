@@ -5,7 +5,7 @@ package velho.model;
  *
  * @author Joona Silvennoinen &amp; Jose Uusitalo
  */
-public class ProductCategory
+public class ProductCategory implements Comparable<ProductCategory>
 {
 	/**
 	 * The database ID of this product category.
@@ -65,6 +65,26 @@ public class ProductCategory
 	public String toString()
 	{
 		return name + " (" + type + ")";
+	}
+
+	@Override
+	public boolean equals(final Object o)
+	{
+		if (!(o instanceof ProductCategory))
+			return false;
+
+		final ProductCategory pc = (ProductCategory) o;
+
+		if (this.getDatabaseID() <= 0)
+			return this == pc;
+
+		return this.getDatabaseID() == pc.getDatabaseID();
+	}
+
+	@Override
+	public int compareTo(final ProductCategory category)
+	{
+		return this.getName().compareTo(category.getName());
 	}
 
 	/**

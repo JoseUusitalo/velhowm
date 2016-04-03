@@ -5,7 +5,7 @@ package velho.model;
  *
  * @author Jose Uusitalo
  */
-public class RemovalPlatform
+public class RemovalPlatform implements Comparable<RemovalPlatform>
 {
 	/**
 	 * The database ID of this removal platform.
@@ -38,6 +38,26 @@ public class RemovalPlatform
 	public String toString()
 	{
 		return "[" + databaseID + "] Removal Platform: " + freeSpacePercent * 100.0 + "% (" + freeSpaceLeftWarningPercent * 100.0 + "%)";
+	}
+
+	@Override
+	public boolean equals(final Object o)
+	{
+		if (!(o instanceof RemovalPlatform))
+			return false;
+
+		final RemovalPlatform rp = (RemovalPlatform) o;
+
+		if (this.getDatabaseID() <= 0)
+			return this == rp;
+
+		return this.getDatabaseID() == rp.getDatabaseID();
+	}
+
+	@Override
+	public int compareTo(final RemovalPlatform platform)
+	{
+		return this.getDatabaseID() - platform.getDatabaseID();
 	}
 
 	/**

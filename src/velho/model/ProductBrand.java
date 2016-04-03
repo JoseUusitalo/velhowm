@@ -5,7 +5,7 @@ package velho.model;
  *
  * @author Joona Silvennoinen &amp; Jose Uusitalo
  */
-public class ProductBrand
+public class ProductBrand implements Comparable<ProductBrand>
 {
 	/**
 	 * The database ID of this product brand.
@@ -49,6 +49,26 @@ public class ProductBrand
 	public String toString()
 	{
 		return name;
+	}
+
+	@Override
+	public boolean equals(final Object o)
+	{
+		if (!(o instanceof ProductBrand))
+			return false;
+
+		final ProductBrand pb = (ProductBrand) o;
+
+		if (this.getDatabaseID() <= 0)
+			return this == pb;
+
+		return this.getDatabaseID() == pb.getDatabaseID();
+	}
+
+	@Override
+	public int compareTo(final ProductBrand brand)
+	{
+		return this.getName().compareTo(brand.getName());
 	}
 
 	/**

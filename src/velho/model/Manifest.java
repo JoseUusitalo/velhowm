@@ -12,7 +12,7 @@ import javafx.collections.ObservableList;
  *
  * @author Jose Uusitalo
  */
-public class Manifest
+public class Manifest implements Comparable<Manifest>
 {
 	// TODO: Generalize products lists into an abstract class. Removal lists and Manifests are basically identical.
 
@@ -96,6 +96,26 @@ public class Manifest
 	{
 		return "[" + databaseID + "] State: " + state + " Driver: " + driverID + " Ordered/Received: " + orderedDate.toString() + "/" + receivedDate.toString()
 				+ " (" + boxes.size() + ")";
+	}
+
+	@Override
+	public boolean equals(final Object o)
+	{
+		if (!(o instanceof Manifest))
+			return false;
+
+		final Manifest m = (Manifest) o;
+
+		if (this.getDatabaseID() <= 0)
+			return this == m;
+
+		return this.getDatabaseID() == m.getDatabaseID();
+	}
+
+	@Override
+	public int compareTo(final Manifest manifest)
+	{
+		return this.getDatabaseID() - manifest.getDatabaseID();
 	}
 
 	/**

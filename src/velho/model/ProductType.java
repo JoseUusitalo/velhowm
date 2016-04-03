@@ -5,7 +5,7 @@ package velho.model;
  *
  * @author Jose Uusitalo
  */
-public class ProductType
+public class ProductType implements Comparable<ProductType>
 {
 	/**
 	 * The database ID of this product category.
@@ -40,6 +40,26 @@ public class ProductType
 	public ProductType()
 	{
 		// For Hibernate.
+	}
+
+	@Override
+	public boolean equals(final Object o)
+	{
+		if (!(o instanceof ProductType))
+			return false;
+
+		final ProductType pt = (ProductType) o;
+
+		if (this.getDatabaseID() <= 0)
+			return this == pt;
+
+		return this.getDatabaseID() == pt.getDatabaseID();
+	}
+
+	@Override
+	public int compareTo(final ProductType type)
+	{
+		return this.getName().compareTo(type.getName());
 	}
 
 	/**

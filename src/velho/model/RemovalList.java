@@ -11,7 +11,7 @@ import javafx.collections.ObservableList;
  *
  * @author Jose Uusitalo
  */
-public class RemovalList
+public class RemovalList implements Comparable<RemovalList>
 {
 	/**
 	 * The database ID of this removal list.
@@ -59,6 +59,26 @@ public class RemovalList
 	public String toString()
 	{
 		return "[" + databaseID + "] " + state + ": " + boxes.size() + " boxes";
+	}
+
+	@Override
+	public boolean equals(final Object o)
+	{
+		if (!(o instanceof RemovalList))
+			return false;
+
+		final RemovalList pt = (RemovalList) o;
+
+		if (this.getDatabaseID() <= 0)
+			return this == pt;
+
+		return this.getDatabaseID() == pt.getDatabaseID();
+	}
+
+	@Override
+	public int compareTo(final RemovalList removallist)
+	{
+		return this.getDatabaseID() - removallist.getDatabaseID();
 	}
 
 	/**

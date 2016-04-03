@@ -84,9 +84,9 @@ public abstract class ProductContainer implements Comparable<ProductContainer>
 	}
 
 	@Override
-	public int compareTo(final ProductContainer c)
+	public int compareTo(final ProductContainer container)
 	{
-		return this.getDatabaseID() - c.getDatabaseID();
+		return this.getDatabaseID() - container.getDatabaseID();
 	}
 
 	/**
