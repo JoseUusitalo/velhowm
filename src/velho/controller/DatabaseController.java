@@ -210,12 +210,6 @@ public class DatabaseController
 	private static Map<Integer, RemovalListState> cachedRemovalListStates = new HashMap<Integer, RemovalListState>();
 
 	/**
-	 * A map of {@link ManifestState} objects loaded from the database.
-	 */
-	@Deprecated
-	private static Map<Integer, ManifestState> cachedManifestStates = new HashMap<Integer, ManifestState>();
-
-	/**
 	 * A map of {@link Manifest} objects loaded from the database.
 	 */
 	@Deprecated
@@ -1973,29 +1967,6 @@ public class DatabaseController
 	}
 
 	/**
-	 * Gets an {@link ObservableList} of cached user names and roles.
-	 *
-	 * @return a cached list of users in the database
-	 * @throws NoDatabaseLinkException
-	 */
-	public static ObservableList<Object> getObservableUsers() throws NoDatabaseLinkException
-	{
-		final String[] columns = { "user_id", "first_name", "last_name", "role" };
-
-		@SuppressWarnings("unchecked")
-		final Set<User> result = (LinkedHashSet<User>) (runQuery(DatabaseQueryType.SELECT, DatabaseTable.USERS, null, columns, null, null));
-
-		final Iterator<User> it = result.iterator();
-
-		observableUsers.clear();
-		while (it.hasNext())
-			observableUsers.add(it.next());
-
-		DBLOG.debug("Observable user list updated.");
-		return observableUsers;
-	}
-
-	/**
 	 * Searches the database for product boxes of the specified size.
 	 *
 	 * @param productData a map of data to search for where the key is the
@@ -2346,6 +2317,62 @@ public class DatabaseController
 	}
 
 	/**
+	 * Deletes an object from the database.
+	 *
+	 * @param object object to delete
+	 * @throws HibernateException when the object was not deleted
+	 */
+	private static void delete(final Object object) throws HibernateException
+	{
+		final Session session = sessionFactory.openSession();
+		session.beginTransaction();
+
+		session.delete(object);
+
+		try
+		{
+			session.getTransaction().commit();
+			session.close();
+		}
+		catch (final HibernateException e)
+		{
+			session.getTransaction().rollback();
+			session.close();
+			throw new HibernateException("Failed to delete.");
+		}
+
+		// TODO: Figure out some way to return a boolean.
+	}
+
+	/**
+	 * Deletes a user from the database.
+	 *
+	 * @param user user to delete
+	 * @throws HibernateException when the user was not deleted
+	 */
+	public static void deleteUser(final User user) throws HibernateException
+	{
+		delete(user);
+
+		// Update the observable list.
+		getAllUsers();
+	}
+
+	/**
+	 * Deletes a removal list from the database.
+	 *
+	 * @param list removal list to delete
+	 * @throws HibernateException when the removal list was not deleted
+	 */
+	public static void deleteRemovalList(final RemovalList list) throws HibernateException
+	{
+		delete(list);
+
+		// Update the observable list.
+		getAllRemovalLists();
+	}
+
+	/**
 	 * <p>
 	 * Adds a new user to the database. If database changed as a result of the
 	 * call, updates the {@link ObservableList} of user data shown in the UI.
@@ -2380,63 +2407,6 @@ public class DatabaseController
 
 		@SuppressWarnings("unchecked")
 		final boolean changed = (0 < ((Set<Integer>) runQuery(DatabaseQueryType.INSERT, DatabaseTable.USERS, null, null, values, null)).size());
-
-		// Update the user list displayed in the UI after adding a new user.
-		if (changed)
-			getObservableUsers();
-
-		return changed;
-	}
-
-	/**
-	 * Removes a user with the specified database row ID. If database changed as
-	 * a result of the call, updates the {@link ObservableList} of user data
-	 * shown in the UI.
-	 *
-	 * @param databaseID the database ID of the user to delete
-	 * @return <code>true</code> if user was deleted
-	 * @throws NoDatabaseLinkException
-	 */
-	public static boolean deleteUser(final int databaseID) throws NoDatabaseLinkException
-	{
-		final List<String> where = new ArrayList<String>();
-		where.add("user_id = " + new Integer(databaseID));
-
-		@SuppressWarnings("unchecked")
-		final boolean changed = (0 < ((Set<Integer>) (runQuery(DatabaseQueryType.DELETE, DatabaseTable.USERS, null, null, null, where))).size());
-
-		// Update the user list displayed in the UI if database changed.
-		if (changed)
-			getObservableUsers();
-
-		return changed;
-	}
-
-	/**
-	 * Deletes the removal list from the database with the given ID.
-	 *
-	 * @param databaseID ID of the removal list to delete
-	 * @return <code>true</code> if the list was deleted
-	 * @throws NoDatabaseLinkException
-	 */
-	public static boolean deleteRemovalListByID(final int databaseID) throws NoDatabaseLinkException
-	{
-		final List<String> where = new ArrayList<String>();
-		where.add("removallist = " + databaseID);
-
-		// First delete the boxes from the list if there are any.
-		runQuery(DatabaseQueryType.DELETE, DatabaseTable.REMOVALLIST_PRODUCTBOXES, null, null, null, where);
-
-		// Then delete the list.
-		where.clear();
-		where.add("removallist_id = " + databaseID);
-
-		@SuppressWarnings("unchecked")
-		final boolean changed = (0 < ((Set<Integer>) (runQuery(DatabaseQueryType.DELETE, DatabaseTable.REMOVALLISTS, null, null, null, where))).size());
-
-		// Update the user list displayed in the UI if database changed.
-		if (changed)
-			getObservableRemovalLists();
 
 		return changed;
 	}
@@ -3061,18 +3031,31 @@ public class DatabaseController
 	}
 
 	/**
-	 * Loads all {@link RemovalList} and {@link RemovalListState} objects from the database into the cache.
+	 * Loads all {@link RemovalList} objects from the database into memory.
 	 *
-	 * @param getCached Get all removal lists from the cache instead of rebuilding the cache from the database but only
-	 * if the cached removal list IDs match the ones in the database.
-	 * Be aware that the cached data may not be up to date.
-	 * @return an {@link ObservableList} of all removal lists
+	 * @return a list of removal lists in the database
+	 * @throws HibernateException when the query failed to commit and has been rolled back
 	 */
 	public static ObservableList<Object> getAllRemovalLists() throws HibernateException
 	{
 		observableRemovalLists.clear();
 		observableRemovalLists.addAll(getAll("RemovalList"));
+
 		return observableRemovalLists;
+	}
+
+	/**
+	 * Loads all {@link User} objects from the database into memory.
+	 *
+	 * @return a list of users in the database
+	 * @throws HibernateException when the query failed to commit and has been rolled back
+	 */
+	public static ObservableList<Object> getAllUsers() throws HibernateException
+	{
+		observableUsers.clear();
+		observableUsers.addAll(getAll("User"));
+
+		return observableUsers;
 	}
 
 	/**
@@ -3085,6 +3068,7 @@ public class DatabaseController
 	{
 		observableProducts.clear();
 		observableProducts.addAll(getAll("Product"));
+
 		return observableProducts;
 	}
 

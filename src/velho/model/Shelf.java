@@ -33,6 +33,8 @@ public class Shelf implements Comparable<Shelf>
 	 */
 	private int shelfID;
 
+	// TODO: Use Hibernate and probably convert slots to a map?
+
 	/**
 	 * The array of shelf slots for each level of the shelf.
 	 */

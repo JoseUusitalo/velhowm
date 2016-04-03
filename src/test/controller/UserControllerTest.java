@@ -68,7 +68,7 @@ public class UserControllerTest
 		assertTrue(controller.createUser(VALID_BADGE_ID, null, VALID_NAME, VALID_NAME, VALID_ROLE_NAME));
 
 		boolean exists = false;
-		ObservableList<Object> users = DatabaseController.getObservableUsers();
+		ObservableList<Object> users = DatabaseController.getAllUsers();
 		DatabaseController.unlink();
 
 		for (final Object user : users)
@@ -91,7 +91,7 @@ public class UserControllerTest
 		assertFalse(controller.createUser(null, VALID_PIN, VALID_NAME, VALID_NAME, INVALID_ROLE_NAME));
 
 		boolean exists = false;
-		ObservableList<Object> users = DatabaseController.getObservableUsers();
+		ObservableList<Object> users = DatabaseController.getAllUsers();
 		DatabaseController.unlink();
 
 		for (final Object user : users)

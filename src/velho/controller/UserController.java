@@ -94,47 +94,26 @@ public class UserController implements UIActionController
 	{
 		USRLOG.debug("Attempting to delete: " + user.getFullDetails());
 
-		try
+		if (LoginController.getCurrentUser().getDatabaseID() == user.getDatabaseID())
 		{
-			if (LoginController.getCurrentUser().getDatabaseID() == user.getDatabaseID())
+			if (PopupController.confirmation(
+					"Are you sure you wish the delete your own user account? You will be logged out and be unable to log in again as a result of this action."))
 			{
-				if (PopupController.confirmation(
-						"Are you sure you wish the delete your own user account? You will be logged out and be unable to log in again as a result of this action."))
-				{
-					if (DatabaseController.deleteUser(user.getDatabaseID()))
-					{
-						LoginController.logout();
-						USRLOG.debug("User deleted themselves: " + user.getFullDetails());
-						PopupController.info("Deleted user: " + user.getFullDetails());
-						return true;
-					}
-
-					SYSLOG.trace("Non-existent user: " + user.toString());
-					PopupController.warning("User does not exist in the database.");
-					return false;
-				}
-
-				USRLOG.trace("Cancelled self-deletion confirmation.");
-				return false;
-			}
-
-			if (DatabaseController.deleteUser(user.getDatabaseID()))
-			{
-				USRLOG.debug("User removed: " + user.getFullDetails());
-				PopupController.info("User removed: " + user.getFullDetails());
+				DatabaseController.deleteUser(user);
+				LoginController.logout();
+				USRLOG.debug("User deleted themselves: " + user.getFullDetails());
+				PopupController.info("Deleted user: " + user.getFullDetails());
 				return true;
-
 			}
-			SYSLOG.warn("Failed to remove user: " + user.getFullDetails());
-			PopupController.info("Failed to remove user.");
+
+			USRLOG.trace("Cancelled self-deletion confirmation.");
 			return false;
 		}
-		catch (final NoDatabaseLinkException e)
-		{
-			DatabaseController.tryReLink();
-		}
 
-		return false;
+		DatabaseController.deleteUser(user);
+		USRLOG.debug("User removed: " + user.getFullDetails());
+		PopupController.info("User removed: " + user.getFullDetails());
+		return true;
 	}
 
 	/**

@@ -203,34 +203,27 @@ public class RemovalListController implements UIActionController
 	{
 		if (newRemovalList.getObservableBoxes().size() > 0)
 		{
-			try
+			SYSLOG.info("Saving Removal List: " + newRemovalList.getBoxes());
+
+			if (DatabaseController.save(newRemovalList) > 0)
 			{
-				SYSLOG.info("Saving Removal List: " + newRemovalList.getBoxes());
+				DatabaseController.clearSearchResults();
 
-				if (DatabaseController.save(newRemovalList) > 0)
-				{
-					DatabaseController.clearSearchResults();
+				USRLOG.info("Created a new Removal List: " + newRemovalList.getBoxes());
 
-					USRLOG.info("Created a new Removal List: " + newRemovalList.getBoxes());
+				/*
+				 * I would much rather create a new object rather than reset the old one but I can't figure out why
+				 * it doesn't work.
+				 * When a new removal list object is created the UI new list view never updates after that even
+				 * though I'm refreshing the view after creating the object.
+				 */
+				newRemovalList.reset();
 
-					/*
-					 * I would much rather create a new object rather than reset the old one but I can't figure out why
-					 * it doesn't work.
-					 * When a new removal list object is created the UI new list view never updates after that even
-					 * though I'm refreshing the view after creating the object.
-					 */
-					newRemovalList.reset();
-
-					creationView.refresh();
-				}
-				else
-				{
-					PopupController.error("Removal list saving failed.");
-				}
+				creationView.refresh();
 			}
-			catch (final NoDatabaseLinkException e)
+			else
 			{
-				DatabaseController.tryReLink();
+				PopupController.error("Removal list saving failed.");
 			}
 		}
 		else
@@ -261,15 +254,8 @@ public class RemovalListController implements UIActionController
 	{
 		removalList.setState(state);
 
-		try
-		{
-			if (DatabaseController.save(removalList) < 0)
-				PopupController.error("Unable to save removal list state.");
-		}
-		catch (final NoDatabaseLinkException e)
-		{
-			DatabaseController.tryReLink();
-		}
+		if (DatabaseController.save(removalList) < 0)
+			PopupController.error("Unable to save removal list state.");
 	}
 
 	@Override
@@ -298,20 +284,8 @@ public class RemovalListController implements UIActionController
 	@Override
 	public void deleteAction(final Object data)
 	{
-		try
-		{
-			if (!DatabaseController.deleteRemovalListByID(((RemovalList) data).getDatabaseID()))
-			{
-				USRLOG.debug("Failed to deleting removal list.");
-				PopupController.error("Failed to deleting removal list.");
-			}
-			else
-				USRLOG.info("Deleted removal list: " + ((RemovalList) data).toString());
-		}
-		catch (final NoDatabaseLinkException e)
-		{
-			DatabaseController.tryReLink();
-		}
+		DatabaseController.deleteRemovalList((RemovalList) data);
+		USRLOG.info("Deleted removal list: " + ((RemovalList) data).toString());
 	}
 
 	@Override

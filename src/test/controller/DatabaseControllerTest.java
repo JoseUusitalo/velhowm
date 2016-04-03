@@ -14,6 +14,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Set;
 
+import org.hibernate.HibernateException;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -154,9 +155,9 @@ public class DatabaseControllerTest
 	}
 
 	@Test
-	public final void testGetPublicUserDataList() throws NoDatabaseLinkException
+	public final void testGetPublicUserDataList()
 	{
-		assertEquals(4, DatabaseController.getObservableUsers().size());
+		assertEquals(4, DatabaseController.getAllUsers().size());
 	}
 
 	@Test
@@ -173,11 +174,12 @@ public class DatabaseControllerTest
 	{
 		// The method does not check for data validity.
 		DatabaseController.insertUser("", "000001", "A very UNIQUE! n4m3", "Some text here!", 1);
+		final User user = DatabaseController.getUserByID(5);
 
-		assertTrue(DatabaseController.getUserByID(5).getFirstName().equals("A very UNIQUE! n4m3"));
-		assertNotEquals(null, DatabaseController.getUserByID(5));
+		assertTrue(user.getFirstName().equals("A very UNIQUE! n4m3"));
+		assertNotEquals(null, user);
 
-		DatabaseController.deleteUser(5);
+		DatabaseController.deleteUser(user);
 		assertEquals(null, DatabaseController.getUserByID(5));
 
 		assertTrue(DatabaseController.initializeDatabase());
@@ -189,18 +191,26 @@ public class DatabaseControllerTest
 		assertEquals(null, DatabaseController.getUserByID(-128));
 	}
 
-	@Test
-	public final void testRemoveUser_Invalid() throws NoDatabaseLinkException
+	@Test(expected = HibernateException.class)
+	public final void testDelete_Invalid()
 	{
-		assertFalse(DatabaseController.deleteUser(-123));
-		assertFalse(DatabaseController.deleteUser(Integer.MAX_VALUE));
+		DatabaseController.deleteUser(new User(-123, "A", "B", null));
+	}
+
+	@Test(expected = IllegalArgumentException.class)
+	public final void testDelete_Null()
+	{
+		DatabaseController.deleteRemovalList(null);
 	}
 
 	@Test
-	public final void testRemoveUser() throws NoDatabaseLinkException
+	public final void testDeleteUser1() throws NoDatabaseLinkException
 	{
-		DatabaseController.loadData();
-		assertTrue(DatabaseController.deleteUser(1));
+		final ObservableList<Object> users = DatabaseController.getAllUsers();
+		final User user = DatabaseController.getUserByID(1);
+		assertTrue(users.contains(user));
+		DatabaseController.deleteUser(user);
+		assertFalse(users.contains(user));
 
 		assertTrue(DatabaseController.initializeDatabase());
 	}

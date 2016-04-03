@@ -5,7 +5,6 @@ import org.apache.log4j.Logger;
 import javafx.scene.Node;
 import velho.model.enums.Position;
 import velho.model.enums.UserRole;
-import velho.model.exceptions.NoDatabaseLinkException;
 import velho.view.MainWindow;
 
 /**
@@ -166,26 +165,17 @@ public class UIController
 		/*
 		 * What is shown in the user list depends on your role.
 		 */
-		try
+		switch (currentUserRole)
 		{
-			switch (currentUserRole)
-			{
-				case ADMINISTRATOR:
-				case MANAGER:
-					return ListController.getTableView(userController, DatabaseController.getPublicUserDataColumns(true),
-							DatabaseController.getObservableUsers());
-				case LOGISTICIAN:
-					return ListController.getTableView(userController, DatabaseController.getPublicUserDataColumns(false),
-							DatabaseController.getObservableUsers());
-				case GUEST:
-					break;
-				default:
-					SYSLOG.error("Unknown user role '" + currentUserRole.getName() + "'.");
-			}
-		}
-		catch (NoDatabaseLinkException e)
-		{
-			DatabaseController.tryReLink();
+			case ADMINISTRATOR:
+			case MANAGER:
+				return ListController.getTableView(userController, DatabaseController.getPublicUserDataColumns(true), DatabaseController.getAllUsers());
+			case LOGISTICIAN:
+				return ListController.getTableView(userController, DatabaseController.getPublicUserDataColumns(false), DatabaseController.getAllUsers());
+			case GUEST:
+				break;
+			default:
+				SYSLOG.error("Unknown user role '" + currentUserRole.getName() + "'.");
 		}
 
 		return null;
