@@ -5,7 +5,7 @@ package velho.model;
  *
  * @author Jose Uusitalo
  */
-public class RemovalListState
+public class RemovalListState implements Comparable<RemovalListState>
 {
 	/**
 	 * The database ID.
@@ -27,10 +27,57 @@ public class RemovalListState
 		this.name = name;
 	}
 
+	/**
+	 */
+	public RemovalListState()
+	{
+		// For Hibernate.
+	}
+
 	@Override
 	public String toString()
 	{
 		return name;
+	}
+
+	@Override
+	public boolean equals(final Object o)
+	{
+		if (!(o instanceof RemovalListState))
+			return false;
+
+		final RemovalListState rls = (RemovalListState) o;
+
+		if (this.getDatabaseID() <= 0)
+			return this == rls;
+
+		return this.getDatabaseID() == rls.getDatabaseID();
+	}
+
+	@Override
+	public int compareTo(final RemovalListState state)
+	{
+		return this.getDatabaseID() - state.getDatabaseID();
+	}
+
+	/**
+	 * Gets the database ID of this removal list state.
+	 *
+	 * @return the database ID of this removal list state
+	 */
+	public int getDatabaseID()
+	{
+		return databaseID;
+	}
+
+	/**
+	 * Sets the database ID of this removal list state.
+	 *
+	 * @param databaseID the new database ID for this removal list state
+	 */
+	public void setDatabaseID(final int id)
+	{
+		databaseID = id;
 	}
 
 	/**
@@ -44,12 +91,12 @@ public class RemovalListState
 	}
 
 	/**
-	 * Gets the database ID of this removal list state.
+	 * Sets the name of this removal list state.
 	 *
-	 * @return the database ID of this removal list state
+	 * @param name the new name of this removal list state
 	 */
-	public int getDatabaseID()
+	public void setName(final String name)
 	{
-		return databaseID;
+		this.name = name;
 	}
 }

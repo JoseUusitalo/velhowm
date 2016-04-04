@@ -5,11 +5,10 @@ import org.apache.log4j.Logger;
 import javafx.scene.Node;
 import javafx.scene.layout.BorderPane;
 import velho.controller.interfaces.UIActionController;
-import velho.model.Manager;
 import velho.model.ProductBoxSearchResultRow;
 import velho.model.RemovalList;
 import velho.model.RemovalListState;
-import velho.model.exceptions.NoDatabaseLinkException;
+import velho.model.enums.UserRole;
 import velho.view.GenericTabView;
 import velho.view.RemovalListCreationView;
 import velho.view.RemovalListManagementView;
@@ -79,7 +78,7 @@ public class RemovalListController implements UIActionController
 	public Node getView()
 	{
 		// Managers and greater see the management view.
-		if (LoginController.userRoleIsGreaterOrEqualTo(new Manager()))
+		if (LoginController.userRoleIsGreaterOrEqualTo(UserRole.MANAGER))
 		{
 			managementView = new RemovalListManagementView(this);
 			creationView = new RemovalListCreationView(this, this.searchController);
@@ -93,16 +92,8 @@ public class RemovalListController implements UIActionController
 		else
 		{
 			// Others see just the browsing view.
-			try
-			{
-				if (browseView == null)
-					browseView = ListController.getTableView(this, DatabaseController.getRemovalListDataColumns(),
-							DatabaseController.getObservableRemovalLists());
-			}
-			catch (final NoDatabaseLinkException e)
-			{
-				DatabaseController.tryReLink();
-			}
+			if (browseView == null)
+				browseView = ListController.getTableView(this, DatabaseController.getRemovalListDataColumns(), DatabaseController.getAllRemovalLists());
 			tabView.setView(browseView);
 		}
 
@@ -115,7 +106,7 @@ public class RemovalListController implements UIActionController
 	 *
 	 * @return view for creating new removal lists
 	 */
-	private Node getRemovalListCreationView() throws NoDatabaseLinkException
+	private Node getRemovalListCreationView()
 	{
 		managementView.setBrowseListsButtonVisiblity(true);
 		return creationView.getView();
@@ -127,29 +118,22 @@ public class RemovalListController implements UIActionController
 	 */
 	public void showNewRemovalListView()
 	{
-		try
-		{
-			// Create a new removal list if it does not exist.
-			if (newRemovalList == null)
-				newRemovalList = new RemovalList();
+		// Create a new removal list if it does not exist.
+		if (newRemovalList == null)
+			newRemovalList = new RemovalList();
 
-			if (managementView.getContent().equals(getRemovalListCreationView()))
-			{
-				USRLOG.info("Resetting new removal list.");
-				newRemovalList.reset();
-			}
-			else
-			{
-				SYSLOG.trace("Setting new removal list view.");
-				managementView.setContent(getRemovalListCreationView());
-			}
-
-			SYSLOG.trace("Removal list is currently: " + newRemovalList.getObservableBoxes());
-		}
-		catch (NoDatabaseLinkException e)
+		if (managementView.getContent().equals(getRemovalListCreationView()))
 		{
-			DatabaseController.tryReLink();
+			USRLOG.info("Resetting new removal list.");
+			newRemovalList.reset();
 		}
+		else
+		{
+			SYSLOG.trace("Setting new removal list view.");
+			managementView.setContent(getRemovalListCreationView());
+		}
+
+		SYSLOG.trace("Removal list is currently: " + newRemovalList.getObservableBoxes());
 	}
 
 	/**
@@ -158,23 +142,16 @@ public class RemovalListController implements UIActionController
 	 */
 	public void showBrowseRemovalListsView()
 	{
-		try
+		if (browseView == null)
 		{
-			if (browseView == null)
-			{
-				SYSLOG.trace("Creating removal list browsing view.");
-				browseView = ListController.getTableView(this, DatabaseController.getRemovalListDataColumns(), DatabaseController.getObservableRemovalLists());
-			}
+			SYSLOG.trace("Creating removal list browsing view.");
+			browseView = ListController.getTableView(this, DatabaseController.getRemovalListDataColumns(), DatabaseController.getAllRemovalLists());
+		}
 
-			SYSLOG.trace("Removal list browsing: " + DatabaseController.getObservableRemovalLists());
-		}
-		catch (final NoDatabaseLinkException e)
-		{
-			DatabaseController.tryReLink();
-		}
+		SYSLOG.trace("Removal list browsing: " + DatabaseController.getAllRemovalLists());
 
 		// Managers and greater see the management view.
-		if (LoginController.userRoleIsGreaterOrEqualTo(new Manager()))
+		if (LoginController.userRoleIsGreaterOrEqualTo(UserRole.MANAGER))
 		{
 			managementView.setBrowseListsButtonVisiblity(false);
 			managementView.setContent(browseView);
@@ -217,34 +194,27 @@ public class RemovalListController implements UIActionController
 	{
 		if (newRemovalList.getObservableBoxes().size() > 0)
 		{
-			try
+			SYSLOG.info("Saving Removal List: " + newRemovalList.getBoxes());
+
+			if (DatabaseController.save(newRemovalList) > 0)
 			{
-				SYSLOG.info("Saving Removal List: " + newRemovalList.getBoxes());
+				DatabaseController.clearSearchResults();
 
-				if (DatabaseController.save(newRemovalList) > 0)
-				{
-					DatabaseController.clearSearchResults();
+				USRLOG.info("Created a new Removal List: " + newRemovalList.getBoxes());
 
-					USRLOG.info("Created a new Removal List: " + newRemovalList.getBoxes());
+				/*
+				 * I would much rather create a new object rather than reset the old one but I can't figure out why
+				 * it doesn't work.
+				 * When a new removal list object is created the UI new list view never updates after that even
+				 * though I'm refreshing the view after creating the object.
+				 */
+				newRemovalList.reset();
 
-					/*
-					 * I would much rather create a new object rather than reset the old one but I can't figure out why
-					 * it doesn't work.
-					 * When a new removal list object is created the UI new list view never updates after that even
-					 * though I'm refreshing the view after creating the object.
-					 */
-					newRemovalList.reset();
-
-					creationView.refresh();
-				}
-				else
-				{
-					PopupController.error("Removal list saving failed.");
-				}
+				creationView.refresh();
 			}
-			catch (final NoDatabaseLinkException e)
+			else
 			{
-				DatabaseController.tryReLink();
+				PopupController.error("Removal list saving failed.");
 			}
 		}
 		else
@@ -275,15 +245,8 @@ public class RemovalListController implements UIActionController
 	{
 		removalList.setState(state);
 
-		try
-		{
-			if (DatabaseController.save(removalList) < 0)
-				PopupController.error("Unable to save removal list state.");
-		}
-		catch (final NoDatabaseLinkException e)
-		{
-			DatabaseController.tryReLink();
-		}
+		if (DatabaseController.save(removalList) < 0)
+			PopupController.error("Unable to save removal list state.");
 	}
 
 	@Override
@@ -312,20 +275,8 @@ public class RemovalListController implements UIActionController
 	@Override
 	public void deleteAction(final Object data)
 	{
-		try
-		{
-			if (!DatabaseController.deleteRemovalListByID(((RemovalList) data).getDatabaseID()))
-			{
-				USRLOG.debug("Failed to deleting removal list.");
-				PopupController.error("Failed to deleting removal list.");
-			}
-			else
-				USRLOG.info("Deleted removal list: " + ((RemovalList) data).toString());
-		}
-		catch (final NoDatabaseLinkException e)
-		{
-			DatabaseController.tryReLink();
-		}
+		DatabaseController.deleteRemovalList((RemovalList) data);
+		USRLOG.info("Deleted removal list: " + ((RemovalList) data).toString());
 	}
 
 	@Override
@@ -344,18 +295,9 @@ public class RemovalListController implements UIActionController
 	{
 		USRLOG.info("Viewing removal list " + data);
 
-		try
-		{
-			if (LoginController.userRoleIsGreaterOrEqualTo(new Manager()))
-
-				managementView.setContent(new RemovalListView((RemovalList) data, this).getView());
-
-			else
-				tabView.setView(new RemovalListView((RemovalList) data, this).getView());
-		}
-		catch (NoDatabaseLinkException e)
-		{
-			DatabaseController.tryReLink();
-		}
+		if (LoginController.userRoleIsGreaterOrEqualTo(UserRole.MANAGER))
+			managementView.setContent(new RemovalListView((RemovalList) data, this).getView());
+		else
+			tabView.setView(new RemovalListView((RemovalList) data, this).getView());
 	}
 }

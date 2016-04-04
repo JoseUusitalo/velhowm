@@ -55,7 +55,7 @@ public class MainWindow extends Application
 	/**
 	 * Relative file path to the Apache log4j logger properties file.
 	 */
-	private static final String LOG4J_PATH = "src/velho/model/log4j.properties";
+	private static final String LOG4J_PATH = "src/log4j.properties";
 
 	/**
 	 * Apache log4j logger: System.
@@ -65,7 +65,7 @@ public class MainWindow extends Application
 	/**
 	 * Enable or disable debug features.
 	 */
-	public static final boolean DEBUG_MODE = false;
+	public static final boolean DEBUG_MODE = true;
 
 	/**
 	 * Enable or disable showing windows. DEBUG_MODE must be <code>true</code>
@@ -77,7 +77,7 @@ public class MainWindow extends Application
 	 * Enable TRACE level logging. DEBUG_MODE must be <code>true</code> for this
 	 * to affect anything.
 	 */
-	public static final boolean SHOW_TRACE = false;
+	public static final boolean SHOW_TRACE = true;
 
 	/**
 	 * The height of the window.
@@ -184,9 +184,10 @@ public class MainWindow extends Application
 			{
 				if (!DEBUG_MODE)
 				{
-					// This is how we prevent Logisticians from reading logs.
-					// Logs can now only be read through the database access to
-					// which can easily be limited.
+					/*
+					 * This is how we prevent Logisticians from reading logs.
+					 * Logs can now only be read through the database, access to which can easily be limited.
+					 */
 					SYSLOG.info("Debug mode not enabled, disabling file and console appenders for all loggers.");
 
 					// Remove console appenders from all system loggers.
@@ -218,6 +219,8 @@ public class MainWindow extends Application
 					if (DatabaseController.connectAndInitialize())
 					{
 						SYSLOG.debug("Creating all controllers...");
+
+						// FIXME: Convert all controllers to use the singleton pattern.
 
 						DatabaseController.loadData();
 						uiController = new UIController();
@@ -465,7 +468,18 @@ public class MainWindow extends Application
 			// Ignore.
 		}
 
+		DatabaseController.closeSessionFactory();
+
 		SYSLOG.info("Exit.");
+
+		try
+		{
+			LogDatabaseController.unlink();
+		}
+		catch (final NoDatabaseLinkException e)
+		{
+			// Ignore.
+		}
 	}
 
 	/**

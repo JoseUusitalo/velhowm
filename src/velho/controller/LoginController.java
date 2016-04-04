@@ -6,8 +6,8 @@ import org.apache.log4j.MDC;
 import javafx.scene.layout.GridPane;
 import velho.model.User;
 import velho.model.enums.Position;
+import velho.model.enums.UserRole;
 import velho.model.exceptions.NoDatabaseLinkException;
-import velho.model.interfaces.UserRole;
 import velho.view.LoginView;
 import velho.view.MainWindow;
 
@@ -188,17 +188,14 @@ public class LoginController
 	 * Does nothing if {@link MainWindow#DEBUG_MODE} is <code>false</code>.
 	 *
 	 * @param userRoleName name of the role
-	 * @return <code>true</code> if login was successful, or <code>false</code> if role name was invalid
+	 * @return <code>true</code> if login was successful, or <code>false</code> if debug mode was disabled
 	 * @throws NoDatabaseLinkException
 	 */
-	public static boolean debugLogin(final String userRoleName) throws NoDatabaseLinkException
+	public static boolean debugLogin(final UserRole role)
 	{
 		if (MainWindow.DEBUG_MODE)
 		{
-			if (DatabaseController.getRoleID(userRoleName) == -1)
-				return false;
-
-			currentUser = UserController.getDebugUser(userRoleName);
+			currentUser = UserController.getDebugUser(role);
 
 			// Put the user database ID into the MDC thing for log4j.
 			MDC.put("user_id", currentUser.getDatabaseID());

@@ -70,7 +70,7 @@ public class ProductBoxSearchResultRow
 	 */
 	public int getProductID()
 	{
-		return box.getProduct().getProductID();
+		return box.getProduct().getDatabaseID();
 	}
 
 	/**
@@ -100,7 +100,7 @@ public class ProductBoxSearchResultRow
 	 */
 	public int getBoxID()
 	{
-		return box.getBoxID();
+		return box.getDatabaseID();
 	}
 
 	/**

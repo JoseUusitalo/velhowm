@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+ "-//Hibernate/Hibernate Mapping DTD//EN"
+ "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+	<class name="velho.model.User" table="USERS">
+		<meta attribute="class-description">A User represents the person using this system.</meta>
+
+		<id name="databaseID"
+			column="user_id"
+			type="int">
+			<generator class="native" />
+		</id>
+
+		<property	name="firstName"
+					column="first_name"
+					type="string"
+					not-null="true" />
+		
+		<property	name="lastName"
+					column="last_name"
+					type="string"
+					not-null="true" />
+
+		<property	name="badgeID"
+					type="string">
+					<column name="badge_id" length="8" default="null" />
+		</property>
+		
+		<property	name="pin"
+					type="string">
+					<column name="pin" length="6" default="null" />
+		</property>
+					
+		<property	name="role"
+					column="role">
+			<type name="org.hibernate.type.EnumType">
+				<param name="enumClass">velho.model.enums.UserRole</param>
+			</type>
+		</property>
+						
+	<!--  TODO: CONSTRAINT `CONST_unique_pin_login` UNIQUE (`pin`,`first_name`,`last_name`) -->
+	<!--  TODO: CONSTRAINT `CONST_unique_badge_login` UNIQUE (`badge_id`,`first_name`,`last_name`) -->
+	<!--  TODO: CONSTRAINT `CONST_unique_name_role` UNIQUE (`first_name`,`last_name`,`role`) -->
+	</class>
+</hibernate-mapping>

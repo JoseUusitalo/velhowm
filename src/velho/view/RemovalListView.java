@@ -18,7 +18,6 @@ import velho.controller.ListController;
 import velho.controller.RemovalListController;
 import velho.model.RemovalList;
 import velho.model.RemovalListState;
-import velho.model.exceptions.NoDatabaseLinkException;
 
 /**
  * View for creating new removal lists
@@ -68,7 +67,7 @@ public class RemovalListView
 	 * @return the removal list viewing BorderPane
 	 * @throws NoDatabaseLinkException
 	 */
-	public BorderPane getView() throws NoDatabaseLinkException
+	public BorderPane getView()
 	{
 		if (bpane == null)
 		{

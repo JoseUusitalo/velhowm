@@ -9,11 +9,12 @@
 
 	<path id="velho.classpath">
         <pathelement location="bin"/>
-        <pathelement location="lib/eclipse/junit.jar"/>
-        <pathelement location="lib/eclipse/org.hamcrest.core_1.3.0.v201303031735.jar"/>
-        <pathelement location="lib/eclipse/org.eclipse.fx.ide.css.jfx8_2.0.0.201506111511.jar"/>
         <pathelement location="lib/h2-1.4.191.jar"/>
         <pathelement location="lib/apache-log4j-1.2.17/log4j-1.2.17.jar"/>
+        <pathelement location="lib/eclipse/*"/>
+		<pathelement location="lib/hibernate/java8/*"/>
+        <pathelement location="lib/hibernate/jpa/*"/>
+        <pathelement location="lib/hibernate/required/*"/>
     </path>
 
 	<target name="init" description="make the classes folder">
