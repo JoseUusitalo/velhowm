@@ -302,13 +302,6 @@ public class DatabaseControllerTest
 	}
 
 	@Test
-	public final void testGetRemovalListsViewList() throws NoDatabaseLinkException
-	{
-		// This test is useless but improves coverage.
-		assertTrue(DatabaseController.getObservableRemovalLists().containsAll(DatabaseController.getCachedRemovalLists().values()));
-	}
-
-	@Test
 	public final void testLoadData() throws NoDatabaseLinkException
 	{
 		DatabaseController.clearAllCaches();

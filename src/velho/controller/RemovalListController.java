@@ -9,7 +9,6 @@ import velho.model.ProductBoxSearchResultRow;
 import velho.model.RemovalList;
 import velho.model.RemovalListState;
 import velho.model.enums.UserRole;
-import velho.model.exceptions.NoDatabaseLinkException;
 import velho.view.GenericTabView;
 import velho.view.RemovalListCreationView;
 import velho.view.RemovalListManagementView;
@@ -93,16 +92,8 @@ public class RemovalListController implements UIActionController
 		else
 		{
 			// Others see just the browsing view.
-			try
-			{
-				if (browseView == null)
-					browseView = ListController.getTableView(this, DatabaseController.getRemovalListDataColumns(),
-							DatabaseController.getObservableRemovalLists());
-			}
-			catch (final NoDatabaseLinkException e)
-			{
-				DatabaseController.tryReLink();
-			}
+			if (browseView == null)
+				browseView = ListController.getTableView(this, DatabaseController.getRemovalListDataColumns(), DatabaseController.getAllRemovalLists());
 			tabView.setView(browseView);
 		}
 
