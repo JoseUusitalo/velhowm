@@ -3159,4 +3159,13 @@ public class DatabaseController
 		DBLOG.info("Clearing search results.");
 		observableProductBoxSearchResults.clear();
 	}
+
+	/**
+	 * Closes the session factory.
+	 */
+	public static void closeSessionFactory()
+	{
+		DBLOG.info("Closing session manager.");
+		sessionFactory.close();
+	}
 }

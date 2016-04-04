@@ -468,7 +468,18 @@ public class MainWindow extends Application
 			// Ignore.
 		}
 
+		DatabaseController.closeSessionFactory();
+
 		SYSLOG.info("Exit.");
+
+		try
+		{
+			LogDatabaseController.unlink();
+		}
+		catch (final NoDatabaseLinkException e)
+		{
+			// Ignore.
+		}
 	}
 
 	/**
