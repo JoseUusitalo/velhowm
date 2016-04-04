@@ -11,7 +11,6 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
@@ -2201,7 +2200,7 @@ public class DatabaseController
 
 				// data[1] is the level index
 				shelfSlotID = Shelf.coordinatesToShelfSlotID(shelfid, data[1] + 1, data[2], true);
-				DBLOG.trace("Placed: " + shelf.addToSlot(shelfSlotID, box, false));
+				DBLOG.trace("Placed: " + shelf.addToSlot(shelfSlotID, box));
 				DBLOG.trace(shelf);
 			}
 
@@ -2213,62 +2212,6 @@ public class DatabaseController
 		}
 	}
 
-	/**
-	 * Places the correct product boxes in the cached removal list.
-	 *
-	 * @param listid removal list to place product boxes into
-	 * @throws NoDatabaseLinkException
-	 */
-	@Deprecated
-	private static void setContainersToRemovalList(final int listid) throws NoDatabaseLinkException
-	{
-		DBLOG.debug("Placing product boxes on removal list " + listid + "...");
-
-		final List<String> where = new ArrayList<String>();
-		where.add("removallist = " + listid);
-
-		final String[] columns = { "productbox" };
-		@SuppressWarnings("unchecked")
-		final Set<Integer> removalListBoxes = (LinkedHashSet<Integer>) runQuery(DatabaseQueryType.SELECT, DatabaseTable.REMOVALLIST_PRODUCTBOXES, null, columns,
-				null, where);
-
-		if (!removalListBoxes.isEmpty())
-		{
-			for (final Integer id : removalListBoxes)
-				cachedRemovalLists.get(listid).addProductBox(getProductBoxByID(id));
-
-			DBLOG.debug("Product boxes placed on removal list " + listid + ".");
-		}
-		else
-			DBLOG.debug("Nothing to place.");
-	}
-
-	@Deprecated
-	private static void setContainersToManifest(final int manifestid) throws NoDatabaseLinkException
-	{
-		DBLOG.debug("Placing product boxes on manifest " + manifestid + "...");
-
-		final List<String> where = new ArrayList<String>();
-		where.add("manifest = " + manifestid);
-
-		final String[] columns = { "productbox" };
-		@SuppressWarnings("unchecked")
-		final Set<Integer> manifestBoxes = (LinkedHashSet<Integer>) runQuery(DatabaseQueryType.SELECT, DatabaseTable.MANIFEST_PRODUCTBOXES, null, columns, null,
-				where);
-
-		if (!manifestBoxes.isEmpty())
-		{
-			Set<ProductBox> boxes = new HashSet<ProductBox>();
-			for (final Integer id : manifestBoxes)
-				boxes.add(getProductBoxByID(id));
-
-			cachedManifests.get(manifestid).setBoxes(boxes);
-
-			DBLOG.debug("Product boxes placed on manifest " + manifestid + ".");
-		}
-		else
-			DBLOG.debug("Nothing to place.");
-	}
 	/*
 	 * -------------------------------- PUBLIC SETTER METHODS --------------------------------
 	 */
@@ -2382,70 +2325,6 @@ public class DatabaseController
 
 		@SuppressWarnings("unchecked")
 		final boolean changed = (0 < ((Set<Integer>) runQuery(DatabaseQueryType.INSERT, DatabaseTable.USERS, null, null, values, null)).size());
-
-		return changed;
-	}
-
-	/**
-	 * Adds the given product box to the shelf slot it specifies.
-	 *
-	 * @param productBox product box to update in the database
-	 * @return <code>true</code> if the database was updated
-	 */
-	@SuppressWarnings("unchecked")
-	public static boolean addProductBoxToShelfSlot(final ProductBox productBox, final String shelfSlotID) throws NoDatabaseLinkException
-	{
-		final Object[] tokens = Shelf.tokenizeShelfSlotID(shelfSlotID);
-		final int shelfID = Integer.parseInt(((String) tokens[0]).substring(1));
-
-		final Map<String, Object> values = new LinkedHashMap<String, Object>();
-		values.put("shelflevel_index", (int) tokens[1] - 1);
-		values.put("shelfslot_index", tokens[2]);
-
-		boolean changed = false;
-
-		// If the product box is not in a shelf yet, INSERT.
-		if (productBox.getShelfSlot() == null)
-		{
-			values.put("shelf", shelfID);
-			values.put("productbox", productBox.getDatabaseID());
-			changed = (0 < ((LinkedHashSet<Object>) runQuery(DatabaseQueryType.INSERT, DatabaseTable.SHELF_PRODUCTBOXES, null, null, values, null)).size());
-		}
-		else
-		{
-			// Otherwise UPDATE.
-
-			final List<String> where = new ArrayList<String>();
-			where.add("productbox = " + productBox.getDatabaseID());
-			changed = (0 < ((LinkedHashSet<Object>) runQuery(DatabaseQueryType.UPDATE, DatabaseTable.SHELF_PRODUCTBOXES, null, null, values, where)).size());
-		}
-
-		// Update the cache.
-		if (changed)
-			getShelfByID(shelfID, false);
-
-		return changed;
-	}
-
-	/**
-	 * Removes the given product box from it's shelf slot.
-	 *
-	 * @param productBox product box to remove from it's shelf slot
-	 */
-	public static boolean removeProductBoxFromShelfSlot(final ProductBox productBox) throws NoDatabaseLinkException
-	{
-		final List<String> where = new ArrayList<String>();
-		where.add("productbox = " + productBox.getDatabaseID());
-
-		@SuppressWarnings("unchecked")
-		final boolean changed = (0 < ((LinkedHashSet<Object>) runQuery(DatabaseQueryType.DELETE, DatabaseTable.SHELF_PRODUCTBOXES, null, null, null, where))
-				.size());
-
-		final Object[] tokens = Shelf.tokenizeShelfSlotID(productBox.getShelfSlot());
-
-		// Update the cache.
-		if (changed)
-			getShelfByID(Integer.parseInt(((String) tokens[0]).substring(1)), false);
 
 		return changed;
 	}
@@ -2768,7 +2647,7 @@ public class DatabaseController
 						DBLOG.trace("Into: " + slot);
 						// Do not update the database as this method loads the
 						// data from the database into objects.
-						DBLOG.trace("Added: " + shelf.addToSlot(slot, box, false));
+						DBLOG.trace("Added: " + shelf.addToSlot(slot, box));
 						DBLOG.trace("Result: " + shelf);
 					}
 				}
@@ -2809,43 +2688,6 @@ public class DatabaseController
 		}
 
 		DBLOG.debug(boxcount + " ProductBoxes placed on " + removalListBoxes.size() + " RemovalLists.");
-	}
-
-	/**
-	 * Places the loaded {@link ProductContainer} objects into
-	 * {@link RemovalList} objects.
-	 *
-	 * @throws NoDatabaseLinkException
-	 */
-	@Deprecated
-	private static void setAllContainersToAllManifests() throws NoDatabaseLinkException
-	{
-		// TODO: Get rid of this.
-		final String[] columns = { "*" };
-		@SuppressWarnings("unchecked")
-		final Map<Integer, ArrayList<Integer>> manifestBoxes = (HashMap<Integer, ArrayList<Integer>>) runQuery(DatabaseQueryType.SELECT,
-				DatabaseTable.MANIFEST_PRODUCTBOXES, null, columns, null, null);
-
-		int boxcount = 0;
-
-		for (final Integer manifestID : manifestBoxes.keySet())
-		{
-			final ArrayList<Integer> boxIDs = manifestBoxes.get(manifestID);
-			boxcount += boxIDs.size();
-
-			/*
-			 * TODO: This bit could be optimized. I'm looping through the same list twice.
-			 */
-
-			Set<ProductBox> boxes = new LinkedHashSet<ProductBox>();
-
-			for (final Integer id : boxIDs)
-				boxes.add(getProductBoxByID(id));
-
-			getManifestByID(manifestID).setBoxes(boxes);
-		}
-
-		DBLOG.debug(boxcount + " ProductBoxes placed on " + manifestBoxes.size() + " Manifests.");
 	}
 
 	/**
