@@ -12,7 +12,6 @@ import velho.controller.ListController;
 import velho.controller.ManifestController;
 import velho.model.Manifest;
 import velho.model.ManifestState;
-import velho.model.exceptions.NoDatabaseLinkException;
 
 /**
  * A view showing the data of a single {@link Manifest} object.
@@ -52,7 +51,7 @@ public class ManifestView
 	 * @return the manifest list root border pane
 	 * @throws NoDatabaseLinkException
 	 */
-	public BorderPane getView() throws NoDatabaseLinkException
+	public BorderPane getView()
 	{
 		if (bpane == null)
 		{
@@ -65,7 +64,7 @@ public class ManifestView
 			Label stateLabel = new Label("State:");
 			ComboBox<Object> manifestState = new ComboBox<Object>();
 
-			manifestState.getItems().addAll(DatabaseController.getAllManifestStates(true, manifest.getState()));
+			manifestState.getItems().addAll(DatabaseController.getManifestStateChangeList(manifest.getState()));
 			manifestState.getSelectionModel().select(manifest.getState());
 
 			stateBox.getChildren().addAll(stateLabel, manifestState);

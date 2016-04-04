@@ -149,15 +149,7 @@ public class SearchController
 	 */
 	public Node getSearchView()
 	{
-		try
-		{
-			return new SearchView(this, DatabaseController.getAllProductBrands(), DatabaseController.getAllProductCategories()).getView();
-		}
-		catch (final NoDatabaseLinkException e)
-		{
-			DatabaseController.tryReLink();
-			return null;
-		}
+		return new SearchView(this, DatabaseController.getAllProductBrands(), DatabaseController.getAllProductCategories()).getView();
 	}
 
 	/**
@@ -168,15 +160,7 @@ public class SearchController
 	 */
 	public Node getSearchView(final String limits)
 	{
-		try
-		{
-			return new SearchView(this, limits, DatabaseController.getAllProductBrands(), DatabaseController.getAllProductCategories()).getView();
-		}
-		catch (final NoDatabaseLinkException e)
-		{
-			DatabaseController.tryReLink();
-			return null;
-		}
+		return new SearchView(this, limits, DatabaseController.getAllProductBrands(), DatabaseController.getAllProductCategories()).getView();
 	}
 
 	/**
@@ -270,14 +254,7 @@ public class SearchController
 		}
 
 		// Search the database for the products.
-		try
-		{
-			DatabaseController.searchProductBoxByDataList(productID_BoxSize);
-		}
-		catch (final NoDatabaseLinkException e)
-		{
-			DatabaseController.tryReLink();
-		}
+		DatabaseController.searchProductBoxByDataList(productID_BoxSize);
 
 		// Return the data for unit testing.
 		return productID_BoxSize;

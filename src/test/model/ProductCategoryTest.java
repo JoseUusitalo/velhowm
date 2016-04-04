@@ -1,6 +1,6 @@
 package test.model;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 import org.junit.Test;
 
@@ -9,10 +9,9 @@ import velho.model.ProductType;
 
 /**
  * Tests for the {@link ProductCategory} class.
- * 
+ *
  * @author Joona Silvennoinen
  */
-@SuppressWarnings("static-method")
 public class ProductCategoryTest
 {
 	private ProductType type = new ProductType(-1, "Regular");
@@ -23,13 +22,6 @@ public class ProductCategoryTest
 	public void testCategory_TypeRegular()
 	{
 		ProductCategory category1 = new ProductCategory(-1, "category1", type);
-	}
-
-	@SuppressWarnings("unused")
-	@Test(expected = IllegalArgumentException.class)
-	public void testCategory_TypeNull()
-	{
-		ProductCategory category2 = new ProductCategory(-1, "category2", null);
 	}
 
 	@Test

@@ -11,6 +11,7 @@ import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.GridPane;
 import velho.controller.UserController;
+import velho.model.enums.UserRole;
 
 /**
  * The add user view class.
@@ -32,15 +33,15 @@ public class AddUserView
 	/**
 	 * A set of user role names.
 	 */
-	private Set<String> rolenameSet;
+	private Set<UserRole> roleSet;
 
 	/**
 	 * @param mcontroller
 	 * @param rolelist
 	 */
-	public AddUserView(final UserController mcontroller, final Set<String> rolelist)
+	public AddUserView(final UserController mcontroller, final Set<UserRole> rolelist)
 	{
-		rolenameSet = rolelist;
+		roleSet = rolelist;
 		controller = mcontroller;
 		grid = null;
 	}
@@ -91,8 +92,8 @@ public class AddUserView
 			Label userInfo = new Label("User role:");
 			grid.add(userInfo, 0, 5);
 
-			final ComboBox<String> listbox = new ComboBox<String>();
-			listbox.getItems().addAll(rolenameSet);
+			final ComboBox<UserRole> listbox = new ComboBox<UserRole>();
+			listbox.getItems().addAll(roleSet);
 			listbox.getSelectionModel().selectFirst();
 			grid.add(listbox, 1, 5);
 

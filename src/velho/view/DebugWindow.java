@@ -1,6 +1,6 @@
 package velho.view;
 
-import java.util.Set;
+import java.util.List;
 
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
@@ -12,6 +12,7 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
 import javafx.stage.Stage;
 import velho.controller.DebugController;
+import velho.model.enums.UserRole;
 
 /**
  * A window with various debug features.
@@ -49,15 +50,15 @@ public class DebugWindow
 	/**
 	 * rolenameSet is a Set for the unique values in the code.
 	 */
-	private Set<String> rolenameSet;
+	private List<UserRole> roles;
 
 	/**
 	 * @param debugController
 	 * @param rolelist
 	 */
-	public DebugWindow(final DebugController debugController, final Set<String> rolelist)
+	public DebugWindow(final DebugController debugController, final List<UserRole> userRoles)
 	{
-		rolenameSet = rolelist;
+		roles = userRoles;
 		this.debugController = debugController;
 		grid = null;
 	}
@@ -100,13 +101,13 @@ public class DebugWindow
 		rootBorderPane.getStyleClass().add("standard-background-color");
 		rootBorderPane.getStyleClass().add("standard-padding-half");
 
-		final ComboBox<String> roleListBox = new ComboBox<String>();
+		final ComboBox<UserRole> roleListBox = new ComboBox<UserRole>();
 
 		grid = new GridPane();
 		grid.setVgap(5);
 		grid.setHgap(10);
 
-		roleListBox.getItems().addAll(rolenameSet);
+		roleListBox.getItems().addAll(roles);
 		roleListBox.getSelectionModel().selectFirst();
 
 		logOutButton.setVisible(false);
