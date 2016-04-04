@@ -2,7 +2,6 @@ package test.controller;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
@@ -87,12 +86,6 @@ public class DatabaseControllerTest
 	}
 
 	@Test
-	public final void testGetRoleID() throws NoDatabaseLinkException
-	{
-		assertNotEquals(-1, DatabaseController.getRoleID("Logistician"));
-	}
-
-	@Test
 	public final void testGetUserRoleNames()
 	{
 		final Set<String> names = new HashSet<String>(Arrays.asList("Manager", "Guest", "Logistician", "Administrator"));
@@ -167,22 +160,6 @@ public class DatabaseControllerTest
 		assertFalse(DatabaseController.getPublicUserDataColumns(false).values().contains("Delete"));
 
 		assertTrue(DatabaseController.getPublicUserDataColumns(true).values().contains("Role"));
-	}
-
-	@Test
-	public final void testAddUser_RemoveUser() throws NoDatabaseLinkException
-	{
-		// The method does not check for data validity.
-		DatabaseController.insertUser("", "000001", "A very UNIQUE! n4m3", "Some text here!", 1);
-		final User user = DatabaseController.getUserByID(5);
-
-		assertTrue(user.getFirstName().equals("A very UNIQUE! n4m3"));
-		assertNotEquals(null, user);
-
-		DatabaseController.deleteUser(user);
-		assertEquals(null, DatabaseController.getUserByID(5));
-
-		assertTrue(DatabaseController.initializeDatabase());
 	}
 
 	@Test
@@ -285,12 +262,6 @@ public class DatabaseControllerTest
 		cols.put("boxProductCount", "Amount");
 
 		assertEquals(cols, DatabaseController.getProductSearchDataColumns(true, true));
-	}
-
-	@Test
-	public final void testGetRoleID_Invalid() throws NoDatabaseLinkException
-	{
-		assertEquals(-1, DatabaseController.getRoleID("This is DEFINITELY! not a role name..."));
 	}
 
 	@Test

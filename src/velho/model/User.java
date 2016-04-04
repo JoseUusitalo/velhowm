@@ -1,8 +1,6 @@
 package velho.model;
 
-import velho.controller.DatabaseController;
 import velho.model.enums.UserRole;
-import velho.model.exceptions.NoDatabaseLinkException;
 
 /**
  * A User represents the person using this system.
@@ -80,6 +78,21 @@ public class User implements Comparable<User>
 		this.role = role;
 	}
 
+	public User(final String identifier, final String firstName, final String lastName, final UserRole role)
+	{
+		if (identifier == null || identifier.isEmpty())
+			throw new IllegalArgumentException("Invalid badge ID or PIN.");
+
+		if (identifier.length() > 6)
+			this.badgeID = identifier;
+		else
+			this.pin = identifier;
+
+		this.firstName = firstName;
+		this.lastName = lastName;
+		this.role = role;
+	}
+
 	/**
 	 */
 	public User()
@@ -106,8 +119,7 @@ public class User implements Comparable<User>
 	 * @return <code>true</code> if given information is valid
 	 * @throws NoDatabaseLinkException
 	 */
-	public static boolean validateUserData(final String badgeID, final String pin, final String firstName, final String lastName, final String roleName)
-			throws NoDatabaseLinkException
+	public static boolean validateUserData(final String badgeID, final String pin, final String firstName, final String lastName, final UserRole role)
 	{
 		final boolean hasBadgeID = isValidBadgeID(badgeID);
 		final boolean hasPIN = isValidPIN(pin);
@@ -124,8 +136,8 @@ public class User implements Comparable<User>
 		if (lastName == null || lastName.isEmpty() || lastName.length() > MAX_NAME_LENGTH)
 			return false;
 
-		// The role must exist in the database.
-		if (DatabaseController.getRoleID(roleName) == -1)
+		// TODO: The role is not in the database at the moment.
+		if (role == null)
 			return false;
 
 		return true;

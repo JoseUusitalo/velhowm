@@ -15,7 +15,8 @@ import org.junit.runners.Suite.SuiteClasses;
 // @formatter:off
 @SuiteClasses({ DatabaseControllerTest.class,
 				ExternalSystemsControllerTest.class,
-				SearchControllerTest.class})
+				SearchControllerTest.class,
+				UserControllerTest.class})
 //@formatter:on
 public class AllControllerTests
 {

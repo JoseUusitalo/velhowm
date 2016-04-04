@@ -1,12 +1,12 @@
 package velho.controller;
 
 import org.apache.log4j.Logger;
+import org.hibernate.exception.ConstraintViolationException;
 
 import javafx.scene.Node;
 import velho.controller.interfaces.UIActionController;
 import velho.model.User;
 import velho.model.enums.UserRole;
-import velho.model.exceptions.NoDatabaseLinkException;
 import velho.view.AddUserView;
 import velho.view.MainWindow;
 
@@ -38,7 +38,63 @@ public class UserController implements UIActionController
 	 */
 	public UserController()
 	{
-		view = new AddUserView(this, DatabaseController.getUserRoleNames());
+		view = new AddUserView(this, DatabaseController.getAllUserRoles());
+	}
+
+	/**
+	 * Attempts to add a new user to the database.
+	 *
+	 * @param badgeID user's badge id number
+	 * @param userFirstName user's first name
+	 * @param userLastName user's last name
+	 * @param userRole user's role in the company
+	 * @param showPopup show popups?
+	 * @return the created user or <code>null</code> if data was invalid
+	 */
+	public User createUser(final String badgeID, final String userPIN, final String userFirstName, final String userLastName, final UserRole userRole,
+			final boolean showPopup)
+	{
+		if (User.validateUserData(badgeID, userPIN, userFirstName, userLastName, userRole))
+		{
+			User newUser;
+			// If no pin is defined, use badge ID.
+			if (userPIN == null || userPIN.isEmpty())
+				newUser = new User(badgeID, userFirstName, userLastName, userRole);
+			else
+				newUser = new User(userPIN, userFirstName, userLastName, userRole);
+
+			try
+			{
+				DatabaseController.save(newUser);
+				USRLOG.debug("Created a user.");
+
+				if (showPopup)
+					PopupController.info("User created.");
+
+				return newUser;
+
+			}
+			catch (final ConstraintViolationException e)
+			{
+				SYSLOG.debug("User already exists.");
+
+				if (showPopup)
+				{
+					PopupController.info("User already exists. Please make sure that the following criteria are met:\n" + "Every Badge ID must be unique.\n"
+							+ "People with the same first and last name are allowed if their roles are different.\n"
+							+ "The combination of the PIN, first name, and last name must be unique.");
+				}
+
+				return null;
+			}
+		}
+
+		SYSLOG.trace("Invalid user data.");
+
+		if (showPopup)
+			PopupController.warning("Invalid user data.");
+
+		return null;
 	}
 
 	/**
@@ -48,41 +104,11 @@ public class UserController implements UIActionController
 	 * @param userFirstName user's first name
 	 * @param userLastName user's last name
 	 * @param userRoleName user's role in the company
+	 * @return the created user or <code>null</code> if data was invalid
 	 */
-	public boolean createUser(final String badgeID, final String userPIN, final String userFirstName, final String userLastName, final String userRoleName)
+	public User createUser(final String badgeID, final String userPIN, final String userFirstName, final String userLastName, final UserRole userRole)
 	{
-		// Validate user data.
-		try
-		{
-			if (User.validateUserData(badgeID, userPIN, userFirstName, userLastName, userRoleName))
-			{
-				final int roleID = DatabaseController.getRoleID(userRoleName);
-
-				// TODO: User accounts related code needs rewriting. This should return the user object.
-
-				if (DatabaseController.insertUser(badgeID, userPIN, userFirstName, userLastName, roleID))
-				{
-					USRLOG.debug("Created a user.");
-					PopupController.info("User created.");
-					return true;
-				}
-
-				SYSLOG.debug("User already exists.");
-				PopupController.info("User already exists. Please make sure that the following criteria are met:\n" + "Every Badge ID must be unique.\n"
-						+ "People with the same first and last name are allowed if their roles are different.\n"
-						+ "The combination of the PIN, first name, and last name must be unique.");
-				return false;
-			}
-
-			SYSLOG.trace("Invalid user data.");
-			PopupController.warning("Invalid user data.");
-		}
-		catch (final NoDatabaseLinkException e)
-		{
-			DatabaseController.tryReLink();
-		}
-
-		return false;
+		return createUser(badgeID, userPIN, userFirstName, userLastName, userRole, true);
 	}
 
 	/**

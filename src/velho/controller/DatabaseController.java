@@ -25,6 +25,7 @@ import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
+import org.hibernate.exception.ConstraintViolationException;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -65,7 +66,7 @@ public class DatabaseController
 	/**
 	 * The database URI on the local machine.
 	 */
-	private final static String DB_URI = "jdbc:h2:./data/velho;MV_STORE=FALSE;MVCC=FALSE;";
+	private final static String DB_URI = "jdbc:h2:./data/velho;MV_STORE=FALSE;MVCC=TRUE;";
 
 	/**
 	 * User name for the system itself.
@@ -1626,30 +1627,6 @@ public class DatabaseController
 	}
 
 	/**
-	 * Gets the database ID of the given user role name.
-	 *
-	 * @param roleName the name of the role
-	 * @return the database ID of the given role (a value greater than 0) or
-	 * <code>-1</code> if the role does not exist in the database'
-	 * @throws NoDatabaseLinkException
-	 */
-	public static int getRoleID(final String roleName) throws NoDatabaseLinkException
-	{
-		final String[] columns = { "role_id" };
-		final List<String> where = new ArrayList<String>();
-		where.add("name = '" + roleName + "'");
-
-		@SuppressWarnings("unchecked")
-		final Set<Integer> result = (LinkedHashSet<Integer>) (runQuery(DatabaseQueryType.SELECT, DatabaseTable.ROLES, null, columns, null, where));
-
-		if (result.size() == 0)
-			return -1;
-
-		// Only one result as IDs are unique.
-		return result.iterator().next().intValue();
-	}
-
-	/**
 	 * Gets a set of user role names.
 	 *
 	 * @return a set of user role names
@@ -2290,45 +2267,6 @@ public class DatabaseController
 		getAllRemovalLists();
 	}
 
-	/**
-	 * <p>
-	 * Adds a new user to the database. If database changed as a result of the
-	 * call, updates the {@link ObservableList} of user data shown in the UI.
-	 * </p>
-	 * <p>
-	 * Warning: Assumes that given data is valid.
-	 * </p>
-	 *
-	 * @param badgeID badge ID of the user
-	 * @param pin PIN of the user
-	 * @param firstName first name of the user
-	 * @param lastName last name of the user
-	 * @param roleID the ID of the role of the user
-	 * @return <code>true</code> if user was added
-	 * @throws NoDatabaseLinkException
-	 * when database link was lost
-	 */
-	public static boolean insertUser(final String badgeID, final String pin, final String firstName, final String lastName, final int roleID)
-			throws NoDatabaseLinkException
-	{
-		final Map<String, Object> values = new LinkedHashMap<String, Object>();
-
-		// If no pin is defined, add with badge ID.
-		if (pin == null || pin.isEmpty())
-			values.put("badge_id", badgeID);
-		else
-			values.put("pin", pin);
-
-		values.put("first_name", firstName);
-		values.put("last_name", lastName);
-		values.put("role", roleID);
-
-		@SuppressWarnings("unchecked")
-		final boolean changed = (0 < ((Set<Integer>) runQuery(DatabaseQueryType.INSERT, DatabaseTable.USERS, null, null, values, null)).size());
-
-		return changed;
-	}
-
 	/*
 	 * -------------------------------- SAVING DATA --------------------------------
 	 */
@@ -2360,6 +2298,43 @@ public class DatabaseController
 			session.close();
 			throw new HibernateException("Failed to commit.");
 		}
+
+		DBLOG.debug("Saved/Updated: " + object);
+
+		return object.getDatabaseID();
+	}
+
+	/**
+	 * Creates a new or updates an existing object depending on whether the given object exists in the database.
+	 *
+	 * @param object new or existing object in the database
+	 * @return the database ID of the inserted or updated object
+	 * @throws HibernateException when data was not saved
+	 * @throws ConstraintViolationException when the user already exists in the database
+	 */
+	public static int save(final User object) throws ConstraintViolationException
+	{
+		// TODO: Generalize when all tests have been updated to manually rollback.
+
+		final Session session = sessionFactory.openSession();
+		final Transaction transaction = session.beginTransaction();
+
+		session.saveOrUpdate(object);
+
+		try
+		{
+			transaction.commit();
+			session.close();
+		}
+		catch (final HibernateException e)
+		{
+			transaction.rollback();
+			session.close();
+			throw new HibernateException("Failed to commit.");
+		}
+
+		// Update observable list.
+		getAllUsers();
 
 		DBLOG.debug("Saved/Updated: " + object);
 
@@ -2765,6 +2740,12 @@ public class DatabaseController
 		observableUsers.addAll(getAll("User"));
 
 		return observableUsers;
+	}
+
+	public static Set<UserRole> getAllUserRoles()
+	{
+		// TODO: Find a way to put roles into the database.
+		return new LinkedHashSet<UserRole>(Arrays.asList(UserRole.values()));
 	}
 
 	/**
