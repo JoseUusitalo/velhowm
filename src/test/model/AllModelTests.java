@@ -31,12 +31,14 @@ public class AllModelTests
 	@BeforeClass
 	public final static void before()
 	{
-		System.out.println("Starting All Model Tests...");
+		System.out.println("\nStarting All Model Tests...");
+		System.out.println("---------------------------");
 	}
 
 	@AfterClass
 	public final static void after()
 	{
-		System.out.println("All Model Tests Done.");
+		System.out.println("---------------------");
+		System.out.println("All Model Tests Done.\n");
 	}
 }

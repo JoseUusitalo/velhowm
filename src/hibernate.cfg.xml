@@ -18,21 +18,22 @@
 		<property name="connection.pool_size">1</property>
 		<property name="show_sql">false</property>
 		<property name="hbm2ddl.auto">update</property>
-		
+
 		<!-- Mappings -->
 		<mapping resource="velho/model/Manifest.hbm.xml" />
 		<mapping resource="velho/model/ManifestState.hbm.xml" />
-		
+
 		<mapping resource="velho/model/Product.hbm.xml" />
 		<mapping resource="velho/model/ProductBox.hbm.xml" />
 		<mapping resource="velho/model/ProductBrand.hbm.xml" />
 		<mapping resource="velho/model/ProductCategory.hbm.xml" />
 		<mapping resource="velho/model/ProductContainer.hbm.xml" />
 		<mapping resource="velho/model/ProductType.hbm.xml" />
-		
+
 		<mapping resource="velho/model/RemovalList.hbm.xml" />
 		<mapping resource="velho/model/RemovalListState.hbm.xml" />
-		
+		<mapping resource="velho/model/RemovalPlatform.hbm.xml" />
+
 		<mapping resource="velho/model/User.hbm.xml" />
 	</session-factory>
 </hibernate-configuration>

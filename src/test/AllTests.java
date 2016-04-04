@@ -25,11 +25,13 @@ public class AllTests
 	public final static void before()
 	{
 		System.out.println("Starting All Tests...");
+		System.out.println("---------------------");
 	}
 
 	@AfterClass
 	public final static void after()
 	{
+		System.out.println("---------------");
 		System.out.println("All Tests Done.");
 	}
 }

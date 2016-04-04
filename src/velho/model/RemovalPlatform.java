@@ -34,6 +34,13 @@ public class RemovalPlatform implements Comparable<RemovalPlatform>
 		this.freeSpaceLeftWarningPercent = freeSpaceLeftWarningPercent;
 	}
 
+	/**
+	 */
+	public RemovalPlatform()
+	{
+		// For Hibernate.
+	}
+
 	@Override
 	public String toString()
 	{
@@ -71,6 +78,16 @@ public class RemovalPlatform implements Comparable<RemovalPlatform>
 	}
 
 	/**
+	 * Sets the database ID of this removal platform.
+	 *
+	 * @param databaseID the new database ID
+	 */
+	public void setDatabaseID(final int databaseID)
+	{
+		this.databaseID = databaseID;
+	}
+
+	/**
 	 * Gets the amount of free space left on this removal platform.
 	 *
 	 * @return free space on this platform as a percentage
@@ -78,6 +95,16 @@ public class RemovalPlatform implements Comparable<RemovalPlatform>
 	public double getFreeSpacePercent()
 	{
 		return freeSpacePercent;
+	}
+
+	/**
+	 * Sets the amount of free space on this removal platform.
+	 *
+	 * @param freeSpacePercent the free space percentage
+	 */
+	public void setFreeSpacePercent(final double freeSpacePercent)
+	{
+		this.freeSpacePercent = freeSpacePercent;
 	}
 
 	/**
@@ -97,11 +124,11 @@ public class RemovalPlatform implements Comparable<RemovalPlatform>
 	 * Should the free space on the platform drop to below or equal to the percentage, a warning will be displayed in
 	 * the UI.
 	 *
-	 * @param freeSpaceLeftPercent a percentage
+	 * @param freeSpaceLeftWarningPercent a percentage
 	 */
-	public void setFreeSpaceWarningPercent(final double freeSpaceLeftPercent)
+	public void setFreeSpaceLeftWarningPercent(final double freeSpaceLeftWarningPercent)
 	{
-		freeSpaceLeftWarningPercent = freeSpaceLeftPercent;
+		this.freeSpaceLeftWarningPercent = freeSpaceLeftWarningPercent;
 	}
 
 	/**

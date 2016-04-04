@@ -215,12 +215,6 @@ public class DatabaseController
 	@Deprecated
 	private static Map<Integer, Manifest> cachedManifests = new HashMap<Integer, Manifest>();
 
-	/**
-	 * A map of {@link RemovalPlatform} objects loaded from the database.
-	 */
-	@Deprecated
-	private static Map<Integer, RemovalPlatform> cachedRemovalPlatforms = new HashMap<Integer, RemovalPlatform>();
-
 	/*
 	 * -------------------------------- PRIVATE DATABASE METHODS --------------------------------
 	 */
@@ -2151,35 +2145,16 @@ public class DatabaseController
 		return (ManifestState) getByID("ManifestState", "manifest_state_id", id);
 	}
 
-	public static RemovalPlatform getRemovalPlatformByID(final int platformid, final boolean getCached) throws NoDatabaseLinkException
+	/**
+	 * Gets the {@link RemovalPlatform} object from the database with the given ID.
+	 *
+	 * @param id the removal platform database ID
+	 * @return the corresponding removal platform object or <code>null</code> for invalid ID
+	 * @throws HibernateException when the query failed to commit and has been rolled back
+	 */
+	public static RemovalPlatform getRemovalPlatformByID(final int id)
 	{
-		if (!cachedRemovalPlatforms.containsKey(platformid) || !getCached)
-		{
-			final String[] columns = { "*" };
-			final List<String> where = new ArrayList<String>();
-			where.add("platform_id = " + new Integer(platformid));
-
-			@SuppressWarnings("unchecked")
-			final Set<RemovalPlatform> result = (LinkedHashSet<RemovalPlatform>) (runQuery(DatabaseQueryType.SELECT, DatabaseTable.REMOVALPLATFORMS, null,
-					columns, null, where));
-
-			if (result.size() == 0)
-				return null;
-
-			final RemovalPlatform r = result.iterator().next();
-
-			// Store for reuse.
-			if (getCached)
-				DBLOG.trace("Caching: " + r);
-			else
-				DBLOG.trace("Updating cache: " + r);
-
-			cachedRemovalPlatforms.put(r.getDatabaseID(), r);
-			return r;
-		}
-
-		DBLOG.trace("Loading RemovalPlatform " + platformid + " from cache.");
-		return cachedRemovalPlatforms.get(platformid);
+		return (RemovalPlatform) getByID("RemovalPlatform", "platform_id", id);
 	}
 
 	/*
@@ -2598,51 +2573,36 @@ public class DatabaseController
 	}
 
 	/**
-	 * Updates an existing removal platform in the database with the data from
-	 * the given removal platform or creates a
-	 * new one if it doesn't exist.
-	 * A database ID of -1 signifies a brand new {@link RemovalPlatform}.
+	 * Creates a new or updates an existing object depending on whether the given object exists in the database.
 	 *
-	 * @param platform new or existing removal platform
-	 * @return <code>true</code> if existing data was updated or a new removal platform
-	 * was created in the database
+	 * @param object new or existing object in the database
+	 * @return the database ID of the inserted or updated object
+	 * @throws HibernateException when data was not saved
 	 */
-	@SuppressWarnings("unchecked")
-	public static boolean save(final RemovalPlatform platform) throws NoDatabaseLinkException
+	public static int save(final RemovalPlatform object)
 	{
-		int platformID = platform.getDatabaseID();
+		// TODO: Generalize when all tests have been updated to manually rollback.
 
-		final Map<String, Object> values = new LinkedHashMap<String, Object>();
-		values.put("platform_id", platform.getDatabaseID());
-		values.put("free_space", platform.getFreeSpacePercent());
-		values.put("free_space_warning", platform.getFreeSpaceLeftWarningPercent());
+		final Session session = sessionFactory.openSession();
+		final Transaction transaction = session.beginTransaction();
 
-		final List<String> where = new ArrayList<String>();
+		session.saveOrUpdate(object);
 
-		DatabaseQueryType query;
-
-		// If the object does not exist yet, INSERT.
-		if (platformID < 1)
-			query = DatabaseQueryType.INSERT;
-		else
+		try
 		{
-			query = DatabaseQueryType.UPDATE;
-			where.add("platform_id = " + platformID);
+			transaction.commit();
+			session.close();
+		}
+		catch (final HibernateException e)
+		{
+			transaction.rollback();
+			session.close();
+			throw new HibernateException("Failed to commit.");
 		}
 
-		// Insert/Update the object
-		Set<Integer> result = (LinkedHashSet<Integer>) runQuery(query, DatabaseTable.REMOVALPLATFORMS, null, null, values, where);
+		DBLOG.debug("Saved/Updated: " + object);
 
-		if (result.size() == 0)
-		{
-			DBLOG.error("Failed to save: " + platform);
-			return false;
-		}
-
-		// Update the cache.
-		DBLOG.debug(query.toString() + ": " + getRemovalPlatformByID(platformID, false));
-
-		return true;
+		return object.getDatabaseID();
 	}
 
 	/**
