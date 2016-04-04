@@ -293,6 +293,6 @@ public class ProductController implements UIActionController
 
 	public Node getAddStuffView()
 	{
-		return addTab.getView();
+		return getAddProductView();
 	}
 }

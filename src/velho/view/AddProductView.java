@@ -107,7 +107,6 @@ public class AddProductView
 			brandList.setPromptText("Brand");
 			brandList.getItems().addAll(DatabaseController.getAllProductBrands());
 			brandList.setMaxWidth(Double.MAX_VALUE);
-			grid.add(brandList, 2, 0);
 
 			Button saveingButton = new Button("Save");
 			saveingButton.setMaxWidth(Double.MAX_VALUE);
