@@ -2521,58 +2521,6 @@ public class DatabaseController
 	}
 
 	/**
-	 * Updates an existing product box in the database with the data from the given product box or creates a new one if
-	 * it doesn't exist.
-	 * A database ID of -1 signifies a brand new {@link ProductBox}.
-	 *
-	 * @param productbox object to save
-	 * @return the database ID of the inserted object or -1 if saving failed
-	 * @throws NoDatabaseLinkException
-	 */
-	private static int save(final ProductBox productbox) throws NoDatabaseLinkException
-	{
-		final Map<String, Object> values = new LinkedHashMap<String, Object>();
-		values.put("expiration_date", getH2DateFormat(productbox.getExpirationDate()));
-		values.put("product", productbox.getProduct().getDatabaseID());
-		values.put("max_size", productbox.getMaxSize());
-		values.put("product_count", productbox.getProductCount());
-
-		final List<String> where = new ArrayList<String>();
-
-		DatabaseQueryType query;
-		int dbID = productbox.getDatabaseID();
-
-		// If the object does not exist yet, INSERT.
-		if (dbID < 1)
-			query = DatabaseQueryType.INSERT;
-		else
-		{
-			query = DatabaseQueryType.UPDATE;
-			where.add("container_id = " + dbID);
-		}
-
-		// Insert/Update
-		@SuppressWarnings("unchecked")
-		final Set<Integer> result = (Set<Integer>) runQuery(query, DatabaseTable.CONTAINERS, null, null, values, where);
-
-		if (result.size() == 0)
-		{
-			DBLOG.error("Failed to save: " + productbox);
-			return -1;
-		}
-
-		// Get the inserted database ID (if the given object was inserted
-		// instead of updated).
-		if (dbID < 1)
-			dbID = result.iterator().next();
-
-		// Update the cache.
-		DBLOG.debug(query.toString() + ": " + getProductBoxByID(dbID));
-
-		return dbID;
-	}
-
-	/**
 	 * Creates a new or updates an existing object depending on whether the given object exists in the database.
 	 *
 	 * @param object new or existing object in the database
@@ -2663,110 +2611,69 @@ public class DatabaseController
 	}
 
 	/**
-	 * Updates an existing product brand in the database with the data from
-	 * the given product brand or creates a new one if it doesn't exist.
-	 * A database ID of -1 signifies a brand new {@link ProductBrand}.
+	 * Creates a new or updates an existing object depending on whether the given object exists in the database.
 	 *
-	 * @param brand new or existing product brand
-	 * @return <code>true</code> if existing data was updated or a new product brand
-	 * was created in the database
+	 * @param object new or existing object in the database
+	 * @return the database ID of the inserted or updated object
+	 * @throws HibernateException when data was not saved
 	 */
-	public static int save(final ProductBrand brand) throws NoDatabaseLinkException
+	public static int save(final ProductBrand object)
 	{
-		final Map<String, Object> values = new LinkedHashMap<String, Object>();
-		values.put("name", brand.getName());
+		// TODO: Generalize when all tests have been updated to manually rollback.
 
-		final List<String> where = new ArrayList<String>();
+		final Session session = sessionFactory.openSession();
+		final Transaction transaction = session.beginTransaction();
 
-		DatabaseQueryType query;
-		int dbID = brand.getDatabaseID();
+		session.saveOrUpdate(object);
 
-		// If the object does not exist yet, INSERT.
-		if (dbID < 1)
-			query = DatabaseQueryType.INSERT;
-		else
+		try
 		{
-			query = DatabaseQueryType.UPDATE;
-			where.add("brand_id = " + dbID);
+			transaction.commit();
+			session.close();
+		}
+		catch (final HibernateException e)
+		{
+			transaction.rollback();
+			session.close();
+			throw new HibernateException("Failed to commit.");
 		}
 
-		// Insert/Update
-		@SuppressWarnings("unchecked")
-		final Set<Integer> result = (Set<Integer>) runQuery(query, DatabaseTable.BRANDS, null, null, values, where);
+		DBLOG.debug("Saved/Updated: " + object);
 
-		if (result.size() == 0)
-		{
-			DBLOG.error("Failed to save: " + brand);
-			return -1;
-		}
-
-		// Get the inserted database ID (if the given object was inserted
-		// instead of updated).
-		if (dbID < 1)
-			dbID = result.iterator().next();
-
-		// Update the cache.
-		DBLOG.debug(query.toString() + ": " + getProductBrandByID(dbID, false));
-
-		// Update the observable list.
-		observableProductBrands.clear();
-		observableProductBrands.addAll(cachedProductBrands.values());
-
-		return dbID;
+		return object.getDatabaseID();
 	}
 
 	/**
-	 * Updates an existing product brand in the database with the data from
-	 * the given product brand or creates a new one if it doesn't exist.
-	 * A database ID of -1 signifies a brand new {@link ProductBrand}.
+	 * Creates a new or updates an existing object depending on whether the given object exists in the database.
 	 *
-	 * @param category new or existing product brand
-	 * @return <code>true</code> if existing data was updated or a new product brand
-	 * was created in the database
+	 * @param object new or existing object in the database
+	 * @return the database ID of the inserted or updated object
+	 * @throws HibernateException when data was not saved
 	 */
-	public static int save(final ProductCategory category) throws NoDatabaseLinkException
+	public static int save(final ProductCategory object)
 	{
-		final Map<String, Object> values = new LinkedHashMap<String, Object>();
-		values.put("name", category.getName());
-		values.put("type", category.getType().getDatabaseID());
+		// TODO: Generalize when all tests have been updated to manually rollback.
 
-		final List<String> where = new ArrayList<String>();
+		final Session session = sessionFactory.openSession();
+		final Transaction transaction = session.beginTransaction();
 
-		DatabaseQueryType query;
-		int dbID = category.getDatabaseID();
+		session.saveOrUpdate(object);
 
-		// If the object does not exist yet, INSERT.
-		if (dbID < 1)
-			query = DatabaseQueryType.INSERT;
-		else
+		try
 		{
-			query = DatabaseQueryType.UPDATE;
-			where.add("category_id = " + dbID);
+			transaction.commit();
+			session.close();
+		}
+		catch (final HibernateException e)
+		{
+			transaction.rollback();
+			session.close();
+			throw new HibernateException("Failed to commit.");
 		}
 
-		// Insert/Update
-		@SuppressWarnings("unchecked")
-		final Set<Integer> result = (Set<Integer>) runQuery(query, DatabaseTable.CATEGORIES, null, null, values, where);
+		DBLOG.debug("Saved/Updated: " + object);
 
-		if (result.size() == 0)
-		{
-			DBLOG.error("Failed to save: " + category);
-			return -1;
-		}
-
-		// Get the inserted database ID (if the given object was inserted
-		// instead of updated).
-		if (dbID < 1)
-			dbID = result.iterator().next();
-
-		// Update the cache.
-		DBLOG.debug(query.toString() + ": " + getProductCategoryByID(dbID, false));
-
-		// Update the observable list.
-		observableProductCategories.clear();
-		observableProductCategories.addAll(cachedProductCategories.values());
-
-		return dbID;
+		return object.getDatabaseID();
 	}
 
 	/*
