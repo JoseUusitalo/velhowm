@@ -17,7 +17,7 @@ import velho.model.Shelf;
 import velho.model.exceptions.NoDatabaseLinkException;
 
 /**
- * Controller handling the communication with systems outside the Velho Warehouse Management.
+ * Controller handling the communication with systems outside the VELHO Warehouse Management.
  *
  * @author Edward Puustinen &amp; Jose Uusitalo
  */
@@ -208,7 +208,7 @@ public class ExternalSystemsController
 	 */
 	public static void receiveManifestBarcode(final Set<ProductBox> boxSet, final Date orderDate, final int driverID)
 	{
-		SYSLOG.info("VelhoWM has received a manifest by driver " + driverID + " with " + boxSet.size() + " product boxes.");
+		SYSLOG.info("VELHOWM has received a manifest by driver " + driverID + " with " + boxSet.size() + " product boxes.");
 		manifestController.receiveShipment(boxSet, orderDate, driverID);
 	}
 }

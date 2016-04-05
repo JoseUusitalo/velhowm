@@ -3,7 +3,7 @@ package velho.controller;
 import org.apache.log4j.Logger;
 import org.apache.log4j.MDC;
 
-import javafx.scene.layout.GridPane;
+import javafx.scene.layout.VBox;
 import velho.model.User;
 import velho.model.enums.Position;
 import velho.model.enums.UserRole;
@@ -225,7 +225,7 @@ public class LoginController
 	 *
 	 * @return the login view
 	 */
-	public static GridPane getView()
+	public static VBox getView()
 	{
 		if (view == null)
 			view = new LoginView();

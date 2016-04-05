@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<project name="VelhoWM" basedir="." default="use">
-	<description>Group #1 Project: Velho Warehouse Management</description>
+<project name="VELHOWM" basedir="." default="use">
+	<description>Group #1 Project: VELHO Warehouse Management</description>
 	<property name="target" value="1.8"/>
 	<property name="source" value="1.8"/>
 	<property name="src" location="src"/>
