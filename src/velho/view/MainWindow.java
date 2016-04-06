@@ -46,7 +46,7 @@ import velho.model.exceptions.ExistingDatabaseLinkException;
 import velho.model.exceptions.NoDatabaseLinkException;
 
 /**
- * The main window and class for Velho Warehouse Management.
+ * The main window and class for VELHO Warehouse Management.
  *
  * @author Jose Uusitalo &amp; Joona Silvennoinen
  */
@@ -276,7 +276,7 @@ public class MainWindow extends Application
 	}
 
 	/**
-	 * The main method of Velho Warehouse Management.
+	 * The main method of VELHO Warehouse Management.
 	 *
 	 * @param args
 	 */
@@ -399,7 +399,7 @@ public class MainWindow extends Application
 		{
 			setUserAgentStylesheet(STYLESHEET_MODENA);
 
-			primaryStage.setTitle("Velho Warehouse Management");
+			primaryStage.setTitle("VELHO Warehouse Management");
 			final Group root = new Group();
 			scene = new Scene(root, WINDOW_WIDTH, WINDOW_HEIGHT);
 			scene.getStylesheets().add(getClass().getResource("velho.css").toExternalForm());
