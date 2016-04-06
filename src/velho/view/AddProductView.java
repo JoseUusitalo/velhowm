@@ -97,6 +97,8 @@ public class AddProductView
 
 			productLabel = new Label();
 			productLabel.setText("Product: ");
+			productLabel.setAlignment(Pos.BASELINE_RIGHT);
+			productLabel.setMinWidth(MainWindow.WINDOW_WIDTH / 10);
 			grid.add(productLabel, 1, 0);
 
 			nameField = new TextField();
@@ -196,7 +198,7 @@ public class AddProductView
 						productController.showProductView(newProduct);
 				}
 			});
-			grid.add(saveButton, 6, 0);
+			grid.add(saveButton, 5, 0);
 
 			grid.setHgap(10);
 			grid.getStyleClass().add("standard-padding");

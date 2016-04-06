@@ -2,6 +2,7 @@ package velho.view;
 
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
+import javafx.geometry.Pos;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
@@ -86,6 +87,8 @@ public class AddCategoryView
 
 			categoryLabel = new Label();
 			categoryLabel.setText("Category: ");
+			categoryLabel.setAlignment(Pos.BASELINE_RIGHT);
+			categoryLabel.setMinWidth(MainWindow.WINDOW_WIDTH / 10);
 			grid.add(categoryLabel, 1, 0);
 
 			nameField = new TextField();

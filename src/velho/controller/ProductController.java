@@ -249,7 +249,7 @@ public class ProductController implements UIActionController
 
 	public Node getProductManagementView()
 	{
-		productManagementView.setContents(getProductEditView(), addBrandView.getView(true), addCategoryView.getView(true), addProductTypeView.getView(true));
+		productManagementView.setContents(getProductEditView(), addCategoryView.getView(true), addProductTypeView.getView(true), addBrandView.getView(true));
 		return productManagementView.getView();
 	}
 }

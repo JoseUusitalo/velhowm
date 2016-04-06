@@ -2,6 +2,7 @@ package velho.view;
 
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
+import javafx.geometry.Pos;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
@@ -87,6 +88,8 @@ public class AddBrandView
 
 			brandLabel = new Label();
 			brandLabel.setText("Brand: ");
+			brandLabel.setAlignment(Pos.BASELINE_RIGHT);
+			brandLabel.setMinWidth(MainWindow.WINDOW_WIDTH / 10);
 			grid.add(brandLabel, 1, 0);
 
 			nameField = new TextField();

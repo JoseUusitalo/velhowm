@@ -2,6 +2,7 @@ package velho.view;
 
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
+import javafx.geometry.Pos;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
@@ -88,6 +89,8 @@ public class AddProductTypeView
 
 			productTypeLabel = new Label();
 			productTypeLabel.setText("Product Type: ");
+			productTypeLabel.setAlignment(Pos.BASELINE_RIGHT);
+			productTypeLabel.setMinWidth(MainWindow.WINDOW_WIDTH / 10);
 			grid.add(productTypeLabel, 1, 0);
 
 			nameField = new TextField();
