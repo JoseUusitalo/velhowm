@@ -3,15 +3,11 @@ package test.model;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
-import org.junit.After;
-import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 import velho.controller.DatabaseController;
 import velho.model.RemovalPlatform;
-import velho.model.enums.DatabaseFileState;
-import velho.model.exceptions.ExistingDatabaseLinkException;
-import velho.model.exceptions.NoDatabaseLinkException;
 
 /**
  * Tests for the {@link RemovalPlatform} class.
@@ -21,41 +17,13 @@ import velho.model.exceptions.NoDatabaseLinkException;
 @SuppressWarnings("static-method")
 public class RemovalPlatformTest
 {
-	private static RemovalPlatform existingPlatform;
+	private static RemovalPlatform existingPlatform = DatabaseController.getRemovalPlatformByID(1);
 
-	@Before
-	public void initDatabase() throws Exception
+	@BeforeClass
+	public static void init()
 	{
-		try
-		{
-			if (!DatabaseController.isLinked())
-				assertTrue(DatabaseController.link() != DatabaseFileState.DOES_NOT_EXIST);
-
-			assertTrue(DatabaseController.initializeDatabase());
-		}
-		catch (ClassNotFoundException | ExistingDatabaseLinkException e)
-		{
-			e.printStackTrace();
-		}
-		catch (NoDatabaseLinkException e)
-		{
-			DatabaseController.tryReLink();
-		}
-
-		existingPlatform = DatabaseController.getRemovalPlatformByID(1, false);
-	}
-
-	@After
-	public void unlinkDatabase() throws Exception
-	{
-		try
-		{
-			DatabaseController.unlink();
-		}
-		catch (NoDatabaseLinkException e)
-		{
-			// Ignore.
-		}
+		// Testing in production environment is fun.
+		existingPlatform.setFreeSpacePercent(1.0);
 	}
 
 	@Test
@@ -81,17 +49,25 @@ public class RemovalPlatformTest
 	{
 		existingPlatform.modifyFreeSpace(-0.125);
 		assertTrue(Double.compare((1.0 - 0.125), existingPlatform.getFreeSpacePercent()) == 0);
+
+		// Rollback.
+		existingPlatform.modifyFreeSpace(0.125);
 	}
 
 	@Test
 	public final void testEmpty()
 	{
+		final double old = existingPlatform.getFreeSpacePercent();
+
 		existingPlatform.modifyFreeSpace(-0.125);
 		assertTrue(Double.compare((1.0 - 0.125), existingPlatform.getFreeSpacePercent()) == 0);
 
 		existingPlatform.empty();
 
 		assertTrue(Double.compare((1.0), existingPlatform.getFreeSpacePercent()) == 0);
+
+		// Rollback.
+		existingPlatform.setFreeSpacePercent(old);
 	}
 
 	@Test
@@ -103,16 +79,19 @@ public class RemovalPlatformTest
 	@Test
 	public final void testsetFreeSpaceLeftWarningPercent()
 	{
-		existingPlatform.setFreeSpaceWarningPercent(0.5);
+		final double old = existingPlatform.getFreeSpaceLeftWarningPercent();
+
+		existingPlatform.setFreeSpaceLeftWarningPercent(0.5);
 
 		assertEquals(0, Double.compare(0.5, existingPlatform.getFreeSpaceLeftWarningPercent()));
+
+		// Rollback.
+		existingPlatform.setFreeSpaceLeftWarningPercent(old);
 	}
 
 	@Test
-	public final void testSetState_SaveToDatabase() throws NoDatabaseLinkException
+	public final void testSetState_SaveToDatabase()
 	{
-		existingPlatform = DatabaseController.getRemovalPlatformByID(1, false);
-
 		final double oldPercent = existingPlatform.getFreeSpacePercent();
 		final double modPercent = -0.125;
 		final double newPercent = oldPercent + modPercent;
@@ -123,12 +102,13 @@ public class RemovalPlatformTest
 
 		// Check that the method worked.
 		assertEquals(0, Double.compare(newPercent, existingPlatform.getFreeSpacePercent()));
-		assertTrue(DatabaseController.save(existingPlatform));
-
-		// Cache was updated
-		assertTrue(Double.compare(newPercent, DatabaseController.getRemovalPlatformByID(existingPlatform.getDatabaseID(), true).getFreeSpacePercent()) == 0);
+		DatabaseController.save(existingPlatform);
 
 		// Database was updated.
-		assertTrue(Double.compare(newPercent, DatabaseController.getRemovalPlatformByID(existingPlatform.getDatabaseID(), false).getFreeSpacePercent()) == 0);
+		assertTrue(Double.compare(newPercent, DatabaseController.getRemovalPlatformByID(existingPlatform.getDatabaseID()).getFreeSpacePercent()) == 0);
+
+		// Rollback.
+		existingPlatform.setFreeSpacePercent(oldPercent);
+		DatabaseController.save(existingPlatform);
 	}
 }

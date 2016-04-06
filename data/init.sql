@@ -65,11 +65,10 @@ CREATE TABLE IF NOT EXISTS `containers`
 	`container_id` INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
 	`expiration_date` DATE NULL,
 	`product` INT UNSIGNED NOT NULL,
-	`max_size` INT NOT NULL,
+	`max_size` INT UNSIGNED NOT NULL,
 	`product_count` INT UNSIGNED NOT NULL DEFAULT 0,
 
-	FOREIGN KEY (`product`) REFERENCES `products`(`product_id`),
-	CHECK (`max_size`>0)
+	FOREIGN KEY (`product`) REFERENCES `products`(`product_id`)
 ) DEFAULT CHARSET=utf8;
 
 DROP TABLE IF EXISTS `freezer_products`;
@@ -109,7 +108,7 @@ DROP TABLE IF EXISTS `removallist_states`;
 CREATE TABLE IF NOT EXISTS `removallist_states`
 (
 	`removallist_state_id` INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
-	`name` VARCHAR(128) NOT NULL
+	`name` VARCHAR(128) UNIQUE NOT NULL
 ) DEFAULT CHARSET=utf8;
 
 DROP TABLE IF EXISTS `removallists`;
@@ -144,9 +143,9 @@ CREATE TABLE IF NOT EXISTS `manifests`
 (
 	`manifest_id` INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
 	`state` INT UNSIGNED NOT NULL,
-	`driver_id` INT UNSIGNED NOT NULL,
-	`date_ordered` DATE NOT NULL,
-	`date_received` DATE NOT NULL,
+	`driver_id` INT UNSIGNED,
+	`date_ordered` DATE,
+	`date_received` DATE,
 
 	FOREIGN KEY (`state`) REFERENCES `manifest_states`(`manifest_state_id`),
 	CHECK (`date_received`>=`date_ordered`)

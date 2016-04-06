@@ -3,7 +3,6 @@ package velho.controller;
 import org.apache.log4j.Logger;
 
 import velho.model.RemovalPlatform;
-import velho.model.exceptions.NoDatabaseLinkException;
 import velho.view.MainWindow;
 
 /**
@@ -44,16 +43,7 @@ public class RemovalPlatformController
 	private RemovalPlatform getPlatform()
 	{
 		if (platform == null)
-		{
-			try
-			{
-				platform = DatabaseController.getRemovalPlatformByID(1, true);
-			}
-			catch (NoDatabaseLinkException e)
-			{
-				DatabaseController.tryReLink();
-			}
-		}
+			platform = DatabaseController.getRemovalPlatformByID(1);
 
 		return platform;
 	}
@@ -76,17 +66,10 @@ public class RemovalPlatformController
 	 */
 	public void modifyFreeSpace(final double percentagePoints)
 	{
-		try
-		{
-			SYSLOG.debug(getPlatform() + " free space decreased by " + percentagePoints);
-			getPlatform().modifyFreeSpace(percentagePoints);
+		SYSLOG.debug(getPlatform() + " free space decreased by " + percentagePoints);
+		getPlatform().modifyFreeSpace(percentagePoints);
 
-			DatabaseController.save(getPlatform());
-		}
-		catch (NoDatabaseLinkException e)
-		{
-			DatabaseController.tryReLink();
-		}
+		DatabaseController.save(getPlatform());
 		checkWarning();
 	}
 

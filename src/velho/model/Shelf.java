@@ -8,15 +8,12 @@ import java.util.Set;
 
 import org.apache.log4j.Logger;
 
-import velho.controller.DatabaseController;
-import velho.model.exceptions.NoDatabaseLinkException;
-
 /**
  * A class representing a physical shelf structure in the warehouse.
  *
  * @author Jose Uusitalo
  */
-public class Shelf
+public class Shelf implements Comparable<Shelf>
 {
 	/**
 	 * Apache log4j logger: System.
@@ -32,6 +29,8 @@ public class Shelf
 	 * The ID of this shelf.
 	 */
 	private int shelfID;
+
+	// TODO: Use Hibernate and probably convert slots to a map?
 
 	/**
 	 * The array of shelf slots for each level of the shelf.
@@ -239,6 +238,26 @@ public class Shelf
 				+ getProductBoxCount() + ", Slts: " + getShelfSlotCount() + ", Free: " + getFreeShelfSlots().size();
 	}
 
+	@Override
+	public boolean equals(final Object o)
+	{
+		if (!(o instanceof Shelf))
+			return false;
+
+		final Shelf s = (Shelf) o;
+
+		if (this.getDatabaseID() <= 0)
+			return this == s;
+
+		return this.getDatabaseID() == s.getDatabaseID();
+	}
+
+	@Override
+	public int compareTo(final Shelf shelf)
+	{
+		return this.getDatabaseID() - shelf.getDatabaseID();
+	}
+
 	/**
 	 * Gets the shelf ID.
 	 *
@@ -396,103 +415,53 @@ public class Shelf
 	/**
 	 * Attempts to add the given {@link ProductBox} into the {@link ShelfSlot} specified by the slot ID.
 	 *
-	 * @param shelfSlotID
-	 * ID of the shelf slot
-	 * @param productBox
-	 * box to add
-	 * @param updateDatabase
-	 * update the database?
+	 * @param shelfSlotID ID of the shelf slot
+	 * @param productBox box to add
 	 * @return <code>true</code> if box was added to the slot, <code>false</code> if the slot ID is not in this shelf,
 	 * or the slot did not have enough free space
 	 * @throws IllegalArgumentException
-	 * @throws NoDatabaseLinkException
 	 */
-	public boolean addToSlot(final String shelfSlotID, final ProductBox productBox, final boolean updateDatabase)
-			throws IllegalArgumentException, NoDatabaseLinkException
+	public boolean addToSlot(final String shelfSlotID, final ProductBox productBox) throws IllegalArgumentException
 	{
 		final int[] tokens = tokenizeAndValidateShelfSlotID(shelfSlotID);
-
-		final boolean addedToSlot = slots[tokens[1]][tokens[2]].addBox(productBox);
-		boolean databaseModified = !updateDatabase;
-
-		if (updateDatabase)
-			databaseModified = DatabaseController.addProductBoxToShelfSlot(productBox, shelfSlotID);
-
-		productBox.setShelfSlot(shelfSlotID);
-
-		SYSLOG.trace("Added: " + addedToSlot + " Database Modified: " + databaseModified);
-
-		return addedToSlot && databaseModified;
-	}
-
-	/**
-	 * Attempts to add the given {@link ProductBox} into the {@link ShelfSlot} specified by the slot ID.
-	 * Updates the database.
-	 *
-	 * @param shelfSlotID
-	 * ID of the shelf slot
-	 * @param productBox
-	 * box to add
-	 * @return <code>true</code> if box was added to the slot, <code>false</code> if the slot ID is not in this shelf,
-	 * or the slot did not have enough free space
-	 * @throws IllegalArgumentException
-	 * @throws NoDatabaseLinkException
-	 */
-	public boolean addToSlot(final String shelfSlotID, final ProductBox productBox) throws IllegalArgumentException, NoDatabaseLinkException
-	{
-		final int[] tokens = tokenizeAndValidateShelfSlotID(shelfSlotID);
-
-		final boolean databaseModified = DatabaseController.addProductBoxToShelfSlot(productBox, shelfSlotID);
 		final boolean addedToSlot = slots[tokens[1]][tokens[2]].addBox(productBox);
 
-		productBox.setShelfSlot(shelfSlotID);
+		if (addedToSlot)
+		{
+			productBox.setShelfSlot(shelfSlotID);
+			// FIXME: Save shelf.
+			// DatabaseController.save(this);
+			SYSLOG.trace("Added: " + addedToSlot);
+		}
 
-		// TODO: Exception on DB update failed.
-		return addedToSlot && databaseModified;
+		return addedToSlot;
 	}
 
 	/**
 	 * Attempts to remove the given {@link ProductBox} from the {@link ShelfSlot} specified by the slot ID.
 	 *
 	 * @param productBox box to remove
-	 * @param updateDatabase update the database?
 	 * @return <code>true</code> if box was added to the slot, <code>false</code> if the slot ID is not in this shelf,
 	 * or the slot did not have the specified box
 	 * @throws IllegalArgumentException
-	 * @throws NoDatabaseLinkException
 	 */
-	public boolean removeFromSlot(final ProductBox productBox, final boolean updateDatabase) throws IllegalArgumentException, NoDatabaseLinkException
+	public boolean removeFromSlot(final ProductBox productBox) throws IllegalArgumentException
 	{
 		if (productBox == null)
 			return false;
 
 		final int[] tokens = tokenizeAndValidateShelfSlotID(productBox.getShelfSlot());
-
 		final boolean removedFromSlot = slots[tokens[1]][tokens[2]].removeBox(productBox);
-		boolean databaseModified = true;
 
-		if (updateDatabase)
-			databaseModified = DatabaseController.removeProductBoxFromShelfSlot(productBox);
+		if (removedFromSlot)
+		{
+			productBox.setShelfSlot(null);
+			// FIXME: Save shelf.
+			// DatabaseController.save(this);
+			SYSLOG.trace("Removed: " + removedFromSlot);
+		}
 
-		productBox.setShelfSlot(null);
-
-		return removedFromSlot && databaseModified;
-	}
-
-	/**
-	 * Attempts to remove the given {@link ProductBox} from the {@link ShelfSlot} specified by the slot ID.
-	 * Updates to the database.
-	 *
-	 * @param productBox box to remove
-	 *
-	 * @return <code>true</code> if box was added to the slot, <code>false</code> if the slot ID is not in this shelf,
-	 * or the slot did not have the specified box
-	 * @throws IllegalArgumentException
-	 * @throws NoDatabaseLinkException
-	 */
-	public boolean removeFromSlot(final ProductBox productBox) throws IllegalArgumentException, NoDatabaseLinkException
-	{
-		return removeFromSlot(productBox, true);
+		return removedFromSlot;
 	}
 
 	/*
@@ -504,7 +473,7 @@ public class Shelf
 	 *
 	 * @author Jose Uusitalo
 	 */
-	class ShelfSlot
+	class ShelfSlot implements Comparable<ShelfSlot>
 	{
 		/**
 		 * A separator string between values in shelf slot IDs.
@@ -549,14 +518,22 @@ public class Shelf
 			boxes = new HashSet<ProductBox>();
 		}
 
-		/*
-		 * Compares the ID of this shelf slot to the given one.
-		 * @Override
-		 * public int compareTo(final ShelfSlot s)
-		 * {
-		 * return getSlotID().compareToIgnoreCase(s.getSlotID());
-		 * }
-		 */
+		@Override
+		public boolean equals(final Object o)
+		{
+			if (!(o instanceof ShelfSlot))
+				return false;
+
+			final ShelfSlot ss = (ShelfSlot) o;
+
+			return this.getSlotID().equals(ss.getSlotID());
+		}
+
+		@Override
+		public int compareTo(final ShelfSlot slot)
+		{
+			return getSlotID().compareToIgnoreCase(slot.getSlotID());
+		}
 
 		/**
 		 * The ID of this shelf slot in the following format:
@@ -568,24 +545,6 @@ public class Shelf
 		{
 			return shelfSlotID;
 		}
-
-		/*
-		 * The ID of the shelf this shelf slot is in.
-		 * @return the ID of the parent shelf
-		 * public int getShelfID()
-		 * {
-		 * return shelfID;
-		 * }
-		 */
-
-		/*
-		 * Gets the maximum number of boxes this shelf slot can contain.
-		 * @return the maximum number of boxes this shelf slot can contain
-		 * public int getMaxBoxCount()
-		 * {
-		 * return maxBoxCount;
-		 * }
-		 */
 
 		/**
 		 * Iterates through the set and counts the number of products in the {@link ProductBox}es.
@@ -603,15 +562,6 @@ public class Shelf
 
 			return sum;
 		}
-
-		/*
-		 * Gets the set of {@link ProductBox}es in this shelf slot.
-		 * @return the set of boxes
-		 * public Set<ProductBox> getBoxes()
-		 * {
-		 * return boxes;
-		 * }
-		 */
 
 		/**
 		 * Gets the number of {@link ProductBox}es in this shelf slot.

@@ -11,8 +11,13 @@ import javafx.collections.ObservableList;
  *
  * @author Jose Uusitalo
  */
-public class RemovalList
+public class RemovalList implements Comparable<RemovalList>
 {
+	/**
+	 * The database ID of this removal list.
+	 */
+	private int databaseID;
+
 	/**
 	 * The set of {@link ProductBox} objects.
 	 */
@@ -24,24 +29,9 @@ public class RemovalList
 	private ObservableList<Object> observableBoxes;
 
 	/**
-	 * The database ID of this removal list.
-	 */
-	private int databaseID;
-
-	/**
 	 * The current state of this removal list.
 	 */
 	private RemovalListState state;
-
-	/**
-	 * Creates a new empty removal list in the active state.
-	 */
-	public RemovalList()
-	{
-		this.state = new RemovalListState(1, "Active");
-		this.boxes = new LinkedHashSet<ProductBox>();
-		this.observableBoxes = FXCollections.observableArrayList();
-	}
 
 	/**
 	 * @param databaseID
@@ -55,20 +45,60 @@ public class RemovalList
 		this.observableBoxes = FXCollections.observableArrayList();
 	}
 
+	/**
+	 * Creates a new empty removal list in the active state.
+	 */
+	public RemovalList()
+	{
+		this.state = new RemovalListState(1, "Active");
+		this.boxes = new LinkedHashSet<ProductBox>();
+		this.observableBoxes = FXCollections.observableArrayList();
+	}
+
 	@Override
 	public String toString()
 	{
 		return "[" + databaseID + "] " + state + ": " + boxes.size() + " boxes";
 	}
 
+	@Override
+	public boolean equals(final Object o)
+	{
+		if (!(o instanceof RemovalList))
+			return false;
+
+		final RemovalList pt = (RemovalList) o;
+
+		if (this.getDatabaseID() <= 0)
+			return this == pt;
+
+		return this.getDatabaseID() == pt.getDatabaseID();
+	}
+
+	@Override
+	public int compareTo(final RemovalList removallist)
+	{
+		return this.getDatabaseID() - removallist.getDatabaseID();
+	}
+
 	/**
-	 * The database ID of this removal list.
+	 * Gets the database ID of this removal list.
 	 *
 	 * @return the database ID of this list
 	 */
 	public int getDatabaseID()
 	{
 		return databaseID;
+	}
+
+	/**
+	 * Sets the database ID of this removal list.
+	 *
+	 * @param id the new database ID of this list
+	 */
+	public void setDatabaseID(final int id)
+	{
+		databaseID = id;
 	}
 
 	/**
@@ -103,11 +133,15 @@ public class RemovalList
 
 	/**
 	 * Gets the contents of this removal list.
+	 * Rebuilds the list on every method call by looping through the set of boxes.
 	 *
 	 * @return the {@link ProductBoxSearchResultRow} objects on this list
 	 */
 	public ObservableList<Object> getObservableBoxes()
 	{
+		observableBoxes.clear();
+		boxes.forEach((final ProductBox box) -> observableBoxes.add(new ProductBoxSearchResultRow(box)));
+
 		return observableBoxes;
 	}
 
@@ -122,6 +156,22 @@ public class RemovalList
 	}
 
 	/**
+	 * Sets the set of actual product boxes in this removal list.
+	 *
+	 * @param boxes the set of boxes on this removal list
+	 */
+	public boolean setBoxes(final Set<ProductBox> boxes)
+	{
+		this.boxes = boxes;
+		boolean bswitch = true;
+
+		for (final ProductBox box : boxes)
+			bswitch = bswitch && (observableBoxes.add(new ProductBoxSearchResultRow(box)));
+
+		return bswitch;
+	}
+
+	/**
 	 * Adds a {@link ProductBox} on this removal list.
 	 *
 	 * @param productBox box to add to this list
@@ -130,9 +180,8 @@ public class RemovalList
 	public boolean addProductBox(final ProductBox productBox)
 	{
 		if (boxes.add(productBox))
-		{
 			return observableBoxes.add(new ProductBoxSearchResultRow(productBox));
-		}
+
 		return false;
 	}
 
@@ -154,6 +203,7 @@ public class RemovalList
 				}
 			}
 		}
+
 		return false;
 	}
 

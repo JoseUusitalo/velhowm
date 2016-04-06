@@ -11,7 +11,6 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
@@ -22,11 +21,15 @@ import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
 import org.h2.jdbcx.JdbcConnectionPool;
+import org.hibernate.HibernateException;
+import org.hibernate.Session;
+import org.hibernate.SessionFactory;
+import org.hibernate.Transaction;
+import org.hibernate.exception.ConstraintViolationException;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import velho.model.Administrator;
-import velho.model.Manager;
+import velho.model.HibernateSessionFactory;
 import velho.model.Manifest;
 import velho.model.ManifestState;
 import velho.model.Product;
@@ -43,9 +46,9 @@ import velho.model.User;
 import velho.model.enums.DatabaseFileState;
 import velho.model.enums.DatabaseQueryType;
 import velho.model.enums.DatabaseTable;
+import velho.model.enums.UserRole;
 import velho.model.exceptions.ExistingDatabaseLinkException;
 import velho.model.exceptions.NoDatabaseLinkException;
-import velho.model.interfaces.UserRole;
 import velho.view.MainWindow;
 
 /**
@@ -63,7 +66,7 @@ public class DatabaseController
 	/**
 	 * The database URI on the local machine.
 	 */
-	private final static String DB_URI = "jdbc:h2:./data/velho;MV_STORE=FALSE;MVCC=FALSE;";
+	private final static String DB_URI = "jdbc:h2:./data/velho;MV_STORE=FALSE;MVCC=TRUE;";
 
 	/**
 	 * User name for the system itself.
@@ -84,6 +87,12 @@ public class DatabaseController
 	 * The date format used by the database.
 	 */
 	private static final SimpleDateFormat H2_DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd");
+
+	/**
+	 * The Hibernate session factory.
+	 */
+	private static final SessionFactory sessionFactory = HibernateSessionFactory.getInstance();
+
 	/*
 	 * ---- UI LISTS ----
 	 */
@@ -95,7 +104,7 @@ public class DatabaseController
 	private static ObservableList<Object> observableUsers = FXCollections.observableArrayList();
 
 	/**
-	 * An observable list of {@link Product} objects display in the user
+	 * An observable list of {@link Product} objects for display in the user
 	 * interface.
 	 */
 	private static ObservableList<Object> observableProducts = FXCollections.observableArrayList();
@@ -105,6 +114,12 @@ public class DatabaseController
 	 * user interface.
 	 */
 	private static ObservableList<Object> observableProductBoxSearchResults = FXCollections.observableArrayList();
+
+	/**
+	 * An observable list of {@link ProductBox} objects for display in the
+	 * user interface.
+	 */
+	private static ObservableList<Object> observableProductBoxes = FXCollections.observableArrayList();
 
 	/**
 	 * An observable list of {@link RemovalList} objects for display in the user
@@ -147,63 +162,13 @@ public class DatabaseController
 	 */
 
 	/**
-	 * A map of {@link ProductBrand} objects loaded from the database.
-	 */
-	private static Map<Integer, ProductBrand> cachedProductBrands = new HashMap<Integer, ProductBrand>();
-
-	/**
-	 * A map of {@link ProductType} objects loaded from the database.
-	 */
-	private static Map<Integer, ProductType> cachedProductTypes = new HashMap<Integer, ProductType>();
-
-	/**
-	 * A map of {@link ProductCategory} objects loaded from the database.
-	 */
-	private static Map<Integer, ProductCategory> cachedProductCategories = new HashMap<Integer, ProductCategory>();
-
-	/**
-	 * A map of {@link Product} objects loaded from the database.
-	 */
-	private static Map<Integer, Product> cachedProducts = new HashMap<Integer, Product>();
-
-	/**
-	 * A map of {@link ProductContainer} objects loaded from the database.
-	 */
-	private static Map<Integer, ProductBox> cachedProductBoxes = new HashMap<Integer, ProductBox>();
-
-	/**
 	 * A map of {@link Shelf} objects loaded from the database.
 	 */
+	@Deprecated
 	private static Map<Integer, Shelf> cachedShelves = new HashMap<Integer, Shelf>();
 
-	/**
-	 * A map of {@link RemovalList} objects loaded from the database.
-	 */
-	private static Map<Integer, RemovalList> cachedRemovalLists = new HashMap<Integer, RemovalList>();
-
-	/**
-	 * A map of {@link RemovalListState} objects loaded from the database.
-	 */
-	private static Map<Integer, RemovalListState> cachedRemovalListStates = new HashMap<Integer, RemovalListState>();
-
-	/**
-	 * A map of {@link ManifestState} objects loaded from the database.
-	 */
-	private static Map<Integer, ManifestState> cachedManifestStates = new HashMap<Integer, ManifestState>();
-
-	/**
-	 * A map of {@link Manifest} objects loaded from the database.
-	 */
-	private static Map<Integer, Manifest> cachedManifests = new HashMap<Integer, Manifest>();
-
-	/**
-	 * A map of {@link RemovalPlatform} objects loaded from the database.
-	 */
-	private static Map<Integer, RemovalPlatform> cachedRemovalPlatforms = new HashMap<Integer, RemovalPlatform>();
-
 	/*
-	 * -------------------------------- PRIVATE DATABASE METHODS
-	 * --------------------------------
+	 * -------------------------------- PRIVATE DATABASE METHODS --------------------------------
 	 */
 
 	/**
@@ -224,6 +189,7 @@ public class DatabaseController
 	 * </ul>
 	 * @throws NoDatabaseLinkException
 	 */
+	@Deprecated
 	private static Object runQuery(final DatabaseQueryType type, final DatabaseTable tableName, final Map<DatabaseTable, String> joinOnValues,
 			final String[] columns, final Map<String, Object> columnValues, final List<String> where) throws NoDatabaseLinkException
 	{
@@ -340,14 +306,14 @@ public class DatabaseController
 							case PRODUCTS:
 								// @formatter:off
 								while (result.next())
-									dataSet.add(new Product(result.getInt("product_id"), result.getString("name"), getProductBrandByID(result.getInt("brand"), true), getProductCategoryByID(result.getInt("category"), true), result.getInt("popularity")));
+									dataSet.add(new Product(result.getInt("product_id"), result.getString("name"), getProductBrandByID(result.getInt("brand")), getProductCategoryByID(result.getInt("category")), result.getInt("popularity")));
 								break;
 							// @formatter:on
 
 							case CONTAINERS:
 								// @formatter:off
 								while (result.next())
-									dataSet.add(new ProductBox(result.getInt("container_id"), result.getDate("expiration_date"), result.getInt("max_size"), getProductByID(result.getInt("product"), true), result.getInt("product_count")));
+									dataSet.add(new ProductBox(result.getInt("container_id"), result.getDate("expiration_date"), result.getInt("max_size"), getProductByID(result.getInt("product")), result.getInt("product_count")));
 								// FIXME: Containers are not set to their respective shelves!
 								break;
 							// @formatter:on
@@ -645,6 +611,7 @@ public class DatabaseController
 	 * @return an Object containing the appropriate data
 	 * @throws NoDatabaseLinkException
 	 */
+	@Deprecated
 	private static Object runQuery(final String sql) throws NoDatabaseLinkException
 	{
 		final Connection connection = getConnection();
@@ -726,6 +693,7 @@ public class DatabaseController
 	/**
 	 * Attempts to re-link the database.
 	 */
+	@Deprecated
 	private static void relink()
 	{
 		DBLOG.info("Attempting to relink database.");
@@ -770,6 +738,7 @@ public class DatabaseController
 	 *
 	 * @return a database connection
 	 */
+	@Deprecated
 	private static Connection getConnection() throws NoDatabaseLinkException
 	{
 		checkLink();
@@ -795,8 +764,7 @@ public class DatabaseController
 	}
 
 	/*
-	 * -------------------------------- PUBLIC DATABASE METHODS
-	 * --------------------------------
+	 * -------------------------------- PUBLIC DATABASE METHODS --------------------------------
 	 */
 
 	/**
@@ -816,6 +784,7 @@ public class DatabaseController
 	 * @param sql string to escape
 	 * @return escaped string
 	 */
+	@Deprecated
 	public static String escape(final String sql)
 	{
 		String escaped = sql.replace("'", "''");
@@ -833,6 +802,7 @@ public class DatabaseController
 	 * @param where conditions (can be <code>null</code>)
 	 * @return an SQL query string
 	 */
+	@Deprecated
 	public static String sqlBuilder(final DatabaseQueryType type, final DatabaseTable tableName, final Map<DatabaseTable, String> joinOnCondition,
 			final String[] columns, final Map<String, Object> columnValues, final List<String> where)
 	{
@@ -950,6 +920,7 @@ public class DatabaseController
 	 *
 	 * @return <code>true</code> if a database link exists
 	 */
+	@Deprecated
 	public static boolean isLinked()
 	{
 		return connectionPool != null;
@@ -962,6 +933,7 @@ public class DatabaseController
 	 *
 	 * @throws NoDatabaseLinkException
 	 */
+	@Deprecated
 	public static void checkLink() throws NoDatabaseLinkException
 	{
 		if (connectionPool == null)
@@ -971,6 +943,7 @@ public class DatabaseController
 	/**
 	 * Attempts to re-link the database.
 	 */
+	@Deprecated
 	public static void tryReLink()
 	{
 		try
@@ -1009,6 +982,7 @@ public class DatabaseController
 	 * @throws ExistingDatabaseLinkException
 	 * when a database link already exists
 	 */
+	@Deprecated
 	public static DatabaseFileState link() throws ClassNotFoundException, ExistingDatabaseLinkException
 	{
 		if (connectionPool != null)
@@ -1081,6 +1055,7 @@ public class DatabaseController
 	 * when attempting unlink a database when no database link
 	 * exists
 	 */
+	@Deprecated
 	public static void unlink() throws NoDatabaseLinkException
 	{
 		if (connectionPool == null)
@@ -1101,6 +1076,8 @@ public class DatabaseController
 	 */
 	public static boolean connectAndInitialize() throws ClassNotFoundException, ExistingDatabaseLinkException, NoDatabaseLinkException
 	{
+		// TODO: Remove connection part, only do initialization.
+
 		final DatabaseFileState state = link();
 		boolean initialized = true;
 
@@ -1121,121 +1098,62 @@ public class DatabaseController
 	}
 
 	/*
-	 * -------------------------------- PRIVATE GETTER METHODS
-	 * --------------------------------
+	 * -------------------------------- PRIVATE GETTER METHODS --------------------------------
 	 */
 
 	/**
-	 * Gets the {@link UserRole} object from the given role ID.
+	 * Gets an object from the database with the given database ID.
 	 *
-	 * @param roleid
-	 * role database ID
-	 * @return the corresponding user role object
-	 * @throws NoDatabaseLinkException
+	 * @param className the name of the class of the object
+	 * @param idColumnName the name of the database ID column
+	 * @param databaseID the database ID of the object
+	 * @return the corresponding object or <code>null</code> for invalid ID
+	 * @throws HibernateException when the query failed to commit and has been rolled back
 	 */
-	private static UserRole getRoleByID(final int roleid) throws NoDatabaseLinkException
+	private static Object getByID(final String className, final String idColumnName, final int databaseID) throws HibernateException
 	{
-		final String[] columns = { "name" };
-		final List<String> where = new ArrayList<String>();
-		where.add("role_id = " + new Integer(roleid));
-
-		@SuppressWarnings("unchecked")
-		final Set<String> result = (LinkedHashSet<String>) (runQuery(DatabaseQueryType.SELECT, DatabaseTable.ROLES, null, columns, null, where));
-
-		if (result.size() == 0)
+		if (databaseID < 1)
 			return null;
 
-		return UserController.stringToRole(result.iterator().next());
-	}
-
-	/**
-	 * Gets the {@link Product} object from the given product name.
-	 *
-	 * @param name the exact product name
-	 * @return the corresponding product object
-	 * @throws NoDatabaseLinkException
-	 */
-	@SuppressWarnings("unused")
-	private static List<ProductBox> getProductBoxesByProductName(final List<String> where) throws NoDatabaseLinkException
-	{
-		final String[] columns = { "containers.container_id" };
-
-		final Map<DatabaseTable, String> join = new LinkedHashMap<DatabaseTable, String>();
-		join.put(DatabaseTable.PRODUCTS, "containers.product = products.product_id");
+		final Session session = sessionFactory.openSession();
+		session.beginTransaction();
 
 		@SuppressWarnings("unchecked")
-		final Set<Integer> result = (LinkedHashSet<Integer>) (runQuery(DatabaseQueryType.SELECT, DatabaseTable.CONTAINERS, join, columns, null, where));
+		final List<RemovalList> result = session.createQuery("from " + className + " where " + idColumnName + " = :id").setParameter("id", databaseID).list();
 
-		final List<ProductBox> boxes = new ArrayList<ProductBox>();
-		final Iterator<Integer> it = result.iterator();
-
-		while (it.hasNext())
-			boxes.add(getProductBoxByID(it.next()));
-
-		return boxes;
-	}
-
-	/**
-	 * Gets the {@link Product} object from the given product name.
-	 *
-	 * @param name the exact product name
-	 * @return the corresponding product object
-	 * @throws NoDatabaseLinkException
-	 */
-	private static List<ProductBox> getProductBoxesByProductID(final List<String> where) throws NoDatabaseLinkException
-	{
-		final String[] columns = { "container_id" };
-
-		@SuppressWarnings("unchecked")
-		final Set<Integer> result = (LinkedHashSet<Integer>) (runQuery(DatabaseQueryType.SELECT, DatabaseTable.CONTAINERS, null, columns, null, where));
-
-		final List<ProductBox> boxes = new ArrayList<ProductBox>();
-		final Iterator<Integer> it = result.iterator();
-
-		while (it.hasNext())
-			boxes.add(getProductBoxByID(it.next()));
-
-		return boxes;
-	}
-
-	/**
-	 * Gets the product box that will expire the soonest.
-	 *
-	 * @param boxes boxes to search from
-	 * @return the oldest product box, expiration date can be null
-	 */
-	private static ProductBox getOldestProductBox(final List<ProductBox> boxes)
-	{
-		ProductBox oldest = boxes.get(0);
-
-		for (final ProductBox box : boxes)
+		try
 		{
-			// TODO: Support searching for products with no expiration dates.
-			if (oldest.getExpirationDate() == null)
-				oldest = box;
-
-			if (box.getExpirationDate() != null)
-			{
-				// Current box has an expiration date.
-				if (box.getExpirationDate() != null)
-				{
-					// Oldest box has an expiration date.
-					if (box.getExpirationDate().before(oldest.getExpirationDate()))
-					{
-						// Current box expires first.
-						oldest = box;
-					}
-				}
-				else
-				{
-					// Current box expires first.
-					oldest = box;
-				}
-			}
-			// Else current box does not have an expiration date.
+			session.getTransaction().commit();
+			session.close();
+		}
+		catch (final HibernateException e)
+		{
+			session.getTransaction().rollback();
+			session.close();
+			throw new HibernateException("Failed to commit.");
 		}
 
-		return oldest;
+		// Only one result should be returned by the query.
+		return result.get(0);
+	}
+
+	/**
+	 * Gets the {@link UserRole} object according to the given ID.
+	 *
+	 * @param id the ordinal of the role
+	 * @return the corresponding user role object or <code>null</code> if role was not found
+	 */
+	private static UserRole getRoleByID(final int id)
+	{
+		// TODO: Find a way to put the roles into the database.
+
+		for (final UserRole role : UserRole.values())
+		{
+			if (role.ordinal() == id)
+				return role;
+		}
+
+		return null;
 	}
 
 	/**
@@ -1489,7 +1407,7 @@ public class DatabaseController
 		cols.put("viewButton", "View");
 
 		// Only managers and administrators can delete lists.
-		if (LoginController.getCurrentUser().getRole().compareTo(new Manager()) >= 0)
+		if (LoginController.getCurrentUser().getRole().compareTo(UserRole.MANAGER) >= 0)
 			cols.put("deleteButton", "Delete");
 
 		return cols;
@@ -1549,155 +1467,59 @@ public class DatabaseController
 	}
 
 	/**
-	 * Gets the {@link ProductType} object from the given type ID.
+	 * Gets the {@link ProductType} object from the database with the given ID.
 	 *
-	 * @param typeid product type database ID
-	 * @return the corresponding product type object
-	 * @throws NoDatabaseLinkException
+	 * @param id the product type database ID
+	 * @return the corresponding product type object or <code>null</code> for invalid ID
+	 * @throws HibernateException when the query failed to commit and has been rolled back
 	 */
-	public static ProductType getProductTypeByID(final int typeid) throws NoDatabaseLinkException
+	public static ProductType getProductTypeByID(final int id) throws HibernateException
 	{
-		if (!cachedProductTypes.containsKey(typeid))
-		{
-			final String[] columns = { "name" };
-			final List<String> where = new ArrayList<String>();
-			where.add("type_id = " + new Integer(typeid));
-
-			@SuppressWarnings("unchecked")
-			final Set<String> result = (LinkedHashSet<String>) (runQuery(DatabaseQueryType.SELECT, DatabaseTable.TYPES, null, columns, null, where));
-
-			if (result.size() == 0)
-				return null;
-
-			final ProductType p = new ProductType(typeid, result.iterator().next());
-
-			// Store for reuse.
-			DBLOG.trace("Caching: " + p);
-			cachedProductTypes.put(p.getDatabaseID(), p);
-
-			return p;
-		}
-
-		DBLOG.trace("Loading ProductType " + typeid + " from cache.");
-		return cachedProductTypes.get(typeid);
+		return (ProductType) getByID("ProductType", "type_id", id);
 	}
 
 	/**
-	 * Gets the {@link ProductCategory} object from the given category ID.
+	 * Gets the {@link ProductCategory} object from the database with the given ID.
 	 *
-	 * @param categoryid product category database ID
-	 * @param getCached Get all product categories from the cache instead of rebuilding the cache from the database but
-	 * only if the cached category IDs match the ones in the database.
-	 * @return the corresponding product category object
-	 * @throws NoDatabaseLinkException
+	 * @param id the product category database ID
+	 * @return the corresponding product category object or <code>null</code> for invalid ID
+	 * @throws HibernateException when the query failed to commit and has been rolled back
 	 */
-	public static ProductCategory getProductCategoryByID(final int categoryid, final boolean getCached) throws NoDatabaseLinkException
+	public static ProductCategory getProductCategoryByID(final int id) throws HibernateException
 	{
-		if (!cachedProductCategories.containsKey(categoryid) || !getCached)
-		{
-			final String[] columns = { "category_id", "name", "type" };
-			final List<String> where = new ArrayList<String>();
-			where.add("category_id = " + new Integer(categoryid));
-
-			@SuppressWarnings("unchecked")
-			final Set<Object> result = (LinkedHashSet<Object>) (runQuery(DatabaseQueryType.SELECT, DatabaseTable.CATEGORIES, null, columns, null, where));
-
-			if (result.size() == 0)
-				return null;
-
-			final ProductCategory p = (ProductCategory) result.iterator().next();
-
-			// Store for reuse.
-			if (getCached)
-				DBLOG.trace("Caching: " + p);
-			else
-				DBLOG.trace("Updating cache: " + p);
-
-			cachedProductCategories.put(p.getDatabaseID(), p);
-			return p;
-		}
-
-		DBLOG.trace("Loading ProductCategory " + categoryid + " from cache.");
-		return cachedProductCategories.get(categoryid);
+		return (ProductCategory) getByID("ProductCategory", "category_id", id);
 	}
 
 	/**
-	 * Gets the {@link ProductBrand} object from the given brand ID.
+	 * Gets the {@link ProductBrand} object from the database with the given ID.
 	 *
-	 * @param brandid product brand database ID
-	 * @param getCached Get all product brands from the cache instead of rebuilding the cache from the database but only
-	 * if the cached brand IDs match the ones in the database.
-	 * @return the corresponding product brand object
-	 * @throws NoDatabaseLinkException
+	 * @param id the product brand database ID
+	 * @return the corresponding product brand object or <code>null</code> for invalid ID
+	 * @throws HibernateException when the query failed to commit and has been rolled back
 	 */
-	public static ProductBrand getProductBrandByID(final int brandid, final boolean getCached) throws NoDatabaseLinkException
+	public static ProductBrand getProductBrandByID(final int id) throws HibernateException
 	{
-		if (!cachedProductBrands.containsKey(brandid) || !getCached)
-		{
-			final String[] columns = { "name" };
-			final List<String> where = new ArrayList<String>();
-			where.add("brand_id = " + new Integer(brandid));
-
-			@SuppressWarnings("unchecked")
-			final Set<String> result = (LinkedHashSet<String>) (runQuery(DatabaseQueryType.SELECT, DatabaseTable.BRANDS, null, columns, null, where));
-
-			if (result.size() == 0)
-				return null;
-
-			final ProductBrand p = new ProductBrand(brandid, result.iterator().next());
-
-			// Store for reuse.
-			if (getCached)
-				DBLOG.trace("Caching: " + p);
-			else
-				DBLOG.trace("Updating cache: " + p);
-
-			cachedProductBrands.put(p.getDatabaseID(), p);
-			return p;
-		}
-
-		DBLOG.trace("Loading ProductBrand " + brandid + " from cache.");
-		return cachedProductBrands.get(brandid);
+		return (ProductBrand) getByID("ProductBrand", "brand_id", id);
 	}
 
 	/**
-	 * Gets the database ID of the given user role name.
-	 *
-	 * @param roleName the name of the role
-	 * @return the database ID of the given role (a value greater than 0) or
-	 * <code>-1</code> if the role does not exist in the database'
-	 * @throws NoDatabaseLinkException
-	 */
-	public static int getRoleID(final String roleName) throws NoDatabaseLinkException
-	{
-		final String[] columns = { "role_id" };
-		final List<String> where = new ArrayList<String>();
-		where.add("name = '" + roleName + "'");
-
-		@SuppressWarnings("unchecked")
-		final Set<Integer> result = (LinkedHashSet<Integer>) (runQuery(DatabaseQueryType.SELECT, DatabaseTable.ROLES, null, columns, null, where));
-
-		if (result.size() == 0)
-			return -1;
-
-		// Only one result as IDs are unique.
-		return result.iterator().next().intValue();
-	}
-
-	/**
-	 * Gets a set of user role names in the database.
+	 * Gets a set of user role names.
 	 *
 	 * @return a set of user role names
-	 * @throws NoDatabaseLinkException
 	 */
-	public static Set<String> getUserRoleNames() throws NoDatabaseLinkException
+	public static Set<String> getUserRoleNames()
 	{
-		final String[] columns = { "name" };
+		// TODO: Use database.
 
-		@SuppressWarnings("unchecked")
-		final Set<String> result = (LinkedHashSet<String>) (runQuery(DatabaseQueryType.SELECT, DatabaseTable.ROLES, null, columns, null, null));
+		final UserRole[] roles = UserRole.values();
+		final Set<String> names = new LinkedHashSet<String>();
 
-		return result;
+		for (final UserRole role : roles)
+		{
+			names.add(role.getName());
+		}
+
+		return names;
 	}
 
 	/**
@@ -1771,101 +1593,50 @@ public class DatabaseController
 	}
 
 	/**
-	 * Gets the {@link Product} object from the given product ID.
+	 * Gets the {@link Product} object from the database with the given ID.
 	 *
-	 * @param productid product database ID
-	 * @return the corresponding product object
-	 * @throws NoDatabaseLinkException
+	 * @param id the product database ID
+	 * @return the corresponding product object or <code>null</code> for invalid ID
+	 * @throws HibernateException when the query failed to commit and has been rolled back
 	 */
-	public static Product getProductByID(final int productid, final boolean getCached) throws NoDatabaseLinkException
+	public static Product getProductByID(final int id) throws HibernateException
 	{
-		if (!cachedProducts.containsKey(productid) || !getCached)
-		{
-			final String[] columns = { "*" };
-			final List<String> where = new ArrayList<String>();
-			where.add("product_id = " + new Integer(productid));
-
-			@SuppressWarnings("unchecked")
-			final Set<Object> result = (LinkedHashSet<Object>) (runQuery(DatabaseQueryType.SELECT, DatabaseTable.PRODUCTS, null, columns, null, where));
-
-			if (result.size() == 0)
-				return null;
-
-			final Product p = (Product) result.iterator().next();
-
-			// Store for reuse.
-			if (getCached)
-				DBLOG.trace("Caching: " + p);
-			else
-				DBLOG.trace("Updating cache: " + p);
-
-			cachedProducts.put(p.getProductID(), p);
-			return p;
-		}
-
-		DBLOG.trace("Loading Product " + productid + " from cache.");
-		return cachedProducts.get(productid);
+		return (Product) getByID("Product", "product_id", id);
 	}
 
 	/**
-	 * Gets the {@link Product} object from the given product ID.
+	 * Gets the {@link ProductBox} object from the database with the given ID.
 	 *
-	 * @param productboxid product database ID
-	 * @return the corresponding product object
-	 * @throws NoDatabaseLinkException
+	 * @param id the product box database ID
+	 * @return the corresponding product box object or <code>null</code> for invalid ID
+	 * @throws HibernateException when the query failed to commit and has been rolled back
 	 */
-	public static ProductBox getProductBoxByID(final int productboxid) throws NoDatabaseLinkException
+	public static ProductBox getProductBoxByID(final int id) throws HibernateException
 	{
-		if (!cachedProductBoxes.containsKey(productboxid))
-		{
-			final String[] columns = { "*" };
-			final List<String> where = new ArrayList<String>();
-			where.add("container_id = " + new Integer(productboxid));
-
-			@SuppressWarnings("unchecked")
-			final Set<ProductBox> result = (LinkedHashSet<ProductBox>) (runQuery(DatabaseQueryType.SELECT, DatabaseTable.CONTAINERS, null, columns, null,
-					where));
-
-			if (result.size() == 0)
-				return null;
-
-			final ProductBox p = result.iterator().next();
-
-			// Store for reuse.
-			DBLOG.trace("Caching: " + p);
-			cachedProductBoxes.put(p.getBoxID(), p);
-
-			return p;
-		}
-
-		DBLOG.trace("Loading ProductBox " + productboxid + " from cache.");
-		return cachedProductBoxes.get(productboxid);
+		return (ProductBox) getByID("ProductBox", "container_id", id);
 	}
 
 	/**
-	 * Gets user data by their database ID.
+	 * Gets the {@link User} object from the database with the given ID.
 	 *
-	 * @param id database ID of the user
-	 * @return a {@link User} object or <code>null</code> if a user with that ID
-	 * was not found
+	 * @param id the user database ID (use a negative number to denote a debug account)
+	 * @return the corresponding user object, <code>null</code> if a user with that ID does not exist, or the currently
+	 * logged in user (i.e. debug user) if the ID was negative
+	 * @throws HibernateException when the query failed to commit and has been rolled back
 	 */
-	public static User getUserByID(final int id) throws NoDatabaseLinkException
+	public static User getUserByID(final int id) throws HibernateException
 	{
-		if (id == -1)
-			return new User(-1, "Debug", "Account", new Administrator());
+		// Debug account ID?
+		if (id < 0)
+			return LoginController.getCurrentUser();
 
-		final String[] columns = { "user_id", "first_name", "last_name", "role" };
-		final List<String> where = new ArrayList<String>();
-		where.add("user_id = " + new Integer(id));
+		final Session session = sessionFactory.openSession();
 
-		@SuppressWarnings("unchecked")
-		final Set<User> result = (LinkedHashSet<User>) (runQuery(DatabaseQueryType.SELECT, DatabaseTable.USERS, null, columns, null, where));
+		final User user = session.get(User.class, id);
 
-		if (result.size() == 0)
-			return null;
+		session.close();
 
-		// Only one result as IDs are unique.
-		return result.iterator().next();
+		return user;
 	}
 
 	/**
@@ -1895,7 +1666,7 @@ public class DatabaseController
 	 * Gets the {@link Shelf} object from the given shelf ID.
 	 *
 	 * @param shelfid shelf database ID
-	 * @return the corresponding shelf object
+	 * @return the corresponding shelf object or <code>null</code> for invalid ID
 	 * @throws NoDatabaseLinkException
 	 */
 	public static Shelf getShelfByID(final int shelfid, final boolean getCached) throws NoDatabaseLinkException
@@ -1931,84 +1702,27 @@ public class DatabaseController
 	}
 
 	/**
-	 * Gets the {@link RemovalList} object from the given removal list ID.
+	 * Gets the {@link RemovalList} object from the database with the given ID.
 	 *
-	 * @param listid removal list database ID
-	 * @return the corresponding removal list object
-	 * @throws NoDatabaseLinkException
+	 * @param id the removal list database ID
+	 * @return the corresponding removal list object or <code>null</code> for invalid ID
+	 * @throws HibernateException when the query failed to commit and has been rolled back
 	 */
-	public static RemovalList getRemovalListByID(final int listid, final boolean getCached) throws NoDatabaseLinkException
+	public static RemovalList getRemovalListByID(final int id) throws HibernateException
 	{
-		if (!cachedRemovalLists.containsKey(listid) || !getCached)
-		{
-			final String[] columns = { "*" };
-			final List<String> where = new ArrayList<String>();
-			where.add("removallist_id = " + listid);
-
-			@SuppressWarnings("unchecked")
-			final Set<Object> result = (LinkedHashSet<Object>) (runQuery(DatabaseQueryType.SELECT, DatabaseTable.REMOVALLISTS, null, columns, null, where));
-
-			if (result.size() == 0)
-				return null;
-
-			final RemovalList r = (RemovalList) result.iterator().next();
-
-			// Store for reuse.
-			if (getCached)
-				DBLOG.trace("Caching: " + r);
-			else
-				DBLOG.trace("Updating cache: " + r);
-
-			cachedRemovalLists.put(r.getDatabaseID(), r);
-			setContainersToRemovalList(listid);
-
-			return cachedRemovalLists.get(listid);
-		}
-
-		DBLOG.trace("Loading RemovalList " + listid + " from cache.");
-		return cachedRemovalLists.get(listid);
+		return (RemovalList) getByID("RemovalList", "removallist_id", id);
 	}
 
 	/**
-	 * Gets the {@link Manifest} object from the given removal list ID.
+	 * Gets the {@link Manifest} object from the database with the given ID.
 	 *
-	 * @param manifestid removal list database ID
-	 * @return the corresponding removal list object
-	 * @throws NoDatabaseLinkException
+	 * @param id the manifest database ID
+	 * @return the corresponding manifest object or <code>null</code> for invalid ID
+	 * @throws HibernateException when the query failed to commit and has been rolled back
 	 */
-	public static Manifest getManifestByID(final int manifestid, final boolean getCached) throws NoDatabaseLinkException
+	public static Manifest getManifestByID(final int id) throws HibernateException
 	{
-		if (!cachedManifests.containsKey(manifestid) || !getCached)
-		{
-			final String[] columns = { "*" };
-			final List<String> where = new ArrayList<String>();
-			where.add("manifest_id = " + manifestid);
-
-			@SuppressWarnings("unchecked")
-			final Set<Object> result = (LinkedHashSet<Object>) (runQuery(DatabaseQueryType.SELECT, DatabaseTable.MANIFESTS, null, columns, null, where));
-
-			if (result.size() == 0)
-				return null;
-
-			final Manifest m = (Manifest) result.iterator().next();
-
-			// Store for reuse.
-			if (getCached)
-				DBLOG.trace("Caching: " + m);
-			else
-				DBLOG.trace("Updating cache: " + m);
-
-			cachedManifests.put(m.getDatabaseID(), m);
-			setContainersToManifest(manifestid);
-
-			observableManifests.clear();
-			observableManifests.addAll(cachedManifests.values());
-
-			return cachedManifests.get(manifestid);
-		}
-
-		DBLOG.trace("Loading Manifest " + manifestid + " from cache.");
-		return cachedManifests.get(manifestid);
+		return (Manifest) getByID("Manifest", "manifest_id", id);
 	}
 
 	/**
@@ -2061,67 +1775,6 @@ public class DatabaseController
 	}
 
 	/**
-	 * Gets an {@link ObservableList} of all removal lists.
-	 *
-	 * @return a cached list of removal lists
-	 */
-	public static ObservableList<Object> getObservableRemovalLists() throws NoDatabaseLinkException
-	{
-		final String[] columns = { "*" };
-
-		@SuppressWarnings("unchecked")
-		final Set<RemovalList> result = (LinkedHashSet<RemovalList>) (runQuery(DatabaseQueryType.SELECT, DatabaseTable.REMOVALLISTS, null, columns, null,
-				null));
-
-		final Iterator<RemovalList> it = result.iterator();
-
-		DBLOG.debug("Caching all removal lists.");
-
-		RemovalList list = null;
-
-		cachedRemovalLists.clear();
-
-		while (it.hasNext())
-		{
-			list = it.next();
-			cachedRemovalLists.put(list.getDatabaseID(), list);
-		}
-		setAllContainersToAllRemovalLists();
-
-		observableRemovalLists.clear();
-		observableRemovalLists.addAll(cachedRemovalLists.values());
-
-		DBLOG.debug("Observable & cached list of RemovalLists updated:");
-		DBLOG.debug(cachedRemovalLists);
-		DBLOG.debug(observableRemovalLists);
-
-		return observableRemovalLists;
-	}
-
-	/**
-	 * Gets an {@link ObservableList} of cached user names and roles.
-	 *
-	 * @return a cached list of users in the database
-	 * @throws NoDatabaseLinkException
-	 */
-	public static ObservableList<Object> getObservableUsers() throws NoDatabaseLinkException
-	{
-		final String[] columns = { "user_id", "first_name", "last_name", "role" };
-
-		@SuppressWarnings("unchecked")
-		final Set<User> result = (LinkedHashSet<User>) (runQuery(DatabaseQueryType.SELECT, DatabaseTable.USERS, null, columns, null, null));
-
-		final Iterator<User> it = result.iterator();
-
-		observableUsers.clear();
-		while (it.hasNext())
-			observableUsers.add(it.next());
-
-		DBLOG.debug("Observable user list updated.");
-		return observableUsers;
-	}
-
-	/**
 	 * Searches the database for product boxes of the specified size.
 	 *
 	 * @param productData a map of data to search for where the key is the
@@ -2129,28 +1782,33 @@ public class DatabaseController
 	 * database ID and the value is the number of products
 	 * @throws NoDatabaseLinkException
 	 */
-	public static List<ProductBoxSearchResultRow> searchProductBoxByDataList(final Map<Integer, Integer> productData) throws NoDatabaseLinkException
+	@SuppressWarnings("unchecked")
+	public static List<ProductBoxSearchResultRow> searchProductBoxByDataList(final Map<Integer, Integer> productData)
 	{
 		final List<ProductBoxSearchResultRow> foundProducts = FXCollections.observableArrayList();
-
-		List<String> where = null;
 		Integer wantedProductCount = null;
 		List<ProductBox> boxes = null;
+
+		final Session session = sessionFactory.openSession();
 
 		// For every unique string representing a product.
 		for (final Integer productID : productData.keySet())
 		{
 			boxes = new ArrayList<ProductBox>();
-			where = new ArrayList<String>();
 			wantedProductCount = productData.get(productID);
 
 			DBLOG.debug("Looking for [" + productID + "] of size " + wantedProductCount);
-			where.add("product = " + productID);
 
 			// First look for an exact amount.
-			where.add("product_count = " + wantedProductCount);
-
-			boxes = getProductBoxesByProductID(where);
+			// @formatter:off
+			boxes = session.createQuery("from ProductBox as pb"
+									  + " where pb.product.databaseID = :id"
+									  + " and pb.productCount = :count"
+									  + " order by pb.expirationDate asc")
+				   	   	   .setParameter("id", productID)
+				   	   	   .setParameter("count", wantedProductCount)
+				   	   	   .list();
+			// @formatter:on
 
 			// Couldn't find a box with exactly the number of products wanted.
 			if (boxes.isEmpty())
@@ -2158,16 +1816,40 @@ public class DatabaseController
 				if (MainWindow.DEBUG_MODE)
 					DBLOG.debug("Unable to find a product box with the wanted size of " + wantedProductCount + ". Looking from multiple boxes.");
 
-				// Remove the product count condition and find all product boxes
-				// with the wanted product ID.
-				where.remove(1);
-				boxes = getBoxesContainingAtLeastProducts(getProductBoxesByProductID(where), wantedProductCount);
+				/*
+				 * Remove the product count condition and find all product boxes with the wanted product ID.
+				 * This could be done with the getByID() private method but since we already have a session open and
+				 * more importantly this query is done in a loop, it is faster to do it here.
+				 */
+				// @formatter:off
+				boxes = session.createQuery("from ProductBox as pb"
+										  + " where pb.product.databaseID = :id"
+										  + " order by pb.expirationDate asc")
+						   	   .setParameter("id", productID)
+						   	   .list();
+				// @formatter:on
+
+				System.out.println("boxes---------------------------");
+				for (ProductBox b : boxes)
+					System.out.println(b.getExpirationDate());
+				boxes = getBoxesContainingAtLeastProducts(boxes, wantedProductCount);
 			}
 			else if (boxes.size() > 1)
 			{
-				// If found multiple boxes with the exact size, select one that
-				// will expire the soonest.
-				final ProductBox oldest = getOldestProductBox(boxes);
+				/*
+				 * If multiple boxes are found with the exact wanted size, select one that will expire the soonest which
+				 * is the first result with a non-null expiration date.
+				 */
+				ProductBox oldest = null;
+
+				for (final ProductBox b : boxes)
+				{
+					if (b.getExpirationDate() != null)
+					{
+						oldest = b;
+						break;
+					}
+				}
 
 				boxes.clear();
 				boxes.add(oldest);
@@ -2176,6 +1858,8 @@ public class DatabaseController
 			for (final ProductBox box : boxes)
 				foundProducts.add(new ProductBoxSearchResultRow(box));
 		}
+
+		session.close();
 
 		// Remove nulls.
 		foundProducts.removeAll(Collections.singleton(null));
@@ -2231,17 +1915,7 @@ public class DatabaseController
 		final Set<ProductBox> result = (LinkedHashSet<ProductBox>) (runQuery(DatabaseQueryType.SELECT, DatabaseTable.CONTAINERS, join, columns, null, where));
 
 		for (final ProductBox box : result)
-		{
-			if (!cachedProductBoxes.containsKey(box.getBoxID()))
-			{
-				// Store for reuse.
-				DBLOG.trace("Caching: " + box);
-
-				cachedProductBoxes.put(box.getBoxID(), box);
-			}
-
 			foundProducts.add(new ProductBoxSearchResultRow(box));
-		}
 
 		DBLOG.trace("Updating product box search results.");
 		observableProductBoxSearchResults.clear();
@@ -2252,108 +1926,43 @@ public class DatabaseController
 	}
 
 	/**
-	 * Gets the {@link RemovalListState} object from the given database ID.
+	 * Gets the {@link RemovalListState} object from the database with the given ID.
 	 *
-	 * @param stateid removal list state database ID
-	 * @return the corresponding removal list state object
-	 * @throws NoDatabaseLinkException
+	 * @param id the removal list state database ID
+	 * @return the corresponding removal list state object or <code>null</code> for invalid ID
+	 * @throws HibernateException when the query failed to commit and has been rolled back
 	 */
-	public static RemovalListState getRemovalListStateByID(final int stateid) throws NoDatabaseLinkException
+	public static RemovalListState getRemovalListStateByID(final int id) throws HibernateException
 	{
-		if (!cachedRemovalListStates.containsKey(stateid))
-		{
-			final String[] columns = { "name" };
-			final List<String> where = new ArrayList<String>();
-			where.add("removallist_state_id = " + new Integer(stateid));
-
-			@SuppressWarnings("unchecked")
-			final Set<String> result = (LinkedHashSet<String>) (runQuery(DatabaseQueryType.SELECT, DatabaseTable.REMOVALLIST_STATES, null, columns, null,
-					where));
-
-			if (result.size() == 0)
-				return null;
-
-			final RemovalListState s = new RemovalListState(stateid, result.iterator().next());
-
-			// Store for reuse.
-			DBLOG.trace("Caching: " + s);
-			cachedRemovalListStates.put(s.getDatabaseID(), s);
-
-			return s;
-		}
-
-		DBLOG.trace("Loading RemovalListState " + stateid + " from cache.");
-		return cachedRemovalListStates.get(stateid);
+		return (RemovalListState) getByID("RemovalListState", "removallist_state_id", id);
 	}
 
 	/**
-	 * Gets the {@link ManifestState} object from the given database ID.
+	 * Gets the {@link ManifestState} object from the database with the given ID.
 	 *
-	 * @param stateid manifest state database ID
-	 * @return the corresponding manifest state object
-	 * @throws NoDatabaseLinkException
+	 * @param id the manifest state database ID
+	 * @return the corresponding manifest state object or <code>null</code> for invalid ID
+	 * @throws HibernateException when the query failed to commit and has been rolled back
 	 */
-	public static ManifestState getManifestStateByID(final int stateid) throws NoDatabaseLinkException
+	public static ManifestState getManifestStateByID(final int id) throws HibernateException
 	{
-		if (!cachedManifestStates.containsKey(stateid))
-		{
-			final String[] columns = { "name" };
-			final List<String> where = new ArrayList<String>();
-			where.add("manifest_state_id = " + new Integer(stateid));
-
-			@SuppressWarnings("unchecked")
-			final Set<String> result = (LinkedHashSet<String>) (runQuery(DatabaseQueryType.SELECT, DatabaseTable.MANIFEST_STATES, null, columns, null, where));
-
-			if (result.size() == 0)
-				return null;
-
-			final ManifestState s = new ManifestState(stateid, result.iterator().next());
-
-			// Store for reuse.
-			DBLOG.trace("Caching: " + s);
-			cachedManifestStates.put(s.getDatabaseID(), s);
-
-			return s;
-		}
-
-		DBLOG.trace("Loading ManifestState " + stateid + " from cache.");
-		return cachedManifestStates.get(stateid);
+		return (ManifestState) getByID("ManifestState", "manifest_state_id", id);
 	}
 
-	public static RemovalPlatform getRemovalPlatformByID(final int platformid, final boolean getCached) throws NoDatabaseLinkException
+	/**
+	 * Gets the {@link RemovalPlatform} object from the database with the given ID.
+	 *
+	 * @param id the removal platform database ID
+	 * @return the corresponding removal platform object or <code>null</code> for invalid ID
+	 * @throws HibernateException when the query failed to commit and has been rolled back
+	 */
+	public static RemovalPlatform getRemovalPlatformByID(final int id)
 	{
-		if (!cachedRemovalPlatforms.containsKey(platformid) || !getCached)
-		{
-			final String[] columns = { "*" };
-			final List<String> where = new ArrayList<String>();
-			where.add("platform_id = " + new Integer(platformid));
-
-			@SuppressWarnings("unchecked")
-			final Set<RemovalPlatform> result = (LinkedHashSet<RemovalPlatform>) (runQuery(DatabaseQueryType.SELECT, DatabaseTable.REMOVALPLATFORMS, null,
-					columns, null, where));
-
-			if (result.size() == 0)
-				return null;
-
-			final RemovalPlatform r = result.iterator().next();
-
-			// Store for reuse.
-			if (getCached)
-				DBLOG.trace("Caching: " + r);
-			else
-				DBLOG.trace("Updating cache: " + r);
-
-			cachedRemovalPlatforms.put(r.getDatabaseID(), r);
-			return r;
-		}
-
-		DBLOG.trace("Loading RemovalPlatform " + platformid + " from cache.");
-		return cachedRemovalPlatforms.get(platformid);
+		return (RemovalPlatform) getByID("RemovalPlatform", "platform_id", id);
 	}
 
 	/*
-	 * -------------------------------- PRIVATE SETTER METHODS
-	 * --------------------------------
+	 * -------------------------------- PRIVATE SETTER METHODS --------------------------------
 	 */
 
 	/**
@@ -2396,7 +2005,7 @@ public class DatabaseController
 
 				// data[1] is the level index
 				shelfSlotID = Shelf.coordinatesToShelfSlotID(shelfid, data[1] + 1, data[2], true);
-				DBLOG.trace("Placed: " + shelf.addToSlot(shelfSlotID, box, false));
+				DBLOG.trace("Placed: " + shelf.addToSlot(shelfSlotID, box));
 				DBLOG.trace(shelf);
 			}
 
@@ -2408,60 +2017,6 @@ public class DatabaseController
 		}
 	}
 
-	/**
-	 * Places the correct product boxes in the cached removal list.
-	 *
-	 * @param listid removal list to place product boxes into
-	 * @throws NoDatabaseLinkException
-	 */
-	private static void setContainersToRemovalList(final int listid) throws NoDatabaseLinkException
-	{
-		DBLOG.debug("Placing product boxes on removal list " + listid + "...");
-
-		final List<String> where = new ArrayList<String>();
-		where.add("removallist = " + listid);
-
-		final String[] columns = { "productbox" };
-		@SuppressWarnings("unchecked")
-		final Set<Integer> removalListBoxes = (LinkedHashSet<Integer>) runQuery(DatabaseQueryType.SELECT, DatabaseTable.REMOVALLIST_PRODUCTBOXES, null, columns,
-				null, where);
-
-		if (!removalListBoxes.isEmpty())
-		{
-			for (final Integer id : removalListBoxes)
-				cachedRemovalLists.get(listid).addProductBox(getProductBoxByID(id));
-
-			DBLOG.debug("Product boxes placed on removal list " + listid + ".");
-		}
-		else
-			DBLOG.debug("Nothing to place.");
-	}
-
-	private static void setContainersToManifest(final int manifestid) throws NoDatabaseLinkException
-	{
-		DBLOG.debug("Placing product boxes on manifest " + manifestid + "...");
-
-		final List<String> where = new ArrayList<String>();
-		where.add("manifest = " + manifestid);
-
-		final String[] columns = { "productbox" };
-		@SuppressWarnings("unchecked")
-		final Set<Integer> manifestBoxes = (LinkedHashSet<Integer>) runQuery(DatabaseQueryType.SELECT, DatabaseTable.MANIFEST_PRODUCTBOXES, null, columns, null,
-				where);
-
-		if (!manifestBoxes.isEmpty())
-		{
-			Set<ProductBox> boxes = new HashSet<ProductBox>();
-			for (final Integer id : manifestBoxes)
-				boxes.add(getProductBoxByID(id));
-
-			cachedManifests.get(manifestid).setProductBoxes(boxes);
-
-			DBLOG.debug("Product boxes placed on manifest " + manifestid + ".");
-		}
-		else
-			DBLOG.debug("Nothing to place.");
-	}
 	/*
 	 * -------------------------------- PUBLIC SETTER METHODS --------------------------------
 	 */
@@ -2485,163 +2040,59 @@ public class DatabaseController
 	}
 
 	/**
-	 * <p>
-	 * Adds a new user to the database. If database changed as a result of the
-	 * call, updates the {@link ObservableList} of user data shown in the UI.
-	 * </p>
-	 * <p>
-	 * Warning: Assumes that given data is valid.
-	 * </p>
+	 * Deletes an object from the database.
 	 *
-	 * @param badgeID badge ID of the user
-	 * @param pin PIN of the user
-	 * @param firstName first name of the user
-	 * @param lastName last name of the user
-	 * @param roleID the ID of the role of the user
-	 * @return <code>true</code> if user was added
-	 * @throws NoDatabaseLinkException
-	 * when database link was lost
+	 * @param object object to delete
+	 * @throws HibernateException when the object was not deleted
 	 */
-	public static boolean insertUser(final String badgeID, final String pin, final String firstName, final String lastName, final int roleID)
-			throws NoDatabaseLinkException
+	private static void delete(final Object object) throws HibernateException
 	{
-		final Map<String, Object> values = new LinkedHashMap<String, Object>();
+		final Session session = sessionFactory.openSession();
+		session.beginTransaction();
 
-		// If no pin is defined, add with badge ID.
-		if (pin == null || pin.isEmpty())
-			values.put("badge_id", badgeID);
-		else
-			values.put("pin", pin);
+		session.delete(object);
 
-		values.put("first_name", firstName);
-		values.put("last_name", lastName);
-		values.put("role", roleID);
-
-		@SuppressWarnings("unchecked")
-		final boolean changed = (0 < ((Set<Integer>) runQuery(DatabaseQueryType.INSERT, DatabaseTable.USERS, null, null, values, null)).size());
-
-		// Update the user list displayed in the UI after adding a new user.
-		if (changed)
-			getObservableUsers();
-
-		return changed;
-	}
-
-	/**
-	 * Removes a user with the specified database row ID. If database changed as
-	 * a result of the call, updates the {@link ObservableList} of user data
-	 * shown in the UI.
-	 *
-	 * @param databaseID the database ID of the user to delete
-	 * @return <code>true</code> if user was deleted
-	 * @throws NoDatabaseLinkException
-	 */
-	public static boolean deleteUser(final int databaseID) throws NoDatabaseLinkException
-	{
-		final List<String> where = new ArrayList<String>();
-		where.add("user_id = " + new Integer(databaseID));
-
-		@SuppressWarnings("unchecked")
-		final boolean changed = (0 < ((Set<Integer>) (runQuery(DatabaseQueryType.DELETE, DatabaseTable.USERS, null, null, null, where))).size());
-
-		// Update the user list displayed in the UI if database changed.
-		if (changed)
-			getObservableUsers();
-
-		return changed;
-	}
-
-	/**
-	 * Deletes the removal list from the database with the given ID.
-	 *
-	 * @param databaseID ID of the removal list to delete
-	 * @return <code>true</code> if the list was deleted
-	 * @throws NoDatabaseLinkException
-	 */
-	public static boolean deleteRemovalListByID(final int databaseID) throws NoDatabaseLinkException
-	{
-		final List<String> where = new ArrayList<String>();
-		where.add("removallist = " + databaseID);
-
-		// First delete the boxes from the list if there are any.
-		runQuery(DatabaseQueryType.DELETE, DatabaseTable.REMOVALLIST_PRODUCTBOXES, null, null, null, where);
-
-		// Then delete the list.
-		where.clear();
-		where.add("removallist_id = " + databaseID);
-
-		@SuppressWarnings("unchecked")
-		final boolean changed = (0 < ((Set<Integer>) (runQuery(DatabaseQueryType.DELETE, DatabaseTable.REMOVALLISTS, null, null, null, where))).size());
-
-		// Update the user list displayed in the UI if database changed.
-		if (changed)
-			getObservableRemovalLists();
-
-		return changed;
-	}
-
-	/**
-	 * Adds the given product box to the shelf slot it specifies.
-	 *
-	 * @param productBox product box to update in the database
-	 * @return <code>true</code> if the database was updated
-	 */
-	@SuppressWarnings("unchecked")
-	public static boolean addProductBoxToShelfSlot(final ProductBox productBox, final String shelfSlotID) throws NoDatabaseLinkException
-	{
-		final Object[] tokens = Shelf.tokenizeShelfSlotID(shelfSlotID);
-		final int shelfID = Integer.parseInt(((String) tokens[0]).substring(1));
-
-		final Map<String, Object> values = new LinkedHashMap<String, Object>();
-		values.put("shelflevel_index", (int) tokens[1] - 1);
-		values.put("shelfslot_index", tokens[2]);
-
-		boolean changed = false;
-
-		// If the product box is not in a shelf yet, INSERT.
-		if (productBox.getShelfSlot() == null)
+		try
 		{
-			values.put("shelf", shelfID);
-			values.put("productbox", productBox.getBoxID());
-			changed = (0 < ((LinkedHashSet<Object>) runQuery(DatabaseQueryType.INSERT, DatabaseTable.SHELF_PRODUCTBOXES, null, null, values, null)).size());
+			session.getTransaction().commit();
+			session.close();
 		}
-		else
+		catch (final HibernateException e)
 		{
-			// Otherwise UPDATE.
-
-			final List<String> where = new ArrayList<String>();
-			where.add("productbox = " + productBox.getBoxID());
-			changed = (0 < ((LinkedHashSet<Object>) runQuery(DatabaseQueryType.UPDATE, DatabaseTable.SHELF_PRODUCTBOXES, null, null, values, where)).size());
+			session.getTransaction().rollback();
+			session.close();
+			throw new HibernateException("Failed to delete.");
 		}
 
-		// Update the cache.
-		if (changed)
-			getShelfByID(shelfID, false);
-
-		return changed;
+		// TODO: Figure out some way to return a boolean.
 	}
 
 	/**
-	 * Removes the given product box from it's shelf slot.
+	 * Deletes a user from the database.
 	 *
-	 * @param productBox product box to remove from it's shelf slot
+	 * @param user user to delete
+	 * @throws HibernateException when the user was not deleted
 	 */
-	public static boolean removeProductBoxFromShelfSlot(final ProductBox productBox) throws NoDatabaseLinkException
+	public static void deleteUser(final User user) throws HibernateException
 	{
-		final List<String> where = new ArrayList<String>();
-		where.add("productbox = " + productBox.getBoxID());
+		delete(user);
 
-		@SuppressWarnings("unchecked")
-		final boolean changed = (0 < ((LinkedHashSet<Object>) runQuery(DatabaseQueryType.DELETE, DatabaseTable.SHELF_PRODUCTBOXES, null, null, null, where))
-				.size());
+		// Update the observable list.
+		getAllUsers();
+	}
 
-		final Object[] tokens = Shelf.tokenizeShelfSlotID(productBox.getShelfSlot());
+	/**
+	 * Deletes a removal list from the database.
+	 *
+	 * @param list removal list to delete
+	 * @throws HibernateException when the removal list was not deleted
+	 */
+	public static void deleteRemovalList(final RemovalList list) throws HibernateException
+	{
+		delete(list);
 
-		// Update the cache.
-		if (changed)
-			getShelfByID(Integer.parseInt(((String) tokens[0]).substring(1)), false);
-
-		return changed;
+		// Update the observable list.
+		getAllRemovalLists();
 	}
 
 	/*
@@ -2649,459 +2100,288 @@ public class DatabaseController
 	 */
 
 	/**
-	 * Updates an existing removal list in the database with the data from the
-	 * given removal list or creates a new one if it doesn't exist.
-	 * A database ID of -1 signifies a brand new {@link RemovalList}.
+	 * Creates a new or updates an existing object depending on whether the given object exists in the database.
 	 *
-	 * @param removalList new or existing removal list
-	 * @return <code>true</code> if existing data was updated or a new removal
-	 * list was created in the database
+	 * @param object new or existing object in the database
+	 * @return the database ID of the inserted or updated object
+	 * @throws HibernateException when data was not saved
 	 */
-	@SuppressWarnings("unchecked")
-	public static int save(final RemovalList removalList) throws NoDatabaseLinkException
+	public static int save(final RemovalList object)
 	{
-		final Map<String, Object> values = new LinkedHashMap<String, Object>();
-		values.put("liststate", removalList.getState().getDatabaseID());
+		// TODO: Generalize when all tests have been updated to manually rollback.
 
-		final List<String> where = new ArrayList<String>();
+		final Session session = sessionFactory.openSession();
+		final Transaction transaction = session.beginTransaction();
 
-		DatabaseQueryType query;
-		int dbID = removalList.getDatabaseID();
+		session.saveOrUpdate(object);
 
-		// If the removal list does not exist yet, INSERT.
-		if (dbID < 1)
-			query = DatabaseQueryType.INSERT;
-		else
+		try
 		{
-			query = DatabaseQueryType.UPDATE;
-			where.add("removallist_id = " + dbID);
+			transaction.commit();
+			session.close();
+		}
+		catch (final HibernateException e)
+		{
+			transaction.rollback();
+			session.close();
+			throw new HibernateException("Failed to commit.");
 		}
 
-		// Insert/Update the list itself
-		Set<Integer> result = (LinkedHashSet<Integer>) runQuery(query, DatabaseTable.REMOVALLISTS, null, null, values, where);
+		DBLOG.debug("Saved/Updated: " + object);
 
-		if (result.size() == 0)
-		{
-			DBLOG.error("Failed to save: " + removalList);
-			return -1;
-		}
-
-		// Get the inserted database ID (if the given object was inserted instead of updated).
-		if (dbID < 1)
-			dbID = result.iterator().next();
-
-		// If the removallist_id was added previously, remove it.
-		if (!where.isEmpty())
-			where.clear();
-
-		// Even if multiple rows were changed, they all have the same ID.
-		where.add("removallist = " + dbID);
-
-		/*
-		 * Delete all boxes from the list in the database.
-		 * We don't really care whether anything was deleted or not, if there
-		 * was something, it is now deleted.
-		 */
-		runQuery(DatabaseQueryType.DELETE, DatabaseTable.REMOVALLIST_PRODUCTBOXES, null, null, null, where);
-
-		// Add all boxes to the database.
-		values.clear();
-		values.put("removallist", dbID);
-		values.put("productbox", -1);
-
-		for (final ProductBox box : removalList.getBoxes())
-		{
-			// Remove the previous box ID.
-			values.remove("productbox");
-
-			// Put in the new box ID.
-			values.put("productbox", box.getBoxID());
-
-			// Run the query.
-			result = (LinkedHashSet<Integer>) runQuery(DatabaseQueryType.INSERT, DatabaseTable.REMOVALLIST_PRODUCTBOXES, null, null, values, null);
-
-			if (result.size() == 0)
-			{
-				DBLOG.error("Failed to save: " + removalList);
-				return -1;
-			}
-		}
-
-		// Update the cache.
-		DBLOG.debug(query.toString() + ": " + getRemovalListByID(dbID, false));
-
-		return dbID;
+		return object.getDatabaseID();
 	}
 
 	/**
-	 * Updates an existing manifest in the database with the data from the given manifest or creates a new one if it
-	 * doesn't exist.
-	 * A database ID of -1 signifies a brand new {@link Manifest}.
+	 * Creates a new or updates an existing object depending on whether the given object exists in the database.
 	 *
-	 * @param manifest new or existing manifest
-	 * @return the database ID of the inserted object or -1 if saving failed
+	 * @param object new or existing object in the database
+	 * @return the database ID of the inserted or updated object
+	 * @throws HibernateException when data was not saved
+	 * @throws ConstraintViolationException when the user already exists in the database
 	 */
-	@SuppressWarnings("unchecked")
-	public static int save(final Manifest manifest) throws NoDatabaseLinkException
+	public static int save(final User object) throws ConstraintViolationException
 	{
+		// TODO: Generalize when all tests have been updated to manually rollback.
 
-		final Map<String, Object> values = new LinkedHashMap<String, Object>();
-		values.put("state", manifest.getState().getDatabaseID());
-		values.put("driver_id", manifest.getDriverID());
-		values.put("date_ordered", getH2DateFormat(manifest.getOrderedDate()));
-		values.put("date_received", getH2DateFormat(manifest.getReceivedDate()));
+		final Session session = sessionFactory.openSession();
+		final Transaction transaction = session.beginTransaction();
 
-		final List<String> where = new ArrayList<String>();
-		int boxid;
+		session.saveOrUpdate(object);
 
-		DatabaseQueryType query;
-		int dbID = manifest.getDatabaseID();
-
-		// If the manifest does not exist yet, INSERT.
-		if (dbID < 1)
-			query = DatabaseQueryType.INSERT;
-		else
+		try
 		{
-			query = DatabaseQueryType.UPDATE;
-			where.add("manifest_id = " + dbID);
+			transaction.commit();
+			session.close();
+		}
+		catch (final HibernateException e)
+		{
+			transaction.rollback();
+			session.close();
+			throw new HibernateException("Failed to commit.");
 		}
 
-		// Insert/Update the manifest
-		Set<Integer> result = (LinkedHashSet<Integer>) runQuery(query, DatabaseTable.MANIFESTS, null, null, values, where);
+		// Update observable list.
+		getAllUsers();
 
-		if (result.size() == 0)
-		{
-			DBLOG.error("Failed to save: " + manifest);
-			return -1;
-		}
+		DBLOG.debug("Saved/Updated: " + object);
 
-		// Get the inserted database ID (if the given object was inserted instead of updated).
-		if (dbID < 1)
-			dbID = result.iterator().next();
-
-		where.clear();
-		where.add("manifest = " + dbID);
-
-		/*
-		 * Delete all boxes from the list in the database.
-		 * We don't really care whether anything was deleted or not, if there
-		 * was something, it is now deleted.
-		 */
-		runQuery(DatabaseQueryType.DELETE, DatabaseTable.MANIFEST_PRODUCTBOXES, null, null, null, where);
-
-		// Add all boxes to the database.
-		values.clear();
-		values.put("manifest", dbID);
-		values.put("productbox", -1);
-
-		for (final ProductBox box : manifest.getBoxes())
-		{
-			// Save the box to database.
-			boxid = save(box);
-
-			if (boxid > 0)
-			{
-				// Remove the previous box ID.
-				values.remove("productbox");
-
-				// Put in the new box ID.
-				values.put("productbox", boxid);
-
-				// Run the query.
-				result = (LinkedHashSet<Integer>) runQuery(DatabaseQueryType.INSERT, DatabaseTable.MANIFEST_PRODUCTBOXES, null, null, values, null);
-
-				if (result.size() == 0)
-				{
-					DBLOG.error("Failed to save: " + manifest);
-					return -1;
-				}
-			}
-		}
-
-		// Update the cache.
-		DBLOG.debug(query.toString() + ": " + getManifestByID(dbID, false));
-
-		return dbID;
+		return object.getDatabaseID();
 	}
 
 	/**
-	 * Updates an existing product box in the database with the data from the given product box or creates a new one if
-	 * it doesn't exist.
-	 * A database ID of -1 signifies a brand new {@link ProductBox}.
+	 * Creates a new or updates an existing object depending on whether the given object exists in the database.
 	 *
-	 * @param productbox object to save
-	 * @return the database ID of the inserted object or -1 if saving failed
-	 * @throws NoDatabaseLinkException
+	 * @param object new or existing object in the database
+	 * @return the database ID of the inserted or updated object
+	 * @throws HibernateException when data was not saved
 	 */
-	private static int save(final ProductBox productbox) throws NoDatabaseLinkException
+	public static int save(final Manifest object)
 	{
-		final Map<String, Object> values = new LinkedHashMap<String, Object>();
-		values.put("expiration_date", getH2DateFormat(productbox.getExpirationDate()));
-		values.put("product", productbox.getProduct().getProductID());
-		values.put("max_size", productbox.getMaxSize());
-		values.put("product_count", productbox.getProductCount());
+		// TODO: Generalize when all tests have been updated to manually rollback.
 
-		final List<String> where = new ArrayList<String>();
+		final Session session = sessionFactory.openSession();
+		final Transaction transaction = session.beginTransaction();
 
-		DatabaseQueryType query;
-		int dbID = productbox.getBoxID();
+		session.saveOrUpdate(object);
 
-		// If the object does not exist yet, INSERT.
-		if (dbID < 1)
-			query = DatabaseQueryType.INSERT;
-		else
+		try
 		{
-			query = DatabaseQueryType.UPDATE;
-			where.add("container_id = " + dbID);
+			transaction.commit();
+			session.close();
+		}
+		catch (final HibernateException e)
+		{
+			transaction.rollback();
+			session.close();
+			throw new HibernateException("Failed to commit.");
 		}
 
-		// Insert/Update
-		@SuppressWarnings("unchecked")
-		final Set<Integer> result = (Set<Integer>) runQuery(query, DatabaseTable.CONTAINERS, null, null, values, where);
+		DBLOG.debug("Saved/Updated: " + object);
 
-		if (result.size() == 0)
-		{
-			DBLOG.error("Failed to save: " + productbox);
-			return -1;
-		}
-
-		// Get the inserted database ID (if the given object was inserted
-		// instead of updated).
-		if (dbID < 1)
-			dbID = result.iterator().next();
-
-		// Update the cache.
-		DBLOG.debug(query.toString() + ": " + getProductBoxByID(dbID));
-
-		return dbID;
+		return object.getDatabaseID();
 	}
 
 	/**
-	 * Updates an existing removal platform in the database with the data from
-	 * the given removal platform or creates a
-	 * new one if it doesn't exist.
-	 * A database ID of -1 signifies a brand new {@link RemovalPlatform}.
+	 * Creates a new or updates an existing object depending on whether the given object exists in the database.
 	 *
-	 * @param platform new or existing removal platform
-	 * @return <code>true</code> if existing data was updated or a new removal platform
-	 * was created in the database
+	 * @param object new or existing object in the database
+	 * @return the database ID of the inserted or updated object
+	 * @throws HibernateException when data was not saved
 	 */
-	@SuppressWarnings("unchecked")
-	public static boolean save(final RemovalPlatform platform) throws NoDatabaseLinkException
+	public static int save(final RemovalPlatform object)
 	{
-		int platformID = platform.getDatabaseID();
+		// TODO: Generalize when all tests have been updated to manually rollback.
 
-		final Map<String, Object> values = new LinkedHashMap<String, Object>();
-		values.put("platform_id", platform.getDatabaseID());
-		values.put("free_space", platform.getFreeSpacePercent());
-		values.put("free_space_warning", platform.getFreeSpaceLeftWarningPercent());
+		final Session session = sessionFactory.openSession();
+		final Transaction transaction = session.beginTransaction();
 
-		final List<String> where = new ArrayList<String>();
+		session.saveOrUpdate(object);
 
-		DatabaseQueryType query;
-
-		// If the object does not exist yet, INSERT.
-		if (platformID < 1)
-			query = DatabaseQueryType.INSERT;
-		else
+		try
 		{
-			query = DatabaseQueryType.UPDATE;
-			where.add("platform_id = " + platformID);
+			transaction.commit();
+			session.close();
+		}
+		catch (final HibernateException e)
+		{
+			transaction.rollback();
+			session.close();
+			throw new HibernateException("Failed to commit.");
 		}
 
-		// Insert/Update the object
-		Set<Integer> result = (LinkedHashSet<Integer>) runQuery(query, DatabaseTable.REMOVALPLATFORMS, null, null, values, where);
+		DBLOG.debug("Saved/Updated: " + object);
 
-		if (result.size() == 0)
-		{
-			DBLOG.error("Failed to save: " + platform);
-			return false;
-		}
-
-		// Update the cache.
-		DBLOG.debug(query.toString() + ": " + getRemovalPlatformByID(platformID, false));
-
-		return true;
+		return object.getDatabaseID();
 	}
 
 	/**
-	 * Updates an existing product in the database with the data from
-	 * the given product or creates a
-	 * new one if it doesn't exist.
-	 * A database ID of -1 signifies a brand new {@link Product}.
+	 * Creates a new or updates an existing object depending on whether the given object exists in the database.
 	 *
-	 * @param product new or existing product
-	 * @return <code>true</code> if existing data was updated or a new product
-	 * was created in the database
+	 * @param object new or existing object in the database
+	 * @return the database ID of the inserted or updated object
+	 * @throws HibernateException when data was not saved
 	 */
-	public static int save(final Product product) throws NoDatabaseLinkException
+	public static int save(final Product object)
 	{
-		final Map<String, Object> values = new LinkedHashMap<String, Object>();
-		values.put("name", product.getName());
-		values.put("brand", product.getBrand().getDatabaseID());
-		values.put("category", product.getCategory().getDatabaseID());
-		values.put("popularity", product.getPopularity());
+		// TODO: Generalize when all tests have been updated to manually rollback.
 
-		final List<String> where = new ArrayList<String>();
+		final Session session = sessionFactory.openSession();
+		final Transaction transaction = session.beginTransaction();
 
-		DatabaseQueryType query;
-		int dbID = product.getProductID();
+		session.saveOrUpdate(object);
 
-		// If the object does not exist yet, INSERT.
-		if (dbID < 1)
-			query = DatabaseQueryType.INSERT;
-		else
+		try
 		{
-			query = DatabaseQueryType.UPDATE;
-			where.add("product_id = " + dbID);
+			transaction.commit();
+			session.close();
+		}
+		catch (final HibernateException e)
+		{
+			transaction.rollback();
+			session.close();
+			throw new HibernateException("Failed to commit.");
 		}
 
-		// Insert/Update
-		@SuppressWarnings("unchecked")
-		final Set<Integer> result = (Set<Integer>) runQuery(query, DatabaseTable.PRODUCTS, null, null, values, where);
+		DBLOG.debug("Saved/Updated: " + object);
 
-		if (result.size() == 0)
-		{
-			DBLOG.error("Failed to save: " + product);
-			return -1;
-		}
-
-		// Get the inserted database ID (if the given object was inserted
-		// instead of updated).
-		if (dbID < 1)
-			dbID = result.iterator().next();
-
-		// Update the cache.
-		DBLOG.debug(query.toString() + ": " + getProductByID(dbID, false));
-
-		// Update the observable list.
-		observableProducts.clear();
-		observableProducts.addAll(cachedProducts.values());
-
-		return dbID;
+		return object.getDatabaseID();
 	}
 
 	/**
-	 * Updates an existing product brand in the database with the data from
-	 * the given product brand or creates a new one if it doesn't exist.
-	 * A database ID of -1 signifies a brand new {@link ProductBrand}.
+	 * Creates a new or updates an existing object depending on whether the given object exists in the database.
 	 *
-	 * @param brand new or existing product brand
-	 * @return <code>true</code> if existing data was updated or a new product brand
-	 * was created in the database
+	 * @param object new or existing object in the database
+	 * @return the database ID of the inserted or updated object
+	 * @throws HibernateException when data was not saved
 	 */
-	public static int save(final ProductBrand brand) throws NoDatabaseLinkException
+	public static int save(final ProductBrand object)
 	{
-		final Map<String, Object> values = new LinkedHashMap<String, Object>();
-		values.put("name", brand.getName());
+		// TODO: Generalize when all tests have been updated to manually rollback.
 
-		final List<String> where = new ArrayList<String>();
+		final Session session = sessionFactory.openSession();
+		final Transaction transaction = session.beginTransaction();
 
-		DatabaseQueryType query;
-		int dbID = brand.getDatabaseID();
+		session.saveOrUpdate(object);
 
-		// If the object does not exist yet, INSERT.
-		if (dbID < 1)
-			query = DatabaseQueryType.INSERT;
-		else
+		try
 		{
-			query = DatabaseQueryType.UPDATE;
-			where.add("brand_id = " + dbID);
+			transaction.commit();
+			session.close();
+		}
+		catch (final HibernateException e)
+		{
+			transaction.rollback();
+			session.close();
+			throw new HibernateException("Failed to commit.");
 		}
 
-		// Insert/Update
-		@SuppressWarnings("unchecked")
-		final Set<Integer> result = (Set<Integer>) runQuery(query, DatabaseTable.BRANDS, null, null, values, where);
+		DBLOG.debug("Saved/Updated: " + object);
 
-		if (result.size() == 0)
-		{
-			DBLOG.error("Failed to save: " + brand);
-			return -1;
-		}
-
-		// Get the inserted database ID (if the given object was inserted
-		// instead of updated).
-		if (dbID < 1)
-			dbID = result.iterator().next();
-
-		// Update the cache.
-		DBLOG.debug(query.toString() + ": " + getProductBrandByID(dbID, false));
-
-		// Update the observable list.
-		observableProductBrands.clear();
-		observableProductBrands.addAll(cachedProductBrands.values());
-
-		return dbID;
+		return object.getDatabaseID();
 	}
 
 	/**
-	 * Updates an existing product brand in the database with the data from
-	 * the given product brand or creates a new one if it doesn't exist.
-	 * A database ID of -1 signifies a brand new {@link ProductBrand}.
+	 * Creates a new or updates an existing object depending on whether the given object exists in the database.
 	 *
-	 * @param category new or existing product brand
-	 * @return <code>true</code> if existing data was updated or a new product brand
-	 * was created in the database
+	 * @param object new or existing object in the database
+	 * @return the database ID of the inserted or updated object
+	 * @throws HibernateException when data was not saved
 	 */
-	public static int save(final ProductCategory category) throws NoDatabaseLinkException
+	public static int save(final ProductCategory object)
 	{
-		final Map<String, Object> values = new LinkedHashMap<String, Object>();
-		values.put("name", category.getName());
-		values.put("type", category.getType().getDatabaseID());
+		// TODO: Generalize when all tests have been updated to manually rollback.
 
-		final List<String> where = new ArrayList<String>();
+		final Session session = sessionFactory.openSession();
+		final Transaction transaction = session.beginTransaction();
 
-		DatabaseQueryType query;
-		int dbID = category.getDatabaseID();
+		session.saveOrUpdate(object);
 
-		// If the object does not exist yet, INSERT.
-		if (dbID < 1)
-			query = DatabaseQueryType.INSERT;
-		else
+		try
 		{
-			query = DatabaseQueryType.UPDATE;
-			where.add("category_id = " + dbID);
+			transaction.commit();
+			session.close();
+		}
+		catch (final HibernateException e)
+		{
+			transaction.rollback();
+			session.close();
+			throw new HibernateException("Failed to commit.");
 		}
 
-		// Insert/Update
-		@SuppressWarnings("unchecked")
-		final Set<Integer> result = (Set<Integer>) runQuery(query, DatabaseTable.CATEGORIES, null, null, values, where);
+		DBLOG.debug("Saved/Updated: " + object);
 
-		if (result.size() == 0)
-		{
-			DBLOG.error("Failed to save: " + category);
-			return -1;
-		}
-
-		// Get the inserted database ID (if the given object was inserted
-		// instead of updated).
-		if (dbID < 1)
-			dbID = result.iterator().next();
-
-		// Update the cache.
-		DBLOG.debug(query.toString() + ": " + getProductCategoryByID(dbID, false));
-
-		// Update the observable list.
-		observableProductCategories.clear();
-		observableProductCategories.addAll(cachedProductCategories.values());
-
-		return dbID;
+		return object.getDatabaseID();
 	}
 
 	/*
-	 * -------------------------------- CACHING --------------------------------
+	 * -------------------------------- GETTERS --------------------------------
 	 */
+
+	/**
+	 * Loads all objects of the specified type from the database into memory.
+	 *
+	 * @param className the name of the Java class of the objects to get
+	 * @return a list of objects
+	 * @throws HibernateException when the query failed to commit and has been rolled back
+	 */
+	@SuppressWarnings("unchecked")
+	private static List<Object> getAll(final String className) throws HibernateException
+	{
+		final Session session = sessionFactory.openSession();
+		session.beginTransaction();
+
+		final List<Object> result = session.createQuery("from " + className).list();
+
+		try
+		{
+			session.getTransaction().commit();
+			session.close();
+		}
+		catch (final HibernateException e)
+		{
+			session.getTransaction().rollback();
+			session.close();
+			throw new HibernateException("Failed to commit.");
+		}
+
+		DBLOG.debug("Loaded all " + className + " objects.");
+
+		return result;
+	}
 
 	/**
 	 * Loads data from database into memory.
 	 */
+	@Deprecated
 	public static void loadData() throws NoDatabaseLinkException
 	{
+		// TODO: Get rid of this.
 		DBLOG.info("Loading data from database...");
 
-		getAllProductBoxes();
+		// getAllProductBoxes();
 		getAllShelves();
-		getAllRemovalLists(false);
+		// getAllRemovalLists();
 
 		DBLOG.info("Data loaded from database.");
 	}
@@ -3112,8 +2392,10 @@ public class DatabaseController
 	 *
 	 * @throws NoDatabaseLinkException
 	 */
+	@Deprecated
 	private static void setAllContainersToAllShelves() throws NoDatabaseLinkException
 	{
+		// TODO: Get rid of this.
 		final String[] columns = { "*" };
 		@SuppressWarnings("unchecked")
 		final Map<Integer, ArrayList<Integer[]>> shelfBoxMap = (HashMap<Integer, ArrayList<Integer[]>>) runQuery(DatabaseQueryType.SELECT,
@@ -3133,20 +2415,17 @@ public class DatabaseController
 
 				for (final Integer[] data : boxes)
 				{
-					if (cachedProductBoxes.containsKey(data[0]))
-					{
-						shelf = cachedShelves.get(shelfID);
-						box = cachedProductBoxes.get(data[0]);
-						slot = Shelf.coordinatesToShelfSlotID(shelfID, data[1] + 1, data[2], true);
+					shelf = cachedShelves.get(shelfID);
+					box = getProductBoxByID(data[0]);
+					slot = Shelf.coordinatesToShelfSlotID(shelfID, data[1] + 1, data[2], true);
 
-						DBLOG.trace("Adding: " + box);
-						DBLOG.trace("To: " + shelf);
-						DBLOG.trace("Into: " + slot);
-						// Do not update the database as this method loads the
-						// data from the database into objects.
-						DBLOG.trace("Added: " + shelf.addToSlot(slot, box, false));
-						DBLOG.trace("Result: " + shelf);
-					}
+					DBLOG.trace("Adding: " + box);
+					DBLOG.trace("To: " + shelf);
+					DBLOG.trace("Into: " + slot);
+					// Do not update the database as this method loads the
+					// data from the database into objects.
+					DBLOG.trace("Added: " + shelf.addToSlot(slot, box));
+					DBLOG.trace("Result: " + shelf);
 				}
 			}
 		}
@@ -3155,73 +2434,8 @@ public class DatabaseController
 	}
 
 	/**
-	 * Places the loaded {@link ProductContainer} objects into
-	 * {@link RemovalList} objects.
-	 *
-	 * @throws NoDatabaseLinkException
-	 */
-	private static void setAllContainersToAllRemovalLists() throws NoDatabaseLinkException
-	{
-		final String[] columns = { "*" };
-		@SuppressWarnings("unchecked")
-		final Map<Integer, ArrayList<Integer>> removalListBoxes = (HashMap<Integer, ArrayList<Integer>>) runQuery(DatabaseQueryType.SELECT,
-				DatabaseTable.REMOVALLIST_PRODUCTBOXES, null, columns, null, null);
-
-		int boxcount = 0;
-
-		for (final Integer removalListID : removalListBoxes.keySet())
-		{
-			final ArrayList<Integer> boxIDs = removalListBoxes.get(removalListID);
-			boxcount += boxIDs.size();
-
-			for (final Integer id : boxIDs)
-			{
-				// Do not update the database as this method loads the data from
-				// the database into objects.
-				getRemovalListByID(removalListID, true).addProductBox(getProductBoxByID(id));
-			}
-		}
-
-		DBLOG.debug(boxcount + " ProductBoxes placed on " + removalListBoxes.size() + " RemovalLists.");
-	}
-
-	/**
-	 * Places the loaded {@link ProductContainer} objects into
-	 * {@link RemovalList} objects.
-	 *
-	 * @throws NoDatabaseLinkException
-	 */
-	private static void setAllContainersToAllManifests() throws NoDatabaseLinkException
-	{
-		final String[] columns = { "*" };
-		@SuppressWarnings("unchecked")
-		final Map<Integer, ArrayList<Integer>> manifestBoxes = (HashMap<Integer, ArrayList<Integer>>) runQuery(DatabaseQueryType.SELECT,
-				DatabaseTable.MANIFEST_PRODUCTBOXES, null, columns, null, null);
-
-		int boxcount = 0;
-
-		for (final Integer manifestID : manifestBoxes.keySet())
-		{
-			final ArrayList<Integer> boxIDs = manifestBoxes.get(manifestID);
-			boxcount += boxIDs.size();
-
-			/*
-			 * TODO: This bit could be optimized. I'm looping through the same list twice.
-			 */
-
-			Set<ProductBox> boxes = new LinkedHashSet<ProductBox>();
-
-			for (final Integer id : boxIDs)
-				boxes.add(getProductBoxByID(id));
-
-			getManifestByID(manifestID, true).setProductBoxes(boxes);
-		}
-
-		DBLOG.debug(boxcount + " ProductBoxes placed on " + manifestBoxes.size() + " Manifests.");
-	}
-
-	/**
-	 * Loads the following objects into memory:
+	 * Loads all {@link ProductBox} objects from the database into memory.
+	 * Additionally loads the following objects into memory:
 	 * <ul>
 	 * <li>{@link ProductBrand}</li>
 	 * <li>{@link ProductType}</li>
@@ -3230,25 +2444,14 @@ public class DatabaseController
 	 * <li>{@link ProductContainer}</li>
 	 * </ul>
 	 *
-	 * @throws NoDatabaseLinkException
+	 * @return a list of products in the database currently on shelves
+	 * @throws HibernateException when the query failed to commit and has been rolled back
 	 */
-	private static void getAllProductBoxes() throws NoDatabaseLinkException
+	public static ObservableList<Object> getAllProductBoxes() throws HibernateException
 	{
-		final String[] columns = { "*" };
-		@SuppressWarnings("unchecked")
-		final Set<ProductBox> result = (Set<ProductBox>) runQuery(DatabaseQueryType.SELECT, DatabaseTable.CONTAINERS, null, columns, null, null);
-
-		final Iterator<ProductBox> it = result.iterator();
-
-		// Store for reuse.
-		while (it.hasNext())
-		{
-			final ProductBox p = it.next();
-			DBLOG.trace("Caching: " + p);
-			cachedProductBoxes.put(p.getBoxID(), p);
-		}
-
-		DBLOG.info("All " + result.size() + " ProductBoxes cached.");
+		observableProductBoxes.clear();
+		observableProductBoxes.addAll(getAll("ProductBox"));
+		return observableProductBoxes;
 	}
 
 	/**
@@ -3280,310 +2483,116 @@ public class DatabaseController
 	}
 
 	/**
-	 * Loads all {@link RemovalList} and {@link RemovalListState} objects from the database into the cache.
+	 * Loads all {@link RemovalList} objects from the database into memory.
 	 *
-	 * @param getCached Get all removal lists from the cache instead of rebuilding the cache from the database but only
-	 * if the cached removal list IDs match the ones in the database.
-	 * Be aware that the cached data may not be up to date.
-	 * @return an {@link ObservableList} of all removal lists
+	 * @return a list of removal lists in the database
+	 * @throws HibernateException when the query failed to commit and has been rolled back
 	 */
-	public static ObservableList<Object> getAllRemovalLists(final boolean getCached) throws NoDatabaseLinkException
+	public static ObservableList<Object> getAllRemovalLists() throws HibernateException
 	{
-		String[] columns = new String[1];
-
-		if (getCached)
-		{
-			columns[0] = "removallist_id";
-
-			@SuppressWarnings("unchecked")
-			Set<Integer> result = (LinkedHashSet<Integer>) (runQuery(DatabaseQueryType.SELECT, DatabaseTable.REMOVALLISTS, null, columns, null, null));
-
-			// Check if all manifests have been cached by their ID.
-			if (cachedRemovalLists.keySet().containsAll(result))
-			{
-				DBLOG.debug("Returning all cached RemovalLists.");
-				return observableRemovalLists;
-			}
-
-			DBLOG.debug("Unable to return all cached RemovalLists, cached IDs do not match.");
-		}
-
-		columns[0] = "*";
-		@SuppressWarnings("unchecked")
-		final Set<RemovalList> result = (Set<RemovalList>) runQuery(DatabaseQueryType.SELECT, DatabaseTable.REMOVALLISTS, null, columns, null, null);
-
-		final Iterator<RemovalList> it = result.iterator();
-
-		// Store for reuse.
-		while (it.hasNext())
-		{
-			final RemovalList r = it.next();
-			DBLOG.trace("Caching: " + r);
-			cachedRemovalLists.put(r.getDatabaseID(), r);
-		}
-
-		DBLOG.info("All " + result.size() + " RemovalLists cached.");
-
-		setAllContainersToAllRemovalLists();
-
 		observableRemovalLists.clear();
-		observableRemovalLists.addAll(cachedRemovalLists.values());
+		observableRemovalLists.addAll(getAll("RemovalList"));
+
 		return observableRemovalLists;
 	}
 
 	/**
-	 * Gets an {@link ObservableList} of product data in shelves.
+	 * Loads all {@link User} objects from the database into memory.
+	 *
+	 * @return a list of users in the database
+	 * @throws HibernateException when the query failed to commit and has been rolled back
+	 */
+	public static ObservableList<Object> getAllUsers() throws HibernateException
+	{
+		observableUsers.clear();
+		observableUsers.addAll(getAll("User"));
+
+		return observableUsers;
+	}
+
+	public static Set<UserRole> getAllUserRoles()
+	{
+		// TODO: Find a way to put roles into the database.
+		return new LinkedHashSet<UserRole>(Arrays.asList(UserRole.values()));
+	}
+
+	/**
+	 * Loads all {@link Product} objects from the database into memory.
 	 *
 	 * @return a list of products in the database currently on shelves
+	 * @throws HibernateException when the query failed to commit and has been rolled back
 	 */
-	public static ObservableList<Object> getAllProducts() throws NoDatabaseLinkException
+	public static ObservableList<Object> getAllProducts() throws HibernateException
 	{
-		final String[] columns = { "*" };
-
-		@SuppressWarnings("unchecked")
-		final Set<Product> result = (LinkedHashSet<Product>) (runQuery(DatabaseQueryType.SELECT, DatabaseTable.PRODUCTS, null, columns, null, null));
-
-		if (result.size() == 0)
-			DBLOG.warn("No Products present in the database.");
-
-		final Iterator<Product> it = result.iterator();
-
-		// Store for reuse.
-		while (it.hasNext())
-		{
-			final Product p = it.next();
-
-			DBLOG.trace("Caching: " + p);
-
-			cachedProducts.put(p.getProductID(), p);
-		}
-
-		DBLOG.info("All " + result.size() + " Product Brands cached.");
-
 		observableProducts.clear();
-		observableProducts.addAll(cachedProducts.values());
+		observableProducts.addAll(getAll("Product"));
+
 		return observableProducts;
 	}
 
 	/**
-	 * Loads all {@link ProductCategory} objects from the database into the
-	 * cache.
+	 * Loads all {@link ProductCategory} objects from the database into memory.
 	 *
 	 * @return an {@link ObservableList} of all product categories
+	 * @throws HibernateException when the query failed to commit and has been rolled back
 	 */
-	public static ObservableList<Object> getAllProductCategories() throws NoDatabaseLinkException
+	public static ObservableList<Object> getAllProductCategories() throws HibernateException
 	{
-		final String[] columns = { "*" };
-
-		@SuppressWarnings("unchecked")
-		final Set<ProductCategory> result = (LinkedHashSet<ProductCategory>) (runQuery(DatabaseQueryType.SELECT, DatabaseTable.CATEGORIES, null, columns, null,
-				null));
-
-		if (result.size() == 0)
-			DBLOG.warn("No Product Categories present in the database.");
-
-		final Iterator<ProductCategory> it = result.iterator();
-
-		// Store for reuse.
-		while (it.hasNext())
-		{
-			final ProductCategory p = it.next();
-
-			DBLOG.trace("Caching: " + p);
-
-			cachedProductCategories.put(p.getDatabaseID(), p);
-		}
-
-		DBLOG.info("All " + result.size() + " Product Categories cached.");
-
 		observableProductCategories.clear();
-		observableProductCategories.addAll(cachedProductCategories.values());
+		observableProductCategories.addAll(getAll("ProductCategory"));
 
 		return observableProductCategories;
 	}
 
 	/**
-	 * Loads all {@link ProductBrand} objects from the database into the cache.
+	 * Loads all {@link ProductBrand} objects from the database into memory.
 	 *
 	 * @return an {@link ObservableList} of all product brands
+	 * @throws HibernateException when the query failed to commit and has been rolled back
 	 */
-	public static ObservableList<Object> getAllProductBrands() throws NoDatabaseLinkException
+	public static ObservableList<Object> getAllProductBrands() throws HibernateException
 	{
-		final String[] columns = { "*" };
-
-		@SuppressWarnings("unchecked")
-		final Set<ProductBrand> result = (LinkedHashSet<ProductBrand>) (runQuery(DatabaseQueryType.SELECT, DatabaseTable.BRANDS, null, columns, null, null));
-
-		if (result.size() == 0)
-			DBLOG.warn("No Product Brands present in the database.");
-
-		final Iterator<ProductBrand> it = result.iterator();
-
-		// Store for reuse.
-		while (it.hasNext())
-		{
-			final ProductBrand p = it.next();
-
-			DBLOG.trace("Caching: " + p);
-
-			cachedProductBrands.put(p.getDatabaseID(), p);
-		}
-
-		DBLOG.info("All " + result.size() + " Product Brands cached.");
+		// TODO: Can this return a list of ProductBrand objects? Will the JavaFX lists still work?
 
 		observableProductBrands.clear();
-		observableProductBrands.addAll(cachedProductBrands.values());
+		observableProductBrands.addAll(getAll("ProductBrand"));
 		return observableProductBrands;
 	}
 
 	/**
-	 * Loads all {@link RemovalListState} objects from the database into the
-	 * cache.
+	 * Loads all {@link RemovalListState} objects from the database into memory.
 	 *
 	 * @return an {@link ObservableList} of all removal list states
 	 */
-	public static ObservableList<Object> getAllRemovalListStates() throws NoDatabaseLinkException
+	public static ObservableList<Object> getAllRemovalListStates()
 	{
-		final String[] columns = { "*" };
-
-		@SuppressWarnings("unchecked")
-		final Set<RemovalListState> result = (LinkedHashSet<RemovalListState>) (runQuery(DatabaseQueryType.SELECT, DatabaseTable.REMOVALLIST_STATES, null,
-				columns, null, null));
-
-		if (result.size() == 0)
-			DBLOG.warn("No Removal List States present in the database.");
-
-		final Iterator<RemovalListState> it = result.iterator();
-
-		// Store for reuse.
-		while (it.hasNext())
-		{
-			final RemovalListState s = it.next();
-
-			DBLOG.trace("Caching: " + s);
-
-			cachedRemovalListStates.put(s.getDatabaseID(), s);
-		}
-
-		DBLOG.info("All " + result.size() + " Removal List States cached.");
-
 		observableRemovalListStates.clear();
-		observableRemovalListStates.addAll(cachedRemovalListStates.values());
+		observableRemovalListStates.addAll(getAll("RemovalListState"));
 		return observableRemovalListStates;
 	}
 
 	/**
-	 * Loads all {@link Manifest} objects from the database into the cache.
+	 * Loads all {@link Manifest} objects from the database into memory.
 	 *
-	 * @param getCached Get all manifests from the cache instead of rebuilding the cache from the database but only if
-	 * the cached manifest IDs match the ones in the database.
-	 * Be aware that the cached data may not be up to date.
 	 * @return an {@link ObservableList} of all manifests
 	 */
-	public static ObservableList<Object> getAllManifests(final boolean getCached) throws NoDatabaseLinkException
+	public static ObservableList<Object> getAllManifests()
 	{
-		String[] columns = new String[1];
-
-		if (getCached)
-		{
-			columns[0] = "manifest_id";
-
-			@SuppressWarnings("unchecked")
-			Set<Integer> result = (LinkedHashSet<Integer>) (runQuery(DatabaseQueryType.SELECT, DatabaseTable.MANIFESTS, null, columns, null, null));
-
-			// Check if all manifests have been cached by their ID.
-			if (cachedManifests.keySet().containsAll(result))
-			{
-				DBLOG.debug("Returning all cached manifests.");
-				return observableManifests;
-			}
-
-			DBLOG.debug("Unable to return all cached manifests, cached IDs do not match.");
-		}
-
-		columns[0] = "*";
-
-		@SuppressWarnings("unchecked")
-		final Set<Manifest> result = (LinkedHashSet<Manifest>) (runQuery(DatabaseQueryType.SELECT, DatabaseTable.MANIFESTS, null, columns, null, null));
-
-		if (result.size() == 0)
-			DBLOG.warn("No Manifests present in the database.");
-
-		final Iterator<Manifest> it = result.iterator();
-
-		// Store for reuse.
-		while (it.hasNext())
-		{
-			final Manifest m = it.next();
-
-			DBLOG.trace("Caching: " + m);
-
-			cachedManifests.put(m.getDatabaseID(), m);
-		}
-
-		DBLOG.info("All " + result.size() + " Manifests cached.");
-
-		setAllContainersToAllManifests();
-
 		observableManifests.clear();
-		observableManifests.addAll(cachedManifests.values());
+		observableManifests.addAll(getAll("Manifest"));
 		return observableManifests;
 	}
 
 	/**
-	 * Loads all {@link ManifestState} objects from the database into the cache.
+	 * Gets an observable list of manifest states for changing a manifest's state.
+	 * The list consists of states the currently logged in user is allowed to use in addition to the current state of
+	 * the manifest regardless of whether the user is allowed to use it or not.
 	 *
-	 * @param getCached Get all manifest states from the cache instead of
-	 * rebuilding the cache from the database but
-	 * only if the cache contains all the manifest states that are in
-	 * the database. Be aware that the cached
-	 * manifest
-	 * state data may not be up to date.
-	 * @return an {@link ObservableList} of all manifest states
+	 * @return an {@link ObservableList} of manifest states
 	 */
-	public static ObservableList<Object> getAllManifestStates(final boolean getCached, final ManifestState currentState) throws NoDatabaseLinkException
+	public static ObservableList<Object> getManifestStateChangeList(final ManifestState currentState)
 	{
-		String[] columns = new String[1];
-
-		if (getCached)
-		{
-			columns[0] = "manifest_state_id";
-
-			@SuppressWarnings("unchecked")
-			Set<Integer> result = (LinkedHashSet<Integer>) (runQuery(DatabaseQueryType.SELECT, DatabaseTable.MANIFEST_STATES, null, columns, null, null));
-
-			// Check if all manifest states have been cached by their ID.
-			if (cachedManifestStates.keySet().containsAll(result))
-			{
-				DBLOG.debug("Returning all cached manifest states.");
-				return observableManifestStates;
-			}
-
-			DBLOG.debug("Unable to return all cached manifest states, cached IDs do not match.");
-		}
-
-		columns[0] = "*";
-
-		@SuppressWarnings("unchecked")
-		final Set<ManifestState> result = (LinkedHashSet<ManifestState>) (runQuery(DatabaseQueryType.SELECT, DatabaseTable.MANIFEST_STATES, null, columns, null,
-				null));
-
-		if (result.size() == 0)
-			DBLOG.warn("No Manifest States present in the database.");
-
-		final Iterator<ManifestState> it = result.iterator();
-
-		// Store for reuse.
-		while (it.hasNext())
-		{
-			final ManifestState s = it.next();
-
-			DBLOG.trace("Caching: " + s);
-
-			cachedManifestStates.put(s.getDatabaseID(), s);
-		}
-
-		DBLOG.info("All " + result.size() + " Removal List States cached.");
+		final List<Object> states = getAll("ManifestState");
 
 		observableManifestStates.clear();
 
@@ -3594,11 +2603,11 @@ public class DatabaseController
 		 * Logisticians can also see the accepted/rejected state if it is the
 		 * current state of the manifest.
 		 */
-		for (final ManifestState state : cachedManifestStates.values())
+		for (final Object state : states)
 		{
-			if (state.getName().equals("Accepted") || state.getName().equals("Rejected"))
+			if (((ManifestState) state).getName().equals("Accepted") || ((ManifestState) state).getName().equals("Rejected"))
 			{
-				if (LoginController.userRoleIsGreaterOrEqualTo(new Manager()) || state.compareTo(currentState) == 0)
+				if (LoginController.userRoleIsGreaterOrEqualTo(UserRole.MANAGER) || ((ManifestState) state).compareTo(currentState) == 0)
 					observableManifestStates.add(state);
 			}
 			else
@@ -3611,29 +2620,12 @@ public class DatabaseController
 	/**
 	 * Clears all cached data.
 	 */
+	@Deprecated
 	public static void clearAllCaches()
 	{
+		// TODO: Get rid of this.
 		DBLOG.info("Clearing all cached data.");
-		cachedProductBoxes.clear();
-		cachedProductBrands.clear();
-		cachedProductCategories.clear();
-		cachedProducts.clear();
-		cachedProductTypes.clear();
-		cachedRemovalLists.clear();
-		cachedRemovalListStates.clear();
 		cachedShelves.clear();
-	}
-
-	/**
-	 * Gets all the {@link RemovalList} objects that have been loaded from the
-	 * database at some point during the execution of the program.
-	 *
-	 * @return a map of cached removal lists where the key is the database ID
-	 * and the value is the object
-	 */
-	public static Map<Integer, RemovalList> getCachedRemovalLists()
-	{
-		return cachedRemovalLists;
 	}
 
 	/**
@@ -3643,5 +2635,14 @@ public class DatabaseController
 	{
 		DBLOG.info("Clearing search results.");
 		observableProductBoxSearchResults.clear();
+	}
+
+	/**
+	 * Closes the session factory.
+	 */
+	public static void closeSessionFactory()
+	{
+		DBLOG.info("Closing session manager.");
+		sessionFactory.close();
 	}
 }

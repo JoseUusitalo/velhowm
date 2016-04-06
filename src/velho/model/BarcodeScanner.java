@@ -172,7 +172,7 @@ public class BarcodeScanner
 				boxSet.add(new ProductBox(	-1,
 											randomDate,
 											maxSize,
-											DatabaseController.getProductByID(productIDs.get(i % uniqueProducts), true), // Make sure that the index doesn't go over the number of unique products in the database.
+											DatabaseController.getProductByID(productIDs.get(i % uniqueProducts)), // Make sure that the index doesn't go over the number of unique products in the database.
 											productCount));
 				// @formatter:on
 			}

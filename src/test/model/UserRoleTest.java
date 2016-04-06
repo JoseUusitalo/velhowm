@@ -1,24 +1,23 @@
 package test.model;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 import org.junit.Test;
 
-import velho.model.Administrator;
-import velho.model.Logistician;
-import velho.model.Manager;
-import velho.model.interfaces.UserRole;
+import velho.model.enums.UserRole;
 
 /**
- * Test for the {@link UserRole} interface and classes: {@link Administrator}, {@link Manager}, {@link Logistician}.
+ * Test for the {@link UserRole} enum.
  *
  * @author Jose Uusitalo
  */
 public class UserRoleTest
 {
-	private UserRole administrator = new Administrator();
-	private UserRole manager = new Manager();
-	private UserRole logistician = new Logistician();
+	private final UserRole administrator = UserRole.ADMINISTRATOR;
+	private final UserRole manager = UserRole.MANAGER;
+	private final UserRole logistician = UserRole.LOGISTICIAN;
+	private final UserRole guest = UserRole.GUEST;
 
 	@Test
 	public final void testGetName()
@@ -29,43 +28,28 @@ public class UserRoleTest
 	@Test
 	public final void testCompareTo_Administrator()
 	{
-		assertEquals(1, administrator.compareTo(manager));
-		assertEquals(1, administrator.compareTo(logistician));
+		assertTrue(administrator.compareTo(guest) > 0);
+		assertTrue(administrator.compareTo(logistician) > 0);
+		assertTrue(administrator.compareTo(manager) > 0);
 		assertEquals(0, administrator.compareTo(administrator));
 	}
 
 	@Test
 	public final void testCompareTo_Manager()
 	{
-		assertEquals(1, manager.compareTo(logistician));
+		assertTrue(manager.compareTo(guest) > 0);
+		assertTrue(manager.compareTo(logistician) > 0);
 		assertEquals(0, manager.compareTo(manager));
-		assertEquals(-1, manager.compareTo(administrator));
+		assertTrue(manager.compareTo(administrator) < 0);
 	}
 
 	@Test
 	public final void testCompareTo_Logistician()
 	{
+		assertTrue(logistician.compareTo(guest) > 0);
 		assertEquals(0, logistician.compareTo(logistician));
-		assertEquals(-1, logistician.compareTo(administrator));
-		assertEquals(-1, logistician.compareTo(manager));
-	}
-
-	@Test(expected = IllegalArgumentException.class)
-	public final void testCompareTo_Administrator_Null()
-	{
-		administrator.compareTo(null);
-	}
-
-	@Test(expected = IllegalArgumentException.class)
-	public final void testCompareTo_Manager_Null()
-	{
-		manager.compareTo(null);
-	}
-
-	@Test(expected = IllegalArgumentException.class)
-	public final void testCompareTo_Logistician_Null()
-	{
-		logistician.compareTo(null);
+		assertTrue(logistician.compareTo(administrator) < 0);
+		assertTrue(logistician.compareTo(manager) < 0);
 	}
 
 	@Test
@@ -74,6 +58,7 @@ public class UserRoleTest
 		assertEquals(administrator.getName(), administrator.toString());
 		assertEquals(manager.getName(), manager.toString());
 		assertEquals(logistician.getName(), logistician.toString());
+		assertEquals(guest.getName(), guest.toString());
 	}
 
 }

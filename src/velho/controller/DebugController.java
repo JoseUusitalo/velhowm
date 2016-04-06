@@ -1,10 +1,14 @@
 package velho.controller;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 import java.util.Random;
 
 import javafx.stage.Stage;
 import velho.model.BarcodeScanner;
-import velho.model.exceptions.NoDatabaseLinkException;
+import velho.model.enums.UserRole;
 import velho.view.DebugWindow;
 
 /**
@@ -33,10 +37,19 @@ public class DebugController
 	 * @param removalPlatformController
 	 * @throws NoDatabaseLinkException
 	 */
-	public DebugController(final RemovalPlatformController removalPlatformController) throws NoDatabaseLinkException
+	public DebugController(final RemovalPlatformController removalPlatformController)
 	{
 		this.removalPlatformController = removalPlatformController;
-		view = new DebugWindow(this, DatabaseController.getUserRoleNames());
+		List<UserRole> roles = new ArrayList<UserRole>();
+		roles.addAll(Arrays.asList(UserRole.values()));
+
+		/*
+		 * Reverse the roles so administrator is first.
+		 * This makes testing faster.
+		 */
+		Collections.reverse(roles);
+
+		view = new DebugWindow(this, roles);
 	}
 
 	/**
@@ -54,19 +67,11 @@ public class DebugController
 	 *
 	 * @param userRoleName role to log in as
 	 */
-	public void login(final String userRoleName)
+	public void login(final UserRole role)
 	{
-		try
-		{
-			LoginController.debugLogin(userRoleName);
-			view.setLogInButton(false);
-			view.setLogOutButton(true);
-		}
-		catch (final NoDatabaseLinkException e)
-		{
-			PopupController.error("Login failed, no database connection.");
-			DatabaseController.tryReLink();
-		}
+		LoginController.debugLogin(role);
+		view.setLogInButton(false);
+		view.setLogOutButton(true);
 	}
 
 	/**
