@@ -3,45 +3,96 @@
 	<description>Group #1 Project: VELHO Warehouse Management</description>
 	<property name="target" value="1.8"/>
 	<property name="source" value="1.8"/>
-	<property name="src" location="src"/>
-	<property name="classes" location="bin"/>
+	<property name="lib.dir" location="lib" />
+	<property name="src.dir" location="src/velho" />
+	<property name="test.dir" location="src/test" />
+	<property name="build.dir" location="bin" />
+	<property name="build.test.dir" location="bin" />
+	<property name="test.report.dir" location="testreport" />
+
 	<property name="main-class" value="velho.view.MainWindow"/>
 
 	<path id="velho.classpath">
-        <pathelement location="bin"/>
-        <pathelement location="lib/h2-1.4.191.jar"/>
-        <pathelement location="lib/apache-log4j-1.2.17/log4j-1.2.17.jar"/>
-        <pathelement location="lib/eclipse/*"/>
-		<pathelement location="lib/hibernate/java8/*"/>
-        <pathelement location="lib/hibernate/jpa/*"/>
-        <pathelement location="lib/hibernate/required/*"/>
-    </path>
+		<fileset dir="${lib.dir}" includes="h2-1.4.191.jar" />
+		<fileset dir="${lib.dir}" includes="apache-log4j-1.2.17/*.jar" />
+		<fileset dir="${lib.dir}" includes="eclipse/*.jar" />
+		<fileset dir="${lib.dir}" includes="hibernate/java8/*.jar" />
+		<fileset dir="${lib.dir}" includes="hibernate/jpa/*.jar" />
+		<fileset dir="${lib.dir}" includes="hibernate/required/*.jar" />
+		<pathelement location="${build.dir}" />
+	</path>
 
-	<target name="init" description="make the classes folder">
+
+	<!-- Deletes the existing build, docs and dist directory-->
+	<target name="clean">
+		<delete dir="${build.dir}" />
+		<delete dir="${test.report.dir}" />
+	</target>
+
+	<!-- Creates the  build, docs and dist directory-->
+	<target name="init">
 		<tstamp/>
-		<mkdir dir="${classes}"/>
+		<mkdir dir="${build.dir}" />
+		<mkdir dir="${build.test.dir}" />
+		<mkdir dir="${test.report.dir}" />
 	</target>
 
-	<target name="compile" depends="init" description="compile the source">
-		<javac source="${source}" destdir="${classes}" target="${target}" includeantruntime="false">
-            <src path="${src}"/>
-            <classpath refid="velho.classpath"/>
-        </javac>
+	<!-- Compiles the java code (including the usage of library for JUnit -->
+	<target name="compile" depends="clean, init">
+		<javac source="${source}" target="${target}" srcdir="${src.dir}" destdir="${build.dir}" includeantruntime="false">
+			<classpath refid="velho.classpath" />
+		</javac>
+
+		<javac srcdir="${test.dir}" destdir="${build.test.dir}" includeantruntime="false">
+			<classpath refid="velho.classpath" />
+		</javac>
 	</target>
 
-	<target name="jar" depends="compile" description="make the jar">
-		<jar destfile="VelhoWM_${DSTAMP}.jar" basedir="${classes}">
+	<target name="test" depends="compile">
+		<junit printsummary="yes" haltonerror="yes" haltonfailure="yes">
+			<formatter type="plain" usefile="false" />
+			<formatter type="xml" />
+			<batchtest todir="${target.report.dir}">
+				<fileset dir="${src.test.dir}">
+					<include name="**/*Test.java" />
+					<exclude name="**/Test*All.java" />
+				</fileset>
+			</batchtest>
+			<classpath>
+				<pathelement location="${target.classes.java.dir}" />
+				<pathelement location="${target.classes.test.dir}" />
+				<pathelement path="lib/junit-4.10.jar" />
+			</classpath>
+		</junit>
+	</target>
+
+	<target name="junit" depends="compile">
+		<junit haltonerror="yes" haltonfailure="yes">
+			<classpath refid="velho.classpath" />
+
+			<classpath>
+				<pathelement location="${build.test.dir}"/>
+			</classpath>
+
+			<formatter type="xml" />
+
+			<batchtest todir="${target.report.dir}">
+				<fileset dir="${test.dir}">
+					<include name="test/model/*Test.java" />
+					<exclude name="test/model/All*Tests.java" />
+				</fileset>
+			</batchtest>
+		</junit>
+	</target>
+
+	<target name="jar" depends="compile, junit" description="make the jar">
+		<jar destfile="VELHOWM_${DSTAMP}.jar" basedir="${build.dir}">
 			<manifest>
 				<attribute name="Main-Class" value="${main-class}"/>
 			</manifest>
 		</jar>
 	</target>
 
-	<target name="use" depends="jar" description="use the task">
-		<java classname="${main-class}" fork="true">
-		  <classpath>
-		    <path refid="velho.classpath"/>
-		  </classpath>
-		</java>
+	<target name="use" depends="jar">
 	</target>
 </project>
