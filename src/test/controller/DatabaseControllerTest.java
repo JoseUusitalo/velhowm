@@ -102,41 +102,41 @@ public class DatabaseControllerTest
 	}
 
 	@Test
-	public final void testAuthenticate_InvalidPinLong() throws NoDatabaseLinkException
+	public final void testAuthenticate_InvalidPinLong()
 	{
-		assertEquals(null, DatabaseController.authenticateBadgeID("1111112"));
+		assertEquals(null, DatabaseController.getUserByBadgeID("1111112"));
 	}
 
 	@Test
-	public final void testAuthenticate_InvalidPinShort() throws NoDatabaseLinkException
+	public final void testAuthenticate_InvalidPinShort()
 	{
-		assertEquals(null, DatabaseController.authenticateBadgeID("0"));
+		assertEquals(null, DatabaseController.getUserByBadgeID("0"));
 	}
 
 	@Test
-	public final void testAuthenticate_InvalidString() throws NoDatabaseLinkException
+	public final void testAuthenticate_InvalidString()
 	{
-		assertEquals(null, DatabaseController.authenticateBadgeID("this is NOT a valid pin or badge number"));
+		assertEquals(null, DatabaseController.getUserByBadgeID("this is NOT a valid pin or badge number"));
 	}
 
 	@Test
-	public final void testAuthenticate_ValidBadge() throws NoDatabaseLinkException
+	public final void testAuthenticate_ValidBadge()
 	{
-		final User user = DatabaseController.authenticateBadgeID("12345678");
+		final User user = DatabaseController.getUserByBadgeID("12345678");
 		assertEquals("Badger", user.getFirstName());
 		assertEquals("Testaccount", user.getLastName());
 	}
 
 	@Test
-	public final void testAuthenticate_InvalidBadgeLong() throws NoDatabaseLinkException
+	public final void testAuthenticate_InvalidBadgeLong()
 	{
-		assertEquals(null, DatabaseController.authenticateBadgeID("100000000"));
+		assertEquals(null, DatabaseController.getUserByBadgeID("100000000"));
 	}
 
 	@Test
-	public final void testAuthenticate_InvalidBadgeShort() throws NoDatabaseLinkException
+	public final void testAuthenticate_InvalidBadgeShort()
 	{
-		assertEquals(null, DatabaseController.authenticateBadgeID("2222222"));
+		assertEquals(null, DatabaseController.getUserByBadgeID("2222222"));
 	}
 
 	@Test

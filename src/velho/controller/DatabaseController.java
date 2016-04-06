@@ -1523,42 +1523,23 @@ public class DatabaseController
 	}
 
 	/**
-	 * <p>
-	 * Authenticates a user with the given badge ID string.
-	 * </p>
-	 * <p>
-	 * Warning: Assumes that the badge ID is technically valid.
-	 * </p>
+	 * Gets a user with the given badge ID string.
 	 *
 	 * @param badgeID a badge ID string
-	 * @return a {@link User} object representing the authenticated user or
-	 * <code>null</code> for invalid credentials
-	 * @throws NoDatabaseLinkException
-	 * @see User#isValidBadgeID(String)
+	 * @return a {@link User} object representing the authenticated user or <code>null</code> for invalid badge id
 	 */
-	public static User authenticateBadgeID(final String badgeID) throws NoDatabaseLinkException
+	public static User getUserByBadgeID(final String badgeID)
 	{
-		try
-		{
-			Integer.parseInt(badgeID);
-		}
-		catch (final NumberFormatException e)
-		{
-			// Although badge IDs are stored as string, they are still numbers.
-			return null;
-		}
+		final Session session = sessionFactory.openSession();
 
-		final String[] columns = { "user_id", "first_name", "last_name", "role" };
-		final List<String> where = new ArrayList<String>();
-		where.add("badge_id = " + badgeID);
-
+		// Transaction is automatically generated.
 		@SuppressWarnings("unchecked")
-		final Set<User> result = (LinkedHashSet<User>) (runQuery(DatabaseQueryType.SELECT, DatabaseTable.USERS, null, columns, null, where));
+		final List<User> result = session.createQuery("from User where badgeID = :id").setParameter("id", badgeID).list();
 
-		if (result.size() == 0)
-			return null;
+		session.close();
 
-		return result.iterator().next();
+		// Only one result should be returned by the query as the database constrait does not allow duplicate badge ids.
+		return result.get(0);
 	}
 
 	/**
@@ -1816,11 +1797,7 @@ public class DatabaseController
 				if (MainWindow.DEBUG_MODE)
 					DBLOG.debug("Unable to find a product box with the wanted size of " + wantedProductCount + ". Looking from multiple boxes.");
 
-				/*
-				 * Remove the product count condition and find all product boxes with the wanted product ID.
-				 * This could be done with the getByID() private method but since we already have a session open and
-				 * more importantly this query is done in a loop, it is faster to do it here.
-				 */
+				// Remove the product count condition and find all product boxes with the wanted product ID.
 				// @formatter:off
 				boxes = session.createQuery("from ProductBox as pb"
 										  + " where pb.product.databaseID = :id"
@@ -2452,6 +2429,26 @@ public class DatabaseController
 		observableProductBoxes.clear();
 		observableProductBoxes.addAll(getAll("ProductBox"));
 		return observableProductBoxes;
+	}
+
+	/**
+	 * Gets all badge IDs from the database.
+	 *
+	 * @return a list of badge id number strings
+	 */
+	public static List<String> getAllBadgeIDS()
+	{
+		final Session session = sessionFactory.openSession();
+
+		// Transaction is created and closed automatically with the session.
+		session.beginTransaction();
+
+		@SuppressWarnings("unchecked")
+		final List<String> result = session.createQuery("select badgeID from User where badgeID is not null").list();
+
+		session.close();
+
+		return result;
 	}
 
 	/**

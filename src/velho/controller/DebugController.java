@@ -6,6 +6,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Random;
 
+import org.apache.log4j.Logger;
+
 import javafx.stage.Stage;
 import velho.model.BarcodeScanner;
 import velho.model.enums.UserRole;
@@ -18,6 +20,11 @@ import velho.view.DebugWindow;
  */
 public class DebugController
 {
+	/**
+	 * Apache log4j logger: System.
+	 */
+	private static final Logger SYSLOG = Logger.getLogger(DebugController.class.getName());
+
 	/**
 	 * The {@link DebugWindow}.
 	 */
@@ -49,7 +56,7 @@ public class DebugController
 		 */
 		Collections.reverse(roles);
 
-		view = new DebugWindow(this, roles);
+		view = new DebugWindow(this, roles, DatabaseController.getAllBadgeIDS());
 	}
 
 	/**
@@ -69,9 +76,19 @@ public class DebugController
 	 */
 	public void login(final UserRole role)
 	{
-		LoginController.debugLogin(role);
-		view.setLogInButton(false);
-		view.setLogOutButton(true);
+		if (LoginController.debugLogin(role))
+			setLogInButtonVisiblity(false);
+	}
+
+	/**
+	 * Forcibly logs the user in with a badge number.
+	 *
+	 * @param userRoleName role to log in as
+	 */
+	public void login(final String badgeString)
+	{
+		if (LoginController.login(badgeString))
+			setLogInButtonVisiblity(false);
 	}
 
 	/**
@@ -82,28 +99,19 @@ public class DebugController
 		// Only log out if a user is logged in, otherwise just visually toggle the buttons.
 		if (LoginController.isLoggedIn())
 			LoginController.logout();
-		view.setLogInButton(true);
-		view.setLogOutButton(false);
+		setLogInButtonVisiblity(true);
 	}
 
 	/**
-	 * Shows or hides the login button.
+	 * Shows or hides the login/logout buttons.
 	 *
 	 * @param visibility show log in button?
 	 */
-	public void setLogInButton(final boolean visibility)
+	public void setLogInButtonVisiblity(final boolean visibility)
 	{
 		view.setLogInButton(visibility);
-	}
-
-	/**
-	 * Shows or hides the logout button.
-	 *
-	 * @param visibility show log out button?
-	 */
-	public void setLogOutButton(final boolean visibility)
-	{
-		view.setLogOutButton(visibility);
+		view.setLogOutButton(!visibility);
+		view.setScanBadgeButton(visibility);
 	}
 
 	/**
@@ -137,5 +145,16 @@ public class DebugController
 	public void emptyPlatform()
 	{
 		removalPlatformController.emptyPlatform();
+	}
+
+	/**
+	 * Sends the given badge ID to the badge scanner.
+	 *
+	 * @param badgeID badge ID number string
+	 */
+	public static void scanBadge(final String badgeID)
+	{
+		SYSLOG.info("Badge scanned: " + badgeID);
+		ExternalSystemsController.receiveBadgeID(badgeID);
 	}
 }

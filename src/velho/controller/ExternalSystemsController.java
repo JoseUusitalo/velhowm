@@ -211,4 +211,18 @@ public class ExternalSystemsController
 		SYSLOG.info("VelhoWM has received a manifest by driver " + driverID + " with " + boxSet.size() + " product boxes.");
 		manifestController.receiveShipment(boxSet, orderDate, driverID);
 	}
+
+	/**
+	 * Receives a badge ID from the badge scanner.
+	 *
+	 * @param badgeID badge identification string
+	 * @return
+	 */
+	public static void receiveBadgeID(final String badgeID)
+	{
+		// TODO: Observer model.
+
+		SYSLOG.info("VELHOWM has received an RFID badge ID: " + badgeID);
+		LoginController.login(badgeID);
+	}
 }
