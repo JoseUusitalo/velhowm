@@ -54,7 +54,7 @@ public class UserController implements UIActionController
 	public User createUser(final String badgeID, final String userPIN, final String userFirstName, final String userLastName, final UserRole userRole,
 			final boolean showPopup)
 	{
-		if (User.validateUserData(badgeID, userPIN, userFirstName, userLastName, userRole))
+		if (validateUserData(badgeID, userPIN, userFirstName, userLastName, userRole))
 		{
 			User newUser;
 			// If no pin is defined, use badge ID.
@@ -232,5 +232,90 @@ public class UserController implements UIActionController
 	public void createAction(final Object data)
 	{
 		throw new UnsupportedOperationException();
+	}
+
+	/**
+	 * Validates the user data against the database requirements.
+	 * Either a badge ID or a PIN must be defined.
+	 * Both cannot be null.
+	 * Both cannot be defined.
+	 *
+	 * @param badgeID RFID identification string of the user's RFID badge
+	 * @param pin the pin string used to log in to the system if no RFID badge ID is provided
+	 * @param firstName the first name of the user
+	 * @param lastName the last name of the user
+	 * @param roleName the name of the role of the user
+	 *
+	 * @return <code>true</code> if given information is valid
+	 * @throws NoDatabaseLinkException
+	 */
+	public static boolean validateUserData(final String badgeID, final String pin, final String firstName, final String lastName, final UserRole role)
+	{
+		final boolean hasBadgeID = isValidBadgeID(badgeID);
+		final boolean hasPIN = isValidPIN(pin);
+
+		// Must have exactly one.
+		if ((hasBadgeID && hasPIN) || (!hasBadgeID && !hasPIN))
+			return false;
+
+		// Name cannot be null, empty, or longer than maximum and length.
+		if (firstName == null || firstName.isEmpty() || firstName.length() > User.MAX_NAME_LENGTH)
+			return false;
+
+		// Name cannot be null, empty, or longer than maximum and length.
+		if (lastName == null || lastName.isEmpty() || lastName.length() > User.MAX_NAME_LENGTH)
+			return false;
+
+		// TODO: The role is not in the database at the moment.
+		if (role == null)
+			return false;
+
+		return true;
+	}
+
+	/**
+	 * Checks if the given PIN is valid.
+	 * PINs must be numerical.
+	 *
+	 * @param pin PIN to check
+	 * @return <code>true</code> if the pin is valid
+	 */
+	public static boolean isValidPIN(final String pin)
+	{
+		if (pin == null || pin.length() != User.PIN_LENGTH)
+			return false;
+
+		try
+		{
+			int value = Integer.parseInt(pin);
+			return (value >= 0 && value <= User.MAX_PIN_VALUE);
+		}
+		catch (NumberFormatException e)
+		{
+			return false;
+		}
+	}
+
+	/**
+	 * Checks if the given badge ID is valid.
+	 * Badge IDs must be numerical.
+	 *
+	 * @param badgeID badge ID to check
+	 * @return <code>true</code> if the badge ID is valid
+	 */
+	public static boolean isValidBadgeID(final String badgeID)
+	{
+		if (badgeID == null || badgeID.length() != User.BADGE_ID_LENGTH)
+			return false;
+
+		try
+		{
+			int value = Integer.parseInt(badgeID);
+			return (value >= 0 && value <= User.MAX_BADGE_ID_VALUE);
+		}
+		catch (NumberFormatException e)
+		{
+			return false;
+		}
 	}
 }
