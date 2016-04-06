@@ -1,5 +1,7 @@
 package velho.model;
 
+import velho.controller.DatabaseController;
+import velho.controller.UserController;
 import velho.model.enums.UserRole;
 
 /**
@@ -91,6 +93,31 @@ public class User implements Comparable<User>
 		this.firstName = firstName;
 		this.lastName = lastName;
 		this.role = role;
+	}
+
+	/**
+	 * @param badgeID
+	 * @param pin
+	 * @param firstName
+	 * @param lastName
+	 * @param roleName
+	 */
+	public User(final String badgeID, final String pin, final String firstName, final String lastName, final String roleName)
+	{
+		// For CSV reader.
+
+		if (UserController.validateUserData(badgeID, pin, firstName, lastName, roleName))
+		{
+			this.badgeID = badgeID;
+			this.pin = pin;
+			this.firstName = firstName;
+			this.lastName = lastName;
+			this.role = DatabaseController.getRoleByName(roleName);
+		}
+		else
+		{
+			throw new IllegalArgumentException("Invalid user data.");
+		}
 	}
 
 	/**

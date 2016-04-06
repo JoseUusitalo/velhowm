@@ -318,4 +318,9 @@ public class UserController implements UIActionController
 			return false;
 		}
 	}
+
+	public static boolean validateUserData(final String badgeID, final String pin, final String firstName, final String lastName, final String roleName)
+	{
+		return validateUserData(badgeID, pin, firstName, lastName, DatabaseController.getRoleByName(roleName));
+	}
 }

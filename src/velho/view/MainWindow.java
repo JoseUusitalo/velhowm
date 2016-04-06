@@ -1,5 +1,6 @@
 package velho.view;
 
+import java.io.FileNotFoundException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -29,6 +30,7 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
+import velho.controller.CSVController;
 import velho.controller.DatabaseController;
 import velho.controller.DebugController;
 import velho.controller.ExternalSystemsController;
@@ -71,7 +73,7 @@ public class MainWindow extends Application
 	 * Enable or disable showing windows. DEBUG_MODE must be <code>true</code>
 	 * for this to affect anything.
 	 */
-	public static final boolean SHOW_WINDOWS = true;
+	public static final boolean SHOW_WINDOWS = false;
 
 	/**
 	 * Enable TRACE level logging. DEBUG_MODE must be <code>true</code> for this
@@ -249,6 +251,16 @@ public class MainWindow extends Application
 						//@formatter:on
 
 						SYSLOG.debug("All controllers created.");
+
+						try
+						{
+							CSVController.readIntoDatabase("data/users.csv");
+						}
+						catch (FileNotFoundException e)
+						{
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
 					}
 					else
 					{

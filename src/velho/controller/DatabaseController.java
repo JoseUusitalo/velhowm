@@ -1160,6 +1160,25 @@ public class DatabaseController
 	}
 
 	/**
+	 * Gets the {@link UserRole} object according to the given name.
+	 *
+	 * @param roleName the name of the role (case insensitive)
+	 * @return the corresponding user role object or <code>null</code> if role was not found
+	 */
+	public static UserRole getRoleByName(final String roleName)
+	{
+		// TODO: Find a way to put the roles into the database.
+
+		for (final UserRole role : UserRole.values())
+		{
+			if (role.getName().equalsIgnoreCase(roleName))
+				return role;
+		}
+
+		return null;
+	}
+
+	/**
 	 * Attempts to find a subset of {@link ProductBox} objects from the given
 	 * list of product boxes that contain at
 	 * least the wanted number of products.
