@@ -94,9 +94,9 @@ public class DatabaseControllerTest
 	}
 
 	@Test
-	public final void testAuthenticate_ValidPin() throws NoDatabaseLinkException
+	public final void testAuthenticate_ValidPin()
 	{
-		final User user = DatabaseController.authenticatePIN("Admin", "Test", "111111");
+		final User user = DatabaseController.getUserByNamesAndPIN("Admin", "Test", "111111");
 		assertEquals("Admin", user.getFirstName());
 		assertEquals("Test", user.getLastName());
 	}
@@ -265,9 +265,9 @@ public class DatabaseControllerTest
 	}
 
 	@Test
-	public final void testAuthenticatePIN_Invalid() throws NoDatabaseLinkException
+	public final void testAuthenticatePIN_Invalid()
 	{
-		assertEquals(null, DatabaseController.authenticatePIN(null, "", "-1"));
+		assertEquals(null, DatabaseController.getUserByNamesAndPIN("Admin", "Test", "-1"));
 	}
 
 	@Test

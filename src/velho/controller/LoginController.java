@@ -7,7 +7,6 @@ import javafx.scene.layout.GridPane;
 import velho.model.User;
 import velho.model.enums.Position;
 import velho.model.enums.UserRole;
-import velho.model.exceptions.NoDatabaseLinkException;
 import velho.view.LoginView;
 import velho.view.MainWindow;
 
@@ -77,6 +76,8 @@ public class LoginController
 	 */
 	public static boolean login(final String badgeString)
 	{
+		SYSLOG.info("Attempting to log in with: " + badgeString);
+
 		if (UserController.isValidBadgeID(badgeString))
 		{
 			currentUser = DatabaseController.getUserByBadgeID(badgeString);
@@ -116,47 +117,40 @@ public class LoginController
 	 * @param lastName the last name of the user
 	 * @param pin login PIN string
 	 */
-	public static boolean login(final String firstName, final String lastName, final String pin)
+	public static boolean login(final String firstName, final String lastName, final String authenticationString)
 	{
-		SYSLOG.info("Attempting to log in with: " + firstName + " " + lastName + " " + pin);
+		if (firstName.isEmpty() || lastName.isEmpty())
+			return login(authenticationString);
 
-		if (!firstName.isEmpty() && !lastName.isEmpty())
+		SYSLOG.info("Attempting to log in with: " + firstName + " " + lastName + " : " + authenticationString);
+
+		if (UserController.isValidPIN(authenticationString))
 		{
-			if (UserController.isValidPIN(pin))
+			currentUser = DatabaseController.getUserByNamesAndPIN(firstName, lastName, authenticationString);
+
+			// Valid credentials.
+			if (currentUser != null)
 			{
-				try
-				{
-					currentUser = DatabaseController.authenticatePIN(firstName, lastName, pin);
+				// Put the user database ID into the MDC thing for log4j.
+				MDC.put("user_id", currentUser.getDatabaseID());
 
-					// Valid credentials.
-					if (currentUser != null)
-					{
-						// Put the user database ID into the MDC thing for log4j.
-						MDC.put("user_id", currentUser.getDatabaseID());
+				USRLOG.info(currentUser.toString() + " logged in with PIN.");
+				uiController.showMainMenu(currentUser.getRole());
+				destroyView();
 
-						USRLOG.info(currentUser.toString() + " logged in with PIN.");
-						uiController.showMainMenu(currentUser.getRole());
-						destroyView();
+				if (MainWindow.DEBUG_MODE)
+					debugController.setLogInButtonVisiblity(false);
 
-						if (MainWindow.DEBUG_MODE)
-							debugController.setLogInButtonVisiblity(false);
-
-						return true;
-					}
-
-					SYSLOG.info("Incorrect PIN or Names.");
-					PopupController.warning("Incorrect PIN or names.");
-				}
-				catch (final NoDatabaseLinkException e)
-				{
-					DatabaseController.tryReLink();
-				}
+				return true;
 			}
-			else
-			{
-				SYSLOG.info("Invalid PIN.");
-				PopupController.warning("Invalid PIN.");
-			}
+
+			SYSLOG.info("Incorrect PIN or Names.");
+			PopupController.warning("Incorrect PIN or names.");
+		}
+		else
+		{
+			SYSLOG.info("Invalid PIN.");
+			PopupController.warning("Invalid PIN.");
 		}
 
 		return false;
