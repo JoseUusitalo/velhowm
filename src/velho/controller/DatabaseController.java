@@ -37,6 +37,7 @@ import velho.model.ProductBox;
 import velho.model.ProductBoxSearchResultRow;
 import velho.model.ProductBrand;
 import velho.model.ProductCategory;
+import velho.model.ProductContainer;
 import velho.model.ProductType;
 import velho.model.RemovalList;
 import velho.model.RemovalListState;
@@ -180,18 +181,17 @@ public class DatabaseController
 	 * @param columnValues values to set to the specified columns
 	 * @param where conditions (can be <code>null</code>)
 	 * @return
-	 * <ul>
-	 * <li>if type is {@link DatabaseQueryType#UPDATE} or
-	 * {@link DatabaseQueryType#DELETE}: the number of rows that were
-	 * changed as a result of the query as an {@link Integer}</li>
-	 * <li>if type is {@link DatabaseQueryType#SELECT}: a Set containing
-	 * the selected data</li>
-	 * </ul>
+	 * 		<ul>
+	 *         <li>if type is {@link DatabaseQueryType#UPDATE} or
+	 *         {@link DatabaseQueryType#DELETE}: the number of rows that were
+	 *         changed as a result of the query as an {@link Integer}</li>
+	 *         <li>if type is {@link DatabaseQueryType#SELECT}: a Set containing
+	 *         the selected data</li>
+	 *         </ul>
 	 * @throws NoDatabaseLinkException
 	 */
 	@Deprecated
-	private static Object runQuery(final DatabaseQueryType type, final DatabaseTable tableName, final Map<DatabaseTable, String> joinOnValues,
-			final String[] columns, final Map<String, Object> columnValues, final List<String> where) throws NoDatabaseLinkException
+	private static Object runQuery(final DatabaseQueryType type, final DatabaseTable tableName, final Map<DatabaseTable, String> joinOnValues, final String[] columns, final Map<String, Object> columnValues, final List<String> where) throws NoDatabaseLinkException
 	{
 		final Connection connection = getConnection();
 		Statement statement = null;
@@ -275,8 +275,7 @@ public class DatabaseController
 						{
 							case USERS:
 								while (result.next())
-									dataSet.add(new User(result.getInt("user_id"), result.getString("first_name"), result.getString("last_name"),
-											getRoleByID(result.getInt("role"))));
+									dataSet.add(new User(result.getInt("user_id"), result.getString("first_name"), result.getString("last_name"), getRoleByID(result.getInt("role"))));
 								break;
 
 							case ROLES:
@@ -299,8 +298,7 @@ public class DatabaseController
 
 							case CATEGORIES:
 								while (result.next())
-									dataSet.add(new ProductCategory(result.getInt("category_id"), result.getString("name"),
-											getProductTypeByID(result.getInt("type"))));
+									dataSet.add(new ProductCategory(result.getInt("category_id"), result.getString("name"), getProductTypeByID(result.getInt("type"))));
 								break;
 
 							case PRODUCTS:
@@ -607,7 +605,7 @@ public class DatabaseController
 	 * Runs a raw SQL query on the database.
 	 *
 	 * @param sql
-	 * SQL to run
+	 *            SQL to run
 	 * @return an Object containing the appropriate data
 	 * @throws NoDatabaseLinkException
 	 */
@@ -803,8 +801,7 @@ public class DatabaseController
 	 * @return an SQL query string
 	 */
 	@Deprecated
-	public static String sqlBuilder(final DatabaseQueryType type, final DatabaseTable tableName, final Map<DatabaseTable, String> joinOnCondition,
-			final String[] columns, final Map<String, Object> columnValues, final List<String> where)
+	public static String sqlBuilder(final DatabaseQueryType type, final DatabaseTable tableName, final Map<DatabaseTable, String> joinOnCondition, final String[] columns, final Map<String, Object> columnValues, final List<String> where)
 	{
 		final StringBuilder sb = new StringBuilder();
 
@@ -978,9 +975,9 @@ public class DatabaseController
 	 *
 	 * @return <code>true</code> if the link was created successfully
 	 * @throws ClassNotFoundException
-	 * when the H2 driver was unable to load
+	 *             when the H2 driver was unable to load
 	 * @throws ExistingDatabaseLinkException
-	 * when a database link already exists
+	 *             when a database link already exists
 	 */
 	@Deprecated
 	public static DatabaseFileState link() throws ClassNotFoundException, ExistingDatabaseLinkException
@@ -1052,8 +1049,8 @@ public class DatabaseController
 	 * to the database again.
 	 *
 	 * @throws NoDatabaseLinkException
-	 * when attempting unlink a database when no database link
-	 * exists
+	 *             when attempting unlink a database when no database link
+	 *             exists
 	 */
 	@Deprecated
 	public static void unlink() throws NoDatabaseLinkException
@@ -1118,8 +1115,7 @@ public class DatabaseController
 		final Session session = sessionFactory.openSession();
 		session.beginTransaction();
 
-		@SuppressWarnings("unchecked")
-		final List<RemovalList> result = session.createQuery("from " + className + " where " + idColumnName + " = :id").setParameter("id", databaseID).list();
+		@SuppressWarnings("unchecked") final List<RemovalList> result = session.createQuery("from " + className + " where " + idColumnName + " = :id").setParameter("id", databaseID).list();
 
 		try
 		{
@@ -1171,10 +1167,10 @@ public class DatabaseController
 	 *
 	 * @param boxes list of product box objects to search from
 	 * @param wantedProductCount number of products wanted from the given
-	 * product boxes
+	 *            product boxes
 	 * @return a list of product boxes that either contains at least the wanted
-	 * number of products, or if there were not
-	 * enough products, the same list that was given
+	 *         number of products, or if there were not
+	 *         enough products, the same list that was given
 	 */
 	private static List<ProductBox> getBoxesContainingAtLeastProducts(final List<ProductBox> boxes, final Integer wantedProductCount)
 	{
@@ -1237,8 +1233,7 @@ public class DatabaseController
 		// product count.
 		while (productCountSum < wantedProductCount)
 		{
-			DBLOG.trace("Search status | Count: " + productCountSum + " / " + wantedProductCount + " | Would Be Index: " + wantedWouldBeIndex + " | Add Index: "
-					+ addCountIndex + " / " + boxProductCount.size());
+			DBLOG.trace("Search status | Count: " + productCountSum + " / " + wantedProductCount + " | Would Be Index: " + wantedWouldBeIndex + " | Add Index: " + addCountIndex + " / " + boxProductCount.size());
 
 			// Looking for too few products, show the smallest box of that
 			// product instead.
@@ -1326,8 +1321,7 @@ public class DatabaseController
 				else
 				{
 					DBLOG.error("Spooky untested code.");
-					DBLOG.error("Search status | Count: " + productCountSum + " / " + wantedProductCount + " | Would Be Index: " + wantedWouldBeIndex
-							+ " | Add Index: " + addCountIndex + " / " + boxProductCount.size());
+					DBLOG.error("Search status | Count: " + productCountSum + " / " + wantedProductCount + " | Would Be Index: " + wantedWouldBeIndex + " | Add Index: " + addCountIndex + " / " + boxProductCount.size());
 				}
 			}
 		}
@@ -1346,7 +1340,7 @@ public class DatabaseController
 	 * @param withDeleteColumn get the delete button column?
 	 *
 	 * @return a map where the key is the column value and value is the column
-	 * name
+	 *         name
 	 */
 	public static Map<String, String> getPublicUserDataColumns(final boolean withDeleteColumn)
 	{
@@ -1369,7 +1363,7 @@ public class DatabaseController
 	 * @param withDeleteColumn get the delete button column?
 	 *
 	 * @return a map where the key is the column value and value is the column
-	 * name
+	 *         name
 	 */
 	public static Map<String, String> getProductDataColumns(final boolean withAddColumn, final boolean withDeleteColumn)
 	{
@@ -1396,7 +1390,7 @@ public class DatabaseController
 	 * objects in table views.
 	 *
 	 * @return a map where the key is the column value and value is the column
-	 * name
+	 *         name
 	 */
 	public static Map<String, String> getRemovalListDataColumns()
 	{
@@ -1421,7 +1415,7 @@ public class DatabaseController
 	 * @param withRemoveColumn get the remove button column?
 	 *
 	 * @return a map where the key is the column value and value is the column
-	 * name
+	 *         name
 	 */
 	public static Map<String, String> getProductSearchDataColumns(final boolean withAddColumn, final boolean withRemoveColumn)
 	{
@@ -1450,7 +1444,7 @@ public class DatabaseController
 	 * objects in table views.
 	 *
 	 * @return a map where the key is the column value and value is the column
-	 * name
+	 *         name
 	 */
 	public static Map<String, String> getManifestDataColumns()
 	{
@@ -1532,7 +1526,7 @@ public class DatabaseController
 	 *
 	 * @param badgeID a badge ID string
 	 * @return a {@link User} object representing the authenticated user or
-	 * <code>null</code> for invalid credentials
+	 *         <code>null</code> for invalid credentials
 	 * @throws NoDatabaseLinkException
 	 * @see User#isValidBadgeID(String)
 	 */
@@ -1552,8 +1546,7 @@ public class DatabaseController
 		final List<String> where = new ArrayList<String>();
 		where.add("badge_id = " + badgeID);
 
-		@SuppressWarnings("unchecked")
-		final Set<User> result = (LinkedHashSet<User>) (runQuery(DatabaseQueryType.SELECT, DatabaseTable.USERS, null, columns, null, where));
+		@SuppressWarnings("unchecked") final Set<User> result = (LinkedHashSet<User>) (runQuery(DatabaseQueryType.SELECT, DatabaseTable.USERS, null, columns, null, where));
 
 		if (result.size() == 0)
 			return null;
@@ -1571,7 +1564,7 @@ public class DatabaseController
 	 *
 	 * @param pin is a PIN string
 	 * @return a {@link User} object representing the authenticated user or
-	 * <code>null</code> for invalid credentials
+	 *         <code>null</code> for invalid credentials
 	 * @throws NoDatabaseLinkException
 	 * @see User#isValidPIN(String)
 	 */
@@ -1583,8 +1576,7 @@ public class DatabaseController
 		where.add("last_name = '" + lastName + "'");
 		where.add("pin = " + pin);
 
-		@SuppressWarnings("unchecked")
-		final Set<User> result = (LinkedHashSet<User>) (runQuery(DatabaseQueryType.SELECT, DatabaseTable.USERS, null, columns, null, where));
+		@SuppressWarnings("unchecked") final Set<User> result = (LinkedHashSet<User>) (runQuery(DatabaseQueryType.SELECT, DatabaseTable.USERS, null, columns, null, where));
 
 		if (result.size() == 0)
 			return null;
@@ -1621,7 +1613,7 @@ public class DatabaseController
 	 *
 	 * @param id the user database ID (use a negative number to denote a debug account)
 	 * @return the corresponding user object, <code>null</code> if a user with that ID does not exist, or the currently
-	 * logged in user (i.e. debug user) if the ID was negative
+	 *         logged in user (i.e. debug user) if the ID was negative
 	 * @throws HibernateException when the query failed to commit and has been rolled back
 	 */
 	public static User getUserByID(final int id) throws HibernateException
@@ -1644,7 +1636,7 @@ public class DatabaseController
 	 *
 	 * @param name unique name of the product
 	 * @return the database ID of the product or <code>-1</code> if the product
-	 * is not present in the database
+	 *         is not present in the database
 	 */
 	public static int getProductIDFromName(final String name) throws NoDatabaseLinkException
 	{
@@ -1652,8 +1644,7 @@ public class DatabaseController
 		final List<String> where = new ArrayList<String>();
 		where.add("name = '" + name + "'");
 
-		@SuppressWarnings("unchecked")
-		final Set<Integer> result = (LinkedHashSet<Integer>) (runQuery(DatabaseQueryType.SELECT, DatabaseTable.PRODUCTS, null, columns, null, where));
+		@SuppressWarnings("unchecked") final Set<Integer> result = (LinkedHashSet<Integer>) (runQuery(DatabaseQueryType.SELECT, DatabaseTable.PRODUCTS, null, columns, null, where));
 
 		if (result.size() == 0)
 			return -1;
@@ -1677,8 +1668,7 @@ public class DatabaseController
 			final List<String> where = new ArrayList<String>();
 			where.add("shelf_id = " + new Integer(shelfid));
 
-			@SuppressWarnings("unchecked")
-			final Set<Object> result = (LinkedHashSet<Object>) (runQuery(DatabaseQueryType.SELECT, DatabaseTable.SHELVES, null, columns, null, where));
+			@SuppressWarnings("unchecked") final Set<Object> result = (LinkedHashSet<Object>) (runQuery(DatabaseQueryType.SELECT, DatabaseTable.SHELVES, null, columns, null, where));
 
 			if (result.size() == 0)
 				return null;
@@ -1734,8 +1724,7 @@ public class DatabaseController
 	{
 		final String[] columns = { "shelf_id" };
 
-		@SuppressWarnings("unchecked")
-		final Set<Integer> result = (LinkedHashSet<Integer>) (runQuery(DatabaseQueryType.SELECT, DatabaseTable.SHELVES, null, columns, null, null));
+		@SuppressWarnings("unchecked") final Set<Integer> result = (LinkedHashSet<Integer>) (runQuery(DatabaseQueryType.SELECT, DatabaseTable.SHELVES, null, columns, null, null));
 
 		final List<Integer> list = new ArrayList<Integer>(result);
 
@@ -1757,8 +1746,7 @@ public class DatabaseController
 	{
 		final String[] columns = { "product_id" };
 
-		@SuppressWarnings("unchecked")
-		final Set<Integer> result = (LinkedHashSet<Integer>) (runQuery(DatabaseQueryType.SELECT, DatabaseTable.PRODUCTS, null, columns, null, null));
+		@SuppressWarnings("unchecked") final Set<Integer> result = (LinkedHashSet<Integer>) (runQuery(DatabaseQueryType.SELECT, DatabaseTable.PRODUCTS, null, columns, null, null));
 		final List<Integer> ints = new ArrayList<Integer>();
 		ints.addAll(result);
 		return ints;
@@ -1778,8 +1766,8 @@ public class DatabaseController
 	 * Searches the database for product boxes of the specified size.
 	 *
 	 * @param productData a map of data to search for where the key is the
-	 * product box
-	 * database ID and the value is the number of products
+	 *            product box
+	 *            database ID and the value is the number of products
 	 * @throws NoDatabaseLinkException
 	 */
 	@SuppressWarnings("unchecked")
@@ -1877,7 +1865,7 @@ public class DatabaseController
 	 *
 	 * @param where conditions in SQL format
 	 * @return a list of found product boxes as
-	 * {@link ProductBoxSearchResultRow} objects
+	 *         {@link ProductBoxSearchResultRow} objects
 	 * @throws NoDatabaseLinkException
 	 */
 	public static List<ProductBoxSearchResultRow> searchProductBox(final List<String> where) throws NoDatabaseLinkException
@@ -1892,11 +1880,10 @@ public class DatabaseController
 	 * @param where conditions in SQL format
 	 * @param joins SQL join statements
 	 * @return a list of found product boxes as
-	 * {@link ProductBoxSearchResultRow} objects
+	 *         {@link ProductBoxSearchResultRow} objects
 	 * @throws NoDatabaseLinkException
 	 */
-	public static List<ProductBoxSearchResultRow> searchProductBox(final List<String> where, final Map<DatabaseTable, String> joins)
-			throws NoDatabaseLinkException
+	public static List<ProductBoxSearchResultRow> searchProductBox(final List<String> where, final Map<DatabaseTable, String> joins) throws NoDatabaseLinkException
 	{
 		final List<ProductBoxSearchResultRow> foundProducts = FXCollections.observableArrayList();
 
@@ -1911,8 +1898,7 @@ public class DatabaseController
 		if (joins != null)
 			join.putAll(joins);
 
-		@SuppressWarnings("unchecked")
-		final Set<ProductBox> result = (LinkedHashSet<ProductBox>) (runQuery(DatabaseQueryType.SELECT, DatabaseTable.CONTAINERS, join, columns, null, where));
+		@SuppressWarnings("unchecked") final Set<ProductBox> result = (LinkedHashSet<ProductBox>) (runQuery(DatabaseQueryType.SELECT, DatabaseTable.CONTAINERS, join, columns, null, where));
 
 		for (final ProductBox box : result)
 			foundProducts.add(new ProductBoxSearchResultRow(box));
@@ -1984,9 +1970,7 @@ public class DatabaseController
 
 		DBLOG.trace(shelf);
 
-		@SuppressWarnings("unchecked")
-		final Map<Integer, ArrayList<Integer[]>> shelfBoxMap = (HashMap<Integer, ArrayList<Integer[]>>) runQuery(DatabaseQueryType.SELECT,
-				DatabaseTable.SHELF_PRODUCTBOXES, null, columns, null, where);
+		@SuppressWarnings("unchecked") final Map<Integer, ArrayList<Integer[]>> shelfBoxMap = (HashMap<Integer, ArrayList<Integer[]>>) runQuery(DatabaseQueryType.SELECT, DatabaseTable.SHELF_PRODUCTBOXES, null, columns, null, where);
 
 		// If the shelf is not empty.
 		if (!shelfBoxMap.isEmpty())
@@ -2397,9 +2381,7 @@ public class DatabaseController
 	{
 		// TODO: Get rid of this.
 		final String[] columns = { "*" };
-		@SuppressWarnings("unchecked")
-		final Map<Integer, ArrayList<Integer[]>> shelfBoxMap = (HashMap<Integer, ArrayList<Integer[]>>) runQuery(DatabaseQueryType.SELECT,
-				DatabaseTable.SHELF_PRODUCTBOXES, null, columns, null, null);
+		@SuppressWarnings("unchecked") final Map<Integer, ArrayList<Integer[]>> shelfBoxMap = (HashMap<Integer, ArrayList<Integer[]>>) runQuery(DatabaseQueryType.SELECT, DatabaseTable.SHELF_PRODUCTBOXES, null, columns, null, null);
 
 		int boxcount = 0;
 		Shelf shelf;
@@ -2465,8 +2447,7 @@ public class DatabaseController
 	private static void getAllShelves() throws NoDatabaseLinkException
 	{
 		final String[] columns = { "*" };
-		@SuppressWarnings("unchecked")
-		final Set<Shelf> result = (Set<Shelf>) runQuery(DatabaseQueryType.SELECT, DatabaseTable.SHELVES, null, columns, null, null);
+		@SuppressWarnings("unchecked") final Set<Shelf> result = (Set<Shelf>) runQuery(DatabaseQueryType.SELECT, DatabaseTable.SHELVES, null, columns, null, null);
 
 		final Iterator<Shelf> it = result.iterator();
 		// Store for reuse.
@@ -2644,5 +2625,13 @@ public class DatabaseController
 	{
 		DBLOG.info("Closing session manager.");
 		sessionFactory.close();
+	}
+
+	public static ObservableList<Object> getAllProductTypes() throws HibernateException
+	{
+		observableUsers.clear();
+		observableUsers.addAll(getAll("User"));
+
+		return observableUsers;
 	}
 }

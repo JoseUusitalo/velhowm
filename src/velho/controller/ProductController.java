@@ -7,9 +7,13 @@ import velho.controller.interfaces.UIActionController;
 import velho.model.Product;
 import velho.model.ProductBrand;
 import velho.model.ProductCategory;
+import velho.view.AddBrandView;
+import velho.view.AddCategoryView;
+import velho.view.AddProductTypeView;
 import velho.view.AddProductView;
 import velho.view.GenericTabView;
 import velho.view.ProductDataView;
+import velho.view.ProductManagementView;
 
 /**
  * Controller for handling {@link Product} objects
@@ -48,12 +52,24 @@ public class ProductController implements UIActionController
 	 */
 	private GenericTabView addTab;
 
+	private ProductManagementView productManagementView;
+
+	private AddBrandView addBrandView;
+
+	private AddProductTypeView addProductTypeView;
+
+	private AddCategoryView addCategoryView;
+
 	/**
 	 * @param uiController
 	 */
 	public ProductController(final UIController uiController)
 	{
 		this.uiController = uiController;
+		this.productManagementView = new ProductManagementView();
+		this.addBrandView = new AddBrandView(this, uiController);
+		this.addProductTypeView = new AddProductTypeView(this, uiController);
+		this.addCategoryView = new AddCategoryView(this, uiController);
 		this.addProductView = new AddProductView(this, uiController);
 		listTab = new GenericTabView();
 		addTab = new GenericTabView();
@@ -120,6 +136,7 @@ public class ProductController implements UIActionController
 		}
 
 		Product newProduct = new Product(databaseID, name, bran, cat, popularity);
+		System.out.println(newProduct.toString());
 		System.out.println(newProduct.toString());
 
 		final int dbID = DatabaseController.save(newProduct);
@@ -230,8 +247,9 @@ public class ProductController implements UIActionController
 		listTab.setView(new ProductDataView(this).getView(((Product) data)));
 	}
 
-	public Node getAddStuffView()
+	public Node getProductManagementView()
 	{
-		return getAddProductView();
+		productManagementView.setContents(getProductEditView(), addBrandView.getView(true), addCategoryView.getView(true), addProductTypeView.getView(true));
+		return productManagementView.getView();
 	}
 }
