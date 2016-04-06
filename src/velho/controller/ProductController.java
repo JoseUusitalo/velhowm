@@ -114,7 +114,6 @@ public class ProductController implements UIActionController
 		}
 
 		Product newProduct = new Product(databaseID, name, bran, cat, popularity);
-		System.out.println(newProduct.toString());
 
 		final int dbID = DatabaseController.save(newProduct);
 

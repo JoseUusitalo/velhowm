@@ -95,7 +95,6 @@ public class DebugWindow
 	 */
 	public void setScanBadgeButton(final boolean visibility)
 	{
-		System.out.println("-----------HIDE-------------");
 		scanBadgeButton.setVisible(visibility);
 	}
 
