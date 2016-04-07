@@ -2,13 +2,8 @@ package velho.model;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
-
-import velho.ShelfSlot;
 
 /**
  * A class representing a physical shelf structure in the warehouse.
@@ -32,58 +27,42 @@ public class Shelf implements Comparable<Shelf>
 	 */
 	private int databaseID;
 
-	// TODO: Use Hibernate and probably convert slots to a map?
-
-	/**
-	 * A map of shelf slot IDs and shelf slot objects.
-	 */
-	private Map<String, ShelfSlot> slotMap;
-
-	/**
-	 * Maximum number of shelf slots per level.
-	 */
-	private int maxSlotsPerLevel;
-
 	/**
 	 * Number of levels on this shelf.
 	 */
 	private int levelCount;
 
 	/**
-	 * Automatically creates the shelf slots for this shelf as well.
-	 *
-	 * @param shelfID
-	 * @param levels must be greater than 0
-	 * @param slotsPerLevel must be greater than 0
-	 * @param maxBoxesPerSlot must be greater than 0
-	 * @throws IllegalArgumentException when one of levels, slotsPerLevel, or maxBoxesPerSlot is 0 or less
+	 * The {@link ShelfLevel}s of this shelf.
 	 */
-	public Shelf(final int databaseID, final int levelCount, final int slotsPerLevel, final int maxBoxesPerSlot)
+	private List<ShelfLevel> levels;
+
+	/**
+	 * @param databaseID
+	 * @param levelCount
+	 */
+	public Shelf(final int databaseID, final int levelCount)
 	{
 		if (levelCount < 1)
 			throw new IllegalArgumentException("Number of levels on a shelf must be greater than 0.");
-		if (slotsPerLevel < 1)
-			throw new IllegalArgumentException("Number of shelf slots on a shelf level must be greater than 0.");
-		if (maxBoxesPerSlot < 1)
-			throw new IllegalArgumentException("Number of boxes on a shelf slot must be greater than 0.");
 
 		this.databaseID = databaseID;
 		this.levelCount = levelCount;
-		this.maxSlotsPerLevel = slotsPerLevel;
+	}
 
-		this.slotMap = new TreeMap<String, ShelfSlot>();
+	/**
+	 * @param levelCount
+	 */
+	public Shelf(final int levelCount)
+	{
+		this(0, levelCount);
+	}
 
-		ShelfSlot ss = null;
-
-		// Initialize the set of boxes.
-		for (int level = 1; level <= levelCount; level++)
-		{
-			for (int slot = 0; slot < slotsPerLevel; slot++)
-			{
-				ss = new ShelfSlot(databaseID, level, slot, maxBoxesPerSlot);
-				slotMap.put(ss.getDatabaseID(), ss);
-			}
-		}
+	/**
+	 */
+	public Shelf()
+	{
+		// For Hibernate.
 	}
 
 	/**
@@ -165,12 +144,11 @@ public class Shelf implements Comparable<Shelf>
 	 * Converts the given slot ID into an array of integers where:
 	 * <ul>
 	 * <li>Index 0: is the shelf database ID</li>
-	 * <li>Index 1: is the level index in the shelf</li>
-	 * <li>Index 2: is the slot index on the level</li>
+	 * <li>Index 1: is the level position in the shelf</li>
+	 * <li>Index 2: is the slot position on the level</li>
 	 * </ul>
 	 * <p>
-	 * For internal use only. Automatically removes the S from shelf ID and converts the shelf level number back to
-	 * an index.
+	 * For internal use only. Automatically removes the S from shelf ID.
 	 * </p>
 	 *
 	 * @param slotID
@@ -202,7 +180,7 @@ public class Shelf implements Comparable<Shelf>
 
 		try
 		{
-			tokens[1] = Integer.parseInt(stringTokens[1]) - 1;
+			tokens[1] = Integer.parseInt(stringTokens[1]);
 		}
 		catch (final NumberFormatException e)
 		{
@@ -241,9 +219,10 @@ public class Shelf implements Comparable<Shelf>
 		if (tokens[1] >= levelCount || tokens[1] < 0)
 			throw new IllegalArgumentException("Invalid shelf slot ID '" + shelfSlotID + "': invalid level");
 
+		// TODO: Remove or fix this?
 		// Enough slots? tokens[2] is an index.
-		if (tokens[2] >= maxSlotsPerLevel || tokens[2] < 0)
-			throw new IllegalArgumentException("Invalid shelf slot ID '" + shelfSlotID + "': invalid slot");
+		// if (tokens[2] >= maxSlotsPerLevel || tokens[2] < 0)
+		// throw new IllegalArgumentException("Invalid shelf slot ID '" + shelfSlotID + "': invalid slot");
 
 		return tokens;
 	}
@@ -251,8 +230,8 @@ public class Shelf implements Comparable<Shelf>
 	@Override
 	public String toString()
 	{
-		return "[" + databaseID + "] Lvls: " + levelCount + ", Slt/Lvl: " + maxSlotsPerLevel + ", Boxs: " + getProductBoxCount() + ", Slts: "
-				+ getShelfSlotCount() + ", Free: " + getFreeShelfSlots().size();
+		return "[" + databaseID + "] Lvls: " + levelCount + ", Boxs: " + getProductBoxCount() + ", Slts: " + getShelfSlotCount() + ", Free: "
+				+ getFreeShelfSlots().size();
 	}
 
 	@Override
@@ -302,7 +281,12 @@ public class Shelf implements Comparable<Shelf>
 	 */
 	public int getShelfSlotCount()
 	{
-		return levelCount * maxSlotsPerLevel;
+		int sum = 0;
+
+		for (final ShelfLevel level : levels)
+			sum += level.getSlots().size();
+
+		return sum;
 	}
 
 	/**
@@ -320,14 +304,17 @@ public class Shelf implements Comparable<Shelf>
 	 *
 	 * @return shelf slots with free space of this shelf
 	 */
-	public List<String> getFreeShelfSlots()
+	public List<ShelfSlot> getFreeShelfSlots()
 	{
-		final List<String> freeSlots = new ArrayList<String>();
+		final List<ShelfSlot> freeSlots = new ArrayList<ShelfSlot>();
 
-		for (final ShelfSlot ss : slotMap.values())
+		for (final ShelfLevel level : levels)
 		{
-			if (ss.hasFreeSpace())
-				freeSlots.add(ss.getDatabaseID());
+			for (final ShelfSlot slot : level.getSlots())
+			{
+				if (slot.hasFreeSpace())
+					freeSlots.add(slot);
+			}
 		}
 
 		return freeSlots;
@@ -342,9 +329,11 @@ public class Shelf implements Comparable<Shelf>
 	{
 		int sum = 0;
 
-		for (final ShelfSlot ss : slotMap.values())
-			sum += ss.getProductCount();
-
+		for (final ShelfLevel level : levels)
+		{
+			for (final ShelfSlot slot : level.getSlots())
+				sum += slot.getProductCount();
+		}
 		return sum;
 	}
 
@@ -357,8 +346,11 @@ public class Shelf implements Comparable<Shelf>
 	{
 		int sum = 0;
 
-		for (final ShelfSlot ss : slotMap.values())
-			sum += ss.getProductBoxCount();
+		for (final ShelfLevel level : levels)
+		{
+			for (final ShelfSlot slot : level.getSlots())
+				sum += slot.getProductBoxCount();
+		}
 
 		return sum;
 	}
@@ -384,29 +376,6 @@ public class Shelf implements Comparable<Shelf>
 	}
 
 	/**
-	 * Checks if the given slot has free space.
-	 *
-	 * @param shelfSlotID the slot ID
-	 * @return <code>true</code> if the slot has free space
-	 */
-	public boolean slotHasFreeSpace(final String shelfSlotID)
-	{
-		return slotMap.get(shelfSlotID).hasFreeSpace();
-	}
-
-	/**
-	 * Gets the specified {@link ShelfSlot}.
-	 *
-	 * @param shelfSlotID
-	 * the ID of the shelf slot to get
-	 * @return the wanted shelf slot or <code>null</code> if shelf slow is not in this shelf
-	 */
-	public Set<ProductBox> getShelfSlotBoxes(final String shelfSlotID) throws IllegalArgumentException
-	{
-		return slotMap.get(shelfSlotID).getBoxes();
-	}
-
-	/**
 	 * Attempts to add the given {@link ProductBox} into the {@link ShelfSlot} specified by the slot ID.
 	 *
 	 * @param shelfSlotID ID of the shelf slot
@@ -420,44 +389,16 @@ public class Shelf implements Comparable<Shelf>
 		if (productBox == null)
 			throw new IllegalArgumentException("Null product box.");
 
-		tokenizeAndValidateShelfSlotID(shelfSlotID);
+		final int[] tokens = tokenizeAndValidateShelfSlotID(shelfSlotID);
 
-		final boolean addedToSlot = slotMap.get(shelfSlotID).addBox(productBox);
-
-		if (addedToSlot)
-		{
-			// FIXME: Save shelf.
-			// DatabaseController.save(this);
-			SYSLOG.trace("Added: " + addedToSlot);
-		}
-
-		return addedToSlot;
+		return levels.get(tokens[1]).addToSlot(tokens[2], productBox);
 	}
 
-	/**
-	 * Attempts to remove the given {@link ProductBox} from the {@link ShelfSlot} specified by the slot ID.
-	 *
-	 * @param productBox box to remove
-	 * @return <code>true</code> if box was added to the slot, <code>false</code> if the slot did not have the specified
-	 * box
-	 * @throws IllegalArgumentException if the slot ID is not in this shelf or the given box was <code>null</code>
-	 */
-	public boolean removeFromSlot(final ProductBox productBox) throws IllegalArgumentException
+	public ShelfSlot getShelfSlot(final String shelfSlotID)
 	{
-		if (productBox == null)
-			throw new IllegalArgumentException("Null product box.");
+		final int[] tokens = tokenizeAndValidateShelfSlotID(shelfSlotID);
 
-		tokenizeAndValidateShelfSlotID(productBox.getShelfSlot());
+		return levels.get(tokens[1]).getShelfSlot(tokens[2]);
 
-		final boolean removedFromSlot = slotMap.get(productBox.getShelfSlot()).removeBox(productBox);
-
-		if (removedFromSlot)
-		{
-			// FIXME: Save shelf.
-			// DatabaseController.save(this);
-			SYSLOG.trace("Removed: " + removedFromSlot);
-		}
-
-		return removedFromSlot;
 	}
 }

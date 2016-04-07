@@ -46,12 +46,12 @@ public class ExternalSystemsControllerTest
 	{
 		final ProductBox box = DatabaseController.getProductBoxByID(BOXDBID);
 
-		final String oldShelfSlot = box.getShelfSlot();
-		final String oldShelfIDString = (String) Shelf.tokenizeShelfSlotID(box.getShelfSlot())[0];
+		final String oldShelfSlot = box.getShelfSlot().getSlotID();
+		final String oldShelfIDString = (String) Shelf.tokenizeShelfSlotID(box.getShelfSlot().getSlotID())[0];
 		final int oldShelfID = Integer.parseInt(oldShelfIDString.substring(1));
 		final Shelf oldShelf = DatabaseController.getShelfByID(oldShelfID, true);
 
-		assertTrue(oldShelf.getShelfSlotBoxes(oldShelfSlot).contains(box));
+		assertTrue(oldShelf.getShelfSlot(oldShelfSlot).contains(box));
 
 		final String newShelfIDString = (String) Shelf.tokenizeShelfSlotID(NEWSHELFID)[0];
 		final int newShelfID = Integer.parseInt(newShelfIDString.substring(1));
@@ -59,10 +59,10 @@ public class ExternalSystemsControllerTest
 
 		assertTrue(ExternalSystemsController.move(BOXDBID, NEWSHELFID, false));
 
-		final String newShelfSlot = box.getShelfSlot();
+		final String newShelfSlot = box.getShelfSlot().getSlotID();
 
-		assertFalse(oldShelf.getShelfSlotBoxes(oldShelfSlot).contains(box));
-		assertTrue(newShelf.getShelfSlotBoxes(newShelfSlot).contains(box));
+		assertFalse(oldShelf.getShelfSlot(oldShelfSlot).contains(box));
+		assertTrue(newShelf.getShelfSlot(newShelfSlot).contains(box));
 	}
 
 	@Test
@@ -90,22 +90,22 @@ public class ExternalSystemsControllerTest
 		System.out.println("Test Move Valid 2");
 		final ProductBox box = DatabaseController.getProductBoxByID(BOXDBID2);
 
-		final String oldShelfIDString = (String) Shelf.tokenizeShelfSlotID(box.getShelfSlot())[0];
+		final String oldShelfIDString = (String) Shelf.tokenizeShelfSlotID(box.getShelfSlot().getSlotID())[0];
 		final int oldShelfID = Integer.parseInt(oldShelfIDString.substring(1));
 		final Shelf oldShelf = DatabaseController.getShelfByID(oldShelfID, false);
-		final String oldShelfSlot = box.getShelfSlot();
+		final String oldShelfSlot = box.getShelfSlot().getSlotID();
 
 		// assertTrue(oldShelf.getShelfSlotBoxes(oldShelfSlot).contains(box));
 		System.out.println("move");
 
 		assertTrue(ExternalSystemsController.move(BOXDBID2, NEWSHELFID, false));
-		assertFalse(oldShelf.getShelfSlotBoxes(oldShelfSlot).contains(box));
+		assertFalse(oldShelf.getShelfSlot(oldShelfSlot).contains(box));
 
 		final String newShelfIDString = (String) Shelf.tokenizeShelfSlotID(NEWSHELFID)[0];
 		final int newShelfID = Integer.parseInt(newShelfIDString.substring(1));
 		final Shelf newShelf = DatabaseController.getShelfByID(newShelfID, false);
 
-		assertTrue(newShelf.getShelfSlotBoxes(NEWSHELFID).contains(box));
+		assertTrue(newShelf.getShelfSlot(NEWSHELFID).contains(box));
 	}
 
 }

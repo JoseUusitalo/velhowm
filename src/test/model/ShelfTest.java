@@ -97,21 +97,7 @@ public class ShelfTest
 	public final void testCreateInvalid()
 	{
 		@SuppressWarnings("unused")
-		final Shelf s = new Shelf(-1, -1, 2, 3);
-	}
-
-	@Test(expected = IllegalArgumentException.class)
-	public final void testCreateInvalid2()
-	{
-		@SuppressWarnings("unused")
-		final Shelf s = new Shelf(1, 1, -2, 3);
-	}
-
-	@Test(expected = IllegalArgumentException.class)
-	public final void testCreateInvalid3()
-	{
-		@SuppressWarnings("unused")
-		final Shelf s = new Shelf(0, 1, 2, -3);
+		final Shelf s = new Shelf(-1);
 	}
 
 	@Test(expected = IllegalArgumentException.class)
@@ -266,7 +252,7 @@ public class ShelfTest
 
 		assertTrue(shelf_FREE_LVL_2.addToSlot(slotid, BOX_1));
 		assertEquals(oldBoxCount + 1, shelf_FREE_LVL_2.getProductBoxCount());
-		assertTrue(shelf_FREE_LVL_2.getShelfSlotBoxes(slotid).contains(BOX_1));
+		assertTrue(shelf_FREE_LVL_2.getShelfSlot(slotid).contains(BOX_1));
 		assertEquals(oldProductCount + BOX_1_2_PRODUCT_COUNT, shelf_FREE_LVL_2.getProductCount());
 	}
 
@@ -275,7 +261,7 @@ public class ShelfTest
 	{
 		final String slotid = shelf_FREE_LVL_2.getShelfID() + "-2-10";
 		assertTrue(shelf_FREE_LVL_2.addToSlot(slotid, BOX_2));
-		assertTrue(shelf_FREE_LVL_2.getShelfSlotBoxes(slotid).contains(BOX_2));
+		assertTrue(shelf_FREE_LVL_2.getShelfSlot(slotid).contains(BOX_2));
 		// FIXME: Hibernate.
 		// assertTrue(DatabaseController.getShelfByID(SHELF_FREE_LVL_2_ID,
 		// false).getShelfSlotBoxes(slotid).contains(BOX_2));
@@ -283,9 +269,9 @@ public class ShelfTest
 		final int oldBoxCount = shelf_FREE_LVL_2.getProductBoxCount();
 		final int oldProductCount = shelf_FREE_LVL_2.getProductCount();
 
-		assertTrue(shelf_FREE_LVL_2.removeFromSlot(BOX_2));
+		assertTrue(BOX_2.getShelfSlot().removeBox(BOX_2));
 
-		assertFalse(shelf_FREE_LVL_2.getShelfSlotBoxes(slotid).contains(BOX_2));
+		assertFalse(shelf_FREE_LVL_2.getShelfSlot(slotid).contains(BOX_2));
 		assertEquals(oldBoxCount - 1, shelf_FREE_LVL_2.getProductBoxCount());
 		assertEquals(oldProductCount - BOX_1_2_PRODUCT_COUNT, shelf_FREE_LVL_2.getProductCount());
 		// assertFalse(DatabaseController.getShelfByID(SHELF_FREE_LVL_2_ID,
@@ -297,7 +283,7 @@ public class ShelfTest
 	{
 		final String slotid = shelf_FREE_LVL_2.getShelfID() + "-2-10";
 		assertTrue(shelf_FREE_LVL_2.addToSlot(slotid, BOX_2));
-		assertTrue(shelf_FREE_LVL_2.getShelfSlotBoxes(slotid).contains(BOX_2));
+		assertTrue(shelf_FREE_LVL_2.getShelfSlot(slotid).contains(BOX_2));
 
 		// FIXME: Hibernate.
 		// assertTrue(DatabaseController.getShelfByID(SHELF_FREE_LVL_2_ID,
@@ -306,19 +292,13 @@ public class ShelfTest
 		final int oldBoxCount = shelf_FREE_LVL_2.getProductBoxCount();
 		final int oldProductCount = shelf_FREE_LVL_2.getProductCount();
 
-		assertTrue(shelf_FREE_LVL_2.removeFromSlot(BOX_2));
+		assertTrue(BOX_2.getShelfSlot().removeBox(BOX_2));
 
-		assertFalse(shelf_FREE_LVL_2.getShelfSlotBoxes(slotid).contains(BOX_2));
+		assertFalse(shelf_FREE_LVL_2.getShelfSlot(slotid).contains(BOX_2));
 		assertEquals(oldBoxCount - 1, shelf_FREE_LVL_2.getProductBoxCount());
 		assertEquals(oldProductCount - BOX_1_2_PRODUCT_COUNT, shelf_FREE_LVL_2.getProductCount());
 		// assertTrue(DatabaseController.getShelfByID(SHELF_FREE_LVL_2_ID,
 		// false).getShelfSlotBoxes(slotid).contains(BOX_2));
-	}
-
-	@Test(expected = IllegalArgumentException.class)
-	public final void testRemoveFromSlot_Null()
-	{
-		assertFalse(shelf_FREE_LVL_2.removeFromSlot(null));
 	}
 
 	@Test

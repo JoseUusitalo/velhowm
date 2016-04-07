@@ -1,14 +1,11 @@
-package velho;
+package velho.model;
 
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 
-import velho.model.ProductBox;
-import velho.model.Shelf;
-
 /**
- * A Shelf Slot represents an indexed area with {@link ProductBox} objects on a {@link Shelf}.
+ * A Shelf Slot represents an indexed area with {@link ProductBox} objects on a {@link ShelfLevel}.
  *
  * @author Jose Uusitalo
  */
@@ -20,6 +17,16 @@ public class ShelfSlot implements Comparable<ShelfSlot>
 	public static final String ID_SEPARATOR = "-";
 
 	/**
+	 * The database ID of this shelf slot.
+	 */
+	private int databaseID;
+
+	/**
+	 * The position (greater than 1) of this shelf slot on a level.
+	 */
+	private int levelPosition;
+
+	/**
 	 * The maximum number of product boxes this slot can contain.
 	 */
 	private int maxBoxCount;
@@ -29,30 +36,24 @@ public class ShelfSlot implements Comparable<ShelfSlot>
 	 */
 	private Set<ProductBox> boxes;
 
-	/**
-	 * The ID string of this shelf slot.
-	 */
-	private String databaseID;
+	private ShelfLevel parentLevel;
+
+	private Shelf parentShelf;
 
 	/**
 	 * @param shelfLevelNumber must be greater than 0
 	 * @param slotIndexInLevel
 	 * @param maxBoxesInSlot must be greater than 0
 	 */
-	public ShelfSlot(final int shelfDatabaseID, final int shelfLevelNumber, final int slotIndexInLevel, final int maxBoxesInSlot)
+	public ShelfSlot(final Shelf parentShelf, final ShelfLevel parentLevel, final int levelPosition, final int maxBoxesInSlot)
 	{
+		this.parentShelf = parentShelf;
+		this.parentLevel = parentLevel;
+
 		if (maxBoxesInSlot < 1)
 			throw new IllegalArgumentException("[" + databaseID + "] Maxmimum ProductBox count must be greater than 0, was " + maxBoxesInSlot + ".");
-		if (shelfLevelNumber < 1)
-			throw new IllegalArgumentException("[" + databaseID + "] Level number must be greater than 0, was " + shelfLevelNumber + ".");
-
-		// @formatter:off
-		this.databaseID = Shelf.SHELF_IDENTIFIER + shelfDatabaseID
-						   + ID_SEPARATOR
-						   + shelfLevelNumber
-						   + ID_SEPARATOR
-						   + slotIndexInLevel;
-		// @formatter:on
+		if (levelPosition < 1)
+			throw new IllegalArgumentException("[" + databaseID + "] Level position must be greater than 0, was " + levelPosition + ".");
 
 		this.maxBoxCount = maxBoxesInSlot;
 
@@ -62,7 +63,7 @@ public class ShelfSlot implements Comparable<ShelfSlot>
 	@Override
 	public String toString()
 	{
-		return databaseID;
+		return parentShelf.getDatabaseID() + ID_SEPARATOR + parentLevel.getDatabaseID() + ID_SEPARATOR + levelPosition;
 	}
 
 	@Override
@@ -73,13 +74,23 @@ public class ShelfSlot implements Comparable<ShelfSlot>
 
 		final ShelfSlot ss = (ShelfSlot) o;
 
-		return this.getDatabaseID().equals(ss.getDatabaseID());
+		return this.getSlotID().equals(ss.getSlotID());
 	}
 
 	@Override
 	public int compareTo(final ShelfSlot slot)
 	{
-		return getDatabaseID().compareToIgnoreCase(slot.getDatabaseID());
+		return getSlotID().compareToIgnoreCase(slot.getSlotID());
+	}
+
+	/**
+	 * Gets the database ID of this shelf slot.
+	 *
+	 * @return the database ID of this shelf slot
+	 */
+	public int getDatabaseID()
+	{
+		return databaseID;
 	}
 
 	/**
@@ -88,9 +99,9 @@ public class ShelfSlot implements Comparable<ShelfSlot>
 	 *
 	 * @return the ID of this shelf slot
 	 */
-	public String getDatabaseID()
+	public String getSlotID()
 	{
-		return databaseID;
+		return parentShelf.getDatabaseID() + ID_SEPARATOR + parentLevel.getDatabaseID() + ID_SEPARATOR + levelPosition;
 	}
 
 	public Set<ProductBox> getBoxes()
@@ -148,7 +159,7 @@ public class ShelfSlot implements Comparable<ShelfSlot>
 
 		if (boxes.add(box))
 		{
-			box.setShelfSlot(databaseID);
+			box.setShelfSlot(this);
 			return true;
 		}
 
@@ -170,5 +181,10 @@ public class ShelfSlot implements Comparable<ShelfSlot>
 		}
 
 		return false;
+	}
+
+	public boolean contains(final ProductBox box)
+	{
+		return boxes.contains(box);
 	}
 }

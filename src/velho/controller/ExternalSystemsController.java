@@ -161,7 +161,7 @@ public class ExternalSystemsController
 				return false;
 			}
 
-			oldShelfIDString = (String) Shelf.tokenizeShelfSlotID(boxToMove.getShelfSlot())[0];
+			oldShelfIDString = (String) Shelf.tokenizeShelfSlotID(boxToMove.getShelfSlot().getSlotID())[0];
 			oldShelfID = Integer.parseInt(oldShelfIDString.substring(1));
 			oldShelf = DatabaseController.getShelfByID(oldShelfID, true);
 
@@ -172,7 +172,7 @@ public class ExternalSystemsController
 				return false;
 			}
 
-			if (oldShelf.removeFromSlot(boxToMove) == false)
+			if (boxToMove.getShelfSlot().removeBox(boxToMove) == false)
 			{
 				return false;
 			}

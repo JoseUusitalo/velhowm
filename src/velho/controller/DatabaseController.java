@@ -321,7 +321,7 @@ public class DatabaseController
 							case SHELVES:
 								// @formatter:off
 								while (result.next())
-									dataSet.add(new Shelf(result.getInt("shelf_id"), result.getInt("max_levels"), result.getInt("max_shelfslots_per_level")));
+									dataSet.add(new Shelf(result.getInt("shelf_id"), result.getInt("levels")));
 								break;
 							// @formatter:on
 
