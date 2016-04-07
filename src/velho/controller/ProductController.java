@@ -272,14 +272,15 @@ public class ProductController implements UIActionController
 	public ProductBrand saveBrand(final String name)
 	{
 		ProductBrand productBrand = new ProductBrand(name);
+		System.out.println("+++" + productBrand);
 		DatabaseController.save(productBrand);
 		return productBrand;
 
 	}
 
-	public ProductCategory saveCategory(final String name)
+	public ProductCategory saveCategory(final String name, final ProductType type)
 	{
-		ProductCategory productCategory = new ProductCategory(name);
+		ProductCategory productCategory = new ProductCategory(name, type);
 		DatabaseController.save(productCategory);
 		return productCategory;
 

@@ -32,7 +32,7 @@ public class ProductType implements Comparable<ProductType>
 	 */
 	public ProductType(final String name)
 	{
-		this(-1, name);
+		this(0, name);
 	}
 
 	/**

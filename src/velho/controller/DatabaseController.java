@@ -111,6 +111,12 @@ public class DatabaseController
 	private static ObservableList<Object> observableProducts = FXCollections.observableArrayList();
 
 	/**
+	 * An observable list of {@link ProductType} objects for display in the user
+	 * interface.
+	 */
+	private static ObservableList<Object> observableProductTypes = FXCollections.observableArrayList();
+
+	/**
 	 * An observable list of {@link Product} search results for display in the
 	 * user interface.
 	 */
@@ -2655,9 +2661,9 @@ public class DatabaseController
 
 	public static ObservableList<Object> getAllProductTypes() throws HibernateException
 	{
-		observableUsers.clear();
-		observableUsers.addAll(getAll("User"));
+		observableProductTypes.clear();
+		observableProductTypes.addAll(getAll("ProductType"));
 
-		return observableUsers;
+		return observableProductTypes;
 	}
 }

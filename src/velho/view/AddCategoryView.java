@@ -15,6 +15,7 @@ import velho.controller.DatabaseController;
 import velho.controller.ProductController;
 import velho.controller.UIController;
 import velho.model.Product;
+import velho.model.ProductType;
 import velho.model.exceptions.NoDatabaseLinkException;
 
 public class AddCategoryView
@@ -113,7 +114,8 @@ public class AddCategoryView
 				@Override
 				public void handle(final ActionEvent event)
 				{
-					productController.saveCategory(nameField.getText());
+					ProductType categoryType = (ProductType) typeList.valueProperty().getValue();
+					productController.saveCategory(nameField.getText(), categoryType);
 				}
 			});
 			grid.add(saveButton, 4, 0);
