@@ -172,7 +172,7 @@ public class ShelfSlot implements Comparable<ShelfSlot>
 	 */
 	public boolean hasFreeSpace()
 	{
-		return (productBoxes.size() != maxProductBoxes);
+		return (productBoxes.size() < maxProductBoxes);
 	}
 
 	/**

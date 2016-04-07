@@ -140,13 +140,23 @@ public class ShelfLevel implements Comparable<ShelfLevel>
 
 	public boolean addToSlot(final int slotPosition, final ProductBox productBox)
 	{
-		// return slots.get(slotPosition).addBox(productBox);
+		for (final ShelfSlot slot : shelfSlots)
+		{
+			if (slot.getLevelPosition() == slotPosition)
+				return slot.addBox(productBox);
+		}
+
 		return false;
 	}
 
 	public ShelfSlot getShelfSlot(final int slotPosition)
 	{
-		// return slots.get(slotPosition);
+		for (final ShelfSlot slot : shelfSlots)
+		{
+			if (slot.getLevelPosition() == slotPosition)
+				return slot;
+		}
+
 		return null;
 	}
 

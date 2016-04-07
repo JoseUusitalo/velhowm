@@ -50,8 +50,8 @@ public class ShelfTest
 	{
 		DatabaseController.link();
 		DatabaseController.loadSampleData();
-		shelf_FREE_LVL_2 = DatabaseController.getShelfByID(SHELF_FREE_LVL_2_ID);
 		fullShelf_LVL_1_SLTIDX_0 = DatabaseController.getShelfByID(FULLSHELF_LVL_1_SLTIDX_0_ID);
+		shelf_FREE_LVL_2 = DatabaseController.getShelfByID(SHELF_FREE_LVL_2_ID);
 		emptyShelf_1_0_to_1_1 = DatabaseController.getShelfByID(EMPTYSHELF_1_0_to_1_1_ID);
 		EMPTY_BOX = DatabaseController.getProductBoxByID(23);
 		BOX_1 = DatabaseController.getProductBoxByID(21);
@@ -59,8 +59,8 @@ public class ShelfTest
 
 		System.out.println("--Start--");
 		System.out.println("Initial state");
-		System.out.println(shelf_FREE_LVL_2);
 		System.out.println(fullShelf_LVL_1_SLTIDX_0);
+		System.out.println(shelf_FREE_LVL_2);
 		System.out.println(emptyShelf_1_0_to_1_1);
 		System.out.println("--Tests--");
 	}
@@ -232,7 +232,10 @@ public class ShelfTest
 		final int oldBoxCount = shelf_FREE_LVL_2.getProductBoxes().size();
 		final int oldProductCount = shelf_FREE_LVL_2.getProductCountInBoxes();
 
+		System.out.println("before " + shelf_FREE_LVL_2.getShelfSlot(slotid).getProductBoxes());
+		System.out.println("add " + BOX_1);
 		assertTrue(shelf_FREE_LVL_2.addToSlot(slotid, BOX_1));
+		System.out.println("before " + shelf_FREE_LVL_2.getShelfSlot(slotid).getProductBoxes());
 		assertEquals(oldBoxCount + 1, shelf_FREE_LVL_2.getProductBoxes().size());
 		assertTrue(shelf_FREE_LVL_2.getShelfSlot(slotid).contains(BOX_1));
 		assertEquals(oldProductCount + BOX_1_2_PRODUCT_COUNT, shelf_FREE_LVL_2.getProductCountInBoxes());
@@ -302,7 +305,7 @@ public class ShelfTest
 	@Test
 	public final void testToString() throws IllegalArgumentException
 	{
-		assertEquals("[1] Lvls: 1, Slt/Lvl: 4, Box/Slt: 1, Boxs: 4, Slts: 4, Free: 0", fullShelf_LVL_1_SLTIDX_0.toString());
+		assertEquals("[1] Lvls: 1, Boxs: 4, Slts: 4, Free: 0", fullShelf_LVL_1_SLTIDX_0.toString());
 	}
 
 	@Test

@@ -216,12 +216,12 @@ public class Shelf implements Comparable<Shelf>
 		if (databaseID != tokens[0])
 			throw new IllegalArgumentException("Invalid shelf slot ID '" + shelfSlotID + "': invalid shelf " + tokens[0]);
 
-		// Enough levels? tokens[1] is an index.
-		if (tokens[1] >= levelCount || tokens[1] < 0)
+		// Enough levels?
+		if (tokens[1] > levelCount || tokens[1] < 0)
 			throw new IllegalArgumentException("Invalid shelf slot ID '" + shelfSlotID + "': invalid level " + tokens[1]);
 
 		// TODO: Remove or fix this?
-		// Enough slots? tokens[2] is an index.
+		// Enough slots?
 		// if (tokens[2] >= maxSlotsPerLevel || tokens[2] < 0)
 		// throw new IllegalArgumentException("Invalid shelf slot ID '" + shelfSlotID + "': invalid slot");
 
@@ -414,7 +414,11 @@ public class Shelf implements Comparable<Shelf>
 
 		final int[] tokens = tokenizeAndValidateShelfSlotID(shelfSlotID);
 
-		// return levels.get(tokens[1]).addToSlot(tokens[2], productBox);
+		for (final ShelfLevel level : shelfLevels)
+		{
+			if (level.getShelfPosition() == tokens[1])
+				return level.addToSlot(tokens[2], productBox);
+		}
 
 		return false;
 	}
@@ -423,7 +427,11 @@ public class Shelf implements Comparable<Shelf>
 	{
 		final int[] tokens = tokenizeAndValidateShelfSlotID(shelfSlotID);
 
-		// return levels.get(tokens[1]).getShelfSlot(tokens[2]);
+		for (final ShelfLevel level : shelfLevels)
+		{
+			if (level.getShelfPosition() == tokens[1])
+				return level.getShelfSlot(tokens[1]);
+		}
 
 		return null;
 	}
