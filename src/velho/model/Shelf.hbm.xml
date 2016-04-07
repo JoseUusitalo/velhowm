@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+ "-//Hibernate/Hibernate Mapping DTD//EN"
+ "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+	<class name="velho.model.Shelf" table="SHELVES">
+		<meta attribute="class-description">A class representing a physical shelf structure in the warehouse.</meta>
+
+		<id name="databaseID"
+			column="shelf_id"
+			type="int">
+			<generator class="native" />
+		</id>
+
+		<property	name="maxSlotsPerLevel"
+					column="max_shelfslots_per_level"
+					type="int" />
+
+		<property	name="levelCount"
+					column="levels"
+					type="int" />
+
+		<set name="slots"
+			 cascade="all"
+			 table="shelf_shelfslots"
+			 fetch="select"
+			 lazy="false" >
+			<key column="shelf" />
+			<many-to-many column="shelfslot"
+						  class="velho.model.ShelfSlot" />
+		</set>
+	</class>
+</hibernate-mapping>

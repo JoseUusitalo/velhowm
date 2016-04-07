@@ -218,6 +218,9 @@ public class MainWindow extends Application
 				{
 					if (DatabaseController.connectAndInitialize())
 					{
+						// FIXME: TEMP!
+						DatabaseController.initializeDatabase();
+
 						SYSLOG.debug("Creating all controllers...");
 
 						// FIXME: Convert all controllers to use the singleton pattern.
