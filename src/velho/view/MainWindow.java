@@ -66,7 +66,7 @@ public class MainWindow extends Application
 	/**
 	 * Enable or disable debug features.
 	 */
-	public static final boolean DEBUG_MODE = false;
+	public static final boolean DEBUG_MODE = true;
 
 	/**
 	 * Enable or disable showing windows. DEBUG_MODE must be <code>true</code>
@@ -219,7 +219,7 @@ public class MainWindow extends Application
 					if (DatabaseController.connectAndInitialize())
 					{
 						SYSLOG.debug("Creating all controllers...");
-
+						LocalizationController.initializeBundle();
 						DatabaseController.loadData();
 						uiController = new UIController();
 						userController = new UserController();
@@ -247,7 +247,7 @@ public class MainWindow extends Application
 						//@formatter:on
 
 						SYSLOG.debug("All controllers created.");
-						LocalizationController.initializeBundle();
+
 					}
 					else
 					{
@@ -354,14 +354,14 @@ public class MainWindow extends Application
 			statusBar.getStyleClass().add("status-bar");
 
 			final HBox platformStatus = new HBox(3);
-			final Label removalPlatform = new Label("Removal Platform:");
+			final Label removalPlatform = new Label(LocalizationController.getString("removalPlatformStatusLabel"));
 			removalPlatformStatus = new Label();
 			platformStatus.getChildren().addAll(removalPlatform, removalPlatformStatus);
 			platformStatus.setAlignment(Pos.CENTER_LEFT);
 
 			final HBox userStatus = new HBox(10);
 			final Label userName = new Label("Hello, " + LoginController.getCurrentUser().getRoleName() + " " + LoginController.getCurrentUser().getFullName());
-			final Button logoutButton = new Button("Log Out");
+			final Button logoutButton = new Button(LocalizationController.getString("logOutButton"));
 			logoutButton.setPrefHeight(5.0);
 			userStatus.getChildren().addAll(userName, logoutButton);
 			userStatus.setAlignment(Pos.CENTER_RIGHT);

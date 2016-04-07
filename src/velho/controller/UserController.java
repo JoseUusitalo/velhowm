@@ -94,7 +94,7 @@ public class UserController implements UIActionController
 	 */
 	public boolean deleteUser(final User user)
 	{
-		USRLOG.debug((LocalizationController.getString("deleteUserAttemptNotification")) + user.getFullDetails());
+		USRLOG.debug("Attempting to delete: " + user.getFullDetails());
 
 		try
 		{
