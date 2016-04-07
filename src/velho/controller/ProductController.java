@@ -7,7 +7,6 @@ import velho.controller.interfaces.UIActionController;
 import velho.model.Product;
 import velho.model.ProductBrand;
 import velho.model.ProductCategory;
-import velho.model.exceptions.NoDatabaseLinkException;
 import velho.view.AddProductView;
 import velho.view.GenericTabView;
 import velho.view.ProductDataView;
@@ -72,15 +71,7 @@ public class ProductController implements UIActionController
 	 */
 	public Node getProductEditView()
 	{
-		try
-		{
-			return addProductView.getView(true);
-		}
-		catch (NoDatabaseLinkException e)
-		{
-			DatabaseController.tryReLink();
-		}
-		return null;
+		return addProductView.getView(true);
 	}
 
 	/**
@@ -97,31 +88,17 @@ public class ProductController implements UIActionController
 	{
 		ProductBrand bran = null;
 		ProductCategory cat = null;
-		try
+		if (brand instanceof String)
 		{
-			if (brand instanceof String)
-			{
-				SYSLOG.trace("creating new brand from " + brand.toString());
+			SYSLOG.trace("creating new brand from " + brand.toString());
 
-				bran = DatabaseController.getProductBrandByID(DatabaseController.save(new ProductBrand((String) brand)), true);
-			}
-
-			if (category instanceof String)
-			{
-				SYSLOG.trace("creating new category from " + category.toString());
-				try
-				{
-					cat = DatabaseController.getProductCategoryByID(DatabaseController.save(new ProductCategory((String) category)), true);
-				}
-				catch (NoDatabaseLinkException e)
-				{
-					DatabaseController.tryReLink();
-				}
-			}
+			bran = DatabaseController.getProductBrandByID(DatabaseController.save(new ProductBrand((String) brand)));
 		}
-		catch (NoDatabaseLinkException e)
+
+		if (category instanceof String)
 		{
-			DatabaseController.tryReLink();
+			SYSLOG.trace("creating new category from " + category.toString());
+			cat = DatabaseController.getProductCategoryByID(DatabaseController.save(new ProductCategory((String) category)));
 		}
 
 		if (brand instanceof ProductBrand)
@@ -137,26 +114,16 @@ public class ProductController implements UIActionController
 		}
 
 		Product newProduct = new Product(databaseID, name, bran, cat, popularity);
-		System.out.println(newProduct.toString());
 
-		try
+		final int dbID = DatabaseController.save(newProduct);
+
+		if (dbID < 0)
 		{
-			final int dbID = DatabaseController.save(newProduct);
-
-			if (dbID < 0)
-			{
-				PopupController.error("Failed to save product data!");
-				return null;
-			}
-
-			return DatabaseController.getProductByID(dbID, true);
-		}
-		catch (NoDatabaseLinkException e)
-		{
-			DatabaseController.tryReLink();
+			PopupController.error("Failed to save product data!");
+			return null;
 		}
 
-		return null;
+		return DatabaseController.getProductByID(dbID);
 	}
 
 	/**
@@ -166,15 +133,8 @@ public class ProductController implements UIActionController
 	 */
 	public void editProduct(final Product product)
 	{
-		try
-		{
-			listTab.setView(addProductView.getView(true));
-			addProductView.setViewData(product);
-		}
-		catch (NoDatabaseLinkException e)
-		{
-			DatabaseController.tryReLink();
-		}
+		listTab.setView(addProductView.getView(true));
+		addProductView.setViewData(product);
 	}
 
 	/**
@@ -184,15 +144,7 @@ public class ProductController implements UIActionController
 	 */
 	public Node getAddProductView()
 	{
-		try
-		{
-			return new AddProductView(this, uiController).getView(false);
-		}
-		catch (NoDatabaseLinkException e)
-		{
-			DatabaseController.tryReLink();
-			return null;
-		}
+		return new AddProductView(this, uiController).getView(false);
 	}
 
 	/**
@@ -200,15 +152,7 @@ public class ProductController implements UIActionController
 	 */
 	public void showList()
 	{
-		try
-		{
-			listTab.setView(ListController.getTableView(this, DatabaseController.getProductDataColumns(false, false), DatabaseController.getAllProducts()));
-		}
-		catch (NoDatabaseLinkException e)
-		{
-			listTab.setView(null);
-			DatabaseController.tryReLink();
-		}
+		listTab.setView(ListController.getTableView(this, DatabaseController.getProductDataColumns(false, false), DatabaseController.getAllProducts()));
 	}
 
 	/**

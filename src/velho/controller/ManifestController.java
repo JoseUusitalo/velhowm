@@ -8,11 +8,10 @@ import org.apache.log4j.Logger;
 
 import javafx.scene.Node;
 import velho.controller.interfaces.UIActionController;
-import velho.model.Manager;
 import velho.model.Manifest;
 import velho.model.ManifestState;
 import velho.model.ProductBox;
-import velho.model.exceptions.NoDatabaseLinkException;
+import velho.model.enums.UserRole;
 import velho.view.GenericTabView;
 import velho.view.MainWindow;
 import velho.view.ManifestManagementView;
@@ -68,9 +67,9 @@ public class ManifestController implements UIActionController
 	 *
 	 * @return a tabular view of all manifests
 	 */
-	public Node getBrowseManifestsView() throws NoDatabaseLinkException
+	public Node getBrowseManifestsView()
 	{
-		return ListController.getTableView(this, DatabaseController.getManifestDataColumns(), DatabaseController.getAllManifests(false));
+		return ListController.getTableView(this, DatabaseController.getManifestDataColumns(), DatabaseController.getAllManifests());
 	}
 
 	/**
@@ -78,17 +77,10 @@ public class ManifestController implements UIActionController
 	 */
 	public void showBrowseManifestsView()
 	{
-		USRLOG.info(LocalizationController.getString("browsingManifestsNotice"));
+		USRLOG.info("Browsing manifests.");
 
-		try
-		{
-			managementView.setContent(getBrowseManifestsView());
-			showStateSelector(null);
-		}
-		catch (NoDatabaseLinkException e)
-		{
-			DatabaseController.tryReLink();
-		}
+		managementView.setContent(getBrowseManifestsView());
+		showStateSelector(null);
 	}
 
 	/**
@@ -98,18 +90,11 @@ public class ManifestController implements UIActionController
 	 */
 	public void showManifestView(final Manifest manifest)
 	{
-		try
-		{
-			USRLOG.info((LocalizationController.getString("viewingManifestsInfo")) + manifest);
-			currentManifest = manifest;
-			managementView.setContent(new ManifestView(manifest, this).getView());
-			// The method showing the combo box state selector is called in the
-			// view.
-		}
-		catch (NoDatabaseLinkException e)
-		{
-			DatabaseController.tryReLink();
-		}
+		USRLOG.info("Viewing manifest: " + manifest);
+		currentManifest = manifest;
+		managementView.setContent(new ManifestView(manifest, this).getView());
+		// The method showing the combo box state selector is called in the
+		// view.
 	}
 
 	/**
@@ -139,20 +124,13 @@ public class ManifestController implements UIActionController
 	 */
 	public void setCurrentManifestState(final ManifestState newState)
 	{
-		USRLOG.info(currentManifest + (LocalizationController.getString("manifestStateChangeNote")) + newState + ".");
+		USRLOG.info(currentManifest + " state changed to " + newState + ".");
 		currentManifest.setState(newState);
 
-		try
-		{
-			if (DatabaseController.save(currentManifest) > 0)
-				SYSLOG.info((LocalizationController.getString("updatedManifestInDatabaseNote")) + currentManifest);
-			else
-				SYSLOG.info((LocalizationController.getString("manifestUpdateInDatabaseFailed")) + currentManifest);
-		}
-		catch (NoDatabaseLinkException e)
-		{
-			DatabaseController.tryReLink();
-		}
+		if (DatabaseController.save(currentManifest) > 0)
+			SYSLOG.info("Updated database: " + currentManifest);
+		else
+			SYSLOG.info("Database update failed: " + currentManifest);
 	}
 
 	/**
@@ -176,28 +154,21 @@ public class ManifestController implements UIActionController
 	{
 		Manifest manifest;
 
-		try
-		{
-			manifest = new Manifest(DatabaseController.getManifestStateByID(3), driverID, orderDate, Date.from(Instant.now()));
-			manifest.setProductBoxes(boxSet);
+		manifest = new Manifest(DatabaseController.getManifestStateByID(3), driverID, orderDate, Date.from(Instant.now()));
+		manifest.setBoxes(boxSet);
 
-			if (DatabaseController.save(manifest) > 0)
+		if (DatabaseController.save(manifest) > 0)
+		{
+			// If the user is a Manager (but not an Administrator!) show a
+			// popup.
+			if (LoginController.userRoleIs(UserRole.MANAGER))
 			{
-				// If the user is a Manager (but not an Administrator!) show a
-				// popup.
-				if (LoginController.userRoleIs(new Manager()))
+				if (PopupController.confirmation("A shipment has arrived. Please accept or refuse it in the Manifests tab. Would you like to view the manifest now?"))
 				{
-					if (PopupController.confirmation(LocalizationController.getString("manifestShipmentArrivalNotice")))
-					{
-						showManifestView(manifest);
-						mainWindow.selectTab("Manifests");
-					}
+					showManifestView(manifest);
+					mainWindow.selectTab("Manifests");
 				}
 			}
-		}
-		catch (NoDatabaseLinkException e)
-		{
-			DatabaseController.tryReLink();
 		}
 
 	}

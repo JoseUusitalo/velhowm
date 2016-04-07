@@ -17,7 +17,6 @@ import velho.controller.LocalizationController;
 import velho.controller.ProductController;
 import velho.controller.UIController;
 import velho.model.Product;
-import velho.model.exceptions.NoDatabaseLinkException;
 
 /**
  * Creates tab for "Product Edit View".
@@ -85,7 +84,7 @@ public class AddProductView
 	 * @return the bPane
 	 * @throws NoDatabaseLinkException to get the data
 	 */
-	public BorderPane getView(final boolean editProduct) throws NoDatabaseLinkException
+	public BorderPane getView(final boolean editProduct)
 	{
 		if (bPane == null)
 		{
@@ -213,7 +212,7 @@ public class AddProductView
 	 */
 	public void setViewData(final Product product)
 	{
-		databaseID.getValueFactory().setValue(product.getProductID());
+		databaseID.getValueFactory().setValue(product.getDatabaseID());
 		nameField.setText(product.getName());
 		brandList.getSelectionModel().select(product.getBrand());
 		categoryList.getSelectionModel().select(product.getCategory());

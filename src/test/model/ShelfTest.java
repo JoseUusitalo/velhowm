@@ -151,19 +151,19 @@ public class ShelfTest
 	}
 
 	@Test(expected = IllegalArgumentException.class)
-	public final void testAddToSlot_Large_Level() throws IllegalArgumentException, NoDatabaseLinkException
+	public final void testAddToSlot_Large_Level() throws IllegalArgumentException
 	{
 		shelf_FREE_LVL_2.addToSlot(shelf_FREE_LVL_2.getShelfID() + "-99999-12", BOX_2);
 	}
 
 	@Test(expected = IllegalArgumentException.class)
-	public final void testAddToSlot_Large_Slot() throws IllegalArgumentException, NoDatabaseLinkException
+	public final void testAddToSlot_Large_Slot() throws IllegalArgumentException
 	{
 		shelf_FREE_LVL_2.addToSlot(shelf_FREE_LVL_2.getShelfID() + "-2-999999", BOX_2);
 	}
 
 	@Test(expected = IllegalArgumentException.class)
-	public final void testAddToSlot_Wrong_ID() throws IllegalArgumentException, NoDatabaseLinkException
+	public final void testAddToSlot_Wrong_ID() throws IllegalArgumentException
 	{
 		shelf_FREE_LVL_2.addToSlot("S" + (SHELF_FREE_LVL_2_ID + 1) + "-2-1", BOX_2);
 	}
@@ -246,7 +246,7 @@ public class ShelfTest
 	}
 
 	@Test
-	public final void testAddToSlot_EmptyBox_GetCount() throws IllegalArgumentException, NoDatabaseLinkException
+	public final void testAddToSlot_EmptyBox_GetCount() throws IllegalArgumentException
 	{
 		final int oldBoxCount = shelf_FREE_LVL_2.getProductBoxCount();
 		final int oldProductCount = shelf_FREE_LVL_2.getProductCount();
@@ -258,7 +258,7 @@ public class ShelfTest
 	}
 
 	@Test
-	public final void testAddToSlot() throws IllegalArgumentException, NoDatabaseLinkException
+	public final void testAddToSlot() throws IllegalArgumentException
 	{
 		final String slotid = shelf_FREE_LVL_2.getShelfID() + "-2-12";
 		final int oldBoxCount = shelf_FREE_LVL_2.getProductBoxCount();
@@ -300,7 +300,7 @@ public class ShelfTest
 		final int oldBoxCount = shelf_FREE_LVL_2.getProductBoxCount();
 		final int oldProductCount = shelf_FREE_LVL_2.getProductCount();
 
-		assertTrue(shelf_FREE_LVL_2.removeFromSlot(BOX_2, false));
+		assertTrue(shelf_FREE_LVL_2.removeFromSlot(BOX_2));
 
 		assertFalse(shelf_FREE_LVL_2.getShelfSlotBoxes(slotid).contains(BOX_2));
 		assertEquals(oldBoxCount - 1, shelf_FREE_LVL_2.getProductBoxCount());
@@ -309,13 +309,13 @@ public class ShelfTest
 	}
 
 	@Test
-	public final void testRemoveFromSlot_Null() throws IllegalArgumentException, NoDatabaseLinkException
+	public final void testRemoveFromSlot_Null() throws IllegalArgumentException
 	{
 		assertFalse(shelf_FREE_LVL_2.removeFromSlot(null));
 	}
 
 	@Test
-	public final void testHasFreeSpace() throws IllegalArgumentException, NoDatabaseLinkException
+	public final void testHasFreeSpace() throws IllegalArgumentException
 	{
 		assertTrue(emptyShelf_1_0_to_1_1.hasFreeSpace());
 		assertTrue(emptyShelf_1_0_to_1_1.isEmpty());
@@ -343,7 +343,7 @@ public class ShelfTest
 	}
 
 	@Test
-	public final void testAddToSlot_Full() throws IllegalArgumentException, NoDatabaseLinkException
+	public final void testAddToSlot_Full() throws IllegalArgumentException
 	{
 		assertTrue(emptyShelf_1_0_to_1_1.addToSlot(emptyShelf_1_0_to_1_1.getShelfID() + "-1-0", BOX_1));
 		assertFalse(emptyShelf_1_0_to_1_1.addToSlot(emptyShelf_1_0_to_1_1.getShelfID() + "-1-0", BOX_2));

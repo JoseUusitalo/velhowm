@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+ "-//Hibernate/Hibernate Mapping DTD//EN"
+ "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+	<class name="velho.model.RemovalPlatform" table="REMOVALPLATFORMS">
+		<meta attribute="class-description">A basic removal platform implementation.</meta>
+
+		<id name="databaseID"
+			column="platform_id"
+			type="int">
+			<generator class="native" />
+		</id>
+
+		<property	name="freeSpacePercent"
+					type="double">
+			<column name="free_space"
+					not-null="true"
+					default="1.0" />
+		</property>
+
+		<property	name="freeSpaceLeftWarningPercent"
+					type="double">
+			<column name="free_space_warning"
+					not-null="true"
+					default="0.1" />
+		</property>
+	</class>
+</hibernate-mapping>

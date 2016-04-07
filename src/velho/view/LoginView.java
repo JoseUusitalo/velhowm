@@ -7,7 +7,10 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.GridPane;
+import javafx.scene.layout.VBox;
 import velho.controller.LocalizationController;
 import velho.controller.LoginController;
 
@@ -19,20 +22,29 @@ import velho.controller.LoginController;
 public class LoginView
 {
 	/**
-	 * The root GridPane for this view.
+	 * The root VBox for this view.
 	 */
-	private GridPane grid;
+	private VBox vbox;
 
 	/**
 	 * Gets the login view.
 	 *
 	 * @return the login view GridPane
 	 */
-	public GridPane getView()
+	public VBox getView()
 	{
-		if (grid == null)
+		if (vbox == null)
 		{
-			grid = new GridPane();
+			vbox = new VBox(40);
+
+			final ImageView logoView = new ImageView(new Image("file:res/velhowm_logo.png"));
+			logoView.setFitWidth(MainWindow.WINDOW_WIDTH / 2.0);
+			logoView.setPreserveRatio(true);
+			logoView.setSmooth(true);
+			logoView.setCache(true);
+			vbox.getChildren().add(logoView);
+
+			final GridPane grid = new GridPane();
 			grid.setVgap(10);
 			grid.setHgap(10);
 			grid.setAlignment(Pos.CENTER);
@@ -59,6 +71,9 @@ public class LoginView
 			logInButton.setPrefHeight(50.0);
 			grid.add(logInButton, 0, 3, 2, 1);
 
+			vbox.getChildren().add(grid);
+			vbox.setAlignment(Pos.CENTER);
+
 			logInButton.setOnAction(new EventHandler<ActionEvent>()
 			{
 				@Override
@@ -69,7 +84,7 @@ public class LoginView
 			});
 		}
 
-		return grid;
+		return vbox;
 	}
 
 	/**
@@ -77,6 +92,6 @@ public class LoginView
 	 */
 	public void destroy()
 	{
-		grid = null;
+		vbox = null;
 	}
 }

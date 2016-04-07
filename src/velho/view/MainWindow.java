@@ -47,7 +47,7 @@ import velho.model.exceptions.ExistingDatabaseLinkException;
 import velho.model.exceptions.NoDatabaseLinkException;
 
 /**
- * The main window and class for Velho Warehouse Management.
+ * The main window and class for VELHO Warehouse Management.
  *
  * @author Jose Uusitalo &amp; Joona Silvennoinen
  */
@@ -56,7 +56,7 @@ public class MainWindow extends Application
 	/**
 	 * Relative file path to the Apache log4j logger properties file.
 	 */
-	private static final String LOG4J_PATH = "src/velho/model/log4j.properties";
+	private static final String LOG4J_PATH = "src/log4j.properties";
 
 	/**
 	 * Apache log4j logger: System.
@@ -78,7 +78,7 @@ public class MainWindow extends Application
 	 * Enable TRACE level logging. DEBUG_MODE must be <code>true</code> for this
 	 * to affect anything.
 	 */
-	public static final boolean SHOW_TRACE = false;
+	public static final boolean SHOW_TRACE = true;
 
 	/**
 	 * The height of the window.
@@ -185,9 +185,11 @@ public class MainWindow extends Application
 			{
 				if (!DEBUG_MODE)
 				{
-					// This is how we prevent Logisticians from reading logs.
-					// Logs can now only be read through the database access to
-					// which can easily be limited.
+					/*
+					 * This is how we prevent Logisticians from reading logs.
+					 * Logs can now only be read through the database, access to
+					 * which can easily be limited.
+					 */
 					SYSLOG.info("Debug mode not enabled, disabling file and console appenders for all loggers.");
 
 					// Remove console appenders from all system loggers.
@@ -220,6 +222,9 @@ public class MainWindow extends Application
 					{
 						SYSLOG.debug("Creating all controllers...");
 						LocalizationController.initializeBundle();
+
+						// FIXME: Convert all controllers to use the singleton
+						// pattern.
 						DatabaseController.loadData();
 						uiController = new UIController();
 						userController = new UserController();
@@ -275,7 +280,7 @@ public class MainWindow extends Application
 	}
 
 	/**
-	 * The main method of Velho Warehouse Management.
+	 * The main method of VELHO Warehouse Management.
 	 *
 	 * @param args
 	 */
@@ -397,7 +402,6 @@ public class MainWindow extends Application
 		else
 		{
 			setUserAgentStylesheet(STYLESHEET_MODENA);
-
 			primaryStage.setTitle(LocalizationController.getString("mainWindowTitle"));
 			final Group root = new Group();
 			scene = new Scene(root, WINDOW_WIDTH, WINDOW_HEIGHT);
@@ -467,7 +471,18 @@ public class MainWindow extends Application
 			// Ignore.
 		}
 
+		DatabaseController.closeSessionFactory();
+
 		SYSLOG.info("Exit.");
+
+		try
+		{
+			LogDatabaseController.unlink();
+		}
+		catch (final NoDatabaseLinkException e)
+		{
+			// Ignore.
+		}
 	}
 
 	/**

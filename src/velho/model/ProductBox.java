@@ -3,7 +3,7 @@ package velho.model;
 import java.util.Date;
 
 /**
- * The ProductBox class.
+ * A class representing a physical box of some sort that can contain any number of {@link Product} objects.
  *
  * @author Joona Silvennoinen &amp; Jose Uusitalo
  */
@@ -20,13 +20,22 @@ public class ProductBox extends ProductContainer
 	{
 		super(databaseID, expirationDate, maxSize, product, productCount);
 
+		// Boxes cannot store cold products. Those may only be stored in freezers.
 		if (product.getCategory().getType().getName() == "Cold")
 		{
 			throw new IllegalArgumentException();
 		}
 	}
 
-	@Override public String toString()
+	/**
+	 */
+	public ProductBox()
+	{
+		// For Hibernate.
+	}
+
+	@Override
+	public String toString()
 	{
 		return "[" + this.databaseID + "] Box: " + this.product.getName() + " (" + this.productCount + ")";
 	}

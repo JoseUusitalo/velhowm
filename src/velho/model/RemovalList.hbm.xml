@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+ "-//Hibernate/Hibernate Mapping DTD//EN"
+ "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+	<class name="velho.model.RemovalList" table="REMOVALLISTS">
+		<meta attribute="class-description">A list of product boxes to be thrown away.</meta>
+
+		<id name="databaseID"
+			column="removallist_id"
+			type="int">
+			<generator class="native" />
+		</id>
+		
+		<!-- Many-to-one: This object can have one referenced object, the referenced object can be referenced from many objects.  
+			 Cascade changes.
+			 "Select" eager fetching: load the referenced object when this object is loaded. -->
+		<many-to-one	name="state"
+						class="velho.model.RemovalListState"
+						column="liststate"
+						not-null="true"
+						cascade="all"
+						fetch="select"
+						lazy="false" />
+		
+		<set name="boxes"
+			 cascade="all"
+			 table="removallist_productboxes"
+			 fetch="select"
+			 lazy="false" >
+			<key column="removallist" />
+			<many-to-many column="productbox"
+						  class="velho.model.ProductBox" />
+		</set>
+	</class>
+</hibernate-mapping>

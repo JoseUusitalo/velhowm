@@ -1,40 +1,38 @@
 package velho.model;
 
-import velho.controller.DatabaseController;
-import velho.model.exceptions.NoDatabaseLinkException;
-import velho.model.interfaces.UserRole;
+import velho.model.enums.UserRole;
 
 /**
  * A User represents the person using this system.
  *
  * @author Jose Uusitalo
  */
-public class User
+public class User implements Comparable<User>
 {
 	/**
 	 * The maximum number of characters a first or last name may have.
 	 */
-	private static final int MAX_NAME_LENGTH = 128;
+	public static final int MAX_NAME_LENGTH = 128;
 
 	/**
 	 * The maximum value for a PIN code.
 	 */
-	private static final int MAX_PIN_VALUE = 999999;
+	public static final int MAX_PIN_VALUE = 999999;
 
 	/**
 	 * The maximum value for a badge ID code.
 	 */
-	private static final int MAX_BADGE_ID_VALUE = 99999999;
+	public static final int MAX_BADGE_ID_VALUE = 99999999;
 
 	/**
 	 * The number of digits a badge ID must have.
 	 */
-	private static final int BADGE_ID_LENGTH = 8;
+	public static final int BADGE_ID_LENGTH = 8;
 
 	/**
 	 * The number of digits a PIN must have.
 	 */
-	private static final int PIN_LENGTH = 6;
+	public static final int PIN_LENGTH = 6;
 
 	/**
 	 * The database row ID of this user.
@@ -50,6 +48,16 @@ public class User
 	 * The last name of this user.
 	 */
 	private String lastName;
+
+	/**
+	 * The ID number of the user's badge.
+	 */
+	private String badgeID;
+
+	/**
+	 * The secret PIN of the user.
+	 */
+	private String pin;
 
 	/**
 	 * The role of this user.
@@ -70,6 +78,28 @@ public class User
 		this.role = role;
 	}
 
+	public User(final String identifier, final String firstName, final String lastName, final UserRole role)
+	{
+		if (identifier == null || identifier.isEmpty())
+			throw new IllegalArgumentException("Invalid badge ID or PIN.");
+
+		if (identifier.length() > 6)
+			this.badgeID = identifier;
+		else
+			this.pin = identifier;
+
+		this.firstName = firstName;
+		this.lastName = lastName;
+		this.role = role;
+	}
+
+	/**
+	 */
+	public User()
+	{
+		// For Hibernate.
+	}
+
 	/**
 	 * Returns the user data in the following format:
 	 * <code>firstname lastname [rolename | databaseid]</code>
@@ -80,24 +110,24 @@ public class User
 		return firstName + " " + lastName + " [" + role.toString() + " | " + databaseID + "]";
 	}
 
-	/**
-	 * Gets the first name of this user.
-	 *
-	 * @return the first name of this user
-	 */
-	public String getFirstName()
+	@Override
+	public boolean equals(final Object o)
 	{
-		return firstName;
+		if (!(o instanceof User))
+			return false;
+
+		final User u = (User) o;
+
+		if (this.getDatabaseID() <= 0)
+			return this == u;
+
+		return this.getDatabaseID() == u.getDatabaseID();
 	}
 
-	/**
-	 * Gets the last name of this user.
-	 *
-	 * @return the last name of this user
-	 */
-	public String getLastName()
+	@Override
+	public int compareTo(final User user)
 	{
-		return lastName;
+		return this.getFullName().compareToIgnoreCase(user.getFullName());
 	}
 
 	/**
@@ -122,16 +152,6 @@ public class User
 	}
 
 	/**
-	 * Gets the role of this user.
-	 *
-	 * @return the role of this user
-	 */
-	public UserRole getRole()
-	{
-		return role;
-	}
-
-	/**
 	 * Gets the name of the role of this user.
 	 *
 	 * @return the role name of this user
@@ -142,7 +162,7 @@ public class User
 	}
 
 	/**
-	 * Gets the database row ID of this user.
+	 * Gets the database ID of this user.
 	 *
 	 * @return the database ID of this user
 	 */
@@ -151,93 +171,113 @@ public class User
 		return databaseID;
 	}
 
-	/*
-	 * STATIC METHODS
-	 */
-
 	/**
-	 * Validates the user data against the database requirements.
-	 * Either a badge ID or a PIN must be defined.
-	 * Both cannot be null.
-	 * Both cannot be defined.
+	 * Sets the database ID of this user.
 	 *
-	 * @param badgeID RFID identification string of the user's RFID badge
-	 * @param pin the pin string used to log in to the system if no RFID badge ID is provided
-	 * @param firstName the first name of the user
-	 * @param lastName the last name of the user
-	 * @param roleName the name of the role of the user
-	 *
-	 * @return <code>true</code> if given information is valid
-	 * @throws NoDatabaseLinkException
+	 * @param databaseID the new database ID
 	 */
-	public static boolean validateUserData(final String badgeID, final String pin, final String firstName, final String lastName, final String roleName)
-			throws NoDatabaseLinkException
+	public void setDatabaseID(final int databaseID)
 	{
-		final boolean hasBadgeID = isValidBadgeID(badgeID);
-		final boolean hasPIN = isValidPIN(pin);
-
-		// Must have exactly one.
-		if ((hasBadgeID && hasPIN) || (!hasBadgeID && !hasPIN))
-			return false;
-
-		// Name cannot be null, empty, or longer than maximum and length.
-		if (firstName == null || firstName.isEmpty() || firstName.length() > MAX_NAME_LENGTH)
-			return false;
-
-		// Name cannot be null, empty, or longer than maximum and length.
-		if (lastName == null || lastName.isEmpty() || lastName.length() > MAX_NAME_LENGTH)
-			return false;
-
-		// The role must exist in the database.
-		if (DatabaseController.getRoleID(roleName) == -1)
-			return false;
-
-		return true;
+		this.databaseID = databaseID;
 	}
 
 	/**
-	 * Checks if the given PIN is valid.
-	 * PINs must be numerical.
+	 * Gets the first name of this user.
 	 *
-	 * @param pin PIN to check
-	 * @return <code>true</code> if the pin is valid
+	 * @return the first name of this user
 	 */
-	public static boolean isValidPIN(final String pin)
+	public String getFirstName()
 	{
-		if (pin == null || pin.length() != PIN_LENGTH)
-			return false;
-
-		try
-		{
-			int value = Integer.parseInt(pin);
-			return (value >= 0 && value <= MAX_PIN_VALUE);
-		}
-		catch (NumberFormatException e)
-		{
-			return false;
-		}
+		return firstName;
 	}
 
 	/**
-	 * Checks if the given badge ID is valid.
-	 * Badge IDs must be numerical.
+	 * Sets the first name of this user.
 	 *
-	 * @param badgeID badge ID to check
-	 * @return <code>true</code> if the badge ID is valid
+	 * @param firstName the new first name of this user
 	 */
-	public static boolean isValidBadgeID(final String badgeID)
+	public void setFirstName(final String firstName)
 	{
-		if (badgeID == null || badgeID.length() != BADGE_ID_LENGTH)
-			return false;
+		this.firstName = firstName;
+	}
 
-		try
-		{
-			int value = Integer.parseInt(badgeID);
-			return (value >= 0 && value <= MAX_BADGE_ID_VALUE);
-		}
-		catch (NumberFormatException e)
-		{
-			return false;
-		}
+	/**
+	 * Gets the last name of this user.
+	 *
+	 * @return the last name of this user
+	 */
+	public String getLastName()
+	{
+		return lastName;
+	}
+
+	/**
+	 * Sets the last name of this user.
+	 *
+	 * @param lastName the new last name of this user
+	 */
+	public void setLastName(final String lastName)
+	{
+		this.lastName = lastName;
+	}
+
+	/**
+	 * Gets the role of this user.
+	 *
+	 * @return the role of this user
+	 */
+	public UserRole getRole()
+	{
+		return role;
+	}
+
+	/**
+	 * Sets the role of this user.
+	 *
+	 * @param role the new role of this user
+	 */
+	public void setRole(final UserRole role)
+	{
+		this.role = role;
+	}
+
+	/**
+	 * Gets the unique badge ID of this user.
+	 *
+	 * @return the badge ID
+	 */
+	public String getBadgeID()
+	{
+		return badgeID;
+	}
+
+	/**
+	 * Sets the unique badge ID of this user.
+	 *
+	 * @param badgeID the new badge ID
+	 */
+	public void setBadgeID(final String badgeID)
+	{
+		this.badgeID = badgeID;
+	}
+
+	/**
+	 * Get the login PIN of this user.
+	 *
+	 * @return the user login PIN
+	 */
+	public String getPin()
+	{
+		return pin;
+	}
+
+	/**
+	 * Sets the login PIN of this user.
+	 *
+	 * @param pin the new PIN
+	 */
+	public void setPin(final String pin)
+	{
+		this.pin = pin;
 	}
 }

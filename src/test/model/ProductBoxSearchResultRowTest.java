@@ -1,17 +1,12 @@
 package test.model;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 
-import org.junit.BeforeClass;
 import org.junit.Test;
 
 import velho.controller.DatabaseController;
 import velho.model.ProductBox;
 import velho.model.ProductBoxSearchResultRow;
-import velho.model.enums.DatabaseFileState;
-import velho.model.exceptions.ExistingDatabaseLinkException;
-import velho.model.exceptions.NoDatabaseLinkException;
 
 /**
  * Tests for the class {@link ProductBoxSearchResultRow}.
@@ -22,29 +17,8 @@ import velho.model.exceptions.NoDatabaseLinkException;
 @SuppressWarnings("static-method")
 public class ProductBoxSearchResultRowTest
 {
-	private static ProductBox box;
-	private static ProductBoxSearchResultRow row;
-
-	@BeforeClass
-	public static void createBox() throws Exception
-	{
-		try
-		{
-			assertTrue(DatabaseController.link() != DatabaseFileState.DOES_NOT_EXIST);
-			assertTrue(DatabaseController.initializeDatabase());
-		}
-		catch (ClassNotFoundException | ExistingDatabaseLinkException e)
-		{
-			e.printStackTrace();
-		}
-		catch (NoDatabaseLinkException e)
-		{
-			DatabaseController.tryReLink();
-		}
-
-		box = DatabaseController.getProductBoxByID(1);
-		row = new ProductBoxSearchResultRow(box);
-	}
+	private static ProductBox box = DatabaseController.getProductBoxByID(1);
+	private static ProductBoxSearchResultRow row = new ProductBoxSearchResultRow(box);
 
 	@Test
 	public final void testGetBox()
@@ -73,7 +47,7 @@ public class ProductBoxSearchResultRowTest
 	@Test
 	public final void testGetProductID()
 	{
-		assertEquals(box.getProduct().getProductID(), row.getProductID());
+		assertEquals(box.getProduct().getDatabaseID(), row.getProductID());
 	}
 
 	@Test
@@ -91,6 +65,6 @@ public class ProductBoxSearchResultRowTest
 	@Test
 	public final void testGetBoxID()
 	{
-		assertEquals(box.getBoxID(), row.getBoxID());
+		assertEquals(box.getDatabaseID(), row.getBoxID());
 	}
 }

@@ -4,8 +4,7 @@ import org.apache.log4j.Logger;
 
 import javafx.scene.Node;
 import velho.model.enums.Position;
-import velho.model.exceptions.NoDatabaseLinkException;
-import velho.model.interfaces.UserRole;
+import velho.model.enums.UserRole;
 import velho.view.MainWindow;
 
 /**
@@ -127,14 +126,14 @@ public class UIController
 		 * What is shown in the tabs depends on your role.
 		 */
 
-		switch (currentUserRole.getName())
+		switch (currentUserRole)
 		{
-			case "Administrator":
-			case "Manager":
+			case ADMINISTRATOR:
+			case MANAGER:
 				mainView.addTab("Add User", userController.getView());
 				mainView.addTab("Logs", logController.getView());
 				//$FALL-THROUGH$
-			case "Logistician":
+			case LOGISTICIAN:
 				mainView.addTab("Search", searchController.getSearchTabView());
 				mainView.addTab("Product List Search", searchController.getProductListSearchView());
 				mainView.addTab("Manifests", manifestController.getView());
@@ -142,6 +141,8 @@ public class UIController
 				mainView.addTab("Add Product", productController.getAddProductView());
 				mainView.addTab("Product List", productController.getTabView());
 				mainView.addTab("User List", getUserListView(currentUserRole));
+				break;
+			case GUEST:
 				break;
 			default:
 				SYSLOG.error("Unknown user role '" + currentUserRole.getName() + "'.");
@@ -164,24 +165,17 @@ public class UIController
 		/*
 		 * What is shown in the user list depends on your role.
 		 */
-		try
+		switch (currentUserRole)
 		{
-			switch (currentUserRole.getName())
-			{
-				case "Administrator":
-				case "Manager":
-					return ListController.getTableView(userController, DatabaseController.getPublicUserDataColumns(true),
-							DatabaseController.getObservableUsers());
-				case "Logistician":
-					return ListController.getTableView(userController, DatabaseController.getPublicUserDataColumns(false),
-							DatabaseController.getObservableUsers());
-				default:
-					SYSLOG.error("Unknown user role '" + currentUserRole.getName() + "'.");
-			}
-		}
-		catch (NoDatabaseLinkException e)
-		{
-			DatabaseController.tryReLink();
+			case ADMINISTRATOR:
+			case MANAGER:
+				return ListController.getTableView(userController, DatabaseController.getPublicUserDataColumns(true), DatabaseController.getAllUsers());
+			case LOGISTICIAN:
+				return ListController.getTableView(userController, DatabaseController.getPublicUserDataColumns(false), DatabaseController.getAllUsers());
+			case GUEST:
+				break;
+			default:
+				SYSLOG.error("Unknown user role '" + currentUserRole.getName() + "'.");
 		}
 
 		return null;

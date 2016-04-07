@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+ "-//Hibernate/Hibernate Mapping DTD//EN"
+ "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+	<class name="velho.model.ProductBrand" table="BRANDS">
+		<meta attribute="class-description">A brand associated with a Product.</meta>
+
+		<id name="databaseID"
+			column="brand_id"
+			type="int">
+			<generator class="native" />
+		</id>
+
+		<property	name="name"
+					column="name"
+					type="string"
+					unique="true"
+					not-null="true" />
+	</class>
+</hibernate-mapping>
