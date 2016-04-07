@@ -2,8 +2,8 @@ package velho.model;
 
 import java.util.ArrayList;
 import java.util.List;
-
-import org.apache.log4j.Logger;
+import java.util.Set;
+import java.util.TreeSet;
 
 /**
  * A class representing a physical shelf structure in the warehouse.
@@ -13,17 +13,12 @@ import org.apache.log4j.Logger;
 public class Shelf implements Comparable<Shelf>
 {
 	/**
-	 * Apache log4j logger: System.
-	 */
-	private static final Logger SYSLOG = Logger.getLogger(Shelf.class.getName());
-
-	/**
 	 * The identifier of a shelf in IDs.
 	 */
 	public static final String SHELF_IDENTIFIER = "S";
 
 	/**
-	 * The ID of this shelf.
+	 * The database ID of this shelf.
 	 */
 	private int databaseID;
 
@@ -33,9 +28,9 @@ public class Shelf implements Comparable<Shelf>
 	private int levelCount;
 
 	/**
-	 * The {@link ShelfLevel}s of this shelf.
+	 * The {@link ShelfLevel}s in this shelf.
 	 */
-	private List<ShelfLevel> levels;
+	private Set<ShelfLevel> shelfLevels;
 
 	/**
 	 * @param databaseID
@@ -48,6 +43,7 @@ public class Shelf implements Comparable<Shelf>
 
 		this.databaseID = databaseID;
 		this.levelCount = levelCount;
+		this.shelfLevels = new TreeSet<ShelfLevel>();
 	}
 
 	/**
@@ -209,15 +205,20 @@ public class Shelf implements Comparable<Shelf>
 	 */
 	private int[] tokenizeAndValidateShelfSlotID(final String shelfSlotID)
 	{
+		/*
+		 * TODO: It would be nice if I could get rid of this and simply pass around the objects and only use the ID
+		 * string for display purposes.
+		 */
+
 		final int[] tokens = shelfSlotIDTokenizer(shelfSlotID);
 
 		// Correct shelf?
 		if (databaseID != tokens[0])
-			throw new IllegalArgumentException("Invalid shelf slot ID '" + shelfSlotID + "': invalid shelf");
+			throw new IllegalArgumentException("Invalid shelf slot ID '" + shelfSlotID + "': invalid shelf " + tokens[0]);
 
 		// Enough levels? tokens[1] is an index.
 		if (tokens[1] >= levelCount || tokens[1] < 0)
-			throw new IllegalArgumentException("Invalid shelf slot ID '" + shelfSlotID + "': invalid level");
+			throw new IllegalArgumentException("Invalid shelf slot ID '" + shelfSlotID + "': invalid level " + tokens[1]);
 
 		// TODO: Remove or fix this?
 		// Enough slots? tokens[2] is an index.
@@ -230,7 +231,7 @@ public class Shelf implements Comparable<Shelf>
 	@Override
 	public String toString()
 	{
-		return "[" + databaseID + "] Lvls: " + levelCount + ", Boxs: " + getProductBoxCount() + ", Slts: " + getShelfSlotCount() + ", Free: "
+		return "[" + databaseID + "] Lvls: " + levelCount + ", Boxs: " + getProductBoxes().size() + ", Slts: " + getShelfSlotCount() + ", Free: "
 				+ getFreeShelfSlots().size();
 	}
 
@@ -255,9 +256,9 @@ public class Shelf implements Comparable<Shelf>
 	}
 
 	/**
-	 * Gets the shelf ID.
+	 * Gets the shelf ID string which is the database ID prefix with {@link Shelf#SHELF_IDENTIFIER}.
 	 *
-	 * @return the shelf ID
+	 * @return the shelf ID string
 	 */
 	public String getShelfID()
 	{
@@ -275,18 +276,15 @@ public class Shelf implements Comparable<Shelf>
 	}
 
 	/**
-	 * Gets the number of shelf slots on this shelf.
+	 * Sets the database ID of this shelf.
 	 *
-	 * @return the number of slots on this shelf
+	 * @param databaseID the new database ID
 	 */
-	public int getShelfSlotCount()
+	public void setDatabaseID(final int databaseID)
 	{
-		int sum = 0;
+		// TODO: It would be nice to handle this in an abstract class.
 
-		for (final ShelfLevel level : levels)
-			sum += level.getSlots().size();
-
-		return sum;
+		this.databaseID = databaseID;
 	}
 
 	/**
@@ -300,59 +298,84 @@ public class Shelf implements Comparable<Shelf>
 	}
 
 	/**
-	 * Gets all shelf slots on this shelf that have some free space.
+	 * Do not use, does not change anything yet.
+	 * Only for Hibernate.
 	 *
-	 * @return shelf slots with free space of this shelf
+	 * @param levels the new number of levels of this shelf
+	 */
+	public void setLevelCount(final int levels)
+	{
+		this.levelCount = levels;
+	}
+
+	public Set<ShelfLevel> getShelfLevels()
+	{
+		return shelfLevels;
+	}
+
+	public void setShelfLevels(final Set<ShelfLevel> shelfLevels)
+	{
+		this.shelfLevels = shelfLevels;
+	}
+
+	/**
+	 * Gets the number of shelf slots on this shelf.
+	 *
+	 * @return the number of slots on this shelf
+	 */
+	public int getShelfSlotCount()
+	{
+		int sum = 0;
+
+		for (final ShelfLevel level : shelfLevels)
+			sum += level.getShelfSlots().size();
+
+		return sum;
+	}
+
+	/**
+	 * Counts the number of all shelf slots on this shelf that have some free space.
+	 *
+	 * @return shelf slots with free space on this shelf
 	 */
 	public List<ShelfSlot> getFreeShelfSlots()
 	{
 		final List<ShelfSlot> freeSlots = new ArrayList<ShelfSlot>();
 
-		for (final ShelfLevel level : levels)
-		{
-			for (final ShelfSlot slot : level.getSlots())
-			{
-				if (slot.hasFreeSpace())
-					freeSlots.add(slot);
-			}
-		}
+		for (final ShelfLevel level : shelfLevels)
+			freeSlots.addAll(level.getFreeShelfSlots());
 
 		return freeSlots;
 	}
 
 	/**
-	 * Counts the number of products on this shelf.
+	 * Counts the number of products inside boxes on this shelf.
 	 *
-	 * @return the number of products of this shelf
+	 * @return the number of products inside boxes on this shelf
 	 */
-	public int getProductCount()
+	public int getProductCountInBoxes()
 	{
 		int sum = 0;
 
-		for (final ShelfLevel level : levels)
-		{
-			for (final ShelfSlot slot : level.getSlots())
-				sum += slot.getProductCount();
-		}
+		for (final ShelfLevel level : shelfLevels)
+			sum += level.getProductCountInBoxes();
+
 		return sum;
 	}
 
 	/**
-	 * Gets the number of product boxes on this shelf.
+	 * Gets all {@link ProductBox} objects on this shelf.
 	 *
-	 * @return the number of product boxes of this shelf
+	 * @return the product boxes on this shelf
 	 */
-	public int getProductBoxCount()
+	public List<ProductBox> getProductBoxes()
 	{
-		int sum = 0;
+		final List<ProductBox> boxes = new ArrayList<ProductBox>();
 
-		for (final ShelfLevel level : levels)
-		{
-			for (final ShelfSlot slot : level.getSlots())
-				sum += slot.getProductBoxCount();
-		}
+		for (final ShelfLevel level : shelfLevels)
+			boxes.addAll(level.getProductBoxes());
 
-		return sum;
+		return boxes;
 	}
 
 	/**
@@ -362,7 +385,7 @@ public class Shelf implements Comparable<Shelf>
 	 */
 	public boolean isEmpty()
 	{
-		return getProductBoxCount() == 0;
+		return getProductBoxes().size() == 0;
 	}
 
 	/**
@@ -391,14 +414,17 @@ public class Shelf implements Comparable<Shelf>
 
 		final int[] tokens = tokenizeAndValidateShelfSlotID(shelfSlotID);
 
-		return levels.get(tokens[1]).addToSlot(tokens[2], productBox);
+		// return levels.get(tokens[1]).addToSlot(tokens[2], productBox);
+
+		return false;
 	}
 
 	public ShelfSlot getShelfSlot(final String shelfSlotID)
 	{
 		final int[] tokens = tokenizeAndValidateShelfSlotID(shelfSlotID);
 
-		return levels.get(tokens[1]).getShelfSlot(tokens[2]);
+		// return levels.get(tokens[1]).getShelfSlot(tokens[2]);
 
+		return null;
 	}
 }

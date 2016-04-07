@@ -33,6 +33,10 @@
 		<mapping resource="velho/model/RemovalList.hbm.xml" />
 		<mapping resource="velho/model/RemovalListState.hbm.xml" />
 		<mapping resource="velho/model/RemovalPlatform.hbm.xml" />
+		
+		<mapping resource="velho/model/Shelf.hbm.xml" />
+		<mapping resource="velho/model/ShelfLevel.hbm.xml" />
+		<mapping resource="velho/model/ShelfSlot.hbm.xml" />
 
 		<mapping resource="velho/model/User.hbm.xml" />
 	</session-factory>

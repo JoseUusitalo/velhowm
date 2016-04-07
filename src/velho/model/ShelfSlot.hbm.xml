@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+ "-//Hibernate/Hibernate Mapping DTD//EN"
+ "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+	<class name="velho.model.ShelfSlot" table="SHELFSLOTS">
+		<meta attribute="class-description">A Shelf Slot represents an indexed area with {@link ProductBox} objects on a shelf level.</meta>
+
+		<id name="databaseID"
+			column="slot_id"
+			type="int">
+			<generator class="native" />
+		</id>
+
+		<property	name="levelPosition"
+					column="level_position"
+					type="int" />
+
+		<property	name="maxProductBoxes"
+					column="max_productboxes"
+					type="int" />
+		
+		<set		name="productBoxes"
+					table="SHELFSLOT_PRODUCTBOXES"
+					cascade="all"
+					lazy="false">
+			<key column="shelfslot" />
+			<!-- The unique="true" makes this a one-to-many mapping. -->
+			<many-to-many	class="velho.model.ProductBox"
+							column="productbox"
+							unique="true" />
+		</set>
+		
+		<!-- This is the inverse "child" side. Updates here do not cascade? -->
+		<join		table="SHELFSLOT_PRODUCTBOXES"
+					optional="true"
+					inverse="true">
+			<key	column="shelfslot"
+					unique="true"
+					not-null="true" />
+			<many-to-one	name="parentShelfLevel"
+							column="shelflevel" />
+		</join>
+	</class>
+</hibernate-mapping>

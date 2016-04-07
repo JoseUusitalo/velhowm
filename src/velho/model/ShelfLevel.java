@@ -1,34 +1,49 @@
 package velho.model;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
+import java.util.TreeSet;
 
+/**
+ * A horizontal level in a {@link Shelf} that contains one or more {@link ShelfSlot}s.
+ *
+ * @author Jose Uusitalo
+ */
 public class ShelfLevel implements Comparable<ShelfLevel>
 {
 	private int databaseID;
 
-	private int levelPosition;
+	private int shelfPosition;
 
-	private int maxProductBoxes;
+	private int maxShelfSlots;
 
-	private List<ShelfSlot> slots;
+	private Set<ShelfSlot> shelfSlots;
+
+	private Shelf parentShelf;
 
 	/**
 	 * @param databaseID
-	 * @param levelPosition
-	 * @param maxProductBoxes
-	 * @param slots
+	 * @param shelfPosition
+	 * @param maxShelfSlots
+	 * @param shelfSlots
 	 */
-	public ShelfLevel(final int databaseID, final int levelPosition, final int maxProductBoxes, final List<ShelfSlot> slots)
+	public ShelfLevel(final int databaseID, final int shelfPosition, final int maxShelfSlots)
 	{
 		this.databaseID = databaseID;
-		this.levelPosition = levelPosition;
-		this.maxProductBoxes = maxProductBoxes;
-		this.slots = slots;
+		this.shelfPosition = shelfPosition;
+		this.maxShelfSlots = maxShelfSlots;
+		this.shelfSlots = new TreeSet<ShelfSlot>();
 	}
 
-	public ShelfLevel(final int levelPosition, final int maxProductBoxes, final List<ShelfSlot> slots)
+	/**
+	 * @param shelfPosition
+	 * @param maxShelfSlots
+	 * @param shelfSlots
+	 */
+	public ShelfLevel(final int shelfPosition, final int maxShelfSlots)
 	{
-		this(0, levelPosition, maxProductBoxes, slots);
+		this(0, shelfPosition, maxShelfSlots);
 	}
 
 	public ShelfLevel()
@@ -68,30 +83,6 @@ public class ShelfLevel implements Comparable<ShelfLevel>
 	}
 
 	/**
-	 * @return the levelPosition
-	 */
-	public int getLevelPosition()
-	{
-		return levelPosition;
-	}
-
-	/**
-	 * @return the maxProductBoxes
-	 */
-	public int getMaxProductBoxes()
-	{
-		return maxProductBoxes;
-	}
-
-	/**
-	 * @return the slots
-	 */
-	public List<ShelfSlot> getSlots()
-	{
-		return slots;
-	}
-
-	/**
 	 * @param databaseID the databaseID to set
 	 */
 	public void setDatabaseID(final int databaseID)
@@ -100,36 +91,105 @@ public class ShelfLevel implements Comparable<ShelfLevel>
 	}
 
 	/**
-	 * @param levelPosition the levelPosition to set
+	 * @return the shelfPosition
 	 */
-	public void setLevelPosition(final int levelPosition)
+	public int getShelfPosition()
 	{
-		this.levelPosition = levelPosition;
+		return shelfPosition;
 	}
 
 	/**
-	 * @param maxProductBoxes the maxProductBoxes to set
+	 * @param shelfPosition the shelfPosition to set
 	 */
-	public void setMaxProductBoxes(final int maxProductBoxes)
+	public void setShelfPosition(final int shelfPosition)
 	{
-		this.maxProductBoxes = maxProductBoxes;
+		this.shelfPosition = shelfPosition;
+	}
+
+	/**
+	 * @return the maxShelfSlots
+	 */
+	public int getMaxShelfSlots()
+	{
+		return maxShelfSlots;
+	}
+
+	/**
+	 * @param maxShelfSlots the maxShelfSlots to set
+	 */
+	public void setMaxShelfSlots(final int maxShelfSlots)
+	{
+		this.maxShelfSlots = maxShelfSlots;
+	}
+
+	/**
+	 * @return the slots
+	 */
+	public Set<ShelfSlot> getShelfSlots()
+	{
+		return shelfSlots;
 	}
 
 	/**
 	 * @param slots the slots to set
 	 */
-	public void setSlots(final List<ShelfSlot> slots)
+	public void setShelfSlots(final Set<ShelfSlot> shelfSlots)
 	{
-		this.slots = slots;
+		this.shelfSlots = shelfSlots;
 	}
 
 	public boolean addToSlot(final int slotPosition, final ProductBox productBox)
 	{
-		return slots.get(slotPosition).addBox(productBox);
+		// return slots.get(slotPosition).addBox(productBox);
+		return false;
 	}
 
 	public ShelfSlot getShelfSlot(final int slotPosition)
 	{
-		return slots.get(slotPosition);
+		// return slots.get(slotPosition);
+		return null;
+	}
+
+	public List<ShelfSlot> getFreeShelfSlots()
+	{
+		final List<ShelfSlot> freeSlots = new ArrayList<ShelfSlot>();
+
+		for (final ShelfSlot slot : shelfSlots)
+		{
+			if (slot.hasFreeSpace())
+				freeSlots.add(slot);
+		}
+
+		return freeSlots;
+	}
+
+	public int getProductCountInBoxes()
+	{
+		int sum = 0;
+
+		for (final ShelfSlot slot : shelfSlots)
+			sum += slot.getProductCountInBoxes();
+
+		return sum;
+	}
+
+	public List<ProductBox> getProductBoxes()
+	{
+		final List<ProductBox> boxes = new ArrayList<ProductBox>();
+
+		for (final ShelfSlot slot : shelfSlots)
+			boxes.addAll(slot.getProductBoxes());
+
+		return boxes;
+	}
+
+	public Shelf getParentShelf()
+	{
+		return parentShelf;
+	}
+
+	public void setParentShelf(final Shelf parentShelf)
+	{
+		this.parentShelf = parentShelf;
 	}
 }

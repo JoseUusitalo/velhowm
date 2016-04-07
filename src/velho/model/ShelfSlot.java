@@ -22,48 +22,57 @@ public class ShelfSlot implements Comparable<ShelfSlot>
 	private int databaseID;
 
 	/**
-	 * The position (greater than 1) of this shelf slot on a level.
+	 * The position (greater than 1) of this shelf slot in a level.
 	 */
 	private int levelPosition;
 
 	/**
 	 * The maximum number of product boxes this slot can contain.
 	 */
-	private int maxBoxCount;
+	private int maxProductBoxes;
 
 	/**
 	 * The contents of this shelf slot.
 	 */
-	private Set<ProductBox> boxes;
+	private Set<ProductBox> productBoxes;
 
-	private ShelfLevel parentLevel;
-
-	private Shelf parentShelf;
+	private ShelfLevel parentShelfLevel;
 
 	/**
-	 * @param shelfLevelNumber must be greater than 0
-	 * @param slotIndexInLevel
-	 * @param maxBoxesInSlot must be greater than 0
+	 * @param databaseID
+	 * @param parentShelfLevel
+	 * @param levelPosition
+	 * @param maxBoxesInSlot
 	 */
-	public ShelfSlot(final Shelf parentShelf, final ShelfLevel parentLevel, final int levelPosition, final int maxBoxesInSlot)
+	public ShelfSlot(final int databaseID, final int levelPosition, final int maxBoxesInSlot, final ShelfLevel parentShelfLevel)
 	{
-		this.parentShelf = parentShelf;
-		this.parentLevel = parentLevel;
+		this.databaseID = databaseID;
+		this.parentShelfLevel = parentShelfLevel;
 
 		if (maxBoxesInSlot < 1)
 			throw new IllegalArgumentException("[" + databaseID + "] Maxmimum ProductBox count must be greater than 0, was " + maxBoxesInSlot + ".");
 		if (levelPosition < 1)
 			throw new IllegalArgumentException("[" + databaseID + "] Level position must be greater than 0, was " + levelPosition + ".");
 
-		this.maxBoxCount = maxBoxesInSlot;
+		this.maxProductBoxes = maxBoxesInSlot;
 
-		boxes = new HashSet<ProductBox>();
+		productBoxes = new HashSet<ProductBox>();
+	}
+
+	public ShelfSlot(final ShelfLevel parentShelfLevel, final int levelPosition, final int maxBoxesInSlot)
+	{
+		this(0, levelPosition, maxBoxesInSlot, parentShelfLevel);
+	}
+
+	public ShelfSlot()
+	{
+		// For Hibernate.
 	}
 
 	@Override
 	public String toString()
 	{
-		return parentShelf.getDatabaseID() + ID_SEPARATOR + parentLevel.getDatabaseID() + ID_SEPARATOR + levelPosition;
+		return parentShelfLevel.getParentShelf().getShelfID() + ID_SEPARATOR + parentShelfLevel.getShelfPosition() + ID_SEPARATOR + levelPosition;
 	}
 
 	@Override
@@ -93,6 +102,31 @@ public class ShelfSlot implements Comparable<ShelfSlot>
 		return databaseID;
 	}
 
+	public void setDatabaseID(final int databaseID)
+	{
+		this.databaseID = databaseID;
+	}
+
+	public int getLevelPosition()
+	{
+		return levelPosition;
+	}
+
+	public void setLevelPosition(final int levelPosition)
+	{
+		this.levelPosition = levelPosition;
+	}
+
+	public int getMaxProductBoxes()
+	{
+		return maxProductBoxes;
+	}
+
+	public void setMaxProductBoxes(final int maxProductBoxes)
+	{
+		this.maxProductBoxes = maxProductBoxes;
+	}
+
 	/**
 	 * The ID of this shelf slot in the following format:
 	 * <code>&lt;shelf id&gt;-&lt;slot level in shelf&gt;-&lt;slot index in shelf&gt;</code>
@@ -101,12 +135,17 @@ public class ShelfSlot implements Comparable<ShelfSlot>
 	 */
 	public String getSlotID()
 	{
-		return parentShelf.getDatabaseID() + ID_SEPARATOR + parentLevel.getDatabaseID() + ID_SEPARATOR + levelPosition;
+		return parentShelfLevel.getParentShelf().getShelfID() + ID_SEPARATOR + parentShelfLevel.getShelfPosition() + ID_SEPARATOR + levelPosition;
 	}
 
-	public Set<ProductBox> getBoxes()
+	public Set<ProductBox> getProductBoxes()
 	{
-		return boxes;
+		return productBoxes;
+	}
+
+	public void setProductBoxes(final Set<ProductBox> productBoxes)
+	{
+		this.productBoxes = productBoxes;
 	}
 
 	/**
@@ -114,9 +153,9 @@ public class ShelfSlot implements Comparable<ShelfSlot>
 	 *
 	 * @return the number of products in this shelf slot
 	 */
-	public int getProductCount()
+	public int getProductCountInBoxes()
 	{
-		final Iterator<ProductBox> it = boxes.iterator();
+		final Iterator<ProductBox> it = productBoxes.iterator();
 
 		int sum = 0;
 
@@ -127,23 +166,13 @@ public class ShelfSlot implements Comparable<ShelfSlot>
 	}
 
 	/**
-	 * Gets the number of {@link ProductBox}es in this shelf slot.
-	 *
-	 * @return the number of product boxes in this shelf slot
-	 */
-	public int getProductBoxCount()
-	{
-		return boxes.size();
-	}
-
-	/**
 	 * Checks if this shelf slot has free space.
 	 *
 	 * @return <code>true</code> if this shelf slot has free space
 	 */
 	public boolean hasFreeSpace()
 	{
-		return (boxes.size() != maxBoxCount);
+		return (productBoxes.size() != maxProductBoxes);
 	}
 
 	/**
@@ -154,10 +183,10 @@ public class ShelfSlot implements Comparable<ShelfSlot>
 	 */
 	public boolean addBox(final ProductBox box)
 	{
-		if (boxes.size() + 1 > maxBoxCount)
+		if (productBoxes.size() + 1 > maxProductBoxes)
 			return false;
 
-		if (boxes.add(box))
+		if (productBoxes.add(box))
 		{
 			box.setShelfSlot(this);
 			return true;
@@ -174,7 +203,7 @@ public class ShelfSlot implements Comparable<ShelfSlot>
 	 */
 	public boolean removeBox(final ProductBox box)
 	{
-		if (boxes.remove(box))
+		if (productBoxes.remove(box))
 		{
 			box.setShelfSlot(null);
 			return true;
@@ -185,6 +214,16 @@ public class ShelfSlot implements Comparable<ShelfSlot>
 
 	public boolean contains(final ProductBox box)
 	{
-		return boxes.contains(box);
+		return productBoxes.contains(box);
+	}
+
+	public ShelfLevel getParentShelfLevel()
+	{
+		return parentShelfLevel;
+	}
+
+	public void setParentShelfLevel(final ShelfLevel parentShelfLevel)
+	{
+		this.parentShelfLevel = parentShelfLevel;
 	}
 }

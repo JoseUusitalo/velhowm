@@ -12,22 +12,19 @@
 			<generator class="native" />
 		</id>
 
-		<property	name="maxSlotsPerLevel"
-					column="max_shelfslots_per_level"
-					type="int" />
-
 		<property	name="levelCount"
 					column="levels"
 					type="int" />
 
-		<set name="slots"
-			 cascade="all"
-			 table="shelf_shelfslots"
-			 fetch="select"
-			 lazy="false" >
+		<set		name="shelfLevels"
+					table="SHELF_SHELFLEVELS"
+					cascade="all"
+					lazy="false">
 			<key column="shelf" />
-			<many-to-many column="shelfslot"
-						  class="velho.model.ShelfSlot" />
+			<!-- The unique="true" makes this a one-to-many mapping. -->
+			<many-to-many	class="velho.model.ShelfLevel"
+							column="shelflevel"
+							unique="true" />
 		</set>
 	</class>
 </hibernate-mapping>

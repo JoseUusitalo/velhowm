@@ -182,13 +182,13 @@ public class ShelfTest
 	@Test
 	public final void testGetProductBoxCount_Empty()
 	{
-		assertEquals(0, emptyShelf_1_0_to_1_1.getProductBoxCount());
+		assertEquals(0, emptyShelf_1_0_to_1_1.getProductBoxes().size());
 	}
 
 	@Test
 	public final void testGetProductCount_Empty()
 	{
-		assertEquals(0, emptyShelf_1_0_to_1_1.getProductCount());
+		assertEquals(0, emptyShelf_1_0_to_1_1.getProductCountInBoxes());
 	}
 
 	@Test
@@ -234,26 +234,26 @@ public class ShelfTest
 	@Test
 	public final void testAddToSlot_EmptyBox_GetCount() throws IllegalArgumentException
 	{
-		final int oldBoxCount = shelf_FREE_LVL_2.getProductBoxCount();
-		final int oldProductCount = shelf_FREE_LVL_2.getProductCount();
+		final int oldBoxCount = shelf_FREE_LVL_2.getProductBoxes().size();
+		final int oldProductCount = shelf_FREE_LVL_2.getProductCountInBoxes();
 		final String slotid = shelf_FREE_LVL_2.getShelfID() + "-2-3";
 
 		assertTrue(shelf_FREE_LVL_2.addToSlot(slotid, EMPTY_BOX));
-		assertEquals(oldBoxCount + 1, shelf_FREE_LVL_2.getProductBoxCount());
-		assertEquals(oldProductCount, shelf_FREE_LVL_2.getProductCount());
+		assertEquals(oldBoxCount + 1, shelf_FREE_LVL_2.getProductBoxes().size());
+		assertEquals(oldProductCount, shelf_FREE_LVL_2.getProductCountInBoxes());
 	}
 
 	@Test
 	public final void testAddToSlot() throws IllegalArgumentException
 	{
 		final String slotid = shelf_FREE_LVL_2.getShelfID() + "-2-12";
-		final int oldBoxCount = shelf_FREE_LVL_2.getProductBoxCount();
-		final int oldProductCount = shelf_FREE_LVL_2.getProductCount();
+		final int oldBoxCount = shelf_FREE_LVL_2.getProductBoxes().size();
+		final int oldProductCount = shelf_FREE_LVL_2.getProductCountInBoxes();
 
 		assertTrue(shelf_FREE_LVL_2.addToSlot(slotid, BOX_1));
-		assertEquals(oldBoxCount + 1, shelf_FREE_LVL_2.getProductBoxCount());
+		assertEquals(oldBoxCount + 1, shelf_FREE_LVL_2.getProductBoxes().size());
 		assertTrue(shelf_FREE_LVL_2.getShelfSlot(slotid).contains(BOX_1));
-		assertEquals(oldProductCount + BOX_1_2_PRODUCT_COUNT, shelf_FREE_LVL_2.getProductCount());
+		assertEquals(oldProductCount + BOX_1_2_PRODUCT_COUNT, shelf_FREE_LVL_2.getProductCountInBoxes());
 	}
 
 	@Test
@@ -266,14 +266,14 @@ public class ShelfTest
 		// assertTrue(DatabaseController.getShelfByID(SHELF_FREE_LVL_2_ID,
 		// false).getShelfSlotBoxes(slotid).contains(BOX_2));
 
-		final int oldBoxCount = shelf_FREE_LVL_2.getProductBoxCount();
-		final int oldProductCount = shelf_FREE_LVL_2.getProductCount();
+		final int oldBoxCount = shelf_FREE_LVL_2.getProductBoxes().size();
+		final int oldProductCount = shelf_FREE_LVL_2.getProductCountInBoxes();
 
 		assertTrue(BOX_2.getShelfSlot().removeBox(BOX_2));
 
 		assertFalse(shelf_FREE_LVL_2.getShelfSlot(slotid).contains(BOX_2));
-		assertEquals(oldBoxCount - 1, shelf_FREE_LVL_2.getProductBoxCount());
-		assertEquals(oldProductCount - BOX_1_2_PRODUCT_COUNT, shelf_FREE_LVL_2.getProductCount());
+		assertEquals(oldBoxCount - 1, shelf_FREE_LVL_2.getProductBoxes().size());
+		assertEquals(oldProductCount - BOX_1_2_PRODUCT_COUNT, shelf_FREE_LVL_2.getProductCountInBoxes());
 		// assertFalse(DatabaseController.getShelfByID(SHELF_FREE_LVL_2_ID,
 		// false).getShelfSlotBoxes(slotid).contains(BOX_2));
 	}
@@ -289,14 +289,14 @@ public class ShelfTest
 		// assertTrue(DatabaseController.getShelfByID(SHELF_FREE_LVL_2_ID,
 		// false).getShelfSlotBoxes(slotid).contains(BOX_2));
 
-		final int oldBoxCount = shelf_FREE_LVL_2.getProductBoxCount();
-		final int oldProductCount = shelf_FREE_LVL_2.getProductCount();
+		final int oldBoxCount = shelf_FREE_LVL_2.getProductBoxes().size();
+		final int oldProductCount = shelf_FREE_LVL_2.getProductCountInBoxes();
 
 		assertTrue(BOX_2.getShelfSlot().removeBox(BOX_2));
 
 		assertFalse(shelf_FREE_LVL_2.getShelfSlot(slotid).contains(BOX_2));
-		assertEquals(oldBoxCount - 1, shelf_FREE_LVL_2.getProductBoxCount());
-		assertEquals(oldProductCount - BOX_1_2_PRODUCT_COUNT, shelf_FREE_LVL_2.getProductCount());
+		assertEquals(oldBoxCount - 1, shelf_FREE_LVL_2.getProductBoxes().size());
+		assertEquals(oldProductCount - BOX_1_2_PRODUCT_COUNT, shelf_FREE_LVL_2.getProductCountInBoxes());
 		// assertTrue(DatabaseController.getShelfByID(SHELF_FREE_LVL_2_ID,
 		// false).getShelfSlotBoxes(slotid).contains(BOX_2));
 	}
