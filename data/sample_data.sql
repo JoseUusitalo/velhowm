@@ -34,26 +34,26 @@ INSERT INTO `products` SET `name`='Lonely Product #12', brand=2, category=4;
 
 /*		1 - Tiny Full Shelf: 1-4		*/
 
-INSERT INTO `containers` SET `product`=9, `max_size`=10, `product_count`=10, `expiration_date`='2016-02-18';
-INSERT INTO `containers` SET `product`=1, `max_size`=10, `product_count`=10, `expiration_date`='2016-10-30';
-INSERT INTO `containers` SET `product`=1, `max_size`=10, `product_count`=10;
-INSERT INTO `containers` SET `product`=3, `max_size`=10, `product_count`=10;
-
 INSERT INTO `shelves` SET `shelf_id`=1, `levels`=1;
 
 INSERT INTO `shelflevels` SET `level_id`=1, `shelf_position`=1, `max_shelfslots`=4;
+
+INSERT INTO `shelf_shelflevels` SET `shelf`=1, `shelflevel`=1;
 
 INSERT INTO `shelfslots` SET `slot_id`=1, `level_position`=1, `max_productboxes`=1;
 INSERT INTO `shelfslots` SET `slot_id`=2, `level_position`=2, `max_productboxes`=1;
 INSERT INTO `shelfslots` SET `slot_id`=3, `level_position`=3, `max_productboxes`=1;
 INSERT INTO `shelfslots` SET `slot_id`=4, `level_position`=4, `max_productboxes`=1;
 
-INSERT INTO `shelf_shelflevels` SET `shelf`=1, `shelflevel`=1;
-
 INSERT INTO `shelflevel_shelfslots` SET `shelflevel`=1, `shelfslot`=1;
 INSERT INTO `shelflevel_shelfslots` SET `shelflevel`=1, `shelfslot`=2;
 INSERT INTO `shelflevel_shelfslots` SET `shelflevel`=1, `shelfslot`=3;
 INSERT INTO `shelflevel_shelfslots` SET `shelflevel`=1, `shelfslot`=4;
+
+INSERT INTO `containers` SET `product`=9, `max_size`=10, `product_count`=10, `expiration_date`='2016-02-18';
+INSERT INTO `containers` SET `product`=1, `max_size`=10, `product_count`=10, `expiration_date`='2016-10-30';
+INSERT INTO `containers` SET `product`=1, `max_size`=10, `product_count`=10;
+INSERT INTO `containers` SET `product`=3, `max_size`=10, `product_count`=10;
 
 INSERT INTO `shelfslot_productboxes` SET `shelfslot`=1, `productbox`=1;
 INSERT INTO `shelfslot_productboxes` SET `shelfslot`=2, `productbox`=2;
@@ -62,16 +62,13 @@ INSERT INTO `shelfslot_productboxes` SET `shelfslot`=4, `productbox`=4;
 
 /*		2 - Slot Full Shelf: 5-9		*/
 
-INSERT INTO `containers` SET `product`=1, `max_size`=50, `product_count`=0;
-INSERT INTO `containers` SET `product`=3, `max_size`=50, `product_count`=5, `expiration_date`='2005-12-12';
-INSERT INTO `containers` SET `product`=6, `max_size`=50, `product_count`=10, `expiration_date`='2008-01-10';
-INSERT INTO `containers` SET `product`=6, `max_size`=50, `product_count`=25;
-INSERT INTO `containers` SET `product`=1, `max_size`=50, `product_count`=50, `expiration_date`='2020-05-26';
-
 INSERT INTO `shelves` SET `shelf_id`=2, `levels`=2;
 
 INSERT INTO `shelflevels` SET `level_id`=2, `shelf_position`=1, `max_shelfslots`=20;
 INSERT INTO `shelflevels` SET `level_id`=3, `shelf_position`=2, `max_shelfslots`=20;
+
+INSERT INTO `shelf_shelflevels` SET `shelf`=2, `shelflevel`=2;
+INSERT INTO `shelf_shelflevels` SET `shelf`=2, `shelflevel`=3;
 
 INSERT INTO `shelfslots` SET `slot_id`=5, `level_position`=1, `max_productboxes`=4;
 INSERT INTO `shelfslots` SET `slot_id`=6, `level_position`=2, `max_productboxes`=4;
@@ -115,9 +112,6 @@ INSERT INTO `shelfslots` SET `slot_id`=42, `level_position`=18, `max_productboxe
 INSERT INTO `shelfslots` SET `slot_id`=43, `level_position`=19, `max_productboxes`=4;
 INSERT INTO `shelfslots` SET `slot_id`=44, `level_position`=20, `max_productboxes`=4;
 
-INSERT INTO `shelf_shelflevels` SET `shelf`=2, `shelflevel`=2;
-INSERT INTO `shelf_shelflevels` SET `shelf`=2, `shelflevel`=3;
-
 INSERT INTO `shelflevel_shelfslots` SET `shelflevel`=2, `shelfslot`=5;
 INSERT INTO `shelflevel_shelfslots` SET `shelflevel`=2, `shelfslot`=6;
 INSERT INTO `shelflevel_shelfslots` SET `shelflevel`=2, `shelfslot`=7;
@@ -160,6 +154,12 @@ INSERT INTO `shelflevel_shelfslots` SET `shelflevel`=3, `shelfslot`=42;
 INSERT INTO `shelflevel_shelfslots` SET `shelflevel`=3, `shelfslot`=43;
 INSERT INTO `shelflevel_shelfslots` SET `shelflevel`=3, `shelfslot`=44;
 
+INSERT INTO `containers` SET `product`=1, `max_size`=50, `product_count`=0;
+INSERT INTO `containers` SET `product`=3, `max_size`=50, `product_count`=5, `expiration_date`='2005-12-12';
+INSERT INTO `containers` SET `product`=6, `max_size`=50, `product_count`=10, `expiration_date`='2008-01-10';
+INSERT INTO `containers` SET `product`=6, `max_size`=50, `product_count`=25;
+INSERT INTO `containers` SET `product`=1, `max_size`=50, `product_count`=50, `expiration_date`='2020-05-26';
+
 INSERT INTO `shelfslot_productboxes` SET `shelfslot`=5, `productbox`=5;
 INSERT INTO `shelfslot_productboxes` SET `shelfslot`=5, `productbox`=6;
 INSERT INTO `shelfslot_productboxes` SET `shelfslot`=5, `productbox`=7;
@@ -168,16 +168,15 @@ INSERT INTO `shelfslot_productboxes` SET `shelfslot`=44, `productbox`=9;
 
 /*		3 - One Slot Level: 10-13		*/
 
-INSERT INTO `containers` SET `product`=1, `max_size`=20, `product_count`=20;
-INSERT INTO `containers` SET `product`=10, `max_size`=20, `product_count`=20, `expiration_date`='2015-03-20';
-INSERT INTO `containers` SET `product`=10, `max_size`=30, `product_count`=20;
-INSERT INTO `containers` SET `product`=8, `max_size`=30, `product_count`=20;
-
 INSERT INTO `shelves` SET `shelf_id`=3, `levels`=3;
 
 INSERT INTO `shelflevels` SET `level_id`=4, `shelf_position`=1, `max_shelfslots`=1;
 INSERT INTO `shelflevels` SET `level_id`=5, `shelf_position`=2, `max_shelfslots`=1;
 INSERT INTO `shelflevels` SET `level_id`=6, `shelf_position`=3, `max_shelfslots`=1;
+
+INSERT INTO `shelf_shelflevels` SET `shelf`=3, `shelflevel`=4;
+INSERT INTO `shelf_shelflevels` SET `shelf`=3, `shelflevel`=5;
+INSERT INTO `shelf_shelflevels` SET `shelf`=3, `shelflevel`=6;
 
 INSERT INTO `shelfslots` SET `slot_id`=45, `level_position`=1, `max_productboxes`=50;
 INSERT INTO `shelfslots` SET `slot_id`=46, `level_position`=1, `max_productboxes`=50;
@@ -187,6 +186,11 @@ INSERT INTO `shelflevel_shelfslots` SET `shelflevel`=4, `shelfslot`=45;
 INSERT INTO `shelflevel_shelfslots` SET `shelflevel`=5, `shelfslot`=46;
 INSERT INTO `shelflevel_shelfslots` SET `shelflevel`=6, `shelfslot`=47;
 
+INSERT INTO `containers` SET `product`=1, `max_size`=20, `product_count`=20;
+INSERT INTO `containers` SET `product`=10, `max_size`=20, `product_count`=20, `expiration_date`='2015-03-20';
+INSERT INTO `containers` SET `product`=10, `max_size`=30, `product_count`=20;
+INSERT INTO `containers` SET `product`=8, `max_size`=30, `product_count`=20;
+
 INSERT INTO `shelfslot_productboxes` SET `shelfslot`=46, `productbox`=10;
 INSERT INTO `shelfslot_productboxes` SET `shelfslot`=46, `productbox`=11;
 INSERT INTO `shelfslot_productboxes` SET `shelfslot`=46, `productbox`=12;
@@ -194,18 +198,13 @@ INSERT INTO `shelfslot_productboxes` SET `shelfslot`=46, `productbox`=13;
 
 /*		4 - Many Slot Level: 14-20		*/
 
-INSERT INTO `containers` SET `product`=1, `max_size`=10, `product_count`=5, `expiration_date`='2030-01-02';
-INSERT INTO `containers` SET `product`=9, `max_size`=10, `product_count`=5;
-INSERT INTO `containers` SET `product`=3, `max_size`=10, `product_count`=5, `expiration_date`='2012-04-18';
-INSERT INTO `containers` SET `product`=4, `max_size`=10, `product_count`=5;
-INSERT INTO `containers` SET `product`=5, `max_size`=10, `product_count`=5;
-INSERT INTO `containers` SET `product`=6, `max_size`=10, `product_count`=5, `expiration_date`='2016-05-16';
-INSERT INTO `containers` SET `product`=7, `max_size`=10, `product_count`=5;
-
 INSERT INTO `shelves` SET `shelf_id`=4, `levels`=2;
 
 INSERT INTO `shelflevels` SET `level_id`=7, `shelf_position`=1, `max_shelfslots`=50;
 INSERT INTO `shelflevels` SET `level_id`=8, `shelf_position`=2, `max_shelfslots`=50;
+
+INSERT INTO `shelf_shelflevels` SET `shelf`=4, `shelflevel`=7;
+INSERT INTO `shelf_shelflevels` SET `shelf`=4, `shelflevel`=8;
 
 INSERT INTO `shelfslots` SET `slot_id`=48, `level_position`=1, `max_productboxes`=1;
 INSERT INTO `shelfslots` SET `slot_id`=49, `level_position`=2, `max_productboxes`=1;
@@ -411,6 +410,14 @@ INSERT INTO `shelflevel_shelfslots` SET `shelflevel`=8, `shelfslot`=145;
 INSERT INTO `shelflevel_shelfslots` SET `shelflevel`=8, `shelfslot`=146;
 INSERT INTO `shelflevel_shelfslots` SET `shelflevel`=8, `shelfslot`=147;
 
+INSERT INTO `containers` SET `product`=1, `max_size`=10, `product_count`=5, `expiration_date`='2030-01-02';
+INSERT INTO `containers` SET `product`=9, `max_size`=10, `product_count`=5;
+INSERT INTO `containers` SET `product`=3, `max_size`=10, `product_count`=5, `expiration_date`='2012-04-18';
+INSERT INTO `containers` SET `product`=4, `max_size`=10, `product_count`=5;
+INSERT INTO `containers` SET `product`=5, `max_size`=10, `product_count`=5;
+INSERT INTO `containers` SET `product`=6, `max_size`=10, `product_count`=5, `expiration_date`='2016-05-16';
+INSERT INTO `containers` SET `product`=7, `max_size`=10, `product_count`=5;
+
 INSERT INTO `shelfslot_productboxes` SET `shelfslot`=48, `productbox`=14;
 INSERT INTO `shelfslot_productboxes` SET `shelfslot`=50, `productbox`=15;
 INSERT INTO `shelfslot_productboxes` SET `shelfslot`=55, `productbox`=16;
@@ -424,6 +431,9 @@ INSERT INTO `shelves` SET `shelf_id`=5, `levels`=1;
 
 INSERT INTO `shelflevels` SET `level_id`=9, `shelf_position`=1, `max_shelfslots`=2;
 INSERT INTO `shelflevels` SET `level_id`=10, `shelf_position`=2, `max_shelfslots`=2;
+
+INSERT INTO `shelf_shelflevels` SET `shelf`=5, `shelflevel`=9;
+INSERT INTO `shelf_shelflevels` SET `shelf`=5, `shelflevel`=10;
 
 INSERT INTO `shelfslots` SET `slot_id`=148, `level_position`=1, `max_productboxes`=1;
 INSERT INTO `shelfslots` SET `slot_id`=149, `level_position`=2, `max_productboxes`=1;
