@@ -13,7 +13,6 @@ import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
 import velho.controller.DatabaseController;
-import velho.controller.ExternalSystemsController;
 import velho.controller.ProductController;
 import velho.controller.UIController;
 import velho.model.Product;
@@ -113,18 +112,6 @@ public class AddProductView
 			brandList.getItems().addAll(DatabaseController.getAllProductBrands());
 			brandList.setMaxWidth(Double.MAX_VALUE);
 
-			Button saveingButton = new Button("Save");
-			saveingButton.setMaxWidth(Double.MAX_VALUE);
-			saveingButton.setAlignment(Pos.CENTER);
-			saveingButton.setOnAction(new EventHandler<ActionEvent>()
-			{
-				@Override
-				public void handle(final ActionEvent event)
-				{
-					ExternalSystemsController.sendDataToPrinter(DatabaseController.getObservableProductSearchResults());
-				}
-			});
-
 			/*
 			 * TODO: Fix combobox selection mechanic breaking on the second try because the selection is converted from
 			 * object to string.
@@ -220,5 +207,10 @@ public class AddProductView
 		brandList.getSelectionModel().select(product.getBrand());
 		categoryList.getSelectionModel().select(product.getCategory());
 		popularity.getValueFactory().setValue(product.getPopularity());
+	}
+
+	public void removeFromViewData(final Product product)
+	{
+		// TODO Here to be the remove method missing implements
 	}
 }

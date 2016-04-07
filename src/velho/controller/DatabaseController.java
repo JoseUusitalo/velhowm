@@ -2318,6 +2318,32 @@ public class DatabaseController
 		return object.getDatabaseID();
 	}
 
+	public static int save(final ProductType object)
+	{
+		// TODO: Generalize when all tests have been updated to manually rollback.
+
+		final Session session = sessionFactory.openSession();
+		final Transaction transaction = session.beginTransaction();
+
+		session.saveOrUpdate(object);
+
+		try
+		{
+			transaction.commit();
+			session.close();
+		}
+		catch (final HibernateException e)
+		{
+			transaction.rollback();
+			session.close();
+			throw new HibernateException("Failed to commit.");
+		}
+
+		DBLOG.debug("Saved/Updated: " + object);
+
+		return object.getDatabaseID();
+	}
+
 	/*
 	 * -------------------------------- GETTERS --------------------------------
 	 */

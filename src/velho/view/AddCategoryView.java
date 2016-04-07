@@ -113,13 +113,7 @@ public class AddCategoryView
 				@Override
 				public void handle(final ActionEvent event)
 				{
-					Object brand = brandList.valueProperty().getValue();
-					Object category = typeList.valueProperty().getValue();
-
-					final Product newProduct = productController.saveProduct(databaseID.getValueFactory().getValue().intValue(), nameField.getText(), brand, category, popularity.getValue().intValue());
-
-					if (editProduct)
-						productController.showProductView(newProduct);
+					productController.saveCategory(nameField.getText());
 				}
 			});
 			grid.add(saveButton, 4, 0);

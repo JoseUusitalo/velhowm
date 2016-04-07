@@ -7,6 +7,7 @@ import velho.controller.interfaces.UIActionController;
 import velho.model.Product;
 import velho.model.ProductBrand;
 import velho.model.ProductCategory;
+import velho.model.ProductType;
 import velho.view.AddBrandView;
 import velho.view.AddCategoryView;
 import velho.view.AddProductTypeView;
@@ -162,6 +163,15 @@ public class ProductController implements UIActionController
 	}
 
 	/**
+	 *
+	 * @param product
+	 */
+	public void deleteProduct(final Product product)
+	{
+		// TODO implement a method to delete product
+	}
+
+	/**
 	 * Gets the view for creating new products.
 	 *
 	 * @return the product creation view
@@ -251,5 +261,35 @@ public class ProductController implements UIActionController
 	{
 		productManagementView.setContents(getProductEditView(), addCategoryView.getView(true), addProductTypeView.getView(true), addBrandView.getView(true));
 		return productManagementView.getView();
+	}
+
+	/**
+	 * Saves the new or existing ProductBrand to database and returns the updated object.
+	 *
+	 * @param name placeholder for the brand
+	 * @return a product brand when called
+	 */
+	public ProductBrand saveBrand(final String name)
+	{
+		ProductBrand productBrand = new ProductBrand(name);
+		DatabaseController.save(productBrand);
+		return productBrand;
+
+	}
+
+	public ProductCategory saveCategory(final String name)
+	{
+		ProductCategory productCategory = new ProductCategory(name);
+		DatabaseController.save(productCategory);
+		return productCategory;
+
+	}
+
+	public ProductType saveProductType(final String name)
+	{
+		ProductType productType = new ProductType(name);
+		DatabaseController.save(productType);
+		return productType;
+
 	}
 }

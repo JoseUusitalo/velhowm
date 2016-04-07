@@ -105,13 +105,7 @@ public class AddBrandView
 				@Override
 				public void handle(final ActionEvent event)
 				{
-					Object brand = brandList.valueProperty().getValue();
-					Object category = categoryList.valueProperty().getValue();
-
-					final Product newProduct = productController.saveProduct(databaseID.getValueFactory().getValue().intValue(), nameField.getText(), brand, category, popularity.getValue().intValue());
-
-					if (editProduct)
-						productController.showProductView(newProduct);
+					productController.saveBrand(nameField.getText());
 				}
 			});
 			grid.add(saveButton, 3, 0);
