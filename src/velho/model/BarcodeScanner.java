@@ -112,7 +112,7 @@ public class BarcodeScanner
 				int derp = Integer.parseInt(((String) tokens[0]).substring(1));
 				SYSLOG.debug("Adding random product: " + list.get(0));
 				SYSLOG.debug("To random shelf slot: " + randomShelfSlot);
-				shelfObj = DatabaseController.getShelfByID(derp, true);
+				shelfObj = DatabaseController.getShelfByID(derp);
 			}
 			while (!shelfObj.getShelfSlot(randomShelfSlot).hasFreeSpace());
 

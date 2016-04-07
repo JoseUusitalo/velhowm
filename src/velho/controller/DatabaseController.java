@@ -48,6 +48,7 @@ import velho.model.enums.DatabaseQueryType;
 import velho.model.enums.DatabaseTable;
 import velho.model.enums.UserRole;
 import velho.model.exceptions.ExistingDatabaseLinkException;
+import velho.model.exceptions.NoDatabaseException;
 import velho.model.exceptions.NoDatabaseLinkException;
 import velho.view.MainWindow;
 
@@ -157,15 +158,11 @@ public class DatabaseController
 	 */
 	private static ObservableList<Object> observableManifestStates = FXCollections.observableArrayList();
 
-	/*
-	 * ---- CACHE MAPS ----
-	 */
-
 	/**
-	 * A map of {@link Shelf} objects loaded from the database.
+	 * An observable list of {@link Shelf} objects for display in the
+	 * user interface.
 	 */
-	@Deprecated
-	private static Map<Integer, Shelf> cachedShelves = new HashMap<Integer, Shelf>();
+	private static ObservableList<Object> observableShelves = FXCollections.observableArrayList();
 
 	/*
 	 * -------------------------------- PRIVATE DATABASE METHODS --------------------------------
@@ -606,12 +603,10 @@ public class DatabaseController
 	/**
 	 * Runs a raw SQL query on the database.
 	 *
-	 * @param sql
-	 * SQL to run
+	 * @param sql SQL to run
 	 * @return an Object containing the appropriate data
 	 * @throws NoDatabaseLinkException
 	 */
-	@Deprecated
 	private static Object runQuery(final String sql) throws NoDatabaseLinkException
 	{
 		final Connection connection = getConnection();
@@ -693,7 +688,6 @@ public class DatabaseController
 	/**
 	 * Attempts to re-link the database.
 	 */
-	@Deprecated
 	private static void relink()
 	{
 		DBLOG.info("Attempting to relink database.");
@@ -711,11 +705,7 @@ public class DatabaseController
 		{
 			link();
 		}
-		catch (final ClassNotFoundException e)
-		{
-			e.printStackTrace();
-		}
-		catch (final ExistingDatabaseLinkException e)
+		catch (final ClassNotFoundException | ExistingDatabaseLinkException e)
 		{
 			e.printStackTrace();
 		}
@@ -738,7 +728,6 @@ public class DatabaseController
 	 *
 	 * @return a database connection
 	 */
-	@Deprecated
 	private static Connection getConnection() throws NoDatabaseLinkException
 	{
 		checkLink();
@@ -920,7 +909,6 @@ public class DatabaseController
 	 *
 	 * @return <code>true</code> if a database link exists
 	 */
-	@Deprecated
 	public static boolean isLinked()
 	{
 		return connectionPool != null;
@@ -933,7 +921,6 @@ public class DatabaseController
 	 *
 	 * @throws NoDatabaseLinkException
 	 */
-	@Deprecated
 	public static void checkLink() throws NoDatabaseLinkException
 	{
 		if (connectionPool == null)
@@ -943,7 +930,6 @@ public class DatabaseController
 	/**
 	 * Attempts to re-link the database.
 	 */
-	@Deprecated
 	public static void tryReLink()
 	{
 		try
@@ -977,12 +963,9 @@ public class DatabaseController
 	 * connection.
 	 *
 	 * @return <code>true</code> if the link was created successfully
-	 * @throws ClassNotFoundException
-	 * when the H2 driver was unable to load
-	 * @throws ExistingDatabaseLinkException
-	 * when a database link already exists
+	 * @throws ClassNotFoundException when the H2 driver was unable to load
+	 * @throws ExistingDatabaseLinkException when a database link already exists
 	 */
-	@Deprecated
 	public static DatabaseFileState link() throws ClassNotFoundException, ExistingDatabaseLinkException
 	{
 		if (connectionPool != null)
@@ -1003,6 +986,7 @@ public class DatabaseController
 		{
 			state = DatabaseFileState.EXISTING;
 			uri += ";IFEXISTS=TRUE";
+			DBLOG.debug("Database exists.");
 		}
 		else
 		{
@@ -1013,8 +997,8 @@ public class DatabaseController
 		// Create a connection pool.
 		connectionPool = JdbcConnectionPool.create(uri, USERNAME, "@_Vry $ECURE pword2");
 
-		// Try getting a connection. If the database does not exist, it is
-		// created.
+		// Try getting a connection
+		// If the database does not exist, it is created.
 		try
 		{
 			final Connection c = getConnection();
@@ -1055,46 +1039,15 @@ public class DatabaseController
 	 * when attempting unlink a database when no database link
 	 * exists
 	 */
-	@Deprecated
 	public static void unlink() throws NoDatabaseLinkException
 	{
+
 		if (connectionPool == null)
 			throw new NoDatabaseLinkException();
 
 		connectionPool.dispose();
 		connectionPool = null;
 		DBLOG.info("Database unlinked.");
-	}
-
-	/**
-	 * Links and initializes the database.
-	 *
-	 * @return <code>true</code> if database is linked, initialized, and ready to use
-	 * @throws ClassNotFoundException
-	 * @throws ExistingDatabaseLinkException}
-	 * @throws NoDatabaseLinkException
-	 */
-	public static boolean connectAndInitialize() throws ClassNotFoundException, ExistingDatabaseLinkException, NoDatabaseLinkException
-	{
-		// TODO: Remove connection part, only do initialization.
-
-		final DatabaseFileState state = link();
-		boolean initialized = true;
-
-		switch (state)
-		{
-			case DOES_NOT_EXIST:
-				return false;
-			case CREATED:
-				// Only initialize the database if it does not exist.
-				initialized = initializeDatabase();
-				break;
-			case EXISTING:
-			default:
-				// Do nothing, database is ready to use.
-		}
-
-		return isLinked() && initialized;
 	}
 
 	/*
@@ -1663,42 +1616,15 @@ public class DatabaseController
 	}
 
 	/**
-	 * Gets the {@link Shelf} object from the given shelf ID.
+	 * Gets the {@link Shelf} object from the database with the given ID.
 	 *
-	 * @param shelfid shelf database ID
+	 * @param id the shelf database ID
 	 * @return the corresponding shelf object or <code>null</code> for invalid ID
-	 * @throws NoDatabaseLinkException
+	 * @throws HibernateException when the query failed to commit and has been rolled back
 	 */
-	public static Shelf getShelfByID(final int shelfid, final boolean getCached) throws NoDatabaseLinkException
+	public static Shelf getShelfByID(final int id) throws HibernateException
 	{
-		if (!cachedShelves.containsKey(shelfid) || !getCached)
-		{
-			final String[] columns = { "*" };
-			final List<String> where = new ArrayList<String>();
-			where.add("shelf_id = " + new Integer(shelfid));
-
-			@SuppressWarnings("unchecked")
-			final Set<Object> result = (LinkedHashSet<Object>) (runQuery(DatabaseQueryType.SELECT, DatabaseTable.SHELVES, null, columns, null, where));
-
-			if (result.size() == 0)
-				return null;
-
-			final Shelf s = (Shelf) result.iterator().next();
-
-			// Store for reuse.
-			if (getCached)
-				DBLOG.trace("Caching: " + s);
-			else
-				DBLOG.trace("Updating cache: " + s);
-
-			cachedShelves.put(s.getDatabaseID(), s);
-			setContainersToShelf(shelfid);
-
-			return cachedShelves.get(shelfid);
-		}
-
-		DBLOG.trace("Loading Shelf " + shelfid + " from cache.");
-		return cachedShelves.get(shelfid);
+		return (Shelf) getByID("Shelf", "shelf_id", id);
 	}
 
 	/**
@@ -1741,7 +1667,7 @@ public class DatabaseController
 
 		Collections.shuffle(list);
 
-		final Shelf randomShelf = getShelfByID(list.get(0), true);
+		final Shelf randomShelf = getShelfByID(list.get(0));
 		final int randomLevel = (int) (Math.round(Math.random() * (randomShelf.getLevelCount() - 1) + 1));
 		final int randomSlotIndex = (int) (Math.round(Math.random() * (randomShelf.getShelfSlotCount() / randomShelf.getLevelCount() - 1)));
 
@@ -1962,79 +1888,49 @@ public class DatabaseController
 	}
 
 	/*
-	 * -------------------------------- PRIVATE SETTER METHODS --------------------------------
-	 */
-
-	/**
-	 * Places the loaded {@link ProductContainer} objects into {@link Shelf}
-	 * objects.
-	 *
-	 * @throws NoDatabaseLinkException
-	 */
-	private static void setContainersToShelf(final int shelfid) throws NoDatabaseLinkException
-	{
-		DBLOG.debug("Placing product boxes on shelf " + shelfid + "...");
-
-		final String[] columns = { "*" };
-
-		final List<String> where = new ArrayList<String>();
-		where.add("shelf = " + shelfid);
-
-		final Shelf shelf = getShelfByID(shelfid, true);
-
-		DBLOG.trace(shelf);
-
-		@SuppressWarnings("unchecked")
-		final Map<Integer, ArrayList<Integer[]>> shelfBoxMap = (HashMap<Integer, ArrayList<Integer[]>>) runQuery(DatabaseQueryType.SELECT,
-				DatabaseTable.SHELF_PRODUCTBOXES, null, columns, null, where);
-
-		// If the shelf is not empty.
-		if (!shelfBoxMap.isEmpty())
-		{
-			ProductBox box = null;
-			String shelfSlotID = null;
-
-			final ArrayList<Integer[]> boxes = shelfBoxMap.get(shelfid);
-
-			for (final Integer[] data : boxes)
-			{
-				box = getProductBoxByID(data[0]);
-
-				DBLOG.trace("Placing box: " + box.toString());
-				DBLOG.trace("Box: " + data[0] + " Slf: " + shelfid + " Lvl: " + data[1] + " Slt: " + data[2]);
-
-				// data[1] is the level index
-				shelfSlotID = Shelf.coordinatesToShelfSlotID(shelfid, data[1] + 1, data[2], true);
-				DBLOG.trace("Placed: " + shelf.addToSlot(shelfSlotID, box));
-				DBLOG.trace(shelf);
-			}
-
-			DBLOG.debug("Product boxes placed on shelf " + shelfid + ".");
-		}
-		else
-		{
-			DBLOG.debug("Nothing to place.");
-		}
-	}
-
-	/*
 	 * -------------------------------- PUBLIC SETTER METHODS --------------------------------
 	 */
 
 	/**
-	 * Initializes the database.
+	 * Loads sample data into the database.
+	 * Assumes that a database exists.
 	 *
 	 * @return <code>true</code> if database changed as a result of this call
 	 * @throws NoDatabaseLinkException
 	 */
-	public static boolean initializeDatabase() throws NoDatabaseLinkException
+	public static boolean initializeDatabase() throws NoDatabaseException, NoDatabaseException, NoDatabaseLinkException
 	{
-		DBLOG.info("Initializing database...");
+		DBLOG.debug("Loading sample data to database...");
+
+		if (!databaseExists())
+			throw new NoDatabaseException();
 
 		final boolean changed = (0 != (Integer) runQuery("RUNSCRIPT FROM './data/init.sql';"));
 
 		if (changed)
-			DBLOG.info("Database initialized.");
+			DBLOG.info("Sample data loaded.");
+
+		return changed;
+	}
+
+	/**
+	 * Loads sample data into the database.
+	 * Assumes that a database exists.
+	 *
+	 * @return <code>true</code> if database changed as a result of this call
+	 * @throws NoDatabaseLinkException
+	 */
+	public static boolean loadSampleData() throws NoDatabaseException, NoDatabaseException, NoDatabaseLinkException
+	{
+		DBLOG.debug("Loading sample data to database...");
+
+		if (!databaseExists())
+			throw new NoDatabaseException();
+
+		final boolean changed = (0 != (Integer) runQuery("RUNSCRIPT FROM './data/sample_data.sql';"));
+
+		if (changed)
+			DBLOG.info("Sample data loaded.");
 
 		return changed;
 	}
@@ -2108,8 +2004,6 @@ public class DatabaseController
 	 */
 	public static int save(final RemovalList object)
 	{
-		// TODO: Generalize when all tests have been updated to manually rollback.
-
 		final Session session = sessionFactory.openSession();
 		final Transaction transaction = session.beginTransaction();
 
@@ -2371,69 +2265,6 @@ public class DatabaseController
 	}
 
 	/**
-	 * Loads data from database into memory.
-	 */
-	@Deprecated
-	public static void loadData() throws NoDatabaseLinkException
-	{
-		// TODO: Get rid of this.
-		DBLOG.info("Loading data from database...");
-
-		// getAllProductBoxes();
-		getAllShelves();
-		// getAllRemovalLists();
-
-		DBLOG.info("Data loaded from database.");
-	}
-
-	/**
-	 * Places the loaded {@link ProductContainer} objects into {@link Shelf}
-	 * objects.
-	 *
-	 * @throws NoDatabaseLinkException
-	 */
-	@Deprecated
-	private static void setAllContainersToAllShelves() throws NoDatabaseLinkException
-	{
-		// TODO: Get rid of this.
-		final String[] columns = { "*" };
-		@SuppressWarnings("unchecked")
-		final Map<Integer, ArrayList<Integer[]>> shelfBoxMap = (HashMap<Integer, ArrayList<Integer[]>>) runQuery(DatabaseQueryType.SELECT,
-				DatabaseTable.SHELF_PRODUCTBOXES, null, columns, null, null);
-
-		int boxcount = 0;
-		Shelf shelf;
-		ProductBox box;
-		String slot;
-
-		for (final Integer shelfID : shelfBoxMap.keySet())
-		{
-			if (cachedShelves.containsKey(shelfID))
-			{
-				final ArrayList<Integer[]> boxes = shelfBoxMap.get(shelfID);
-				boxcount += boxes.size();
-
-				for (final Integer[] data : boxes)
-				{
-					shelf = cachedShelves.get(shelfID);
-					box = getProductBoxByID(data[0]);
-					slot = Shelf.coordinatesToShelfSlotID(shelfID, data[1] + 1, data[2], true);
-
-					DBLOG.trace("Adding: " + box);
-					DBLOG.trace("To: " + shelf);
-					DBLOG.trace("Into: " + slot);
-					// Do not update the database as this method loads the
-					// data from the database into objects.
-					DBLOG.trace("Added: " + shelf.addToSlot(slot, box));
-					DBLOG.trace("Result: " + shelf);
-				}
-			}
-		}
-
-		DBLOG.debug(boxcount + " ProductBoxes placed on " + shelfBoxMap.size() + " Shelves.");
-	}
-
-	/**
 	 * Loads all {@link ProductBox} objects from the database into memory.
 	 * Additionally loads the following objects into memory:
 	 * <ul>
@@ -2455,31 +2286,17 @@ public class DatabaseController
 	}
 
 	/**
-	 * Loads the following objects into memory:
-	 * <ul>
-	 * <li>{@link Shelf}</li>
-	 * </ul>
+	 * Loads all {@link Shelf} objects from the database into memory.
 	 *
-	 * @throws NoDatabaseLinkException
+	 * @return a list of removal lists in the database
+	 * @throws HibernateException when the query failed to commit and has been rolled back
 	 */
-	private static void getAllShelves() throws NoDatabaseLinkException
+	public static ObservableList<Object> getAllShelves() throws HibernateException
 	{
-		final String[] columns = { "*" };
-		@SuppressWarnings("unchecked")
-		final Set<Shelf> result = (Set<Shelf>) runQuery(DatabaseQueryType.SELECT, DatabaseTable.SHELVES, null, columns, null, null);
+		observableShelves.clear();
+		observableShelves.addAll(getAll("Shelf"));
 
-		final Iterator<Shelf> it = result.iterator();
-		// Store for reuse.
-		while (it.hasNext())
-		{
-			final Shelf s = it.next();
-			DBLOG.trace("Caching: " + s);
-			cachedShelves.put(s.getDatabaseID(), s);
-		}
-
-		DBLOG.info("All " + result.size() + " Shelves cached.");
-
-		setAllContainersToAllShelves();
+		return observableShelves;
 	}
 
 	/**
@@ -2618,17 +2435,6 @@ public class DatabaseController
 	}
 
 	/**
-	 * Clears all cached data.
-	 */
-	@Deprecated
-	public static void clearAllCaches()
-	{
-		// TODO: Get rid of this.
-		DBLOG.info("Clearing all cached data.");
-		cachedShelves.clear();
-	}
-
-	/**
 	 * Clears the observable list of product box search results.
 	 */
 	public static void clearSearchResults()
@@ -2644,5 +2450,14 @@ public class DatabaseController
 	{
 		DBLOG.info("Closing session manager.");
 		sessionFactory.close();
+	}
+
+	public static boolean resetDatabase() throws ClassNotFoundException, NoDatabaseException, NoDatabaseLinkException, ExistingDatabaseLinkException
+	{
+		boolean failure = link() == DatabaseFileState.DOES_NOT_EXIST;
+		failure = failure && initializeDatabase();
+		failure = failure && loadSampleData();
+
+		return !failure;
 	}
 }

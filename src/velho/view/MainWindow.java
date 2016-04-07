@@ -43,6 +43,7 @@ import velho.controller.SearchController;
 import velho.controller.UIController;
 import velho.controller.UserController;
 import velho.model.exceptions.ExistingDatabaseLinkException;
+import velho.model.exceptions.NoDatabaseException;
 import velho.model.exceptions.NoDatabaseLinkException;
 
 /**
@@ -214,18 +215,20 @@ public class MainWindow extends Application
 
 				SYSLOG.info("Running VELHO Warehouse Management.");
 
+				// FIXME: Database is not created correctly on first run.
+
 				try
 				{
-					if (DatabaseController.connectAndInitialize())
+					DatabaseController.link();
+					if (DatabaseController.isLinked())
 					{
 						// FIXME: TEMP!
-						DatabaseController.initializeDatabase();
+						DatabaseController.loadSampleData();
 
 						SYSLOG.debug("Creating all controllers...");
 
 						// FIXME: Convert all controllers to use the singleton pattern.
 
-						DatabaseController.loadData();
 						uiController = new UIController();
 						userController = new UserController();
 						logController = new LogController();
@@ -260,7 +263,7 @@ public class MainWindow extends Application
 						System.exit(0);
 					}
 				}
-				catch (ClassNotFoundException | ExistingDatabaseLinkException | NoDatabaseLinkException e1)
+				catch (ClassNotFoundException | ExistingDatabaseLinkException | NoDatabaseLinkException | NoDatabaseException e1)
 				{
 					e1.printStackTrace();
 				}

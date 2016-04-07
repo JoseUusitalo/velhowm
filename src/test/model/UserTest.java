@@ -12,6 +12,7 @@ import velho.controller.DatabaseController;
 import velho.model.User;
 import velho.model.enums.UserRole;
 import velho.model.exceptions.ExistingDatabaseLinkException;
+import velho.model.exceptions.NoDatabaseException;
 import velho.model.exceptions.NoDatabaseLinkException;
 
 /**
@@ -41,10 +42,9 @@ public class UserTest
 	private final User user = new User(-1, "f", "l", UserRole.MANAGER);
 
 	@BeforeClass
-	public final static void linkDatabase() throws ClassNotFoundException, NoDatabaseLinkException, ExistingDatabaseLinkException
+	public final static void linkDatabase() throws ClassNotFoundException, NoDatabaseLinkException, ExistingDatabaseLinkException, NoDatabaseException
 	{
-		DatabaseController.link();
-		DatabaseController.initializeDatabase();
+		DatabaseController.resetDatabase();
 	}
 
 	@AfterClass

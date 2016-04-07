@@ -13,6 +13,7 @@ import velho.model.ProductBox;
 import velho.model.Shelf;
 import velho.model.enums.DatabaseFileState;
 import velho.model.exceptions.ExistingDatabaseLinkException;
+import velho.model.exceptions.NoDatabaseException;
 import velho.model.exceptions.NoDatabaseLinkException;
 
 /**
@@ -28,11 +29,11 @@ public class ExternalSystemsControllerTest
 	private static final int BOXDBID2 = 2;
 
 	@BeforeClass
-	public final static void connectAndInitializeDatabase() throws ClassNotFoundException, NoDatabaseLinkException, ExistingDatabaseLinkException
+	public final static void connectAndInitializeDatabase()
+			throws ClassNotFoundException, NoDatabaseLinkException, ExistingDatabaseLinkException, NoDatabaseException
 	{
 		assertTrue(DatabaseController.link() != DatabaseFileState.DOES_NOT_EXIST);
-		assertTrue(DatabaseController.initializeDatabase());
-		DatabaseController.loadData();
+		assertTrue(DatabaseController.resetDatabase());
 	}
 
 	@AfterClass
@@ -42,20 +43,20 @@ public class ExternalSystemsControllerTest
 	}
 
 	@Test
-	public final void testMoveValid() throws NoDatabaseLinkException
+	public final void testMoveValid()
 	{
 		final ProductBox box = DatabaseController.getProductBoxByID(BOXDBID);
 
 		final String oldShelfSlot = box.getShelfSlot().getSlotID();
 		final String oldShelfIDString = (String) Shelf.tokenizeShelfSlotID(box.getShelfSlot().getSlotID())[0];
 		final int oldShelfID = Integer.parseInt(oldShelfIDString.substring(1));
-		final Shelf oldShelf = DatabaseController.getShelfByID(oldShelfID, true);
+		final Shelf oldShelf = DatabaseController.getShelfByID(oldShelfID);
 
 		assertTrue(oldShelf.getShelfSlot(oldShelfSlot).contains(box));
 
 		final String newShelfIDString = (String) Shelf.tokenizeShelfSlotID(NEWSHELFID)[0];
 		final int newShelfID = Integer.parseInt(newShelfIDString.substring(1));
-		final Shelf newShelf = DatabaseController.getShelfByID(newShelfID, true);
+		final Shelf newShelf = DatabaseController.getShelfByID(newShelfID);
 
 		assertTrue(ExternalSystemsController.move(BOXDBID, NEWSHELFID, false));
 
@@ -85,14 +86,14 @@ public class ExternalSystemsControllerTest
 	}
 
 	@Test
-	public final void testMoveValid2() throws NoDatabaseLinkException
+	public final void testMoveValid2()
 	{
 		System.out.println("Test Move Valid 2");
 		final ProductBox box = DatabaseController.getProductBoxByID(BOXDBID2);
 
 		final String oldShelfIDString = (String) Shelf.tokenizeShelfSlotID(box.getShelfSlot().getSlotID())[0];
 		final int oldShelfID = Integer.parseInt(oldShelfIDString.substring(1));
-		final Shelf oldShelf = DatabaseController.getShelfByID(oldShelfID, false);
+		final Shelf oldShelf = DatabaseController.getShelfByID(oldShelfID);
 		final String oldShelfSlot = box.getShelfSlot().getSlotID();
 
 		// assertTrue(oldShelf.getShelfSlotBoxes(oldShelfSlot).contains(box));
@@ -103,7 +104,7 @@ public class ExternalSystemsControllerTest
 
 		final String newShelfIDString = (String) Shelf.tokenizeShelfSlotID(NEWSHELFID)[0];
 		final int newShelfID = Integer.parseInt(newShelfIDString.substring(1));
-		final Shelf newShelf = DatabaseController.getShelfByID(newShelfID, false);
+		final Shelf newShelf = DatabaseController.getShelfByID(newShelfID);
 
 		assertTrue(newShelf.getShelfSlot(NEWSHELFID).contains(box));
 	}

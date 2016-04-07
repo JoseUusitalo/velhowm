@@ -8,15 +8,15 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import org.junit.After;
-import org.junit.Before;
+import org.junit.AfterClass;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 import velho.controller.DatabaseController;
 import velho.model.ProductBox;
 import velho.model.Shelf;
-import velho.model.enums.DatabaseFileState;
 import velho.model.exceptions.ExistingDatabaseLinkException;
+import velho.model.exceptions.NoDatabaseException;
 import velho.model.exceptions.NoDatabaseLinkException;
 
 /**
@@ -41,55 +41,33 @@ public class ShelfTest
 	private static final int FULLSHELF_LVL_1_SLTIDX_0_ID = 1;
 
 	private static ProductBox EMPTY_BOX;
-	private ProductBox BOX_1;
-	private ProductBox BOX_2;
+	private static ProductBox BOX_1;
+	private static ProductBox BOX_2;
 	private static final int BOX_1_2_PRODUCT_COUNT = 2;
 
-	@Before
-	public final void createShelf()
+	@BeforeClass
+	public static final void createShelf() throws ClassNotFoundException, ExistingDatabaseLinkException, NoDatabaseException, NoDatabaseLinkException
 	{
+		DatabaseController.link();
+		DatabaseController.loadSampleData();
+		shelf_FREE_LVL_2 = DatabaseController.getShelfByID(SHELF_FREE_LVL_2_ID);
+		fullShelf_LVL_1_SLTIDX_0 = DatabaseController.getShelfByID(FULLSHELF_LVL_1_SLTIDX_0_ID);
+		emptyShelf_1_0_to_1_1 = DatabaseController.getShelfByID(EMPTYSHELF_1_0_to_1_1_ID);
+		EMPTY_BOX = DatabaseController.getProductBoxByID(23);
+		BOX_1 = DatabaseController.getProductBoxByID(21);
+		BOX_2 = DatabaseController.getProductBoxByID(22);
+
 		System.out.println("--Start--");
-		// Get shelves before each test.
-		try
-		{
-			assertTrue(DatabaseController.link() != DatabaseFileState.DOES_NOT_EXIST);
-			assertTrue(DatabaseController.initializeDatabase());
-			DatabaseController.loadData();
-		}
-		catch (ClassNotFoundException | ExistingDatabaseLinkException e)
-		{
-			e.printStackTrace();
-		}
-		catch (NoDatabaseLinkException e)
-		{
-			DatabaseController.tryReLink();
-		}
-
-		try
-		{
-			shelf_FREE_LVL_2 = DatabaseController.getShelfByID(SHELF_FREE_LVL_2_ID, false);
-			fullShelf_LVL_1_SLTIDX_0 = DatabaseController.getShelfByID(FULLSHELF_LVL_1_SLTIDX_0_ID, false);
-			emptyShelf_1_0_to_1_1 = DatabaseController.getShelfByID(EMPTYSHELF_1_0_to_1_1_ID, false);
-			EMPTY_BOX = DatabaseController.getProductBoxByID(23);
-			BOX_1 = DatabaseController.getProductBoxByID(21);
-			BOX_2 = DatabaseController.getProductBoxByID(22);
-
-			System.out.println("Initial state");
-			System.out.println(shelf_FREE_LVL_2);
-			System.out.println(fullShelf_LVL_1_SLTIDX_0);
-			System.out.println(emptyShelf_1_0_to_1_1);
-			System.out.println("--Test--");
-		}
-		catch (NoDatabaseLinkException e)
-		{
-			DatabaseController.tryReLink();
-		}
+		System.out.println("Initial state");
+		System.out.println(shelf_FREE_LVL_2);
+		System.out.println(fullShelf_LVL_1_SLTIDX_0);
+		System.out.println(emptyShelf_1_0_to_1_1);
+		System.out.println("--Tests--");
 	}
 
-	@After
-	public final void unlinkDatabase() throws NoDatabaseLinkException
+	@AfterClass
+	public static final void unlinkDatabase()
 	{
-		DatabaseController.unlink();
 		System.out.println("--Done--");
 	}
 
@@ -170,6 +148,10 @@ public class ShelfTest
 	public final void testGetFreeShelfSlots2()
 	{
 		final String slotid = shelf_FREE_LVL_2.getShelfID() + "-2-1";
+
+		System.out.println(shelf_FREE_LVL_2);
+		System.out.println(shelf_FREE_LVL_2.getFreeShelfSlots());
+
 		assertTrue(shelf_FREE_LVL_2.getFreeShelfSlots().contains(slotid));
 	}
 
@@ -257,7 +239,7 @@ public class ShelfTest
 	}
 
 	@Test
-	public final void testRemoveFromSlot() throws IllegalArgumentException, NoDatabaseLinkException
+	public final void testRemoveFromSlot() throws IllegalArgumentException
 	{
 		final String slotid = shelf_FREE_LVL_2.getShelfID() + "-2-10";
 		assertTrue(shelf_FREE_LVL_2.addToSlot(slotid, BOX_2));
@@ -279,7 +261,7 @@ public class ShelfTest
 	}
 
 	@Test
-	public final void testRemoveFromSlot_NoUpdate() throws IllegalArgumentException, NoDatabaseLinkException
+	public final void testRemoveFromSlot_NoUpdate() throws IllegalArgumentException
 	{
 		final String slotid = shelf_FREE_LVL_2.getShelfID() + "-2-10";
 		assertTrue(shelf_FREE_LVL_2.addToSlot(slotid, BOX_2));
