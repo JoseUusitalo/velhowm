@@ -158,12 +158,12 @@ public class ProductController implements UIActionController
 	 */
 	public void editProduct(final Product product)
 	{
-		listTab.setView(addProductView.getView(true));
-		addProductView.setViewData(product);
+		AddProductView editView = new AddProductView(this, uiController);
+		listTab.setView(editView.getView(true));
+		editView.setViewData(product);
 	}
 
 	/**
-	 *
 	 * @param product
 	 */
 	public void deleteProduct(final Product product)
