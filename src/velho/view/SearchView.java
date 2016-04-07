@@ -13,6 +13,7 @@ import javafx.scene.control.SpinnerValueFactory;
 import javafx.scene.control.TextField;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.GridPane;
+import velho.controller.LocalizationController;
 import velho.controller.SearchController;
 
 /**
@@ -43,8 +44,7 @@ public class SearchView
 	 * @param productBrands
 	 * @param productCategories
 	 */
-	public SearchView(final SearchController searchController, final String limits, final ObservableList<Object> productBrands,
-			final ObservableList<Object> productCategories)
+	public SearchView(final SearchController searchController, final String limits, final ObservableList<Object> productBrands, final ObservableList<Object> productCategories)
 	{
 		this.searchController = searchController;
 		this.limits = limits;
@@ -67,19 +67,20 @@ public class SearchView
 			grid.setAlignment(Pos.CENTER);
 
 			final TextField nameField = new TextField();
-			nameField.setPromptText("Product Name or Product ID");
+			nameField.setPromptText(LocalizationController.getString("productNameorIDPromptText"));
 			grid.add(nameField, 0, 1, 2, 1);
 
-			final Label countSpinnerLabel = new Label("Product Count: ");
+			final Label countSpinnerLabel = new Label(LocalizationController.getString("productCountSpinnerText"));
 			countSpinnerLabel.setAlignment(Pos.CENTER);
 			grid.add(countSpinnerLabel, 2, 1, 1, 1);
 
-			final Label popularitySpinnerLabel = new Label("Product Popularity: ");
+			final Label popularitySpinnerLabel = new Label(LocalizationController.getString("productPopularitySpinnerText"));
 			popularitySpinnerLabel.setAlignment(Pos.CENTER);
 			// grid.add(popularitySpinnerLabel, 2, 2, 1, 1);
 
 			final Spinner<Integer> productCountField = new Spinner<Integer>();
-			// productCountField.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(-1, 10000));
+			// productCountField.setValueFactory(new
+			// SpinnerValueFactory.IntegerSpinnerValueFactory(-1, 10000));
 			productCountField.setEditable(true);
 			productCountField.setPrefWidth(75.0);
 
@@ -111,7 +112,8 @@ public class SearchView
 			grid.add(productCountField, 3, 1, 1, 1);
 
 			final Spinner<Integer> popularityField = new Spinner<Integer>();
-			// popularityField.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(-1, 10000));
+			// popularityField.setValueFactory(new
+			// SpinnerValueFactory.IntegerSpinnerValueFactory(-1, 10000));
 			popularityField.setEditable(true);
 			popularityField.setPrefWidth(75.0);
 
@@ -143,7 +145,7 @@ public class SearchView
 
 			final ComboBox<Object> brandbox = new ComboBox<Object>();
 			brandbox.getItems().add(null);
-			brandbox.setPromptText("Product Brand");
+			brandbox.setPromptText(LocalizationController.getString("productBrandComboboxPrompt"));
 			brandbox.getItems().addAll(productBrands);
 			brandbox.setMaxWidth(Double.MAX_VALUE);
 			brandbox.getSelectionModel().selectFirst();
@@ -151,20 +153,20 @@ public class SearchView
 
 			final ComboBox<Object> categorybox = new ComboBox<Object>();
 			categorybox.getItems().add(null);
-			categorybox.setPromptText("Product Category");
+			categorybox.setPromptText(LocalizationController.getString("productCategoryComboboxPrompt"));
 			categorybox.getItems().addAll(productCategories);
 			categorybox.getSelectionModel().selectFirst();
 			grid.add(categorybox, 4, 2, 1, 1);
 
 			final DatePicker dpStart = new DatePicker();
-			dpStart.setPromptText("Expration Date Start");
+			dpStart.setPromptText(LocalizationController.getString("expirationDateStartDTPrompt"));
 			grid.add(dpStart, 0, 2, 1, 1);
 
 			final DatePicker dpEnd = new DatePicker();
-			dpEnd.setPromptText("Expration Date End");
+			dpEnd.setPromptText(LocalizationController.getString("expirationDateEndDTPrompt"));
 			grid.add(dpEnd, 1, 2, 1, 1);
 
-			Button searchButton = new Button("Search");
+			Button searchButton = new Button(LocalizationController.getString("searchButton"));
 			searchButton.setMaxWidth(Double.MAX_VALUE);
 			searchButton.setPrefHeight(60.0);
 			searchButton.setPrefWidth(120.0);
@@ -182,7 +184,8 @@ public class SearchView
 					}
 					catch (final NumberFormatException e)
 					{
-						// Although badge IDs are stored as string, they are still numbers.
+						// Although badge IDs are stored as string, they are
+						// still numbers.
 					}
 
 					try
@@ -191,10 +194,10 @@ public class SearchView
 					}
 					catch (final NumberFormatException e)
 					{
-						// Although badge IDs are stored as string, they are still numbers.
+						// Although badge IDs are stored as string, they are
+						// still numbers.
 					}
-					searchController.productSearch(limits, nameField.getText(), productCountField.getValue(), popularityField.getValue(), brandbox.getValue(),
-							categorybox.getValue(), dpStart.getValue(), dpEnd.getValue());
+					searchController.productSearch(limits, nameField.getText(), productCountField.getValue(), popularityField.getValue(), brandbox.getValue(), categorybox.getValue(), dpStart.getValue(), dpEnd.getValue());
 				}
 			});
 		}

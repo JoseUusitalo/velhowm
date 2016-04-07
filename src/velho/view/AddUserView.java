@@ -10,6 +10,7 @@ import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.GridPane;
+import velho.controller.LocalizationController;
 import velho.controller.UserController;
 
 /**
@@ -60,35 +61,35 @@ public class AddUserView
 			grid.setHgap(10);
 			grid.setVgap(10);
 
-			Label scenetitle = new Label("Add user info");
+			Label scenetitle = new Label(LocalizationController.getString("addUserInfoSceneTitle"));
 			scenetitle.getStyleClass().add("centered-title");
 			grid.add(scenetitle, 0, 0, 2, 1);
 
-			Label userID = new Label("Badge ID:");
+			Label userID = new Label(LocalizationController.getString("badgeIDInputFieldLabel"));
 			grid.add(userID, 0, 1);
 
 			final TextField badgeIDField = new TextField();
 			grid.add(badgeIDField, 1, 1);
 
-			Label pinLabel = new Label("PIN:");
+			Label pinLabel = new Label(LocalizationController.getString("PINInputFieldLabel"));
 			grid.add(pinLabel, 0, 2);
 
 			final TextField pinField = new TextField();
 			grid.add(pinField, 1, 2);
 
-			Label userFirstName = new Label("First name:");
+			Label userFirstName = new Label(LocalizationController.getString("userFirstNameFieldLabel"));
 			grid.add(userFirstName, 0, 3);
 
 			final TextField userFnameField = new TextField();
 			grid.add(userFnameField, 1, 3);
 
-			Label userLastName = new Label("Last name:");
+			Label userLastName = new Label(LocalizationController.getString("userLastNameFieldLabel"));
 			grid.add(userLastName, 0, 4);
 
 			final TextField userLNameField = new TextField();
 			grid.add(userLNameField, 1, 4);
 
-			Label userInfo = new Label("User role:");
+			Label userInfo = new Label(LocalizationController.getString("userRoleComboboxLabel"));
 			grid.add(userInfo, 0, 5);
 
 			final ComboBox<String> listbox = new ComboBox<String>();
@@ -96,7 +97,7 @@ public class AddUserView
 			listbox.getSelectionModel().selectFirst();
 			grid.add(listbox, 1, 5);
 
-			Button createButton = new Button("Create user");
+			Button createButton = new Button(LocalizationController.getString("createUserButton"));
 			grid.add(createButton, 0, 6);
 
 			/**

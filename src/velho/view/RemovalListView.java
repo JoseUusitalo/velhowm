@@ -15,6 +15,7 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Priority;
 import velho.controller.DatabaseController;
 import velho.controller.ListController;
+import velho.controller.LocalizationController;
 import velho.controller.RemovalListController;
 import velho.model.RemovalList;
 import velho.model.RemovalListState;
@@ -77,7 +78,7 @@ public class RemovalListView
 			final GridPane top = new GridPane();
 			top.getStyleClass().add("standard-padding");
 
-			final Button browseListsButton = new Button("Browse Removal Lists");
+			final Button browseListsButton = new Button(LocalizationController.getString("browseRemovalListsButton"));
 			browseListsButton.setAlignment(Pos.CENTER_LEFT);
 
 			browseListsButton.setOnAction(new EventHandler<ActionEvent>()
@@ -89,7 +90,7 @@ public class RemovalListView
 				}
 			});
 
-			final Label removalListLabel = new Label("Removal List #" + removalList.getDatabaseID());
+			final Label removalListLabel = new Label((LocalizationController.getString("removalListLabel")) + removalList.getDatabaseID());
 			removalListLabel.getStyleClass().add("centered-title-small");
 			removalListLabel.setAlignment(Pos.CENTER);
 			removalListLabel.setMaxWidth(Double.MAX_VALUE);
@@ -108,8 +109,7 @@ public class RemovalListView
 				}
 			});
 
-			thisList = (BorderPane) ListController.getTableView(removalListController, DatabaseController.getProductSearchDataColumns(false, false),
-					removalList.getObservableBoxes());
+			thisList = (BorderPane) ListController.getTableView(removalListController, DatabaseController.getProductSearchDataColumns(false, false), removalList.getObservableBoxes());
 
 			// Make the list always take up the full vertical space.
 			GridPane.setVgrow(thisList, Priority.ALWAYS);
@@ -134,11 +134,12 @@ public class RemovalListView
 	}
 
 	/**
-	 * Gets the search results list and the current new removal list views again.
+	 * Gets the search results list and the current new removal list views
+	 * again.
 	 */
 	public void refresh()
 	{
-		SYSLOG.trace("Refreshing removal list viewing view.");
+		SYSLOG.trace(LocalizationController.getString("refreshRemovalListViewingView"));
 		thisList = removalListController.getNewRemovalListView();
 	}
 }

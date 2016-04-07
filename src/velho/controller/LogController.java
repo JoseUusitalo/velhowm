@@ -54,7 +54,7 @@ public class LogController
 		StringBuilder sb = new StringBuilder();
 		ArrayList<Object> log = new ArrayList<Object>();
 
-		SYSLOG.info("Loading the full system log.");
+		SYSLOG.info(LocalizationController.getString("systemLogLoadingNotification"));
 		try
 		{
 			log = LogDatabaseController.getSystemLog();
@@ -84,7 +84,7 @@ public class LogController
 		StringBuilder sb = new StringBuilder();
 		ArrayList<Object> log = new ArrayList<Object>();
 
-		SYSLOG.info("Loading the full user log.");
+		SYSLOG.info(LocalizationController.getString("userLogLoadingNotification"));
 		try
 		{
 			log = LogDatabaseController.getUserLog();

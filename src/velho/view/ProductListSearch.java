@@ -12,6 +12,7 @@ import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import velho.controller.DatabaseController;
 import velho.controller.ExternalSystemsController;
+import velho.controller.LocalizationController;
 import velho.controller.SearchController;
 
 /**
@@ -48,13 +49,11 @@ public class ProductListSearch
 		{
 			pane = new BorderPane();
 			VBox left = new VBox();
-			Button printButton = new Button("Print");
-			Button sendToScannerButton = new Button("Send to Scanner ");
+			Button printButton = new Button(LocalizationController.getString("printButton"));
+			Button sendToScannerButton = new Button(LocalizationController.getString("sendToScannerButton"));
 
 			final TextArea textArea = new TextArea();
-			textArea.setPromptText("Please type one product code or name per line. "
-					+ "To Search for multiple products of the same type, type the number of products you want and a colon before the product name or ID. "
-					+ "Empty lines and redundant spaces are ignored.");
+			textArea.setPromptText((LocalizationController.getString("productSearchByNameOrCodeFirstRowText")) + (LocalizationController.getString("productSearchByNameOrCodeSecondRowText")) + (LocalizationController.getString("productSearchByNameOrCodeThirdRowText")));
 			textArea.setPrefWidth(MainWindow.WINDOW_WIDTH / 5);
 			printButton.setMaxWidth(Double.MAX_VALUE);
 			printButton.setAlignment(Pos.CENTER);

@@ -14,14 +14,15 @@ import javafx.scene.control.ButtonType;
 public class PopupController
 {
 	/**
-	 * Displays a popup alert with the given message asking the user a yes/no question.
+	 * Displays a popup alert with the given message asking the user a yes/no
+	 * question.
 	 *
 	 * @param msg the message to show
 	 */
 	public static boolean confirmation(final String msg)
 	{
 		Alert alert = new Alert(AlertType.CONFIRMATION);
-		alert.setTitle("Confirm");
+		alert.setTitle(LocalizationController.getString("popUpConfirmTitle"));
 		alert.setHeaderText(null);
 		alert.setContentText(msg);
 
@@ -37,7 +38,7 @@ public class PopupController
 	public static void info(final String msg)
 	{
 		Alert alert = new Alert(AlertType.INFORMATION);
-		alert.setTitle("Info");
+		alert.setTitle(LocalizationController.getString("popUpInfoTitle"));
 		alert.setHeaderText(null);
 		alert.setContentText(msg);
 
@@ -52,7 +53,7 @@ public class PopupController
 	public static void warning(final String msg)
 	{
 		Alert alert = new Alert(AlertType.WARNING);
-		alert.setTitle("Warning");
+		alert.setTitle(LocalizationController.getString("popUpWarningTitle"));
 		alert.setHeaderText(null);
 		alert.setContentText(msg);
 
@@ -67,7 +68,7 @@ public class PopupController
 	public static void error(final String msg)
 	{
 		Alert alert = new Alert(AlertType.ERROR);
-		alert.setTitle("Error");
+		alert.setTitle(LocalizationController.getString("popUpErrorTitle"));
 		alert.setHeaderText(null);
 		alert.setContentText(msg);
 

@@ -61,24 +61,23 @@ public class UserController implements UIActionController
 			{
 				final int roleID = DatabaseController.getRoleID(userRoleName);
 
-				// TODO: User accounts related code needs rewriting. This should return the user object.
+				// TODO: User accounts related code needs rewriting. This should
+				// return the user object.
 
 				if (DatabaseController.insertUser(badgeID, userPIN, userFirstName, userLastName, roleID))
 				{
-					USRLOG.debug("Created a user.");
-					PopupController.info("User created.");
+					USRLOG.debug(LocalizationController.getString("createdUserDebugInfo"));
+					PopupController.info(LocalizationController.getString("popUpUserCreatedInfo"));
 					return true;
 				}
 
-				SYSLOG.debug("User already exists.");
-				PopupController.info("User already exists. Please make sure that the following criteria are met:\n" + "Every Badge ID must be unique.\n"
-						+ "People with the same first and last name are allowed if their roles are different.\n"
-						+ "The combination of the PIN, first name, and last name must be unique.");
+				SYSLOG.debug(LocalizationController.getString("userAlreadyExistsDebugNotice"));
+				PopupController.info("User already exists. Please make sure that the following criteria are met:\n" + "Every Badge ID must be unique.\n" + "People with the same first and last name are allowed if their roles are different.\n" + "The combination of the PIN, first name, and last name must be unique.");
 				return false;
 			}
 
-			SYSLOG.trace("Invalid user data.");
-			PopupController.warning("Invalid user data.");
+			SYSLOG.trace(LocalizationController.getString("invalidUserDataInputNotice"));
+			PopupController.warning(LocalizationController.getString("invalidUserDataInputNotice"));
 		}
 		catch (final NoDatabaseLinkException e)
 		{
@@ -95,14 +94,13 @@ public class UserController implements UIActionController
 	 */
 	public boolean deleteUser(final User user)
 	{
-		USRLOG.debug("Attempting to delete: " + user.getFullDetails());
+		USRLOG.debug((LocalizationController.getString("deleteUserAttemptNotification")) + user.getFullDetails());
 
 		try
 		{
 			if (LoginController.getCurrentUser().getDatabaseID() == user.getDatabaseID())
 			{
-				if (PopupController.confirmation(
-						"Are you sure you wish the delete your own user account? You will be logged out and be unable to log in again as a result of this action."))
+				if (PopupController.confirmation("Are you sure you wish the delete your own user account? You will be logged out and be unable to log in again as a result of this action."))
 				{
 					if (DatabaseController.deleteUser(user.getDatabaseID()))
 					{
@@ -162,7 +160,8 @@ public class UserController implements UIActionController
 	 * Creates the temporary debug user for logging in through the debug window.
 	 *
 	 * @param userRoleName role to create the user as
-	 * @return a {@link User} object or <code>null</code> if {@link MainWindow#DEBUG_MODE} is <code>false</code>
+	 * @return a {@link User} object or <code>null</code> if
+	 *         {@link MainWindow#DEBUG_MODE} is <code>false</code>
 	 */
 	public static User getDebugUser(final String userRoleName)
 	{

@@ -32,6 +32,7 @@ import javafx.stage.WindowEvent;
 import velho.controller.DatabaseController;
 import velho.controller.DebugController;
 import velho.controller.ExternalSystemsController;
+import velho.controller.LocalizationController;
 import velho.controller.LogController;
 import velho.controller.LogDatabaseController;
 import velho.controller.LoginController;
@@ -246,6 +247,7 @@ public class MainWindow extends Application
 						//@formatter:on
 
 						SYSLOG.debug("All controllers created.");
+						LocalizationController.initializeBundle();
 					}
 					else
 					{
@@ -396,7 +398,7 @@ public class MainWindow extends Application
 		{
 			setUserAgentStylesheet(STYLESHEET_MODENA);
 
-			primaryStage.setTitle("Velho Warehouse Management");
+			primaryStage.setTitle(LocalizationController.getString("mainWindowTitle"));
 			final Group root = new Group();
 			scene = new Scene(root, WINDOW_WIDTH, WINDOW_HEIGHT);
 			scene.getStylesheets().add(getClass().getResource("velho.css").toExternalForm());

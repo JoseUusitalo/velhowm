@@ -10,6 +10,7 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
+import velho.controller.LocalizationController;
 import velho.controller.ManifestController;
 
 /**
@@ -56,11 +57,12 @@ public class ManifestManagementView
 			managementPanel = new HBox(10);
 			managementPanel.getStyleClass().add("standard-padding");
 
-			Button browseButton = new Button("Browse Manifests");
+			Button browseButton = new Button(LocalizationController.getString("browseManifestsButton"));
 			GridPane.setConstraints(browseButton, 0, 0, 1, 1, HPos.LEFT, VPos.CENTER);
 
 			/*
-			 * After nearly an hour of trying to align the two nodes (button and state selector) on separate sides of
+			 * After nearly an hour of trying to align the two nodes (button and
+			 * state selector) on separate sides of
 			 * the HBox this was the best and only working solution.
 			 */
 			final HBox spacer = new HBox();
@@ -115,7 +117,8 @@ public class ManifestManagementView
 		{
 			try
 			{
-				// NOTE: Assumes that the panel only has the browse button and spacer in it permanently.
+				// NOTE: Assumes that the panel only has the browse button and
+				// spacer in it permanently.
 				managementPanel.getChildren().remove(2);
 			}
 			catch (IndexOutOfBoundsException e)

@@ -15,6 +15,7 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Priority;
 import velho.controller.DatabaseController;
+import velho.controller.LocalizationController;
 import velho.controller.RemovalListController;
 import velho.controller.SearchController;
 import velho.model.RemovalListState;
@@ -85,7 +86,7 @@ public class RemovalListCreationView
 
 			final GridPane left = new GridPane();
 
-			final Label resultsLabel = new Label("Search Results");
+			final Label resultsLabel = new Label(LocalizationController.getString("searchResultsLabel"));
 			resultsLabel.getStyleClass().add("centered-title-medium");
 			resultsLabel.setPadding(new Insets(7, 0, 0, 0));
 			resultsLabel.setAlignment(Pos.CENTER);
@@ -102,7 +103,7 @@ public class RemovalListCreationView
 
 			final GridPane center = new GridPane();
 
-			final Label removalListLabel = new Label("New Removal List");
+			final Label removalListLabel = new Label(LocalizationController.getString("newRemovalListLabel"));
 			removalListLabel.getStyleClass().add("centered-title-medium");
 			removalListLabel.setAlignment(Pos.CENTER);
 			removalListLabel.setMaxWidth(Double.MAX_VALUE);
@@ -130,7 +131,7 @@ public class RemovalListCreationView
 				}
 			});
 
-			final Button saveButton = new Button("Save");
+			final Button saveButton = new Button(LocalizationController.getString("saveButton"));
 			center.add(saveButton, 2, 0);
 
 			saveButton.setOnAction(new EventHandler<ActionEvent>()
@@ -163,11 +164,12 @@ public class RemovalListCreationView
 	}
 
 	/**
-	 * Gets the search results list and the current new removal list views again.
+	 * Gets the search results list and the current new removal list views
+	 * again.
 	 */
 	public void refresh()
 	{
-		SYSLOG.trace("Refreshing removal list creation view.");
+		SYSLOG.trace(LocalizationController.getString("refreshRemovalListNotice"));
 		resultList = removalListController.getSearchResultsListView();
 		newList = removalListController.getNewRemovalListView();
 	}

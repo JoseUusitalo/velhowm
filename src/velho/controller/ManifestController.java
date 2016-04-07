@@ -78,7 +78,7 @@ public class ManifestController implements UIActionController
 	 */
 	public void showBrowseManifestsView()
 	{
-		USRLOG.info("Browsing manifests.");
+		USRLOG.info(LocalizationController.getString("browsingManifestsNotice"));
 
 		try
 		{
@@ -100,10 +100,11 @@ public class ManifestController implements UIActionController
 	{
 		try
 		{
-			USRLOG.info("Viewing manifest: " + manifest);
+			USRLOG.info((LocalizationController.getString("viewingManifestsInfo")) + manifest);
 			currentManifest = manifest;
 			managementView.setContent(new ManifestView(manifest, this).getView());
-			// The method showing the combo box state selector is called in the view.
+			// The method showing the combo box state selector is called in the
+			// view.
 		}
 		catch (NoDatabaseLinkException e)
 		{
@@ -138,15 +139,15 @@ public class ManifestController implements UIActionController
 	 */
 	public void setCurrentManifestState(final ManifestState newState)
 	{
-		USRLOG.info(currentManifest + " state changed to " + newState + ".");
+		USRLOG.info(currentManifest + (LocalizationController.getString("manifestStateChangeNote")) + newState + ".");
 		currentManifest.setState(newState);
 
 		try
 		{
 			if (DatabaseController.save(currentManifest) > 0)
-				SYSLOG.info("Updated database: " + currentManifest);
+				SYSLOG.info((LocalizationController.getString("updatedManifestInDatabaseNote")) + currentManifest);
 			else
-				SYSLOG.info("Database update failed: " + currentManifest);
+				SYSLOG.info((LocalizationController.getString("manifestUpdateInDatabaseFailed")) + currentManifest);
 		}
 		catch (NoDatabaseLinkException e)
 		{
@@ -166,7 +167,8 @@ public class ManifestController implements UIActionController
 	}
 
 	/**
-	 * Processes the set of boxes that barcode scanner built from the barcode of the newly arrived shipment manifest.
+	 * Processes the set of boxes that barcode scanner built from the barcode of
+	 * the newly arrived shipment manifest.
 	 *
 	 * @param boxSet set of {@link ProductBox} objects on the physical manifest
 	 */
@@ -181,11 +183,11 @@ public class ManifestController implements UIActionController
 
 			if (DatabaseController.save(manifest) > 0)
 			{
-				// If the user is a Manager (but not an Administrator!) show a popup.
+				// If the user is a Manager (but not an Administrator!) show a
+				// popup.
 				if (LoginController.userRoleIs(new Manager()))
 				{
-					if (PopupController
-							.confirmation("A shipment has arrived. Please accept or refuse it in the Manifests tab. Would you like to view the manifest now?"))
+					if (PopupController.confirmation(LocalizationController.getString("manifestShipmentArrivalNotice")))
 					{
 						showManifestView(manifest);
 						mainWindow.selectTab("Manifests");

@@ -9,6 +9,7 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import velho.controller.DatabaseController;
 import velho.controller.ListController;
+import velho.controller.LocalizationController;
 import velho.controller.ManifestController;
 import velho.model.Manifest;
 import velho.model.ManifestState;
@@ -58,11 +59,10 @@ public class ManifestView
 		{
 			bpane = new BorderPane();
 
-			BorderPane boxlist = (BorderPane) ListController.getTableView(manifestController, DatabaseController.getProductSearchDataColumns(false, false),
-					manifest.getObservableBoxes());
+			BorderPane boxlist = (BorderPane) ListController.getTableView(manifestController, DatabaseController.getProductSearchDataColumns(false, false), manifest.getObservableBoxes());
 
 			HBox stateBox = new HBox(10);
-			Label stateLabel = new Label("State:");
+			Label stateLabel = new Label(LocalizationController.getString("manifestStateLabel"));
 			ComboBox<Object> manifestState = new ComboBox<Object>();
 
 			manifestState.getItems().addAll(DatabaseController.getAllManifestStates(true, manifest.getState()));

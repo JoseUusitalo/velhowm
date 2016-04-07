@@ -13,6 +13,7 @@ import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
 import velho.controller.DatabaseController;
+import velho.controller.LocalizationController;
 import velho.controller.ProductController;
 import velho.controller.UIController;
 import velho.model.Product;
@@ -96,19 +97,20 @@ public class AddProductView
 			databaseID.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(-1, Integer.MAX_VALUE, Integer.parseInt("-1")));
 
 			nameField = new TextField();
-			nameField.setPromptText("Product name");
+			nameField.setPromptText(LocalizationController.getString("promtTextProductName"));
 			nameField.setPrefWidth(MainWindow.WINDOW_WIDTH / 5);
 			nameField.setMaxWidth(Double.MAX_VALUE);
 			grid.add(nameField, 1, 0);
 
 			brandList = new ComboBox<Object>();
 			// TODO make it so that you dont need to press enter
-			brandList.setPromptText("Brand");
+			brandList.setPromptText(LocalizationController.getString("promtTextBrand"));
 			brandList.getItems().addAll(DatabaseController.getAllProductBrands());
 			brandList.setMaxWidth(Double.MAX_VALUE);
 
 			/*
-			 * TODO: Fix combobox selection mechanic breaking on the second try because the selection is converted from
+			 * TODO: Fix combobox selection mechanic breaking on the second try
+			 * because the selection is converted from
 			 * object to string.
 			 */
 			// brandList.setEditable(true);
@@ -118,12 +120,13 @@ public class AddProductView
 
 			categoryList = new ComboBox<Object>();
 			// TODO make it so that you dont need to press enter
-			categoryList.setPromptText("Category");
+			categoryList.setPromptText(LocalizationController.getString("promtTextCategory"));
 			categoryList.getItems().addAll(DatabaseController.getAllProductCategories());
 			categoryList.setMaxWidth(Double.MAX_VALUE);
 
 			/*
-			 * TODO: Fix combobox selection mechanic breaking on the second try because the selection is converted from
+			 * TODO: Fix combobox selection mechanic breaking on the second try
+			 * because the selection is converted from
 			 * object to string.
 			 */
 			// categoryList.setEditable(true);
@@ -131,7 +134,7 @@ public class AddProductView
 			categoryList.getSelectionModel().selectFirst();
 			grid.add(categoryList, 3, 0);
 
-			Label popularityLabel = new Label("Popularity: ");
+			Label popularityLabel = new Label(LocalizationController.getString("productPopularitySpinnerLabel"));
 			popularityLabel.setAlignment(Pos.CENTER_RIGHT);
 			// grid.add(popularityLabel, 4, 0);
 
@@ -164,7 +167,7 @@ public class AddProductView
 			popularity.getEditor().addEventHandler(KeyEvent.KEY_RELEASED, keyboardHandler);
 			// grid.add(popularity, 5, 0);
 
-			final Button cancelButton = new Button("Back to List");
+			final Button cancelButton = new Button(LocalizationController.getString("cancelButtonBackToList"));
 
 			cancelButton.setOnAction(new EventHandler<ActionEvent>()
 			{
@@ -172,12 +175,12 @@ public class AddProductView
 				public void handle(final ActionEvent event)
 				{
 					productController.showList();
-					uiController.selectTab("Product List");
+					uiController.selectTab(LocalizationController.getString("productListTabName"));
 				}
 			});
 			grid.add(cancelButton, 6, 0);
 
-			Button saveButton = new Button("Save");
+			Button saveButton = new Button(LocalizationController.getString("saveButton"));
 
 			saveButton.setOnAction(new EventHandler<ActionEvent>()
 			{
@@ -187,8 +190,7 @@ public class AddProductView
 					Object brand = brandList.valueProperty().getValue();
 					Object category = categoryList.valueProperty().getValue();
 
-					final Product newProduct = productController.saveProduct(databaseID.getValueFactory().getValue().intValue(), nameField.getText(), brand,
-							category, popularity.getValue().intValue());
+					final Product newProduct = productController.saveProduct(databaseID.getValueFactory().getValue().intValue(), nameField.getText(), brand, category, popularity.getValue().intValue());
 
 					if (editProduct)
 						productController.showProductView(newProduct);
