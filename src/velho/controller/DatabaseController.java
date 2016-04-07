@@ -1356,12 +1356,12 @@ public class DatabaseController
 	public static Map<String, String> getPublicUserDataColumns(final boolean withDeleteColumn)
 	{
 		final LinkedHashMap<String, String> cols = new LinkedHashMap<String, String>();
-		cols.put("firstName", "First Name");
-		cols.put("lastName", "Last Name");
-		cols.put("roleName", "Role");
+		cols.put("firstName", LocalizationController.getString("publicUserTableHeaderFirstName"));
+		cols.put("lastName", LocalizationController.getString("publicUserTableHeaderLastName"));
+		cols.put("roleName", LocalizationController.getString("publicUserTableHeaderRole"));
 
 		if (withDeleteColumn)
-			cols.put("deleteButton", "Delete");
+			cols.put("deleteButton", LocalizationController.getString("publicProductTableDeleteButton"));
 
 		return cols;
 	}
@@ -1386,10 +1386,10 @@ public class DatabaseController
 		if (withDeleteColumn)
 			cols.put("deleteButton", "Delete");
 
-		cols.put("productID", "ID");
-		cols.put("name", "Name");
-		cols.put("brand", "Brand");
-		cols.put("category", "Category");
+		cols.put("productID", LocalizationController.getString("publicProductTableHeaderID"));
+		cols.put("name", LocalizationController.getString("publicProductTableHeaderName"));
+		cols.put("brand", LocalizationController.getString("publicProductTableHeaderBrand"));
+		cols.put("category", LocalizationController.getString("publicProductTableHeaderCategory"));
 		// cols.put("popularity", "Popularity");
 		cols.put("viewButton", "");
 
@@ -1406,14 +1406,14 @@ public class DatabaseController
 	public static Map<String, String> getRemovalListDataColumns()
 	{
 		final LinkedHashMap<String, String> cols = new LinkedHashMap<String, String>();
-		cols.put("databaseID", "ID");
-		cols.put("state", "State");
-		cols.put("size", "Size");
-		cols.put("viewButton", "View");
+		cols.put("databaseID", LocalizationController.getString("publicRemovalTableHeaderID"));
+		cols.put("state", LocalizationController.getString("publicRemovalTableHeaderState"));
+		cols.put("size", LocalizationController.getString("publicRemovalTableHeaderSize"));
+		cols.put("viewButton", LocalizationController.getString("publicRemovalTableViewButton"));
 
 		// Only managers and administrators can delete lists.
 		if (LoginController.getCurrentUser().getRole().compareTo(UserRole.MANAGER) >= 0)
-			cols.put("deleteButton", "Delete");
+			cols.put("deleteButton", LocalizationController.getString("publicRemovalTableDeleteButton"));
 
 		return cols;
 	}
@@ -1438,12 +1438,12 @@ public class DatabaseController
 		if (withRemoveColumn)
 			cols.put("removeButton", "Remove");
 
-		cols.put("productID", "ID");
-		cols.put("productName", "Name");
-		cols.put("productBrand", "Brand");
-		cols.put("productCategory", "Category");
-		cols.put("expirationDate", "Expires");
-		cols.put("boxID", "Box ID");
+		cols.put("productID", LocalizationController.getString("publicProductSearchTableHeaderID"));
+		cols.put("productName", LocalizationController.getString("publicProductSearchTableHeaderName"));
+		cols.put("productBrand", LocalizationController.getString("publicProductSearchTableHeaderBrand"));
+		cols.put("productCategory", LocalizationController.getString("publicProductSearchTableHeaderCategory"));
+		cols.put("expirationDate", LocalizationController.getString("publicProductSearchTableHeaderExpires"));
+		cols.put("boxID", LocalizationController.getString("publicProductSearchTableHeaderBoxID"));
 		cols.put("boxShelfSlot", "Shelf Slot");
 		cols.put("boxProductCount", "Amount");
 
