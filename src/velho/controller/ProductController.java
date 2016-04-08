@@ -8,13 +8,13 @@ import velho.model.Product;
 import velho.model.ProductBrand;
 import velho.model.ProductCategory;
 import velho.model.ProductType;
-import velho.view.AddBrandView;
 import velho.view.AddCategoryView;
-import velho.view.AddProductTypeView;
 import velho.view.AddProductView;
+import velho.view.BrandsTab;
 import velho.view.GenericTabView;
 import velho.view.ProductDataView;
 import velho.view.ProductManagementView;
+import velho.view.ProductsTypeTabView;
 
 /**
  * Controller for handling {@link Product} objects
@@ -55,11 +55,11 @@ public class ProductController implements UIActionController
 
 	private ProductManagementView productManagementView;
 
-	private AddBrandView addBrandView;
-
-	private AddProductTypeView addProductTypeView;
+	private ProductsTypeTabView productsTypeTabView;
 
 	private AddCategoryView addCategoryView;
+
+	private BrandsTab brandsTabView;
 
 	/**
 	 * @param uiController
@@ -68,10 +68,10 @@ public class ProductController implements UIActionController
 	{
 		this.uiController = uiController;
 		this.productManagementView = new ProductManagementView();
-		this.addBrandView = new AddBrandView(this, uiController);
-		this.addProductTypeView = new AddProductTypeView(this, uiController);
+		this.productsTypeTabView = new ProductsTypeTabView(this, uiController);
 		this.addCategoryView = new AddCategoryView(this, uiController);
 		this.addProductView = new AddProductView(this, uiController);
+		this.brandsTabView = new BrandsTab(this, uiController);
 		listTab = new GenericTabView();
 		addTab = new GenericTabView();
 		showList();
@@ -259,7 +259,7 @@ public class ProductController implements UIActionController
 
 	public Node getProductManagementView()
 	{
-		productManagementView.setContents(getProductEditView(), addCategoryView.getView(true), addProductTypeView.getView(true), addBrandView.getView(true));
+		productManagementView.setContents(getProductEditView(), addCategoryView.getView(true));
 		return productManagementView.getView();
 	}
 
@@ -292,5 +292,28 @@ public class ProductController implements UIActionController
 		DatabaseController.save(productType);
 		return productType;
 
+	}
+
+	public Node getBrandsTab()
+	{
+		return brandsTabView.getView();
+	}
+
+	public Node getProductTypesTab()
+	{
+		return productsTypeTabView.getView();
+	}
+
+	public void saveBrand(final ProductBrand editBrand)
+	{
+		DatabaseController.save(editBrand);
+		// TODO Validate data
+
+	}
+
+	public void saveProductType(final ProductType saveProductType)
+	{
+		// TODO Validate data
+		DatabaseController.save(saveProductType);
 	}
 }

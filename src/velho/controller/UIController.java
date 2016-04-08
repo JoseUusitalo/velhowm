@@ -138,6 +138,8 @@ public class UIController
 				mainView.addTab("Removal Lists", removalListController.getView());
 				mainView.addTab("Products", productController.getProductManagementView());
 				mainView.addTab("Product List", productController.getTabView());
+				mainView.addTab("Brands", productController.getBrandsTab());
+				mainView.addTab("Product Types", productController.getProductTypesTab());
 				mainView.addTab("User List", getUserListView(currentUserRole));
 				break;
 			case GUEST:
