@@ -220,10 +220,21 @@ public class MainWindow extends Application
 				try
 				{
 					DatabaseController.link();
+
 					if (DatabaseController.isLinked())
 					{
 						// FIXME: TEMP!
-						DatabaseController.loadSampleData();
+						DatabaseController.resetDatabase();
+						System.out.println(DatabaseController.getProductBrandByID(1));
+						System.out.println("\n\n\n----------------");
+
+						DatabaseController.resetDatabase();
+						System.out.println(DatabaseController.getProductBrandByID(1));
+						System.out.println("\n\n\n----------------");
+
+						DatabaseController.resetDatabase();
+						System.out.println(DatabaseController.getProductBrandByID(1));
+						System.out.println("\n\n\n----------------");
 
 						SYSLOG.debug("Creating all controllers...");
 

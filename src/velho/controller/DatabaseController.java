@@ -50,6 +50,7 @@ import velho.model.enums.UserRole;
 import velho.model.exceptions.ExistingDatabaseLinkException;
 import velho.model.exceptions.NoDatabaseException;
 import velho.model.exceptions.NoDatabaseLinkException;
+import velho.model.exceptions.UniqueKeyViolationException;
 import velho.view.MainWindow;
 
 /**
@@ -207,7 +208,7 @@ public class DatabaseController
 			// Initialize a statement.
 			statement = connection.createStatement();
 
-			statement.execute(sqlBuilder(type, tableName, joinOnValues, columns, columnValues, where), Statement.RETURN_GENERATED_KEYS);
+			statement.execute(sqlBuilder(type, tableName.toString(), joinOnValues, columns, columnValues, where), Statement.RETURN_GENERATED_KEYS);
 
 			switch (type)
 			{
@@ -322,7 +323,7 @@ public class DatabaseController
 								break;
 							// @formatter:on
 
-							case SHELF_PRODUCTBOXES:
+							case SHELFSLOT_PRODUCTBOXES:
 								shelfBoxMap = new HashMap<Integer, ArrayList<Integer[]>>();
 								Integer[] coords = null;
 								Integer shelfID = null;
@@ -582,7 +583,7 @@ public class DatabaseController
 					case MANIFEST_STATES:
 					case REMOVALPLATFORMS:
 						return dataSet;
-					case SHELF_PRODUCTBOXES:
+					case SHELFSLOT_PRODUCTBOXES:
 						return shelfBoxMap;
 					case REMOVALLIST_PRODUCTBOXES:
 						if (columns.length == 1 && columns[0] != "*")
@@ -607,7 +608,7 @@ public class DatabaseController
 	 * @return an Object containing the appropriate data
 	 * @throws NoDatabaseLinkException
 	 */
-	private static Object runQuery(final String sql) throws NoDatabaseLinkException
+	private static Object runQuery(final String sql) throws NoDatabaseLinkException, UniqueKeyViolationException
 	{
 		final Connection connection = getConnection();
 		Statement statement = null;
@@ -657,16 +658,37 @@ public class DatabaseController
 
 			// If it was a UNIQUE constraint violation, continue normally as
 			// those are handled separately.
-			DBLOG.error("Silently ignored an SQL UNIQUE constraint violation. Begin message:");
+			DBLOG.error("Passing SQL UNIQUE constraint violation. Begin message:");
 			DBLOG.error(escape(e.getMessage()));
 			DBLOG.error("End of message.");
+
+			// Close all resources.
+			try
+			{
+				if (statement != null)
+					statement.close();
+			}
+			catch (final SQLException e2)
+			{
+				e.printStackTrace();
+			}
+
+			try
+			{
+				connection.close();
+			}
+			catch (final SQLException e2)
+			{
+				e.printStackTrace();
+			}
+
+			throw new UniqueKeyViolationException();
 		}
 
 		// Close all resources.
 		try
 		{
-			if (statement != null)
-				statement.close();
+			statement.close();
 		}
 		catch (final SQLException e)
 		{
@@ -792,7 +814,7 @@ public class DatabaseController
 	 * @return an SQL query string
 	 */
 	@Deprecated
-	public static String sqlBuilder(final DatabaseQueryType type, final DatabaseTable tableName, final Map<DatabaseTable, String> joinOnCondition,
+	public static String sqlBuilder(final DatabaseQueryType type, final String tableName, final Map<DatabaseTable, String> joinOnCondition,
 			final String[] columns, final Map<String, Object> columnValues, final List<String> where)
 	{
 		final StringBuilder sb = new StringBuilder();
@@ -827,7 +849,7 @@ public class DatabaseController
 		}
 
 		// Table name.
-		sb.append(tableName.toString().toLowerCase());
+		sb.append(tableName.toLowerCase());
 
 		// Join.
 		if (joinOnCondition != null)
@@ -1905,12 +1927,63 @@ public class DatabaseController
 		if (!databaseExists())
 			throw new NoDatabaseException();
 
-		final boolean changed = (0 != (Integer) runQuery("RUNSCRIPT FROM './data/init.sql';"));
+		boolean changed = false;
+		try
+		{
+			changed = (0 != (Integer) runQuery("RUNSCRIPT FROM './data/init.sql';"));
+		}
+		catch (UniqueKeyViolationException e)
+		{
+			e.printStackTrace();
+		}
 
 		if (changed)
 			DBLOG.info("Sample data loaded.");
 
 		return changed;
+	}
+
+	/**
+	 * Deletes all data from all tables in the database.
+	 *
+	 * @return <code>true</code> if database changed as a result of this call
+	 */
+	public static boolean deleteAllData() throws NoDatabaseException, NoDatabaseException, NoDatabaseLinkException
+	{
+		DBLOG.info("Truncating database...");
+
+		if (!databaseExists())
+			throw new NoDatabaseException();
+
+		boolean notChanged = false;
+
+		try
+		{
+			runQuery("SET REFERENTIAL_INTEGRITY FALSE;");
+
+			for (final DatabaseTable table : DatabaseTable.values())
+			{
+				notChanged = notChanged && (0 == (Integer) runQuery("TRUNCATE TABLE " + table.toString() + ";"));
+				DBLOG.debug("Truncate table: " + table.toString() + " | " + !notChanged);
+			}
+
+			runQuery("SET REFERENTIAL_INTEGRITY TRUE;");
+		}
+		catch (UniqueKeyViolationException e)
+		{
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+		if (!notChanged)
+			DBLOG.info("Database contents deleted.");
+
+		System.out.println("\n\n\n\n++++++++++++++++++++++++++++++");
+		System.out.println("                       " + getAllProductBrands());
+		System.out.println("                       " + getAllProductBrands().size());
+		System.out.println("\n\n\n\n++++++++++++++++++++++++++++++");
+
+		return !notChanged;
 	}
 
 	/**
@@ -1920,12 +1993,17 @@ public class DatabaseController
 	 * @return <code>true</code> if database changed as a result of this call
 	 * @throws NoDatabaseLinkException
 	 */
-	public static boolean loadSampleData() throws NoDatabaseException, NoDatabaseException, NoDatabaseLinkException
+	public static boolean loadSampleData() throws NoDatabaseException, NoDatabaseException, NoDatabaseLinkException, UniqueKeyViolationException
 	{
 		DBLOG.debug("Loading sample data to database...");
 
 		if (!databaseExists())
 			throw new NoDatabaseException();
+
+		System.out.println("\n\n\n\n++++++++++++++++++++++++++++++");
+		System.out.println("                       " + getAllProductBrands());
+		System.out.println("                       " + getAllProductBrands().size());
+		System.out.println("\n\n\n\n++++++++++++++++++++++++++++++");
 
 		final boolean changed = (0 != (Integer) runQuery("RUNSCRIPT FROM './data/sample_data.sql';"));
 
@@ -2452,12 +2530,36 @@ public class DatabaseController
 		sessionFactory.close();
 	}
 
-	public static boolean resetDatabase() throws ClassNotFoundException, NoDatabaseException, NoDatabaseLinkException, ExistingDatabaseLinkException
+	/**
+	 * Deletes all data from the database and loads the sample data into it.
+	 *
+	 * @return <code>true</code> if the operation was succesfull
+	 */
+	public static boolean resetDatabase() throws NoDatabaseException, NoDatabaseLinkException
 	{
-		boolean failure = link() == DatabaseFileState.DOES_NOT_EXIST;
-		failure = failure && initializeDatabase();
-		failure = failure && loadSampleData();
+		/*
+		 * This is absurd. If I use the code below it somehow skips the method calls to deleteAllData() and
+		 * loadSampleData()!
+		 * I have't the slightest clue what on earth is going on.
+		 *
+		 * failure = failure && !deleteAllData();
+		 * failure = failure && !loadSampleData();
+		 */
 
-		return !failure;
+		final boolean delete = deleteAllData();
+
+		boolean load;
+
+		try
+		{
+			load = loadSampleData();
+		}
+		catch (UniqueKeyViolationException e)
+		{
+			load = false;
+			e.printStackTrace();
+		}
+
+		return delete && load;
 	}
 }

@@ -27,6 +27,7 @@ import velho.model.User;
 import velho.model.exceptions.ExistingDatabaseLinkException;
 import velho.model.exceptions.NoDatabaseException;
 import velho.model.exceptions.NoDatabaseLinkException;
+import velho.model.exceptions.UniqueKeyViolationException;
 
 /**
  * Tests for the {@link DatabaseController} class.
@@ -82,6 +83,10 @@ public class DatabaseControllerTest
 			{
 				fail(e1.toString());
 			}
+		}
+		catch (UniqueKeyViolationException e)
+		{
+			e.printStackTrace();
 		}
 	}
 

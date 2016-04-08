@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -15,9 +16,11 @@ import org.junit.Test;
 import velho.controller.DatabaseController;
 import velho.model.ProductBox;
 import velho.model.Shelf;
+import velho.model.enums.DatabaseFileState;
 import velho.model.exceptions.ExistingDatabaseLinkException;
 import velho.model.exceptions.NoDatabaseException;
 import velho.model.exceptions.NoDatabaseLinkException;
+import velho.model.exceptions.UniqueKeyViolationException;
 
 /**
  * Tests for the {@link Shelf} class.
@@ -35,10 +38,10 @@ public class ShelfTest
 	private static Shelf shelf_FREE_LVL_2;
 	private static final int SHELF_FREE_LVL_2_ID = 4;
 	private static final int SHELF_FREE_LVL_2_ID_LEVELS = 2;
-	private static Shelf emptyShelf_1_0_to_1_1;
-	private static final int EMPTYSHELF_1_0_to_1_1_ID = 5;
-	private static Shelf fullShelf_LVL_1_SLTIDX_0;
-	private static final int FULLSHELF_LVL_1_SLTIDX_0_ID = 1;
+	private static Shelf emptyShelf_1_1_to_1_2;
+	private static final int EMPTYSHELF_1_1_to_1_2_ID = 5;
+	private static Shelf fullShelf_LVL_1_SLTPOS_1;
+	private static final int FULLSHELF_LVL_1_SLTPOS_1_ID = 1;
 
 	private static ProductBox EMPTY_BOX;
 	private static ProductBox BOX_1;
@@ -48,21 +51,38 @@ public class ShelfTest
 	@BeforeClass
 	public static final void createShelf() throws ClassNotFoundException, ExistingDatabaseLinkException, NoDatabaseException, NoDatabaseLinkException
 	{
-		DatabaseController.link();
-		DatabaseController.loadSampleData();
-		fullShelf_LVL_1_SLTIDX_0 = DatabaseController.getShelfByID(FULLSHELF_LVL_1_SLTIDX_0_ID);
+		System.out.println("\n\n\n------beforeclass----------");
+		DatabaseController.resetDatabase();
+		System.out.println(DatabaseController.getProductBrandByID(1));
+		System.out.println("------beforeclass----------\n\n\n");
+
+		fullShelf_LVL_1_SLTPOS_1 = DatabaseController.getShelfByID(FULLSHELF_LVL_1_SLTPOS_1_ID);
 		shelf_FREE_LVL_2 = DatabaseController.getShelfByID(SHELF_FREE_LVL_2_ID);
-		emptyShelf_1_0_to_1_1 = DatabaseController.getShelfByID(EMPTYSHELF_1_0_to_1_1_ID);
+		emptyShelf_1_1_to_1_2 = DatabaseController.getShelfByID(EMPTYSHELF_1_1_to_1_2_ID);
 		EMPTY_BOX = DatabaseController.getProductBoxByID(23);
 		BOX_1 = DatabaseController.getProductBoxByID(21);
 		BOX_2 = DatabaseController.getProductBoxByID(22);
 
 		System.out.println("--Start--");
 		System.out.println("Initial state");
-		System.out.println(fullShelf_LVL_1_SLTIDX_0);
+		System.out.println(fullShelf_LVL_1_SLTPOS_1);
 		System.out.println(shelf_FREE_LVL_2);
-		System.out.println(emptyShelf_1_0_to_1_1);
+		System.out.println(emptyShelf_1_1_to_1_2);
 		System.out.println("--Tests--");
+	}
+
+	@After
+	public void resetDB()
+			throws ClassNotFoundException, NoDatabaseException, NoDatabaseLinkException, ExistingDatabaseLinkException, UniqueKeyViolationException
+	{
+		System.out.println("\n\n\n------after----------");
+
+		assertTrue(DatabaseController.link() != DatabaseFileState.DOES_NOT_EXIST);
+		assertTrue(DatabaseController.deleteAllData());
+		assertTrue(DatabaseController.loadSampleData());
+
+		System.out.println(DatabaseController.getProductBrandByID(1));
+		System.out.println("---------after-------\n\n\n");
 	}
 
 	@AfterClass
@@ -141,7 +161,7 @@ public class ShelfTest
 	@Test
 	public final void testGetFreeShelfSlots_Empty()
 	{
-		assertEquals(emptyShelf_1_0_to_1_1.getShelfSlotCount(), emptyShelf_1_0_to_1_1.getFreeShelfSlots().size());
+		assertEquals(emptyShelf_1_1_to_1_2.getShelfSlotCount(), emptyShelf_1_1_to_1_2.getFreeShelfSlots().size());
 	}
 
 	@Test
@@ -164,25 +184,25 @@ public class ShelfTest
 	@Test
 	public final void testGetProductBoxCount_Empty()
 	{
-		assertEquals(0, emptyShelf_1_0_to_1_1.getProductBoxes().size());
+		assertEquals(0, emptyShelf_1_1_to_1_2.getProductBoxes().size());
 	}
 
 	@Test
 	public final void testGetProductCount_Empty()
 	{
-		assertEquals(0, emptyShelf_1_0_to_1_1.getProductCountInBoxes());
+		assertEquals(0, emptyShelf_1_1_to_1_2.getProductCountInBoxes());
 	}
 
 	@Test
 	public final void testIsEmpty_Empty()
 	{
-		assertTrue(emptyShelf_1_0_to_1_1.isEmpty());
+		assertTrue(emptyShelf_1_1_to_1_2.isEmpty());
 	}
 
 	@Test
 	public final void testHasFreeSpace_Empty()
 	{
-		assertTrue(emptyShelf_1_0_to_1_1.hasFreeSpace());
+		assertTrue(emptyShelf_1_1_to_1_2.hasFreeSpace());
 	}
 
 	@Test
@@ -289,23 +309,20 @@ public class ShelfTest
 	@Test
 	public final void testHasFreeSpace() throws IllegalArgumentException
 	{
-		assertTrue(emptyShelf_1_0_to_1_1.hasFreeSpace());
-		assertTrue(emptyShelf_1_0_to_1_1.isEmpty());
+		assertTrue(emptyShelf_1_1_to_1_2.hasFreeSpace());
+		assertTrue(emptyShelf_1_1_to_1_2.isEmpty());
 
-		assertTrue(emptyShelf_1_0_to_1_1.addToSlot(emptyShelf_1_0_to_1_1.getShelfID() + "-1-0", BOX_1));
+		assertTrue(emptyShelf_1_1_to_1_2.addToSlot(emptyShelf_1_1_to_1_2.getShelfID() + "-1-1", BOX_1));
 
-		assertTrue(emptyShelf_1_0_to_1_1.hasFreeSpace());
-		assertFalse(emptyShelf_1_0_to_1_1.isEmpty());
-
-		assertTrue(emptyShelf_1_0_to_1_1.addToSlot(emptyShelf_1_0_to_1_1.getShelfID() + "-1-1", BOX_2));
-
-		assertFalse(emptyShelf_1_0_to_1_1.hasFreeSpace());
+		assertTrue(emptyShelf_1_1_to_1_2.hasFreeSpace());
+		assertFalse(emptyShelf_1_1_to_1_2.isEmpty());
 	}
 
 	@Test
 	public final void testToString() throws IllegalArgumentException
 	{
-		assertEquals("[1] Lvls: 1, Boxs: 4, Slts: 4, Free: 0", fullShelf_LVL_1_SLTIDX_0.toString());
+		System.out.println("tostring");
+		assertEquals("[1] Lvls: 1, Boxs: 4, Slts: 4, Free: 0", fullShelf_LVL_1_SLTPOS_1.toString());
 	}
 
 	@Test
@@ -317,7 +334,7 @@ public class ShelfTest
 	@Test
 	public final void testAddToSlot_Full() throws IllegalArgumentException
 	{
-		assertTrue(emptyShelf_1_0_to_1_1.addToSlot(emptyShelf_1_0_to_1_1.getShelfID() + "-1-0", BOX_1));
-		assertFalse(emptyShelf_1_0_to_1_1.addToSlot(emptyShelf_1_0_to_1_1.getShelfID() + "-1-0", BOX_2));
+		assertTrue(emptyShelf_1_1_to_1_2.addToSlot(emptyShelf_1_1_to_1_2.getShelfID() + "-1-0", BOX_1));
+		assertFalse(emptyShelf_1_1_to_1_2.addToSlot(emptyShelf_1_1_to_1_2.getShelfID() + "-1-0", BOX_2));
 	}
 }
