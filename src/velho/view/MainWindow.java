@@ -81,6 +81,12 @@ public class MainWindow extends Application
 	public static final boolean SHOW_TRACE = true;
 
 	/**
+	 * Skips the entire main application code. DEBUG_MODE must be <code>true</code> for this
+	 * to affect anything.
+	 */
+	public static final boolean SKIP_MAIN_CODE = true;
+
+	/**
 	 * The height of the window.
 	 */
 	public static final double WINDOW_HEIGHT = 640;
@@ -176,6 +182,43 @@ public class MainWindow extends Application
 	 */
 	public MainWindow()
 	{
+		prepareLogger();
+		prepareDatabase();
+
+		if (DEBUG_MODE)
+		{
+			if (!SKIP_MAIN_CODE)
+			{
+				runApp();
+			}
+			else
+				SYSLOG.info("Skipping main application code.");
+		}
+		else
+			runApp();
+	}
+
+	private static void prepareDatabase()
+	{
+		try
+		{
+			DatabaseController.link();
+
+			// FIXME: TEMP!
+			DatabaseController.resetDatabase();
+
+			System.out.println(DatabaseController.getProductBrandByID(1));
+			System.out.println("\n\n\n----------------");
+		}
+		catch (NoDatabaseException | NoDatabaseLinkException | ClassNotFoundException | ExistingDatabaseLinkException e)
+		{
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+
+	private static void prepareLogger()
+	{
 		// Load the logger properties.
 		PropertyConfigurator.configure(LOG4J_PATH);
 
@@ -207,76 +250,11 @@ public class MainWindow extends Application
 				{
 					if (SHOW_TRACE)
 					{
+						SYSLOG.debug("Enabling trace.");
 						((AppenderSkeleton) Logger.getRootLogger().getAppender("SysConsoleAppender")).setThreshold(Level.TRACE);
 						((AppenderSkeleton) Logger.getLogger("userLogger").getAppender("UsrConsoleAppender")).setThreshold(Level.TRACE);
 						((AppenderSkeleton) Logger.getLogger("dbLogger").getAppender("DbConsoleAppender")).setThreshold(Level.TRACE);
 					}
-				}
-
-				SYSLOG.info("Running VELHO Warehouse Management.");
-
-				// FIXME: Database is not created correctly on first run.
-
-				try
-				{
-					DatabaseController.link();
-
-					if (DatabaseController.isLinked())
-					{
-						// FIXME: TEMP!
-						DatabaseController.resetDatabase();
-						System.out.println(DatabaseController.getProductBrandByID(1));
-						System.out.println("\n\n\n----------------");
-
-						DatabaseController.resetDatabase();
-						System.out.println(DatabaseController.getProductBrandByID(1));
-						System.out.println("\n\n\n----------------");
-
-						DatabaseController.resetDatabase();
-						System.out.println(DatabaseController.getProductBrandByID(1));
-						System.out.println("\n\n\n----------------");
-
-						SYSLOG.debug("Creating all controllers...");
-
-						// FIXME: Convert all controllers to use the singleton pattern.
-
-						uiController = new UIController();
-						userController = new UserController();
-						logController = new LogController();
-
-						manifestController = new ManifestController(this);
-						productController = new ProductController(uiController);
-						removalPlatformController = new RemovalPlatformController(this);
-						debugController = new DebugController(removalPlatformController);
-						searchController = new SearchController(productController);
-						removalListController = new RemovalListController(searchController);
-
-						ExternalSystemsController.setControllers(manifestController);
-						LoginController.setControllers(uiController, debugController);
-
-						//@formatter:off
-						uiController.setControllers(this,
-													userController,
-													removalListController,
-													searchController,
-													logController,
-													manifestController,
-													productController,
-													removalPlatformController);
-						//@formatter:on
-
-						SYSLOG.debug("All controllers created.");
-					}
-					else
-					{
-						SYSLOG.fatal("Failed to connect to database.");
-						SYSLOG.info("Closing application.");
-						System.exit(0);
-					}
-				}
-				catch (ClassNotFoundException | ExistingDatabaseLinkException | NoDatabaseLinkException | NoDatabaseException e1)
-				{
-					e1.printStackTrace();
 				}
 			}
 			else
@@ -289,6 +267,62 @@ public class MainWindow extends Application
 		catch (ClassNotFoundException | ExistingDatabaseLinkException | NoDatabaseLinkException e)
 		{
 			e.printStackTrace();
+		}
+	}
+
+	private void runApp()
+	{
+		SYSLOG.info("Running VELHO Warehouse Management.");
+
+		// FIXME: Database is not created correctly on first run.
+
+		try
+		{
+			DatabaseController.link();
+
+			if (DatabaseController.isLinked())
+			{
+				SYSLOG.debug("Creating all controllers...");
+
+				// FIXME: Convert all controllers to use the singleton pattern.
+
+				uiController = new UIController();
+				userController = new UserController();
+				logController = new LogController();
+
+				manifestController = new ManifestController(this);
+				productController = new ProductController(uiController);
+				removalPlatformController = new RemovalPlatformController(this);
+				debugController = new DebugController(removalPlatformController);
+				searchController = new SearchController(productController);
+				removalListController = new RemovalListController(searchController);
+
+				ExternalSystemsController.setControllers(manifestController);
+				LoginController.setControllers(uiController, debugController);
+
+				//@formatter:off
+				uiController.setControllers(this,
+											userController,
+											removalListController,
+											searchController,
+											logController,
+											manifestController,
+											productController,
+											removalPlatformController);
+				//@formatter:on
+
+				SYSLOG.debug("All controllers created.");
+			}
+			else
+			{
+				SYSLOG.fatal("Failed to connect to database.");
+				SYSLOG.info("Closing application.");
+				System.exit(0);
+			}
+		}
+		catch (ClassNotFoundException | ExistingDatabaseLinkException e1)
+		{
+			e1.printStackTrace();
 		}
 	}
 
@@ -408,7 +442,7 @@ public class MainWindow extends Application
 	@Override
 	public void start(final Stage primaryStage)
 	{
-		if (!SHOW_WINDOWS && DEBUG_MODE)
+		if (SKIP_MAIN_CODE || (!SHOW_WINDOWS && DEBUG_MODE))
 		{
 			SYSLOG.debug("Windows are disabled.");
 		}
