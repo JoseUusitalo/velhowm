@@ -35,7 +35,7 @@ public class SearchControllerTest
 	private SearchController searchController = new SearchController(null);
 
 	@BeforeClass
-	public static final void initializeDatabase() throws ClassNotFoundException, ExistingDatabaseLinkException, NoDatabaseException, NoDatabaseLinkException
+	public static final void initializeDatabase() throws NoDatabaseException, NoDatabaseLinkException
 	{
 		DatabaseController.resetDatabase();
 	}

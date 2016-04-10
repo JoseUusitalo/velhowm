@@ -16,11 +16,8 @@ import org.junit.Test;
 import velho.controller.DatabaseController;
 import velho.model.ProductBox;
 import velho.model.Shelf;
-import velho.model.enums.DatabaseFileState;
-import velho.model.exceptions.ExistingDatabaseLinkException;
 import velho.model.exceptions.NoDatabaseException;
 import velho.model.exceptions.NoDatabaseLinkException;
-import velho.model.exceptions.UniqueKeyViolationException;
 
 /**
  * Tests for the {@link Shelf} class.
@@ -49,7 +46,7 @@ public class ShelfTest
 	private static final int BOX_1_2_PRODUCT_COUNT = 2;
 
 	@BeforeClass
-	public static final void createShelf() throws ClassNotFoundException, ExistingDatabaseLinkException, NoDatabaseException, NoDatabaseLinkException
+	public static final void createShelf() throws NoDatabaseException, NoDatabaseLinkException
 	{
 		System.out.println("\n\n\n------beforeclass----------");
 		DatabaseController.resetDatabase();
@@ -72,16 +69,10 @@ public class ShelfTest
 	}
 
 	@After
-	public void resetDB()
-			throws ClassNotFoundException, NoDatabaseException, NoDatabaseLinkException, ExistingDatabaseLinkException, UniqueKeyViolationException
+	public void resetDB() throws NoDatabaseException, NoDatabaseLinkException
 	{
 		System.out.println("\n\n\n------after----------");
-
-		assertTrue(DatabaseController.link() != DatabaseFileState.DOES_NOT_EXIST);
-		assertTrue(DatabaseController.deleteAllData());
-		assertTrue(DatabaseController.loadSampleData());
-
-		System.out.println(DatabaseController.getProductBrandByID(1));
+		DatabaseController.resetDatabase();
 		System.out.println("---------after-------\n\n\n");
 	}
 

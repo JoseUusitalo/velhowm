@@ -8,14 +8,14 @@ package velho.model.enums;
 public enum DatabaseTable
 {
 	//@formatter:off
-	ROLES,
+	//ROLES,
 	USERS,
 	BRANDS,
 	TYPES,
 	CATEGORIES,
 	PRODUCTS,
 	CONTAINERS,
-	FREEZER_PRODUCTS,
+	//FREEZER_PRODUCTS,
 	SHELVES,
 	SHELFLEVELS,
 	SHELFSLOTS,

@@ -277,19 +277,20 @@ public class DatabaseController
 											getRoleByID(result.getInt("role"))));
 								break;
 
-							case ROLES:
-								if (columns.length == 1 && Arrays.asList(columns).contains("name"))
-								{
-									while (result.next())
-										dataSet.add(result.getString("name"));
-								}
-								else if (columns.length == 1 && Arrays.asList(columns).contains("role_id"))
-								{
-									while (result.next())
-										dataSet.add(result.getInt("role_id"));
-								}
-								break;
-
+							/*
+							 * case ROLES:
+							 * if (columns.length == 1 && Arrays.asList(columns).contains("name"))
+							 * {
+							 * while (result.next())
+							 * dataSet.add(result.getString("name"));
+							 * }
+							 * else if (columns.length == 1 && Arrays.asList(columns).contains("role_id"))
+							 * {
+							 * while (result.next())
+							 * dataSet.add(result.getInt("role_id"));
+							 * }
+							 * break;
+							 */
 							case BRANDS:
 								while (result.next())
 									dataSet.add(new ProductBrand(result.getInt("brand_id"), result.getString("name")));
@@ -570,7 +571,7 @@ public class DatabaseController
 				switch (tableName)
 				{
 					case USERS:
-					case ROLES:
+						// case ROLES:
 					case TYPES:
 					case BRANDS:
 					case CATEGORIES:
@@ -1079,14 +1080,15 @@ public class DatabaseController
 	/**
 	 * Gets an object from the database with the given database ID.
 	 *
-	 * @param className the name of the class of the object
-	 * @param idColumnName the name of the database ID column
+	 * @param objectClass the name class of the object to get
 	 * @param databaseID the database ID of the object
 	 * @return the corresponding object or <code>null</code> for invalid ID
 	 * @throws HibernateException when the query failed to commit and has been rolled back
 	 */
-	private static Object getByID(final String className, final String idColumnName, final int databaseID) throws HibernateException
+	private static Object getByID(final Class objectClass, final int databaseID) throws HibernateException
 	{
+		// TODO: Database object abstract class.
+
 		if (databaseID < 1)
 			return null;
 
@@ -1094,7 +1096,7 @@ public class DatabaseController
 		session.beginTransaction();
 
 		@SuppressWarnings("unchecked")
-		final List<RemovalList> result = session.createQuery("from " + className + " where " + idColumnName + " = :id").setParameter("id", databaseID).list();
+		final Object result = session.get(objectClass, databaseID);
 
 		try
 		{
@@ -1108,8 +1110,7 @@ public class DatabaseController
 			throw new HibernateException("Failed to commit.");
 		}
 
-		// Only one result should be returned by the query.
-		return result.get(0);
+		return result;
 	}
 
 	/**
@@ -1450,7 +1451,7 @@ public class DatabaseController
 	 */
 	public static ProductType getProductTypeByID(final int id) throws HibernateException
 	{
-		return (ProductType) getByID("ProductType", "type_id", id);
+		return (ProductType) getByID(ProductType.class, id);
 	}
 
 	/**
@@ -1462,7 +1463,7 @@ public class DatabaseController
 	 */
 	public static ProductCategory getProductCategoryByID(final int id) throws HibernateException
 	{
-		return (ProductCategory) getByID("ProductCategory", "category_id", id);
+		return (ProductCategory) getByID(ProductCategory.class, id);
 	}
 
 	/**
@@ -1474,7 +1475,7 @@ public class DatabaseController
 	 */
 	public static ProductBrand getProductBrandByID(final int id) throws HibernateException
 	{
-		return (ProductBrand) getByID("ProductBrand", "brand_id", id);
+		return (ProductBrand) getByID(ProductBrand.class, id);
 	}
 
 	/**
@@ -1576,7 +1577,7 @@ public class DatabaseController
 	 */
 	public static Product getProductByID(final int id) throws HibernateException
 	{
-		return (Product) getByID("Product", "product_id", id);
+		return (Product) getByID(Product.class, id);
 	}
 
 	/**
@@ -1588,7 +1589,7 @@ public class DatabaseController
 	 */
 	public static ProductBox getProductBoxByID(final int id) throws HibernateException
 	{
-		return (ProductBox) getByID("ProductBox", "container_id", id);
+		return (ProductBox) getByID(ProductBox.class, id);
 	}
 
 	/**
@@ -1646,7 +1647,7 @@ public class DatabaseController
 	 */
 	public static Shelf getShelfByID(final int id) throws HibernateException
 	{
-		return (Shelf) getByID("Shelf", "shelf_id", id);
+		return (Shelf) getByID(Shelf.class, id);
 	}
 
 	/**
@@ -1658,7 +1659,7 @@ public class DatabaseController
 	 */
 	public static RemovalList getRemovalListByID(final int id) throws HibernateException
 	{
-		return (RemovalList) getByID("RemovalList", "removallist_id", id);
+		return (RemovalList) getByID(RemovalList.class, id);
 	}
 
 	/**
@@ -1670,7 +1671,7 @@ public class DatabaseController
 	 */
 	public static Manifest getManifestByID(final int id) throws HibernateException
 	{
-		return (Manifest) getByID("Manifest", "manifest_id", id);
+		return (Manifest) getByID(Manifest.class, id);
 	}
 
 	/**
@@ -1882,7 +1883,7 @@ public class DatabaseController
 	 */
 	public static RemovalListState getRemovalListStateByID(final int id) throws HibernateException
 	{
-		return (RemovalListState) getByID("RemovalListState", "removallist_state_id", id);
+		return (RemovalListState) getByID(RemovalListState.class, id);
 	}
 
 	/**
@@ -1894,7 +1895,7 @@ public class DatabaseController
 	 */
 	public static ManifestState getManifestStateByID(final int id) throws HibernateException
 	{
-		return (ManifestState) getByID("ManifestState", "manifest_state_id", id);
+		return (ManifestState) getByID(ManifestState.class, id);
 	}
 
 	/**
@@ -1906,7 +1907,7 @@ public class DatabaseController
 	 */
 	public static RemovalPlatform getRemovalPlatformByID(final int id)
 	{
-		return (RemovalPlatform) getByID("RemovalPlatform", "platform_id", id);
+		return (RemovalPlatform) getByID(RemovalPlatform.class, id);
 	}
 
 	/*
@@ -1948,40 +1949,42 @@ public class DatabaseController
 	 *
 	 * @return <code>true</code> if database changed as a result of this call
 	 */
-	public static boolean deleteAllData() throws NoDatabaseException, NoDatabaseException, NoDatabaseLinkException
+	public static boolean deleteAllData() throws NoDatabaseException, NoDatabaseException
 	{
 		DBLOG.info("Truncating database...");
 
 		if (!databaseExists())
 			throw new NoDatabaseException();
 
+		final Session session = sessionFactory.openSession();
+		Transaction transaction = session.beginTransaction();
+
 		boolean notChanged = false;
+		int changes = 0;
 
-		try
+		session.createSQLQuery("SET REFERENTIAL_INTEGRITY FALSE;").executeUpdate();
+		transaction.commit();
+
+		for (final DatabaseTable table : DatabaseTable.values())
 		{
-			runQuery("SET REFERENTIAL_INTEGRITY FALSE;");
+			transaction = session.beginTransaction();
+			changes = session.createSQLQuery("TRUNCATE TABLE " + table.toString() + ";").executeUpdate();
+			transaction.commit();
 
-			for (final DatabaseTable table : DatabaseTable.values())
-			{
-				notChanged = notChanged && (0 == (Integer) runQuery("TRUNCATE TABLE " + table.toString() + ";"));
-				DBLOG.debug("Truncate table: " + table.toString() + " | " + !notChanged);
-			}
+			DBLOG.debug("Truncate table: " + table.toString() + " | changed rows: " + changes);
+			notChanged = notChanged && (changes == 0);
+		}
 
-			runQuery("SET REFERENTIAL_INTEGRITY TRUE;");
-		}
-		catch (UniqueKeyViolationException e)
-		{
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		transaction = session.beginTransaction();
+		session.createSQLQuery("SET REFERENTIAL_INTEGRITY TRUE;").executeUpdate();
+		transaction.commit();
+
+		session.close();
 
 		if (!notChanged)
 			DBLOG.info("Database contents deleted.");
-
-		System.out.println("\n\n\n\n++++++++++++++++++++++++++++++");
-		System.out.println("                       " + getAllProductBrands());
-		System.out.println("                       " + getAllProductBrands().size());
-		System.out.println("\n\n\n\n++++++++++++++++++++++++++++++");
+		else
+			DBLOG.info("Failed to delete database contents.");
 
 		return !notChanged;
 	}
@@ -1999,11 +2002,6 @@ public class DatabaseController
 
 		if (!databaseExists())
 			throw new NoDatabaseException();
-
-		System.out.println("\n\n\n\n++++++++++++++++++++++++++++++");
-		System.out.println("                       " + getAllProductBrands());
-		System.out.println("                       " + getAllProductBrands().size());
-		System.out.println("\n\n\n\n++++++++++++++++++++++++++++++");
 
 		final boolean changed = (0 != (Integer) runQuery("RUNSCRIPT FROM './data/sample_data.sql';"));
 
@@ -2537,11 +2535,24 @@ public class DatabaseController
 	 */
 	public static boolean resetDatabase() throws NoDatabaseException, NoDatabaseLinkException
 	{
+		try
+		{
+			if (!isLinked())
+				DatabaseController.link();
+		}
+		catch (final ClassNotFoundException e)
+		{
+			e.printStackTrace();
+		}
+		catch (final ExistingDatabaseLinkException e1)
+		{
+			// Ignore.
+		}
+
 		/*
 		 * This is absurd. If I use the code below it somehow skips the method calls to deleteAllData() and
 		 * loadSampleData()!
 		 * I have't the slightest clue what on earth is going on.
-		 *
 		 * failure = failure && !deleteAllData();
 		 * failure = failure && !loadSampleData();
 		 */

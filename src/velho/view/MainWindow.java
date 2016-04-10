@@ -43,7 +43,6 @@ import velho.controller.SearchController;
 import velho.controller.UIController;
 import velho.controller.UserController;
 import velho.model.exceptions.ExistingDatabaseLinkException;
-import velho.model.exceptions.NoDatabaseException;
 import velho.model.exceptions.NoDatabaseLinkException;
 
 /**
@@ -203,16 +202,9 @@ public class MainWindow extends Application
 		try
 		{
 			DatabaseController.link();
-
-			// FIXME: TEMP!
-			DatabaseController.resetDatabase();
-
-			System.out.println(DatabaseController.getProductBrandByID(1));
-			System.out.println("\n\n\n----------------");
 		}
-		catch (NoDatabaseException | NoDatabaseLinkException | ClassNotFoundException | ExistingDatabaseLinkException e)
+		catch (ClassNotFoundException | ExistingDatabaseLinkException e)
 		{
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}

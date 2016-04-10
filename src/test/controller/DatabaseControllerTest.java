@@ -24,7 +24,6 @@ import velho.model.ProductBox;
 import velho.model.ProductBoxSearchResultRow;
 import velho.model.RemovalList;
 import velho.model.User;
-import velho.model.exceptions.ExistingDatabaseLinkException;
 import velho.model.exceptions.NoDatabaseException;
 import velho.model.exceptions.NoDatabaseLinkException;
 import velho.model.exceptions.UniqueKeyViolationException;
@@ -38,8 +37,7 @@ import velho.model.exceptions.UniqueKeyViolationException;
 public class DatabaseControllerTest
 {
 	@BeforeClass
-	public final static void connectAndInitializeDatabase()
-			throws ClassNotFoundException, NoDatabaseLinkException, ExistingDatabaseLinkException, NoDatabaseException
+	public final static void connectAndInitializeDatabase() throws NoDatabaseException, NoDatabaseLinkException
 	{
 		assertTrue(DatabaseController.resetDatabase());
 	}
@@ -57,7 +55,7 @@ public class DatabaseControllerTest
 	}
 
 	@Test
-	public final void testFailInitialization() throws ClassNotFoundException, ExistingDatabaseLinkException, NoDatabaseException
+	public final void testFailInitialization() throws NoDatabaseException
 	{
 		try
 		{
@@ -186,7 +184,7 @@ public class DatabaseControllerTest
 	}
 
 	@Test
-	public final void testDeleteUser1() throws NoDatabaseLinkException, NoDatabaseException, ClassNotFoundException, ExistingDatabaseLinkException
+	public final void testDeleteUser1() throws NoDatabaseLinkException, NoDatabaseException
 	{
 		final ObservableList<Object> users = DatabaseController.getAllUsers();
 		final User user = DatabaseController.getUserByID(1);
