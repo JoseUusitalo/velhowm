@@ -5,6 +5,8 @@ import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 
+import org.apache.log4j.Logger;
+
 /**
  * A horizontal level in a {@link Shelf} that contains one or more {@link ShelfSlot}s.
  *
@@ -12,6 +14,14 @@ import java.util.TreeSet;
  */
 public class ShelfLevel implements Comparable<ShelfLevel>
 {
+	/**
+	 * Apache log4j logger: System.
+	 */
+	private static final Logger SYSLOG = Logger.getLogger(ShelfLevel.class.getName());
+
+	/**
+	 * The database ID of this {@link Shelf} level.
+	 */
 	private int databaseID;
 
 	private int shelfPosition;
@@ -154,7 +164,10 @@ public class ShelfLevel implements Comparable<ShelfLevel>
 		for (final ShelfSlot slot : shelfSlots)
 		{
 			if (slot.getLevelPosition() == slotPosition)
+			{
+				SYSLOG.trace("Slot DBID: " + slot.getDatabaseID());
 				return slot;
+			}
 		}
 
 		return null;

@@ -245,9 +245,15 @@ public class ShelfTest
 
 		System.out.println("before " + shelf_FREE_LVL_2.getShelfSlot(slotid).getProductBoxes());
 		System.out.println("add " + BOX_1);
+		System.out.println(shelf_FREE_LVL_2);
+
 		assertTrue(shelf_FREE_LVL_2.addToSlot(slotid, BOX_1));
-		System.out.println("before " + shelf_FREE_LVL_2.getShelfSlot(slotid).getProductBoxes());
+
+		System.out.println("after " + shelf_FREE_LVL_2.getShelfSlot(slotid).getProductBoxes());
+
+		System.out.println(shelf_FREE_LVL_2);
 		assertEquals(oldBoxCount + 1, shelf_FREE_LVL_2.getProductBoxes().size());
+		assertTrue(shelf_FREE_LVL_2.getProductBoxes().contains(BOX_1));
 		assertTrue(shelf_FREE_LVL_2.getShelfSlot(slotid).contains(BOX_1));
 		assertEquals(oldProductCount + BOX_1_2_PRODUCT_COUNT, shelf_FREE_LVL_2.getProductCountInBoxes());
 	}

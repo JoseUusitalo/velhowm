@@ -5,6 +5,8 @@ import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 
+import org.apache.log4j.Logger;
+
 /**
  * A class representing a physical shelf structure in the warehouse.
  *
@@ -12,6 +14,11 @@ import java.util.TreeSet;
  */
 public class Shelf implements Comparable<Shelf>
 {
+	/**
+	 * Apache log4j logger: System.
+	 */
+	private static final Logger SYSLOG = Logger.getLogger(Shelf.class.getName());
+
 	/**
 	 * The identifier of a shelf in IDs.
 	 */
@@ -427,10 +434,15 @@ public class Shelf implements Comparable<Shelf>
 	{
 		final int[] tokens = tokenizeAndValidateShelfSlotID(shelfSlotID);
 
+		SYSLOG.trace("Looking for shelf slot " + shelfSlotID + ".");
+
 		for (final ShelfLevel level : shelfLevels)
 		{
 			if (level.getShelfPosition() == tokens[1])
+			{
+				SYSLOG.trace("Level DBID: " + level.getDatabaseID());
 				return level.getShelfSlot(tokens[1]);
+			}
 		}
 
 		return null;
