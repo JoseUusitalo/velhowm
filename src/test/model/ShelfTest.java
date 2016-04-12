@@ -9,7 +9,6 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.junit.After;
-import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -46,12 +45,10 @@ public class ShelfTest
 	private static final int BOX_1_2_PRODUCT_COUNT = 2;
 
 	@BeforeClass
-	public static final void createShelf() throws NoDatabaseException, NoDatabaseLinkException
+	public static final void initializeData() throws NoDatabaseException, NoDatabaseLinkException
 	{
-		System.out.println("\n\n\n------beforeclass----------");
+		System.out.println("------beforeclass----------");
 		DatabaseController.resetDatabase();
-		System.out.println(DatabaseController.getProductBrandByID(1));
-		System.out.println("------beforeclass----------\n\n\n");
 
 		fullShelf_LVL_1_SLTPOS_1 = DatabaseController.getShelfByID(FULLSHELF_LVL_1_SLTPOS_1_ID);
 		shelf_FREE_LVL_2 = DatabaseController.getShelfByID(SHELF_FREE_LVL_2_ID);
@@ -65,21 +62,23 @@ public class ShelfTest
 		System.out.println(fullShelf_LVL_1_SLTPOS_1);
 		System.out.println(shelf_FREE_LVL_2);
 		System.out.println(emptyShelf_1_1_to_1_2);
-		System.out.println("--Tests--");
+		System.out.println("------beforeclass----------\n\n\n");
 	}
 
 	@After
-	public void resetDB() throws NoDatabaseException, NoDatabaseLinkException
+	public void resetDatabase() throws NoDatabaseException, NoDatabaseLinkException
 	{
-		System.out.println("\n\n\n------after----------");
-		DatabaseController.resetDatabase();
-		System.out.println("---------after-------\n\n\n");
-	}
+		System.out.println("\n------after----------");
 
-	@AfterClass
-	public static final void unlinkDatabase()
-	{
-		System.out.println("--Done--");
+		DatabaseController.resetDatabase();
+		fullShelf_LVL_1_SLTPOS_1 = DatabaseController.getShelfByID(FULLSHELF_LVL_1_SLTPOS_1_ID);
+		shelf_FREE_LVL_2 = DatabaseController.getShelfByID(SHELF_FREE_LVL_2_ID);
+		emptyShelf_1_1_to_1_2 = DatabaseController.getShelfByID(EMPTYSHELF_1_1_to_1_2_ID);
+		EMPTY_BOX = DatabaseController.getProductBoxByID(23);
+		BOX_1 = DatabaseController.getProductBoxByID(21);
+		BOX_2 = DatabaseController.getProductBoxByID(22);
+
+		System.out.println("---------after-------\n");
 	}
 
 	@Test(expected = IllegalArgumentException.class)
@@ -163,7 +162,7 @@ public class ShelfTest
 		System.out.println(shelf_FREE_LVL_2);
 		System.out.println(shelf_FREE_LVL_2.getFreeShelfSlots());
 
-		assertTrue(shelf_FREE_LVL_2.getFreeShelfSlots().contains(slotid));
+		assertTrue(shelf_FREE_LVL_2.getFreeShelfSlots().contains(shelf_FREE_LVL_2.getShelfSlot(slotid)));
 	}
 
 	@Test
@@ -187,6 +186,7 @@ public class ShelfTest
 	@Test
 	public final void testIsEmpty_Empty()
 	{
+		System.out.println(emptyShelf_1_1_to_1_2.getProductBoxes());
 		assertTrue(emptyShelf_1_1_to_1_2.isEmpty());
 	}
 
@@ -244,12 +244,14 @@ public class ShelfTest
 		final int oldProductCount = shelf_FREE_LVL_2.getProductCountInBoxes();
 
 		System.out.println("before " + shelf_FREE_LVL_2.getShelfSlot(slotid).getProductBoxes());
+		System.out.println(shelf_FREE_LVL_2.getProductBoxes());
 		System.out.println("add " + BOX_1);
 		System.out.println(shelf_FREE_LVL_2);
 
 		assertTrue(shelf_FREE_LVL_2.addToSlot(slotid, BOX_1));
 
 		System.out.println("after " + shelf_FREE_LVL_2.getShelfSlot(slotid).getProductBoxes());
+		System.out.println(shelf_FREE_LVL_2.getProductBoxes());
 
 		System.out.println(shelf_FREE_LVL_2);
 		assertEquals(oldBoxCount + 1, shelf_FREE_LVL_2.getProductBoxes().size());
@@ -331,7 +333,7 @@ public class ShelfTest
 	@Test
 	public final void testAddToSlot_Full() throws IllegalArgumentException
 	{
-		assertTrue(emptyShelf_1_1_to_1_2.addToSlot(emptyShelf_1_1_to_1_2.getShelfID() + "-1-0", BOX_1));
-		assertFalse(emptyShelf_1_1_to_1_2.addToSlot(emptyShelf_1_1_to_1_2.getShelfID() + "-1-0", BOX_2));
+		assertTrue(emptyShelf_1_1_to_1_2.addToSlot(emptyShelf_1_1_to_1_2.getShelfID() + "-1-1", BOX_1));
+		assertFalse(emptyShelf_1_1_to_1_2.addToSlot(emptyShelf_1_1_to_1_2.getShelfID() + "-1-1", BOX_2));
 	}
 }
