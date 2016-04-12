@@ -65,7 +65,7 @@ public class MainWindow extends Application
 	/**
 	 * Enable or disable debug features.
 	 */
-	public static final boolean DEBUG_MODE = true;
+	public static final boolean DEBUG_MODE = false;
 
 	/**
 	 * Enable or disable showing windows. DEBUG_MODE must be <code>true</code>
@@ -222,7 +222,8 @@ public class MainWindow extends Application
 				{
 					/*
 					 * This is how we prevent Logisticians from reading logs.
-					 * Logs can now only be read through the database, access to which can easily be limited.
+					 * Logs can now only be read through the database, access to
+					 * which can easily be limited.
 					 */
 					SYSLOG.info("Debug mode not enabled, disabling file and console appenders for all loggers.");
 
