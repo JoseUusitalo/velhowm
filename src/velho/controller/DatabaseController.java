@@ -2108,6 +2108,37 @@ public class DatabaseController
 	 * @param object new or existing object in the database
 	 * @return the database ID of the inserted or updated object
 	 * @throws HibernateException when data was not saved
+	 */
+	public static int save(final Shelf object)
+	{
+		final Session session = sessionFactory.openSession();
+		final Transaction transaction = session.beginTransaction();
+
+		session.saveOrUpdate(object);
+
+		try
+		{
+			transaction.commit();
+			session.close();
+		}
+		catch (final HibernateException e)
+		{
+			transaction.rollback();
+			session.close();
+			throw new HibernateException("Failed to commit.");
+		}
+
+		DBLOG.debug("Saved/Updated: " + object);
+
+		return object.getDatabaseID();
+	}
+
+	/**
+	 * Creates a new or updates an existing object depending on whether the given object exists in the database.
+	 *
+	 * @param object new or existing object in the database
+	 * @return the database ID of the inserted or updated object
+	 * @throws HibernateException when data was not saved
 	 * @throws ConstraintViolationException when the user already exists in the database
 	 */
 	public static int save(final User object) throws ConstraintViolationException
