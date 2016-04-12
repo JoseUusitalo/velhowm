@@ -19,7 +19,7 @@
 		<property	name="maxProductBoxes"
 					column="max_productboxes"
 					type="int" />
-		
+
 		<set		name="productBoxes"
 					table="SHELFSLOT_PRODUCTBOXES"
 					cascade="all"
@@ -30,9 +30,9 @@
 							column="productbox"
 							unique="true" />
 		</set>
-		
+
 		<!-- This is the inverse "child" side. Updates here do not cascade? -->
-		<join		table="SHELFSLOT_PRODUCTBOXES"
+		<join		table="SHELFLEVEL_SHELFSLOTS"
 					optional="true"
 					inverse="true">
 			<key	column="shelfslot"
