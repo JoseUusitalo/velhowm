@@ -4,6 +4,8 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 
+import org.apache.log4j.Logger;
+
 /**
  * A Shelf Slot represents an indexed area with {@link ProductBox} objects on a {@link ShelfLevel}.
  *
@@ -11,6 +13,11 @@ import java.util.Set;
  */
 public class ShelfSlot implements Comparable<ShelfSlot>
 {
+	/**
+	 * Apache log4j logger: System.
+	 */
+	private static final Logger SYSLOG = Logger.getLogger(ShelfSlot.class.getName());
+
 	/**
 	 * A separator string between values in shelf slot IDs.
 	 */
@@ -51,15 +58,18 @@ public class ShelfSlot implements Comparable<ShelfSlot>
 
 		if (maxBoxesInSlot < 1)
 			throw new IllegalArgumentException("[" + databaseID + "] Maxmimum ProductBox count must be greater than 0, was " + maxBoxesInSlot + ".");
+
+		this.maxProductBoxes = maxBoxesInSlot;
+
 		if (levelPosition < 1)
 			throw new IllegalArgumentException("[" + databaseID + "] Level position must be greater than 0, was " + levelPosition + ".");
 
-		this.maxProductBoxes = maxBoxesInSlot;
+		this.levelPosition = levelPosition;
 
 		productBoxes = new HashSet<ProductBox>();
 	}
 
-	public ShelfSlot(final ShelfLevel parentShelfLevel, final int levelPosition, final int maxBoxesInSlot)
+	public ShelfSlot(final int levelPosition, final int maxBoxesInSlot, final ShelfLevel parentShelfLevel)
 	{
 		this(0, levelPosition, maxBoxesInSlot, parentShelfLevel);
 	}
@@ -183,15 +193,22 @@ public class ShelfSlot implements Comparable<ShelfSlot>
 	 */
 	public boolean addBox(final ProductBox box)
 	{
+		SYSLOG.trace("Adding product box " + box + " to shelf slot: " + this);
+
 		if (productBoxes.size() + 1 > maxProductBoxes)
+		{
+			SYSLOG.trace("Adding product box + " + box + " failed: shelf slot was full.");
 			return false;
+		}
 
 		if (productBoxes.add(box))
 		{
 			box.setShelfSlot(this);
+			SYSLOG.trace("Product box + " + box + " was successfully added.");
 			return true;
 		}
 
+		SYSLOG.trace("Adding product box + " + box + " failed: box set already contains the box.");
 		return false;
 	}
 
