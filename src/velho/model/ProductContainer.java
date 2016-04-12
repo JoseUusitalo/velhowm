@@ -234,9 +234,9 @@ public abstract class ProductContainer implements Comparable<ProductContainer>
 	}
 
 	/**
-	 * Sets the shelf slot ID of this product container
+	 * Sets the shelf slot of this product container.
 	 *
-	 * @param shelfSlot the new shelf slot ID string
+	 * @param shelfSlot the shelf slot object
 	 */
 	public void setShelfSlot(final ShelfSlot shelfSlot)
 	{
