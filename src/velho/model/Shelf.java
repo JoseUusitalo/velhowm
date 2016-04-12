@@ -229,10 +229,9 @@ public class Shelf implements Comparable<Shelf>
 		if (tokens[1] > levelCount || tokens[1] < 0)
 			throw new IllegalArgumentException("Invalid shelf slot ID '" + shelfSlotID + "': invalid level " + tokens[1]);
 
-		// TODO: Remove or fix this?
 		// Enough slots?
-		// if (tokens[2] >= maxSlotsPerLevel || tokens[2] < 0)
-		// throw new IllegalArgumentException("Invalid shelf slot ID '" + shelfSlotID + "': invalid slot");
+		if (tokens[2] > getShelfLevel(tokens[1]).getMaxShelfSlots() || tokens[2] < 0)
+			throw new IllegalArgumentException("Invalid shelf slot ID '" + shelfSlotID + "': invalid slot");
 
 		return tokens;
 	}
@@ -425,22 +424,32 @@ public class Shelf implements Comparable<Shelf>
 
 		final int[] tokens = tokenizeAndValidateShelfSlotID(shelfSlotID);
 
-		for (final ShelfLevel level : shelfLevels)
+		final ShelfLevel level = getShelfLevel(tokens[1]);
+
+		if (level != null)
 		{
-			if (level.getShelfPosition() == tokens[1])
+			try
 			{
-				try
-				{
-					return level.addToSlot(tokens[2], productBox);
-				}
-				catch (InvalidAttributesException e)
-				{
-					e.printStackTrace();
-				}
+				return level.addToSlot(tokens[2], productBox);
+			}
+			catch (InvalidAttributesException e)
+			{
+				e.printStackTrace();
 			}
 		}
 
 		return false;
+	}
+
+	public ShelfLevel getShelfLevel(final int shelfPosition)
+	{
+		for (final ShelfLevel level : shelfLevels)
+		{
+			if (level.getShelfPosition() == shelfPosition)
+				return level;
+		}
+
+		return null;
 	}
 
 	public ShelfSlot getShelfSlot(final String shelfSlotID)
@@ -449,13 +458,12 @@ public class Shelf implements Comparable<Shelf>
 
 		SYSLOG.trace("Looking for shelf slot " + shelfSlotID + ".");
 
-		for (final ShelfLevel level : shelfLevels)
+		final ShelfLevel level = getShelfLevel(tokens[1]);
+
+		if (level != null)
 		{
-			if (level.getShelfPosition() == tokens[1])
-			{
-				SYSLOG.trace("Level: " + level);
-				return level.getShelfSlot(tokens[2]);
-			}
+			SYSLOG.trace("Level: " + level);
+			return level.getShelfSlot(tokens[2]);
 		}
 
 		return null;
