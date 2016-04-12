@@ -5,6 +5,8 @@ import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 
+import javax.naming.directory.InvalidAttributesException;
+
 import org.apache.log4j.Logger;
 
 /**
@@ -64,7 +66,7 @@ public class ShelfLevel implements Comparable<ShelfLevel>
 	@Override
 	public String toString()
 	{
-		return "ShelfLevel [" + databaseID + "]";
+		return parentShelf.getShelfID() + ShelfSlot.ID_SEPARATOR + shelfPosition;
 	}
 
 	@Override
@@ -148,8 +150,13 @@ public class ShelfLevel implements Comparable<ShelfLevel>
 		this.shelfSlots = shelfSlots;
 	}
 
-	public boolean addToSlot(final int slotPosition, final ProductBox productBox)
+	public boolean addToSlot(final int slotPosition, final ProductBox productBox) throws InvalidAttributesException
 	{
+		SYSLOG.trace("Adding product box " + productBox + " to shelf level slot at position " + slotPosition + " in the shelf level: " + toString());
+
+		if (shelfSlots.isEmpty())
+			throw new InvalidAttributesException("Shelf level must contain at least one shelf slot.");
+
 		for (final ShelfSlot slot : shelfSlots)
 		{
 			if (slot.getLevelPosition() == slotPosition)
@@ -165,7 +172,7 @@ public class ShelfLevel implements Comparable<ShelfLevel>
 		{
 			if (slot.getLevelPosition() == slotPosition)
 			{
-				SYSLOG.trace("Slot DBID: " + slot.getDatabaseID());
+				SYSLOG.trace("Slot: " + slot);
 				return slot;
 			}
 		}

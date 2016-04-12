@@ -5,6 +5,8 @@ import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 
+import javax.naming.directory.InvalidAttributesException;
+
 import org.apache.log4j.Logger;
 
 /**
@@ -416,6 +418,8 @@ public class Shelf implements Comparable<Shelf>
 	 */
 	public boolean addToSlot(final String shelfSlotID, final ProductBox productBox) throws IllegalArgumentException
 	{
+		SYSLOG.trace("Adding product box " + productBox + " to shelf slot " + shelfSlotID + " in the shelf: " + toString());
+
 		if (productBox == null)
 			throw new IllegalArgumentException("Null product box.");
 
@@ -424,7 +428,16 @@ public class Shelf implements Comparable<Shelf>
 		for (final ShelfLevel level : shelfLevels)
 		{
 			if (level.getShelfPosition() == tokens[1])
-				return level.addToSlot(tokens[2], productBox);
+			{
+				try
+				{
+					return level.addToSlot(tokens[2], productBox);
+				}
+				catch (InvalidAttributesException e)
+				{
+					e.printStackTrace();
+				}
+			}
 		}
 
 		return false;
@@ -440,8 +453,8 @@ public class Shelf implements Comparable<Shelf>
 		{
 			if (level.getShelfPosition() == tokens[1])
 			{
-				SYSLOG.trace("Level DBID: " + level.getDatabaseID());
-				return level.getShelfSlot(tokens[1]);
+				SYSLOG.trace("Level: " + level);
+				return level.getShelfSlot(tokens[2]);
 			}
 		}
 
