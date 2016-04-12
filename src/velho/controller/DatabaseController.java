@@ -165,6 +165,11 @@ public class DatabaseController
 	 */
 	private static ObservableList<Object> observableShelves = FXCollections.observableArrayList();
 
+	/**
+	 * An observable list of {@link RemovalPlatform} objects for display in the user interface.
+	 */
+	private static ObservableList<Object> observableRemovalPlatforms = FXCollections.observableArrayList();
+
 	/*
 	 * -------------------------------- PRIVATE DATABASE METHODS --------------------------------
 	 */
@@ -2373,7 +2378,6 @@ public class DatabaseController
 	}
 
 	/**
-	 * <<<<<<< HEAD
 	 * Gets all badge IDs from the database.
 	 *
 	 * @return a list of badge id number strings
@@ -2394,13 +2398,20 @@ public class DatabaseController
 	}
 
 	/**
-	 * Loads the following objects into memory:
-	 * <ul>
-	 * <li>{@link Shelf}</li>
-	 * </ul>
-	 * =======
+	 * Loads all {@link RemovalPlatform} objects from the database into memory.
+	 *
+	 * @return a list of removal platforms in the database
+	 * @throws HibernateException when the query failed to commit and has been rolled back
+	 */
+	public static ObservableList<Object> getAllRemovalPlatforms() throws HibernateException
+	{
+		observableRemovalPlatforms.clear();
+		observableRemovalPlatforms.addAll(getAll("RemovalPlatform"));
+		return observableRemovalPlatforms;
+	}
+
+	/**
 	 * Loads all {@link Shelf} objects from the database into memory.
-	 * >>>>>>> refs/heads/hibernate510
 	 *
 	 * @return a list of removal lists in the database
 	 * @throws HibernateException when the query failed to commit and has been rolled back
