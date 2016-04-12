@@ -77,13 +77,13 @@ public class MainWindow extends Application
 	 * Enable TRACE level logging. DEBUG_MODE must be <code>true</code> for this
 	 * to affect anything.
 	 */
-	public static final boolean SHOW_TRACE = true;
+	public static final boolean SHOW_TRACE = false;
 
 	/**
 	 * Skips the entire main application code. DEBUG_MODE must be <code>true</code> for this
 	 * to affect anything.
 	 */
-	public static final boolean SKIP_MAIN_CODE = true;
+	public static final boolean SKIP_MAIN_CODE = false;
 
 	/**
 	 * The height of the window.
@@ -270,7 +270,14 @@ public class MainWindow extends Application
 
 		try
 		{
-			DatabaseController.link();
+			try
+			{
+				DatabaseController.link();
+			}
+			catch (ExistingDatabaseLinkException e)
+			{
+				// Ignore.
+			}
 
 			if (DatabaseController.isLinked())
 			{
@@ -312,7 +319,7 @@ public class MainWindow extends Application
 				System.exit(0);
 			}
 		}
-		catch (ClassNotFoundException | ExistingDatabaseLinkException e1)
+		catch (ClassNotFoundException e1)
 		{
 			e1.printStackTrace();
 		}
