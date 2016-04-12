@@ -43,7 +43,9 @@ import velho.controller.SearchController;
 import velho.controller.UIController;
 import velho.controller.UserController;
 import velho.model.exceptions.ExistingDatabaseLinkException;
+import velho.model.exceptions.NoDatabaseException;
 import velho.model.exceptions.NoDatabaseLinkException;
+import velho.model.exceptions.UniqueKeyViolationException;
 
 /**
  * The main window and class for Velho Warehouse Management.
@@ -77,7 +79,7 @@ public class MainWindow extends Application
 	 * Enable TRACE level logging. DEBUG_MODE must be <code>true</code> for this
 	 * to affect anything.
 	 */
-	public static final boolean SHOW_TRACE = false;
+	public static final boolean SHOW_TRACE = true;
 
 	/**
 	 * Skips the entire main application code. DEBUG_MODE must be <code>true</code> for this
@@ -202,8 +204,9 @@ public class MainWindow extends Application
 		try
 		{
 			DatabaseController.link();
+			DatabaseController.loadSampleData();
 		}
-		catch (ClassNotFoundException | ExistingDatabaseLinkException e)
+		catch (ClassNotFoundException | ExistingDatabaseLinkException | NoDatabaseException | NoDatabaseLinkException | UniqueKeyViolationException e)
 		{
 			e.printStackTrace();
 		}

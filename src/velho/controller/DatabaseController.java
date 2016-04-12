@@ -165,6 +165,11 @@ public class DatabaseController
 	 */
 	private static ObservableList<Object> observableShelves = FXCollections.observableArrayList();
 
+	/**
+	 * An observable list of {@link RemovalPlatform} objects for display in the user interface.
+	 */
+	private static ObservableList<Object> observableRemovalPlatforms = FXCollections.observableArrayList();
+
 	/*
 	 * -------------------------------- PRIVATE DATABASE METHODS --------------------------------
 	 */
@@ -2390,6 +2395,19 @@ public class DatabaseController
 		observableProductBoxes.clear();
 		observableProductBoxes.addAll(getAll("ProductBox"));
 		return observableProductBoxes;
+	}
+
+	/**
+	 * Loads all {@link RemovalPlatform} objects from the database into memory.
+	 *
+	 * @return a list of removal platforms in the database
+	 * @throws HibernateException when the query failed to commit and has been rolled back
+	 */
+	public static ObservableList<Object> getAllRemovalPlatforms() throws HibernateException
+	{
+		observableRemovalPlatforms.clear();
+		observableRemovalPlatforms.addAll(getAll("RemovalPlatform"));
+		return observableRemovalPlatforms;
 	}
 
 	/**
