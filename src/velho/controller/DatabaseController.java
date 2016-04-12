@@ -1971,7 +1971,7 @@ public class DatabaseController
 			changes = session.createSQLQuery("TRUNCATE TABLE " + table.toString() + ";").executeUpdate();
 			transaction.commit();
 
-			DBLOG.debug("Truncate table: " + table.toString() + " | changed rows: " + changes);
+			DBLOG.trace("Truncate table: " + table.toString() + " | changed rows: " + changes);
 			notChanged = notChanged && (changes == 0);
 		}
 
