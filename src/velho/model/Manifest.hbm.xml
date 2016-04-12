@@ -35,6 +35,7 @@
 						fetch="select"
 						lazy="false" />
 		
+		<!-- TODO: This is wrong, it should be many-to-one with a custom join table. -->
 		<set name="boxes"
 			 cascade="all"
 			 table="manifest_productboxes"

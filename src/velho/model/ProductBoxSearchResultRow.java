@@ -49,7 +49,7 @@ public class ProductBoxSearchResultRow
 	 */
 	public String getBoxShelfSlot()
 	{
-		return box.getShelfSlot();
+		return box.getShelfSlot().getSlotID();
 	}
 
 	/**

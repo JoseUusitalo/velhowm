@@ -14,7 +14,6 @@ import velho.model.Printer;
 import velho.model.ProductBox;
 import velho.model.ProductBoxSearchResultRow;
 import velho.model.Shelf;
-import velho.model.exceptions.NoDatabaseLinkException;
 
 /**
  * Controller handling the communication with systems outside the VELHO Warehouse Management.
@@ -143,48 +142,40 @@ public class ExternalSystemsController
 		ProductBox boxToMove = null;
 		final boolean success = true;
 
-		try
+		newShelf = DatabaseController.getShelfByID(newShelfID);
+		boxToMove = DatabaseController.getProductBoxByID(productBoxCode);
+
+		SYSLOG.debug("Moving box: " + boxToMove);
+		SYSLOG.debug("To shelf: " + newShelfID);
+
+		if (boxToMove == null)
 		{
-			newShelf = DatabaseController.getShelfByID(newShelfID, true);
-			boxToMove = DatabaseController.getProductBoxByID(productBoxCode);
-
-			SYSLOG.debug("Moving box: " + boxToMove);
-			SYSLOG.debug("To shelf: " + newShelfID);
-
-			if (boxToMove == null)
-			{
-				return false;
-			}
-
-			if (newShelf == null)
-			{
-				return false;
-			}
-
-			oldShelfIDString = (String) Shelf.tokenizeShelfSlotID(boxToMove.getShelfSlot())[0];
-			oldShelfID = Integer.parseInt(oldShelfIDString.substring(1));
-			oldShelf = DatabaseController.getShelfByID(oldShelfID, true);
-
-			SYSLOG.debug("From shelf: " + oldShelf);
-
-			if (oldShelf == null)
-			{
-				return false;
-			}
-
-			if (oldShelf.removeFromSlot(boxToMove) == false)
-			{
-				return false;
-			}
-			if (newShelf.addToSlot(newShelfSlotID, boxToMove) == false)
-			{
-				return false;
-			}
+			return false;
 		}
-		catch (final NoDatabaseLinkException e)
-		{
-			DatabaseController.tryReLink();
 
+		if (newShelf == null)
+		{
+			return false;
+		}
+
+		oldShelfIDString = (String) Shelf.tokenizeShelfSlotID(boxToMove.getShelfSlot().getSlotID())[0];
+		oldShelfID = Integer.parseInt(oldShelfIDString.substring(1));
+		oldShelf = DatabaseController.getShelfByID(oldShelfID);
+
+		SYSLOG.debug("From shelf: " + oldShelf);
+
+		if (oldShelf == null)
+		{
+			return false;
+		}
+
+		if (boxToMove.getShelfSlot().removeBox(boxToMove) == false)
+		{
+			return false;
+		}
+		if (newShelf.addToSlot(newShelfSlotID, boxToMove) == false)
+		{
+			return false;
 		}
 
 		if (showPopup)

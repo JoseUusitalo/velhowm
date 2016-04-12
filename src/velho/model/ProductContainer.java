@@ -37,7 +37,7 @@ public abstract class ProductContainer implements Comparable<ProductContainer>
 	/**
 	 * For {@link ProductBox}: the shelf slot id.
 	 */
-	protected String shelfSlot;
+	protected ShelfSlot shelfSlot;
 
 	/**
 	 * @param boxID
@@ -228,17 +228,17 @@ public abstract class ProductContainer implements Comparable<ProductContainer>
 	 *
 	 * @return the shelf slot of this product container
 	 */
-	public String getShelfSlot()
+	public ShelfSlot getShelfSlot()
 	{
 		return shelfSlot;
 	}
 
 	/**
-	 * Sets the shelf slot ID of this product container
+	 * Sets the shelf slot of this product container.
 	 *
-	 * @param shelfSlot the new shelf slot ID string
+	 * @param shelfSlot the shelf slot object
 	 */
-	public void setShelfSlot(final String shelfSlot)
+	public void setShelfSlot(final ShelfSlot shelfSlot)
 	{
 		this.shelfSlot = shelfSlot;
 	}

@@ -14,6 +14,7 @@ import org.junit.Test;
 import velho.controller.DatabaseController;
 import velho.controller.SearchController;
 import velho.model.exceptions.ExistingDatabaseLinkException;
+import velho.model.exceptions.NoDatabaseException;
 import velho.model.exceptions.NoDatabaseLinkException;
 
 /**
@@ -34,9 +35,9 @@ public class SearchControllerTest
 	private SearchController searchController = new SearchController(null);
 
 	@BeforeClass
-	public static final void initializeDatabase() throws ClassNotFoundException, ExistingDatabaseLinkException, NoDatabaseLinkException
+	public static final void initializeDatabase() throws NoDatabaseException, NoDatabaseLinkException
 	{
-		DatabaseController.connectAndInitialize();
+		DatabaseController.resetDatabase();
 	}
 
 	@Before
