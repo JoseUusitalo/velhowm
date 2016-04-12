@@ -15,6 +15,7 @@ import org.h2.jdbcx.JdbcConnectionPool;
 import velho.model.enums.DatabaseFileState;
 import velho.model.enums.DatabaseQueryType;
 import velho.model.enums.DatabaseTable;
+import velho.model.enums.LogDatabaseTable;
 import velho.model.exceptions.ExistingDatabaseLinkException;
 import velho.model.exceptions.NoDatabaseLinkException;
 import velho.view.MainWindow;
@@ -68,7 +69,7 @@ public class LogDatabaseController
 	 * </ul>
 	 * @throws NoDatabaseLinkException
 	 */
-	private static List<Object> runQuery(final DatabaseQueryType type, final DatabaseTable tableName, final Map<DatabaseTable, String> joinOnValues,
+	private static List<Object> runQuery(final DatabaseQueryType type, final LogDatabaseTable tableName, final Map<DatabaseTable, String> joinOnValues,
 			final String[] columns, final Map<String, Object> columnValues, final List<String> where) throws NoDatabaseLinkException
 	{
 		final Connection connection = getConnection();
@@ -84,7 +85,8 @@ public class LogDatabaseController
 			// Initialize a statement.
 			statement = connection.createStatement();
 
-			statement.execute(DatabaseController.sqlBuilder(type, tableName, joinOnValues, columns, columnValues, where), Statement.RETURN_GENERATED_KEYS);
+			statement.execute(DatabaseController.sqlBuilder(type, tableName.toString(), joinOnValues, columns, columnValues, where),
+					Statement.RETURN_GENERATED_KEYS);
 
 			switch (type)
 			{
@@ -583,13 +585,13 @@ public class LogDatabaseController
 
 		// If not in debug mode return just the info.
 		if (!MainWindow.DEBUG_MODE)
-			return (ArrayList<Object>) runQuery(DatabaseQueryType.SELECT, DatabaseTable.SYSLOGS, null, columns, null, where);
+			return (ArrayList<Object>) runQuery(DatabaseQueryType.SELECT, LogDatabaseTable.SYSLOGS, null, columns, null, where);
 
 		// Else get debug too.
 		where.clear();
 		where.add("level = 'INFO' OR level = 'DEBUG'");
 
-		return (ArrayList<Object>) runQuery(DatabaseQueryType.SELECT, DatabaseTable.SYSLOGS, null, columns, null, where);
+		return (ArrayList<Object>) runQuery(DatabaseQueryType.SELECT, LogDatabaseTable.SYSLOGS, null, columns, null, where);
 	}
 
 	/**
@@ -605,11 +607,11 @@ public class LogDatabaseController
 		where.add("level = 'INFO'");
 
 		if (!MainWindow.DEBUG_MODE)
-			return (ArrayList<Object>) runQuery(DatabaseQueryType.SELECT, DatabaseTable.USRLOGS, null, columns, null, where);
+			return (ArrayList<Object>) runQuery(DatabaseQueryType.SELECT, LogDatabaseTable.USRLOGS, null, columns, null, where);
 
 		where.clear();
 		where.add("level = 'INFO' OR level = 'DEBUG'");
 
-		return (ArrayList<Object>) runQuery(DatabaseQueryType.SELECT, DatabaseTable.USRLOGS, null, columns, null, where);
+		return (ArrayList<Object>) runQuery(DatabaseQueryType.SELECT, LogDatabaseTable.USRLOGS, null, columns, null, where);
 	}
 }
