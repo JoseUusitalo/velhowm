@@ -172,9 +172,9 @@ CREATE TABLE IF NOT EXISTS `removalplatforms`
 
 /* ---- EXAMPLE DATA ---- */
 
-INSERT INTO `roles` SET `name`='Administrator';
-INSERT INTO `roles` SET `name`='Manager';
 INSERT INTO `roles` SET `name`='Logistician';
+INSERT INTO `roles` SET `name`='Manager'
+INSERT INTO `roles` SET `name`='Administrator';
 
 INSERT INTO `users`(`pin`,`first_name`,`last_name`,`role`) VALUES ('111111','Admin','Test',3);
 INSERT INTO `users`(`pin`,`first_name`,`last_name`,`role`) VALUES ('222222','Boss','Test',2);
