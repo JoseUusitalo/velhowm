@@ -19,6 +19,9 @@
 		<property name="show_sql">false</property>
 		<property name="hbm2ddl.auto">create-drop</property>
 
+		<!--  I have no idea what this does but it fixes an error. -->
+		<property name="hibernate.current_session_context_class">thread</property>
+
 		<!-- Mappings -->
 		<mapping resource="velho/model/Manifest.hbm.xml" />
 		<mapping resource="velho/model/ManifestState.hbm.xml" />
@@ -33,7 +36,7 @@
 		<mapping resource="velho/model/RemovalList.hbm.xml" />
 		<mapping resource="velho/model/RemovalListState.hbm.xml" />
 		<mapping resource="velho/model/RemovalPlatform.hbm.xml" />
-		
+
 		<mapping resource="velho/model/Shelf.hbm.xml" />
 		<mapping resource="velho/model/ShelfLevel.hbm.xml" />
 		<mapping resource="velho/model/ShelfSlot.hbm.xml" />

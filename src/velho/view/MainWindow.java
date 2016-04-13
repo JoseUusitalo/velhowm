@@ -43,7 +43,9 @@ import velho.controller.SearchController;
 import velho.controller.UIController;
 import velho.controller.UserController;
 import velho.model.exceptions.ExistingDatabaseLinkException;
+import velho.model.exceptions.NoDatabaseException;
 import velho.model.exceptions.NoDatabaseLinkException;
+import velho.model.exceptions.UniqueKeyViolationException;
 
 /**
  * The main window and class for Velho Warehouse Management.
@@ -83,7 +85,7 @@ public class MainWindow extends Application
 	 * Skips the entire main application code. DEBUG_MODE must be <code>true</code> for this
 	 * to affect anything.
 	 */
-	public static final boolean SKIP_MAIN_CODE = true;
+	public static final boolean SKIP_MAIN_CODE = false;
 
 	/**
 	 * The height of the window.
@@ -202,8 +204,10 @@ public class MainWindow extends Application
 		try
 		{
 			DatabaseController.link();
+			DatabaseController.openSession();
+			DatabaseController.loadSampleData();
 		}
-		catch (ClassNotFoundException | ExistingDatabaseLinkException e)
+		catch (ClassNotFoundException | ExistingDatabaseLinkException | NoDatabaseException | NoDatabaseLinkException | UniqueKeyViolationException e)
 		{
 			e.printStackTrace();
 		}
@@ -270,7 +274,14 @@ public class MainWindow extends Application
 
 		try
 		{
-			DatabaseController.link();
+			try
+			{
+				DatabaseController.link();
+			}
+			catch (ExistingDatabaseLinkException e)
+			{
+				// Ignore.
+			}
 
 			if (DatabaseController.isLinked())
 			{
@@ -312,7 +323,7 @@ public class MainWindow extends Application
 				System.exit(0);
 			}
 		}
-		catch (ClassNotFoundException | ExistingDatabaseLinkException e1)
+		catch (ClassNotFoundException e1)
 		{
 			e1.printStackTrace();
 		}
@@ -502,6 +513,9 @@ public class MainWindow extends Application
 				debugStage.close();
 		}
 
+		DatabaseController.closeSession();
+		DatabaseController.closeSessionFactory();
+
 		try
 		{
 			DatabaseController.unlink();
@@ -510,8 +524,6 @@ public class MainWindow extends Application
 		{
 			// Ignore.
 		}
-
-		DatabaseController.closeSessionFactory();
 
 		SYSLOG.info("Exit.");
 

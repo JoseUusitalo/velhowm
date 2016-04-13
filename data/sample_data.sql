@@ -2,10 +2,10 @@
 INSERT INTO `roles` SET `name`='Manager';
 INSERT INTO `roles` SET `name`='Logistician';*/
 
-INSERT INTO `users`(`pin`, `first_name`, `last_name`, `role`) VALUES ('111111','Admin','Test',1);
+INSERT INTO `users`(`pin`, `first_name`, `last_name`, `role`) VALUES ('111111','Admin','Test',3);
 INSERT INTO `users`(`pin`, `first_name`, `last_name`, `role`) VALUES ('222222','Boss','Test',2);
-INSERT INTO `users`(`pin`, `first_name`, `last_name`, `role`) VALUES ('333333','Worker','Test',3);
-INSERT INTO `users`(`badge_id`, `first_name`, `last_name`, `role`) VALUES ('12345678','Badger','Testaccount',3);
+INSERT INTO `users`(`pin`, `first_name`, `last_name`, `role`) VALUES ('333333','Worker','Test',1);
+INSERT INTO `users`(`badge_id`, `first_name`, `last_name`, `role`) VALUES ('12345678','Badger','Testaccount',1);
 
 /* Test Products */
 INSERT INTO `brands` SET `brand_id`=1, `name`='Test Brand #1';
@@ -518,4 +518,4 @@ INSERT INTO `manifest_productboxes` SET `manifest`=4, `productbox`=38;
 INSERT INTO `manifest_productboxes` SET `manifest`=4, `productbox`=39;
 
 /* The removal platform, only one is supported for now. */
-INSERT INTO `removalplatforms` SET `platform_id`=1;
+INSERT INTO `removalplatforms` SET `platform_id`=1, `free_space`=1.0, `free_space_warning`=0.1;
