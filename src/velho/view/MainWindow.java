@@ -204,6 +204,7 @@ public class MainWindow extends Application
 		try
 		{
 			DatabaseController.link();
+			DatabaseController.openSession();
 			DatabaseController.loadSampleData();
 		}
 		catch (ClassNotFoundException | ExistingDatabaseLinkException | NoDatabaseException | NoDatabaseLinkException | UniqueKeyViolationException e)
@@ -512,6 +513,9 @@ public class MainWindow extends Application
 				debugStage.close();
 		}
 
+		DatabaseController.closeSession();
+		DatabaseController.closeSessionFactory();
+
 		try
 		{
 			DatabaseController.unlink();
@@ -520,8 +524,6 @@ public class MainWindow extends Application
 		{
 			// Ignore.
 		}
-
-		DatabaseController.closeSessionFactory();
 
 		SYSLOG.info("Exit.");
 

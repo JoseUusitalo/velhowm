@@ -1090,6 +1090,7 @@ public class DatabaseController
 	 * @return the corresponding object or <code>null</code> for invalid ID
 	 * @throws HibernateException when the query failed to commit and has been rolled back
 	 */
+	@SuppressWarnings("resource")
 	private static Object getByID(final Class objectClass, final int databaseID) throws HibernateException
 	{
 		// TODO: Database object abstract class.
@@ -1097,7 +1098,7 @@ public class DatabaseController
 		if (databaseID < 1)
 			return null;
 
-		final Session session = sessionFactory.openSession();
+		final Session session = sessionFactory.getCurrentSession();
 		session.beginTransaction();
 
 		@SuppressWarnings("unchecked")
@@ -1106,12 +1107,12 @@ public class DatabaseController
 		try
 		{
 			session.getTransaction().commit();
-			session.close();
+
 		}
 		catch (final HibernateException e)
 		{
 			session.getTransaction().rollback();
-			session.close();
+
 			throw new HibernateException("Failed to commit.");
 		}
 
@@ -1605,17 +1606,19 @@ public class DatabaseController
 	 * logged in user (i.e. debug user) if the ID was negative
 	 * @throws HibernateException when the query failed to commit and has been rolled back
 	 */
+	@SuppressWarnings("resource")
 	public static User getUserByID(final int id) throws HibernateException
 	{
 		// Debug account ID?
 		if (id < 0)
 			return LoginController.getCurrentUser();
 
-		final Session session = sessionFactory.openSession();
+		final Session session = sessionFactory.getCurrentSession();
+		final Transaction transaction = session.beginTransaction();
 
 		final User user = session.get(User.class, id);
 
-		session.close();
+		transaction.commit();
 
 		return user;
 	}
@@ -1736,14 +1739,14 @@ public class DatabaseController
 	 * database ID and the value is the number of products
 	 * @throws NoDatabaseLinkException
 	 */
-	@SuppressWarnings("unchecked")
+	@SuppressWarnings({ "unchecked", "resource" })
 	public static List<ProductBoxSearchResultRow> searchProductBoxByDataList(final Map<Integer, Integer> productData)
 	{
 		final List<ProductBoxSearchResultRow> foundProducts = FXCollections.observableArrayList();
 		Integer wantedProductCount = null;
 		List<ProductBox> boxes = null;
 
-		final Session session = sessionFactory.openSession();
+		final Session session = sessionFactory.getCurrentSession();
 
 		// For every unique string representing a product.
 		for (final Integer productID : productData.keySet())
@@ -1812,8 +1815,6 @@ public class DatabaseController
 			for (final ProductBox box : boxes)
 				foundProducts.add(new ProductBoxSearchResultRow(box));
 		}
-
-		session.close();
 
 		// Remove nulls.
 		foundProducts.removeAll(Collections.singleton(null));
@@ -1954,6 +1955,7 @@ public class DatabaseController
 	 *
 	 * @return <code>true</code> if database changed as a result of this call
 	 */
+	@SuppressWarnings("resource")
 	public static boolean deleteAllData() throws NoDatabaseException, NoDatabaseException
 	{
 		DBLOG.info("Truncating database...");
@@ -1961,7 +1963,7 @@ public class DatabaseController
 		if (!databaseExists())
 			throw new NoDatabaseException();
 
-		final Session session = sessionFactory.openSession();
+		final Session session = sessionFactory.getCurrentSession();
 		Transaction transaction = session.beginTransaction();
 
 		boolean notChanged = false;
@@ -1983,8 +1985,6 @@ public class DatabaseController
 		transaction = session.beginTransaction();
 		session.createSQLQuery("SET REFERENTIAL_INTEGRITY TRUE;").executeUpdate();
 		transaction.commit();
-
-		session.close();
 
 		if (!notChanged)
 			DBLOG.info("Database contents deleted.");
@@ -2022,9 +2022,10 @@ public class DatabaseController
 	 * @param object object to delete
 	 * @throws HibernateException when the object was not deleted
 	 */
+	@SuppressWarnings("resource")
 	private static void delete(final Object object) throws HibernateException
 	{
-		final Session session = sessionFactory.openSession();
+		final Session session = sessionFactory.getCurrentSession();
 		session.beginTransaction();
 
 		session.delete(object);
@@ -2032,12 +2033,12 @@ public class DatabaseController
 		try
 		{
 			session.getTransaction().commit();
-			session.close();
+
 		}
 		catch (final HibernateException e)
 		{
 			session.getTransaction().rollback();
-			session.close();
+
 			throw new HibernateException("Failed to delete.");
 		}
 
@@ -2083,9 +2084,10 @@ public class DatabaseController
 	 * @return the database ID of the inserted or updated object
 	 * @throws HibernateException when data was not saved
 	 */
+	@SuppressWarnings("resource")
 	public static int save(final RemovalList object)
 	{
-		final Session session = sessionFactory.openSession();
+		final Session session = sessionFactory.getCurrentSession();
 		final Transaction transaction = session.beginTransaction();
 
 		session.saveOrUpdate(object);
@@ -2093,12 +2095,12 @@ public class DatabaseController
 		try
 		{
 			transaction.commit();
-			session.close();
+
 		}
 		catch (final HibernateException e)
 		{
 			transaction.rollback();
-			session.close();
+
 			throw new HibernateException("Failed to commit.");
 		}
 
@@ -2114,9 +2116,10 @@ public class DatabaseController
 	 * @return the database ID of the inserted or updated object
 	 * @throws HibernateException when data was not saved
 	 */
+	@SuppressWarnings("resource")
 	public static int save(final Shelf object)
 	{
-		final Session session = sessionFactory.openSession();
+		final Session session = sessionFactory.getCurrentSession();
 		final Transaction transaction = session.beginTransaction();
 
 		session.saveOrUpdate(object);
@@ -2124,12 +2127,12 @@ public class DatabaseController
 		try
 		{
 			transaction.commit();
-			session.close();
+
 		}
 		catch (final HibernateException e)
 		{
 			transaction.rollback();
-			session.close();
+
 			throw new HibernateException("Failed to commit.");
 		}
 
@@ -2146,11 +2149,12 @@ public class DatabaseController
 	 * @throws HibernateException when data was not saved
 	 * @throws ConstraintViolationException when the user already exists in the database
 	 */
+	@SuppressWarnings("resource")
 	public static int save(final User object) throws ConstraintViolationException
 	{
 		// TODO: Generalize when all tests have been updated to manually rollback.
 
-		final Session session = sessionFactory.openSession();
+		final Session session = sessionFactory.getCurrentSession();
 		final Transaction transaction = session.beginTransaction();
 
 		session.saveOrUpdate(object);
@@ -2158,12 +2162,12 @@ public class DatabaseController
 		try
 		{
 			transaction.commit();
-			session.close();
+
 		}
 		catch (final HibernateException e)
 		{
 			transaction.rollback();
-			session.close();
+
 			throw new HibernateException("Failed to commit.");
 		}
 
@@ -2182,11 +2186,12 @@ public class DatabaseController
 	 * @return the database ID of the inserted or updated object
 	 * @throws HibernateException when data was not saved
 	 */
+	@SuppressWarnings("resource")
 	public static int save(final Manifest object)
 	{
 		// TODO: Generalize when all tests have been updated to manually rollback.
 
-		final Session session = sessionFactory.openSession();
+		final Session session = sessionFactory.getCurrentSession();
 		final Transaction transaction = session.beginTransaction();
 
 		session.saveOrUpdate(object);
@@ -2194,12 +2199,12 @@ public class DatabaseController
 		try
 		{
 			transaction.commit();
-			session.close();
+
 		}
 		catch (final HibernateException e)
 		{
 			transaction.rollback();
-			session.close();
+
 			throw new HibernateException("Failed to commit.");
 		}
 
@@ -2215,11 +2220,12 @@ public class DatabaseController
 	 * @return the database ID of the inserted or updated object
 	 * @throws HibernateException when data was not saved
 	 */
+	@SuppressWarnings("resource")
 	public static int save(final RemovalPlatform object)
 	{
 		// TODO: Generalize when all tests have been updated to manually rollback.
 
-		final Session session = sessionFactory.openSession();
+		final Session session = sessionFactory.getCurrentSession();
 		final Transaction transaction = session.beginTransaction();
 
 		session.saveOrUpdate(object);
@@ -2227,12 +2233,12 @@ public class DatabaseController
 		try
 		{
 			transaction.commit();
-			session.close();
+
 		}
 		catch (final HibernateException e)
 		{
 			transaction.rollback();
-			session.close();
+
 			throw new HibernateException("Failed to commit.");
 		}
 
@@ -2248,11 +2254,12 @@ public class DatabaseController
 	 * @return the database ID of the inserted or updated object
 	 * @throws HibernateException when data was not saved
 	 */
+	@SuppressWarnings("resource")
 	public static int save(final Product object)
 	{
 		// TODO: Generalize when all tests have been updated to manually rollback.
 
-		final Session session = sessionFactory.openSession();
+		final Session session = sessionFactory.getCurrentSession();
 		final Transaction transaction = session.beginTransaction();
 
 		session.saveOrUpdate(object);
@@ -2260,12 +2267,12 @@ public class DatabaseController
 		try
 		{
 			transaction.commit();
-			session.close();
+
 		}
 		catch (final HibernateException e)
 		{
 			transaction.rollback();
-			session.close();
+
 			throw new HibernateException("Failed to commit.");
 		}
 
@@ -2281,11 +2288,12 @@ public class DatabaseController
 	 * @return the database ID of the inserted or updated object
 	 * @throws HibernateException when data was not saved
 	 */
+	@SuppressWarnings("resource")
 	public static int save(final ProductBrand object)
 	{
 		// TODO: Generalize when all tests have been updated to manually rollback.
 
-		final Session session = sessionFactory.openSession();
+		final Session session = sessionFactory.getCurrentSession();
 		final Transaction transaction = session.beginTransaction();
 
 		session.saveOrUpdate(object);
@@ -2293,12 +2301,12 @@ public class DatabaseController
 		try
 		{
 			transaction.commit();
-			session.close();
+
 		}
 		catch (final HibernateException e)
 		{
 			transaction.rollback();
-			session.close();
+
 			throw new HibernateException("Failed to commit.");
 		}
 
@@ -2314,11 +2322,12 @@ public class DatabaseController
 	 * @return the database ID of the inserted or updated object
 	 * @throws HibernateException when data was not saved
 	 */
+	@SuppressWarnings("resource")
 	public static int save(final ProductCategory object)
 	{
 		// TODO: Generalize when all tests have been updated to manually rollback.
 
-		final Session session = sessionFactory.openSession();
+		final Session session = sessionFactory.getCurrentSession();
 		final Transaction transaction = session.beginTransaction();
 
 		session.saveOrUpdate(object);
@@ -2326,12 +2335,12 @@ public class DatabaseController
 		try
 		{
 			transaction.commit();
-			session.close();
+
 		}
 		catch (final HibernateException e)
 		{
 			transaction.rollback();
-			session.close();
+
 			throw new HibernateException("Failed to commit.");
 		}
 
@@ -2351,10 +2360,10 @@ public class DatabaseController
 	 * @return a list of objects
 	 * @throws HibernateException when the query failed to commit and has been rolled back
 	 */
-	@SuppressWarnings("unchecked")
+	@SuppressWarnings({ "unchecked", "resource" })
 	private static List<Object> getAll(final String className) throws HibernateException
 	{
-		final Session session = sessionFactory.openSession();
+		final Session session = sessionFactory.getCurrentSession();
 		session.beginTransaction();
 
 		final List<Object> result = session.createQuery("from " + className).list();
@@ -2362,12 +2371,12 @@ public class DatabaseController
 		try
 		{
 			session.getTransaction().commit();
-			session.close();
+
 		}
 		catch (final HibernateException e)
 		{
 			session.getTransaction().rollback();
-			session.close();
+
 			throw new HibernateException("Failed to commit.");
 		}
 
@@ -2621,5 +2630,32 @@ public class DatabaseController
 		}
 
 		return delete && load;
+	}
+
+	public static void openSession()
+	{
+		try
+		{
+			sessionFactory.getCurrentSession();
+			DBLOG.error("Attempted to open a database session, but a session was already open.");
+		}
+		catch (HibernateException e)
+		{
+			sessionFactory.openSession();
+			DBLOG.info("Database session open.");
+		}
+	}
+
+	public static void closeSession()
+	{
+		try
+		{
+			sessionFactory.getCurrentSession().close();
+			DBLOG.info("Database session closed.");
+		}
+		catch (HibernateException e)
+		{
+			DBLOG.warn("Attempted to close a database session, but there was no session.");
+		}
 	}
 }
