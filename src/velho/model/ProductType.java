@@ -56,6 +56,9 @@ public class ProductType implements Comparable<ProductType>
 		return this.getDatabaseID() == pt.getDatabaseID();
 	}
 
+	/**
+	 * compares the name to another name
+	 */
 	@Override
 	public int compareTo(final ProductType type)
 	{

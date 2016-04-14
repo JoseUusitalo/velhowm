@@ -36,6 +36,7 @@ public class ProductBrand implements Comparable<ProductBrand>
 	}
 
 	/**
+	 * Product Brand for Hibernate
 	 */
 	public ProductBrand()
 	{
@@ -51,6 +52,9 @@ public class ProductBrand implements Comparable<ProductBrand>
 		return name;
 	}
 
+	/**
+	 * Gets Product Brand and returns DatabaseID
+	 */
 	@Override
 	public boolean equals(final Object o)
 	{
@@ -65,6 +69,9 @@ public class ProductBrand implements Comparable<ProductBrand>
 		return this.getDatabaseID() == pb.getDatabaseID();
 	}
 
+	/**
+	 * Compares brand to another brand
+	 */
 	@Override
 	public int compareTo(final ProductBrand brand)
 	{

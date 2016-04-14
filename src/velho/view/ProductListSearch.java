@@ -31,6 +31,11 @@ public class ProductListSearch
 	 */
 	private SearchController searchController;
 
+	/**
+	 * Searches the list of products
+	 * 
+	 * @param searchController embodies SearchController
+	 */
 	public ProductListSearch(final SearchController searchController)
 	{
 		this.searchController = searchController;
@@ -52,9 +57,7 @@ public class ProductListSearch
 			Button sendToScannerButton = new Button("Send to Scanner ");
 
 			final TextArea textArea = new TextArea();
-			textArea.setPromptText("Please type one product code or name per line. "
-					+ "To Search for multiple products of the same type, type the number of products you want and a colon before the product name or ID. "
-					+ "Empty lines and redundant spaces are ignored.");
+			textArea.setPromptText("Please type one product code or name per line. " + "To Search for multiple products of the same type, type the number of products you want and a colon before the product name or ID. " + "Empty lines and redundant spaces are ignored.");
 			textArea.setPrefWidth(MainWindow.WINDOW_WIDTH / 5);
 			printButton.setMaxWidth(Double.MAX_VALUE);
 			printButton.setAlignment(Pos.CENTER);

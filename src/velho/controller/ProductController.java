@@ -11,6 +11,7 @@ import velho.model.ProductType;
 import velho.view.AddCategoryView;
 import velho.view.AddProductView;
 import velho.view.BrandsTab;
+import velho.view.CategoryTab;
 import velho.view.GenericTabView;
 import velho.view.ProductDataView;
 import velho.view.ProductManagementView;
@@ -53,13 +54,30 @@ public class ProductController implements UIActionController
 	 */
 	private GenericTabView addTab;
 
+	/**
+	 * The tab for creating product management view
+	 */
 	private ProductManagementView productManagementView;
 
+	/**
+	 * The tab for creating product type view
+	 */
 	private ProductsTypeTabView productsTypeTabView;
 
+	/**
+	 * The tab for creating add category view
+	 */
 	private AddCategoryView addCategoryView;
 
+	/**
+	 * The tab for creating brands view
+	 */
 	private BrandsTab brandsTabView;
+
+	/**
+	 * The tab for creating categories view
+	 */
+	private CategoryTab categoryTabView;
 
 	/**
 	 * @param uiController
@@ -72,6 +90,7 @@ public class ProductController implements UIActionController
 		this.addCategoryView = new AddCategoryView(this, uiController);
 		this.addProductView = new AddProductView(this, uiController);
 		this.brandsTabView = new BrandsTab(this, uiController);
+		this.categoryTabView = new CategoryTab(this, uiController);
 		listTab = new GenericTabView();
 		addTab = new GenericTabView();
 		showList();
@@ -164,7 +183,7 @@ public class ProductController implements UIActionController
 	}
 
 	/**
-	 * @param product
+	 * @param product {@demolish Product} to destroy product
 	 */
 	public void deleteProduct(final Product product)
 	{
@@ -220,36 +239,54 @@ public class ProductController implements UIActionController
 		return ListController.getTableView(this, DatabaseController.getProductDataColumns(true, false), DatabaseController.getObservableProductSearchResults());
 	}
 
+	/**
+	 * Makes an unsupported Object to data
+	 */
 	@Override
 	public void createAction(final Object data)
 	{
 		throw new UnsupportedOperationException();
 	}
 
+	/**
+	 * Updates the new unsupported Object to data
+	 */
 	@Override
 	public void updateAction(final Object data)
 	{
 		throw new UnsupportedOperationException();
 	}
 
+	/**
+	 * Makes an unsupported Object to data
+	 */
 	@Override
 	public void addAction(final Object data)
 	{
 		throw new UnsupportedOperationException();
 	}
 
+	/**
+	 * Removes an unsupported Object from data
+	 */
 	@Override
 	public void removeAction(final Object data)
 	{
 		throw new UnsupportedOperationException();
 	}
 
+	/**
+	 * Deletes an unsupported Object from data
+	 */
 	@Override
 	public void deleteAction(final Object data)
 	{
 		throw new UnsupportedOperationException();
 	}
 
+	/**
+	 * Makes an unsupported Object Observable
+	 */
 	@Override
 	public void viewAction(final Object data)
 	{
@@ -257,6 +294,9 @@ public class ProductController implements UIActionController
 		listTab.setView(new ProductDataView(this).getView(((Product) data)));
 	}
 
+	/**
+	 * Directs the addCategoryView and makes it viewable in tabs
+	 */
 	public Node getProductManagementView()
 	{
 		productManagementView.setContents(getProductEditView(), addCategoryView.getView(true));
@@ -278,6 +318,14 @@ public class ProductController implements UIActionController
 
 	}
 
+	/**
+	 * Saves the category however since category is not observable system does not update on fly
+	 * Restart required to view new set category
+	 *
+	 * @param name the name of the new category
+	 * @param type the type of the new category
+	 * @return what ever is in the product category
+	 */
 	public ProductCategory saveCategory(final String name, final ProductType type)
 	{
 		ProductCategory productCategory = new ProductCategory(name, type);
@@ -286,6 +334,13 @@ public class ProductController implements UIActionController
 
 	}
 
+	/**
+	 * Saves the new ProductType into databasecontroller idea is that this should minimize the tasks that product
+	 * controller already is running
+	 *
+	 * @param name The new name of the product
+	 * @return what ever is in the product type
+	 */
 	public ProductType saveProductType(final String name)
 	{
 		ProductType productType = new ProductType(name);
@@ -294,16 +349,31 @@ public class ProductController implements UIActionController
 
 	}
 
+	/**
+	 * Gets brands tab and makes it viewable
+	 *
+	 * @return returns the BrandsTabView making it Viewable in tabs
+	 */
 	public Node getBrandsTab()
 	{
 		return brandsTabView.getView();
 	}
 
+	/**
+	 * Gets product type tab and makes it viewable
+	 *
+	 * @return returns the ProductTypesTabView making it Viewable in tabs
+	 */
 	public Node getProductTypesTab()
 	{
 		return productsTypeTabView.getView();
 	}
 
+	/**
+	 * Save a new brand to Product Controller
+	 *
+	 * @param editBrand allows to edit the new brand
+	 */
 	public void saveBrand(final ProductBrand editBrand)
 	{
 		DatabaseController.save(editBrand);
@@ -311,9 +381,31 @@ public class ProductController implements UIActionController
 
 	}
 
+	/**
+	 * Controlls the action the new Product Type to Product Controller when action is performed
+	 *
+	 * @param saveProductType saves the new Product Type written in the TextField
+	 */
 	public void saveProductType(final ProductType saveProductType)
 	{
 		// TODO Validate data
 		DatabaseController.save(saveProductType);
+	}
+
+	/**
+	 * Controlls the action of a new Category to Product Controller when action is performed
+	 *
+	 * @param saveProductCategory saves the new data written in the TextField
+	 */
+	public void saveProductCategory(final ProductCategory saveProductCategory)
+	{
+		// TODO Need validation
+		DatabaseController.save(saveProductCategory);
+	}
+
+	public Node getCategoryTab()
+	{
+		// TODO Auto-generated method stub
+		return categoryTabView.getView();
 	}
 }

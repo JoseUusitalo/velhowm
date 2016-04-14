@@ -2659,6 +2659,12 @@ public class DatabaseController
 		sessionFactory.close();
 	}
 
+	/**
+	 * Makes the product types and observable in the Hibernate
+	 * 
+	 * @return Observable Product Types
+	 * @throws HibernateException this should be the new database to get the information from
+	 */
 	public static ObservableList<Object> getAllProductTypes() throws HibernateException
 	{
 		observableProductTypes.clear();

@@ -1,5 +1,6 @@
 package velho.view;
 
+import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Pos;
@@ -8,13 +9,18 @@ import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.Spinner;
 import javafx.scene.control.SpinnerValueFactory;
+import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableColumn.CellEditEvent;
+import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
+import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
 import velho.controller.DatabaseController;
 import velho.controller.ProductController;
 import velho.controller.UIController;
 import velho.model.Product;
+import velho.model.ProductBrand;
 import velho.model.ProductType;
 import velho.model.exceptions.NoDatabaseLinkException;
 
@@ -58,6 +64,20 @@ public class AddCategoryView
 	 */
 	private Spinner<Integer> popularity;
 
+	// *************************************************
+
+	/**
+	 * Makes the Brands tab call for table and make it viewable
+	 */
+	private final TableView<Object> table = new TableView<Object>();
+
+	/**
+	 * making the Category an observable list
+	 */
+	private ObservableList<Object> data = DatabaseController.getAllProductCategories();
+
+	// *************************************************
+
 	/**
 	 * @param productController
 	 * @param uiController
@@ -80,6 +100,26 @@ public class AddCategoryView
 		if (bPane == null)
 		{
 			bPane = new BorderPane();
+
+			// *************************************************
+
+			table.setEditable(true);
+
+			TableColumn<Object, String> nameColumn = new TableColumn<Object, String>("Name");
+
+			nameColumn.setMinWidth(100);
+			nameColumn.setCellValueFactory(new PropertyValueFactory<>("name"));
+
+			nameColumn.setOnEditCommit((final CellEditEvent<Object, String> t) ->
+			{
+				final ProductBrand editBrand = ((ProductBrand) t.getTableView().getItems().get(t.getTablePosition().getRow()));
+				editBrand.setName(t.getNewValue());
+				productController.saveBrand(editBrand);
+			});
+			table.setItems(data);
+			table.getColumns().add(nameColumn);
+
+			// *************************************************
 
 			final GridPane grid = new GridPane();
 

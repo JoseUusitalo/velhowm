@@ -209,6 +209,11 @@ public class AddProductView
 		popularity.getValueFactory().setValue(product.getPopularity());
 	}
 
+	/**
+	 * Deletes data from database
+	 *
+	 * @param product to enable the removing from database
+	 */
 	public void removeFromViewData(final Product product)
 	{
 		// TODO Here to be the remove method missing implements

@@ -17,9 +17,10 @@ import javafx.util.Callback;
 import velho.controller.DatabaseController;
 import velho.controller.ProductController;
 import velho.controller.UIController;
-import velho.model.ProductBrand;
+import velho.model.ProductCategory;
+import velho.model.ProductType;
 
-public class BrandsTab
+public class CategoryTab
 {
 
 	/**
@@ -28,7 +29,7 @@ public class BrandsTab
 	private ProductController productController;
 
 	/**
-	 * Makes the Brands tab call for table and make it viewable
+	 * Makes the Categories tab call for table and make it viewable
 	 */
 	private final TableView<Object> table = new TableView<Object>();
 
@@ -38,24 +39,24 @@ public class BrandsTab
 	private VBox vbox;
 
 	/**
-	 * Makes the Brands and ObservableList
+	 * Makes the Categories and ObservableList
 	 */
-	private ObservableList<Object> data = DatabaseController.getAllProductBrands();
+	private ObservableList<Object> data = DatabaseController.getAllProductCategories();
 
 	/**
 	 * Adds info to Product Controller about brands
-	 * 
+	 *
 	 * @param productController Product Controller handles the database work
 	 * @param uiController links UIController to the productController
 	 */
-	public BrandsTab(final ProductController productController, final UIController uiController)
+	public CategoryTab(final ProductController productController, final UIController uiController)
 	{
 		this.productController = productController;
 	}
 
 	/**
 	 * VBox grid view make it visible
-	 * 
+	 *
 	 * @return the VBox
 	 */
 	public VBox getView()
@@ -66,36 +67,52 @@ public class BrandsTab
 
 			table.setEditable(true);
 
-			Callback<TableColumn<Object, String>, TableCell<Object, String>> cellFactory = (final TableColumn<Object, String> p) -> new EditingCell();
+			Callback<TableColumn<Object, Object>, TableCell<Object, Object>> cellFactory = (final TableColumn<Object, Object> p) -> new EditingCell();
 
-			TableColumn<Object, String> nameColumn = new TableColumn<Object, String>("Name");
+			TableColumn<Object, Object> nameColumn = new TableColumn<Object, Object>("Name");
 
 			nameColumn.setMinWidth(100);
 			nameColumn.setCellValueFactory(new PropertyValueFactory<>("name"));
 			nameColumn.setCellFactory(cellFactory);
 
-			nameColumn.setOnEditCommit((final CellEditEvent<Object, String> t) ->
+			nameColumn.setOnEditCommit((final CellEditEvent<Object, Object> t) ->
 			{
-				final ProductBrand editBrand = ((ProductBrand) t.getTableView().getItems().get(t.getTablePosition().getRow()));
-				editBrand.setName(t.getNewValue());
-				productController.saveBrand(editBrand);
+				final ProductCategory editCategory = ((ProductCategory) t.getTableView().getItems().get(t.getTablePosition().getRow()));
+				editCategory.setName(t.getNewValue().toString());
+				productController.saveProductCategory(editCategory);
 			});
 			table.setItems(data);
 			table.getColumns().add(nameColumn);
 
-			final TextField brandName = new TextField();
-			brandName.setPromptText("Brand Name");
-			brandName.setMaxWidth(nameColumn.getPrefWidth());
+			Callback<TableColumn<Object, Object>, TableCell<Object, Object>> cellFactory2 = (final TableColumn<Object, Object> p) -> new EditingCell();
+
+			TableColumn<Object, Object> typesColumn = new TableColumn<Object, Object>("Types Combobox");
+
+			typesColumn.setMinWidth(150);
+			typesColumn.setCellValueFactory(new PropertyValueFactory<>("type"));
+			typesColumn.setCellFactory(cellFactory2);
+
+			typesColumn.setOnEditCommit((final CellEditEvent<Object, Object> t) ->
+			{
+				final ProductCategory editCategory = ((ProductCategory) t.getTableView().getItems().get(t.getTablePosition().getRow()));
+				editCategory.setType((ProductType) t.getNewValue());
+				productController.saveProductCategory(editCategory);
+			});
+			table.getColumns().add(typesColumn);
+
+			final TextField categoryName = new TextField();
+			categoryName.setPromptText("Category Name");
+			categoryName.setMaxWidth(nameColumn.getPrefWidth());
 			final Button addButton = new Button("Create");
 			addButton.setOnAction((final ActionEvent e) ->
 			{
-				final ProductBrand saveBrand = new ProductBrand(brandName.getText());
-				data.add(saveBrand);
-				brandName.clear();
-				productController.saveBrand(saveBrand);
+				final ProductCategory saveCategory = new ProductCategory(categoryName.getText());
+				data.add(saveCategory);
+				categoryName.clear();
+				productController.saveProductCategory(saveCategory);
 			});
 
-			hb.getChildren().addAll(brandName, addButton);
+			hb.getChildren().addAll(categoryName, addButton);
 			hb.setSpacing(3);
 
 			vbox = new VBox();
@@ -112,7 +129,7 @@ public class BrandsTab
 	 * @author Edward
 	 *         Enables editing a cell, nameley the textField
 	 */
-	class EditingCell extends TableCell<Object, String>
+	class EditingCell extends TableCell<Object, Object>
 	{
 
 		private TextField textField;
@@ -139,12 +156,12 @@ public class BrandsTab
 		{
 			super.cancelEdit();
 
-			setText(getItem());
+			setText(getItem().toString());
 			setGraphic(null);
 		}
 
 		@Override
-		public void updateItem(final String item, final boolean empty)
+		public void updateItem(final Object item, final boolean empty)
 		{
 			super.updateItem(item, empty);
 

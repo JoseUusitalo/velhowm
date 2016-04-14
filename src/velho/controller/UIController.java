@@ -139,6 +139,7 @@ public class UIController
 				mainView.addTab("Products", productController.getProductManagementView());
 				mainView.addTab("Product List", productController.getTabView());
 				mainView.addTab("Brands", productController.getBrandsTab());
+				mainView.addTab("Categories", productController.getCategoryTab());
 				mainView.addTab("Product Types", productController.getProductTypesTab());
 				mainView.addTab("User List", getUserListView(currentUserRole));
 				break;
