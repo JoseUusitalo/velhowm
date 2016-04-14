@@ -1607,11 +1607,11 @@ public class DatabaseController
 		if (id < 0)
 			return LoginController.getCurrentUser();
 
-		final Transaction transaction = sessionFactory.getCurrentSession().beginTransaction();
+		sessionFactory.getCurrentSession().beginTransaction();
 
 		final User user = sessionFactory.getCurrentSession().get(User.class, id);
 
-		transaction.commit();
+		sessionFactory.getCurrentSession().getTransaction().commit();
 
 		return user;
 	}
@@ -1959,13 +1959,13 @@ public class DatabaseController
 		int changes = 0;
 
 		sessionFactory.getCurrentSession().createSQLQuery("SET REFERENTIAL_INTEGRITY FALSE;").executeUpdate();
-		transaction.commit();
+		sessionFactory.getCurrentSession().getTransaction().commit();
 
 		for (final DatabaseTable table : DatabaseTable.values())
 		{
 			transaction = sessionFactory.getCurrentSession().beginTransaction();
 			changes = sessionFactory.getCurrentSession().createSQLQuery("TRUNCATE TABLE " + table.toString() + ";").executeUpdate();
-			transaction.commit();
+			sessionFactory.getCurrentSession().getTransaction().commit();
 
 			DBLOG.trace("Truncate table: " + table.toString() + " | changed rows: " + changes);
 			notChanged = notChanged && (changes == 0);
@@ -1973,7 +1973,7 @@ public class DatabaseController
 
 		transaction = sessionFactory.getCurrentSession().beginTransaction();
 		sessionFactory.getCurrentSession().createSQLQuery("SET REFERENTIAL_INTEGRITY TRUE;").executeUpdate();
-		transaction.commit();
+		sessionFactory.getCurrentSession().getTransaction().commit();
 
 		if (!notChanged)
 			DBLOG.info("Database contents deleted.");
@@ -2074,18 +2074,18 @@ public class DatabaseController
 	public static int save(final RemovalList object)
 	{
 
-		final Transaction transaction = sessionFactory.getCurrentSession().beginTransaction();
+		sessionFactory.getCurrentSession().beginTransaction();
 
 		sessionFactory.getCurrentSession().saveOrUpdate(object);
 
 		try
 		{
-			transaction.commit();
+			sessionFactory.getCurrentSession().getTransaction().commit();
 
 		}
 		catch (final HibernateException e)
 		{
-			transaction.rollback();
+			sessionFactory.getCurrentSession().getTransaction().rollback();
 
 			throw new HibernateException("Failed to commit.");
 		}
@@ -2105,18 +2105,18 @@ public class DatabaseController
 	public static int save(final Shelf object)
 	{
 
-		final Transaction transaction = sessionFactory.getCurrentSession().beginTransaction();
+		sessionFactory.getCurrentSession().beginTransaction();
 
 		sessionFactory.getCurrentSession().saveOrUpdate(object);
 
 		try
 		{
-			transaction.commit();
+			sessionFactory.getCurrentSession().getTransaction().commit();
 
 		}
 		catch (final HibernateException e)
 		{
-			transaction.rollback();
+			sessionFactory.getCurrentSession().getTransaction().rollback();
 
 			throw new HibernateException("Failed to commit.");
 		}
@@ -2138,18 +2138,18 @@ public class DatabaseController
 	{
 		// TODO: Generalize when all tests have been updated to manually rollback.
 
-		final Transaction transaction = sessionFactory.getCurrentSession().beginTransaction();
+		sessionFactory.getCurrentSession().beginTransaction();
 
 		sessionFactory.getCurrentSession().saveOrUpdate(object);
 
 		try
 		{
-			transaction.commit();
+			sessionFactory.getCurrentSession().getTransaction().commit();
 
 		}
 		catch (final HibernateException e)
 		{
-			transaction.rollback();
+			sessionFactory.getCurrentSession().getTransaction().rollback();
 
 			throw new HibernateException("Failed to commit.");
 		}
@@ -2173,18 +2173,18 @@ public class DatabaseController
 	{
 		// TODO: Generalize when all tests have been updated to manually rollback.
 
-		final Transaction transaction = sessionFactory.getCurrentSession().beginTransaction();
+		sessionFactory.getCurrentSession().beginTransaction();
 
 		sessionFactory.getCurrentSession().saveOrUpdate(object);
 
 		try
 		{
-			transaction.commit();
+			sessionFactory.getCurrentSession().getTransaction().commit();
 
 		}
 		catch (final HibernateException e)
 		{
-			transaction.rollback();
+			sessionFactory.getCurrentSession().getTransaction().rollback();
 
 			throw new HibernateException("Failed to commit.");
 		}
@@ -2205,18 +2205,18 @@ public class DatabaseController
 	{
 		// TODO: Generalize when all tests have been updated to manually rollback.
 
-		final Transaction transaction = sessionFactory.getCurrentSession().beginTransaction();
+		sessionFactory.getCurrentSession().beginTransaction();
 
 		sessionFactory.getCurrentSession().saveOrUpdate(object);
 
 		try
 		{
-			transaction.commit();
+			sessionFactory.getCurrentSession().getTransaction().commit();
 
 		}
 		catch (final HibernateException e)
 		{
-			transaction.rollback();
+			sessionFactory.getCurrentSession().getTransaction().rollback();
 
 			throw new HibernateException("Failed to commit.");
 		}
@@ -2237,18 +2237,18 @@ public class DatabaseController
 	{
 		// TODO: Generalize when all tests have been updated to manually rollback.
 
-		final Transaction transaction = sessionFactory.getCurrentSession().beginTransaction();
+		sessionFactory.getCurrentSession().beginTransaction();
 
 		sessionFactory.getCurrentSession().saveOrUpdate(object);
 
 		try
 		{
-			transaction.commit();
+			sessionFactory.getCurrentSession().getTransaction().commit();
 
 		}
 		catch (final HibernateException e)
 		{
-			transaction.rollback();
+			sessionFactory.getCurrentSession().getTransaction().rollback();
 
 			throw new HibernateException("Failed to commit.");
 		}
@@ -2269,18 +2269,18 @@ public class DatabaseController
 	{
 		// TODO: Generalize when all tests have been updated to manually rollback.
 
-		final Transaction transaction = sessionFactory.getCurrentSession().beginTransaction();
+		sessionFactory.getCurrentSession().beginTransaction();
 
 		sessionFactory.getCurrentSession().saveOrUpdate(object);
 
 		try
 		{
-			transaction.commit();
+			sessionFactory.getCurrentSession().getTransaction().commit();
 
 		}
 		catch (final HibernateException e)
 		{
-			transaction.rollback();
+			sessionFactory.getCurrentSession().getTransaction().rollback();
 
 			throw new HibernateException("Failed to commit.");
 		}
@@ -2301,18 +2301,18 @@ public class DatabaseController
 	{
 		// TODO: Generalize when all tests have been updated to manually rollback.
 
-		final Transaction transaction = sessionFactory.getCurrentSession().beginTransaction();
+		sessionFactory.getCurrentSession().beginTransaction();
 
 		sessionFactory.getCurrentSession().saveOrUpdate(object);
 
 		try
 		{
-			transaction.commit();
+			sessionFactory.getCurrentSession().getTransaction().commit();
 
 		}
 		catch (final HibernateException e)
 		{
-			transaction.rollback();
+			sessionFactory.getCurrentSession().getTransaction().rollback();
 
 			throw new HibernateException("Failed to commit.");
 		}
