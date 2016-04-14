@@ -1718,6 +1718,8 @@ public class DatabaseController
 
 			DBLOG.debug("Looking for [" + productID + "] of size " + wantedProductCount);
 
+			sessionFactory.getCurrentSession().beginTransaction();
+
 			// First look for an exact amount.
 			// @formatter:off
 			boxes = sessionFactory.getCurrentSession().createQuery("from ProductBox as pb"
@@ -1729,16 +1731,18 @@ public class DatabaseController
 				   	   	   .list();
 			// @formatter:on
 
+			sessionFactory.getCurrentSession().getTransaction().commit();
+
 			// Couldn't find a box with exactly the number of products wanted.
 			if (boxes.isEmpty())
 			{
 				if (MainWindow.DEBUG_MODE)
 					DBLOG.debug("Unable to find a product box with the wanted size of " + wantedProductCount + ". Looking from multiple boxes.");
 
+				sessionFactory.getCurrentSession().beginTransaction();
+
 				/*
 				 * Remove the product count condition and find all product boxes with the wanted product ID.
-				 * This could be done with the getByID() private method but since we already have a session open and
-				 * more importantly this query is done in a loop, it is faster to do it here.
 				 */
 				// @formatter:off
 				boxes = sessionFactory.getCurrentSession().createQuery("from ProductBox as pb"
@@ -1748,9 +1752,10 @@ public class DatabaseController
 						   	   .list();
 				// @formatter:on
 
-				System.out.println("boxes---------------------------");
-				for (ProductBox b : boxes)
-					System.out.println(b.getExpirationDate());
+				sessionFactory.getCurrentSession().getTransaction().commit();
+
+				// for (ProductBox b : boxes)
+				// System.out.println(b.getExpirationDate());
 				boxes = getBoxesContainingAtLeastProducts(boxes, wantedProductCount);
 			}
 			else if (boxes.size() > 1)
