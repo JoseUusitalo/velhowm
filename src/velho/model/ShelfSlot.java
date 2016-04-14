@@ -211,6 +211,8 @@ public class ShelfSlot extends AbstractDatabaseObject implements Comparable<Shel
 
 	public boolean contains(final ProductBox box)
 	{
+		System.out.println("BOXES IN SLOT!");
+		System.out.println(productBoxes);
 		return productBoxes.contains(box);
 	}
 

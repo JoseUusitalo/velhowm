@@ -25,6 +25,14 @@
 			<column name="product_count" not-null="true" default="0" />
 		</property>
 
+
+		<many-to-one	name="shelfSlot"
+						class="velho.model.ShelfSlot"
+						fetch="select">
+			<column	name="shelfslot"
+					not-null="false" />
+		</many-to-one>
+
 		<!-- No cascade solves an exception. -->
 		<!-- Many-to-one: This object can have one referenced object, the referenced object can be referenced from many objects.
 			 Cascade changes.

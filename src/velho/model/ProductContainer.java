@@ -30,7 +30,7 @@ public abstract class ProductContainer extends AbstractDatabaseObject implements
 	protected int productCount;
 
 	/**
-	 * For {@link ProductBox}: the shelf slot id.
+	 * The {@link ShelfSlot} this container is currently in.
 	 */
 	protected ShelfSlot shelfSlot;
 
@@ -74,6 +74,9 @@ public abstract class ProductContainer extends AbstractDatabaseObject implements
 
 		if (this.getDatabaseID() <= 0)
 			return this == c;
+
+		System.out.println("THIS IS " + this.getDatabaseID());
+		System.out.println("THAT IS " + c.getDatabaseID());
 
 		return this.getDatabaseID() == c.getDatabaseID();
 	}

@@ -17,6 +17,8 @@
 					type="string"
 					not-null="true" />
 
+		<!--  Unused at the moment.
+			  Not deleted because it might break something I don't have the time to fix. -->
 		<property name="popularity" type="int">
 			<column name="popularity" default="-1" />
 		</property>

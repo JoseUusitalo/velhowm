@@ -10,7 +10,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
@@ -201,10 +200,6 @@ public class DatabaseController
 		// Most other queries.
 		final Set<Object> dataSet = new LinkedHashSet<Object>();
 
-		// Putting boxes on shelves.
-		Map<Integer, ArrayList<Integer[]>> shelfBoxMap = null;
-		Map<Integer, ArrayList<Integer>> listBoxMap = null;
-
 		try
 		{
 			ResultSet result = null;
@@ -328,39 +323,6 @@ public class DatabaseController
 								break;
 							// @formatter:on
 
-							case SHELFSLOT_PRODUCTBOXES:
-								shelfBoxMap = new HashMap<Integer, ArrayList<Integer[]>>();
-								Integer[] coords = null;
-								Integer shelfID = null;
-								ArrayList<Integer[]> list;
-
-								while (result.next())
-								{
-									coords = new Integer[3];
-									// Get all the data.
-									shelfID = result.getInt("shelf");
-									coords[0] = result.getInt("productbox");
-									coords[1] = result.getInt("shelflevel_index");
-									coords[2] = result.getInt("shelfslot_index");
-
-									// Does this shelf already have boxes in it?
-									if (shelfBoxMap.containsKey(shelfID))
-									{
-										// Add to the list.
-										shelfBoxMap.get(shelfID).add(coords);
-									}
-									else
-									{
-										// Create a new list and put in the
-										// data.
-										list = new ArrayList<Integer[]>();
-										list.add(coords);
-										shelfBoxMap.put(shelfID, list);
-									}
-								}
-
-								break;
-
 							case REMOVALLIST_STATES:
 								while (result.next())
 									dataSet.add(new RemovalListState(result.getInt("removallist_state_id"), result.getString("name")));
@@ -384,60 +346,6 @@ public class DatabaseController
 									dataSet.add(new Manifest(result.getInt("manifest_id"), getManifestStateByID(result.getInt("state")), result.getInt("driver_id"), result.getDate("date_ordered"), result.getDate("date_received")));
 								break;
 							// @formatter:on
-
-							case REMOVALLIST_PRODUCTBOXES:
-								listBoxMap = new HashMap<Integer, ArrayList<Integer>>();
-								Integer listID = null;
-								ArrayList<Integer> boxIDs = new ArrayList<Integer>();
-
-								while (result.next())
-								{
-									listID = result.getInt("removallist");
-
-									// Does this removal list already have boxes
-									// in it?
-									if (listBoxMap.containsKey(listID))
-									{
-										// Add to the list.
-										listBoxMap.get(listID).add(result.getInt("productbox"));
-									}
-									else
-									{
-										// Create a new list and put in the
-										// data.
-										boxIDs = new ArrayList<Integer>();
-										boxIDs.add(result.getInt("productbox"));
-										listBoxMap.put(listID, boxIDs);
-									}
-								}
-								break;
-
-							case MANIFEST_PRODUCTBOXES:
-								listBoxMap = new HashMap<Integer, ArrayList<Integer>>();
-								Integer manifestID = null;
-								ArrayList<Integer> pboxIDs = new ArrayList<Integer>();
-
-								while (result.next())
-								{
-									manifestID = result.getInt("manifest");
-
-									// Does this removal list already have boxes
-									// in it?
-									if (listBoxMap.containsKey(manifestID))
-									{
-										// Add to the list.
-										listBoxMap.get(manifestID).add(result.getInt("productbox"));
-									}
-									else
-									{
-										// Create a new list and put in the
-										// data.
-										pboxIDs = new ArrayList<Integer>();
-										pboxIDs.add(result.getInt("productbox"));
-										listBoxMap.put(manifestID, pboxIDs);
-									}
-								}
-								break;
 
 							case REMOVALPLATFORMS:
 								// @formatter:off
@@ -588,16 +496,6 @@ public class DatabaseController
 					case MANIFEST_STATES:
 					case REMOVALPLATFORMS:
 						return dataSet;
-					case SHELFSLOT_PRODUCTBOXES:
-						return shelfBoxMap;
-					case REMOVALLIST_PRODUCTBOXES:
-						if (columns.length == 1 && columns[0] != "*")
-							return dataSet;
-						return listBoxMap;
-					case MANIFEST_PRODUCTBOXES:
-						if (columns.length == 1 && columns[0] != "*")
-							return dataSet;
-						return listBoxMap;
 					default:
 						throw new IllegalArgumentException();
 				}
@@ -2052,6 +1950,7 @@ public class DatabaseController
 		sessionFactory.getCurrentSession().beginTransaction();
 
 		sessionFactory.getCurrentSession().saveOrUpdate(object);
+		sessionFactory.getCurrentSession().flush();
 
 		try
 		{

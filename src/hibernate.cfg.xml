@@ -27,7 +27,7 @@
 		<mapping resource="velho/model/ManifestState.hbm.xml" />
 
 		<mapping resource="velho/model/Product.hbm.xml" />
-		<mapping resource="velho/model/ProductBox.hbm.xml" />
+		<!-- <mapping resource="velho/model/ProductBox.hbm.xml" /> -->
 		<mapping resource="velho/model/ProductBrand.hbm.xml" />
 		<mapping resource="velho/model/ProductCategory.hbm.xml" />
 		<mapping resource="velho/model/ProductContainer.hbm.xml" />

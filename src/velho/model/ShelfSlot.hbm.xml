@@ -20,26 +20,22 @@
 					column="max_productboxes"
 					type="int" />
 
-		<!-- No cascade solves an exception. -->
-		<set		name="productBoxes"
-					table="SHELFSLOT_PRODUCTBOXES"
-					lazy="false">
-			<key column="shelfslot" />
-			<!-- The unique="true" makes this a one-to-many mapping. -->
-			<many-to-many	class="velho.model.ProductBox"
-							column="productbox"
-							unique="true" />
+		<set	name="productBoxes"
+				table="PRODUCTBOXES"
+				inverse="true"
+				cascade="all"
+				fetch="select"
+				lazy="false">
+
+			<key column="slot_id" not-null="false"/>
+			<one-to-many class="velho.model.ProductBox" />
 		</set>
 
-		<!-- This is the inverse "child" side. Updates here do not cascade? -->
-		<join		table="SHELFLEVEL_SHELFSLOTS"
-					optional="true"
-					inverse="true">
-			<key	column="shelfslot"
-					unique="true"
+		<many-to-one	name="parentShelfLevel"
+						class="velho.model.ShelfLevel"
+						fetch="select">
+			<column	name="level_id"
 					not-null="true" />
-			<many-to-one	name="parentShelfLevel"
-							column="shelflevel" />
-		</join>
+		</many-to-one>
 	</class>
 </hibernate-mapping>

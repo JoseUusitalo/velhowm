@@ -27,13 +27,20 @@
 					default="0" />
 		</property>
 
-		<!-- No cascade solves an exception. -->
+		<many-to-one	name="shelfSlot"
+						class="velho.model.ShelfSlot"
+						fetch="select">
+			<column	name="slot_id"
+					not-null="false" />
+		</many-to-one>
+
 		<!-- Many-to-one: This object can have one referenced object, the referenced object can be referenced from many objects.
 			 Cascade changes.
 			 "Select" eager fetching: load the referenced object when this object is loaded. -->
 		<many-to-one	name="product"
 						class="velho.model.Product"
 						column="product"
+						cascade="all"
 						not-null="true"
 						fetch="select"
 						lazy="false" />
