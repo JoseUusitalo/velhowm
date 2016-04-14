@@ -23,11 +23,10 @@ import org.apache.log4j.Logger;
 import org.h2.jdbcx.JdbcConnectionPool;
 import org.hibernate.HibernateException;
 import org.hibernate.SessionFactory;
-import org.hibernate.Transaction;
-import org.hibernate.exception.ConstraintViolationException;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import velho.model.AbstractDatabaseObject;
 import velho.model.HibernateSessionFactory;
 import velho.model.Manifest;
 import velho.model.ManifestState;
@@ -50,6 +49,7 @@ import velho.model.exceptions.ExistingDatabaseLinkException;
 import velho.model.exceptions.NoDatabaseException;
 import velho.model.exceptions.NoDatabaseLinkException;
 import velho.model.exceptions.UniqueKeyViolationException;
+import velho.model.interfaces.DatabaseObject;
 import velho.view.MainWindow;
 
 /**
@@ -713,32 +713,6 @@ public class DatabaseController
 	}
 
 	/**
-	 * Attempts to re-link the database.
-	 */
-	private static void relink()
-	{
-		DBLOG.info("Attempting to relink database.");
-		try
-		{
-			// Just in case.
-			unlink();
-		}
-		catch (final NoDatabaseLinkException e)
-		{
-			// Do nothing. This is expected.
-		}
-
-		try
-		{
-			link();
-		}
-		catch (final ClassNotFoundException | ExistingDatabaseLinkException e)
-		{
-			e.printStackTrace();
-		}
-	}
-
-	/**
 	 * Checks if the database file exists.
 	 *
 	 * @return <code>true</code> if the database file exists
@@ -1082,21 +1056,18 @@ public class DatabaseController
 	/**
 	 * Gets an object from the database with the given database ID.
 	 *
-	 * @param objectClass the name class of the object to get
+	 * @param objectClass the name class of the {@link AbstractDatabaseObject} to get
 	 * @param databaseID the database ID of the object
 	 * @return the corresponding object or <code>null</code> for invalid ID
 	 * @throws HibernateException when the query failed to commit and has been rolled back
 	 */
-	private static Object getByID(final Class objectClass, final int databaseID) throws HibernateException
+	private static Object getByID(final Class<? extends AbstractDatabaseObject> objectClass, final int databaseID) throws HibernateException
 	{
-		// TODO: Database object abstract class.
-
 		if (databaseID < 1)
 			return null;
 
 		sessionFactory.getCurrentSession().beginTransaction();
 
-		@SuppressWarnings("unchecked")
 		final Object result = sessionFactory.getCurrentSession().get(objectClass, databaseID);
 
 		try
@@ -1953,7 +1924,7 @@ public class DatabaseController
 		if (!databaseExists())
 			throw new NoDatabaseException();
 
-		Transaction transaction = sessionFactory.getCurrentSession().beginTransaction();
+		sessionFactory.getCurrentSession().beginTransaction();
 
 		boolean notChanged = false;
 		int changes = 0;
@@ -1963,7 +1934,7 @@ public class DatabaseController
 
 		for (final DatabaseTable table : DatabaseTable.values())
 		{
-			transaction = sessionFactory.getCurrentSession().beginTransaction();
+			sessionFactory.getCurrentSession().beginTransaction();
 			changes = sessionFactory.getCurrentSession().createSQLQuery("TRUNCATE TABLE " + table.toString() + ";").executeUpdate();
 			sessionFactory.getCurrentSession().getTransaction().commit();
 
@@ -1971,7 +1942,7 @@ public class DatabaseController
 			notChanged = notChanged && (changes == 0);
 		}
 
-		transaction = sessionFactory.getCurrentSession().beginTransaction();
+		sessionFactory.getCurrentSession().beginTransaction();
 		sessionFactory.getCurrentSession().createSQLQuery("SET REFERENTIAL_INTEGRITY TRUE;").executeUpdate();
 		sessionFactory.getCurrentSession().getTransaction().commit();
 
@@ -2067,13 +2038,12 @@ public class DatabaseController
 	/**
 	 * Creates a new or updates an existing object depending on whether the given object exists in the database.
 	 *
-	 * @param object new or existing object in the database
+	 * @param object new or existing {@link DatabaseObject} in the database
 	 * @return the database ID of the inserted or updated object
 	 * @throws HibernateException when data was not saved
 	 */
-	public static int save(final RemovalList object)
+	public static int save(final DatabaseObject object)
 	{
-
 		sessionFactory.getCurrentSession().beginTransaction();
 
 		sessionFactory.getCurrentSession().saveOrUpdate(object);
@@ -2092,232 +2062,7 @@ public class DatabaseController
 
 		DBLOG.debug("Saved/Updated: " + object);
 
-		return object.getDatabaseID();
-	}
-
-	/**
-	 * Creates a new or updates an existing object depending on whether the given object exists in the database.
-	 *
-	 * @param object new or existing object in the database
-	 * @return the database ID of the inserted or updated object
-	 * @throws HibernateException when data was not saved
-	 */
-	public static int save(final Shelf object)
-	{
-
-		sessionFactory.getCurrentSession().beginTransaction();
-
-		sessionFactory.getCurrentSession().saveOrUpdate(object);
-
-		try
-		{
-			sessionFactory.getCurrentSession().getTransaction().commit();
-
-		}
-		catch (final HibernateException e)
-		{
-			sessionFactory.getCurrentSession().getTransaction().rollback();
-
-			throw new HibernateException("Failed to commit.");
-		}
-
-		DBLOG.debug("Saved/Updated: " + object);
-
-		return object.getDatabaseID();
-	}
-
-	/**
-	 * Creates a new or updates an existing object depending on whether the given object exists in the database.
-	 *
-	 * @param object new or existing object in the database
-	 * @return the database ID of the inserted or updated object
-	 * @throws HibernateException when data was not saved
-	 * @throws ConstraintViolationException when the user already exists in the database
-	 */
-	public static int save(final User object) throws ConstraintViolationException
-	{
-		// TODO: Generalize when all tests have been updated to manually rollback.
-
-		sessionFactory.getCurrentSession().beginTransaction();
-
-		sessionFactory.getCurrentSession().saveOrUpdate(object);
-
-		try
-		{
-			sessionFactory.getCurrentSession().getTransaction().commit();
-
-		}
-		catch (final HibernateException e)
-		{
-			sessionFactory.getCurrentSession().getTransaction().rollback();
-
-			throw new HibernateException("Failed to commit.");
-		}
-
-		// Update observable list.
-		getAllUsers();
-
-		DBLOG.debug("Saved/Updated: " + object);
-
-		return object.getDatabaseID();
-	}
-
-	/**
-	 * Creates a new or updates an existing object depending on whether the given object exists in the database.
-	 *
-	 * @param object new or existing object in the database
-	 * @return the database ID of the inserted or updated object
-	 * @throws HibernateException when data was not saved
-	 */
-	public static int save(final Manifest object)
-	{
-		// TODO: Generalize when all tests have been updated to manually rollback.
-
-		sessionFactory.getCurrentSession().beginTransaction();
-
-		sessionFactory.getCurrentSession().saveOrUpdate(object);
-
-		try
-		{
-			sessionFactory.getCurrentSession().getTransaction().commit();
-
-		}
-		catch (final HibernateException e)
-		{
-			sessionFactory.getCurrentSession().getTransaction().rollback();
-
-			throw new HibernateException("Failed to commit.");
-		}
-
-		DBLOG.debug("Saved/Updated: " + object);
-
-		return object.getDatabaseID();
-	}
-
-	/**
-	 * Creates a new or updates an existing object depending on whether the given object exists in the database.
-	 *
-	 * @param object new or existing object in the database
-	 * @return the database ID of the inserted or updated object
-	 * @throws HibernateException when data was not saved
-	 */
-	public static int save(final RemovalPlatform object)
-	{
-		// TODO: Generalize when all tests have been updated to manually rollback.
-
-		sessionFactory.getCurrentSession().beginTransaction();
-
-		sessionFactory.getCurrentSession().saveOrUpdate(object);
-
-		try
-		{
-			sessionFactory.getCurrentSession().getTransaction().commit();
-
-		}
-		catch (final HibernateException e)
-		{
-			sessionFactory.getCurrentSession().getTransaction().rollback();
-
-			throw new HibernateException("Failed to commit.");
-		}
-
-		DBLOG.debug("Saved/Updated: " + object);
-
-		return object.getDatabaseID();
-	}
-
-	/**
-	 * Creates a new or updates an existing object depending on whether the given object exists in the database.
-	 *
-	 * @param object new or existing object in the database
-	 * @return the database ID of the inserted or updated object
-	 * @throws HibernateException when data was not saved
-	 */
-	public static int save(final Product object)
-	{
-		// TODO: Generalize when all tests have been updated to manually rollback.
-
-		sessionFactory.getCurrentSession().beginTransaction();
-
-		sessionFactory.getCurrentSession().saveOrUpdate(object);
-
-		try
-		{
-			sessionFactory.getCurrentSession().getTransaction().commit();
-
-		}
-		catch (final HibernateException e)
-		{
-			sessionFactory.getCurrentSession().getTransaction().rollback();
-
-			throw new HibernateException("Failed to commit.");
-		}
-
-		DBLOG.debug("Saved/Updated: " + object);
-
-		return object.getDatabaseID();
-	}
-
-	/**
-	 * Creates a new or updates an existing object depending on whether the given object exists in the database.
-	 *
-	 * @param object new or existing object in the database
-	 * @return the database ID of the inserted or updated object
-	 * @throws HibernateException when data was not saved
-	 */
-	public static int save(final ProductBrand object)
-	{
-		// TODO: Generalize when all tests have been updated to manually rollback.
-
-		sessionFactory.getCurrentSession().beginTransaction();
-
-		sessionFactory.getCurrentSession().saveOrUpdate(object);
-
-		try
-		{
-			sessionFactory.getCurrentSession().getTransaction().commit();
-
-		}
-		catch (final HibernateException e)
-		{
-			sessionFactory.getCurrentSession().getTransaction().rollback();
-
-			throw new HibernateException("Failed to commit.");
-		}
-
-		DBLOG.debug("Saved/Updated: " + object);
-
-		return object.getDatabaseID();
-	}
-
-	/**
-	 * Creates a new or updates an existing object depending on whether the given object exists in the database.
-	 *
-	 * @param object new or existing object in the database
-	 * @return the database ID of the inserted or updated object
-	 * @throws HibernateException when data was not saved
-	 */
-	public static int save(final ProductCategory object)
-	{
-		// TODO: Generalize when all tests have been updated to manually rollback.
-
-		sessionFactory.getCurrentSession().beginTransaction();
-
-		sessionFactory.getCurrentSession().saveOrUpdate(object);
-
-		try
-		{
-			sessionFactory.getCurrentSession().getTransaction().commit();
-
-		}
-		catch (final HibernateException e)
-		{
-			sessionFactory.getCurrentSession().getTransaction().rollback();
-
-			throw new HibernateException("Failed to commit.");
-		}
-
-		DBLOG.debug("Saved/Updated: " + object);
+		// TODO: Update observable lists.
 
 		return object.getDatabaseID();
 	}

@@ -11,13 +11,8 @@ import javafx.collections.ObservableList;
  *
  * @author Jose Uusitalo
  */
-public class RemovalList implements Comparable<RemovalList>
+public class RemovalList extends AbstractDatabaseObject implements Comparable<RemovalList>
 {
-	/**
-	 * The database ID of this removal list.
-	 */
-	private int databaseID;
-
 	/**
 	 * The set of {@link ProductBox} objects.
 	 */
@@ -39,7 +34,7 @@ public class RemovalList implements Comparable<RemovalList>
 	 */
 	public RemovalList(final int databaseID, final RemovalListState state)
 	{
-		this.databaseID = databaseID;
+		setDatabaseID(databaseID);
 		this.state = state;
 		this.boxes = new LinkedHashSet<ProductBox>();
 		this.observableBoxes = FXCollections.observableArrayList();
@@ -50,6 +45,10 @@ public class RemovalList implements Comparable<RemovalList>
 	 */
 	public RemovalList()
 	{
+		/*
+		 * I have to create a new object here because attempting to get one from the database causes a weird null
+		 * pointer exception.
+		 */
 		this.state = new RemovalListState(1, "Active");
 		this.boxes = new LinkedHashSet<ProductBox>();
 		this.observableBoxes = FXCollections.observableArrayList();
@@ -58,7 +57,7 @@ public class RemovalList implements Comparable<RemovalList>
 	@Override
 	public String toString()
 	{
-		return "[" + databaseID + "] " + state + ": " + boxes.size() + " boxes";
+		return "[" + getDatabaseID() + "] " + state + ": " + boxes.size() + " boxes";
 	}
 
 	@Override
@@ -79,26 +78,6 @@ public class RemovalList implements Comparable<RemovalList>
 	public int compareTo(final RemovalList removallist)
 	{
 		return this.getDatabaseID() - removallist.getDatabaseID();
-	}
-
-	/**
-	 * Gets the database ID of this removal list.
-	 *
-	 * @return the database ID of this list
-	 */
-	public int getDatabaseID()
-	{
-		return databaseID;
-	}
-
-	/**
-	 * Sets the database ID of this removal list.
-	 *
-	 * @param id the new database ID of this list
-	 */
-	public void setDatabaseID(final int id)
-	{
-		databaseID = id;
 	}
 
 	/**

@@ -5,13 +5,8 @@ package velho.model;
  *
  * @author Jose Uusitalo
  */
-public class ProductType implements Comparable<ProductType>
+public class ProductType extends AbstractDatabaseObject implements Comparable<ProductType>
 {
-	/**
-	 * The database ID of this product category.
-	 */
-	private int databaseID;
-
 	/**
 	 * The product category name.
 	 */
@@ -23,8 +18,8 @@ public class ProductType implements Comparable<ProductType>
 	 */
 	public ProductType(final int databaseID, final String name)
 	{
+		setDatabaseID(databaseID);
 		this.name = name;
-		this.databaseID = databaseID;
 	}
 
 	/**
@@ -72,16 +67,6 @@ public class ProductType implements Comparable<ProductType>
 	}
 
 	/**
-	 * Gets the database ID of this category.
-	 *
-	 * @return the database id
-	 */
-	public int getDatabaseID()
-	{
-		return databaseID;
-	}
-
-	/**
 	 * Gets the name of this product type.
 	 *
 	 * @return the name of this product type
@@ -89,16 +74,6 @@ public class ProductType implements Comparable<ProductType>
 	public String getName()
 	{
 		return name;
-	}
-
-	/**
-	 * Sets a new database ID for this product type.
-	 *
-	 * @param databaseID the new database ID
-	 */
-	public void setDatabaseID(final int databaseID)
-	{
-		this.databaseID = databaseID;
 	}
 
 	/**

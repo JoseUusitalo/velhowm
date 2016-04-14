@@ -14,7 +14,7 @@ import org.apache.log4j.Logger;
  *
  * @author Jose Uusitalo
  */
-public class Shelf implements Comparable<Shelf>
+public class Shelf extends AbstractDatabaseObject implements Comparable<Shelf>
 {
 	/**
 	 * Apache log4j logger: System.
@@ -25,11 +25,6 @@ public class Shelf implements Comparable<Shelf>
 	 * The identifier of a shelf in IDs.
 	 */
 	public static final String SHELF_IDENTIFIER = "S";
-
-	/**
-	 * The database ID of this shelf.
-	 */
-	private int databaseID;
 
 	/**
 	 * Number of levels on this shelf.
@@ -50,7 +45,7 @@ public class Shelf implements Comparable<Shelf>
 		if (levelCount < 1)
 			throw new IllegalArgumentException("Number of levels on a shelf must be greater than 0.");
 
-		this.databaseID = databaseID;
+		setDatabaseID(databaseID);
 		this.levelCount = levelCount;
 		this.shelfLevels = new TreeSet<ShelfLevel>();
 	}
@@ -222,7 +217,7 @@ public class Shelf implements Comparable<Shelf>
 		final int[] tokens = shelfSlotIDTokenizer(shelfSlotID);
 
 		// Correct shelf?
-		if (databaseID != tokens[0])
+		if (getDatabaseID() != tokens[0])
 			throw new IllegalArgumentException("Invalid shelf slot ID '" + shelfSlotID + "': invalid shelf " + tokens[0]);
 
 		// Enough levels?
@@ -239,7 +234,7 @@ public class Shelf implements Comparable<Shelf>
 	@Override
 	public String toString()
 	{
-		return "[" + databaseID + "] Lvls: " + levelCount + ", Boxs: " + getProductBoxes().size() + ", Slts: " + getShelfSlotCount() + ", Free: "
+		return "[" + getDatabaseID() + "] Lvls: " + levelCount + ", Boxs: " + getProductBoxes().size() + ", Slts: " + getShelfSlotCount() + ", Free: "
 				+ getFreeShelfSlots().size();
 	}
 
@@ -270,29 +265,7 @@ public class Shelf implements Comparable<Shelf>
 	 */
 	public String getShelfID()
 	{
-		return SHELF_IDENTIFIER + databaseID;
-	}
-
-	/**
-	 * Gets the database ID of this shelf.
-	 *
-	 * @return the database ID
-	 */
-	public int getDatabaseID()
-	{
-		return databaseID;
-	}
-
-	/**
-	 * Sets the database ID of this shelf.
-	 *
-	 * @param databaseID the new database ID
-	 */
-	public void setDatabaseID(final int databaseID)
-	{
-		// TODO: It would be nice to handle this in an abstract class.
-
-		this.databaseID = databaseID;
+		return SHELF_IDENTIFIER + getDatabaseID();
 	}
 
 	/**

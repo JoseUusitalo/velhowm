@@ -5,13 +5,8 @@ package velho.model;
  *
  * @author Jose Uusitalo
  */
-public class ManifestState implements Comparable<ManifestState>
+public class ManifestState extends AbstractDatabaseObject implements Comparable<ManifestState>
 {
-	/**
-	 * The database ID.
-	 */
-	private int databaseID;
-
 	/**
 	 * The name of this state.
 	 */
@@ -23,7 +18,7 @@ public class ManifestState implements Comparable<ManifestState>
 	 */
 	public ManifestState(final int databaseID, final String name)
 	{
-		this.databaseID = databaseID;
+		setDatabaseID(databaseID);
 		this.name = name;
 	}
 
@@ -58,26 +53,6 @@ public class ManifestState implements Comparable<ManifestState>
 	public int compareTo(final ManifestState state)
 	{
 		return this.getDatabaseID() - state.getDatabaseID();
-	}
-
-	/**
-	 * Gets the database ID of this manifest state.
-	 *
-	 * @return the database ID of this manifest state
-	 */
-	public int getDatabaseID()
-	{
-		return databaseID;
-	}
-
-	/**
-	 * Sets the database ID of this manifest state.
-	 *
-	 * @param databaseID the new database ID for this manifest state
-	 */
-	public void setDatabaseID(final int id)
-	{
-		databaseID = id;
 	}
 
 	/**

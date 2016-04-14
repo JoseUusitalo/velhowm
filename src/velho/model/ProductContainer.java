@@ -7,13 +7,8 @@ import java.util.Date;
  *
  * @author Joona Silvennoinen &amp; Jose Uusitalo
  */
-public abstract class ProductContainer implements Comparable<ProductContainer>
+public abstract class ProductContainer extends AbstractDatabaseObject implements Comparable<ProductContainer>
 {
-	/**
-	 * The ID of the product box.
-	 */
-	protected int databaseID;
-
 	/**
 	 * The expiration date of the products in this container.
 	 */
@@ -54,7 +49,7 @@ public abstract class ProductContainer implements Comparable<ProductContainer>
 		}
 		this.expirationDate = expirationDate;
 		this.maxSize = maxSize;
-		this.databaseID = boxID;
+		setDatabaseID(boxID);
 		this.product = product;
 		this.productCount = productCount;
 	}
@@ -107,24 +102,6 @@ public abstract class ProductContainer implements Comparable<ProductContainer>
 	public void setMaxSize(final int maxSize)
 	{
 		this.maxSize = maxSize;
-	}
-
-	/**
-	 * Gets the ID of the product container.
-	 *
-	 * @return the ID of the product container.
-	 */
-	public int getDatabaseID()
-	{
-		return databaseID;
-	}
-
-	/**
-	 * Assigns a new database ID for this product container.
-	 */
-	public void setDatabaseID(final int id)
-	{
-		databaseID = id;
 	}
 
 	/**
