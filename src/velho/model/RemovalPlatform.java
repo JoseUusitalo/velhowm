@@ -5,13 +5,8 @@ package velho.model;
  *
  * @author Jose Uusitalo
  */
-public class RemovalPlatform implements Comparable<RemovalPlatform>
+public class RemovalPlatform extends AbstractDatabaseObject implements Comparable<RemovalPlatform>
 {
-	/**
-	 * The database ID of this removal platform.
-	 */
-	private int databaseID;
-
 	/**
 	 * The amount of free space left on this removal platform as a percentage.
 	 */
@@ -29,7 +24,7 @@ public class RemovalPlatform implements Comparable<RemovalPlatform>
 	 */
 	public RemovalPlatform(final int databaseID, final double freeSpacePercent, final double freeSpaceLeftWarningPercent)
 	{
-		this.databaseID = databaseID;
+		setDatabaseID(databaseID);
 		this.freeSpacePercent = freeSpacePercent;
 		this.freeSpaceLeftWarningPercent = freeSpaceLeftWarningPercent;
 	}
@@ -44,7 +39,7 @@ public class RemovalPlatform implements Comparable<RemovalPlatform>
 	@Override
 	public String toString()
 	{
-		return "[" + databaseID + "] Removal Platform: " + freeSpacePercent * 100.0 + "% (" + freeSpaceLeftWarningPercent * 100.0 + "%)";
+		return "[" + getDatabaseID() + "] Removal Platform: " + freeSpacePercent * 100.0 + "% (" + freeSpaceLeftWarningPercent * 100.0 + "%)";
 	}
 
 	@Override
@@ -65,26 +60,6 @@ public class RemovalPlatform implements Comparable<RemovalPlatform>
 	public int compareTo(final RemovalPlatform platform)
 	{
 		return this.getDatabaseID() - platform.getDatabaseID();
-	}
-
-	/**
-	 * Gets the database ID of this removal platform.
-	 *
-	 * @return the database ID
-	 */
-	public int getDatabaseID()
-	{
-		return databaseID;
-	}
-
-	/**
-	 * Sets the database ID of this removal platform.
-	 *
-	 * @param databaseID the new database ID
-	 */
-	public void setDatabaseID(final int databaseID)
-	{
-		this.databaseID = databaseID;
 	}
 
 	/**

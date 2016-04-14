@@ -29,6 +29,6 @@ public class Freezer extends ProductContainer
 	@Override
 	public String toString()
 	{
-		return "[" + this.databaseID + "] Freezer: " + this.product.getName() + " (" + this.productCount + ")";
+		return "[" + getDatabaseID() + "] Freezer: " + this.product.getName() + " (" + this.productCount + ")";
 	}
 }

@@ -12,14 +12,9 @@ import javafx.collections.ObservableList;
  *
  * @author Jose Uusitalo
  */
-public class Manifest implements Comparable<Manifest>
+public class Manifest extends AbstractDatabaseObject implements Comparable<Manifest>
 {
 	// TODO: Generalize products lists into an abstract class. Removal lists and Manifests are basically identical.
-
-	/**
-	 * The database ID of this manifest.
-	 */
-	private int databaseID;
 
 	/**
 	 * The set of {@link ProductBox} objects.
@@ -60,7 +55,7 @@ public class Manifest implements Comparable<Manifest>
 	 */
 	public Manifest(final int databaseID, final ManifestState state, final int driverID, final Date ordered, final Date received)
 	{
-		this.databaseID = databaseID;
+		setDatabaseID(databaseID);
 		this.state = state;
 		this.driverID = driverID;
 		this.orderedDate = ordered;
@@ -79,7 +74,7 @@ public class Manifest implements Comparable<Manifest>
 	 */
 	public Manifest(final ManifestState state, final int driverID, final Date ordered, final Date received)
 	{
-		this(-1, state, driverID, ordered, received);
+		this(0, state, driverID, ordered, received);
 	}
 
 	/**
@@ -94,8 +89,8 @@ public class Manifest implements Comparable<Manifest>
 	@Override
 	public String toString()
 	{
-		return "[" + databaseID + "] State: " + state + " Driver: " + driverID + " Ordered/Received: " + orderedDate.toString() + "/" + receivedDate.toString()
-				+ " (" + boxes.size() + ")";
+		return "[" + getDatabaseID() + "] State: " + state + " Driver: " + driverID + " Ordered/Received: " + orderedDate.toString() + "/"
+				+ receivedDate.toString() + " (" + boxes.size() + ")";
 	}
 
 	@Override
@@ -116,26 +111,6 @@ public class Manifest implements Comparable<Manifest>
 	public int compareTo(final Manifest manifest)
 	{
 		return this.getDatabaseID() - manifest.getDatabaseID();
-	}
-
-	/**
-	 * Gets the database ID of this manifest.
-	 *
-	 * @return the database ID of this manifest
-	 */
-	public int getDatabaseID()
-	{
-		return databaseID;
-	}
-
-	/**
-	 * Sets the database ID of this manifest.
-	 *
-	 * @param databaseID the new database ID of this manifest
-	 */
-	public void setDatabaseID(final int databaseID)
-	{
-		this.databaseID = databaseID;
 	}
 
 	/**

@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+ "-//Hibernate/Hibernate Mapping DTD//EN"
+ "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+	<class name="velho.model.ShelfLevel" table="SHELFLEVELS">
+		<meta attribute="class-description">A horizontal level on a shelf that contains one or more shelf slots.</meta>
+
+		<id name="databaseID"
+			column="level_id"
+			type="int">
+			<generator class="native" />
+		</id>
+
+		<property	name="shelfPosition"
+					column="shelf_position"
+					type="int" />
+
+		<property	name="maxShelfSlots"
+					column="max_shelfslots"
+					type="int" />
+
+		<!-- No cascade solves an exception. -->
+		<set		name="shelfSlots"
+					table="SHELFLEVEL_SHELFSLOTS"
+					lazy="false">
+			<key column="shelflevel" />
+			<!-- The unique="true" makes this a one-to-many mapping. -->
+			<many-to-many	class="velho.model.ShelfSlot"
+							column="shelfslot"
+							unique="true" />
+		</set>
+
+		<!-- This is the inverse "child" side. Updates here do not cascade? -->
+		<join		table="SHELF_SHELFLEVELS"
+					optional="true"
+					inverse="true">
+			<key	column="shelflevel"
+					unique="true"
+					not-null="true" />
+			<many-to-one	name="parentShelf"
+							column="shelf" />
+		</join>
+	</class>
+</hibernate-mapping>

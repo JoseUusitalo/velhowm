@@ -7,7 +7,7 @@ import velho.model.enums.UserRole;
  *
  * @author Jose Uusitalo
  */
-public class User implements Comparable<User>
+public class User extends AbstractDatabaseObject implements Comparable<User>
 {
 	/**
 	 * The maximum number of characters a first or last name may have.
@@ -33,11 +33,6 @@ public class User implements Comparable<User>
 	 * The number of digits a PIN must have.
 	 */
 	public static final int PIN_LENGTH = 6;
-
-	/**
-	 * The database row ID of this user.
-	 */
-	private int databaseID;
 
 	/**
 	 * The first name of this user.
@@ -72,7 +67,7 @@ public class User implements Comparable<User>
 	 */
 	public User(final int databaseID, final String firstName, final String lastName, final UserRole role)
 	{
-		this.databaseID = databaseID;
+		setDatabaseID(databaseID);
 		this.firstName = firstName;
 		this.lastName = lastName;
 		this.role = role;
@@ -107,7 +102,7 @@ public class User implements Comparable<User>
 	@Override
 	public String toString()
 	{
-		return firstName + " " + lastName + " [" + role.toString() + " | " + databaseID + "]";
+		return firstName + " " + lastName + " [" + role.toString() + " | " + getDatabaseID() + "]";
 	}
 
 	@Override
@@ -159,26 +154,6 @@ public class User implements Comparable<User>
 	public String getRoleName()
 	{
 		return role.getName();
-	}
-
-	/**
-	 * Gets the database ID of this user.
-	 *
-	 * @return the database ID of this user
-	 */
-	public int getDatabaseID()
-	{
-		return databaseID;
-	}
-
-	/**
-	 * Sets the database ID of this user.
-	 *
-	 * @param databaseID the new database ID
-	 */
-	public void setDatabaseID(final int databaseID)
-	{
-		this.databaseID = databaseID;
 	}
 
 	/**

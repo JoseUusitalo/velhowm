@@ -24,9 +24,9 @@ import velho.model.ProductBox;
 import velho.model.ProductBoxSearchResultRow;
 import velho.model.RemovalList;
 import velho.model.User;
-import velho.model.enums.DatabaseFileState;
-import velho.model.exceptions.ExistingDatabaseLinkException;
+import velho.model.exceptions.NoDatabaseException;
 import velho.model.exceptions.NoDatabaseLinkException;
+import velho.model.exceptions.UniqueKeyViolationException;
 
 /**
  * Tests for the {@link DatabaseController} class.
@@ -37,10 +37,9 @@ import velho.model.exceptions.NoDatabaseLinkException;
 public class DatabaseControllerTest
 {
 	@BeforeClass
-	public final static void connectAndInitializeDatabase() throws ClassNotFoundException, NoDatabaseLinkException, ExistingDatabaseLinkException
+	public final static void connectAndInitializeDatabase() throws NoDatabaseException, NoDatabaseLinkException
 	{
-		assertTrue(DatabaseController.link() != DatabaseFileState.DOES_NOT_EXIST);
-		assertTrue(DatabaseController.initializeDatabase());
+		assertTrue(DatabaseController.resetDatabase());
 	}
 
 	@AfterClass
@@ -56,7 +55,7 @@ public class DatabaseControllerTest
 	}
 
 	@Test
-	public final void testFailInitialization() throws ClassNotFoundException, ExistingDatabaseLinkException
+	public final void testFailInitialization() throws NoDatabaseException
 	{
 		try
 		{
@@ -70,7 +69,7 @@ public class DatabaseControllerTest
 
 		try
 		{
-			assertFalse(DatabaseController.initializeDatabase());
+			assertFalse(DatabaseController.loadSampleData());
 		}
 		catch (final NoDatabaseLinkException e)
 		{
@@ -82,6 +81,10 @@ public class DatabaseControllerTest
 			{
 				fail(e1.toString());
 			}
+		}
+		catch (UniqueKeyViolationException e)
+		{
+			e.printStackTrace();
 		}
 	}
 
@@ -181,7 +184,7 @@ public class DatabaseControllerTest
 	}
 
 	@Test
-	public final void testDeleteUser1() throws NoDatabaseLinkException
+	public final void testDeleteUser1() throws NoDatabaseLinkException, NoDatabaseException
 	{
 		final ObservableList<Object> users = DatabaseController.getAllUsers();
 		final User user = DatabaseController.getUserByID(1);
@@ -189,7 +192,7 @@ public class DatabaseControllerTest
 		DatabaseController.deleteUser(user);
 		assertFalse(users.contains(user));
 
-		assertTrue(DatabaseController.initializeDatabase());
+		assertTrue(DatabaseController.resetDatabase());
 	}
 
 	@Test
@@ -297,26 +300,19 @@ public class DatabaseControllerTest
 	@Test
 	public final void testGetRemovalListByID_LoadAndCache()
 	{
-		DatabaseController.clearAllCaches();
 		assertEquals("[1] Active: 3 boxes", DatabaseController.getRemovalListByID(1).toString());
 	}
 
 	@Test
-	public final void testLoadData() throws NoDatabaseLinkException
+	public final void testLoadData()
 	{
-		DatabaseController.clearAllCaches();
-		DatabaseController.loadData();
-
 		// Make sure that a removal list was loaded and the product boxes were placed on it.
 		assertEquals(0, DatabaseController.getRemovalListByID(5).getSize());
 	}
 
 	@Test
-	public final void testInsertRemovalList() throws NoDatabaseLinkException
+	public final void testInsertRemovalList()
 	{
-		DatabaseController.clearAllCaches();
-		DatabaseController.loadData();
-
 		final RemovalList list = new RemovalList();
 		final ProductBox box = DatabaseController.getProductBoxByID(1);
 		list.addProductBox(box);

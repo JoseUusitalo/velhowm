@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+ "-//Hibernate/Hibernate Mapping DTD//EN"
+ "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+	<class name="velho.model.Shelf" table="SHELVES">
+		<meta attribute="class-description">A class representing a physical shelf structure in the warehouse.</meta>
+
+		<id name="databaseID"
+			column="shelf_id"
+			type="int">
+			<generator class="native" />
+		</id>
+
+		<property	name="levelCount"
+					column="levels"
+					type="int" />
+
+		<!-- No cascade solves an exception. -->
+		<set		name="shelfLevels"
+					table="SHELF_SHELFLEVELS"
+					lazy="false">
+			<key column="shelf" />
+			<!-- The unique="true" makes this a one-to-many mapping. -->
+			<many-to-many	class="velho.model.ShelfLevel"
+							column="shelflevel"
+							unique="true" />
+		</set>
+	</class>
+</hibernate-mapping>
