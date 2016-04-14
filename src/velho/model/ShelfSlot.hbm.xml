@@ -20,9 +20,9 @@
 					column="max_productboxes"
 					type="int" />
 
+		<!-- No cascade solves an exception. -->
 		<set		name="productBoxes"
 					table="SHELFSLOT_PRODUCTBOXES"
-					cascade="all"
 					lazy="false">
 			<key column="shelfslot" />
 			<!-- The unique="true" makes this a one-to-many mapping. -->

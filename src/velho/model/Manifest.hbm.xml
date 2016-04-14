@@ -11,33 +11,33 @@
 			type="int">
 			<generator class="native" />
 		</id>
-		
+
 		<property	name="driverID"
 					column="driver_id"
 					type="int" />
-		
+
 		<property	name="orderedDate"
 					column="date_ordered"
 					type="date" />
-		
+
 		<property	name="receivedDate"
 					column="date_received"
 					type="date" />
-		
-		<!-- Many-to-one: This object can have one referenced object, the referenced object can be referenced from many objects.  
+
+		<!-- No cascade solves an exception. -->
+		<!-- Many-to-one: This object can have one referenced object, the referenced object can be referenced from many objects.
 			 Cascade changes.
 			 "Select" eager fetching: load the referenced object when this object is loaded. -->
 		<many-to-one	name="state"
 						class="velho.model.ManifestState"
 						column="state"
 						not-null="true"
-						cascade="all"
 						fetch="select"
 						lazy="false" />
-		
+
+		<!-- No cascade solves an exception. -->
 		<!-- TODO: This is wrong, it should be many-to-one with a custom join table. -->
 		<set name="boxes"
-			 cascade="all"
 			 table="manifest_productboxes"
 			 fetch="select"
 			 lazy="false" >
@@ -45,7 +45,7 @@
 			<many-to-many column="productbox"
 						  class="velho.model.ProductBox" />
 		</set>
-		
+
 		<!-- TODO: CHECK (`date_received`>=`date_ordered`) -->
 	</class>
 </hibernate-mapping>

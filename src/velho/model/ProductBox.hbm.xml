@@ -15,24 +15,24 @@
 		<property	name="expirationDate"
 					column="expiration_date"
 					type="date" />
-		
+
 		<property	name="maxSize"
 					column="max_size"
 					type="int"
 					not-null="true" />
-		
+
 		<property name="productCount" type="int">
 			<column name="product_count" not-null="true" default="0" />
-		</property>		
+		</property>
 
-		<!-- Many-to-one: This object can have one referenced object, the referenced object can be referenced from many objects.  
+		<!-- No cascade solves an exception. -->
+		<!-- Many-to-one: This object can have one referenced object, the referenced object can be referenced from many objects.
 			 Cascade changes.
 			 "Select" eager fetching: load the referenced object when this object is loaded. -->
 		<many-to-one	name="product"
 						class="velho.model.Product"
 						column="product"
 						not-null="true"
-						cascade="all"
 						fetch="select"
 						lazy="false" />
 	</class>

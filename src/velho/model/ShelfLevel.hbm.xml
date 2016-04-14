@@ -19,10 +19,10 @@
 		<property	name="maxShelfSlots"
 					column="max_shelfslots"
 					type="int" />
-		
+
+		<!-- No cascade solves an exception. -->
 		<set		name="shelfSlots"
 					table="SHELFLEVEL_SHELFSLOTS"
-					cascade="all"
 					lazy="false">
 			<key column="shelflevel" />
 			<!-- The unique="true" makes this a one-to-many mapping. -->
@@ -30,7 +30,7 @@
 							column="shelfslot"
 							unique="true" />
 		</set>
-		
+
 		<!-- This is the inverse "child" side. Updates here do not cascade? -->
 		<join		table="SHELF_SHELFLEVELS"
 					optional="true"

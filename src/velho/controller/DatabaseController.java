@@ -2056,7 +2056,6 @@ public class DatabaseController
 		try
 		{
 			sessionFactory.getCurrentSession().getTransaction().commit();
-
 		}
 		catch (final HibernateException e)
 		{

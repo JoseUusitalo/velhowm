@@ -16,9 +16,9 @@
 					column="levels"
 					type="int" />
 
+		<!-- No cascade solves an exception. -->
 		<set		name="shelfLevels"
 					table="SHELF_SHELFLEVELS"
-					cascade="all"
 					lazy="false">
 			<key column="shelf" />
 			<!-- The unique="true" makes this a one-to-many mapping. -->
