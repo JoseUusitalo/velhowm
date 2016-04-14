@@ -1089,7 +1089,6 @@ public class DatabaseController
 	 * @return the corresponding object or <code>null</code> for invalid ID
 	 * @throws HibernateException when the query failed to commit and has been rolled back
 	 */
-	@SuppressWarnings("resource")
 	private static Object getByID(final Class objectClass, final int databaseID) throws HibernateException
 	{
 		// TODO: Database object abstract class.
@@ -1604,7 +1603,6 @@ public class DatabaseController
 	 * logged in user (i.e. debug user) if the ID was negative
 	 * @throws HibernateException when the query failed to commit and has been rolled back
 	 */
-	@SuppressWarnings("resource")
 	public static User getUserByID(final int id) throws HibernateException
 	{
 		// Debug account ID?
@@ -1736,7 +1734,7 @@ public class DatabaseController
 	 * database ID and the value is the number of products
 	 * @throws NoDatabaseLinkException
 	 */
-	@SuppressWarnings({ "unchecked", "resource" })
+	@SuppressWarnings("unchecked")
 	public static List<ProductBoxSearchResultRow> searchProductBoxByDataList(final Map<Integer, Integer> productData)
 	{
 		final List<ProductBoxSearchResultRow> foundProducts = FXCollections.observableArrayList();
@@ -1950,7 +1948,6 @@ public class DatabaseController
 	 *
 	 * @return <code>true</code> if database changed as a result of this call
 	 */
-	@SuppressWarnings("resource")
 	public static boolean deleteAllData() throws NoDatabaseException, NoDatabaseException
 	{
 		DBLOG.info("Truncating database...");
@@ -2016,7 +2013,6 @@ public class DatabaseController
 	 * @param object object to delete
 	 * @throws HibernateException when the object was not deleted
 	 */
-	@SuppressWarnings("resource")
 	private static void delete(final Object object) throws HibernateException
 	{
 		sessionFactory.getCurrentSession().beginTransaction();
@@ -2077,7 +2073,6 @@ public class DatabaseController
 	 * @return the database ID of the inserted or updated object
 	 * @throws HibernateException when data was not saved
 	 */
-	@SuppressWarnings("resource")
 	public static int save(final RemovalList object)
 	{
 
@@ -2109,7 +2104,6 @@ public class DatabaseController
 	 * @return the database ID of the inserted or updated object
 	 * @throws HibernateException when data was not saved
 	 */
-	@SuppressWarnings("resource")
 	public static int save(final Shelf object)
 	{
 
@@ -2142,7 +2136,6 @@ public class DatabaseController
 	 * @throws HibernateException when data was not saved
 	 * @throws ConstraintViolationException when the user already exists in the database
 	 */
-	@SuppressWarnings("resource")
 	public static int save(final User object) throws ConstraintViolationException
 	{
 		// TODO: Generalize when all tests have been updated to manually rollback.
@@ -2178,7 +2171,6 @@ public class DatabaseController
 	 * @return the database ID of the inserted or updated object
 	 * @throws HibernateException when data was not saved
 	 */
-	@SuppressWarnings("resource")
 	public static int save(final Manifest object)
 	{
 		// TODO: Generalize when all tests have been updated to manually rollback.
@@ -2211,7 +2203,6 @@ public class DatabaseController
 	 * @return the database ID of the inserted or updated object
 	 * @throws HibernateException when data was not saved
 	 */
-	@SuppressWarnings("resource")
 	public static int save(final RemovalPlatform object)
 	{
 		// TODO: Generalize when all tests have been updated to manually rollback.
@@ -2244,7 +2235,6 @@ public class DatabaseController
 	 * @return the database ID of the inserted or updated object
 	 * @throws HibernateException when data was not saved
 	 */
-	@SuppressWarnings("resource")
 	public static int save(final Product object)
 	{
 		// TODO: Generalize when all tests have been updated to manually rollback.
@@ -2277,7 +2267,6 @@ public class DatabaseController
 	 * @return the database ID of the inserted or updated object
 	 * @throws HibernateException when data was not saved
 	 */
-	@SuppressWarnings("resource")
 	public static int save(final ProductBrand object)
 	{
 		// TODO: Generalize when all tests have been updated to manually rollback.
@@ -2310,7 +2299,6 @@ public class DatabaseController
 	 * @return the database ID of the inserted or updated object
 	 * @throws HibernateException when data was not saved
 	 */
-	@SuppressWarnings("resource")
 	public static int save(final ProductCategory object)
 	{
 		// TODO: Generalize when all tests have been updated to manually rollback.
@@ -2347,12 +2335,12 @@ public class DatabaseController
 	 * @return a list of objects
 	 * @throws HibernateException when the query failed to commit and has been rolled back
 	 */
-	@SuppressWarnings({ "unchecked", "resource" })
 	private static List<Object> getAll(final String className) throws HibernateException
 	{
 
 		sessionFactory.getCurrentSession().beginTransaction();
 
+		@SuppressWarnings("unchecked")
 		final List<Object> result = sessionFactory.getCurrentSession().createQuery("from " + className).list();
 
 		try
