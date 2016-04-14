@@ -53,6 +53,7 @@ public class ProductListSearch
 			Button sendToScannerButton = new Button(LocalizationController.getString("sendToScannerButton"));
 
 			final TextArea textArea = new TextArea();
+			// fixme
 			textArea.setPromptText((LocalizationController.getString("productSearchByNameOrCodeFirstRowText")) + (LocalizationController.getString("productSearchByNameOrCodeSecondRowText")) + (LocalizationController.getString("productSearchByNameOrCodeThirdRowText")));
 			textArea.setPrefWidth(MainWindow.WINDOW_WIDTH / 5);
 			printButton.setMaxWidth(Double.MAX_VALUE);

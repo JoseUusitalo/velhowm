@@ -1,6 +1,7 @@
 package velho.controller;
 
 import java.io.File;
+import java.text.MessageFormat;
 import java.util.Locale;
 import java.util.ResourceBundle;
 
@@ -18,11 +19,20 @@ public class LocalizationController
 
 		System.out.println(new File("res/en-US").getAbsolutePath());
 		msgBundle = ResourceBundle.getBundle("res.en-US", locale);
+
 	}
 
 	public static void setLocale(final Locale locale)
 	{
 		LocalizationController.locale = locale;
+	}
+
+	public static String getCompoundString(final String key, final Object[] messageArguments)
+	{
+		MessageFormat formatter = new MessageFormat("");
+		formatter.setLocale(locale);
+		formatter.applyPattern(msgBundle.getString(key));
+		return formatter.format(messageArguments);
 	}
 
 	public static String getString(final String key)
