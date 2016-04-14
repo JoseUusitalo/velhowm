@@ -771,10 +771,8 @@ public class DatabaseController
 				DBLOG.info("Database is already in use.");
 				PopupController.error("Database is already in use. Please close the open application.");
 			}
-			else
-			{
-				relink();
-			}
+
+			System.out.println(e);
 		}
 		return connection;
 	}
@@ -2609,12 +2607,11 @@ public class DatabaseController
 
 	public static void openSession()
 	{
-		try
+		if (sessionFactory.getCurrentSession().isOpen())
 		{
-			sessionFactory.getCurrentSession();
 			DBLOG.error("Attempted to open a database session, but a session was already open.");
 		}
-		catch (HibernateException e)
+		else
 		{
 			sessionFactory.openSession();
 			DBLOG.info("Database session open.");
@@ -2623,13 +2620,12 @@ public class DatabaseController
 
 	public static void closeSession()
 	{
-		try
+		if (sessionFactory.getCurrentSession().isOpen())
 		{
-			sessionFactory.getCurrentSession().disconnect();
 			sessionFactory.getCurrentSession().close();
 			DBLOG.info("Database session closed.");
 		}
-		catch (HibernateException e)
+		else
 		{
 			DBLOG.warn("Attempted to close a database session, but there was no session.");
 		}
