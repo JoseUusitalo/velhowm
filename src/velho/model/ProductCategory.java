@@ -40,7 +40,7 @@ public class ProductCategory implements Comparable<ProductCategory>
 	 */
 	public ProductCategory(final String name, final ProductType type)
 	{
-		this(-1, name, type);
+		this(0, name, type);
 	}
 
 	/**
@@ -48,7 +48,7 @@ public class ProductCategory implements Comparable<ProductCategory>
 	 */
 	public ProductCategory(final String name)
 	{
-		this(-1, name, null);
+		this(0, name, null);
 	}
 
 	/**

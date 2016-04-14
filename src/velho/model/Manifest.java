@@ -79,7 +79,7 @@ public class Manifest implements Comparable<Manifest>
 	 */
 	public Manifest(final ManifestState state, final int driverID, final Date ordered, final Date received)
 	{
-		this(-1, state, driverID, ordered, received);
+		this(0, state, driverID, ordered, received);
 	}
 
 	/**

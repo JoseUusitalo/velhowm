@@ -50,7 +50,7 @@ public class Product implements Comparable<Product>
 
 	public Product(final String name, final ProductBrand brand, final ProductCategory category, final int popularity)
 	{
-		this.databaseID = -1;
+		this.databaseID = 0;
 		this.name = name;
 		this.brand = brand;
 		this.category = category;

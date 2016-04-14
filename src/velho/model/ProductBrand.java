@@ -32,7 +32,7 @@ public class ProductBrand implements Comparable<ProductBrand>
 	 */
 	public ProductBrand(final String name)
 	{
-		this(-1, name);
+		this(0, name);
 	}
 
 	/**
