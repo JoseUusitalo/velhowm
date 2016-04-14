@@ -22,7 +22,6 @@ import java.util.TreeMap;
 import org.apache.log4j.Logger;
 import org.h2.jdbcx.JdbcConnectionPool;
 import org.hibernate.HibernateException;
-import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
 import org.hibernate.exception.ConstraintViolationException;
@@ -1098,20 +1097,19 @@ public class DatabaseController
 		if (databaseID < 1)
 			return null;
 
-		final Session session = sessionFactory.getCurrentSession();
-		session.beginTransaction();
+		sessionFactory.getCurrentSession().beginTransaction();
 
 		@SuppressWarnings("unchecked")
-		final Object result = session.get(objectClass, databaseID);
+		final Object result = sessionFactory.getCurrentSession().get(objectClass, databaseID);
 
 		try
 		{
-			session.getTransaction().commit();
+			sessionFactory.getCurrentSession().getTransaction().commit();
 
 		}
 		catch (final HibernateException e)
 		{
-			session.getTransaction().rollback();
+			sessionFactory.getCurrentSession().getTransaction().rollback();
 
 			throw new HibernateException("Failed to commit.");
 		}
@@ -1613,10 +1611,9 @@ public class DatabaseController
 		if (id < 0)
 			return LoginController.getCurrentUser();
 
-		final Session session = sessionFactory.getCurrentSession();
-		final Transaction transaction = session.beginTransaction();
+		final Transaction transaction = sessionFactory.getCurrentSession().beginTransaction();
 
-		final User user = session.get(User.class, id);
+		final User user = sessionFactory.getCurrentSession().get(User.class, id);
 
 		transaction.commit();
 
@@ -1746,8 +1743,6 @@ public class DatabaseController
 		Integer wantedProductCount = null;
 		List<ProductBox> boxes = null;
 
-		final Session session = sessionFactory.getCurrentSession();
-
 		// For every unique string representing a product.
 		for (final Integer productID : productData.keySet())
 		{
@@ -1758,7 +1753,7 @@ public class DatabaseController
 
 			// First look for an exact amount.
 			// @formatter:off
-			boxes = session.createQuery("from ProductBox as pb"
+			boxes = sessionFactory.getCurrentSession().createQuery("from ProductBox as pb"
 									  + " where pb.product.databaseID = :id"
 									  + " and pb.productCount = :count"
 									  + " order by pb.expirationDate asc")
@@ -1779,7 +1774,7 @@ public class DatabaseController
 				 * more importantly this query is done in a loop, it is faster to do it here.
 				 */
 				// @formatter:off
-				boxes = session.createQuery("from ProductBox as pb"
+				boxes = sessionFactory.getCurrentSession().createQuery("from ProductBox as pb"
 										  + " where pb.product.databaseID = :id"
 										  + " order by pb.expirationDate asc")
 						   	   .setParameter("id", productID)
@@ -1963,27 +1958,26 @@ public class DatabaseController
 		if (!databaseExists())
 			throw new NoDatabaseException();
 
-		final Session session = sessionFactory.getCurrentSession();
-		Transaction transaction = session.beginTransaction();
+		Transaction transaction = sessionFactory.getCurrentSession().beginTransaction();
 
 		boolean notChanged = false;
 		int changes = 0;
 
-		session.createSQLQuery("SET REFERENTIAL_INTEGRITY FALSE;").executeUpdate();
+		sessionFactory.getCurrentSession().createSQLQuery("SET REFERENTIAL_INTEGRITY FALSE;").executeUpdate();
 		transaction.commit();
 
 		for (final DatabaseTable table : DatabaseTable.values())
 		{
-			transaction = session.beginTransaction();
-			changes = session.createSQLQuery("TRUNCATE TABLE " + table.toString() + ";").executeUpdate();
+			transaction = sessionFactory.getCurrentSession().beginTransaction();
+			changes = sessionFactory.getCurrentSession().createSQLQuery("TRUNCATE TABLE " + table.toString() + ";").executeUpdate();
 			transaction.commit();
 
 			DBLOG.trace("Truncate table: " + table.toString() + " | changed rows: " + changes);
 			notChanged = notChanged && (changes == 0);
 		}
 
-		transaction = session.beginTransaction();
-		session.createSQLQuery("SET REFERENTIAL_INTEGRITY TRUE;").executeUpdate();
+		transaction = sessionFactory.getCurrentSession().beginTransaction();
+		sessionFactory.getCurrentSession().createSQLQuery("SET REFERENTIAL_INTEGRITY TRUE;").executeUpdate();
 		transaction.commit();
 
 		if (!notChanged)
@@ -2025,19 +2019,18 @@ public class DatabaseController
 	@SuppressWarnings("resource")
 	private static void delete(final Object object) throws HibernateException
 	{
-		final Session session = sessionFactory.getCurrentSession();
-		session.beginTransaction();
+		sessionFactory.getCurrentSession().beginTransaction();
 
-		session.delete(object);
+		sessionFactory.getCurrentSession().delete(object);
 
 		try
 		{
-			session.getTransaction().commit();
+			sessionFactory.getCurrentSession().getTransaction().commit();
 
 		}
 		catch (final HibernateException e)
 		{
-			session.getTransaction().rollback();
+			sessionFactory.getCurrentSession().getTransaction().rollback();
 
 			throw new HibernateException("Failed to delete.");
 		}
@@ -2087,10 +2080,10 @@ public class DatabaseController
 	@SuppressWarnings("resource")
 	public static int save(final RemovalList object)
 	{
-		final Session session = sessionFactory.getCurrentSession();
-		final Transaction transaction = session.beginTransaction();
 
-		session.saveOrUpdate(object);
+		final Transaction transaction = sessionFactory.getCurrentSession().beginTransaction();
+
+		sessionFactory.getCurrentSession().saveOrUpdate(object);
 
 		try
 		{
@@ -2119,10 +2112,10 @@ public class DatabaseController
 	@SuppressWarnings("resource")
 	public static int save(final Shelf object)
 	{
-		final Session session = sessionFactory.getCurrentSession();
-		final Transaction transaction = session.beginTransaction();
 
-		session.saveOrUpdate(object);
+		final Transaction transaction = sessionFactory.getCurrentSession().beginTransaction();
+
+		sessionFactory.getCurrentSession().saveOrUpdate(object);
 
 		try
 		{
@@ -2154,10 +2147,9 @@ public class DatabaseController
 	{
 		// TODO: Generalize when all tests have been updated to manually rollback.
 
-		final Session session = sessionFactory.getCurrentSession();
-		final Transaction transaction = session.beginTransaction();
+		final Transaction transaction = sessionFactory.getCurrentSession().beginTransaction();
 
-		session.saveOrUpdate(object);
+		sessionFactory.getCurrentSession().saveOrUpdate(object);
 
 		try
 		{
@@ -2191,10 +2183,9 @@ public class DatabaseController
 	{
 		// TODO: Generalize when all tests have been updated to manually rollback.
 
-		final Session session = sessionFactory.getCurrentSession();
-		final Transaction transaction = session.beginTransaction();
+		final Transaction transaction = sessionFactory.getCurrentSession().beginTransaction();
 
-		session.saveOrUpdate(object);
+		sessionFactory.getCurrentSession().saveOrUpdate(object);
 
 		try
 		{
@@ -2225,10 +2216,9 @@ public class DatabaseController
 	{
 		// TODO: Generalize when all tests have been updated to manually rollback.
 
-		final Session session = sessionFactory.getCurrentSession();
-		final Transaction transaction = session.beginTransaction();
+		final Transaction transaction = sessionFactory.getCurrentSession().beginTransaction();
 
-		session.saveOrUpdate(object);
+		sessionFactory.getCurrentSession().saveOrUpdate(object);
 
 		try
 		{
@@ -2259,10 +2249,9 @@ public class DatabaseController
 	{
 		// TODO: Generalize when all tests have been updated to manually rollback.
 
-		final Session session = sessionFactory.getCurrentSession();
-		final Transaction transaction = session.beginTransaction();
+		final Transaction transaction = sessionFactory.getCurrentSession().beginTransaction();
 
-		session.saveOrUpdate(object);
+		sessionFactory.getCurrentSession().saveOrUpdate(object);
 
 		try
 		{
@@ -2293,10 +2282,9 @@ public class DatabaseController
 	{
 		// TODO: Generalize when all tests have been updated to manually rollback.
 
-		final Session session = sessionFactory.getCurrentSession();
-		final Transaction transaction = session.beginTransaction();
+		final Transaction transaction = sessionFactory.getCurrentSession().beginTransaction();
 
-		session.saveOrUpdate(object);
+		sessionFactory.getCurrentSession().saveOrUpdate(object);
 
 		try
 		{
@@ -2327,10 +2315,9 @@ public class DatabaseController
 	{
 		// TODO: Generalize when all tests have been updated to manually rollback.
 
-		final Session session = sessionFactory.getCurrentSession();
-		final Transaction transaction = session.beginTransaction();
+		final Transaction transaction = sessionFactory.getCurrentSession().beginTransaction();
 
-		session.saveOrUpdate(object);
+		sessionFactory.getCurrentSession().saveOrUpdate(object);
 
 		try
 		{
@@ -2363,19 +2350,19 @@ public class DatabaseController
 	@SuppressWarnings({ "unchecked", "resource" })
 	private static List<Object> getAll(final String className) throws HibernateException
 	{
-		final Session session = sessionFactory.getCurrentSession();
-		session.beginTransaction();
 
-		final List<Object> result = session.createQuery("from " + className).list();
+		sessionFactory.getCurrentSession().beginTransaction();
+
+		final List<Object> result = sessionFactory.getCurrentSession().createQuery("from " + className).list();
 
 		try
 		{
-			session.getTransaction().commit();
+			sessionFactory.getCurrentSession().getTransaction().commit();
 
 		}
 		catch (final HibernateException e)
 		{
-			session.getTransaction().rollback();
+			sessionFactory.getCurrentSession().getTransaction().rollback();
 
 			throw new HibernateException("Failed to commit.");
 		}
@@ -2650,6 +2637,7 @@ public class DatabaseController
 	{
 		try
 		{
+			sessionFactory.getCurrentSession().disconnect();
 			sessionFactory.getCurrentSession().close();
 			DBLOG.info("Database session closed.");
 		}
