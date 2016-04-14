@@ -183,7 +183,7 @@ public class ExternalSystemsController
 		if (showPopup)
 		{
 			if (success)
-				PopupController.info(productBoxCode + " was moved to " + newShelfSlotID + ".");
+				PopupController.info(LocalizationController.getCompoundString("productBoxTransferSuccessMessage", new Object[] { productBoxCode, newShelfSlotID }));
 			else
 				PopupController.error(LocalizationController.getCompoundString("productBoxTransferFailureMessage", new Object[] { productBoxCode, newShelfSlotID }));
 		}

@@ -72,7 +72,8 @@ public class LoginController
 	 * Validates the badge ID and logs the user into the system.
 	 *
 	 * @param badgeString use RFID badge identification number
-	 * @return <code>true</code> if login was successful, or <code>false</code> if debug mode was disabled
+	 * @return <code>true</code> if login was successful, or <code>false</code>
+	 *         if debug mode was disabled
 	 */
 	public static boolean login(final String badgeString)
 	{
@@ -99,19 +100,20 @@ public class LoginController
 			}
 
 			SYSLOG.debug("Incorrect Badge ID.");
-			PopupController.warning("Incorrect Badge ID.");
+			PopupController.warning(LocalizationController.getString("logInFailurePopUp"));
 		}
 		else
 		{
 			SYSLOG.debug("Invalid Badge ID.");
-			PopupController.warning("Invalid Badge ID.");
+			PopupController.warning(LocalizationController.getString("logInFailurePopUp"));
 		}
 
 		return false;
 	}
 
 	/**
-	 * Validates the given authentication data and logs the user into the system.
+	 * Validates the given authentication data and logs the user into the
+	 * system.
 	 *
 	 * @param firstName the first name of the user
 	 * @param lastName the last name of the user
@@ -145,12 +147,12 @@ public class LoginController
 			}
 
 			SYSLOG.info("Incorrect PIN or Names.");
-			PopupController.warning("Incorrect PIN or names.");
+			PopupController.warning(LocalizationController.getString("logInPinOrNamesIncorrect"));
 		}
 		else
 		{
 			SYSLOG.info("Invalid PIN.");
-			PopupController.warning("Invalid PIN.");
+			PopupController.warning(LocalizationController.getString("logInInvalidPin"));
 		}
 
 		return false;
@@ -179,7 +181,8 @@ public class LoginController
 	 * Does nothing if {@link MainWindow#DEBUG_MODE} is <code>false</code>.
 	 *
 	 * @param userRoleName name of the role
-	 * @return <code>true</code> if login was successful, or <code>false</code> if debug mode was disabled
+	 * @return <code>true</code> if login was successful, or <code>false</code>
+	 *         if debug mode was disabled
 	 */
 	public static boolean debugLogin(final UserRole role)
 	{
@@ -256,11 +259,13 @@ public class LoginController
 	}
 
 	/**
-	 * Checks if the currently logged in user's role is greater than or equal to the given role.
+	 * Checks if the currently logged in user's role is greater than or equal to
+	 * the given role.
 	 *
 	 * @param role role to check against
-	 * @return <code>true</code> if logged in user's role is greater than or equal to the given role, <code>false</code>
-	 * if user is not logged in
+	 * @return <code>true</code> if logged in user's role is greater than or
+	 *         equal to the given role, <code>false</code>
+	 *         if user is not logged in
 	 */
 	public static boolean userRoleIsGreaterOrEqualTo(final UserRole role)
 	{
@@ -273,7 +278,8 @@ public class LoginController
 	 * Checks if the currently logged in user's role is the given role.
 	 *
 	 * @param role role to check against
-	 * @return <code>true</code> if logged in user's role is the given role, <code>false</code> if user is not logged in
+	 * @return <code>true</code> if logged in user's role is the given role,
+	 *         <code>false</code> if user is not logged in
 	 */
 	public static boolean userRoleIs(final UserRole role)
 	{

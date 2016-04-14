@@ -1,6 +1,5 @@
 package velho.controller;
 
-import java.io.File;
 import java.text.MessageFormat;
 import java.util.Locale;
 import java.util.ResourceBundle;
@@ -17,7 +16,6 @@ public class LocalizationController
 
 		locale = new Locale(language, country);
 
-		System.out.println(new File("res/en-US").getAbsolutePath());
 		msgBundle = ResourceBundle.getBundle("res.en-US", locale);
 
 	}

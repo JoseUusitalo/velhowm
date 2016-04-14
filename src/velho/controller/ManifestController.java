@@ -163,10 +163,10 @@ public class ManifestController implements UIActionController
 			// popup.
 			if (LoginController.userRoleIs(UserRole.MANAGER))
 			{
-				if (PopupController.confirmation("A shipment has arrived. Please accept or refuse it in the Manifests tab. Would you like to view the manifest now?"))
+				if (PopupController.confirmation(LocalizationController.getString("manifestShipmentArrivalPopUp")))
 				{
 					showManifestView(manifest);
-					mainWindow.selectTab("Manifests");
+					mainWindow.selectTab(LocalizationController.getString("addManifestsTab"));
 				}
 			}
 		}

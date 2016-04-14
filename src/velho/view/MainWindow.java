@@ -186,6 +186,7 @@ public class MainWindow extends Application
 	public MainWindow()
 	{
 		prepareLogger();
+		LocalizationController.initializeBundle();
 		prepareDatabase();
 
 		if (DEBUG_MODE)
