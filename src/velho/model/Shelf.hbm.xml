@@ -16,15 +16,15 @@
 					column="levels"
 					type="int" />
 
-		<set		name="shelfLevels"
-					table="SHELF_SHELFLEVELS"
-					cascade="all"
-					lazy="false">
-			<key column="shelf" />
-			<!-- The unique="true" makes this a one-to-many mapping. -->
-			<many-to-many	class="velho.model.ShelfLevel"
-							column="shelflevel"
-							unique="true" />
+		<set	name="shelfLevels"
+				table="SHELFLEVELS"
+				inverse="true"
+				cascade="all"
+				fetch="select"
+				lazy="false">
+
+			<key column="shelf_id" not-null="true"/>
+			<one-to-many class="velho.model.ShelfLevel" />
 		</set>
 	</class>
 </hibernate-mapping>

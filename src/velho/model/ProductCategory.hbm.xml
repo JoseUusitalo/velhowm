@@ -18,14 +18,14 @@
 					unique="true"
 					not-null="true" />
 
-		<!-- Many-to-one: This object can have one referenced object, the referenced object can be referenced from many objects.  
+		<!-- No cascade solves an exception. -->
+		<!-- Many-to-one: This object can have one referenced object, the referenced object can be referenced from many objects.
 			 Cascade changes.
 			 "Select" eager fetching: load the referenced object when this object is loaded. -->
 		<many-to-one	name="type"
 						class="velho.model.ProductType"
 						column="type"
 						not-null="true"
-						cascade="all"
 						fetch="select"
 						lazy="false" />
 	</class>

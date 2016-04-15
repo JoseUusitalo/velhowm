@@ -17,29 +17,31 @@
 					type="string"
 					not-null="true" />
 
+		<!--  Unused at the moment.
+			  Not deleted because it might break something I don't have the time to fix. -->
 		<property name="popularity" type="int">
 			<column name="popularity" default="-1" />
-		</property>	
-					
-		<!-- Many-to-one: This object can have one referenced object, the referenced object can be referenced from many objects.  
+		</property>
+
+		<!-- No cascade solves an exception. -->
+		<!-- Many-to-one: This object can have one referenced object, the referenced object can be referenced from many objects.
 			 Cascade changes.
 			 "Select" eager fetching: load the referenced object when this object is loaded. -->
 		<many-to-one	name="brand"
 						class="velho.model.ProductBrand"
 						column="brand"
 						not-null="true"
-						cascade="all"
 						fetch="select"
 						lazy="false" />
-		
+
+		<!-- No cascade solves an exception. -->
 		<many-to-one	name="category"
 						class="velho.model.ProductCategory"
 						column="category"
 						not-null="true"
-						cascade="all"
 						fetch="select"
 						lazy="false" />
-						
+
 	<!--  TODO: CONSTRAINT `CONST_unique_products` UNIQUE (`name`,`brand`,`category`) -->
 	</class>
 </hibernate-mapping>

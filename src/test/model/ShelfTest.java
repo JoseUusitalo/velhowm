@@ -9,6 +9,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.junit.After;
+import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -41,7 +42,7 @@ public class ShelfTest
 	private static final int FULLSHELF_LVL_1_SLTPOS_1_ID = 1;
 
 	private static ProductBox EMPTY_BOX;
-	private static ProductBox BOX_1;
+	private static ProductBox BOX_ID_21;
 	private static ProductBox BOX_2;
 	private static final int BOX_1_2_PRODUCT_COUNT = 2;
 
@@ -61,7 +62,7 @@ public class ShelfTest
 		shelf_FREE_LVL_2 = DatabaseController.getShelfByID(SHELF_FREE_LVL_2_ID);
 		emptyShelf_1_1_to_1_2 = DatabaseController.getShelfByID(EMPTYSHELF_1_1_to_1_2_ID);
 		EMPTY_BOX = DatabaseController.getProductBoxByID(23);
-		BOX_1 = DatabaseController.getProductBoxByID(21);
+		BOX_ID_21 = DatabaseController.getProductBoxByID(21);
 		BOX_2 = DatabaseController.getProductBoxByID(22);
 
 		System.out.println("--Start--");
@@ -89,10 +90,16 @@ public class ShelfTest
 		shelf_FREE_LVL_2 = DatabaseController.getShelfByID(SHELF_FREE_LVL_2_ID);
 		emptyShelf_1_1_to_1_2 = DatabaseController.getShelfByID(EMPTYSHELF_1_1_to_1_2_ID);
 		EMPTY_BOX = DatabaseController.getProductBoxByID(23);
-		BOX_1 = DatabaseController.getProductBoxByID(21);
+		BOX_ID_21 = DatabaseController.getProductBoxByID(21);
 		BOX_2 = DatabaseController.getProductBoxByID(22);
 
 		System.out.println("---------after-------\n");
+	}
+
+	@AfterClass
+	public static void closeSession()
+	{
+		DatabaseController.closeSession();
 	}
 
 	/**
@@ -310,21 +317,21 @@ public class ShelfTest
 
 		System.out.println("before " + shelf_FREE_LVL_2.getShelfSlot(slotid).getProductBoxes());
 		System.out.println(shelf_FREE_LVL_2.getProductBoxes());
-		System.out.println("add " + BOX_1);
+		System.out.println("add " + BOX_ID_21);
 		System.out.println(shelf_FREE_LVL_2);
 
-		// Add to the object.
-		assertTrue(shelf_FREE_LVL_2.addToSlot(slotid, BOX_1));
+		// Add to the shelf.
+		assertTrue(shelf_FREE_LVL_2.addToSlot(slotid, BOX_ID_21));
 
 		System.out.println("after " + shelf_FREE_LVL_2.getShelfSlot(slotid).getProductBoxes());
 		System.out.println(shelf_FREE_LVL_2.getProductBoxes());
 		System.out.println(shelf_FREE_LVL_2);
 
 		// Product box is in the shelf.
-		assertTrue(shelf_FREE_LVL_2.getProductBoxes().contains(BOX_1));
+		assertTrue(shelf_FREE_LVL_2.getProductBoxes().contains(BOX_ID_21));
 
 		// Product box is in the slot.
-		assertTrue(shelf_FREE_LVL_2.getShelfSlot(slotid).contains(BOX_1));
+		assertTrue(shelf_FREE_LVL_2.getShelfSlot(slotid).contains(BOX_ID_21));
 
 		// Number of product boxes in the shelf has increased by one.
 		assertEquals(oldBoxCount + 1, shelf_FREE_LVL_2.getProductBoxes().size());
@@ -338,11 +345,14 @@ public class ShelfTest
 		// Check that database has been updated.
 		shelf_FREE_LVL_2 = DatabaseController.getShelfByID(SHELF_FREE_LVL_2_ID);
 
+		System.out.println("From database");
+		System.out.println(shelf_FREE_LVL_2);
+
 		// Product box is in the shelf.
-		assertTrue(shelf_FREE_LVL_2.getProductBoxes().contains(BOX_1));
+		assertTrue(shelf_FREE_LVL_2.getProductBoxes().contains(BOX_ID_21));
 
 		// Product box is in the slot.
-		assertTrue(shelf_FREE_LVL_2.getShelfSlot(slotid).contains(BOX_1));
+		assertTrue(shelf_FREE_LVL_2.getShelfSlot(slotid).contains(BOX_ID_21));
 
 		// Number of product boxes in the shelf has increased by one.
 		assertEquals(oldBoxCount + 1, shelf_FREE_LVL_2.getProductBoxes().size());
@@ -369,10 +379,10 @@ public class ShelfTest
 		DatabaseController.save(shelf_FREE_LVL_2);
 
 		// Product box is in the shelf.
-		assertTrue(shelf_FREE_LVL_2.getProductBoxes().contains(BOX_1));
+		assertTrue(shelf_FREE_LVL_2.getProductBoxes().contains(BOX_ID_21));
 
 		// Product box is in the slot.
-		assertTrue(shelf_FREE_LVL_2.getShelfSlot(slotid).contains(BOX_1));
+		assertTrue(shelf_FREE_LVL_2.getShelfSlot(slotid).contains(BOX_ID_21));
 
 		// Number of product boxes in the shelf has increased by one.
 		assertEquals(oldBoxCount + 1, shelf_FREE_LVL_2.getProductBoxes().size());
@@ -388,10 +398,10 @@ public class ShelfTest
 		assertTrue(BOX_2.getShelfSlot().removeBox(BOX_2));
 
 		// Product box is not in the shelf.
-		assertTrue(shelf_FREE_LVL_2.getProductBoxes().contains(BOX_1));
+		assertTrue(shelf_FREE_LVL_2.getProductBoxes().contains(BOX_ID_21));
 
 		// Product box is not in the slot.
-		assertTrue(shelf_FREE_LVL_2.getShelfSlot(slotid).contains(BOX_1));
+		assertTrue(shelf_FREE_LVL_2.getShelfSlot(slotid).contains(BOX_ID_21));
 
 		// Number of product boxes in the shelf has decreased by one.
 		assertEquals(oldBoxCount - 1, shelf_FREE_LVL_2.getProductBoxes().size());
@@ -406,10 +416,10 @@ public class ShelfTest
 		shelf_FREE_LVL_2 = DatabaseController.getShelfByID(SHELF_FREE_LVL_2_ID);
 
 		// Product box is not in the shelf.
-		assertTrue(shelf_FREE_LVL_2.getProductBoxes().contains(BOX_1));
+		assertTrue(shelf_FREE_LVL_2.getProductBoxes().contains(BOX_ID_21));
 
 		// Product box is not in the slot.
-		assertTrue(shelf_FREE_LVL_2.getShelfSlot(slotid).contains(BOX_1));
+		assertTrue(shelf_FREE_LVL_2.getShelfSlot(slotid).contains(BOX_ID_21));
 
 		// Number of product boxes in the shelf has decreased by one.
 		assertEquals(oldBoxCount - 1, shelf_FREE_LVL_2.getProductBoxes().size());
@@ -447,7 +457,7 @@ public class ShelfTest
 		assertTrue(emptyShelf_1_1_to_1_2.hasFreeSpace());
 		assertTrue(emptyShelf_1_1_to_1_2.isEmpty());
 
-		assertTrue(emptyShelf_1_1_to_1_2.addToSlot(emptyShelf_1_1_to_1_2.getShelfID() + "-1-1", BOX_1));
+		assertTrue(emptyShelf_1_1_to_1_2.addToSlot(emptyShelf_1_1_to_1_2.getShelfID() + "-1-1", BOX_ID_21));
 
 		assertTrue(emptyShelf_1_1_to_1_2.hasFreeSpace());
 		assertFalse(emptyShelf_1_1_to_1_2.isEmpty());
@@ -468,7 +478,7 @@ public class ShelfTest
 	@Test
 	public final void testAddToSlot_Full() throws IllegalArgumentException
 	{
-		assertTrue(emptyShelf_1_1_to_1_2.addToSlot(emptyShelf_1_1_to_1_2.getShelfID() + "-1-1", BOX_1));
+		assertTrue(emptyShelf_1_1_to_1_2.addToSlot(emptyShelf_1_1_to_1_2.getShelfID() + "-1-1", BOX_ID_21));
 		assertFalse(emptyShelf_1_1_to_1_2.addToSlot(emptyShelf_1_1_to_1_2.getShelfID() + "-1-1", BOX_2));
 	}
 }

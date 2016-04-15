@@ -34,7 +34,7 @@ public class ManifestTest
 		Date order = new Date(1234);
 		Date rec = new Date(12341234);
 		Manifest anotherManifest = new Manifest(new ManifestState(-1, "Whatever"), 123, order, rec);
-		assertEquals("[-1] State: Whatever Driver: 123 Ordered/Received: " + DatabaseController.getH2DateFormat(order) + "/"
+		assertEquals("[0] State: Whatever Driver: 123 Ordered/Received: " + DatabaseController.getH2DateFormat(order) + "/"
 				+ DatabaseController.getH2DateFormat(rec) + " (0)", anotherManifest.toString());
 	}
 

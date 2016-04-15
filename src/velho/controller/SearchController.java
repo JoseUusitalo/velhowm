@@ -117,10 +117,8 @@ public class SearchController
 			switch (limits)
 			{
 				case "removal-list":
-					joins.put(DatabaseTable.REMOVALLIST_PRODUCTBOXES, "containers.container_id = removallist_productboxes.productbox");
-
 					// Only finds products that are not already on a removal list.
-					where.add("removallist_productboxes.removallist IS NULL");
+					where.add("productboxes.removallist IS NULL");
 					break;
 				default:
 					break;

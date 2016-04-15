@@ -5,13 +5,8 @@ package velho.model;
  *
  * @author Joona Silvennoinen &amp; Jose Uusitalo
  */
-public class Product implements Comparable<Product>
+public class Product extends AbstractDatabaseObject implements Comparable<Product>
 {
-	/**
-	 * The database ID of this product.
-	 */
-	private int databaseID;
-
 	/**
 	 * The name of this product.
 	 */
@@ -41,7 +36,7 @@ public class Product implements Comparable<Product>
 	 */
 	public Product(final int databaseID, final String name, final ProductBrand brand, final ProductCategory category, final int popularity)
 	{
-		this.databaseID = databaseID;
+		setDatabaseID(databaseID);
 		this.name = name;
 		this.brand = brand;
 		this.category = category;
@@ -50,7 +45,7 @@ public class Product implements Comparable<Product>
 
 	public Product(final String name, final ProductBrand brand, final ProductCategory category, final int popularity)
 	{
-		this.databaseID = -1;
+		setDatabaseID(0);
 		this.name = name;
 		this.brand = brand;
 		this.category = category;
@@ -67,7 +62,7 @@ public class Product implements Comparable<Product>
 	@Override
 	public String toString()
 	{
-		return "[" + databaseID + "] " + name + " (" + brand + " / " + category + "), Popularity: " + popularity;
+		return "[" + getDatabaseID() + "] " + name + " (" + brand + " / " + category + "), Popularity: " + popularity;
 	}
 
 	@Override
@@ -128,26 +123,6 @@ public class Product implements Comparable<Product>
 	public void setName(final String name)
 	{
 		this.name = name;
-	}
-
-	/**
-	 * Gets the database ID of this product.
-	 *
-	 * @return the database ID of this product
-	 */
-	public int getDatabaseID()
-	{
-		return databaseID;
-	}
-
-	/**
-	 * Sets the database ID of this product.
-	 *
-	 * @param id the new database ID of this product
-	 */
-	public void setDatabaseID(final int id)
-	{
-		databaseID = id;
 	}
 
 	/**

@@ -10,7 +10,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
@@ -22,13 +21,11 @@ import java.util.TreeMap;
 import org.apache.log4j.Logger;
 import org.h2.jdbcx.JdbcConnectionPool;
 import org.hibernate.HibernateException;
-import org.hibernate.Session;
 import org.hibernate.SessionFactory;
-import org.hibernate.Transaction;
-import org.hibernate.exception.ConstraintViolationException;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import velho.model.AbstractDatabaseObject;
 import velho.model.HibernateSessionFactory;
 import velho.model.Manifest;
 import velho.model.ManifestState;
@@ -51,6 +48,7 @@ import velho.model.exceptions.ExistingDatabaseLinkException;
 import velho.model.exceptions.NoDatabaseException;
 import velho.model.exceptions.NoDatabaseLinkException;
 import velho.model.exceptions.UniqueKeyViolationException;
+import velho.model.interfaces.DatabaseObject;
 import velho.view.MainWindow;
 
 /**
@@ -202,10 +200,6 @@ public class DatabaseController
 		// Most other queries.
 		final Set<Object> dataSet = new LinkedHashSet<Object>();
 
-		// Putting boxes on shelves.
-		Map<Integer, ArrayList<Integer[]>> shelfBoxMap = null;
-		Map<Integer, ArrayList<Integer>> listBoxMap = null;
-
 		try
 		{
 			ResultSet result = null;
@@ -329,39 +323,6 @@ public class DatabaseController
 								break;
 							// @formatter:on
 
-							case SHELFSLOT_PRODUCTBOXES:
-								shelfBoxMap = new HashMap<Integer, ArrayList<Integer[]>>();
-								Integer[] coords = null;
-								Integer shelfID = null;
-								ArrayList<Integer[]> list;
-
-								while (result.next())
-								{
-									coords = new Integer[3];
-									// Get all the data.
-									shelfID = result.getInt("shelf");
-									coords[0] = result.getInt("productbox");
-									coords[1] = result.getInt("shelflevel_index");
-									coords[2] = result.getInt("shelfslot_index");
-
-									// Does this shelf already have boxes in it?
-									if (shelfBoxMap.containsKey(shelfID))
-									{
-										// Add to the list.
-										shelfBoxMap.get(shelfID).add(coords);
-									}
-									else
-									{
-										// Create a new list and put in the
-										// data.
-										list = new ArrayList<Integer[]>();
-										list.add(coords);
-										shelfBoxMap.put(shelfID, list);
-									}
-								}
-
-								break;
-
 							case REMOVALLIST_STATES:
 								while (result.next())
 									dataSet.add(new RemovalListState(result.getInt("removallist_state_id"), result.getString("name")));
@@ -385,60 +346,6 @@ public class DatabaseController
 									dataSet.add(new Manifest(result.getInt("manifest_id"), getManifestStateByID(result.getInt("state")), result.getInt("driver_id"), result.getDate("date_ordered"), result.getDate("date_received")));
 								break;
 							// @formatter:on
-
-							case REMOVALLIST_PRODUCTBOXES:
-								listBoxMap = new HashMap<Integer, ArrayList<Integer>>();
-								Integer listID = null;
-								ArrayList<Integer> boxIDs = new ArrayList<Integer>();
-
-								while (result.next())
-								{
-									listID = result.getInt("removallist");
-
-									// Does this removal list already have boxes
-									// in it?
-									if (listBoxMap.containsKey(listID))
-									{
-										// Add to the list.
-										listBoxMap.get(listID).add(result.getInt("productbox"));
-									}
-									else
-									{
-										// Create a new list and put in the
-										// data.
-										boxIDs = new ArrayList<Integer>();
-										boxIDs.add(result.getInt("productbox"));
-										listBoxMap.put(listID, boxIDs);
-									}
-								}
-								break;
-
-							case MANIFEST_PRODUCTBOXES:
-								listBoxMap = new HashMap<Integer, ArrayList<Integer>>();
-								Integer manifestID = null;
-								ArrayList<Integer> pboxIDs = new ArrayList<Integer>();
-
-								while (result.next())
-								{
-									manifestID = result.getInt("manifest");
-
-									// Does this removal list already have boxes
-									// in it?
-									if (listBoxMap.containsKey(manifestID))
-									{
-										// Add to the list.
-										listBoxMap.get(manifestID).add(result.getInt("productbox"));
-									}
-									else
-									{
-										// Create a new list and put in the
-										// data.
-										pboxIDs = new ArrayList<Integer>();
-										pboxIDs.add(result.getInt("productbox"));
-										listBoxMap.put(manifestID, pboxIDs);
-									}
-								}
-								break;
 
 							case REMOVALPLATFORMS:
 								// @formatter:off
@@ -589,16 +496,6 @@ public class DatabaseController
 					case MANIFEST_STATES:
 					case REMOVALPLATFORMS:
 						return dataSet;
-					case SHELFSLOT_PRODUCTBOXES:
-						return shelfBoxMap;
-					case REMOVALLIST_PRODUCTBOXES:
-						if (columns.length == 1 && columns[0] != "*")
-							return dataSet;
-						return listBoxMap;
-					case MANIFEST_PRODUCTBOXES:
-						if (columns.length == 1 && columns[0] != "*")
-							return dataSet;
-						return listBoxMap;
 					default:
 						throw new IllegalArgumentException();
 				}
@@ -714,32 +611,6 @@ public class DatabaseController
 	}
 
 	/**
-	 * Attempts to re-link the database.
-	 */
-	private static void relink()
-	{
-		DBLOG.info("Attempting to relink database.");
-		try
-		{
-			// Just in case.
-			unlink();
-		}
-		catch (final NoDatabaseLinkException e)
-		{
-			// Do nothing. This is expected.
-		}
-
-		try
-		{
-			link();
-		}
-		catch (final ClassNotFoundException | ExistingDatabaseLinkException e)
-		{
-			e.printStackTrace();
-		}
-	}
-
-	/**
 	 * Checks if the database file exists.
 	 *
 	 * @return <code>true</code> if the database file exists
@@ -772,10 +643,8 @@ public class DatabaseController
 				DBLOG.info("Database is already in use.");
 				PopupController.error("Database is already in use. Please close the open application.");
 			}
-			else
-			{
-				relink();
-			}
+
+			System.out.println(e);
 		}
 		return connection;
 	}
@@ -1085,33 +954,28 @@ public class DatabaseController
 	/**
 	 * Gets an object from the database with the given database ID.
 	 *
-	 * @param objectClass the name class of the object to get
+	 * @param objectClass the name class of the {@link AbstractDatabaseObject} to get
 	 * @param databaseID the database ID of the object
 	 * @return the corresponding object or <code>null</code> for invalid ID
 	 * @throws HibernateException when the query failed to commit and has been rolled back
 	 */
-	@SuppressWarnings("resource")
-	private static Object getByID(final Class objectClass, final int databaseID) throws HibernateException
+	private static Object getByID(final Class<? extends AbstractDatabaseObject> objectClass, final int databaseID) throws HibernateException
 	{
-		// TODO: Database object abstract class.
-
 		if (databaseID < 1)
 			return null;
 
-		final Session session = sessionFactory.getCurrentSession();
-		session.beginTransaction();
+		sessionFactory.getCurrentSession().beginTransaction();
 
-		@SuppressWarnings("unchecked")
-		final Object result = session.get(objectClass, databaseID);
+		final Object result = sessionFactory.getCurrentSession().get(objectClass, databaseID);
 
 		try
 		{
-			session.getTransaction().commit();
+			sessionFactory.getCurrentSession().getTransaction().commit();
 
 		}
 		catch (final HibernateException e)
 		{
-			session.getTransaction().rollback();
+			sessionFactory.getCurrentSession().getTransaction().rollback();
 
 			throw new HibernateException("Failed to commit.");
 		}
@@ -1606,19 +1470,17 @@ public class DatabaseController
 	 * logged in user (i.e. debug user) if the ID was negative
 	 * @throws HibernateException when the query failed to commit and has been rolled back
 	 */
-	@SuppressWarnings("resource")
 	public static User getUserByID(final int id) throws HibernateException
 	{
 		// Debug account ID?
 		if (id < 0)
 			return LoginController.getCurrentUser();
 
-		final Session session = sessionFactory.getCurrentSession();
-		final Transaction transaction = session.beginTransaction();
+		sessionFactory.getCurrentSession().beginTransaction();
 
-		final User user = session.get(User.class, id);
+		final User user = sessionFactory.getCurrentSession().get(User.class, id);
 
-		transaction.commit();
+		sessionFactory.getCurrentSession().getTransaction().commit();
 
 		return user;
 	}
@@ -1739,14 +1601,12 @@ public class DatabaseController
 	 * database ID and the value is the number of products
 	 * @throws NoDatabaseLinkException
 	 */
-	@SuppressWarnings({ "unchecked", "resource" })
+	@SuppressWarnings("unchecked")
 	public static List<ProductBoxSearchResultRow> searchProductBoxByDataList(final Map<Integer, Integer> productData)
 	{
 		final List<ProductBoxSearchResultRow> foundProducts = FXCollections.observableArrayList();
 		Integer wantedProductCount = null;
 		List<ProductBox> boxes = null;
-
-		final Session session = sessionFactory.getCurrentSession();
 
 		// For every unique string representing a product.
 		for (final Integer productID : productData.keySet())
@@ -1756,9 +1616,11 @@ public class DatabaseController
 
 			DBLOG.debug("Looking for [" + productID + "] of size " + wantedProductCount);
 
+			sessionFactory.getCurrentSession().beginTransaction();
+
 			// First look for an exact amount.
 			// @formatter:off
-			boxes = session.createQuery("from ProductBox as pb"
+			boxes = sessionFactory.getCurrentSession().createQuery("from ProductBox as pb"
 									  + " where pb.product.databaseID = :id"
 									  + " and pb.productCount = :count"
 									  + " order by pb.expirationDate asc")
@@ -1767,28 +1629,31 @@ public class DatabaseController
 				   	   	   .list();
 			// @formatter:on
 
+			sessionFactory.getCurrentSession().getTransaction().commit();
+
 			// Couldn't find a box with exactly the number of products wanted.
 			if (boxes.isEmpty())
 			{
 				if (MainWindow.DEBUG_MODE)
 					DBLOG.debug("Unable to find a product box with the wanted size of " + wantedProductCount + ". Looking from multiple boxes.");
 
+				sessionFactory.getCurrentSession().beginTransaction();
+
 				/*
 				 * Remove the product count condition and find all product boxes with the wanted product ID.
-				 * This could be done with the getByID() private method but since we already have a session open and
-				 * more importantly this query is done in a loop, it is faster to do it here.
 				 */
 				// @formatter:off
-				boxes = session.createQuery("from ProductBox as pb"
+				boxes = sessionFactory.getCurrentSession().createQuery("from ProductBox as pb"
 										  + " where pb.product.databaseID = :id"
 										  + " order by pb.expirationDate asc")
 						   	   .setParameter("id", productID)
 						   	   .list();
 				// @formatter:on
 
-				System.out.println("boxes---------------------------");
-				for (ProductBox b : boxes)
-					System.out.println(b.getExpirationDate());
+				sessionFactory.getCurrentSession().getTransaction().commit();
+
+				// for (ProductBox b : boxes)
+				// System.out.println(b.getExpirationDate());
 				boxes = getBoxesContainingAtLeastProducts(boxes, wantedProductCount);
 			}
 			else if (boxes.size() > 1)
@@ -1955,7 +1820,6 @@ public class DatabaseController
 	 *
 	 * @return <code>true</code> if database changed as a result of this call
 	 */
-	@SuppressWarnings("resource")
 	public static boolean deleteAllData() throws NoDatabaseException, NoDatabaseException
 	{
 		DBLOG.info("Truncating database...");
@@ -1963,28 +1827,27 @@ public class DatabaseController
 		if (!databaseExists())
 			throw new NoDatabaseException();
 
-		final Session session = sessionFactory.getCurrentSession();
-		Transaction transaction = session.beginTransaction();
+		sessionFactory.getCurrentSession().beginTransaction();
 
 		boolean notChanged = false;
 		int changes = 0;
 
-		session.createSQLQuery("SET REFERENTIAL_INTEGRITY FALSE;").executeUpdate();
-		transaction.commit();
+		sessionFactory.getCurrentSession().createSQLQuery("SET REFERENTIAL_INTEGRITY FALSE;").executeUpdate();
+		sessionFactory.getCurrentSession().getTransaction().commit();
 
 		for (final DatabaseTable table : DatabaseTable.values())
 		{
-			transaction = session.beginTransaction();
-			changes = session.createSQLQuery("TRUNCATE TABLE " + table.toString() + ";").executeUpdate();
-			transaction.commit();
+			sessionFactory.getCurrentSession().beginTransaction();
+			changes = sessionFactory.getCurrentSession().createSQLQuery("TRUNCATE TABLE " + table.toString() + ";").executeUpdate();
+			sessionFactory.getCurrentSession().getTransaction().commit();
 
 			DBLOG.trace("Truncate table: " + table.toString() + " | changed rows: " + changes);
 			notChanged = notChanged && (changes == 0);
 		}
 
-		transaction = session.beginTransaction();
-		session.createSQLQuery("SET REFERENTIAL_INTEGRITY TRUE;").executeUpdate();
-		transaction.commit();
+		sessionFactory.getCurrentSession().beginTransaction();
+		sessionFactory.getCurrentSession().createSQLQuery("SET REFERENTIAL_INTEGRITY TRUE;").executeUpdate();
+		sessionFactory.getCurrentSession().getTransaction().commit();
 
 		if (!notChanged)
 			DBLOG.info("Database contents deleted.");
@@ -2022,22 +1885,20 @@ public class DatabaseController
 	 * @param object object to delete
 	 * @throws HibernateException when the object was not deleted
 	 */
-	@SuppressWarnings("resource")
 	private static void delete(final Object object) throws HibernateException
 	{
-		final Session session = sessionFactory.getCurrentSession();
-		session.beginTransaction();
+		sessionFactory.getCurrentSession().beginTransaction();
 
-		session.delete(object);
+		sessionFactory.getCurrentSession().delete(object);
 
 		try
 		{
-			session.getTransaction().commit();
+			sessionFactory.getCurrentSession().getTransaction().commit();
 
 		}
 		catch (final HibernateException e)
 		{
-			session.getTransaction().rollback();
+			sessionFactory.getCurrentSession().getTransaction().rollback();
 
 			throw new HibernateException("Failed to delete.");
 		}
@@ -2080,271 +1941,31 @@ public class DatabaseController
 	/**
 	 * Creates a new or updates an existing object depending on whether the given object exists in the database.
 	 *
-	 * @param object new or existing object in the database
+	 * @param object new or existing {@link DatabaseObject} in the database
 	 * @return the database ID of the inserted or updated object
 	 * @throws HibernateException when data was not saved
 	 */
-	@SuppressWarnings("resource")
-	public static int save(final RemovalList object)
+	public static int save(final DatabaseObject object)
 	{
-		final Session session = sessionFactory.getCurrentSession();
-		final Transaction transaction = session.beginTransaction();
+		sessionFactory.getCurrentSession().beginTransaction();
 
-		session.saveOrUpdate(object);
+		sessionFactory.getCurrentSession().saveOrUpdate(object);
+		sessionFactory.getCurrentSession().flush();
 
 		try
 		{
-			transaction.commit();
-
+			sessionFactory.getCurrentSession().getTransaction().commit();
 		}
 		catch (final HibernateException e)
 		{
-			transaction.rollback();
+			sessionFactory.getCurrentSession().getTransaction().rollback();
 
 			throw new HibernateException("Failed to commit.");
 		}
 
 		DBLOG.debug("Saved/Updated: " + object);
 
-		return object.getDatabaseID();
-	}
-
-	/**
-	 * Creates a new or updates an existing object depending on whether the given object exists in the database.
-	 *
-	 * @param object new or existing object in the database
-	 * @return the database ID of the inserted or updated object
-	 * @throws HibernateException when data was not saved
-	 */
-	@SuppressWarnings("resource")
-	public static int save(final Shelf object)
-	{
-		final Session session = sessionFactory.getCurrentSession();
-		final Transaction transaction = session.beginTransaction();
-
-		session.saveOrUpdate(object);
-
-		try
-		{
-			transaction.commit();
-
-		}
-		catch (final HibernateException e)
-		{
-			transaction.rollback();
-
-			throw new HibernateException("Failed to commit.");
-		}
-
-		DBLOG.debug("Saved/Updated: " + object);
-
-		return object.getDatabaseID();
-	}
-
-	/**
-	 * Creates a new or updates an existing object depending on whether the given object exists in the database.
-	 *
-	 * @param object new or existing object in the database
-	 * @return the database ID of the inserted or updated object
-	 * @throws HibernateException when data was not saved
-	 * @throws ConstraintViolationException when the user already exists in the database
-	 */
-	@SuppressWarnings("resource")
-	public static int save(final User object) throws ConstraintViolationException
-	{
-		// TODO: Generalize when all tests have been updated to manually rollback.
-
-		final Session session = sessionFactory.getCurrentSession();
-		final Transaction transaction = session.beginTransaction();
-
-		session.saveOrUpdate(object);
-
-		try
-		{
-			transaction.commit();
-
-		}
-		catch (final HibernateException e)
-		{
-			transaction.rollback();
-
-			throw new HibernateException("Failed to commit.");
-		}
-
-		// Update observable list.
-		getAllUsers();
-
-		DBLOG.debug("Saved/Updated: " + object);
-
-		return object.getDatabaseID();
-	}
-
-	/**
-	 * Creates a new or updates an existing object depending on whether the given object exists in the database.
-	 *
-	 * @param object new or existing object in the database
-	 * @return the database ID of the inserted or updated object
-	 * @throws HibernateException when data was not saved
-	 */
-	@SuppressWarnings("resource")
-	public static int save(final Manifest object)
-	{
-		// TODO: Generalize when all tests have been updated to manually rollback.
-
-		final Session session = sessionFactory.getCurrentSession();
-		final Transaction transaction = session.beginTransaction();
-
-		session.saveOrUpdate(object);
-
-		try
-		{
-			transaction.commit();
-
-		}
-		catch (final HibernateException e)
-		{
-			transaction.rollback();
-
-			throw new HibernateException("Failed to commit.");
-		}
-
-		DBLOG.debug("Saved/Updated: " + object);
-
-		return object.getDatabaseID();
-	}
-
-	/**
-	 * Creates a new or updates an existing object depending on whether the given object exists in the database.
-	 *
-	 * @param object new or existing object in the database
-	 * @return the database ID of the inserted or updated object
-	 * @throws HibernateException when data was not saved
-	 */
-	@SuppressWarnings("resource")
-	public static int save(final RemovalPlatform object)
-	{
-		// TODO: Generalize when all tests have been updated to manually rollback.
-
-		final Session session = sessionFactory.getCurrentSession();
-		final Transaction transaction = session.beginTransaction();
-
-		session.saveOrUpdate(object);
-
-		try
-		{
-			transaction.commit();
-
-		}
-		catch (final HibernateException e)
-		{
-			transaction.rollback();
-
-			throw new HibernateException("Failed to commit.");
-		}
-
-		DBLOG.debug("Saved/Updated: " + object);
-
-		return object.getDatabaseID();
-	}
-
-	/**
-	 * Creates a new or updates an existing object depending on whether the given object exists in the database.
-	 *
-	 * @param object new or existing object in the database
-	 * @return the database ID of the inserted or updated object
-	 * @throws HibernateException when data was not saved
-	 */
-	@SuppressWarnings("resource")
-	public static int save(final Product object)
-	{
-		// TODO: Generalize when all tests have been updated to manually rollback.
-
-		final Session session = sessionFactory.getCurrentSession();
-		final Transaction transaction = session.beginTransaction();
-
-		session.saveOrUpdate(object);
-
-		try
-		{
-			transaction.commit();
-
-		}
-		catch (final HibernateException e)
-		{
-			transaction.rollback();
-
-			throw new HibernateException("Failed to commit.");
-		}
-
-		DBLOG.debug("Saved/Updated: " + object);
-
-		return object.getDatabaseID();
-	}
-
-	/**
-	 * Creates a new or updates an existing object depending on whether the given object exists in the database.
-	 *
-	 * @param object new or existing object in the database
-	 * @return the database ID of the inserted or updated object
-	 * @throws HibernateException when data was not saved
-	 */
-	@SuppressWarnings("resource")
-	public static int save(final ProductBrand object)
-	{
-		// TODO: Generalize when all tests have been updated to manually rollback.
-
-		final Session session = sessionFactory.getCurrentSession();
-		final Transaction transaction = session.beginTransaction();
-
-		session.saveOrUpdate(object);
-
-		try
-		{
-			transaction.commit();
-
-		}
-		catch (final HibernateException e)
-		{
-			transaction.rollback();
-
-			throw new HibernateException("Failed to commit.");
-		}
-
-		DBLOG.debug("Saved/Updated: " + object);
-
-		return object.getDatabaseID();
-	}
-
-	/**
-	 * Creates a new or updates an existing object depending on whether the given object exists in the database.
-	 *
-	 * @param object new or existing object in the database
-	 * @return the database ID of the inserted or updated object
-	 * @throws HibernateException when data was not saved
-	 */
-	@SuppressWarnings("resource")
-	public static int save(final ProductCategory object)
-	{
-		// TODO: Generalize when all tests have been updated to manually rollback.
-
-		final Session session = sessionFactory.getCurrentSession();
-		final Transaction transaction = session.beginTransaction();
-
-		session.saveOrUpdate(object);
-
-		try
-		{
-			transaction.commit();
-
-		}
-		catch (final HibernateException e)
-		{
-			transaction.rollback();
-
-			throw new HibernateException("Failed to commit.");
-		}
-
-		DBLOG.debug("Saved/Updated: " + object);
+		// TODO: Update observable lists.
 
 		return object.getDatabaseID();
 	}
@@ -2360,22 +1981,22 @@ public class DatabaseController
 	 * @return a list of objects
 	 * @throws HibernateException when the query failed to commit and has been rolled back
 	 */
-	@SuppressWarnings({ "unchecked", "resource" })
 	private static List<Object> getAll(final String className) throws HibernateException
 	{
-		final Session session = sessionFactory.getCurrentSession();
-		session.beginTransaction();
 
-		final List<Object> result = session.createQuery("from " + className).list();
+		sessionFactory.getCurrentSession().beginTransaction();
+
+		@SuppressWarnings("unchecked")
+		final List<Object> result = sessionFactory.getCurrentSession().createQuery("from " + className).list();
 
 		try
 		{
-			session.getTransaction().commit();
+			sessionFactory.getCurrentSession().getTransaction().commit();
 
 		}
 		catch (final HibernateException e)
 		{
-			session.getTransaction().rollback();
+			sessionFactory.getCurrentSession().getTransaction().rollback();
 
 			throw new HibernateException("Failed to commit.");
 		}
@@ -2634,12 +2255,11 @@ public class DatabaseController
 
 	public static void openSession()
 	{
-		try
+		if (sessionFactory.getCurrentSession().isOpen())
 		{
-			sessionFactory.getCurrentSession();
 			DBLOG.error("Attempted to open a database session, but a session was already open.");
 		}
-		catch (HibernateException e)
+		else
 		{
 			sessionFactory.openSession();
 			DBLOG.info("Database session open.");
@@ -2648,12 +2268,12 @@ public class DatabaseController
 
 	public static void closeSession()
 	{
-		try
+		if (sessionFactory.getCurrentSession().isOpen())
 		{
 			sessionFactory.getCurrentSession().close();
 			DBLOG.info("Database session closed.");
 		}
-		catch (HibernateException e)
+		else
 		{
 			DBLOG.warn("Attempted to close a database session, but there was no session.");
 		}

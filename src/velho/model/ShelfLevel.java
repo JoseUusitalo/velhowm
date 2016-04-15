@@ -14,17 +14,12 @@ import org.apache.log4j.Logger;
  *
  * @author Jose Uusitalo
  */
-public class ShelfLevel implements Comparable<ShelfLevel>
+public class ShelfLevel extends AbstractDatabaseObject implements Comparable<ShelfLevel>
 {
 	/**
 	 * Apache log4j logger: System.
 	 */
 	private static final Logger SYSLOG = Logger.getLogger(ShelfLevel.class.getName());
-
-	/**
-	 * The database ID of this {@link Shelf} level.
-	 */
-	private int databaseID;
 
 	private int shelfPosition;
 
@@ -42,7 +37,7 @@ public class ShelfLevel implements Comparable<ShelfLevel>
 	 */
 	public ShelfLevel(final int databaseID, final int shelfPosition, final int maxShelfSlots)
 	{
-		this.databaseID = databaseID;
+		setDatabaseID(databaseID);
 		this.shelfPosition = shelfPosition;
 		this.maxShelfSlots = maxShelfSlots;
 		this.shelfSlots = new TreeSet<ShelfSlot>();
@@ -84,22 +79,6 @@ public class ShelfLevel implements Comparable<ShelfLevel>
 	public int compareTo(final ShelfLevel level)
 	{
 		return getDatabaseID() - level.getDatabaseID();
-	}
-
-	/**
-	 * @return the databaseID
-	 */
-	public int getDatabaseID()
-	{
-		return databaseID;
-	}
-
-	/**
-	 * @param databaseID the databaseID to set
-	 */
-	public void setDatabaseID(final int databaseID)
-	{
-		this.databaseID = databaseID;
 	}
 
 	/**

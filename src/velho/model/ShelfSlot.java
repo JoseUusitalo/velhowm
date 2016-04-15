@@ -11,7 +11,7 @@ import org.apache.log4j.Logger;
  *
  * @author Jose Uusitalo
  */
-public class ShelfSlot implements Comparable<ShelfSlot>
+public class ShelfSlot extends AbstractDatabaseObject implements Comparable<ShelfSlot>
 {
 	/**
 	 * Apache log4j logger: System.
@@ -22,11 +22,6 @@ public class ShelfSlot implements Comparable<ShelfSlot>
 	 * A separator string between values in shelf slot IDs.
 	 */
 	public static final String ID_SEPARATOR = "-";
-
-	/**
-	 * The database ID of this shelf slot.
-	 */
-	private int databaseID;
 
 	/**
 	 * The position (greater than 1) of this shelf slot in a level.
@@ -53,7 +48,7 @@ public class ShelfSlot implements Comparable<ShelfSlot>
 	 */
 	public ShelfSlot(final int databaseID, final int levelPosition, final int maxBoxesInSlot, final ShelfLevel parentShelfLevel)
 	{
-		this.databaseID = databaseID;
+		setDatabaseID(databaseID);
 		this.parentShelfLevel = parentShelfLevel;
 
 		if (maxBoxesInSlot < 1)
@@ -100,21 +95,6 @@ public class ShelfSlot implements Comparable<ShelfSlot>
 	public int compareTo(final ShelfSlot slot)
 	{
 		return getSlotID().compareToIgnoreCase(slot.getSlotID());
-	}
-
-	/**
-	 * Gets the database ID of this shelf slot.
-	 *
-	 * @return the database ID of this shelf slot
-	 */
-	public int getDatabaseID()
-	{
-		return databaseID;
-	}
-
-	public void setDatabaseID(final int databaseID)
-	{
-		this.databaseID = databaseID;
 	}
 
 	public int getLevelPosition()
@@ -231,6 +211,8 @@ public class ShelfSlot implements Comparable<ShelfSlot>
 
 	public boolean contains(final ProductBox box)
 	{
+		System.out.println("BOXES IN SLOT!");
+		System.out.println(productBoxes);
 		return productBoxes.contains(box);
 	}
 

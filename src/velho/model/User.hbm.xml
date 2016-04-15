@@ -24,12 +24,16 @@
 
 		<property	name="badgeID"
 					type="string">
-					<column name="badge_id" length="8" default="null" />
+					<column name="badge_id"
+							length="8"
+							default="null" />
 		</property>
 		
 		<property	name="pin"
 					type="string">
-					<column name="pin" length="6" default="null" />
+					<column name="pin"
+							length="6"
+							default="null" />
 		</property>
 					
 		<property	name="role"

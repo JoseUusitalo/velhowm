@@ -3,7 +3,7 @@ package velho.model;
 import java.util.Date;
 
 /**
- * A table row object containing the necessary data for display in search lists.
+ * A proxy object for displaying {@link ProductBox} data in the UI.
  *
  * @author Jose Uusitalo
  */

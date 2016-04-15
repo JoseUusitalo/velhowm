@@ -11,30 +11,40 @@
 			type="int">
 			<generator class="native" />
 		</id>
-
+					
 		<property	name="expirationDate"
 					column="expiration_date"
 					type="date" />
-		
+
 		<property	name="maxSize"
-					column="max_size"
-					type="int"
-					not-null="true" />
-		
+					type="int">
+			<column name="max_size"
+					not-null="true"
+					default="1" />
+		</property>
+
 		<property name="productCount" type="int">
 			<column name="product_count"
 					not-null="true"
 					default="0" />
 		</property>
 
-		<!-- Many-to-one: This object can have one referenced object, the referenced object can be referenced from many objects.  
+		<!-- Bidirectional relationship, child side. -->
+		<many-to-one	name="shelfSlot"
+						class="velho.model.ShelfSlot"
+						fetch="select">
+			<column	name="slot_id"
+					not-null="false" />
+		</many-to-one>
+
+		<!-- Many-to-one: This object can have one referenced object, the referenced object can be referenced from many objects.
 			 Cascade changes.
 			 "Select" eager fetching: load the referenced object when this object is loaded. -->
 		<many-to-one	name="product"
 						class="velho.model.Product"
 						column="product"
-						not-null="true"
 						cascade="all"
+						not-null="true"
 						fetch="select"
 						lazy="false" />
 	</class>
