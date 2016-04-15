@@ -1,5 +1,7 @@
 package velho.model;
 
+import java.util.UUID;
+
 /**
  * A class describing the category of a {@link Product}.
  *
@@ -12,6 +14,8 @@ public class ProductCategory extends AbstractDatabaseObject implements Comparabl
 	 */
 	private String name;
 
+	private UUID uuid;
+
 	/**
 	 * The product category type.
 	 */
@@ -22,9 +26,10 @@ public class ProductCategory extends AbstractDatabaseObject implements Comparabl
 	 * @param name
 	 * @param type
 	 */
-	public ProductCategory(final int databaseID, final String name, final ProductType type)
+	public ProductCategory(final int databaseID, final UUID uuid, final String name, final ProductType type)
 	{
 		setDatabaseID(databaseID);
+		this.setUuid(uuid);
 		this.type = type;
 		this.name = name;
 	}
@@ -35,7 +40,7 @@ public class ProductCategory extends AbstractDatabaseObject implements Comparabl
 	 */
 	public ProductCategory(final String name, final ProductType type)
 	{
-		this(0, name, type);
+		this(0, UUID.randomUUID(), name, type);
 	}
 
 	/**
@@ -43,7 +48,7 @@ public class ProductCategory extends AbstractDatabaseObject implements Comparabl
 	 */
 	public ProductCategory(final String name)
 	{
-		this(0, name, null);
+		this(0, UUID.randomUUID(), name, null);
 	}
 
 	/**
@@ -51,6 +56,7 @@ public class ProductCategory extends AbstractDatabaseObject implements Comparabl
 	public ProductCategory()
 	{
 		// For Hibernate.
+		this(null);
 	}
 
 	/**
@@ -65,21 +71,41 @@ public class ProductCategory extends AbstractDatabaseObject implements Comparabl
 	@Override
 	public boolean equals(final Object o)
 	{
-		if (!(o instanceof ProductCategory))
+		if (this == o)
+			return true;
+
+		if (o == null || !(o instanceof ProductCategory))
 			return false;
 
-		final ProductCategory pc = (ProductCategory) o;
-
-		if (this.getDatabaseID() <= 0)
-			return this == pc;
-
-		return this.getDatabaseID() == pc.getDatabaseID();
+		return this.getUuid().equals(((ProductCategory) o).getUuid());
 	}
 
 	@Override
 	public int compareTo(final ProductCategory category)
 	{
 		return this.getName().compareTo(category.getName());
+	}
+
+	@Override
+	public int hashCode()
+	{
+		return 3 * getUuid().hashCode();
+	}
+
+	/**
+	 * @return the uuid
+	 */
+	public UUID getUuid()
+	{
+		return uuid;
+	}
+
+	/**
+	 * @param uuid the uuid to set
+	 */
+	public void setUuid(final UUID uuid)
+	{
+		this.uuid = uuid;
 	}
 
 	/**

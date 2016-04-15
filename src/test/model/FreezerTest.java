@@ -19,13 +19,13 @@ import velho.model.ProductType;
  */
 public class FreezerTest
 {
-	private ProductBrand brand1 = new ProductBrand(-1, "pirkka");
-	private ProductType regular = new ProductType(-1, "Regular");
-	private ProductType raw = new ProductType(-1, "Raw");
-	private ProductType cold = new ProductType(-1, "Cold");
-	private ProductCategory category = new ProductCategory(-1, "tyyppi nimi", regular);
-	private ProductCategory category2 = new ProductCategory(-1, "tyyppi nimi", raw);
-	private ProductCategory category3 = new ProductCategory(-1, "tyyppi nimi", cold);
+	private ProductBrand brand1 = new ProductBrand("pirkka");
+	private ProductType regular = new ProductType("Regular");
+	private ProductType raw = new ProductType("Raw");
+	private ProductType cold = new ProductType("Cold");
+	private ProductCategory category = new ProductCategory("tyyppi nimi", regular);
+	private ProductCategory category2 = new ProductCategory("tyyppi nimi", raw);
+	private ProductCategory category3 = new ProductCategory("tyyppi nimi", cold);
 	private ProductBrand brand2 = new ProductBrand(-1, "rainbow");
 	private Date date = new Date(1000);
 	private String name1 = "porkkana";

@@ -18,9 +18,9 @@ import velho.model.ProductType;
  */
 public class ProductTest
 {
-	private ProductBrand brand = new ProductBrand(1, "jotain");
-	private ProductType regular = new ProductType(2, "Regular");
-	private ProductCategory category = new ProductCategory(3, "jahas", regular);
+	private ProductBrand brand = new ProductBrand("jotain");
+	private ProductType regular = new ProductType("Regular");
+	private ProductCategory category = new ProductCategory("jahas", regular);
 	private Product product;
 	private String name = "porkkana";
 	private int id = 20;

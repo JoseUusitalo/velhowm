@@ -14,14 +14,14 @@ import velho.model.ProductType;
  */
 public class ProductCategoryTest
 {
-	private ProductType type = new ProductType(-1, "Regular");
-	private ProductCategory category = new ProductCategory(-1, "category1", type);
+	private ProductType type = new ProductType("Regular");
+	private ProductCategory category = new ProductCategory("category1", type);
 
 	@SuppressWarnings("unused")
 	@Test
 	public void testCategory_TypeRegular()
 	{
-		ProductCategory category1 = new ProductCategory(-1, "category1", type);
+		ProductCategory category1 = new ProductCategory("category1", type);
 	}
 
 	@Test
