@@ -11,15 +11,17 @@
 			type="int">
 			<generator class="native" />
 		</id>
-
+					
 		<property	name="expirationDate"
 					column="expiration_date"
 					type="date" />
 
 		<property	name="maxSize"
-					column="max_size"
-					type="int"
-					not-null="true" />
+					type="int">
+			<column name="max_size"
+					not-null="true"
+					default="1" />
+		</property>
 
 		<property name="productCount" type="int">
 			<column name="product_count"
@@ -27,6 +29,7 @@
 					default="0" />
 		</property>
 
+		<!-- Bidirectional relationship, child side. -->
 		<many-to-one	name="shelfSlot"
 						class="velho.model.ShelfSlot"
 						fetch="select">

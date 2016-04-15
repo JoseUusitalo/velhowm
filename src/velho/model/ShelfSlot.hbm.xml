@@ -31,6 +31,7 @@
 			<one-to-many class="velho.model.ProductBox" />
 		</set>
 
+		<!-- Bidirectional relationship, child side. -->
 		<many-to-one	name="parentShelfLevel"
 						class="velho.model.ShelfLevel"
 						fetch="select">
