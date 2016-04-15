@@ -2318,11 +2318,4 @@ public class DatabaseController
 			DBLOG.warn("Attempted to close a database session, but there was no session.");
 		}
 	}
-
-	public static void clearCurrentSession()
-	{
-		sessionFactory.getCurrentSession().beginTransaction();
-		sessionFactory.getCurrentSession().clear();
-		sessionFactory.getCurrentSession().getTransaction().commit();
-	}
 }

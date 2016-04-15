@@ -44,39 +44,25 @@ public class SampleData
 		 */
 
 		createSample_Users();
-		DatabaseController.clearCurrentSession();
 
 		createSample_Brands();
-		DatabaseController.clearCurrentSession();
 		createSample_ProductTypes();
-		DatabaseController.clearCurrentSession();
 		createSample_ProductCategories();
-		DatabaseController.clearCurrentSession();
 		createSample_Products();
-		DatabaseController.clearCurrentSession();
 
 		createSample_Shelves();
-		DatabaseController.clearCurrentSession();
 		createSample_ShelfLevels();
-		DatabaseController.clearCurrentSession();
 		createSample_ShelfSlots();
-		DatabaseController.clearCurrentSession();
 
 		createSample_ManifestStates();
-		DatabaseController.clearCurrentSession();
 		createSample_Manifests();
-		DatabaseController.clearCurrentSession();
 
 		createSample_RemovalListStates();
-		DatabaseController.clearCurrentSession();
 		createSample_RemovalLists();
-		DatabaseController.clearCurrentSession();
 
 		createSample_ProductBoxes();
-		DatabaseController.clearCurrentSession();
 
 		createSample_RemovalPlatforms();
-		DatabaseController.clearCurrentSession();
 	}
 
 	private static void createSample_Users()
@@ -175,8 +161,6 @@ public class SampleData
 		DatabaseController.save(new ShelfSlot(3, levels.get(1), 3, 1));
 		DatabaseController.save(new ShelfSlot(4, levels.get(1), 4, 1));
 
-		DatabaseController.clearCurrentSession();
-
 		DatabaseController.save(new ShelfSlot(5, levels.get(2), 1, 4));
 		DatabaseController.save(new ShelfSlot(6, levels.get(2), 2, 4));
 		DatabaseController.save(new ShelfSlot(7, levels.get(2), 3, 4));
@@ -186,9 +170,6 @@ public class SampleData
 		DatabaseController.save(new ShelfSlot(11, levels.get(2), 7, 4));
 		DatabaseController.save(new ShelfSlot(12, levels.get(2), 8, 4));
 		DatabaseController.save(new ShelfSlot(13, levels.get(2), 9, 4));
-
-		DatabaseController.clearCurrentSession();
-
 		DatabaseController.save(new ShelfSlot(14, levels.get(2), 10, 4));
 		DatabaseController.save(new ShelfSlot(15, levels.get(2), 11, 4));
 		DatabaseController.save(new ShelfSlot(16, levels.get(2), 12, 4));
@@ -201,8 +182,6 @@ public class SampleData
 		DatabaseController.save(new ShelfSlot(23, levels.get(2), 19, 4));
 		DatabaseController.save(new ShelfSlot(24, levels.get(2), 20, 4));
 
-		DatabaseController.clearCurrentSession();
-
 		DatabaseController.save(new ShelfSlot(25, levels.get(3), 1, 4));
 		DatabaseController.save(new ShelfSlot(26, levels.get(3), 2, 4));
 		DatabaseController.save(new ShelfSlot(27, levels.get(3), 3, 4));
@@ -212,9 +191,6 @@ public class SampleData
 		DatabaseController.save(new ShelfSlot(31, levels.get(3), 7, 4));
 		DatabaseController.save(new ShelfSlot(32, levels.get(3), 8, 4));
 		DatabaseController.save(new ShelfSlot(33, levels.get(3), 9, 4));
-
-		DatabaseController.clearCurrentSession();
-
 		DatabaseController.save(new ShelfSlot(34, levels.get(3), 10, 4));
 		DatabaseController.save(new ShelfSlot(35, levels.get(3), 11, 4));
 		DatabaseController.save(new ShelfSlot(36, levels.get(3), 12, 4));
@@ -231,8 +207,6 @@ public class SampleData
 		DatabaseController.save(new ShelfSlot(46, levels.get(5), 1, 50));
 		DatabaseController.save(new ShelfSlot(47, levels.get(6), 1, 50));
 
-		DatabaseController.clearCurrentSession();
-
 		DatabaseController.save(new ShelfSlot(48, levels.get(7), 1, 1));
 		DatabaseController.save(new ShelfSlot(49, levels.get(7), 2, 1));
 		DatabaseController.save(new ShelfSlot(50, levels.get(7), 3, 1));
@@ -247,8 +221,6 @@ public class SampleData
 		DatabaseController.save(new ShelfSlot(59, levels.get(7), 12, 1));
 		DatabaseController.save(new ShelfSlot(60, levels.get(7), 13, 1));
 		DatabaseController.save(new ShelfSlot(61, levels.get(7), 14, 1));
-
-		DatabaseController.clearCurrentSession();
 
 		DatabaseController.save(new ShelfSlot(62, levels.get(7), 15, 1));
 		DatabaseController.save(new ShelfSlot(63, levels.get(7), 16, 1));
@@ -267,8 +239,6 @@ public class SampleData
 		DatabaseController.save(new ShelfSlot(76, levels.get(7), 29, 1));
 		DatabaseController.save(new ShelfSlot(77, levels.get(7), 30, 1));
 		DatabaseController.save(new ShelfSlot(78, levels.get(7), 31, 1));
-
-		DatabaseController.clearCurrentSession();
 
 		DatabaseController.save(new ShelfSlot(79, levels.get(7), 32, 1));
 		DatabaseController.save(new ShelfSlot(80, levels.get(7), 33, 1));
@@ -290,8 +260,6 @@ public class SampleData
 		DatabaseController.save(new ShelfSlot(96, levels.get(7), 49, 1));
 		DatabaseController.save(new ShelfSlot(97, levels.get(7), 50, 1));
 
-		DatabaseController.clearCurrentSession();
-
 		DatabaseController.save(new ShelfSlot(98, levels.get(8), 1, 1));
 		DatabaseController.save(new ShelfSlot(99, levels.get(8), 2, 1));
 		DatabaseController.save(new ShelfSlot(100, levels.get(8), 3, 1));
@@ -305,8 +273,6 @@ public class SampleData
 		DatabaseController.save(new ShelfSlot(108, levels.get(8), 11, 1));
 		DatabaseController.save(new ShelfSlot(109, levels.get(8), 12, 1));
 
-		DatabaseController.clearCurrentSession();
-
 		DatabaseController.save(new ShelfSlot(110, levels.get(8), 13, 1));
 		DatabaseController.save(new ShelfSlot(111, levels.get(8), 14, 1));
 		DatabaseController.save(new ShelfSlot(112, levels.get(8), 15, 1));
@@ -317,8 +283,6 @@ public class SampleData
 		DatabaseController.save(new ShelfSlot(117, levels.get(8), 20, 1));
 		DatabaseController.save(new ShelfSlot(118, levels.get(8), 21, 1));
 		DatabaseController.save(new ShelfSlot(119, levels.get(8), 22, 1));
-
-		DatabaseController.clearCurrentSession();
 
 		DatabaseController.save(new ShelfSlot(120, levels.get(8), 23, 1));
 		DatabaseController.save(new ShelfSlot(121, levels.get(8), 24, 1));
@@ -332,8 +296,6 @@ public class SampleData
 		DatabaseController.save(new ShelfSlot(129, levels.get(8), 32, 1));
 		DatabaseController.save(new ShelfSlot(130, levels.get(8), 33, 1));
 		DatabaseController.save(new ShelfSlot(131, levels.get(8), 34, 1));
-
-		DatabaseController.clearCurrentSession();
 
 		DatabaseController.save(new ShelfSlot(132, levels.get(8), 35, 1));
 		DatabaseController.save(new ShelfSlot(133, levels.get(8), 36, 1));
@@ -351,8 +313,6 @@ public class SampleData
 		DatabaseController.save(new ShelfSlot(145, levels.get(8), 48, 1));
 		DatabaseController.save(new ShelfSlot(146, levels.get(8), 49, 1));
 		DatabaseController.save(new ShelfSlot(147, levels.get(8), 50, 1));
-
-		DatabaseController.clearCurrentSession();
 
 		DatabaseController.save(new ShelfSlot(148, levels.get(9), 1, 1));
 		DatabaseController.save(new ShelfSlot(149, levels.get(9), 2, 1));
@@ -418,8 +378,6 @@ public class SampleData
 		DatabaseController.save(new ProductBox(9, null, null, DatabaseController.getShelfSlotByID(44), DatabaseController.getProductByID(1), 50, 50,
 				DatabaseController.parseDateString("2020-05-26")));
 
-		DatabaseController.clearCurrentSession();
-
 		DatabaseController.save(new ProductBox(10, null, null, DatabaseController.getShelfSlotByID(46), DatabaseController.getProductByID(1), 20, 20));
 		DatabaseController.save(new ProductBox(11, null, null, DatabaseController.getShelfSlotByID(46), DatabaseController.getProductByID(10), 20, 20,
 				DatabaseController.parseDateString("2015-03-20")));
@@ -454,8 +412,6 @@ public class SampleData
 		DatabaseController.save(new ProductBox(29, null, DatabaseController.getRemovalListByID(3), null, DatabaseController.getProductByID(1), 200, 10,
 				DatabaseController.parseDateString("2016-08-11")));
 		DatabaseController.save(new ProductBox(30, null, DatabaseController.getRemovalListByID(4), null, DatabaseController.getProductByID(4), 5, 0));
-
-		DatabaseController.clearCurrentSession();
 
 		// Manifest containers.
 		DatabaseController.save(new ProductBox(31, DatabaseController.getManifestByID(1), null, null, DatabaseController.getProductByID(4), 1, 1,
