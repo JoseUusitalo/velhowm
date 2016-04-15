@@ -10,7 +10,6 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.junit.After;
-import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -94,12 +93,6 @@ public class ShelfTest
 		BOX_2 = DatabaseController.getProductBoxByID(22);
 
 		System.out.println("---------after-------\n");
-	}
-
-	@AfterClass
-	public static void closeSession()
-	{
-		DatabaseController.closeSession();
 	}
 
 	/**
@@ -363,7 +356,7 @@ public class ShelfTest
 
 	/**
 	 * Tests that removing product boxes from shelf slots works as intended.
-	 * 
+	 *
 	 * @throws IllegalArgumentException
 	 */
 	@Test

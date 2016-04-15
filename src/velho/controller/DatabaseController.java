@@ -2292,30 +2292,4 @@ public class DatabaseController
 
 		return delete && load;
 	}
-
-	public static void openSession()
-	{
-		if (sessionFactory.getCurrentSession().isOpen())
-		{
-			DBLOG.error("Attempted to open a database session, but a session was already open.");
-		}
-		else
-		{
-			sessionFactory.openSession();
-			DBLOG.info("Database session open.");
-		}
-	}
-
-	public static void closeSession()
-	{
-		if (sessionFactory.getCurrentSession().isOpen())
-		{
-			sessionFactory.getCurrentSession().close();
-			DBLOG.info("Database session closed.");
-		}
-		else
-		{
-			DBLOG.warn("Attempted to close a database session, but there was no session.");
-		}
-	}
 }

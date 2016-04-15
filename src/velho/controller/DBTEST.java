@@ -21,6 +21,7 @@ public class DBTEST
 		shelf();
 	}
 
+	@SuppressWarnings("unused")
 	private static void brands()
 	{
 		Set<ProductBrand> brands = new LinkedHashSet<ProductBrand>();

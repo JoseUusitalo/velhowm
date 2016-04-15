@@ -204,7 +204,6 @@ public class MainWindow extends Application
 		try
 		{
 			DatabaseController.link();
-			DatabaseController.openSession();
 			DatabaseController.loadSampleData();
 		}
 		catch (ClassNotFoundException | ExistingDatabaseLinkException | HibernateException | ParseException e)
@@ -513,7 +512,6 @@ public class MainWindow extends Application
 				debugStage.close();
 		}
 
-		DatabaseController.closeSession();
 		DatabaseController.closeSessionFactory();
 
 		try
