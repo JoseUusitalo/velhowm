@@ -239,6 +239,26 @@ public abstract class ProductContainer extends AbstractDatabaseObject implements
 		this.shelfSlot = shelfSlot;
 	}
 
+	public RemovalList getRemovalList()
+	{
+		return removalList;
+	}
+
+	public Manifest getManifest()
+	{
+		return manifest;
+	}
+
+	public void setRemovalList(final RemovalList removalList)
+	{
+		this.removalList = removalList;
+	}
+
+	public void setManifest(final Manifest manifest)
+	{
+		this.manifest = manifest;
+	}
+
 	/**
 	 * Gets the expiration date of the products in this product container.
 	 *

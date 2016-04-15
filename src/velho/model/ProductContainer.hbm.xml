@@ -31,6 +31,26 @@
 
 		<!-- Bidirectional relationship, child side.
 			 "Select" eager fetching: load the referenced object when this object is loaded. -->
+		<many-to-one	name="manifest"
+						class="velho.model.Manifest"
+						fetch="select"
+						lazy="false">
+			<column	name="manifest"
+					not-null="false" />
+		</many-to-one>
+		
+		<!-- Bidirectional relationship, child side.
+			 "Select" eager fetching: load the referenced object when this object is loaded. -->
+		<many-to-one	name="removalList"
+						class="velho.model.RemovalList"
+						fetch="select"
+						lazy="false">
+			<column	name="removallist"
+					not-null="false" />
+		</many-to-one>
+		
+		<!-- Bidirectional relationship, child side.
+			 "Select" eager fetching: load the referenced object when this object is loaded. -->
 		<many-to-one	name="shelfSlot"
 						class="velho.model.ShelfSlot"
 						fetch="select"

@@ -11,6 +11,8 @@ public class ProductBox extends ProductContainer
 {
 	/**
 	 * @param databaseID
+	 * @param manifest
+	 * @param removalList
 	 * @param shelfSlot
 	 * @param product
 	 * @param maxSize
