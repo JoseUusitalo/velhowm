@@ -4,6 +4,8 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
+import java.text.ParseException;
+
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -41,7 +43,7 @@ public class UserTest
 	private final User user = new User(-1, "f", "l", UserRole.MANAGER);
 
 	@BeforeClass
-	public final static void linkDatabase() throws NoDatabaseLinkException, NoDatabaseException
+	public final static void linkDatabase() throws ParseException, NoDatabaseException
 	{
 		DatabaseController.resetDatabase();
 	}

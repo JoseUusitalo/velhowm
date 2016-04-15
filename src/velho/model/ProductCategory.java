@@ -35,12 +35,22 @@ public class ProductCategory extends AbstractDatabaseObject implements Comparabl
 	}
 
 	/**
+	 * @param databaseID
+	 * @param name
+	 * @param type
+	 */
+	public ProductCategory(final int databaseID, final String name, final ProductType type)
+	{
+		this(databaseID, UUID.randomUUID(), name, type);
+	}
+
+	/**
 	 * @param name
 	 * @param type
 	 */
 	public ProductCategory(final String name, final ProductType type)
 	{
-		this(0, UUID.randomUUID(), name, type);
+		this(0, name, type);
 	}
 
 	/**

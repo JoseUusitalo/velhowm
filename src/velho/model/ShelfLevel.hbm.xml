@@ -31,10 +31,12 @@
 			<one-to-many class="velho.model.ShelfSlot" />
 		</set>
 
-		<!-- Bidirectional relationship, child side. -->
+		<!-- Bidirectional relationship, child side.
+			 "Select" eager fetching: load the referenced object when this object is loaded. -->
 		<many-to-one	name="parentShelf"
 						class="velho.model.Shelf"
-						fetch="select">
+						fetch="select"
+						lazy="false">
 			<column	name="shelf_id"
 					not-null="true" />
 		</many-to-one>

@@ -29,11 +29,20 @@ public class ProductType extends AbstractDatabaseObject implements Comparable<Pr
 	}
 
 	/**
+	 * @param databaseID
+	 * @param name
+	 */
+	public ProductType(final int databaseID, final String name)
+	{
+		this(databaseID, UUID.randomUUID(), name);
+	}
+
+	/**
 	 * @param name
 	 */
 	public ProductType(final String name)
 	{
-		this(0, UUID.randomUUID(), name);
+		this(0, name);
 	}
 
 	/**

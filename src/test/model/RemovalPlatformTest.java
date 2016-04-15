@@ -102,13 +102,13 @@ public class RemovalPlatformTest
 
 		// Check that the method worked.
 		assertEquals(0, Double.compare(newPercent, existingPlatform.getFreeSpacePercent()));
-		DatabaseController.save(existingPlatform);
+		DatabaseController.saveOrUpdate(existingPlatform);
 
 		// Database was updated.
 		assertTrue(Double.compare(newPercent, DatabaseController.getRemovalPlatformByID(existingPlatform.getDatabaseID()).getFreeSpacePercent()) == 0);
 
 		// Rollback.
 		existingPlatform.setFreeSpacePercent(oldPercent);
-		DatabaseController.save(existingPlatform);
+		DatabaseController.saveOrUpdate(existingPlatform);
 	}
 }

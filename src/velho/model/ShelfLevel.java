@@ -35,27 +35,19 @@ public class ShelfLevel extends AbstractDatabaseObject implements Comparable<She
 	 * @param maxShelfSlots
 	 * @param shelfSlots
 	 */
-	public ShelfLevel(final int databaseID, final int shelfPosition, final int maxShelfSlots)
+	public ShelfLevel(final int databaseID, final Shelf parentShelf, final int shelfPosition, final int maxShelfSlots)
 	{
 		setDatabaseID(databaseID);
+		this.parentShelf = parentShelf;
 		this.shelfPosition = shelfPosition;
 		this.maxShelfSlots = maxShelfSlots;
 		this.shelfSlots = new TreeSet<ShelfSlot>();
 	}
 
-	/**
-	 * @param shelfPosition
-	 * @param maxShelfSlots
-	 * @param shelfSlots
-	 */
-	public ShelfLevel(final int shelfPosition, final int maxShelfSlots)
-	{
-		this(0, shelfPosition, maxShelfSlots);
-	}
-
 	public ShelfLevel()
 	{
 		// For Hibernate.
+		this.shelfSlots = new TreeSet<ShelfSlot>();
 	}
 
 	@Override

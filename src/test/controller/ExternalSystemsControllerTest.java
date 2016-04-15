@@ -3,6 +3,8 @@ package test.controller;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
+import java.text.ParseException;
+
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -29,8 +31,7 @@ public class ExternalSystemsControllerTest
 	private static final int BOXDBID2 = 2;
 
 	@BeforeClass
-	public final static void connectAndInitializeDatabase()
-			throws ClassNotFoundException, NoDatabaseLinkException, ExistingDatabaseLinkException, NoDatabaseException
+	public final static void connectAndInitializeDatabase() throws ClassNotFoundException, ParseException, ExistingDatabaseLinkException, NoDatabaseException
 	{
 		assertTrue(DatabaseController.link() != DatabaseFileState.DOES_NOT_EXIST);
 		assertTrue(DatabaseController.resetDatabase());

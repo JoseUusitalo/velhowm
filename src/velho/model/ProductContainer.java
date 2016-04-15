@@ -35,21 +35,37 @@ public abstract class ProductContainer extends AbstractDatabaseObject implements
 	protected ShelfSlot shelfSlot;
 
 	/**
-	 * @param boxID
-	 * @param expirationDate
-	 * @param maxSize
-	 * @param product
-	 * @param productCount
+	 * The {@link RemovalList} this container is currently in.
 	 */
-	public ProductContainer(final int boxID, final Date expirationDate, final int maxSize, final Product product, final int productCount)
+	protected RemovalList removalList;
+
+	/**
+	 * The {@link Manifest} this container is currently in.
+	 */
+	protected Manifest manifest;
+
+	/**
+	 * @param databaseID
+	 * @param shelfSlot
+	 * @param product
+	 * @param maxSize
+	 * @param productCount
+	 * @param expirationDate
+	 */
+	public ProductContainer(final int databaseID, final Manifest manifest, final RemovalList removalList, final ShelfSlot shelfSlot, final Product product,
+			final int maxSize, final int productCount, final Date expirationDate)
 	{
 		if (maxSize < 1 || maxSize < productCount)
 		{
 			throw new IllegalArgumentException();
 		}
+
+		this.manifest = manifest;
+		this.removalList = removalList;
+		this.shelfSlot = shelfSlot;
 		this.expirationDate = expirationDate;
 		this.maxSize = maxSize;
-		setDatabaseID(boxID);
+		setDatabaseID(databaseID);
 		this.product = product;
 		this.productCount = productCount;
 	}

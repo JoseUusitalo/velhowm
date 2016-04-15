@@ -46,7 +46,7 @@ public class ShelfSlot extends AbstractDatabaseObject implements Comparable<Shel
 	 * @param levelPosition
 	 * @param maxBoxesInSlot
 	 */
-	public ShelfSlot(final int databaseID, final int levelPosition, final int maxBoxesInSlot, final ShelfLevel parentShelfLevel)
+	public ShelfSlot(final int databaseID, final ShelfLevel parentShelfLevel, final int levelPosition, final int maxBoxesInSlot)
 	{
 		setDatabaseID(databaseID);
 		this.parentShelfLevel = parentShelfLevel;
@@ -64,14 +64,10 @@ public class ShelfSlot extends AbstractDatabaseObject implements Comparable<Shel
 		productBoxes = new HashSet<ProductBox>();
 	}
 
-	public ShelfSlot(final int levelPosition, final int maxBoxesInSlot, final ShelfLevel parentShelfLevel)
-	{
-		this(0, levelPosition, maxBoxesInSlot, parentShelfLevel);
-	}
-
 	public ShelfSlot()
 	{
 		// For Hibernate.
+		productBoxes = new HashSet<ProductBox>();
 	}
 
 	@Override

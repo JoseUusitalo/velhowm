@@ -5,6 +5,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -26,7 +27,6 @@ import velho.model.RemovalList;
 import velho.model.User;
 import velho.model.exceptions.NoDatabaseException;
 import velho.model.exceptions.NoDatabaseLinkException;
-import velho.model.exceptions.UniqueKeyViolationException;
 
 /**
  * Tests for the {@link DatabaseController} class.
@@ -37,7 +37,7 @@ import velho.model.exceptions.UniqueKeyViolationException;
 public class DatabaseControllerTest
 {
 	@BeforeClass
-	public final static void connectAndInitializeDatabase() throws NoDatabaseException, NoDatabaseLinkException
+	public final static void connectAndInitializeDatabase() throws NoDatabaseException, ParseException
 	{
 		assertTrue(DatabaseController.resetDatabase());
 	}
@@ -55,7 +55,7 @@ public class DatabaseControllerTest
 	}
 
 	@Test
-	public final void testFailInitialization() throws NoDatabaseException
+	public final void testFailInitialization() throws HibernateException, ParseException
 	{
 		try
 		{
@@ -67,25 +67,7 @@ public class DatabaseControllerTest
 			fail(e.toString());
 		}
 
-		try
-		{
-			assertFalse(DatabaseController.loadSampleData());
-		}
-		catch (final NoDatabaseLinkException e)
-		{
-			try
-			{
-				connectAndInitializeDatabase();
-			}
-			catch (final NoDatabaseLinkException e1)
-			{
-				fail(e1.toString());
-			}
-		}
-		catch (UniqueKeyViolationException e)
-		{
-			e.printStackTrace();
-		}
+		assertFalse(DatabaseController.loadSampleData());
 	}
 
 	@Test
@@ -184,7 +166,7 @@ public class DatabaseControllerTest
 	}
 
 	@Test
-	public final void testDeleteUser1() throws NoDatabaseLinkException, NoDatabaseException
+	public final void testDeleteUser1() throws ParseException, NoDatabaseException
 	{
 		final ObservableList<Object> users = DatabaseController.getAllUsers();
 		final User user = DatabaseController.getUserByID(1);
@@ -317,7 +299,7 @@ public class DatabaseControllerTest
 		final ProductBox box = DatabaseController.getProductBoxByID(1);
 		list.addProductBox(box);
 
-		assertTrue(DatabaseController.save(list) > 0);
+		assertTrue(DatabaseController.saveOrUpdate(list) > 0);
 		final ObservableList<Object> obsboxes = DatabaseController.getRemovalListByID(6).getObservableBoxes();
 		final List<ProductBox> boxes = new ArrayList<ProductBox>();
 		final Iterator<Object> it = obsboxes.iterator();

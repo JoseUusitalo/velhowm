@@ -53,7 +53,7 @@ public class Manifest extends AbstractDatabaseObject implements Comparable<Manif
 	 * @param ordered
 	 * @param received
 	 */
-	public Manifest(final int databaseID, final ManifestState state, final int driverID, final Date ordered, final Date received)
+	public Manifest(final int databaseID, final int driverID, final ManifestState state, final Date ordered, final Date received)
 	{
 		setDatabaseID(databaseID);
 		this.state = state;
@@ -74,7 +74,7 @@ public class Manifest extends AbstractDatabaseObject implements Comparable<Manif
 	 */
 	public Manifest(final ManifestState state, final int driverID, final Date ordered, final Date received)
 	{
-		this(0, state, driverID, ordered, received);
+		this(0, driverID, state, ordered, received);
 	}
 
 	/**

@@ -18,7 +18,7 @@ public class Freezer extends ProductContainer
 	 */
 	public Freezer(final int freezerID, final Date expirationDate, final int maxSize, final Product product, final int productCount)
 	{
-		super(freezerID, expirationDate, maxSize, product, productCount);
+		super(freezerID, null, null, null, product, maxSize, productCount, expirationDate);
 
 		if (this.getBoxType().getName() == "Regular")
 		{

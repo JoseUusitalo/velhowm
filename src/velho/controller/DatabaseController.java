@@ -5,6 +5,7 @@ import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -39,7 +40,10 @@ import velho.model.RemovalList;
 import velho.model.RemovalListState;
 import velho.model.RemovalPlatform;
 import velho.model.Shelf;
+import velho.model.ShelfLevel;
+import velho.model.ShelfSlot;
 import velho.model.User;
+import velho.model.data.SampleData;
 import velho.model.enums.DatabaseFileState;
 import velho.model.enums.DatabaseQueryType;
 import velho.model.enums.DatabaseTable;
@@ -180,7 +184,8 @@ public class DatabaseController
 	 * @param columns columns to select (can be <code>null</code>)
 	 * @param columnValues values to set to the specified columns
 	 * @param where conditions (can be <code>null</code>)
-	 * @return <ul>
+	 * @return
+	 *         <ul>
 	 *         <li>if type is {@link DatabaseQueryType#UPDATE} or
 	 *         {@link DatabaseQueryType#DELETE}: the number of rows that were
 	 *         changed as a result of the query as an {@link Integer}</li>
@@ -301,14 +306,6 @@ public class DatabaseController
 								break;
 							// @formatter:on
 
-							case CONTAINERS:
-								// @formatter:off
-								while (result.next())
-									dataSet.add(new ProductBox(result.getInt("container_id"), result.getDate("expiration_date"), result.getInt("max_size"), getProductByID(result.getInt("product")), result.getInt("product_count")));
-								// FIXME: Containers are not set to their respective shelves!
-								break;
-							// @formatter:on
-
 							case SHELVES:
 								// @formatter:off
 								while (result.next())
@@ -332,13 +329,6 @@ public class DatabaseController
 								while (result.next())
 									dataSet.add(new ManifestState(result.getInt("manifest_state_id"), result.getString("name")));
 								break;
-
-							case MANIFESTS:
-								// @formatter:off
-								while (result.next())
-									dataSet.add(new Manifest(result.getInt("manifest_id"), getManifestStateByID(result.getInt("state")), result.getInt("driver_id"), result.getDate("date_ordered"), result.getDate("date_received")));
-								break;
-							// @formatter:on
 
 							case REMOVALPLATFORMS:
 								// @formatter:off
@@ -655,6 +645,17 @@ public class DatabaseController
 	public static String getH2DateFormat(final Date date)
 	{
 		return H2_DATE_FORMAT.format(date);
+	}
+
+	/**
+	 * Formats the given H2 date string into a {@link Date} object.
+	 *
+	 * @param dateString date string to parse
+	 * @return a Date object representing the string
+	 */
+	public static Date parseDateString(final String dateString) throws ParseException
+	{
+		return H2_DATE_FORMAT.parse(dateString);
 	}
 
 	/**
@@ -1512,6 +1513,30 @@ public class DatabaseController
 	}
 
 	/**
+	 * Gets the {@link ShelfLevel} object from the database with the given ID.
+	 *
+	 * @param id the shelf level database ID
+	 * @return the corresponding shelf object or <code>null</code> for invalid ID
+	 * @throws HibernateException when the query failed to commit and has been rolled back
+	 */
+	public static ShelfLevel getShelfLevelByID(final int id) throws HibernateException
+	{
+		return (ShelfLevel) getByID(ShelfLevel.class, id);
+	}
+
+	/**
+	 * Gets the {@link ShelfSlot} object from the database with the given ID.
+	 *
+	 * @param id the shelf slot database ID
+	 * @return the corresponding shelf object or <code>null</code> for invalid ID
+	 * @throws HibernateException when the query failed to commit and has been rolled back
+	 */
+	public static ShelfSlot getShelfSlotByID(final int id) throws HibernateException
+	{
+		return (ShelfSlot) getByID(ShelfSlot.class, id);
+	}
+
+	/**
 	 * Gets the {@link RemovalList} object from the database with the given ID.
 	 *
 	 * @param id the removal list database ID
@@ -1855,19 +1880,16 @@ public class DatabaseController
 	 * @return <code>true</code> if database changed as a result of this call
 	 * @throws NoDatabaseLinkException
 	 */
-	public static boolean loadSampleData() throws NoDatabaseException, NoDatabaseException, NoDatabaseLinkException, UniqueKeyViolationException
+	public static boolean loadSampleData() throws HibernateException, ParseException
 	{
 		DBLOG.debug("Loading sample data to database...");
 
-		if (!databaseExists())
-			throw new NoDatabaseException();
+		// TODO: Find a way to return a boolean.
+		SampleData.createAll();
 
-		final boolean changed = (0 != (Integer) runQuery("RUNSCRIPT FROM './data/sample_data.sql';"));
+		DBLOG.info("Sample data loaded.");
 
-		if (changed)
-			DBLOG.info("Sample data loaded.");
-
-		return changed;
+		return true;
 	}
 
 	/**
@@ -1936,7 +1958,7 @@ public class DatabaseController
 	 * @return the database ID of the inserted or updated object
 	 * @throws HibernateException when data was not saved
 	 */
-	public static int save(final DatabaseObject object)
+	public static int saveOrUpdate(final DatabaseObject object)
 	{
 		sessionFactory.getCurrentSession().beginTransaction();
 
@@ -1955,6 +1977,38 @@ public class DatabaseController
 		}
 
 		DBLOG.debug("Saved/Updated: " + object);
+
+		// TODO: Update observable lists.
+
+		return object.getDatabaseID();
+	}
+
+	/**
+	 * Inserts a new object into the database.
+	 *
+	 * @param object new database object
+	 * @return the database ID of the inserted object
+	 * @throws HibernateException when data was not saved
+	 */
+	public static int save(final DatabaseObject object)
+	{
+		sessionFactory.getCurrentSession().beginTransaction();
+
+		sessionFactory.getCurrentSession().save(object);
+		sessionFactory.getCurrentSession().flush();
+
+		try
+		{
+			sessionFactory.getCurrentSession().getTransaction().commit();
+		}
+		catch (final HibernateException e)
+		{
+			sessionFactory.getCurrentSession().getTransaction().rollback();
+
+			throw new HibernateException("Failed to commit.");
+		}
+
+		DBLOG.debug("Saved: " + object);
 
 		// TODO: Update observable lists.
 
@@ -2043,6 +2097,11 @@ public class DatabaseController
 		observableShelves.addAll(getAll("Shelf"));
 
 		return observableShelves;
+	}
+
+	public static List<Object> getAllShelfLevels()
+	{
+		return getAll("ShelfLevel");
 	}
 
 	/**
@@ -2203,7 +2262,7 @@ public class DatabaseController
 	 *
 	 * @return <code>true</code> if the operation was succesfull
 	 */
-	public static boolean resetDatabase() throws NoDatabaseException, NoDatabaseLinkException
+	public static boolean resetDatabase() throws NoDatabaseException, HibernateException, ParseException
 	{
 		try
 		{
@@ -2229,17 +2288,7 @@ public class DatabaseController
 
 		final boolean delete = deleteAllData();
 
-		boolean load;
-
-		try
-		{
-			load = loadSampleData();
-		}
-		catch (UniqueKeyViolationException e)
-		{
-			load = false;
-			e.printStackTrace();
-		}
+		boolean load = loadSampleData();
 
 		return delete && load;
 	}
@@ -2268,5 +2317,12 @@ public class DatabaseController
 		{
 			DBLOG.warn("Attempted to close a database session, but there was no session.");
 		}
+	}
+
+	public static void clearCurrentSession()
+	{
+		sessionFactory.getCurrentSession().beginTransaction();
+		sessionFactory.getCurrentSession().clear();
+		sessionFactory.getCurrentSession().getTransaction().commit();
 	}
 }

@@ -91,7 +91,7 @@ public class ManifestTest
 		assertEquals(newState, existingManifest.getState());
 
 		// Save.
-		final int saveID = DatabaseController.save(existingManifest);
+		final int saveID = DatabaseController.saveOrUpdate(existingManifest);
 		assertTrue(saveID > 0);
 
 		// Check that that the object was updated, not inserted.
@@ -102,7 +102,7 @@ public class ManifestTest
 
 		// TODO: Figure out a better way to roll back changes.
 		existingManifest.setState(oldState);
-		DatabaseController.save(existingManifest);
+		DatabaseController.saveOrUpdate(existingManifest);
 	}
 
 	@Test

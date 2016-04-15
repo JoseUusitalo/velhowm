@@ -4,6 +4,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -17,7 +18,6 @@ import velho.controller.DatabaseController;
 import velho.model.ProductBox;
 import velho.model.Shelf;
 import velho.model.exceptions.NoDatabaseException;
-import velho.model.exceptions.NoDatabaseLinkException;
 
 /**
  * Tests for the {@link Shelf} class.
@@ -53,7 +53,7 @@ public class ShelfTest
 	 * @throws NoDatabaseLinkException
 	 */
 	@BeforeClass
-	public static final void initializeData() throws NoDatabaseException, NoDatabaseLinkException
+	public static final void initializeData() throws NoDatabaseException, ParseException
 	{
 		System.out.println("------beforeclass----------");
 		DatabaseController.resetDatabase();
@@ -81,7 +81,7 @@ public class ShelfTest
 	 * @throws NoDatabaseLinkException
 	 */
 	@After
-	public void resetDatabase() throws NoDatabaseException, NoDatabaseLinkException
+	public void resetDatabase() throws NoDatabaseException, ParseException
 	{
 		System.out.println("\n------after----------");
 
@@ -340,7 +340,7 @@ public class ShelfTest
 		assertEquals(oldProductCount + BOX_1_2_PRODUCT_COUNT, shelf_FREE_LVL_2.getProductCountInBoxes());
 
 		// -- Save to database --
-		DatabaseController.save(shelf_FREE_LVL_2);
+		DatabaseController.saveOrUpdate(shelf_FREE_LVL_2);
 
 		// Check that database has been updated.
 		shelf_FREE_LVL_2 = DatabaseController.getShelfByID(SHELF_FREE_LVL_2_ID);
@@ -363,6 +363,7 @@ public class ShelfTest
 
 	/**
 	 * Tests that removing product boxes from shelf slots works as intended.
+	 * 
 	 * @throws IllegalArgumentException
 	 */
 	@Test
@@ -376,7 +377,7 @@ public class ShelfTest
 		assertTrue(shelf_FREE_LVL_2.addToSlot(slotid, BOX_2));
 
 		// Save to database.
-		DatabaseController.save(shelf_FREE_LVL_2);
+		DatabaseController.saveOrUpdate(shelf_FREE_LVL_2);
 
 		// Product box is in the shelf.
 		assertTrue(shelf_FREE_LVL_2.getProductBoxes().contains(BOX_ID_21));
@@ -410,7 +411,7 @@ public class ShelfTest
 		assertEquals(oldProductCount - BOX_1_2_PRODUCT_COUNT, shelf_FREE_LVL_2.getProductCountInBoxes());
 
 		// -- Save to database --
-		DatabaseController.save(shelf_FREE_LVL_2);
+		DatabaseController.saveOrUpdate(shelf_FREE_LVL_2);
 
 		// Check that database has been updated.
 		shelf_FREE_LVL_2 = DatabaseController.getShelfByID(SHELF_FREE_LVL_2_ID);

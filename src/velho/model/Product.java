@@ -43,13 +43,9 @@ public class Product extends AbstractDatabaseObject implements Comparable<Produc
 		this.popularity = popularity;
 	}
 
-	public Product(final String name, final ProductBrand brand, final ProductCategory category, final int popularity)
+	public Product(final int databaseID, final String name, final ProductBrand brand, final ProductCategory category)
 	{
-		setDatabaseID(0);
-		this.name = name;
-		this.brand = brand;
-		this.category = category;
-		this.popularity = popularity;
+		this(databaseID, name, brand, category, -1);
 	}
 
 	/**

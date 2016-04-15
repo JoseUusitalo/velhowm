@@ -65,7 +65,7 @@ public class UserController implements UIActionController
 
 			try
 			{
-				DatabaseController.save(newUser);
+				DatabaseController.saveOrUpdate(newUser);
 				USRLOG.debug("Created a user.");
 
 				if (showPopup)

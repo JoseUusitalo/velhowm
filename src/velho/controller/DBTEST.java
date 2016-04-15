@@ -43,7 +43,7 @@ public class DBTEST
 
 		for (ProductBrand t : brands)
 		{
-			DatabaseController.save(t);
+			DatabaseController.saveOrUpdate(t);
 		}
 
 		System.out.println();
@@ -69,7 +69,7 @@ public class DBTEST
 		System.out.println(typ.getUuid());
 		System.out.println(typ.getDatabaseID());
 
-		DatabaseController.save(cat);
+		DatabaseController.saveOrUpdate(cat);
 		System.out.println(typ);
 		System.out.println(typ.getUuid());
 		System.out.println(typ.getDatabaseID());
@@ -101,7 +101,7 @@ public class DBTEST
 
 		for (ProductType t : types)
 		{
-			DatabaseController.save(t);
+			DatabaseController.saveOrUpdate(t);
 		}
 
 		System.out.println();
@@ -168,7 +168,7 @@ public class DBTEST
 		System.out.println(oldProductCount + boxProductCount + " = " + shelf.getProductCountInBoxes());
 
 		System.out.println("\n-- Save to database --");
-		DatabaseController.save(shelf);
+		DatabaseController.saveOrUpdate(shelf);
 
 		System.out.println("\nCheck that database has been updated.");
 		shelf = DatabaseController.getShelfByID(shelfID);

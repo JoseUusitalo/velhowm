@@ -46,7 +46,7 @@ public class ProductBoxTest
 	@Before
 	public void createProductBox()
 	{
-		box = new ProductBox(id1, date, maxSize, product1, 0);
+		box = new ProductBox(id1, product1, maxSize, 0, date);
 	}
 
 	@After
@@ -59,28 +59,28 @@ public class ProductBoxTest
 	@Test
 	public void testCreateProductBox_RAW()
 	{
-		ProductBox productBox2 = new ProductBox(1, date, 1, product2, 0);
+		ProductBox productBox2 = new ProductBox(1, product2, 1, 0, date);
 	}
 
 	@SuppressWarnings("unused")
 	@Test(expected = IllegalArgumentException.class)
 	public void testCreateProductBox_COLD()
 	{
-		ProductBox productBox3 = new ProductBox(1, date, 1, product3, 0);
+		ProductBox productBox3 = new ProductBox(1, product3, 1, 0, date);
 	}
 
 	@SuppressWarnings("unused")
 	@Test(expected = IllegalArgumentException.class)
 	public void testCreateProductBox_MaxSize_1()
 	{
-		ProductBox productBox4 = new ProductBox(1, date, maxSize, product3, maxSize + 1);
+		ProductBox productBox4 = new ProductBox(1, product3, maxSize, maxSize + 1, date);
 	}
 
 	@SuppressWarnings("unused")
 	@Test(expected = IllegalArgumentException.class)
 	public void testCreateProductBox_MaxSize_2()
 	{
-		ProductBox productBox5 = new ProductBox(1, date, maxSize - 14, product3, maxSize);
+		ProductBox productBox5 = new ProductBox(1, product3, maxSize - 14, maxSize, date);
 	}
 
 	@Test
@@ -116,14 +116,14 @@ public class ProductBoxTest
 	@Test
 	public void testGetProduct2()
 	{
-		ProductBox box2 = new ProductBox(id1, date, maxSize, product2, 0);
+		ProductBox box2 = new ProductBox(id1, product2, maxSize, 0, date);
 		assertEquals(product2, box2.getProduct());
 	}
 
 	@Test(expected = IllegalArgumentException.class)
 	public void testGetProduct3()
 	{
-		ProductBox box3 = new ProductBox(id1, date, maxSize, product3, 0);
+		ProductBox box3 = new ProductBox(id1, product3, maxSize, 0, date);
 		assertEquals(product3, box3.getProduct());
 	}
 
@@ -199,7 +199,7 @@ public class ProductBoxTest
 	@Test
 	public void testToString()
 	{
-		ProductBox box2 = new ProductBox(1, date, 1, product2, 0);
+		ProductBox box2 = new ProductBox(1, product2, 1, 0, date);
 		assertEquals("[1] Box: peruna (0)", box2.toString());
 	}
 
