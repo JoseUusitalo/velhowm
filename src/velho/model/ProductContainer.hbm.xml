@@ -12,6 +12,12 @@
 			<generator class="native" />
 		</id>
 					
+		<property	name="uuid"
+					column="uuid"
+					type="java.util.UUID"
+					unique="true"
+					not-null="true" />
+		
 		<property	name="expirationDate"
 					column="expiration_date"
 					type="date" />

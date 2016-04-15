@@ -102,17 +102,11 @@ public class ProductCategory extends AbstractDatabaseObject implements Comparabl
 		return 3 * getUuid().hashCode();
 	}
 
-	/**
-	 * @return the uuid
-	 */
 	public UUID getUuid()
 	{
 		return uuid;
 	}
 
-	/**
-	 * @param uuid the uuid to set
-	 */
 	public void setUuid(final UUID uuid)
 	{
 		this.uuid = uuid;

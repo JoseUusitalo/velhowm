@@ -84,7 +84,9 @@ public class ShelfTest
 	{
 		System.out.println("\n------after----------");
 
+		System.out.println("Before trunc " + DatabaseController.getProductTypeByID(1) + " " + DatabaseController.getProductTypeByID(1).getDatabaseID());
 		DatabaseController.resetDatabase();
+
 		fullShelf_LVL_1_SLTPOS_1 = DatabaseController.getShelfByID(FULLSHELF_LVL_1_SLTPOS_1_ID);
 		shelf_FREE_LVL_2 = DatabaseController.getShelfByID(SHELF_FREE_LVL_2_ID);
 		emptyShelf_1_1_to_1_2 = DatabaseController.getShelfByID(EMPTYSHELF_1_1_to_1_2_ID);

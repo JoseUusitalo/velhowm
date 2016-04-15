@@ -1,6 +1,7 @@
 package velho.model;
 
 import java.util.Date;
+import java.util.UUID;
 
 /**
  * A class representing a physical box of some sort that can contain any number of {@link Product} objects.
@@ -11,6 +12,7 @@ public class ProductBox extends ProductContainer
 {
 	/**
 	 * @param databaseID
+	 * @param uuid
 	 * @param manifest
 	 * @param removalList
 	 * @param shelfSlot
@@ -19,16 +21,22 @@ public class ProductBox extends ProductContainer
 	 * @param productCount
 	 * @param expirationDate
 	 */
-	public ProductBox(final int databaseID, final Manifest manifest, final RemovalList removalList, final ShelfSlot shelfSlot, final Product product,
-			final int maxSize, final int productCount, final Date expirationDate)
+	public ProductBox(final int databaseID, final UUID uuid, final Manifest manifest, final RemovalList removalList, final ShelfSlot shelfSlot,
+			final Product product, final int maxSize, final int productCount, final Date expirationDate)
 	{
-		super(databaseID, manifest, removalList, shelfSlot, product, maxSize, productCount, expirationDate);
+		super(databaseID, uuid, manifest, removalList, shelfSlot, product, maxSize, productCount, expirationDate);
 
 		// Boxes cannot store cold products. Those may only be stored in freezers.
 		if (product.getCategory().getType().getName() == "Cold")
 		{
 			throw new IllegalArgumentException();
 		}
+	}
+
+	public ProductBox(final int databaseID, final Manifest manifest, final RemovalList removalList, final ShelfSlot shelfSlot, final Product product,
+			final int maxSize, final int productCount, final Date expirationDate)
+	{
+		this(databaseID, UUID.randomUUID(), manifest, removalList, shelfSlot, product, maxSize, productCount, expirationDate);
 	}
 
 	/**

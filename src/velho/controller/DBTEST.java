@@ -1,8 +1,11 @@
 package velho.controller;
 
+import java.text.ParseException;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.Set;
+
+import org.hibernate.HibernateException;
 
 import velho.model.HibernateSessionFactory;
 import velho.model.ProductBox;
@@ -16,7 +19,8 @@ import velho.model.exceptions.NoDatabaseLinkException;
 
 public class DBTEST
 {
-	public static void main(final String[] args) throws ClassNotFoundException, ExistingDatabaseLinkException, NoDatabaseException, NoDatabaseLinkException
+	public static void main(final String[] args)
+			throws ClassNotFoundException, ExistingDatabaseLinkException, NoDatabaseException, NoDatabaseLinkException, HibernateException, ParseException
 	{
 		shelf();
 	}
@@ -118,10 +122,13 @@ public class DBTEST
 	}
 
 	@SuppressWarnings("unused")
-	private static void shelf() throws ClassNotFoundException, ExistingDatabaseLinkException, NoDatabaseException, NoDatabaseLinkException
+	private static void shelf()
+			throws ClassNotFoundException, ExistingDatabaseLinkException, NoDatabaseException, NoDatabaseLinkException, HibernateException, ParseException
 	{
-		System.out.println("\n\nlink\n\n");
-		System.out.println("STATE:              " + DatabaseController.link());
+		DatabaseController.resetDatabase();
+
+		// System.out.println("\n\nlink\n\n");
+		// System.out.println("STATE: " + DatabaseController.link());
 
 		// System.out.println("\n\nopen session\n\n");
 		// DatabaseController.openSession();

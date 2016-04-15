@@ -47,6 +47,9 @@ public class SampleData
 
 		createSample_Brands();
 		createSample_ProductTypes();
+
+		System.out.println("After reload " + DatabaseController.getProductTypeByID(1) + " " + DatabaseController.getProductTypeByID(4));
+
 		createSample_ProductCategories();
 		createSample_Products();
 

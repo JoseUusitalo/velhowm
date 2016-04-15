@@ -1,6 +1,7 @@
 package velho.model;
 
 import java.util.Date;
+import java.util.UUID;
 
 /**
  * An abstract container that can hold any number of {@link Product} objects.
@@ -9,6 +10,8 @@ import java.util.Date;
  */
 public abstract class ProductContainer extends AbstractDatabaseObject implements Comparable<ProductContainer>
 {
+	private UUID uuid;
+
 	/**
 	 * The expiration date of the products in this container.
 	 */
@@ -52,20 +55,21 @@ public abstract class ProductContainer extends AbstractDatabaseObject implements
 	 * @param productCount
 	 * @param expirationDate
 	 */
-	public ProductContainer(final int databaseID, final Manifest manifest, final RemovalList removalList, final ShelfSlot shelfSlot, final Product product,
-			final int maxSize, final int productCount, final Date expirationDate)
+	public ProductContainer(final int databaseID, final UUID uuid, final Manifest manifest, final RemovalList removalList, final ShelfSlot shelfSlot,
+			final Product product, final int maxSize, final int productCount, final Date expirationDate)
 	{
 		if (maxSize < 1 || maxSize < productCount)
 		{
 			throw new IllegalArgumentException();
 		}
 
+		setDatabaseID(databaseID);
+		this.uuid = uuid;
 		this.manifest = manifest;
 		this.removalList = removalList;
 		this.shelfSlot = shelfSlot;
 		this.expirationDate = expirationDate;
 		this.maxSize = maxSize;
-		setDatabaseID(databaseID);
 		this.product = product;
 		this.productCount = productCount;
 	}
@@ -83,24 +87,35 @@ public abstract class ProductContainer extends AbstractDatabaseObject implements
 	@Override
 	public boolean equals(final Object o)
 	{
-		if (!(o instanceof ProductContainer))
+		if (this == o)
+			return true;
+
+		if (o == null || !(o instanceof ProductContainer))
 			return false;
 
-		final ProductContainer c = (ProductContainer) o;
+		return this.getUuid().equals(((ProductContainer) o).getUuid());
+	}
 
-		if (this.getDatabaseID() <= 0)
-			return this == c;
-
-		System.out.println("THIS IS " + this.getDatabaseID());
-		System.out.println("THAT IS " + c.getDatabaseID());
-
-		return this.getDatabaseID() == c.getDatabaseID();
+	@Override
+	public int hashCode()
+	{
+		return 3 * getUuid().hashCode();
 	}
 
 	@Override
 	public int compareTo(final ProductContainer container)
 	{
 		return this.getDatabaseID() - container.getDatabaseID();
+	}
+
+	public UUID getUuid()
+	{
+		return uuid;
+	}
+
+	public void setUuid(final UUID uuid)
+	{
+		this.uuid = uuid;
 	}
 
 	/**
