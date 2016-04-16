@@ -6,10 +6,12 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 import java.sql.Date;
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 import velho.controller.DatabaseController;
@@ -27,6 +29,17 @@ public class ManifestTest
 {
 	private static Manifest newManifest = new Manifest();
 	private static Manifest existingManifest = DatabaseController.getManifestByID(2);
+
+	/**
+	 * Loads the sample data into the database if it does not yet exist.
+	 *
+	 * @throws ParseException
+	 */
+	@BeforeClass
+	public static final void loadSampleData() throws ParseException
+	{
+		DatabaseController.loadSampleData();
+	}
 
 	@Test
 	public final void testToString()
@@ -112,7 +125,7 @@ public class ManifestTest
 				Arrays.asList(DatabaseController.getProductBoxByID(35), DatabaseController.getProductBoxByID(36), DatabaseController.getProductBoxByID(37)));
 
 		/*
-		 * FIXME: This is not transitive and does not when the list is a set.
+		 * FIXME: This is not transitive and does not work when the list is a set.
 		 * list.containsAll(existingManifest.getBoxes()) = true
 		 * existingManifest.getBoxes().containsAll(list) = false
 		 */

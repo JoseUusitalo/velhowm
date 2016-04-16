@@ -3,6 +3,8 @@ package test.model;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
+import java.text.ParseException;
+
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -19,9 +21,15 @@ public class RemovalPlatformTest
 {
 	private static RemovalPlatform existingPlatform = DatabaseController.getRemovalPlatformByID(1);
 
+	/**
+	 * Loads the sample data into the database if it does not yet exist.
+	 *
+	 * @throws ParseException
+	 */
 	@BeforeClass
-	public static void init()
+	public static final void loadSampleData() throws ParseException
 	{
+		DatabaseController.loadSampleData();
 		// Testing in production environment is fun.
 		existingPlatform.setFreeSpacePercent(1.0);
 	}

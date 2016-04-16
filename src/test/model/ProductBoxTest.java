@@ -5,11 +5,14 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import java.sql.Date;
+import java.text.ParseException;
 
 import org.junit.After;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
+import velho.controller.DatabaseController;
 import velho.model.Product;
 import velho.model.ProductBox;
 import velho.model.ProductBrand;
@@ -42,6 +45,17 @@ public class ProductBoxTest
 	private Product product1 = new Product(id1, name1, brand1, category, -1);
 	private Product product2 = new Product(id2, name2, brand2, category2, -1);
 	private Product product3 = new Product(id2, name2, brand2, category3, -1);
+
+	/**
+	 * Loads the sample data into the database if it does not yet exist.
+	 *
+	 * @throws ParseException
+	 */
+	@BeforeClass
+	public static final void loadSampleData() throws ParseException
+	{
+		DatabaseController.loadSampleData();
+	}
 
 	@Before
 	public void createProductBox()

@@ -2,10 +2,14 @@ package test.model;
 
 import static org.junit.Assert.assertEquals;
 
+import java.text.ParseException;
+
 import org.junit.After;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
+import velho.controller.DatabaseController;
 import velho.model.Product;
 import velho.model.ProductBrand;
 import velho.model.ProductCategory;
@@ -24,6 +28,17 @@ public class ProductTest
 	private Product product;
 	private String name = "porkkana";
 	private int id = 20;
+
+	/**
+	 * Loads the sample data into the database if it does not yet exist.
+	 *
+	 * @throws ParseException
+	 */
+	@BeforeClass
+	public static final void loadSampleData() throws ParseException
+	{
+		DatabaseController.loadSampleData();
+	}
 
 	@Before
 	public void createProduct()

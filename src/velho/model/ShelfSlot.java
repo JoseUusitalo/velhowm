@@ -181,6 +181,7 @@ public class ShelfSlot extends AbstractDatabaseObject implements Comparable<Shel
 		{
 			box.setShelfSlot(this);
 			SYSLOG.trace("Product box + " + box + " was successfully added.");
+
 			return true;
 		}
 
@@ -199,6 +200,7 @@ public class ShelfSlot extends AbstractDatabaseObject implements Comparable<Shel
 		if (productBoxes.remove(box))
 		{
 			box.setShelfSlot(null);
+
 			return true;
 		}
 
@@ -207,8 +209,7 @@ public class ShelfSlot extends AbstractDatabaseObject implements Comparable<Shel
 
 	public boolean contains(final ProductBox box)
 	{
-		System.out.println("BOXES IN SLOT!");
-		System.out.println(productBoxes);
+		System.out.println("BOXES IN " + this + ": " + productBoxes);
 		return productBoxes.contains(box);
 	}
 

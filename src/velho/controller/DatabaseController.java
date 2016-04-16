@@ -48,7 +48,6 @@ import velho.model.enums.DatabaseFileState;
 import velho.model.enums.DatabaseQueryType;
 import velho.model.enums.DatabaseTable;
 import velho.model.enums.UserRole;
-import velho.model.exceptions.ExistingDatabaseLinkException;
 import velho.model.exceptions.NoDatabaseException;
 import velho.model.exceptions.NoDatabaseLinkException;
 import velho.model.exceptions.UniqueKeyViolationException;
@@ -841,10 +840,6 @@ public class DatabaseController
 		{
 			e.printStackTrace();
 		}
-		catch (final ExistingDatabaseLinkException e)
-		{
-			e.printStackTrace();
-		}
 
 		PopupController.warning("Database connection was temporarily lost. Please try again or restart the application.");
 	}
@@ -857,10 +852,10 @@ public class DatabaseController
 	 * @throws ClassNotFoundException when the H2 driver was unable to load
 	 * @throws ExistingDatabaseLinkException when a database link already exists
 	 */
-	public static DatabaseFileState link() throws ClassNotFoundException, ExistingDatabaseLinkException
+	public static DatabaseFileState link() throws ClassNotFoundException
 	{
-		if (connectionPool != null)
-			throw new ExistingDatabaseLinkException();
+		if (isLinked())
+			return DatabaseFileState.EXISTING;
 
 		// Load the driver.
 		Class.forName("org.h2.Driver");
@@ -930,7 +925,6 @@ public class DatabaseController
 	 */
 	public static void unlink() throws NoDatabaseLinkException
 	{
-
 		if (connectionPool == null)
 			throw new NoDatabaseLinkException();
 
@@ -1832,49 +1826,7 @@ public class DatabaseController
 	}
 
 	/**
-	 * Deletes all data from all tables in the database.
-	 *
-	 * @return <code>true</code> if database changed as a result of this call
-	 */
-	public static boolean deleteAllData() throws NoDatabaseException, NoDatabaseException
-	{
-		DBLOG.info("Truncating database...");
-
-		if (!databaseExists())
-			throw new NoDatabaseException();
-
-		sessionFactory.getCurrentSession().beginTransaction();
-
-		boolean notChanged = false;
-		int changes = 0;
-
-		sessionFactory.getCurrentSession().createSQLQuery("SET REFERENTIAL_INTEGRITY FALSE;").executeUpdate();
-		sessionFactory.getCurrentSession().getTransaction().commit();
-
-		for (final DatabaseTable table : DatabaseTable.values())
-		{
-			sessionFactory.getCurrentSession().beginTransaction();
-			changes = sessionFactory.getCurrentSession().createSQLQuery("TRUNCATE TABLE " + table.toString() + ";").executeUpdate();
-			sessionFactory.getCurrentSession().getTransaction().commit();
-
-			DBLOG.trace("Truncate table: " + table.toString() + " | changed rows: " + changes);
-			notChanged = notChanged && (changes == 0);
-		}
-
-		sessionFactory.getCurrentSession().beginTransaction();
-		sessionFactory.getCurrentSession().createSQLQuery("SET REFERENTIAL_INTEGRITY TRUE;").executeUpdate();
-		sessionFactory.getCurrentSession().getTransaction().commit();
-
-		if (!notChanged)
-			DBLOG.info("Database contents deleted.");
-		else
-			DBLOG.info("Failed to delete database contents.");
-
-		return !notChanged;
-	}
-
-	/**
-	 * Loads sample data into the database.
+	 * Loads sample data into the database if it does not yet exist there.
 	 * Assumes that a database exists.
 	 *
 	 * @return <code>true</code> if database changed as a result of this call
@@ -1882,14 +1834,8 @@ public class DatabaseController
 	 */
 	public static boolean loadSampleData() throws HibernateException, ParseException
 	{
-		DBLOG.debug("Loading sample data to database...");
-
-		// TODO: Find a way to return a boolean.
-		SampleData.createAll();
-
-		DBLOG.info("Sample data loaded.");
-
-		return true;
+		// TODO: Find a way to return a proper boolean.
+		return SampleData.createAll();
 	}
 
 	/**
@@ -2255,41 +2201,5 @@ public class DatabaseController
 	{
 		DBLOG.info("Closing session manager.");
 		sessionFactory.close();
-	}
-
-	/**
-	 * Deletes all data from the database and loads the sample data into it.
-	 *
-	 * @return <code>true</code> if the operation was succesfull
-	 */
-	public static boolean resetDatabase() throws NoDatabaseException, HibernateException, ParseException
-	{
-		try
-		{
-			if (!isLinked())
-				DatabaseController.link();
-		}
-		catch (final ClassNotFoundException e)
-		{
-			e.printStackTrace();
-		}
-		catch (final ExistingDatabaseLinkException e1)
-		{
-			// Ignore.
-		}
-
-		/*
-		 * This is absurd. If I use the code below it somehow skips the method calls to deleteAllData() and
-		 * loadSampleData()!
-		 * I have't the slightest clue what on earth is going on.
-		 * failure = failure && !deleteAllData();
-		 * failure = failure && !loadSampleData();
-		 */
-
-		final boolean delete = deleteAllData();
-
-		boolean load = loadSampleData();
-
-		return delete && load;
 	}
 }

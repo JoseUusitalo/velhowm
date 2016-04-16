@@ -3,7 +3,6 @@ package test.controller;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
 
 import java.text.ParseException;
 import java.util.ArrayList;
@@ -15,7 +14,6 @@ import java.util.List;
 import java.util.Set;
 
 import org.hibernate.HibernateException;
-import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -25,7 +23,6 @@ import velho.model.ProductBox;
 import velho.model.ProductBoxSearchResultRow;
 import velho.model.RemovalList;
 import velho.model.User;
-import velho.model.exceptions.NoDatabaseException;
 import velho.model.exceptions.NoDatabaseLinkException;
 
 /**
@@ -36,38 +33,22 @@ import velho.model.exceptions.NoDatabaseLinkException;
 @SuppressWarnings("static-method")
 public class DatabaseControllerTest
 {
+	/**
+	 * Loads the sample data into the database if it does not yet exist.
+	 *
+	 * @throws ParseException
+	 */
 	@BeforeClass
-	public final static void connectAndInitializeDatabase() throws NoDatabaseException, ParseException
+	public static final void loadSampleData() throws ParseException, ClassNotFoundException
 	{
-		assertTrue(DatabaseController.resetDatabase());
-	}
-
-	@AfterClass
-	public final static void unlink() throws NoDatabaseLinkException
-	{
-		DatabaseController.unlink();
+		DatabaseController.link();
+		DatabaseController.loadSampleData();
 	}
 
 	@Test
 	public final void testIsLinked()
 	{
 		assertTrue(DatabaseController.isLinked());
-	}
-
-	@Test
-	public final void testFailInitialization() throws HibernateException, ParseException
-	{
-		try
-		{
-			DatabaseController.unlink();
-			assertFalse(DatabaseController.isLinked());
-		}
-		catch (final NoDatabaseLinkException e)
-		{
-			fail(e.toString());
-		}
-
-		assertFalse(DatabaseController.loadSampleData());
 	}
 
 	@Test
@@ -166,7 +147,7 @@ public class DatabaseControllerTest
 	}
 
 	@Test
-	public final void testDeleteUser1() throws ParseException, NoDatabaseException
+	public final void testDeleteUser1()
 	{
 		final ObservableList<Object> users = DatabaseController.getAllUsers();
 		final User user = DatabaseController.getUserByID(1);
@@ -174,7 +155,7 @@ public class DatabaseControllerTest
 		DatabaseController.deleteUser(user);
 		assertFalse(users.contains(user));
 
-		assertTrue(DatabaseController.resetDatabase());
+		// TODO: Rollback.
 	}
 
 	@Test

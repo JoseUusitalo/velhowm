@@ -5,12 +5,14 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertTrue;
 
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 import javafx.collections.ObservableList;
@@ -30,6 +32,17 @@ public class RemovalListTest
 	private static RemovalList newlist = new RemovalList();
 	private static RemovalList existingRemovalList = DatabaseController.getRemovalListByID(1);
 	private static ProductBox box1 = DatabaseController.getProductBoxByID(1);
+
+	/**
+	 * Loads the sample data into the database if it does not yet exist.
+	 *
+	 * @throws ParseException
+	 */
+	@BeforeClass
+	public static final void loadSampleData() throws ParseException
+	{
+		DatabaseController.loadSampleData();
+	}
 
 	@Test
 	public final void testToString()

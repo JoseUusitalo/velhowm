@@ -125,7 +125,7 @@ public class DBTEST
 	private static void shelf()
 			throws ClassNotFoundException, ExistingDatabaseLinkException, NoDatabaseException, NoDatabaseLinkException, HibernateException, ParseException
 	{
-		DatabaseController.resetDatabase();
+		DatabaseController.loadSampleData();
 
 		// System.out.println("\n\nlink\n\n");
 		// System.out.println("STATE: " + DatabaseController.link());

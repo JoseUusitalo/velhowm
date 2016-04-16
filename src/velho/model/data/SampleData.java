@@ -4,6 +4,7 @@ import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.log4j.Logger;
 import org.hibernate.HibernateException;
 
 import velho.controller.DatabaseController;
@@ -31,41 +32,66 @@ import velho.model.enums.UserRole;
 public class SampleData
 {
 	/**
-	 * Creates all sample data objects into the database.
+	 * Apache log4j logger: System.
+	 */
+	private static final Logger SYSLOG = Logger.getLogger(SampleData.class.getName());
+
+	/**
+	 * Has the data been loaded?
+	 */
+	private static boolean dataLoaded = false;
+
+	/**
+	 * Saves all sample data objects into the database only if the data has not yet been loaded.
 	 *
+	 * @return <code>true</code> if data was (hopefully...) loaded
 	 * @throws HibernateException
 	 * @throws ParseException
 	 */
-	public static void createAll() throws HibernateException, ParseException
+	public static boolean createAll() throws HibernateException, ParseException
 	{
-		/*
-		 * The order of these methods calls must never be changed in order to not break the referential integrity of the
-		 * database.
-		 */
+		if (!dataLoaded)
+		{
+			SYSLOG.debug("Loading sample data to database...");
 
-		createSample_Users();
+			/*
+			 * The order of these methods calls must never be changed in order to not break the referential integrity of
+			 * the
+			 * database.
+			 */
 
-		createSample_Brands();
-		createSample_ProductTypes();
+			createSample_Users();
 
-		System.out.println("After reload " + DatabaseController.getProductTypeByID(1) + " " + DatabaseController.getProductTypeByID(4));
+			createSample_Brands();
+			createSample_ProductTypes();
 
-		createSample_ProductCategories();
-		createSample_Products();
+			// System.out.println("After reload " + DatabaseController.getProductTypeByID(1) + " " +
+			// DatabaseController.getProductTypeByID(4));
 
-		createSample_Shelves();
-		createSample_ShelfLevels();
-		createSample_ShelfSlots();
+			createSample_ProductCategories();
+			createSample_Products();
 
-		createSample_ManifestStates();
-		createSample_Manifests();
+			createSample_Shelves();
+			createSample_ShelfLevels();
+			createSample_ShelfSlots();
 
-		createSample_RemovalListStates();
-		createSample_RemovalLists();
+			createSample_ManifestStates();
+			createSample_Manifests();
 
-		createSample_ProductBoxes();
+			createSample_RemovalListStates();
+			createSample_RemovalLists();
 
-		createSample_RemovalPlatforms();
+			createSample_ProductBoxes();
+
+			createSample_RemovalPlatforms();
+
+			dataLoaded = true;
+			SYSLOG.info("Sample data loaded.");
+		}
+		else
+			SYSLOG.info("Sample data already exists.");
+
+		return dataLoaded;
 	}
 
 	private static void createSample_Users()

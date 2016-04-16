@@ -206,7 +206,7 @@ public class MainWindow extends Application
 			DatabaseController.link();
 			DatabaseController.loadSampleData();
 		}
-		catch (ClassNotFoundException | ExistingDatabaseLinkException | HibernateException | ParseException e)
+		catch (ClassNotFoundException | HibernateException | ParseException e)
 		{
 			e.printStackTrace();
 		}
@@ -273,14 +273,7 @@ public class MainWindow extends Application
 
 		try
 		{
-			try
-			{
-				DatabaseController.link();
-			}
-			catch (ExistingDatabaseLinkException e)
-			{
-				// Ignore.
-			}
+			DatabaseController.link();
 
 			if (DatabaseController.isLinked())
 			{

@@ -6,6 +6,9 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
+import java.text.ParseException;
+
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 import javafx.collections.ObservableList;
@@ -29,6 +32,17 @@ public class UserControllerTest
 	private final String VALID_NAME = "First-Name";
 	private final UserRole VALID_ROLE = UserRole.MANAGER;
 	private final UserRole NULL_ROLE = null;
+
+	/**
+	 * Loads the sample data into the database if it does not yet exist.
+	 *
+	 * @throws ParseException
+	 */
+	@BeforeClass
+	public static final void loadSampleData() throws ParseException
+	{
+		DatabaseController.loadSampleData();
+	}
 
 	@Test
 	public final void testAddUserValid()
