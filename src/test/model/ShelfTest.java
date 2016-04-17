@@ -79,7 +79,7 @@ public class ShelfTest
 	public final void testCreateInvalid_ShelfLevelCount_Negative()
 	{
 		@SuppressWarnings("unused")
-		final Shelf s = new Shelf(-1);
+		final Shelf s = new Shelf(0, -1);
 	}
 
 	/**
@@ -89,7 +89,7 @@ public class ShelfTest
 	public final void testCreateInvalid_ShelfLevelCount_Zero()
 	{
 		@SuppressWarnings("unused")
-		final Shelf s = new Shelf(0);
+		final Shelf s = new Shelf(0, 0);
 	}
 
 	/**

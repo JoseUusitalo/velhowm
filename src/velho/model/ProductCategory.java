@@ -7,14 +7,12 @@ import java.util.UUID;
  *
  * @author Joona Silvennoinen &amp; Jose Uusitalo
  */
-public class ProductCategory extends AbstractDatabaseObject implements Comparable<ProductCategory>
+public class ProductCategory extends AbstractDatabaseObject
 {
 	/**
 	 * The product category name.
 	 */
 	private String name;
-
-	private UUID uuid;
 
 	/**
 	 * The product category type.
@@ -23,13 +21,14 @@ public class ProductCategory extends AbstractDatabaseObject implements Comparabl
 
 	/**
 	 * @param databaseID
+	 * @param uuid
 	 * @param name
 	 * @param type
 	 */
 	public ProductCategory(final int databaseID, final UUID uuid, final String name, final ProductType type)
 	{
 		setDatabaseID(databaseID);
-		this.setUuid(uuid);
+		setUuid(uuid);
 		this.type = type;
 		this.name = name;
 	}
@@ -66,7 +65,7 @@ public class ProductCategory extends AbstractDatabaseObject implements Comparabl
 	public ProductCategory()
 	{
 		// For Hibernate.
-		this(null);
+		setUuid(UUID.randomUUID());
 	}
 
 	/**
@@ -79,37 +78,12 @@ public class ProductCategory extends AbstractDatabaseObject implements Comparabl
 	}
 
 	@Override
-	public boolean equals(final Object o)
+	public int compareTo(final AbstractDatabaseObject category)
 	{
-		if (this == o)
-			return true;
+		if (category instanceof ProductCategory)
+			return this.getName().compareTo(((ProductCategory) category).getName());
 
-		if (o == null || !(o instanceof ProductCategory))
-			return false;
-
-		return this.getUuid().equals(((ProductCategory) o).getUuid());
-	}
-
-	@Override
-	public int compareTo(final ProductCategory category)
-	{
-		return this.getName().compareTo(category.getName());
-	}
-
-	@Override
-	public int hashCode()
-	{
-		return 3 * getUuid().hashCode();
-	}
-
-	public UUID getUuid()
-	{
-		return uuid;
-	}
-
-	public void setUuid(final UUID uuid)
-	{
-		this.uuid = uuid;
+		return super.compareTo(category);
 	}
 
 	/**

@@ -276,7 +276,7 @@ public class DatabaseController
 							case USERS:
 								while (result.next())
 									dataSet.add(new User(result.getInt("user_id"), result.getString("first_name"), result.getString("last_name"),
-											getRoleByID(result.getInt("role"))));
+											result.getString("pin"), result.getString("badge_id"), getRoleByID(result.getInt("role"))));
 								break;
 
 							/*
@@ -301,7 +301,7 @@ public class DatabaseController
 							case PRODUCTS:
 								// @formatter:off
 								while (result.next())
-									dataSet.add(new Product(result.getInt("product_id"), result.getString("name"), getProductBrandByID(result.getInt("brand")), getProductCategoryByID(result.getInt("category")), result.getInt("popularity")));
+									dataSet.add(new Product(result.getInt("product_id"), result.getString("name"), getProductBrandByID(result.getInt("brand")), getProductCategoryByID(result.getInt("category"))));
 								break;
 							// @formatter:on
 
@@ -1217,7 +1217,6 @@ public class DatabaseController
 		cols.put("name", "Name");
 		cols.put("brand", "Brand");
 		cols.put("category", "Category");
-		// cols.put("popularity", "Popularity");
 		cols.put("viewButton", "");
 
 		return cols;
@@ -1380,7 +1379,7 @@ public class DatabaseController
 			return null;
 		}
 
-		final String[] columns = { "user_id", "first_name", "last_name", "role" };
+		final String[] columns = { "*" };
 		final List<String> where = new ArrayList<String>();
 		where.add("badge_id = " + badgeID);
 
@@ -1409,7 +1408,7 @@ public class DatabaseController
 	 */
 	public static User authenticatePIN(final String firstName, final String lastName, final String pin) throws NoDatabaseLinkException
 	{
-		final String[] columns = { "user_id", "first_name", "last_name", "role" };
+		final String[] columns = { "*" };
 		final List<String> where = new ArrayList<String>();
 		where.add("first_name = '" + firstName + "'");
 		where.add("last_name = '" + lastName + "'");

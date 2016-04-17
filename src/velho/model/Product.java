@@ -1,11 +1,13 @@
 package velho.model;
 
+import java.util.UUID;
+
 /**
  * A class representing a generic product of any type, shape, or size.
  *
  * @author Joona Silvennoinen &amp; Jose Uusitalo
  */
-public class Product extends AbstractDatabaseObject implements Comparable<Product>
+public class Product extends AbstractDatabaseObject
 {
 	/**
 	 * The name of this product.
@@ -23,29 +25,40 @@ public class Product extends AbstractDatabaseObject implements Comparable<Produc
 	private ProductCategory category;
 
 	/**
-	 * Popularity of this product.
-	 */
-	private int popularity;
-
-	/**
-	 * @param name
 	 * @param databaseID
+	 * @param uuid
+	 * @param name
 	 * @param brand
 	 * @param category
-	 * @param popularity
 	 */
-	public Product(final int databaseID, final String name, final ProductBrand brand, final ProductCategory category, final int popularity)
+	public Product(final int databaseID, final UUID uuid, final String name, final ProductBrand brand, final ProductCategory category)
 	{
 		setDatabaseID(databaseID);
+		setUuid(uuid);
 		this.name = name;
 		this.brand = brand;
 		this.category = category;
-		this.popularity = popularity;
 	}
 
+	/**
+	 * @param databaseID
+	 * @param name
+	 * @param brand
+	 * @param category
+	 */
 	public Product(final int databaseID, final String name, final ProductBrand brand, final ProductCategory category)
 	{
-		this(databaseID, name, brand, category, -1);
+		this(databaseID, UUID.randomUUID(), name, brand, category);
+	}
+
+	/**
+	 * @param name
+	 * @param brand
+	 * @param category
+	 */
+	public Product(final String name, final ProductBrand brand, final ProductCategory category)
+	{
+		this(0, UUID.randomUUID(), name, brand, category);
 	}
 
 	/**
@@ -53,52 +66,22 @@ public class Product extends AbstractDatabaseObject implements Comparable<Produc
 	public Product()
 	{
 		// For Hibernate.
+		setUuid(UUID.randomUUID());
 	}
 
 	@Override
 	public String toString()
 	{
-		return "[" + getDatabaseID() + "] " + name + " (" + brand + " / " + category + "), Popularity: " + popularity;
+		return "[" + getDatabaseID() + "] " + name + " (" + brand + " / " + category + ")";
 	}
 
 	@Override
-	public boolean equals(final Object o)
+	public int compareTo(final AbstractDatabaseObject product)
 	{
-		if (!(o instanceof Product))
-			return false;
+		if (product instanceof Product)
+			return this.getName().compareTo(((Product) product).getName());
 
-		final Product p = (Product) o;
-
-		if (this.getDatabaseID() <= 0)
-			return this == p;
-
-		return this.getDatabaseID() == p.getDatabaseID();
-	}
-
-	@Override
-	public int compareTo(final Product product)
-	{
-		return this.getName().compareTo(product.getName());
-	}
-
-	/**
-	 * Gets the popularity of this product.
-	 *
-	 * @return the popularity of this product
-	 */
-	public int getPopularity()
-	{
-		return popularity;
-	}
-
-	/**
-	 * Sets the popularity value.
-	 *
-	 * @param popularity the new popularity value
-	 */
-	public void setPopularity(final int popularity)
-	{
-		this.popularity = popularity;
+		return super.compareTo(product);
 	}
 
 	/**

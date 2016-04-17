@@ -1,11 +1,13 @@
 package velho.model;
 
+import java.util.UUID;
+
 /**
  * A brand associated with a {@link Product}.
  *
  * @author Joona Silvennoinen &amp; Jose Uusitalo
  */
-public class ProductBrand extends AbstractDatabaseObject implements Comparable<ProductBrand>
+public class ProductBrand extends AbstractDatabaseObject
 {
 	/**
 	 * The name of this product brand.
@@ -14,12 +16,22 @@ public class ProductBrand extends AbstractDatabaseObject implements Comparable<P
 
 	/**
 	 * @param databaseID
+	 * @param uuid
+	 * @param name
+	 */
+	public ProductBrand(final int databaseID, final UUID uuid, final String name)
+	{
+		setDatabaseID(databaseID);
+		setUuid(uuid);
+		this.name = name;
+	}
+
+	/**
 	 * @param name
 	 */
 	public ProductBrand(final int databaseID, final String name)
 	{
-		setDatabaseID(databaseID);
-		this.name = name;
+		this(databaseID, UUID.randomUUID(), name);
 	}
 
 	/**
@@ -27,7 +39,7 @@ public class ProductBrand extends AbstractDatabaseObject implements Comparable<P
 	 */
 	public ProductBrand(final String name)
 	{
-		this(0, name);
+		this(0, UUID.randomUUID(), name);
 	}
 
 	/**
@@ -35,6 +47,7 @@ public class ProductBrand extends AbstractDatabaseObject implements Comparable<P
 	public ProductBrand()
 	{
 		// For Hibernate.
+		setUuid(UUID.randomUUID());
 	}
 
 	/**
@@ -47,23 +60,12 @@ public class ProductBrand extends AbstractDatabaseObject implements Comparable<P
 	}
 
 	@Override
-	public boolean equals(final Object o)
+	public int compareTo(final AbstractDatabaseObject brand)
 	{
-		if (!(o instanceof ProductBrand))
-			return false;
+		if (brand instanceof ProductBrand)
+			return this.getName().compareTo(((ProductBrand) brand).getName());
 
-		final ProductBrand pb = (ProductBrand) o;
-
-		if (this.getDatabaseID() <= 0)
-			return this == pb;
-
-		return this.getDatabaseID() == pb.getDatabaseID();
-	}
-
-	@Override
-	public int compareTo(final ProductBrand brand)
-	{
-		return this.getName().compareTo(brand.getName());
+		return super.compareTo(brand);
 	}
 
 	/**

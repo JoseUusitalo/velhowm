@@ -81,10 +81,9 @@ public class ProductController implements UIActionController
 	 * @param name name of the of product
 	 * @param brand brand of the product
 	 * @param category category of the product
-	 * @param popularity popularity of the product
 	 */
 	@SuppressWarnings("static-method")
-	public Product saveProduct(final int databaseID, final String name, final Object brand, final Object category, final int popularity)
+	public Product saveProduct(final int databaseID, final String name, final Object brand, final Object category)
 	{
 		ProductBrand bran = null;
 		ProductCategory cat = null;
@@ -113,7 +112,7 @@ public class ProductController implements UIActionController
 			SYSLOG.trace("new product category is " + cat.toString());
 		}
 
-		Product newProduct = new Product(databaseID, name, bran, cat, popularity);
+		Product newProduct = new Product(databaseID, name, bran, cat);
 		System.out.println(newProduct.toString());
 
 		final int dbID = DatabaseController.saveOrUpdate(newProduct);

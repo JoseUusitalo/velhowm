@@ -96,10 +96,10 @@ public class SampleData
 
 	private static void createSample_Users()
 	{
-		DatabaseController.save(new User("111111", "Admin", "Test", UserRole.ADMINISTRATOR));
-		DatabaseController.save(new User("222222", "Boss", "Test", UserRole.MANAGER));
-		DatabaseController.save(new User("333333", "Worker", "Test", UserRole.LOGISTICIAN));
-		DatabaseController.save(new User("12345678", "Badger", "Testaccount", UserRole.LOGISTICIAN));
+		DatabaseController.save(new User(1, "Admin", "Test", "111111", null, UserRole.ADMINISTRATOR));
+		DatabaseController.save(new User(2, "Boss", "Test", "222222", null, UserRole.MANAGER));
+		DatabaseController.save(new User(3, "Worker", "Test", "333333", null, UserRole.LOGISTICIAN));
+		DatabaseController.save(new User(4, "Badger", "Testaccount", null, "12345678", UserRole.LOGISTICIAN));
 	}
 
 	private static void createSample_Brands()

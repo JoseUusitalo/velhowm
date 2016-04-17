@@ -8,10 +8,8 @@ import java.util.UUID;
  *
  * @author Joona Silvennoinen &amp; Jose Uusitalo
  */
-public abstract class ProductContainer extends AbstractDatabaseObject implements Comparable<ProductContainer>
+public abstract class ProductContainer extends AbstractDatabaseObject
 {
-	private UUID uuid;
-
 	/**
 	 * The expiration date of the products in this container.
 	 */
@@ -64,7 +62,7 @@ public abstract class ProductContainer extends AbstractDatabaseObject implements
 		}
 
 		setDatabaseID(databaseID);
-		this.uuid = uuid;
+		setUuid(uuid);
 		this.manifest = manifest;
 		this.removalList = removalList;
 		this.shelfSlot = shelfSlot;
@@ -79,43 +77,6 @@ public abstract class ProductContainer extends AbstractDatabaseObject implements
 	public ProductContainer()
 	{
 		setUuid(UUID.randomUUID());
-	}
-
-	@Override
-	public abstract String toString();
-
-	@Override
-	public boolean equals(final Object o)
-	{
-		if (this == o)
-			return true;
-
-		if (o == null || !(o instanceof ProductContainer))
-			return false;
-
-		return this.getUuid().equals(((ProductContainer) o).getUuid());
-	}
-
-	@Override
-	public int hashCode()
-	{
-		return 3 * getUuid().hashCode();
-	}
-
-	@Override
-	public int compareTo(final ProductContainer container)
-	{
-		return this.getDatabaseID() - container.getDatabaseID();
-	}
-
-	public UUID getUuid()
-	{
-		return uuid;
-	}
-
-	public void setUuid(final UUID uuid)
-	{
-		this.uuid = uuid;
 	}
 
 	/**

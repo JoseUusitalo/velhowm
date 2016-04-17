@@ -33,9 +33,9 @@ public class FreezerTest
 	private int id1 = 1;
 	private int id2 = 2;
 
-	private Product product1 = new Product(id1, name1, brand1, category, -1);
-	private Product product2 = new Product(id2, name2, brand2, category2, -1);
-	private Product product3 = new Product(id2, name2, brand2, category3, -1);
+	private Product product1 = new Product(id1, name1, brand1, category);
+	private Product product2 = new Product(id2, name2, brand2, category2);
+	private Product product3 = new Product(id2, name2, brand2, category3);
 
 	@SuppressWarnings("unused")
 	@Test(expected = IllegalArgumentException.class)

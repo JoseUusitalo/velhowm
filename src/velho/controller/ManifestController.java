@@ -152,7 +152,7 @@ public class ManifestController implements UIActionController
 	{
 		Manifest manifest;
 
-		manifest = new Manifest(DatabaseController.getManifestStateByID(3), driverID, orderDate, Date.from(Instant.now()));
+		manifest = new Manifest(driverID, DatabaseController.getManifestStateByID(3), orderDate, Date.from(Instant.now()));
 		manifest.setBoxes(boxSet);
 
 		if (DatabaseController.saveOrUpdate(manifest) > 0)

@@ -33,10 +33,41 @@ public class ProductBox extends ProductContainer
 		}
 	}
 
+	/**
+	 * @param databaseID
+	 * @param manifest
+	 * @param removalList
+	 * @param shelfSlot
+	 * @param product
+	 * @param maxSize
+	 * @param productCount
+	 * @param expirationDate
+	 */
 	public ProductBox(final int databaseID, final Manifest manifest, final RemovalList removalList, final ShelfSlot shelfSlot, final Product product,
 			final int maxSize, final int productCount, final Date expirationDate)
 	{
-		this(databaseID, UUID.randomUUID(), manifest, removalList, shelfSlot, product, maxSize, productCount, expirationDate);
+		super(databaseID, UUID.randomUUID(), manifest, removalList, shelfSlot, product, maxSize, productCount, expirationDate);
+
+		// Boxes cannot store cold products. Those may only be stored in freezers.
+		if (product.getCategory().getType().getName() == "Cold")
+		{
+			throw new IllegalArgumentException();
+		}
+	}
+
+	/**
+	 * @param manifest
+	 * @param removalList
+	 * @param shelfSlot
+	 * @param product
+	 * @param maxSize
+	 * @param productCount
+	 * @param expirationDate
+	 */
+	public ProductBox(final Manifest manifest, final RemovalList removalList, final ShelfSlot shelfSlot, final Product product, final int maxSize,
+			final int productCount, final Date expirationDate)
+	{
+		this(0, UUID.randomUUID(), manifest, removalList, shelfSlot, product, maxSize, productCount, expirationDate);
 	}
 
 	/**
@@ -53,6 +84,18 @@ public class ProductBox extends ProductContainer
 	}
 
 	/**
+	 * @param shelfSlot
+	 * @param product
+	 * @param maxSize
+	 * @param productCount
+	 */
+	public ProductBox(final Manifest manifest, final RemovalList removalList, final ShelfSlot shelfSlot, final Product product, final int maxSize,
+			final int productCount)
+	{
+		this(0, manifest, removalList, shelfSlot, product, maxSize, productCount, null);
+	}
+
+	/**
 	 * @param databaseID
 	 * @param product
 	 * @param maxSize
@@ -62,6 +105,17 @@ public class ProductBox extends ProductContainer
 	public ProductBox(final int databaseID, final Product product, final int maxSize, final int productCount, final Date expirationDate)
 	{
 		this(databaseID, null, null, null, product, maxSize, productCount, expirationDate);
+	}
+
+	/**
+	 * @param product
+	 * @param maxSize
+	 * @param productCount
+	 * @param expirationDate
+	 */
+	public ProductBox(final Product product, final int maxSize, final int productCount, final Date expirationDate)
+	{
+		this(0, null, null, null, product, maxSize, productCount, expirationDate);
 	}
 
 	/**
@@ -76,11 +130,21 @@ public class ProductBox extends ProductContainer
 	}
 
 	/**
+	 * @param product
+	 * @param maxSize
+	 * @param productCount
+	 */
+	public ProductBox(final Product product, final int maxSize, final int productCount)
+	{
+		this(0, null, null, null, product, maxSize, productCount, null);
+	}
+
+	/**
 	 */
 	public ProductBox()
 	{
 		super();
-		// For Hibernate.
+		// For Hibernate, also generates the UUID.
 	}
 
 	@Override

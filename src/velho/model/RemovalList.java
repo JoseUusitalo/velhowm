@@ -2,6 +2,7 @@ package velho.model;
 
 import java.util.LinkedHashSet;
 import java.util.Set;
+import java.util.UUID;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -11,7 +12,7 @@ import javafx.collections.ObservableList;
  *
  * @author Jose Uusitalo
  */
-public class RemovalList extends AbstractDatabaseObject implements Comparable<RemovalList>
+public class RemovalList extends AbstractDatabaseObject
 {
 	/**
 	 * The set of {@link ProductBox} objects.
@@ -30,18 +31,28 @@ public class RemovalList extends AbstractDatabaseObject implements Comparable<Re
 
 	/**
 	 * @param databaseID
+	 * @param uuid
 	 * @param state
 	 */
-	public RemovalList(final int databaseID, final RemovalListState state)
+	public RemovalList(final int databaseID, final UUID uuid, final RemovalListState state)
 	{
 		setDatabaseID(databaseID);
+		setUuid(uuid);
 		this.state = state;
 		this.boxes = new LinkedHashSet<ProductBox>();
 		this.observableBoxes = FXCollections.observableArrayList();
 	}
 
 	/**
-	 * Creates a new empty removal list in the active state.
+	 * @param databaseID
+	 * @param state
+	 */
+	public RemovalList(final int databaseID, final RemovalListState state)
+	{
+		this(databaseID, UUID.randomUUID(), state);
+	}
+
+	/**
 	 */
 	public RemovalList()
 	{
@@ -50,6 +61,7 @@ public class RemovalList extends AbstractDatabaseObject implements Comparable<Re
 		 * pointer exception.
 		 */
 		this.state = new RemovalListState(1, "Active");
+		setUuid(UUID.randomUUID());
 		this.boxes = new LinkedHashSet<ProductBox>();
 		this.observableBoxes = FXCollections.observableArrayList();
 	}
@@ -58,26 +70,6 @@ public class RemovalList extends AbstractDatabaseObject implements Comparable<Re
 	public String toString()
 	{
 		return "[" + getDatabaseID() + "] " + state + ": " + boxes.size() + " boxes";
-	}
-
-	@Override
-	public boolean equals(final Object o)
-	{
-		if (!(o instanceof RemovalList))
-			return false;
-
-		final RemovalList pt = (RemovalList) o;
-
-		if (this.getDatabaseID() <= 0)
-			return this == pt;
-
-		return this.getDatabaseID() == pt.getDatabaseID();
-	}
-
-	@Override
-	public int compareTo(final RemovalList removallist)
-	{
-		return this.getDatabaseID() - removallist.getDatabaseID();
 	}
 
 	/**

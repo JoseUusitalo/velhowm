@@ -3,6 +3,7 @@ package velho.model;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
+import java.util.UUID;
 
 import org.apache.log4j.Logger;
 
@@ -11,7 +12,7 @@ import org.apache.log4j.Logger;
  *
  * @author Jose Uusitalo
  */
-public class ShelfSlot extends AbstractDatabaseObject implements Comparable<ShelfSlot>
+public class ShelfSlot extends AbstractDatabaseObject
 {
 	/**
 	 * Apache log4j logger: System.
@@ -38,17 +39,22 @@ public class ShelfSlot extends AbstractDatabaseObject implements Comparable<Shel
 	 */
 	private Set<ProductBox> productBoxes;
 
+	/**
+	 * The {@link ShelfLevel} that this shelf slot is on.
+	 */
 	private ShelfLevel parentShelfLevel;
 
 	/**
 	 * @param databaseID
+	 * @param uuid
 	 * @param parentShelfLevel
 	 * @param levelPosition
 	 * @param maxBoxesInSlot
 	 */
-	public ShelfSlot(final int databaseID, final ShelfLevel parentShelfLevel, final int levelPosition, final int maxBoxesInSlot)
+	public ShelfSlot(final int databaseID, final UUID uuid, final ShelfLevel parentShelfLevel, final int levelPosition, final int maxBoxesInSlot)
 	{
 		setDatabaseID(databaseID);
+		setUuid(uuid);
 		this.parentShelfLevel = parentShelfLevel;
 
 		if (maxBoxesInSlot < 1)
@@ -64,9 +70,23 @@ public class ShelfSlot extends AbstractDatabaseObject implements Comparable<Shel
 		productBoxes = new HashSet<ProductBox>();
 	}
 
+	/**
+	 * @param databaseID
+	 * @param parentShelfLevel
+	 * @param levelPosition
+	 * @param maxBoxesInSlot
+	 */
+	public ShelfSlot(final int databaseID, final ShelfLevel parentShelfLevel, final int levelPosition, final int maxBoxesInSlot)
+	{
+		this(databaseID, UUID.randomUUID(), parentShelfLevel, levelPosition, maxBoxesInSlot);
+	}
+
+	/**
+	 */
 	public ShelfSlot()
 	{
 		// For Hibernate.
+		setUuid(UUID.randomUUID());
 		productBoxes = new HashSet<ProductBox>();
 	}
 
@@ -77,20 +97,12 @@ public class ShelfSlot extends AbstractDatabaseObject implements Comparable<Shel
 	}
 
 	@Override
-	public boolean equals(final Object o)
+	public int compareTo(final AbstractDatabaseObject slot)
 	{
-		if (!(o instanceof ShelfSlot))
-			return false;
+		if (slot instanceof ShelfSlot)
+			return getSlotID().compareToIgnoreCase(((ShelfSlot) slot).getSlotID());
 
-		final ShelfSlot ss = (ShelfSlot) o;
-
-		return this.getSlotID().equals(ss.getSlotID());
-	}
-
-	@Override
-	public int compareTo(final ShelfSlot slot)
-	{
-		return getSlotID().compareToIgnoreCase(slot.getSlotID());
+		return super.compareTo(slot);
 	}
 
 	public int getLevelPosition()

@@ -37,7 +37,7 @@ public class UserTest
 	private final UserRole VALID_ROLE = UserRole.MANAGER;
 	private final UserRole NULL_ROLE = null;
 
-	private final User user = new User(-1, "f", "l", UserRole.MANAGER);
+	private final User user = new User(-1, "f", "l", "000000", null, UserRole.MANAGER);
 
 	/**
 	 * Loads the sample data into the database if it does not yet exist.

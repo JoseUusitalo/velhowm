@@ -7,11 +7,8 @@ import java.util.UUID;
  *
  * @author Jose Uusitalo
  */
-public class ProductType extends AbstractDatabaseObject implements Comparable<ProductType>
+public class ProductType extends AbstractDatabaseObject
 {
-
-	private UUID uuid;
-
 	/**
 	 * The product category name.
 	 */
@@ -24,7 +21,7 @@ public class ProductType extends AbstractDatabaseObject implements Comparable<Pr
 	public ProductType(final int databaseID, final UUID uuid, final String name)
 	{
 		setDatabaseID(databaseID);
-		this.uuid = uuid;
+		setUuid(uuid);
 		this.name = name;
 	}
 
@@ -50,31 +47,16 @@ public class ProductType extends AbstractDatabaseObject implements Comparable<Pr
 	public ProductType()
 	{
 		// For Hibernate.
-		this(null);
+		setUuid(UUID.randomUUID());
 	}
 
 	@Override
-	public boolean equals(final Object o)
+	public int compareTo(final AbstractDatabaseObject type)
 	{
-		if (this == o)
-			return true;
+		if (type instanceof ProductType)
+			return this.getName().compareTo(((ProductType) type).getName());
 
-		if (o == null || !(o instanceof ProductType))
-			return false;
-
-		return this.getUuid().equals(((ProductType) o).getUuid());
-	}
-
-	@Override
-	public int hashCode()
-	{
-		return 3 * getUuid().hashCode();
-	}
-
-	@Override
-	public int compareTo(final ProductType type)
-	{
-		return this.getName().compareTo(type.getName());
+		return super.compareTo(type);
 	}
 
 	/**
@@ -84,22 +66,6 @@ public class ProductType extends AbstractDatabaseObject implements Comparable<Pr
 	public String toString()
 	{
 		return name;
-	}
-
-	/**
-	 * @return the uuid
-	 */
-	public UUID getUuid()
-	{
-		return uuid;
-	}
-
-	/**
-	 * @param uuid the uuid to set
-	 */
-	public void setUuid(final UUID uuid)
-	{
-		this.uuid = uuid;
 	}
 
 	/**

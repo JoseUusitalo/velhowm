@@ -20,6 +20,7 @@ import velho.controller.DatabaseController;
 import velho.model.ProductBox;
 import velho.model.RemovalList;
 import velho.model.User;
+import velho.model.enums.UserRole;
 import velho.model.exceptions.NoDatabaseLinkException;
 
 /**
@@ -128,7 +129,7 @@ public class DatabaseControllerTest
 	@Test(expected = HibernateException.class)
 	public final void testDelete_Invalid()
 	{
-		DatabaseController.deleteUser(new User(-123, "A", "B", null));
+		DatabaseController.deleteUser(new User(-123, "A", "B", "000000", null, UserRole.ADMINISTRATOR));
 	}
 
 	@Test(expected = IllegalArgumentException.class)
@@ -159,7 +160,6 @@ public class DatabaseControllerTest
 		cols.put("name", "Name");
 		cols.put("brand", "Brand");
 		cols.put("category", "Category");
-		// cols.put("popularity", "Popularity");
 		cols.put("viewButton", "");
 
 		assertEquals(cols, DatabaseController.getProductDataColumns(false, false));
@@ -177,7 +177,6 @@ public class DatabaseControllerTest
 		cols.put("name", "Name");
 		cols.put("brand", "Brand");
 		cols.put("category", "Category");
-		// cols.put("popularity", "Popularity");
 		cols.put("viewButton", "");
 
 		assertEquals(cols, DatabaseController.getProductDataColumns(true, true));
@@ -240,19 +239,7 @@ public class DatabaseControllerTest
 	}
 
 	@Test
-	public final void testGetRemovalListByID_ForceLoad()
-	{
-		assertEquals("[1] Active: 3 boxes", DatabaseController.getRemovalListByID(1).toString());
-	}
-
-	@Test
-	public final void testGetRemovalListByID_Cached()
-	{
-		assertEquals("[1] Active: 3 boxes", DatabaseController.getRemovalListByID(1).toString());
-	}
-
-	@Test
-	public final void testGetRemovalListByID_LoadAndCache()
+	public final void testGetRemovalListByID()
 	{
 		assertEquals("[1] Active: 3 boxes", DatabaseController.getRemovalListByID(1).toString());
 	}
@@ -269,7 +256,7 @@ public class DatabaseControllerTest
 	{
 		final ProductBox box = DatabaseController.getProductBoxByID(1);
 		RemovalList list = new RemovalList();
-		list.addProductBox(box);
+		assertTrue(list.addProductBox(box));
 
 		assertTrue(list.getBoxes().contains(box));
 

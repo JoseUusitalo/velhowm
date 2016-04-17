@@ -43,7 +43,7 @@ public class ProductTest
 	@Before
 	public void createProduct()
 	{
-		product = new Product(id, name, brand, category, -1);
+		product = new Product(id, name, brand, category);
 	}
 
 	@After
@@ -56,12 +56,6 @@ public class ProductTest
 	public void testGetName()
 	{
 		assertEquals(name, product.getName());
-	}
-
-	@Test
-	public void testGetPopularity()
-	{
-		assertEquals(-1, product.getPopularity());
 	}
 
 	@Test
@@ -107,16 +101,8 @@ public class ProductTest
 	}
 
 	@Test
-	public void testSetPopularity()
-	{
-		int popularity = 10;
-		product.setPopularity(popularity);
-		assertEquals(popularity, product.getPopularity());
-	}
-
-	@Test
 	public final void testToString()
 	{
-		assertEquals("[20] porkkana (jotain / jahas (Regular)), Popularity: -1", product.toString());
+		assertEquals("[20] porkkana (jotain / jahas (Regular))", product.toString());
 	}
 }
