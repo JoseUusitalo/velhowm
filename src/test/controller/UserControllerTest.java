@@ -77,6 +77,8 @@ public class UserControllerTest
 		assertNotNull(newUser);
 
 		final User newUser2 = controller.createUser(VALID_BADGE_ID, null, VALID_NAME, VALID_NAME, VALID_ROLE, false);
+
+		// TODO: Test fails because the database has no unique constraints.
 		assertNull(newUser2);
 
 		DatabaseController.deleteUser(newUser);

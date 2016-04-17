@@ -5,10 +5,8 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import java.text.ParseException;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Set;
@@ -20,7 +18,6 @@ import org.junit.Test;
 import javafx.collections.ObservableList;
 import velho.controller.DatabaseController;
 import velho.model.ProductBox;
-import velho.model.ProductBoxSearchResultRow;
 import velho.model.RemovalList;
 import velho.model.User;
 import velho.model.exceptions.NoDatabaseLinkException;
@@ -111,12 +108,6 @@ public class DatabaseControllerTest
 		final List<Integer> list = DatabaseController.getProductCodeList();
 		assertEquals(12, list.size());
 		assertTrue(list.containsAll(Arrays.asList(1, 2, 3, 4, 5, 6, 7, 8, 9, 10)));
-	}
-
-	@Test
-	public final void testGetPublicUserDataList()
-	{
-		assertEquals(4, DatabaseController.getAllUsers().size());
 	}
 
 	@Test
@@ -276,18 +267,24 @@ public class DatabaseControllerTest
 	@Test
 	public final void testInsertRemovalList()
 	{
-		final RemovalList list = new RemovalList();
 		final ProductBox box = DatabaseController.getProductBoxByID(1);
+		RemovalList list = new RemovalList();
 		list.addProductBox(box);
 
-		assertTrue(DatabaseController.saveOrUpdate(list) > 0);
-		final ObservableList<Object> obsboxes = DatabaseController.getRemovalListByID(6).getObservableBoxes();
-		final List<ProductBox> boxes = new ArrayList<ProductBox>();
-		final Iterator<Object> it = obsboxes.iterator();
+		assertTrue(list.getBoxes().contains(box));
 
-		while (it.hasNext())
-			boxes.add(((ProductBoxSearchResultRow) it.next()).getBox());
+		final int newid = DatabaseController.saveOrUpdate(list);
 
-		assertTrue(boxes.contains(box));
+		assertTrue(newid > 0);
+
+		list = DatabaseController.getRemovalListByID(newid);
+
+		assertTrue(list.getBoxes().contains(box));
+
+		/*
+		 * Rollback.
+		 */
+
+		DatabaseController.deleteRemovalList(list);
 	}
 }
