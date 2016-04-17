@@ -159,7 +159,10 @@ public class RemovalList extends AbstractDatabaseObject
 	public boolean addProductBox(final ProductBox productBox)
 	{
 		if (boxes.add(productBox))
+		{
+			productBox.setRemovalList(this);
 			return observableBoxes.add(new ProductBoxSearchResultRow(productBox));
+		}
 
 		return false;
 	}
@@ -174,6 +177,8 @@ public class RemovalList extends AbstractDatabaseObject
 	{
 		if (boxes.remove(productBox))
 		{
+			productBox.setRemovalList(null);
+
 			for (final Object row : observableBoxes)
 			{
 				if (((ProductBoxSearchResultRow) row).getBox().equals(productBox))

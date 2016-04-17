@@ -13,7 +13,6 @@ import velho.controller.DatabaseController;
 import velho.model.Product;
 import velho.model.ProductBrand;
 import velho.model.ProductCategory;
-import velho.model.ProductType;
 
 /**
  * Tests for the {@link Product} class.
@@ -22,9 +21,8 @@ import velho.model.ProductType;
  */
 public class ProductTest
 {
-	private ProductBrand brand = new ProductBrand("jotain");
-	private ProductType regular = new ProductType("Regular");
-	private ProductCategory category = new ProductCategory("jahas", regular);
+	private ProductBrand brand = DatabaseController.getProductBrandByID(1);
+	private ProductCategory category = DatabaseController.getProductCategoryByID(3);
 	private Product product;
 	private String name = "porkkana";
 	private int id = 20;
@@ -73,7 +71,7 @@ public class ProductTest
 	@Test
 	public void testGetBrandName()
 	{
-		assertEquals("jotain", product.getBrand().getName());
+		assertEquals("Test Brand #1", product.getBrand().getName());
 	}
 
 	@Test
@@ -97,12 +95,12 @@ public class ProductTest
 	@Test
 	public void testGetTypeID()
 	{
-		assertEquals(2, product.getCategory().getType().getDatabaseID());
+		assertEquals(3, product.getCategory().getType().getDatabaseID());
 	}
 
 	@Test
 	public final void testToString()
 	{
-		assertEquals("[20] porkkana (jotain / jahas (Regular))", product.toString());
+		assertEquals("[20] porkkana (Test Brand #1 / Frozen Things (Frozen))", product.toString());
 	}
 }

@@ -506,15 +506,7 @@ public class MainWindow extends Application
 		}
 
 		DatabaseController.closeSessionFactory();
-
-		try
-		{
-			DatabaseController.unlink();
-		}
-		catch (final NoDatabaseLinkException e)
-		{
-			// Ignore.
-		}
+		DatabaseController.unlink();
 
 		SYSLOG.info("Exit.");
 

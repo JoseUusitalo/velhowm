@@ -387,24 +387,22 @@ public class ShelfTest
 		// Number of products in the shelf has increased.
 		assertEquals(oldProductCount + BOX_ID_21_PRODUCT_COUNT, shelf_FREE_LVL_2.getProductCountInBoxes());
 
-		// -- Update counts --
-		oldBoxCount = shelf_FREE_LVL_2.getProductBoxes().size();
-		oldProductCount = shelf_FREE_LVL_2.getProductCountInBoxes();
-
 		// Removal is a success.
 		assertTrue(BOX_ID_21.getShelfSlot().removeBox(BOX_ID_21));
 
+		// FIXME: Doing this does not update the shelf.
+
 		// Product box is not in the shelf.
-		assertTrue(shelf_FREE_LVL_2.getProductBoxes().contains(BOX_ID_21));
+		assertFalse(shelf_FREE_LVL_2.getProductBoxes().contains(BOX_ID_21));
 
 		// Product box is not in the slot.
-		assertTrue(shelf_FREE_LVL_2.getShelfSlot(slotid).contains(BOX_ID_21));
+		assertFalse(shelf_FREE_LVL_2.getShelfSlot(slotid).contains(BOX_ID_21));
 
-		// Number of product boxes in the shelf has decreased by one.
-		assertEquals(oldBoxCount - 1, shelf_FREE_LVL_2.getProductBoxes().size());
+		// Number of product boxes in the shelf is back to the old one.
+		assertEquals(oldBoxCount, shelf_FREE_LVL_2.getProductBoxes().size());
 
-		// Number of products in the shelf has decreased.
-		assertEquals(oldProductCount - BOX_ID_21_PRODUCT_COUNT, shelf_FREE_LVL_2.getProductCountInBoxes());
+		// Number of products in the shelf is back to the old one.
+		assertEquals(oldProductCount, shelf_FREE_LVL_2.getProductCountInBoxes());
 
 		// -- Save to database --
 		DatabaseController.saveOrUpdate(shelf_FREE_LVL_2);
@@ -413,16 +411,16 @@ public class ShelfTest
 		shelf_FREE_LVL_2 = DatabaseController.getShelfByID(SHELF_FREE_LVL_2_ID);
 
 		// Product box is not in the shelf.
-		assertTrue(shelf_FREE_LVL_2.getProductBoxes().contains(BOX_ID_21));
+		assertFalse(shelf_FREE_LVL_2.getProductBoxes().contains(BOX_ID_21));
 
 		// Product box is not in the slot.
-		assertTrue(shelf_FREE_LVL_2.getShelfSlot(slotid).contains(BOX_ID_21));
+		assertFalse(shelf_FREE_LVL_2.getShelfSlot(slotid).contains(BOX_ID_21));
 
-		// Number of product boxes in the shelf has decreased by one.
-		assertEquals(oldBoxCount - 1, shelf_FREE_LVL_2.getProductBoxes().size());
+		// Number of product boxes in the shelf is back to the old one.
+		assertEquals(oldBoxCount, shelf_FREE_LVL_2.getProductBoxes().size());
 
-		// Number of products in the shelf has decreased.
-		assertEquals(oldProductCount - BOX_ID_21_PRODUCT_COUNT, shelf_FREE_LVL_2.getProductCountInBoxes());
+		// Number of products in the shelf is back to the old one.
+		assertEquals(oldProductCount, shelf_FREE_LVL_2.getProductCountInBoxes());
 
 		/*
 		 * No rollback required.

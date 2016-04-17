@@ -215,7 +215,13 @@ public class Manifest extends AbstractDatabaseObject
 	public boolean setBoxes(final Set<ProductBox> productBoxes)
 	{
 		if (productBoxes == null)
+		{
+			for (final ProductBox box : this.boxes)
+				box.setManifest(null);
+
 			this.boxes.clear();
+			this.observableBoxes.clear();
+		}
 		else
 			this.boxes = productBoxes;
 
@@ -224,7 +230,10 @@ public class Manifest extends AbstractDatabaseObject
 		for (final ProductBox box : this.boxes)
 		{
 			if (box != null)
+			{
+				box.setManifest(this);
 				bswitch = bswitch && (observableBoxes.add(new ProductBoxSearchResultRow(box)));
+			}
 		}
 
 		return bswitch;

@@ -822,15 +822,8 @@ public class DatabaseController
 	 */
 	public static void tryReLink()
 	{
-		try
-		{
-			// Just in case.
-			unlink();
-		}
-		catch (final NoDatabaseLinkException e)
-		{
-			// Do nothing. This is expected.
-		}
+		// Just in case.
+		unlink();
 
 		try
 		{
@@ -920,17 +913,17 @@ public class DatabaseController
 	/**
 	 * Shuts down the connection to the database. Use {@link #link()} to connect
 	 * to the database again.
-	 *
-	 * @throws NoDatabaseLinkException when attempting unlink a database when no database link exists
 	 */
-	public static void unlink() throws NoDatabaseLinkException
+	public static void unlink()
 	{
-		if (connectionPool == null)
-			throw new NoDatabaseLinkException();
-
-		connectionPool.dispose();
-		connectionPool = null;
-		DBLOG.info("Database unlinked.");
+		if (connectionPool != null)
+		{
+			connectionPool.dispose();
+			connectionPool = null;
+			DBLOG.info("Database unlinked.");
+		}
+		else
+			DBLOG.info("No database link to unlink.");
 	}
 
 	/*
@@ -1857,8 +1850,6 @@ public class DatabaseController
 		catch (final HibernateException e)
 		{
 			sessionFactory.getCurrentSession().getTransaction().rollback();
-
-			throw new HibernateException("Failed to delete.");
 		}
 
 		// TODO: Figure out some way to return a boolean.
