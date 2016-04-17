@@ -137,15 +137,23 @@ public class RemovalList extends AbstractDatabaseObject implements Comparable<Re
 	/**
 	 * Sets the set of actual product boxes in this removal list.
 	 *
-	 * @param boxes the set of boxes on this removal list
+	 * @param boxes the set of boxes on this removal list, <code>null</code> to clear
+	 * @return <code>true</code> if all boxes were added to this manifest
 	 */
-	public boolean setBoxes(final Set<ProductBox> boxes)
+	public boolean setBoxes(final Set<ProductBox> productBoxes)
 	{
-		this.boxes = boxes;
+		if (productBoxes == null)
+			this.boxes.clear();
+		else
+			this.boxes = productBoxes;
+
 		boolean bswitch = true;
 
-		for (final ProductBox box : boxes)
-			bswitch = bswitch && (observableBoxes.add(new ProductBoxSearchResultRow(box)));
+		for (final ProductBox box : this.boxes)
+		{
+			if (box != null)
+				bswitch = bswitch && (observableBoxes.add(new ProductBoxSearchResultRow(box)));
+		}
 
 		return bswitch;
 	}

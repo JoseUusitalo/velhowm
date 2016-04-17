@@ -211,16 +211,23 @@ public class Manifest extends AbstractDatabaseObject implements Comparable<Manif
 	/**
 	 * Adds the specified {@link ProductBox} objects to this manifest.
 	 *
-	 * @param productBoxes set of boxes to add to this list
+	 * @param productBoxes set of boxes to add to this list, <code>null</code> to clear
 	 * @return <code>true</code> if all boxes were added to this manifest
 	 */
 	public boolean setBoxes(final Set<ProductBox> productBoxes)
 	{
-		this.boxes = productBoxes;
+		if (productBoxes == null)
+			this.boxes.clear();
+		else
+			this.boxes = productBoxes;
+
 		boolean bswitch = true;
 
-		for (final ProductBox box : productBoxes)
-			bswitch = bswitch && (observableBoxes.add(new ProductBoxSearchResultRow(box)));
+		for (final ProductBox box : this.boxes)
+		{
+			if (box != null)
+				bswitch = bswitch && (observableBoxes.add(new ProductBoxSearchResultRow(box)));
+		}
 
 		return bswitch;
 	}
