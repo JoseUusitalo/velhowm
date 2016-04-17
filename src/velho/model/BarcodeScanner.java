@@ -13,7 +13,6 @@ import org.apache.log4j.Logger;
 
 import velho.controller.DatabaseController;
 import velho.controller.ExternalSystemsController;
-import velho.model.exceptions.NoDatabaseLinkException;
 
 /**
  * Created to scan newly arrived product boxes. This class creates product boxes into the system.
@@ -66,14 +65,7 @@ public class BarcodeScanner
 	{
 
 		List<Integer> numbers = new ArrayList<Integer>();
-		try
-		{
-			numbers = DatabaseController.getProductCodeList();
-		}
-		catch (final NoDatabaseLinkException e)
-		{
-			DatabaseController.tryReLink();
-		}
+		numbers = DatabaseController.getProductCodeList();
 
 		final int maximSize = (int) (Math.random() * (numbers.size() + 1));
 
@@ -96,39 +88,30 @@ public class BarcodeScanner
 		SYSLOG.info("Moving a box.");
 
 		List<Integer> list = null;
-		String randomShelfSlot = null;
+		ShelfSlot randomShelfSlot = null;
 
-		Object[] tokens;
-
-		try
+		do
 		{
-			Shelf shelfObj = null;
-			do
-			{
-				list = DatabaseController.getProductCodeList();
-				Collections.shuffle(list);
-				randomShelfSlot = DatabaseController.getRandomShelfSlot();
-				tokens = Shelf.tokenizeShelfSlotID(randomShelfSlot);
-				int derp = Integer.parseInt(((String) tokens[0]).substring(1));
-				SYSLOG.debug("Adding random product: " + list.get(0));
-				SYSLOG.debug("To random shelf slot: " + randomShelfSlot);
-				shelfObj = DatabaseController.getShelfByID(derp);
-			}
-			while (!shelfObj.getShelfSlot(randomShelfSlot).hasFreeSpace());
+			list = DatabaseController.getProductCodeList();
+			Collections.shuffle(list);
 
-			if (ExternalSystemsController.move(list.get(0), randomShelfSlot, true))
-			{
-				SYSLOG.debug("Move successful.");
-				return true;
-			}
+			List<Object> allSlots = DatabaseController.getAllShelfSlots();
+			Collections.shuffle(allSlots);
 
-			SYSLOG.debug("Move failed.");
-			return false;
+			randomShelfSlot = (ShelfSlot) allSlots.get(0);
+
+			SYSLOG.debug("Adding random product: " + list.get(0));
+			SYSLOG.debug("To random shelf slot: " + randomShelfSlot);
 		}
-		catch (final NoDatabaseLinkException e)
+		while (!randomShelfSlot.hasFreeSpace());
+
+		if (ExternalSystemsController.move(list.get(0), randomShelfSlot, true))
 		{
-			DatabaseController.tryReLink();
+			SYSLOG.debug("Move successful.");
+			return true;
 		}
+
+		SYSLOG.debug("Move failed.");
 		return false;
 	}
 
@@ -148,37 +131,30 @@ public class BarcodeScanner
 		// Range: [1 month ago, yesterday]
 		Date orderDate = new Date((now - 2628000000L) + (long) (r.nextDouble() * ((now - 86400000L) - (now - 2628000000L))));
 
-		try
+		productIDs = DatabaseController.getProductCodeList();
+		Collections.shuffle(productIDs);
+
+		int uniqueProducts = productIDs.size();
+		int randomBoxes = r.nextInt(29) + 1; // Range: [1, 30]
+		int maxSize;
+		int productCount;
+		Date randomDate;
+
+		for (int i = 0; i < randomBoxes; i++)
 		{
-			productIDs = DatabaseController.getProductCodeList();
-			Collections.shuffle(productIDs);
+			maxSize = r.nextInt(499) + 1; // Range: [1, 500]
+			productCount = r.nextInt(maxSize) + 1; // Range: [1, maxSize]
 
-			int uniqueProducts = productIDs.size();
-			int randomBoxes = r.nextInt(29) + 1; // Range: [1, 30]
-			int maxSize;
-			int productCount;
-			Date randomDate;
+			// 10 years is about 315400000000 milliseconds.
+			// Exact rounding is irrelevant so cast is fine.
+			randomDate = new Date(now + (long) (r.nextDouble() * 315400000000L));
 
-			for (int i = 0; i < randomBoxes; i++)
-			{
-				maxSize = r.nextInt(499) + 1; // Range: [1, 500]
-				productCount = r.nextInt(maxSize) + 1; // Range: [1, maxSize]
-
-				// 10 years is about 315400000000 milliseconds.
-				// Exact rounding is irrelevant so cast is fine.
-				randomDate = new Date(now + (long) (r.nextDouble() * 315400000000L));
-
-				// @formatter:off
+			// @formatter:off
 				boxSet.add(new ProductBox(	DatabaseController.getProductByID(productIDs.get(i % uniqueProducts)), // Make sure that the index doesn't go over the number of unique products in the database.
 											maxSize,
 											productCount,
 											randomDate));
 				// @formatter:on
-			}
-		}
-		catch (final NoDatabaseLinkException e)
-		{
-			DatabaseController.tryReLink();
 		}
 
 		SYSLOG.debug("Generated " + boxSet.size() + " random product boxes.");

@@ -1347,73 +1347,82 @@ public class DatabaseController
 	}
 
 	/**
-	 * <p>
 	 * Authenticates a user with the given badge ID string.
-	 * </p>
-	 * <p>
-	 * Warning: Assumes that the badge ID is technically valid.
-	 * </p>
 	 *
 	 * @param badgeID a badge ID string
 	 * @return a {@link User} object representing the authenticated user or
 	 *         <code>null</code> for invalid credentials
-	 * @throws NoDatabaseLinkException
 	 * @see User#isValidBadgeID(String)
 	 */
-	public static User authenticateBadgeID(final String badgeID) throws NoDatabaseLinkException
+	public static User authenticateBadgeID(final String badgeID)
 	{
+		sessionFactory.getCurrentSession().beginTransaction();
+
+		// @formatter:off
+		@SuppressWarnings("unchecked")
+		List<User> result = sessionFactory.getCurrentSession().createQuery("from User where badgeID = :id")
+			   	   	   .setParameter("id", badgeID)
+			   	   	   .list();
+		// @formatter:on
+
 		try
 		{
-			Integer.parseInt(badgeID);
+			sessionFactory.getCurrentSession().getTransaction().commit();
 		}
-		catch (final NumberFormatException e)
+		catch (final HibernateException e)
 		{
-			// Although badge IDs are stored as string, they are still numbers.
-			return null;
+			sessionFactory.getCurrentSession().getTransaction().rollback();
+			throw e;
 		}
-
-		final String[] columns = { "*" };
-		final List<String> where = new ArrayList<String>();
-		where.add("badge_id = " + badgeID);
-
-		@SuppressWarnings("unchecked")
-		final Set<User> result = (LinkedHashSet<User>) (runQuery(DatabaseQueryType.SELECT, DatabaseTable.USERS, null, columns, null, where));
 
 		if (result.size() == 0)
 			return null;
+		else if (result.size() > 1)
+			DBLOG.error("Multiple users with the same badge ID: " + badgeID);
 
-		return result.iterator().next();
+		return result.get(0);
 	}
 
 	/**
-	 * <p>
 	 * Authenticates a user with the given PIN string.
-	 * </p>
-	 * <p>
-	 * Warning: Assumes that the PIN is technically valid.
-	 * </p>
 	 *
 	 * @param pin is a PIN string
 	 * @return a {@link User} object representing the authenticated user or
 	 *         <code>null</code> for invalid credentials
-	 * @throws NoDatabaseLinkException
 	 * @see User#isValidPIN(String)
 	 */
-	public static User authenticatePIN(final String firstName, final String lastName, final String pin) throws NoDatabaseLinkException
+	public static User authenticatePIN(final String firstName, final String lastName, final String pin)
 	{
-		final String[] columns = { "*" };
-		final List<String> where = new ArrayList<String>();
-		where.add("first_name = '" + firstName + "'");
-		where.add("last_name = '" + lastName + "'");
-		where.add("pin = " + pin);
+		sessionFactory.getCurrentSession().beginTransaction();
 
+		// @formatter:off
 		@SuppressWarnings("unchecked")
-		final Set<User> result = (LinkedHashSet<User>) (runQuery(DatabaseQueryType.SELECT, DatabaseTable.USERS, null, columns, null, where));
+		List<User> result = sessionFactory.getCurrentSession().createQuery("from User "
+																		 + "where firstName = :fn "
+																		 + "and lastName = :ln "
+																		 + "and pin = :pin")
+								   	   	  .setParameter("fn", firstName)
+								   	   	  .setParameter("ln", lastName)
+								   	   	  .setParameter("pin", pin)
+								   	   	  .list();
+		// @formatter:on
+
+		try
+		{
+			sessionFactory.getCurrentSession().getTransaction().commit();
+		}
+		catch (final HibernateException e)
+		{
+			sessionFactory.getCurrentSession().getTransaction().rollback();
+			throw e;
+		}
 
 		if (result.size() == 0)
 			return null;
+		else if (result.size() > 1)
+			DBLOG.error("Multiple users with the same data: " + firstName + " " + lastName + " " + pin);
 
-		return result.iterator().next();
+		return result.get(0);
 	}
 
 	/**
@@ -1464,26 +1473,36 @@ public class DatabaseController
 	}
 
 	/**
-	 * Gets the product ID by its name.
+	 * Gets a {@link Product} from the database by its name.
 	 *
 	 * @param name unique name of the product
-	 * @return the database ID of the product or <code>-1</code> if the product
-	 *         is not present in the database
+	 * @return the wanted product or <code>null</code> if the product is not present in the database
 	 */
-	public static int getProductIDFromName(final String name) throws NoDatabaseLinkException
+	public static Product getProductByName(final String name)
 	{
-		final String[] columns = { "product_id" };
-		final List<String> where = new ArrayList<String>();
-		where.add("name = '" + name + "'");
+		sessionFactory.getCurrentSession().beginTransaction();
 
+		// @formatter:off
 		@SuppressWarnings("unchecked")
-		final Set<Integer> result = (LinkedHashSet<Integer>) (runQuery(DatabaseQueryType.SELECT, DatabaseTable.PRODUCTS, null, columns, null, where));
+		List<Product> result = sessionFactory.getCurrentSession().createQuery("from Product where name = :name")
+			   	   	   .setParameter("name", name)
+			   	   	   .list();
+		// @formatter:on
+
+		try
+		{
+			sessionFactory.getCurrentSession().getTransaction().commit();
+		}
+		catch (final HibernateException e)
+		{
+			sessionFactory.getCurrentSession().getTransaction().rollback();
+			throw e;
+		}
 
 		if (result.size() == 0)
-			return -1;
+			return null;
 
-		// Only one result as names are unique.
-		return result.iterator().next();
+		return result.get(0);
 	}
 
 	/**
@@ -1547,41 +1566,18 @@ public class DatabaseController
 	}
 
 	/**
-	 * Gets a random valid shelf slot ID string.
+	 * Gets a list of {@link Product} database ID in the database.
 	 *
-	 * @return random valid shelf slot ID string
+	 * @return a list of integer product database IDs
 	 */
-	public static String getRandomShelfSlot() throws NoDatabaseLinkException
+	public static List<Integer> getProductCodeList()
 	{
-		final String[] columns = { "shelf_id" };
-
-		@SuppressWarnings("unchecked")
-		final Set<Integer> result = (LinkedHashSet<Integer>) (runQuery(DatabaseQueryType.SELECT, DatabaseTable.SHELVES, null, columns, null, null));
-
-		final List<Integer> list = new ArrayList<Integer>(result);
-
-		Collections.shuffle(list);
-
-		final Shelf randomShelf = getShelfByID(list.get(0));
-		final int randomLevel = (int) (Math.round(Math.random() * (randomShelf.getLevelCount() - 1) + 1));
-		final int randomSlotIndex = (int) (Math.round(Math.random() * (randomShelf.getShelfSlotCount() / randomShelf.getLevelCount() - 1)));
-
-		return Shelf.coordinatesToShelfSlotID(list.get(0), randomLevel, randomSlotIndex, true);
-	}
-
-	/**
-	 * Gets a list product codes in the database.
-	 *
-	 * @return a list of integer product codes
-	 */
-	public static List<Integer> getProductCodeList() throws NoDatabaseLinkException
-	{
-		final String[] columns = { "product_id" };
-
-		@SuppressWarnings("unchecked")
-		final Set<Integer> result = (LinkedHashSet<Integer>) (runQuery(DatabaseQueryType.SELECT, DatabaseTable.PRODUCTS, null, columns, null, null));
+		final List<Object> result = getAllProducts();
 		final List<Integer> ints = new ArrayList<Integer>();
-		ints.addAll(result);
+
+		for (final Object p : result)
+			ints.add(((AbstractDatabaseObject) p).getDatabaseID());
+
 		return ints;
 	}
 
@@ -1973,13 +1969,11 @@ public class DatabaseController
 		try
 		{
 			sessionFactory.getCurrentSession().getTransaction().commit();
-
 		}
 		catch (final HibernateException e)
 		{
 			sessionFactory.getCurrentSession().getTransaction().rollback();
-
-			throw new HibernateException("Failed to commit.");
+			throw e;
 		}
 
 		DBLOG.debug("Loaded all " + className + " objects.");
@@ -2038,6 +2032,11 @@ public class DatabaseController
 	public static List<Object> getAllShelfLevels()
 	{
 		return getAll("ShelfLevel");
+	}
+
+	public static List<Object> getAllShelfSlots()
+	{
+		return getAll("ShelfSlot");
 	}
 
 	/**

@@ -13,7 +13,6 @@ import org.junit.Test;
 
 import velho.controller.DatabaseController;
 import velho.controller.SearchController;
-import velho.model.exceptions.NoDatabaseLinkException;
 
 /**
  * Tests for the {@link SearchController} class.
@@ -45,7 +44,7 @@ public class SearchControllerTest
 	}
 
 	@Test
-	public final void testSearchByProductList() throws NoDatabaseLinkException
+	public final void testSearchByProductList()
 	{
 		final Map<Integer, Integer> expected = new LinkedHashMap<Integer, Integer>();
 		expected.put(PRODUCT_1, 1);
@@ -65,7 +64,7 @@ public class SearchControllerTest
 	}
 
 	@Test
-	public final void testSearchByProductList_Duplicates() throws NoDatabaseLinkException
+	public final void testSearchByProductList_Duplicates()
 	{
 		final Map<Integer, Integer> expected = new LinkedHashMap<Integer, Integer>();
 		expected.put(PRODUCT_1, 8);
@@ -82,7 +81,7 @@ public class SearchControllerTest
 	}
 
 	@Test
-	public final void testSearchByProductList_Duplicates_Spaces() throws NoDatabaseLinkException
+	public final void testSearchByProductList_Duplicates_Spaces()
 	{
 		final Map<Integer, Integer> expected = new LinkedHashMap<Integer, Integer>();
 		expected.put(PRODUCT_1, 8);
@@ -99,7 +98,7 @@ public class SearchControllerTest
 	}
 
 	@Test
-	public final void testSearchByProductList_Nulls() throws NoDatabaseLinkException
+	public final void testSearchByProductList_Nulls()
 	{
 		final Map<Integer, Integer> expected = new LinkedHashMap<Integer, Integer>();
 		expected.put(PRODUCT_1, 1);
@@ -117,7 +116,7 @@ public class SearchControllerTest
 	}
 
 	@Test
-	public final void testSearchByProductList_Spaces() throws NoDatabaseLinkException
+	public final void testSearchByProductList_Spaces()
 	{
 		final Map<Integer, Integer> expected = new LinkedHashMap<Integer, Integer>();
 		expected.put(PRODUCT_1, 1);
@@ -135,7 +134,7 @@ public class SearchControllerTest
 	}
 
 	@Test
-	public final void testSearchByProductList_Spaces2() throws NoDatabaseLinkException
+	public final void testSearchByProductList_Spaces2()
 	{
 		final Map<Integer, Integer> expected = new LinkedHashMap<Integer, Integer>();
 		expected.put(PRODUCT_1, 1);
@@ -154,7 +153,7 @@ public class SearchControllerTest
 	}
 
 	@Test
-	public final void testSearchByProductList_Spaces3() throws NoDatabaseLinkException
+	public final void testSearchByProductList_Spaces3()
 	{
 		final Map<Integer, Integer> expected = new LinkedHashMap<Integer, Integer>();
 		expected.put(PRODUCT_1, 10);
@@ -172,7 +171,7 @@ public class SearchControllerTest
 	}
 
 	@Test
-	public final void testParse_NameWithColon() throws NoDatabaseLinkException
+	public final void testParse_NameWithColon()
 	{
 		final Object[] expected = new Object[2];
 		expected[0] = 1;
@@ -186,7 +185,7 @@ public class SearchControllerTest
 	}
 
 	@Test
-	public final void testParse_NameWithColon2() throws NoDatabaseLinkException
+	public final void testParse_NameWithColon2()
 	{
 		final Object[] expected = new Object[2];
 		expected[0] = 10;
@@ -200,7 +199,7 @@ public class SearchControllerTest
 	}
 
 	@Test
-	public final void testParse_NameWithColon3() throws NoDatabaseLinkException
+	public final void testParse_NameWithColon3()
 	{
 		final Object[] expected = new Object[2];
 		expected[0] = 1;

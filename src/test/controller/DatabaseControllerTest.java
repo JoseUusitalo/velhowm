@@ -21,7 +21,6 @@ import velho.model.ProductBox;
 import velho.model.RemovalList;
 import velho.model.User;
 import velho.model.enums.UserRole;
-import velho.model.exceptions.NoDatabaseLinkException;
 
 /**
  * Tests for the {@link DatabaseController} class.
@@ -58,7 +57,7 @@ public class DatabaseControllerTest
 	}
 
 	@Test
-	public final void testAuthenticate_ValidPin() throws NoDatabaseLinkException
+	public final void testAuthenticate_ValidPin()
 	{
 		final User user = DatabaseController.authenticatePIN("Admin", "Test", "111111");
 		assertEquals("Admin", user.getFirstName());
@@ -66,25 +65,25 @@ public class DatabaseControllerTest
 	}
 
 	@Test
-	public final void testAuthenticate_InvalidPinLong() throws NoDatabaseLinkException
+	public final void testAuthenticate_InvalidPinLong()
 	{
 		assertEquals(null, DatabaseController.authenticateBadgeID("1111112"));
 	}
 
 	@Test
-	public final void testAuthenticate_InvalidPinShort() throws NoDatabaseLinkException
+	public final void testAuthenticate_InvalidPinShort()
 	{
 		assertEquals(null, DatabaseController.authenticateBadgeID("0"));
 	}
 
 	@Test
-	public final void testAuthenticate_InvalidString() throws NoDatabaseLinkException
+	public final void testAuthenticate_InvalidString()
 	{
 		assertEquals(null, DatabaseController.authenticateBadgeID("this is NOT a valid pin or badge number"));
 	}
 
 	@Test
-	public final void testAuthenticate_ValidBadge() throws NoDatabaseLinkException
+	public final void testAuthenticate_ValidBadge()
 	{
 		final User user = DatabaseController.authenticateBadgeID("12345678");
 		assertEquals("Badger", user.getFirstName());
@@ -92,19 +91,19 @@ public class DatabaseControllerTest
 	}
 
 	@Test
-	public final void testAuthenticate_InvalidBadgeLong() throws NoDatabaseLinkException
+	public final void testAuthenticate_InvalidBadgeLong()
 	{
 		assertEquals(null, DatabaseController.authenticateBadgeID("100000000"));
 	}
 
 	@Test
-	public final void testAuthenticate_InvalidBadgeShort() throws NoDatabaseLinkException
+	public final void testAuthenticate_InvalidBadgeShort()
 	{
 		assertEquals(null, DatabaseController.authenticateBadgeID("2222222"));
 	}
 
 	@Test
-	public final void testGetProductCodeList() throws NoDatabaseLinkException
+	public final void testGetProductCodeList()
 	{
 		final List<Integer> list = DatabaseController.getProductCodeList();
 		assertEquals(12, list.size());
@@ -221,7 +220,7 @@ public class DatabaseControllerTest
 	}
 
 	@Test
-	public final void testAuthenticatePIN_Invalid() throws NoDatabaseLinkException
+	public final void testAuthenticatePIN_Invalid()
 	{
 		assertEquals(null, DatabaseController.authenticatePIN(null, "", "-1"));
 	}
@@ -233,9 +232,9 @@ public class DatabaseControllerTest
 	}
 
 	@Test
-	public final void testgetProductIDFromName_Invalid() throws NoDatabaseLinkException
+	public final void testgetProductIDFromName_Invalid()
 	{
-		assertEquals(-1, DatabaseController.getProductIDFromName("just some random text here not a product name"));
+		assertEquals(-1, DatabaseController.getProductByName("just some random text here not a product name"));
 	}
 
 	@Test

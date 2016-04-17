@@ -7,7 +7,6 @@ import javafx.scene.layout.GridPane;
 import velho.model.User;
 import velho.model.enums.Position;
 import velho.model.enums.UserRole;
-import velho.model.exceptions.NoDatabaseLinkException;
 import velho.view.LoginView;
 import velho.view.MainWindow;
 
@@ -82,35 +81,28 @@ public class LoginController
 		{
 			if (User.isValidBadgeID(authenticationString))
 			{
-				try
+				currentUser = DatabaseController.authenticateBadgeID(authenticationString);
+
+				// Valid credentials.
+				if (currentUser != null)
 				{
-					currentUser = DatabaseController.authenticateBadgeID(authenticationString);
+					// Put the user database ID into the MDC thing for log4j.
+					MDC.put("user_id", currentUser.getDatabaseID());
 
-					// Valid credentials.
-					if (currentUser != null)
+					USRLOG.info(currentUser.toString() + " logged in with a badge.");
+					uiController.showMainMenu(currentUser.getRole());
+					destroyView();
+
+					if (MainWindow.DEBUG_MODE)
 					{
-						// Put the user database ID into the MDC thing for log4j.
-						MDC.put("user_id", currentUser.getDatabaseID());
-
-						USRLOG.info(currentUser.toString() + " logged in with a badge.");
-						uiController.showMainMenu(currentUser.getRole());
-						destroyView();
-
-						if (MainWindow.DEBUG_MODE)
-						{
-							debugController.setLogInButton(false);
-							debugController.setLogOutButton(true);
-						}
-					}
-					else
-					{
-						SYSLOG.debug("Incorrect Badge ID.");
-						PopupController.warning("Incorrect Badge ID.");
+						debugController.setLogInButton(false);
+						debugController.setLogOutButton(true);
 					}
 				}
-				catch (final NoDatabaseLinkException e)
+				else
 				{
-					DatabaseController.tryReLink();
+					SYSLOG.debug("Incorrect Badge ID.");
+					PopupController.warning("Incorrect Badge ID.");
 				}
 			}
 			else
@@ -123,35 +115,28 @@ public class LoginController
 		{
 			if (User.isValidPIN(authenticationString))
 			{
-				try
+				currentUser = DatabaseController.authenticatePIN(firstName, lastName, authenticationString);
+
+				// Valid credentials.
+				if (currentUser != null)
 				{
-					currentUser = DatabaseController.authenticatePIN(firstName, lastName, authenticationString);
+					// Put the user database ID into the MDC thing for log4j.
+					MDC.put("user_id", currentUser.getDatabaseID());
 
-					// Valid credentials.
-					if (currentUser != null)
+					USRLOG.info(currentUser.toString() + " logged in with PIN.");
+					uiController.showMainMenu(currentUser.getRole());
+					destroyView();
+
+					if (MainWindow.DEBUG_MODE)
 					{
-						// Put the user database ID into the MDC thing for log4j.
-						MDC.put("user_id", currentUser.getDatabaseID());
-
-						USRLOG.info(currentUser.toString() + " logged in with PIN.");
-						uiController.showMainMenu(currentUser.getRole());
-						destroyView();
-
-						if (MainWindow.DEBUG_MODE)
-						{
-							debugController.setLogInButton(false);
-							debugController.setLogOutButton(true);
-						}
-					}
-					else
-					{
-						SYSLOG.info("Incorrect PIN or Names.");
-						PopupController.warning("Incorrect PIN or names.");
+						debugController.setLogInButton(false);
+						debugController.setLogOutButton(true);
 					}
 				}
-				catch (final NoDatabaseLinkException e)
+				else
 				{
-					DatabaseController.tryReLink();
+					SYSLOG.info("Incorrect PIN or Names.");
+					PopupController.warning("Incorrect PIN or names.");
 				}
 			}
 			else
@@ -270,7 +255,7 @@ public class LoginController
 	 *
 	 * @param role role to check against
 	 * @return <code>true</code> if logged in user's role is greater than or equal to the given role, <code>false</code>
-	 * if user is not logged in
+	 *         if user is not logged in
 	 */
 	public static boolean userRoleIsGreaterOrEqualTo(final UserRole role)
 	{

@@ -21,6 +21,7 @@ import velho.model.Shelf;
 @SuppressWarnings("static-method")
 public class ExternalSystemsControllerTest
 {
+	private static Shelf newShelf_ID2;
 	private static final String NEWSHELFID = "S2-1-1";
 	private static final int BOX_DBID_1 = 1;
 	private static final int BOX_DBID_2 = 2;
@@ -34,6 +35,7 @@ public class ExternalSystemsControllerTest
 	public static final void loadSampleData() throws ParseException
 	{
 		DatabaseController.loadSampleData();
+		newShelf_ID2 = DatabaseController.getShelfByID(2);
 	}
 
 	@Test
@@ -52,7 +54,7 @@ public class ExternalSystemsControllerTest
 		final int newShelfID = Integer.parseInt(newShelfIDString.substring(1));
 		final Shelf newShelf = DatabaseController.getShelfByID(newShelfID);
 
-		assertTrue(ExternalSystemsController.move(BOX_DBID_1, NEWSHELFID, false));
+		assertTrue(ExternalSystemsController.move(BOX_DBID_1, newShelf_ID2.getShelfSlot(NEWSHELFID), false));
 
 		final String newShelfSlot = box.getShelfSlot().getSlotID();
 
@@ -61,22 +63,15 @@ public class ExternalSystemsControllerTest
 	}
 
 	@Test
-	public final void testMoveInValid()
-	{
-		assertFalse(ExternalSystemsController.move(BOX_DBID_1, "S999-1-1", false));
-	}
-
-	@Test
 	public final void testMoveFull()
 	{
-
-		// assertTrue(ExternalSystemsController.move(BOXDBID, "S1-1-1", false));
+		assertTrue(ExternalSystemsController.move(BOX_DBID_1, DatabaseController.getShelfByID(1).getShelfSlot("S1-1-1"), false));
 	}
 
 	@Test
 	public final void testMoveInValidBox()
 	{
-		assertFalse(ExternalSystemsController.move(99999, "S4-1-1", false));
+		assertFalse(ExternalSystemsController.move(99999, DatabaseController.getShelfByID(4).getShelfSlot("S4-1-1"), false));
 	}
 
 	@Test
@@ -93,7 +88,7 @@ public class ExternalSystemsControllerTest
 		// assertTrue(oldShelf.getShelfSlotBoxes(oldShelfSlot).contains(box));
 		System.out.println("move");
 
-		assertTrue(ExternalSystemsController.move(BOX_DBID_2, NEWSHELFID, false));
+		assertTrue(ExternalSystemsController.move(BOX_DBID_2, newShelf_ID2.getShelfSlot(NEWSHELFID), false));
 		assertFalse(oldShelf.getShelfSlot(oldShelfSlot).contains(box));
 
 		final String newShelfIDString = (String) Shelf.tokenizeShelfSlotID(NEWSHELFID)[0];

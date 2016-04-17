@@ -222,14 +222,7 @@ public class SearchController
 				}
 				catch (final NumberFormatException e)
 				{
-					try
-					{
-						productID = DatabaseController.getProductIDFromName((String) countName[1]);
-					}
-					catch (final NoDatabaseLinkException e1)
-					{
-						DatabaseController.tryReLink();
-					}
+					productID = DatabaseController.getProductByName((String) countName[1]).getDatabaseID();
 				}
 
 				// If the product already exists, add the new count to the
