@@ -56,15 +56,14 @@ public class SearchController
 	 * @param limits internal string representing the search target
 	 * @param name the name of the product
 	 * @param productCount how many products of this type of find in the product boxes
-	 * @param popularity how popular the product is
 	 * @param brand the {@link ProductBrand}
 	 * @param category the {@link ProductCategory}
 	 * @param expiresStart the expiration date range start
 	 * @param expiresEnd the expiration date range end
 	 */
 	@SuppressWarnings("static-method")
-	public void productSearch(final String limits, final String name, final Integer productCount, final Integer popularity, final Object brand,
-			final Object category, final LocalDate expiresStart, final LocalDate expiresEnd)
+	public void productSearch(final String limits, final String name, final Integer productCount, final Object brand, final Object category,
+			final LocalDate expiresStart, final LocalDate expiresEnd)
 	{
 		final List<String> where = new ArrayList<String>();
 
@@ -83,11 +82,6 @@ public class SearchController
 		if (productCount != null && productCount >= 0)
 		{
 			where.add("containers.product_count = " + productCount.intValue());
-		}
-
-		if (popularity != null && popularity >= 0)
-		{
-			where.add("products.popularity = " + popularity.intValue());
 		}
 
 		if (brand != null)
@@ -266,7 +260,7 @@ public class SearchController
 	 *
 	 * @param line String to parse
 	 * @return an object array where the first element is the integer and the
-	 * second element is the product name
+	 *         second element is the product name
 	 */
 	public static Object[] parseProductLine(final String line)
 	{

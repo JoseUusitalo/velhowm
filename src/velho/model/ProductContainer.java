@@ -1,13 +1,14 @@
 package velho.model;
 
 import java.util.Date;
+import java.util.UUID;
 
 /**
  * An abstract container that can hold any number of {@link Product} objects.
  *
  * @author Joona Silvennoinen &amp; Jose Uusitalo
  */
-public abstract class ProductContainer extends AbstractDatabaseObject implements Comparable<ProductContainer>
+public abstract class ProductContainer extends AbstractDatabaseObject
 {
 	/**
 	 * The expiration date of the products in this container.
@@ -35,21 +36,38 @@ public abstract class ProductContainer extends AbstractDatabaseObject implements
 	protected ShelfSlot shelfSlot;
 
 	/**
-	 * @param boxID
-	 * @param expirationDate
-	 * @param maxSize
-	 * @param product
-	 * @param productCount
+	 * The {@link RemovalList} this container is currently in.
 	 */
-	public ProductContainer(final int boxID, final Date expirationDate, final int maxSize, final Product product, final int productCount)
+	protected RemovalList removalList;
+
+	/**
+	 * The {@link Manifest} this container is currently in.
+	 */
+	protected Manifest manifest;
+
+	/**
+	 * @param databaseID
+	 * @param shelfSlot
+	 * @param product
+	 * @param maxSize
+	 * @param productCount
+	 * @param expirationDate
+	 */
+	public ProductContainer(final int databaseID, final UUID uuid, final Manifest manifest, final RemovalList removalList, final ShelfSlot shelfSlot,
+			final Product product, final int maxSize, final int productCount, final Date expirationDate)
 	{
 		if (maxSize < 1 || maxSize < productCount)
 		{
 			throw new IllegalArgumentException();
 		}
+
+		setDatabaseID(databaseID);
+		setUuid(uuid);
+		this.manifest = manifest;
+		this.removalList = removalList;
+		this.shelfSlot = shelfSlot;
 		this.expirationDate = expirationDate;
 		this.maxSize = maxSize;
-		setDatabaseID(boxID);
 		this.product = product;
 		this.productCount = productCount;
 	}
@@ -58,33 +76,7 @@ public abstract class ProductContainer extends AbstractDatabaseObject implements
 	 */
 	public ProductContainer()
 	{
-		// For Hibernate.
-	}
-
-	@Override
-	public abstract String toString();
-
-	@Override
-	public boolean equals(final Object o)
-	{
-		if (!(o instanceof ProductContainer))
-			return false;
-
-		final ProductContainer c = (ProductContainer) o;
-
-		if (this.getDatabaseID() <= 0)
-			return this == c;
-
-		System.out.println("THIS IS " + this.getDatabaseID());
-		System.out.println("THAT IS " + c.getDatabaseID());
-
-		return this.getDatabaseID() == c.getDatabaseID();
-	}
-
-	@Override
-	public int compareTo(final ProductContainer container)
-	{
-		return this.getDatabaseID() - container.getDatabaseID();
+		setUuid(UUID.randomUUID());
 	}
 
 	/**
@@ -221,6 +213,26 @@ public abstract class ProductContainer extends AbstractDatabaseObject implements
 	public void setShelfSlot(final ShelfSlot shelfSlot)
 	{
 		this.shelfSlot = shelfSlot;
+	}
+
+	public RemovalList getRemovalList()
+	{
+		return removalList;
+	}
+
+	public Manifest getManifest()
+	{
+		return manifest;
+	}
+
+	public void setRemovalList(final RemovalList removalList)
+	{
+		this.removalList = removalList;
+	}
+
+	public void setManifest(final Manifest manifest)
+	{
+		this.manifest = manifest;
 	}
 
 	/**

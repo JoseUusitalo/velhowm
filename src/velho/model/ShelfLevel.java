@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
+import java.util.UUID;
 
 import javax.naming.directory.InvalidAttributesException;
 
@@ -14,7 +15,7 @@ import org.apache.log4j.Logger;
  *
  * @author Jose Uusitalo
  */
-public class ShelfLevel extends AbstractDatabaseObject implements Comparable<ShelfLevel>
+public class ShelfLevel extends AbstractDatabaseObject
 {
 	/**
 	 * Apache log4j logger: System.
@@ -31,54 +32,45 @@ public class ShelfLevel extends AbstractDatabaseObject implements Comparable<She
 
 	/**
 	 * @param databaseID
+	 * @param uuid
+	 * @param parentShelf
 	 * @param shelfPosition
 	 * @param maxShelfSlots
-	 * @param shelfSlots
 	 */
-	public ShelfLevel(final int databaseID, final int shelfPosition, final int maxShelfSlots)
+	public ShelfLevel(final int databaseID, final UUID uuid, final Shelf parentShelf, final int shelfPosition, final int maxShelfSlots)
 	{
 		setDatabaseID(databaseID);
+		setUuid(uuid);
+		this.parentShelf = parentShelf;
 		this.shelfPosition = shelfPosition;
 		this.maxShelfSlots = maxShelfSlots;
 		this.shelfSlots = new TreeSet<ShelfSlot>();
 	}
 
 	/**
+	 * @param databaseID
+	 * @param parentShelf
 	 * @param shelfPosition
 	 * @param maxShelfSlots
-	 * @param shelfSlots
 	 */
-	public ShelfLevel(final int shelfPosition, final int maxShelfSlots)
+	public ShelfLevel(final int databaseID, final Shelf parentShelf, final int shelfPosition, final int maxShelfSlots)
 	{
-		this(0, shelfPosition, maxShelfSlots);
+		this(databaseID, UUID.randomUUID(), parentShelf, shelfPosition, maxShelfSlots);
 	}
 
+	/**
+	 */
 	public ShelfLevel()
 	{
 		// For Hibernate.
+		setUuid(UUID.randomUUID());
+		this.shelfSlots = new TreeSet<ShelfSlot>();
 	}
 
 	@Override
 	public String toString()
 	{
 		return parentShelf.getShelfID() + ShelfSlot.ID_SEPARATOR + shelfPosition;
-	}
-
-	@Override
-	public boolean equals(final Object o)
-	{
-		if (!(o instanceof ShelfLevel))
-			return false;
-
-		final ShelfLevel sl = (ShelfLevel) o;
-
-		return this.getDatabaseID() == sl.getDatabaseID();
-	}
-
-	@Override
-	public int compareTo(final ShelfLevel level)
-	{
-		return getDatabaseID() - level.getDatabaseID();
 	}
 
 	/**

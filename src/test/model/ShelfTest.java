@@ -4,20 +4,17 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import org.junit.After;
-import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
 import velho.controller.DatabaseController;
 import velho.model.ProductBox;
 import velho.model.Shelf;
-import velho.model.exceptions.NoDatabaseException;
-import velho.model.exceptions.NoDatabaseLinkException;
 
 /**
  * Tests for the {@link Shelf} class.
@@ -36,34 +33,36 @@ public class ShelfTest
 	private static Shelf shelf_FREE_LVL_2;
 	private static final int SHELF_FREE_LVL_2_ID = 4;
 	private static final int SHELF_FREE_LVL_2_ID_LEVELS = 2;
+
 	private static Shelf emptyShelf_1_1_to_1_2;
 	private static final int EMPTYSHELF_1_1_to_1_2_ID = 5;
+
 	private static Shelf fullShelf_LVL_1_SLTPOS_1;
 	private static final int FULLSHELF_LVL_1_SLTPOS_1_ID = 1;
 
 	private static ProductBox EMPTY_BOX;
 	private static ProductBox BOX_ID_21;
-	private static ProductBox BOX_2;
-	private static final int BOX_1_2_PRODUCT_COUNT = 2;
+	private static ProductBox BOX_ID_22;
+	private static final int BOX_ID_21_PRODUCT_COUNT = 2;
 
 	/**
-	 * Replaces the database contents with the sample data and loads the required objects from database into memory.
+	 * Loads the sample data into the database if it does not yet exist.
 	 *
 	 * @throws NoDatabaseException
 	 * @throws NoDatabaseLinkException
 	 */
 	@BeforeClass
-	public static final void initializeData() throws NoDatabaseException, NoDatabaseLinkException
+	public static final void loadSampleData() throws ParseException
 	{
 		System.out.println("------beforeclass----------");
-		DatabaseController.resetDatabase();
+		DatabaseController.loadSampleData();
 
 		fullShelf_LVL_1_SLTPOS_1 = DatabaseController.getShelfByID(FULLSHELF_LVL_1_SLTPOS_1_ID);
 		shelf_FREE_LVL_2 = DatabaseController.getShelfByID(SHELF_FREE_LVL_2_ID);
 		emptyShelf_1_1_to_1_2 = DatabaseController.getShelfByID(EMPTYSHELF_1_1_to_1_2_ID);
 		EMPTY_BOX = DatabaseController.getProductBoxByID(23);
 		BOX_ID_21 = DatabaseController.getProductBoxByID(21);
-		BOX_2 = DatabaseController.getProductBoxByID(22);
+		BOX_ID_22 = DatabaseController.getProductBoxByID(22);
 
 		System.out.println("--Start--");
 		System.out.println("Initial state");
@@ -74,42 +73,13 @@ public class ShelfTest
 	}
 
 	/**
-	 * Replaces the database contents with the sample data and loads the required objects from database into memory
-	 * after each test.
-	 *
-	 * @throws NoDatabaseException
-	 * @throws NoDatabaseLinkException
-	 */
-	@After
-	public void resetDatabase() throws NoDatabaseException, NoDatabaseLinkException
-	{
-		System.out.println("\n------after----------");
-
-		DatabaseController.resetDatabase();
-		fullShelf_LVL_1_SLTPOS_1 = DatabaseController.getShelfByID(FULLSHELF_LVL_1_SLTPOS_1_ID);
-		shelf_FREE_LVL_2 = DatabaseController.getShelfByID(SHELF_FREE_LVL_2_ID);
-		emptyShelf_1_1_to_1_2 = DatabaseController.getShelfByID(EMPTYSHELF_1_1_to_1_2_ID);
-		EMPTY_BOX = DatabaseController.getProductBoxByID(23);
-		BOX_ID_21 = DatabaseController.getProductBoxByID(21);
-		BOX_2 = DatabaseController.getProductBoxByID(22);
-
-		System.out.println("---------after-------\n");
-	}
-
-	@AfterClass
-	public static void closeSession()
-	{
-		DatabaseController.closeSession();
-	}
-
-	/**
 	 * Tests that shelf requires level count to be positive and non-zero.
 	 */
 	@Test(expected = IllegalArgumentException.class)
 	public final void testCreateInvalid_ShelfLevelCount_Negative()
 	{
 		@SuppressWarnings("unused")
-		final Shelf s = new Shelf(-1);
+		final Shelf s = new Shelf(0, -1);
 	}
 
 	/**
@@ -119,7 +89,7 @@ public class ShelfTest
 	public final void testCreateInvalid_ShelfLevelCount_Zero()
 	{
 		@SuppressWarnings("unused")
-		final Shelf s = new Shelf(0);
+		final Shelf s = new Shelf(0, 0);
 	}
 
 	/**
@@ -182,7 +152,7 @@ public class ShelfTest
 	@Test(expected = IllegalArgumentException.class)
 	public final void testAddToSlot_Large_Level() throws IllegalArgumentException
 	{
-		shelf_FREE_LVL_2.addToSlot(shelf_FREE_LVL_2.getShelfID() + "-99999-12", BOX_2);
+		shelf_FREE_LVL_2.addToSlot(shelf_FREE_LVL_2.getShelfID() + "-99999-12", BOX_ID_22);
 	}
 
 	/**
@@ -191,7 +161,7 @@ public class ShelfTest
 	@Test(expected = IllegalArgumentException.class)
 	public final void testAddToSlot_Large_Slot() throws IllegalArgumentException
 	{
-		shelf_FREE_LVL_2.addToSlot(shelf_FREE_LVL_2.getShelfID() + "-2-999999", BOX_2);
+		shelf_FREE_LVL_2.addToSlot(shelf_FREE_LVL_2.getShelfID() + "-2-999999", BOX_ID_22);
 	}
 
 	/**
@@ -301,6 +271,13 @@ public class ShelfTest
 		assertTrue(shelf_FREE_LVL_2.addToSlot(slotid, EMPTY_BOX));
 		assertEquals(oldBoxCount + 1, shelf_FREE_LVL_2.getProductBoxes().size());
 		assertEquals(oldProductCount, shelf_FREE_LVL_2.getProductCountInBoxes());
+
+		/*
+		 * Rollback.
+		 */
+
+		// TODO: Refactor removing a box. This is silly.
+		assertTrue(EMPTY_BOX.getShelfSlot().removeBox(EMPTY_BOX));
 	}
 
 	/**
@@ -337,10 +314,10 @@ public class ShelfTest
 		assertEquals(oldBoxCount + 1, shelf_FREE_LVL_2.getProductBoxes().size());
 
 		// Number of products in the shelf has increased.
-		assertEquals(oldProductCount + BOX_1_2_PRODUCT_COUNT, shelf_FREE_LVL_2.getProductCountInBoxes());
+		assertEquals(oldProductCount + BOX_ID_21_PRODUCT_COUNT, shelf_FREE_LVL_2.getProductCountInBoxes());
 
 		// -- Save to database --
-		DatabaseController.save(shelf_FREE_LVL_2);
+		DatabaseController.saveOrUpdate(shelf_FREE_LVL_2);
 
 		// Check that database has been updated.
 		shelf_FREE_LVL_2 = DatabaseController.getShelfByID(SHELF_FREE_LVL_2_ID);
@@ -358,11 +335,31 @@ public class ShelfTest
 		assertEquals(oldBoxCount + 1, shelf_FREE_LVL_2.getProductBoxes().size());
 
 		// Number of products in the shelf has increased.
-		assertEquals(oldProductCount + BOX_1_2_PRODUCT_COUNT, shelf_FREE_LVL_2.getProductCountInBoxes());
+		assertEquals(oldProductCount + BOX_ID_21_PRODUCT_COUNT, shelf_FREE_LVL_2.getProductCountInBoxes());
+
+		/*
+		 * Manual rollback.
+		 */
+		System.out.println("-- ROLLBACK --");
+		System.out.println(shelf_FREE_LVL_2);
+		System.out.println(shelf_FREE_LVL_2.getShelfSlot(slotid).getProductBoxes());
+
+		// Remove.
+		assertTrue(BOX_ID_21.getShelfSlot().removeBox(BOX_ID_21));
+
+		// Check.
+		// FIXME: Fails because the shelf has a different instance of the shelf slot object than the box has.
+		assertFalse(shelf_FREE_LVL_2.getShelfSlot(slotid).contains(BOX_ID_21));
+
+		// Save.
+		DatabaseController.saveOrUpdate(shelf_FREE_LVL_2);
+		System.out.println(shelf_FREE_LVL_2);
+		System.out.println(shelf_FREE_LVL_2.getShelfSlot(slotid).getProductBoxes());
 	}
 
 	/**
 	 * Tests that removing product boxes from shelf slots works as intended.
+	 *
 	 * @throws IllegalArgumentException
 	 */
 	@Test
@@ -373,10 +370,10 @@ public class ShelfTest
 		int oldProductCount = shelf_FREE_LVL_2.getProductCountInBoxes();
 
 		// Add a box to the shelf.
-		assertTrue(shelf_FREE_LVL_2.addToSlot(slotid, BOX_2));
+		assertTrue(shelf_FREE_LVL_2.addToSlot(slotid, BOX_ID_21));
 
 		// Save to database.
-		DatabaseController.save(shelf_FREE_LVL_2);
+		DatabaseController.saveOrUpdate(shelf_FREE_LVL_2);
 
 		// Product box is in the shelf.
 		assertTrue(shelf_FREE_LVL_2.getProductBoxes().contains(BOX_ID_21));
@@ -388,14 +385,14 @@ public class ShelfTest
 		assertEquals(oldBoxCount + 1, shelf_FREE_LVL_2.getProductBoxes().size());
 
 		// Number of products in the shelf has increased.
-		assertEquals(oldProductCount + BOX_1_2_PRODUCT_COUNT, shelf_FREE_LVL_2.getProductCountInBoxes());
+		assertEquals(oldProductCount + BOX_ID_21_PRODUCT_COUNT, shelf_FREE_LVL_2.getProductCountInBoxes());
 
 		// -- Update counts --
 		oldBoxCount = shelf_FREE_LVL_2.getProductBoxes().size();
 		oldProductCount = shelf_FREE_LVL_2.getProductCountInBoxes();
 
 		// Removal is a success.
-		assertTrue(BOX_2.getShelfSlot().removeBox(BOX_2));
+		assertTrue(BOX_ID_21.getShelfSlot().removeBox(BOX_ID_21));
 
 		// Product box is not in the shelf.
 		assertTrue(shelf_FREE_LVL_2.getProductBoxes().contains(BOX_ID_21));
@@ -407,10 +404,10 @@ public class ShelfTest
 		assertEquals(oldBoxCount - 1, shelf_FREE_LVL_2.getProductBoxes().size());
 
 		// Number of products in the shelf has decreased.
-		assertEquals(oldProductCount - BOX_1_2_PRODUCT_COUNT, shelf_FREE_LVL_2.getProductCountInBoxes());
+		assertEquals(oldProductCount - BOX_ID_21_PRODUCT_COUNT, shelf_FREE_LVL_2.getProductCountInBoxes());
 
 		// -- Save to database --
-		DatabaseController.save(shelf_FREE_LVL_2);
+		DatabaseController.saveOrUpdate(shelf_FREE_LVL_2);
 
 		// Check that database has been updated.
 		shelf_FREE_LVL_2 = DatabaseController.getShelfByID(SHELF_FREE_LVL_2_ID);
@@ -425,30 +422,11 @@ public class ShelfTest
 		assertEquals(oldBoxCount - 1, shelf_FREE_LVL_2.getProductBoxes().size());
 
 		// Number of products in the shelf has decreased.
-		assertEquals(oldProductCount - BOX_1_2_PRODUCT_COUNT, shelf_FREE_LVL_2.getProductCountInBoxes());
-	}
+		assertEquals(oldProductCount - BOX_ID_21_PRODUCT_COUNT, shelf_FREE_LVL_2.getProductCountInBoxes());
 
-	@Test
-	public final void testRemoveFromSlot_NoUpdate() throws IllegalArgumentException
-	{
-		final String slotid = shelf_FREE_LVL_2.getShelfID() + "-2-10";
-		assertTrue(shelf_FREE_LVL_2.addToSlot(slotid, BOX_2));
-		assertTrue(shelf_FREE_LVL_2.getShelfSlot(slotid).contains(BOX_2));
-
-		// FIXME: Hibernate.
-		// assertTrue(DatabaseController.getShelfByID(SHELF_FREE_LVL_2_ID,
-		// false).getShelfSlotBoxes(slotid).contains(BOX_2));
-
-		final int oldBoxCount = shelf_FREE_LVL_2.getProductBoxes().size();
-		final int oldProductCount = shelf_FREE_LVL_2.getProductCountInBoxes();
-
-		assertTrue(BOX_2.getShelfSlot().removeBox(BOX_2));
-
-		assertFalse(shelf_FREE_LVL_2.getShelfSlot(slotid).contains(BOX_2));
-		assertEquals(oldBoxCount - 1, shelf_FREE_LVL_2.getProductBoxes().size());
-		assertEquals(oldProductCount - BOX_1_2_PRODUCT_COUNT, shelf_FREE_LVL_2.getProductCountInBoxes());
-		// assertTrue(DatabaseController.getShelfByID(SHELF_FREE_LVL_2_ID,
-		// false).getShelfSlotBoxes(slotid).contains(BOX_2));
+		/*
+		 * No rollback required.
+		 */
 	}
 
 	@Test
@@ -461,6 +439,12 @@ public class ShelfTest
 
 		assertTrue(emptyShelf_1_1_to_1_2.hasFreeSpace());
 		assertFalse(emptyShelf_1_1_to_1_2.isEmpty());
+
+		/*
+		 * Rollback.
+		 */
+
+		assertTrue(BOX_ID_21.getShelfSlot().removeBox(BOX_ID_21));
 	}
 
 	@Test
@@ -479,6 +463,12 @@ public class ShelfTest
 	public final void testAddToSlot_Full() throws IllegalArgumentException
 	{
 		assertTrue(emptyShelf_1_1_to_1_2.addToSlot(emptyShelf_1_1_to_1_2.getShelfID() + "-1-1", BOX_ID_21));
-		assertFalse(emptyShelf_1_1_to_1_2.addToSlot(emptyShelf_1_1_to_1_2.getShelfID() + "-1-1", BOX_2));
+		assertFalse(emptyShelf_1_1_to_1_2.addToSlot(emptyShelf_1_1_to_1_2.getShelfID() + "-1-1", BOX_ID_22));
+
+		/*
+		 * Rollback.
+		 */
+
+		assertTrue(BOX_ID_21.getShelfSlot().removeBox(BOX_ID_21));
 	}
 }

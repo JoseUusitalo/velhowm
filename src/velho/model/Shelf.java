@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
+import java.util.UUID;
 
 import javax.naming.directory.InvalidAttributesException;
 
@@ -14,7 +15,7 @@ import org.apache.log4j.Logger;
  *
  * @author Jose Uusitalo
  */
-public class Shelf extends AbstractDatabaseObject implements Comparable<Shelf>
+public class Shelf extends AbstractDatabaseObject
 {
 	/**
 	 * Apache log4j logger: System.
@@ -38,24 +39,27 @@ public class Shelf extends AbstractDatabaseObject implements Comparable<Shelf>
 
 	/**
 	 * @param databaseID
+	 * @param uuid
 	 * @param levelCount
 	 */
-	public Shelf(final int databaseID, final int levelCount)
+	public Shelf(final int databaseID, final UUID uuid, final int levelCount)
 	{
 		if (levelCount < 1)
 			throw new IllegalArgumentException("Number of levels on a shelf must be greater than 0.");
 
 		setDatabaseID(databaseID);
+		setUuid(uuid);
 		this.levelCount = levelCount;
 		this.shelfLevels = new TreeSet<ShelfLevel>();
 	}
 
 	/**
+	 * @param databaseID
 	 * @param levelCount
 	 */
-	public Shelf(final int levelCount)
+	public Shelf(final int databaseID, final int levelCount)
 	{
-		this(0, levelCount);
+		this(databaseID, UUID.randomUUID(), levelCount);
 	}
 
 	/**
@@ -63,6 +67,7 @@ public class Shelf extends AbstractDatabaseObject implements Comparable<Shelf>
 	public Shelf()
 	{
 		// For Hibernate.
+		setUuid(UUID.randomUUID());
 	}
 
 	/**
@@ -205,7 +210,7 @@ public class Shelf extends AbstractDatabaseObject implements Comparable<Shelf>
 	 *
 	 * @param shelfSlotID shelf slot ID string to tokenize and validate
 	 * @return an array of integers where the values are: the database ID of this shelf, the index of the level, and the
-	 * index of the slot on the level
+	 *         index of the slot on the level
 	 */
 	private int[] tokenizeAndValidateShelfSlotID(final String shelfSlotID)
 	{
@@ -236,26 +241,6 @@ public class Shelf extends AbstractDatabaseObject implements Comparable<Shelf>
 	{
 		return "[" + getDatabaseID() + "] Lvls: " + levelCount + ", Boxs: " + getProductBoxes().size() + ", Slts: " + getShelfSlotCount() + ", Free: "
 				+ getFreeShelfSlots().size();
-	}
-
-	@Override
-	public boolean equals(final Object o)
-	{
-		if (!(o instanceof Shelf))
-			return false;
-
-		final Shelf s = (Shelf) o;
-
-		if (this.getDatabaseID() <= 0)
-			return this == s;
-
-		return this.getDatabaseID() == s.getDatabaseID();
-	}
-
-	@Override
-	public int compareTo(final Shelf shelf)
-	{
-		return this.getDatabaseID() - shelf.getDatabaseID();
 	}
 
 	/**
@@ -385,7 +370,7 @@ public class Shelf extends AbstractDatabaseObject implements Comparable<Shelf>
 	 * @param shelfSlotID ID of the shelf slot
 	 * @param productBox box to add
 	 * @return <code>true</code> if box was added to the slot, <code>false</code> the slot did not have enough free
-	 * space
+	 *         space
 	 * @throws IllegalArgumentException if the slot ID is not in this shelf or the given box was <code>null</code>
 	 */
 	public boolean addToSlot(final String shelfSlotID, final ProductBox productBox) throws IllegalArgumentException

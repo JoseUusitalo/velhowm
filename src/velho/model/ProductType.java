@@ -1,11 +1,13 @@
 package velho.model;
 
+import java.util.UUID;
+
 /**
  * A class representing the type of the product.
  *
  * @author Jose Uusitalo
  */
-public class ProductType extends AbstractDatabaseObject implements Comparable<ProductType>
+public class ProductType extends AbstractDatabaseObject
 {
 	/**
 	 * The product category name.
@@ -16,10 +18,20 @@ public class ProductType extends AbstractDatabaseObject implements Comparable<Pr
 	 * @param databaseID
 	 * @param name
 	 */
-	public ProductType(final int databaseID, final String name)
+	public ProductType(final int databaseID, final UUID uuid, final String name)
 	{
 		setDatabaseID(databaseID);
+		setUuid(uuid);
 		this.name = name;
+	}
+
+	/**
+	 * @param databaseID
+	 * @param name
+	 */
+	public ProductType(final int databaseID, final String name)
+	{
+		this(databaseID, UUID.randomUUID(), name);
 	}
 
 	/**
@@ -35,26 +47,16 @@ public class ProductType extends AbstractDatabaseObject implements Comparable<Pr
 	public ProductType()
 	{
 		// For Hibernate.
+		setUuid(UUID.randomUUID());
 	}
 
 	@Override
-	public boolean equals(final Object o)
+	public int compareTo(final AbstractDatabaseObject type)
 	{
-		if (!(o instanceof ProductType))
-			return false;
+		if (type instanceof ProductType)
+			return this.getName().compareTo(((ProductType) type).getName());
 
-		final ProductType pt = (ProductType) o;
-
-		if (this.getDatabaseID() <= 0)
-			return this == pt;
-
-		return this.getDatabaseID() == pt.getDatabaseID();
-	}
-
-	@Override
-	public int compareTo(final ProductType type)
-	{
-		return this.getName().compareTo(type.getName());
+		return super.compareTo(type);
 	}
 
 	/**

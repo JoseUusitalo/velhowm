@@ -196,7 +196,7 @@ public class RemovalListController implements UIActionController
 		{
 			SYSLOG.info("Saving Removal List: " + newRemovalList.getBoxes());
 
-			if (DatabaseController.save(newRemovalList) > 0)
+			if (DatabaseController.saveOrUpdate(newRemovalList) > 0)
 			{
 				DatabaseController.clearSearchResults();
 
@@ -245,7 +245,7 @@ public class RemovalListController implements UIActionController
 	{
 		removalList.setState(state);
 
-		if (DatabaseController.save(removalList) < 0)
+		if (DatabaseController.saveOrUpdate(removalList) < 0)
 			PopupController.error("Unable to save removal list state.");
 	}
 

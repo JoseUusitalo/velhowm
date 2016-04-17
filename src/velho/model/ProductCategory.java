@@ -1,11 +1,13 @@
 package velho.model;
 
+import java.util.UUID;
+
 /**
  * A class describing the category of a {@link Product}.
  *
  * @author Joona Silvennoinen &amp; Jose Uusitalo
  */
-public class ProductCategory extends AbstractDatabaseObject implements Comparable<ProductCategory>
+public class ProductCategory extends AbstractDatabaseObject
 {
 	/**
 	 * The product category name.
@@ -19,14 +21,26 @@ public class ProductCategory extends AbstractDatabaseObject implements Comparabl
 
 	/**
 	 * @param databaseID
+	 * @param uuid
+	 * @param name
+	 * @param type
+	 */
+	public ProductCategory(final int databaseID, final UUID uuid, final String name, final ProductType type)
+	{
+		setDatabaseID(databaseID);
+		setUuid(uuid);
+		this.type = type;
+		this.name = name;
+	}
+
+	/**
+	 * @param databaseID
 	 * @param name
 	 * @param type
 	 */
 	public ProductCategory(final int databaseID, final String name, final ProductType type)
 	{
-		setDatabaseID(databaseID);
-		this.type = type;
-		this.name = name;
+		this(databaseID, UUID.randomUUID(), name, type);
 	}
 
 	/**
@@ -43,7 +57,7 @@ public class ProductCategory extends AbstractDatabaseObject implements Comparabl
 	 */
 	public ProductCategory(final String name)
 	{
-		this(0, name, null);
+		this(0, UUID.randomUUID(), name, null);
 	}
 
 	/**
@@ -51,6 +65,7 @@ public class ProductCategory extends AbstractDatabaseObject implements Comparabl
 	public ProductCategory()
 	{
 		// For Hibernate.
+		setUuid(UUID.randomUUID());
 	}
 
 	/**
@@ -63,23 +78,12 @@ public class ProductCategory extends AbstractDatabaseObject implements Comparabl
 	}
 
 	@Override
-	public boolean equals(final Object o)
+	public int compareTo(final AbstractDatabaseObject category)
 	{
-		if (!(o instanceof ProductCategory))
-			return false;
+		if (category instanceof ProductCategory)
+			return this.getName().compareTo(((ProductCategory) category).getName());
 
-		final ProductCategory pc = (ProductCategory) o;
-
-		if (this.getDatabaseID() <= 0)
-			return this == pc;
-
-		return this.getDatabaseID() == pc.getDatabaseID();
-	}
-
-	@Override
-	public int compareTo(final ProductCategory category)
-	{
-		return this.getName().compareTo(category.getName());
+		return super.compareTo(category);
 	}
 
 	/**

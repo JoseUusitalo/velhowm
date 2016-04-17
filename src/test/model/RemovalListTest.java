@@ -5,12 +5,14 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertTrue;
 
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 import javafx.collections.ObservableList;
@@ -30,6 +32,17 @@ public class RemovalListTest
 	private static RemovalList newlist = new RemovalList();
 	private static RemovalList existingRemovalList = DatabaseController.getRemovalListByID(1);
 	private static ProductBox box1 = DatabaseController.getProductBoxByID(1);
+
+	/**
+	 * Loads the sample data into the database if it does not yet exist.
+	 *
+	 * @throws ParseException
+	 */
+	@BeforeClass
+	public static final void loadSampleData() throws ParseException
+	{
+		DatabaseController.loadSampleData();
+	}
 
 	@Test
 	public final void testToString()
@@ -76,7 +89,7 @@ public class RemovalListTest
 		assertEquals(newState, existingRemovalList.getState());
 
 		// Save.
-		final int saveID = DatabaseController.save(existingRemovalList);
+		final int saveID = DatabaseController.saveOrUpdate(existingRemovalList);
 		assertTrue(saveID > 0);
 
 		// Check that that the object was updated, not inserted.
@@ -87,7 +100,7 @@ public class RemovalListTest
 
 		// TODO: Figure out a better way to roll back changes.
 		existingRemovalList.setState(oldState);
-		DatabaseController.save(existingRemovalList);
+		DatabaseController.saveOrUpdate(existingRemovalList);
 	}
 
 	@Test
@@ -106,7 +119,7 @@ public class RemovalListTest
 
 		// Rollback.
 		assertTrue(existingRemovalList.setBoxes(boxes));
-		DatabaseController.save(existingRemovalList);
+		DatabaseController.saveOrUpdate(existingRemovalList);
 	}
 
 	@Test
@@ -131,7 +144,7 @@ public class RemovalListTest
 		assertFalse(existingRemovalList.getBoxes().contains(first));
 
 		// Save.
-		final int saveID = DatabaseController.save(existingRemovalList);
+		final int saveID = DatabaseController.saveOrUpdate(existingRemovalList);
 		assertTrue(saveID > 0);
 
 		// Database was updated.
@@ -140,7 +153,7 @@ public class RemovalListTest
 		// TODO: Figure out a better way to roll back changes.
 		assertTrue(existingRemovalList.addProductBox(first));
 		assertTrue(existingRemovalList.getBoxes().contains(first));
-		DatabaseController.save(existingRemovalList);
+		DatabaseController.saveOrUpdate(existingRemovalList);
 	}
 
 	@Test
@@ -194,6 +207,6 @@ public class RemovalListTest
 		// Roll back.
 		existingRemovalList.setState(oldState);
 		assertTrue(existingRemovalList.setBoxes(boxes));
-		DatabaseController.save(existingRemovalList);
+		DatabaseController.saveOrUpdate(existingRemovalList);
 	}
 }

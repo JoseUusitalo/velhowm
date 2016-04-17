@@ -1,5 +1,6 @@
 package velho.view;
 
+import java.text.ParseException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -7,6 +8,7 @@ import org.apache.log4j.AppenderSkeleton;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
+import org.hibernate.HibernateException;
 
 import javafx.application.Application;
 import javafx.beans.property.ReadOnlyDoubleProperty;
@@ -43,9 +45,7 @@ import velho.controller.SearchController;
 import velho.controller.UIController;
 import velho.controller.UserController;
 import velho.model.exceptions.ExistingDatabaseLinkException;
-import velho.model.exceptions.NoDatabaseException;
 import velho.model.exceptions.NoDatabaseLinkException;
-import velho.model.exceptions.UniqueKeyViolationException;
 
 /**
  * The main window and class for Velho Warehouse Management.
@@ -204,10 +204,9 @@ public class MainWindow extends Application
 		try
 		{
 			DatabaseController.link();
-			DatabaseController.openSession();
 			DatabaseController.loadSampleData();
 		}
-		catch (ClassNotFoundException | ExistingDatabaseLinkException | NoDatabaseException | NoDatabaseLinkException | UniqueKeyViolationException e)
+		catch (ClassNotFoundException | HibernateException | ParseException e)
 		{
 			e.printStackTrace();
 		}
@@ -274,14 +273,7 @@ public class MainWindow extends Application
 
 		try
 		{
-			try
-			{
-				DatabaseController.link();
-			}
-			catch (ExistingDatabaseLinkException e)
-			{
-				// Ignore.
-			}
+			DatabaseController.link();
 
 			if (DatabaseController.isLinked())
 			{
@@ -513,7 +505,6 @@ public class MainWindow extends Application
 				debugStage.close();
 		}
 
-		DatabaseController.closeSession();
 		DatabaseController.closeSessionFactory();
 
 		try

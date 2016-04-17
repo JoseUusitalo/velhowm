@@ -11,7 +11,13 @@
 			type="int">
 			<generator class="native" />
 		</id>
-
+		
+		<property	name="uuid"
+					column="uuid"
+					type="java.util.UUID"
+					unique="true"
+					not-null="true" />
+		
 		<!-- No cascade solves an exception. -->
 		<!-- Many-to-one: This object can have one referenced object, the referenced object can be referenced from many objects.
 			 Cascade changes.
