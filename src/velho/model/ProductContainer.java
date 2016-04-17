@@ -78,7 +78,7 @@ public abstract class ProductContainer extends AbstractDatabaseObject implements
 	 */
 	public ProductContainer()
 	{
-		// For Hibernate.
+		setUuid(UUID.randomUUID());
 	}
 
 	@Override

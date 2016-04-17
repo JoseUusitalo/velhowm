@@ -79,6 +79,7 @@ public class ProductBox extends ProductContainer
 	 */
 	public ProductBox()
 	{
+		super();
 		// For Hibernate.
 	}
 
