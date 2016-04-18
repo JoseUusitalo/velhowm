@@ -65,6 +65,8 @@ public class ExternalSystemsControllerTest
 	@Test
 	public final void testMoveFull()
 	{
+		// TODO: Fails because the shelf slot reference in the box is a different instance from the shelf slot in the
+		// shelf.
 		assertTrue(ExternalSystemsController.move(BOX_DBID_1, DatabaseController.getShelfByID(1).getShelfSlot("S1-1-1"), false));
 	}
 

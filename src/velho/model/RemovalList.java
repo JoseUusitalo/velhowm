@@ -4,8 +4,11 @@ import java.util.LinkedHashSet;
 import java.util.Set;
 import java.util.UUID;
 
+import org.apache.log4j.Logger;
+
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import velho.controller.DatabaseController;
 
 /**
  * A list of product boxes to be thrown away.
@@ -14,6 +17,11 @@ import javafx.collections.ObservableList;
  */
 public class RemovalList extends AbstractDatabaseObject
 {
+	/**
+	 * Apache log4j logger: System.
+	 */
+	private static final Logger SYSLOG = Logger.getLogger(RemovalList.class.getName());
+
 	/**
 	 * The set of {@link ProductBox} objects.
 	 */
@@ -161,8 +169,12 @@ public class RemovalList extends AbstractDatabaseObject
 		if (boxes.add(productBox))
 		{
 			productBox.setRemovalList(this);
+			SYSLOG.trace(productBox + " added to removal list " + this);
+
 			return observableBoxes.add(new ProductBoxSearchResultRow(productBox));
 		}
+
+		SYSLOG.error("Failed to add " + productBox + " to removal list " + this);
 
 		return false;
 	}
@@ -177,16 +189,23 @@ public class RemovalList extends AbstractDatabaseObject
 	{
 		if (boxes.remove(productBox))
 		{
+			SYSLOG.trace(productBox + " removed from removal list " + this);
+
 			productBox.setRemovalList(null);
 
 			for (final Object row : observableBoxes)
 			{
 				if (((ProductBoxSearchResultRow) row).getBox().equals(productBox))
 				{
+					SYSLOG.trace("Observable list updated");
 					return observableBoxes.remove(row);
 				}
 			}
+
+			SYSLOG.warn(productBox + " was not in the observable list!");
 		}
+
+		SYSLOG.error("Failed to remove " + productBox + " from removal list " + this);
 
 		return false;
 	}
@@ -196,7 +215,7 @@ public class RemovalList extends AbstractDatabaseObject
 	 */
 	public void reset()
 	{
-		state = new RemovalListState(1, "Active");
+		state = DatabaseController.getRemovalListStateByID(1);
 		boxes.clear();
 		observableBoxes.clear();
 	}

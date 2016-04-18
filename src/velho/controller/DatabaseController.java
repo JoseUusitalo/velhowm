@@ -1849,6 +1849,8 @@ public class DatabaseController
 		catch (final HibernateException e)
 		{
 			sessionFactory.getCurrentSession().getTransaction().rollback();
+
+			throw e;
 		}
 
 		// TODO: Figure out some way to return a boolean.
@@ -1895,23 +1897,32 @@ public class DatabaseController
 	 */
 	public static int saveOrUpdate(final DatabaseObject object)
 	{
-		sessionFactory.getCurrentSession().beginTransaction();
-
-		sessionFactory.getCurrentSession().saveOrUpdate(object);
-		sessionFactory.getCurrentSession().flush();
-
 		try
 		{
+			sessionFactory.getCurrentSession().beginTransaction();
+
+			if (object.getDatabaseID() < 1)
+			{
+				DBLOG.debug("Saving: " + object);
+				sessionFactory.getCurrentSession().save(object);
+			}
+			else
+			{
+				DBLOG.debug("Updating: " + object);
+				sessionFactory.getCurrentSession().update(object);
+			}
+
+			sessionFactory.getCurrentSession().flush();
+			sessionFactory.getCurrentSession().clear();
+
 			sessionFactory.getCurrentSession().getTransaction().commit();
 		}
-		catch (final HibernateException e)
+		catch (final Exception e)
 		{
 			sessionFactory.getCurrentSession().getTransaction().rollback();
 
-			throw new HibernateException("Failed to commit.");
+			throw e;
 		}
-
-		DBLOG.debug("Saved/Updated: " + object);
 
 		// TODO: Update observable lists.
 

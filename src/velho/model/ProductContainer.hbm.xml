@@ -11,13 +11,13 @@
 			type="int">
 			<generator class="native" />
 		</id>
-		
+
 		<property	name="uuid"
 					column="uuid"
 					type="java.util.UUID"
 					unique="true"
 					not-null="true" />
-		
+
 		<property	name="expirationDate"
 					column="expiration_date"
 					type="date" />
@@ -44,17 +44,16 @@
 			<column	name="manifest"
 					not-null="false" />
 		</many-to-one>
-		
+
 		<!-- Bidirectional relationship, child side.
 			 "Select" eager fetching: load the referenced object when this object is loaded. -->
 		<many-to-one	name="removalList"
 						class="velho.model.RemovalList"
 						fetch="select"
-						lazy="false">
-			<column	name="removallist"
-					not-null="false" />
-		</many-to-one>
-		
+						lazy="false"
+						column="removallist"
+						not-null="false" />
+
 		<!-- Bidirectional relationship, child side.
 			 "Select" eager fetching: load the referenced object when this object is loaded. -->
 		<many-to-one	name="shelfSlot"
