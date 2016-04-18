@@ -125,6 +125,9 @@ public class DatabaseControllerTest
 		assertEquals(null, DatabaseController.getUserByID(-128));
 	}
 
+	/**
+	 * Tests that a non-existent user cannot be deleted.
+	 */
 	@Test(expected = HibernateException.class)
 	public final void testDelete_Invalid()
 	{
@@ -234,7 +237,7 @@ public class DatabaseControllerTest
 	@Test
 	public final void testgetProductIDFromName_Invalid()
 	{
-		assertEquals(-1, DatabaseController.getProductByName("just some random text here not a product name"));
+		assertEquals(null, DatabaseController.getProductByName("just some random text here not a product name"));
 	}
 
 	@Test
