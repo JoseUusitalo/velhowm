@@ -105,23 +105,49 @@ public class ShelfSlot extends AbstractDatabaseObject
 		return super.compareTo(slot);
 	}
 
+	/**
+	 * Gets the position (greater than 1) of this shelf slot in the parent {@link ShelfLevel}.
+	 *
+	 * @return the position of this shelf slot in the parent shelf level
+	 */
 	public int getLevelPosition()
 	{
 		return levelPosition;
 	}
 
+	/**
+	 * Sets the position of this shelf slot in the parent {@link ShelfLevel}.
+	 *
+	 * @param levelPosition the new position in the parent level in the range [1, {@link Integer#MAX_VALUE}]
+	 */
 	public void setLevelPosition(final int levelPosition)
 	{
+		if (levelPosition < 1)
+			throw new IllegalArgumentException("Shelf slot position was less than 1.");
+
 		this.levelPosition = levelPosition;
 	}
 
+	/**
+	 * Gets the maximum number of product boxes in this shelf slot.
+	 *
+	 * @return the maximum product boxes this slot can hold
+	 */
 	public int getMaxProductBoxes()
 	{
 		return maxProductBoxes;
 	}
 
+	/**
+	 * Sets the maximum number of {@link ProductBox} objects this shelf slot can hold.
+	 *
+	 * @param maxProductBoxes the new maximum number of product boxes (greater than or equal to 0)
+	 */
 	public void setMaxProductBoxes(final int maxProductBoxes)
 	{
+		if (maxProductBoxes < 0)
+			throw new IllegalArgumentException("Maximum product boxes was less than 0.");
+
 		this.maxProductBoxes = maxProductBoxes;
 	}
 
@@ -136,14 +162,32 @@ public class ShelfSlot extends AbstractDatabaseObject
 		return parentShelfLevel.getParentShelf().getShelfID() + ID_SEPARATOR + parentShelfLevel.getShelfPosition() + ID_SEPARATOR + levelPosition;
 	}
 
+	/**
+	 * Gets the set of {@link ProductBox} objects on this shelf slot.
+	 *
+	 * @return the set of product boxes in this slot
+	 */
 	public Set<ProductBox> getProductBoxes()
 	{
 		return productBoxes;
 	}
 
+	/**
+	 * Sets the set of {@link ProductBox} objects in this shelf slot.
+	 *
+	 * @param productBoxes the new set of product boxes, <code>null</code> to clear
+	 */
 	public void setProductBoxes(final Set<ProductBox> productBoxes)
 	{
-		this.productBoxes = productBoxes;
+		if (productBoxes == null)
+		{
+			for (final ProductBox b : this.productBoxes)
+				b.setShelfSlot(null);
+
+			this.productBoxes.clear();
+		}
+		else
+			this.productBoxes = productBoxes;
 	}
 
 	/**
@@ -219,19 +263,38 @@ public class ShelfSlot extends AbstractDatabaseObject
 		return false;
 	}
 
+	/**
+	 * Checks if this shelf slot contains the given {@link ProductBox} object.
+	 *
+	 * @param box product box to check
+	 * @return <code>true</code> if the product box is in this shelf slot
+	 */
 	public boolean contains(final ProductBox box)
 	{
 		System.out.println("BOXES IN " + this + ": " + productBoxes);
 		return productBoxes.contains(box);
 	}
 
+	/**
+	 * Gets the parent {@link ShelfLevel} object this shelf slot is in.
+	 *
+	 * @return the parent shelf level
+	 */
 	public ShelfLevel getParentShelfLevel()
 	{
 		return parentShelfLevel;
 	}
 
+	/**
+	 * Sets the parent {@link ShelfLevel} object for this shelf slot.
+	 *
+	 * @param parentShelfLevel the new parent shelf level
+	 */
 	public void setParentShelfLevel(final ShelfLevel parentShelfLevel)
 	{
+		if (parentShelfLevel == null)
+			this.parentShelfLevel.removeSlot(this);
+
 		this.parentShelfLevel = parentShelfLevel;
 	}
 }

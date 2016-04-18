@@ -210,7 +210,7 @@ public class Shelf extends AbstractDatabaseObject
 	 *
 	 * @param shelfSlotID shelf slot ID string to tokenize and validate
 	 * @return an array of integers where the values are: the database ID of this shelf, the index of the level, and the
-	 *         index of the slot on the level
+	 * index of the slot on the level
 	 */
 	private int[] tokenizeAndValidateShelfSlotID(final String shelfSlotID)
 	{
@@ -274,11 +274,21 @@ public class Shelf extends AbstractDatabaseObject
 		this.levelCount = levels;
 	}
 
+	/**
+	 * Gets all {@link ShelfLevel} objects in this shelf.
+	 *
+	 * @return a set of all shelf levels
+	 */
 	public Set<ShelfLevel> getShelfLevels()
 	{
 		return shelfLevels;
 	}
 
+	/**
+	 * Assign a new set of {@link ShelfLevel} objects to this shelf.
+	 *
+	 * @param shelfLevels the set of shelf levels
+	 */
 	public void setShelfLevels(final Set<ShelfLevel> shelfLevels)
 	{
 		this.shelfLevels = shelfLevels;
@@ -370,7 +380,7 @@ public class Shelf extends AbstractDatabaseObject
 	 * @param shelfSlotID ID of the shelf slot
 	 * @param productBox box to add
 	 * @return <code>true</code> if box was added to the slot, <code>false</code> the slot did not have enough free
-	 *         space
+	 * space
 	 * @throws IllegalArgumentException if the slot ID is not in this shelf or the given box was <code>null</code>
 	 */
 	public boolean addToSlot(final String shelfSlotID, final ProductBox productBox) throws IllegalArgumentException
@@ -399,6 +409,12 @@ public class Shelf extends AbstractDatabaseObject
 		return false;
 	}
 
+	/**
+	 * Gets the {@link ShelfLevel} object according to its position in this shelf from the bottom starting at 1.
+	 *
+	 * @param shelfPosition the shelf position integer
+	 * @return the corresponding shelf level object
+	 */
 	public ShelfLevel getShelfLevel(final int shelfPosition)
 	{
 		for (final ShelfLevel level : shelfLevels)
@@ -410,6 +426,12 @@ public class Shelf extends AbstractDatabaseObject
 		return null;
 	}
 
+	/**
+	 * Gets the {@link ShelfSlot} object according to its {@link ShelfSlot#getSlotID()}.
+	 *
+	 * @param shelfSlotID the shelf slot ID string
+	 * @return the corresponding shelf slot object
+	 */
 	public ShelfSlot getShelfSlot(final String shelfSlotID)
 	{
 		final int[] tokens = tokenizeAndValidateShelfSlotID(shelfSlotID);
@@ -425,5 +447,15 @@ public class Shelf extends AbstractDatabaseObject
 		}
 
 		return null;
+	}
+
+	/**
+	 * Removes the given {@link ShelfLevel} from this shelf.
+	 *
+	 * @param shelfLevel the shelf level to remove
+	 */
+	public void removeLevel(final ShelfLevel shelfLevel)
+	{
+		shelfLevels.remove(shelfLevel);
 	}
 }
