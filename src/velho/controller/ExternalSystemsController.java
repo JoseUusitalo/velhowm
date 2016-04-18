@@ -14,10 +14,10 @@ import velho.model.Printer;
 import velho.model.ProductBox;
 import velho.model.ProductBoxSearchResultRow;
 import velho.model.Shelf;
-import velho.model.exceptions.NoDatabaseLinkException;
+import velho.model.ShelfSlot;
 
 /**
- * Controller handling the communication with systems outside the Velho Warehouse Management.
+ * Controller handling the communication with systems outside the VELHO Warehouse Management.
  *
  * @author Edward Puustinen &amp; Jose Uusitalo
  */
@@ -127,15 +127,12 @@ public class ExternalSystemsController
 	 * Moves the specified box to the given shelf.
 	 *
 	 * @param productBoxCode the database ID of the box to move
-	 * @param newShelfSlotID the ID of the shelf slot to move the box to
+	 * @param newShelfSlot the shelf slot to move the box to
 	 * @param showPopup show popup messages about failure/success?
 	 * @return <code>true</code> if the box was moved successfully
 	 */
-	public static boolean move(final int productBoxCode, final String newShelfSlotID, final boolean showPopup)
+	public static boolean move(final int productBoxCode, final ShelfSlot newShelfSlot, final boolean showPopup)
 	{
-		final String newShelfIDString = (String) Shelf.tokenizeShelfSlotID(newShelfSlotID)[0];
-		final int newShelfID = Integer.parseInt(newShelfIDString.substring(1));
-
 		String oldShelfIDString = null;
 		int oldShelfID = -1;
 		Shelf oldShelf = null;
@@ -143,57 +140,49 @@ public class ExternalSystemsController
 		ProductBox boxToMove = null;
 		final boolean success = true;
 
-		try
+		newShelf = newShelfSlot.getParentShelfLevel().getParentShelf();
+		boxToMove = DatabaseController.getProductBoxByID(productBoxCode);
+
+		SYSLOG.debug("Moving box: " + boxToMove);
+		SYSLOG.debug("To shelf: " + newShelf);
+
+		if (boxToMove == null)
 		{
-			newShelf = DatabaseController.getShelfByID(newShelfID, true);
-			boxToMove = DatabaseController.getProductBoxByID(productBoxCode);
-
-			SYSLOG.debug("Moving box: " + boxToMove);
-			SYSLOG.debug("To shelf: " + newShelfID);
-
-			if (boxToMove == null)
-			{
-				return false;
-			}
-
-			if (newShelf == null)
-			{
-				return false;
-			}
-
-			oldShelfIDString = (String) Shelf.tokenizeShelfSlotID(boxToMove.getShelfSlot())[0];
-			oldShelfID = Integer.parseInt(oldShelfIDString.substring(1));
-			oldShelf = DatabaseController.getShelfByID(oldShelfID, true);
-
-			SYSLOG.debug("From shelf: " + oldShelf);
-
-			if (oldShelf == null)
-			{
-				return false;
-			}
-
-			if (oldShelf.removeFromSlot(boxToMove) == false)
-			{
-				return false;
-			}
-			if (newShelf.addToSlot(newShelfSlotID, boxToMove) == false)
-			{
-				return false;
-			}
+			return false;
 		}
-		catch (final NoDatabaseLinkException e)
-		{
-			DatabaseController.tryReLink();
 
+		if (newShelf == null)
+		{
+			return false;
+		}
+
+		oldShelfIDString = (String) Shelf.tokenizeShelfSlotID(boxToMove.getShelfSlot().getSlotID())[0];
+		oldShelfID = Integer.parseInt(oldShelfIDString.substring(1));
+		oldShelf = DatabaseController.getShelfByID(oldShelfID);
+
+		SYSLOG.debug("From shelf: " + oldShelf);
+
+		if (oldShelf == null)
+		{
+			return false;
+		}
+
+		if (boxToMove.getShelfSlot().removeBox(boxToMove) == false)
+		{
+			return false;
+		}
+		if (newShelf.addToSlot(newShelfSlot.getSlotID(), boxToMove) == false)
+		{
+			return false;
 		}
 
 		if (showPopup)
 		{
 			if (success)
-				PopupController.info(productBoxCode + " was moved to " + newShelfSlotID + ".");
+				PopupController.info(productBoxCode + " was moved to " + newShelfSlot + ".");
 			else
-				PopupController.error(
-						productBoxCode + " was not moved to " + newShelfSlotID + ". Either the product box or the shelf does not exist in the database!");
+				PopupController
+						.error(productBoxCode + " was not moved to " + newShelfSlot + ". Either the product box or the shelf does not exist in the database!");
 		}
 
 		return success;
@@ -208,7 +197,21 @@ public class ExternalSystemsController
 	 */
 	public static void receiveManifestBarcode(final Set<ProductBox> boxSet, final Date orderDate, final int driverID)
 	{
-		SYSLOG.info("VelhoWM has received a manifest by driver " + driverID + " with " + boxSet.size() + " product boxes.");
+		SYSLOG.info("VELHOWM has received a manifest by driver " + driverID + " with " + boxSet.size() + " product boxes.");
 		manifestController.receiveShipment(boxSet, orderDate, driverID);
+	}
+
+	/**
+	 * Receives a badge ID from the badge scanner.
+	 *
+	 * @param badgeID badge identification string
+	 * @return
+	 */
+	public static void receiveBadgeID(final String badgeID)
+	{
+		// TODO: Observer model.
+
+		SYSLOG.info("VELHOWM has received an RFID badge ID: " + badgeID);
+		LoginController.login(badgeID);
 	}
 }

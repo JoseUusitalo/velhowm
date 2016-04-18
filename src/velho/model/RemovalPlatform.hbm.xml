@@ -11,7 +11,13 @@
 			type="int">
 			<generator class="native" />
 		</id>
-
+		
+		<property	name="uuid"
+					column="uuid"
+					type="java.util.UUID"
+					unique="true"
+					not-null="true" />
+		
 		<property	name="freeSpacePercent"
 					type="double">
 			<column name="free_space"

@@ -1,6 +1,7 @@
 package velho.model;
 
 import java.util.Date;
+import java.util.UUID;
 
 /**
  * The freezer class.
@@ -16,9 +17,9 @@ public class Freezer extends ProductContainer
 	 * @param product
 	 * @param productCount
 	 */
-	public Freezer(final int freezerID, final Date expirationDate, final int maxSize, final Product product, final int productCount)
+	public Freezer(final int freezerID, final UUID uuid, final Date expirationDate, final int maxSize, final Product product, final int productCount)
 	{
-		super(freezerID, expirationDate, maxSize, product, productCount);
+		super(freezerID, uuid, null, null, null, product, maxSize, productCount, expirationDate);
 
 		if (this.getBoxType().getName() == "Regular")
 		{
@@ -26,9 +27,14 @@ public class Freezer extends ProductContainer
 		}
 	}
 
+	public Freezer(final int databaseID, final Date expirationDate, final int maxSize, final Product product, final int productCount)
+	{
+		this(databaseID, UUID.randomUUID(), expirationDate, maxSize, product, productCount);
+	}
+
 	@Override
 	public String toString()
 	{
-		return "[" + this.databaseID + "] Freezer: " + this.product.getName() + " (" + this.productCount + ")";
+		return "[" + getDatabaseID() + "] Freezer: " + this.product.getName() + " (" + this.productCount + ")";
 	}
 }

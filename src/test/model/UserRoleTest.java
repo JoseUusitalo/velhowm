@@ -3,8 +3,12 @@ package test.model;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
+import java.text.ParseException;
+
+import org.junit.BeforeClass;
 import org.junit.Test;
 
+import velho.controller.DatabaseController;
 import velho.model.enums.UserRole;
 
 /**
@@ -18,6 +22,17 @@ public class UserRoleTest
 	private final UserRole manager = UserRole.MANAGER;
 	private final UserRole logistician = UserRole.LOGISTICIAN;
 	private final UserRole guest = UserRole.GUEST;
+
+	/**
+	 * Loads the sample data into the database if it does not yet exist.
+	 *
+	 * @throws ParseException
+	 */
+	@BeforeClass
+	public static final void loadSampleData() throws ParseException
+	{
+		DatabaseController.loadSampleData();
+	}
 
 	@Test
 	public final void testGetName()

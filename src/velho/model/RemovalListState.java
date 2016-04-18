@@ -1,17 +1,14 @@
 package velho.model;
 
+import java.util.UUID;
+
 /**
  * A state of a {@link RemovalList}.
  *
  * @author Jose Uusitalo
  */
-public class RemovalListState implements Comparable<RemovalListState>
+public class RemovalListState extends AbstractDatabaseObject
 {
-	/**
-	 * The database ID.
-	 */
-	private int databaseID;
-
 	/**
 	 * The name of this state.
 	 */
@@ -19,12 +16,23 @@ public class RemovalListState implements Comparable<RemovalListState>
 
 	/**
 	 * @param databaseID
+	 * @param uuid
+	 * @param name
+	 */
+	public RemovalListState(final int databaseID, final UUID uuid, final String name)
+	{
+		setDatabaseID(databaseID);
+		setUuid(uuid);
+		this.name = name;
+	}
+
+	/**
+	 * @param databaseID
 	 * @param name
 	 */
 	public RemovalListState(final int databaseID, final String name)
 	{
-		this.databaseID = databaseID;
-		this.name = name;
+		this(databaseID, UUID.randomUUID(), name);
 	}
 
 	/**
@@ -32,52 +40,13 @@ public class RemovalListState implements Comparable<RemovalListState>
 	public RemovalListState()
 	{
 		// For Hibernate.
+		setUuid(UUID.randomUUID());
 	}
 
 	@Override
 	public String toString()
 	{
 		return name;
-	}
-
-	@Override
-	public boolean equals(final Object o)
-	{
-		if (!(o instanceof RemovalListState))
-			return false;
-
-		final RemovalListState rls = (RemovalListState) o;
-
-		if (this.getDatabaseID() <= 0)
-			return this == rls;
-
-		return this.getDatabaseID() == rls.getDatabaseID();
-	}
-
-	@Override
-	public int compareTo(final RemovalListState state)
-	{
-		return this.getDatabaseID() - state.getDatabaseID();
-	}
-
-	/**
-	 * Gets the database ID of this removal list state.
-	 *
-	 * @return the database ID of this removal list state
-	 */
-	public int getDatabaseID()
-	{
-		return databaseID;
-	}
-
-	/**
-	 * Sets the database ID of this removal list state.
-	 *
-	 * @param databaseID the new database ID for this removal list state
-	 */
-	public void setDatabaseID(final int id)
-	{
-		databaseID = id;
 	}
 
 	/**
