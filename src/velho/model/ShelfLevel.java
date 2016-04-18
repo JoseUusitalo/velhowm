@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
+import java.util.UUID;
 
 import javax.naming.directory.InvalidAttributesException;
 
@@ -14,7 +15,7 @@ import org.apache.log4j.Logger;
  *
  * @author Jose Uusitalo
  */
-public class ShelfLevel implements Comparable<ShelfLevel>
+public class ShelfLevel extends AbstractDatabaseObject
 {
 	/**
 	 * Apache log4j logger: System.
@@ -22,45 +23,60 @@ public class ShelfLevel implements Comparable<ShelfLevel>
 	private static final Logger SYSLOG = Logger.getLogger(ShelfLevel.class.getName());
 
 	/**
-	 * The database ID of this {@link Shelf} level.
+	 * The position of this shelf level in its parent shelf from bottom. (Minimum value is 1.)
 	 */
-	private int databaseID;
-
 	private int shelfPosition;
 
+	/**
+	 * The maximum number of {@link ShelfSlot} objects this shelf level can have.
+	 */
 	private int maxShelfSlots;
 
+	/**
+	 * The set of {@link ShelfSlot} objects in this shelf level.
+	 */
 	private Set<ShelfSlot> shelfSlots;
 
+	/**
+	 * The parent {@link Shelf} objects that this shelf level is a part of.
+	 */
 	private Shelf parentShelf;
 
 	/**
 	 * @param databaseID
+	 * @param uuid
+	 * @param parentShelf
 	 * @param shelfPosition
 	 * @param maxShelfSlots
-	 * @param shelfSlots
 	 */
-	public ShelfLevel(final int databaseID, final int shelfPosition, final int maxShelfSlots)
+	public ShelfLevel(final int databaseID, final UUID uuid, final Shelf parentShelf, final int shelfPosition, final int maxShelfSlots)
 	{
-		this.databaseID = databaseID;
+		setDatabaseID(databaseID);
+		setUuid(uuid);
+		this.parentShelf = parentShelf;
 		this.shelfPosition = shelfPosition;
 		this.maxShelfSlots = maxShelfSlots;
 		this.shelfSlots = new TreeSet<ShelfSlot>();
 	}
 
 	/**
+	 * @param databaseID
+	 * @param parentShelf
 	 * @param shelfPosition
 	 * @param maxShelfSlots
-	 * @param shelfSlots
 	 */
-	public ShelfLevel(final int shelfPosition, final int maxShelfSlots)
+	public ShelfLevel(final int databaseID, final Shelf parentShelf, final int shelfPosition, final int maxShelfSlots)
 	{
-		this(0, shelfPosition, maxShelfSlots);
+		this(databaseID, UUID.randomUUID(), parentShelf, shelfPosition, maxShelfSlots);
 	}
 
+	/**
+	 */
 	public ShelfLevel()
 	{
 		// For Hibernate.
+		setUuid(UUID.randomUUID());
+		this.shelfSlots = new TreeSet<ShelfSlot>();
 	}
 
 	@Override
@@ -69,41 +85,11 @@ public class ShelfLevel implements Comparable<ShelfLevel>
 		return parentShelf.getShelfID() + ShelfSlot.ID_SEPARATOR + shelfPosition;
 	}
 
-	@Override
-	public boolean equals(final Object o)
-	{
-		if (!(o instanceof ShelfLevel))
-			return false;
-
-		final ShelfLevel sl = (ShelfLevel) o;
-
-		return this.getDatabaseID() == sl.getDatabaseID();
-	}
-
-	@Override
-	public int compareTo(final ShelfLevel level)
-	{
-		return getDatabaseID() - level.getDatabaseID();
-	}
-
 	/**
-	 * @return the databaseID
-	 */
-	public int getDatabaseID()
-	{
-		return databaseID;
-	}
-
-	/**
-	 * @param databaseID the databaseID to set
-	 */
-	public void setDatabaseID(final int databaseID)
-	{
-		this.databaseID = databaseID;
-	}
-
-	/**
-	 * @return the shelfPosition
+	 * Gets the position of this shelf level in the parent shelf starting from the bottom.
+	 * The minimum value is 1.
+	 *
+	 * @return the position of this shelf level in the parent shelf
 	 */
 	public int getShelfPosition()
 	{
@@ -111,15 +97,22 @@ public class ShelfLevel implements Comparable<ShelfLevel>
 	}
 
 	/**
-	 * @param shelfPosition the shelfPosition to set
+	 * Changes the position of this shelf level in its parent {@link Shelf}.
+	 *
+	 * @param shelfPosition the new shelf position in range [1, {@link Integer#MAX_VALUE}]
 	 */
 	public void setShelfPosition(final int shelfPosition)
 	{
+		if (shelfPosition < 1)
+			throw new IllegalArgumentException("Shelf position was less than 1.");
+
 		this.shelfPosition = shelfPosition;
 	}
 
 	/**
-	 * @return the maxShelfSlots
+	 * Gets the maximum number of {@link ShelfSlot} objects this shelf level can hold.
+	 *
+	 * @return the maximum number of shelf slots
 	 */
 	public int getMaxShelfSlots()
 	{
@@ -127,15 +120,22 @@ public class ShelfLevel implements Comparable<ShelfLevel>
 	}
 
 	/**
-	 * @param maxShelfSlots the maxShelfSlots to set
+	 * Sets the maximum number of {@link ShelfSlot} objects this shelf level can hold.
+	 *
+	 * @param maxShelfSlots the new maximum number of shelf slots in the range [1, {@link Integer#MAX_VALUE}]
 	 */
 	public void setMaxShelfSlots(final int maxShelfSlots)
 	{
+		if (maxShelfSlots < 1)
+			throw new IllegalArgumentException("Maximum shelf slots was less than 1.");
+
 		this.maxShelfSlots = maxShelfSlots;
 	}
 
 	/**
-	 * @return the slots
+	 * Gets the set of {@link ShelfSlot} objects in this shelf level.
+	 *
+	 * @return the shelf slots in this shelf level
 	 */
 	public Set<ShelfSlot> getShelfSlots()
 	{
@@ -143,13 +143,31 @@ public class ShelfLevel implements Comparable<ShelfLevel>
 	}
 
 	/**
-	 * @param slots the slots to set
+	 * Sets the set of {@link ShelfSlot} objects in this shelf level.
+	 *
+	 * @param slots the new shelf slots, <code>null</code> to clear
 	 */
 	public void setShelfSlots(final Set<ShelfSlot> shelfSlots)
 	{
-		this.shelfSlots = shelfSlots;
+		if (shelfSlots == null)
+		{
+			for (final ShelfSlot s : this.shelfSlots)
+				s.setParentShelfLevel(null);
+
+			this.shelfSlots.clear();
+		}
+		else
+			this.shelfSlots = shelfSlots;
 	}
 
+	/**
+	 * Adds the given {@link ProductBox} to the given {@link ShelfSlot#getLevelPosition()} in this level.
+	 *
+	 * @param slotPosition the position of the slot in this shelf level
+	 * @param productBox the product box to add
+	 * @return <code>true</code> if box was added successfully
+	 * @throws InvalidAttributesException if this shelf level has no shelf slots
+	 */
 	public boolean addToSlot(final int slotPosition, final ProductBox productBox) throws InvalidAttributesException
 	{
 		SYSLOG.trace("Adding product box " + productBox + " to shelf level slot at position " + slotPosition + " in the shelf level: " + toString());
@@ -166,6 +184,12 @@ public class ShelfLevel implements Comparable<ShelfLevel>
 		return false;
 	}
 
+	/**
+	 * Gets the {@link ShelfSlot} objects in the given position of this shelf level.
+	 *
+	 * @param slotPosition the position of the wanted shelf slot in this shelf level
+	 * @return the wanted shelf slot or <code>null</code> if the slot was not found
+	 */
 	public ShelfSlot getShelfSlot(final int slotPosition)
 	{
 		for (final ShelfSlot slot : shelfSlots)
@@ -180,6 +204,11 @@ public class ShelfLevel implements Comparable<ShelfLevel>
 		return null;
 	}
 
+	/**
+	 * Gets the list of {@link ShelfSlot} objects that have free space in them in this shelf level.
+	 *
+	 * @return the list of shelf slots with free space
+	 */
 	public List<ShelfSlot> getFreeShelfSlots()
 	{
 		final List<ShelfSlot> freeSlots = new ArrayList<ShelfSlot>();
@@ -193,6 +222,11 @@ public class ShelfLevel implements Comparable<ShelfLevel>
 		return freeSlots;
 	}
 
+	/**
+	 * Gets the number of products inside product boxes in this shelf level.
+	 *
+	 * @return the number of products in this shelf level
+	 */
 	public int getProductCountInBoxes()
 	{
 		int sum = 0;
@@ -203,6 +237,11 @@ public class ShelfLevel implements Comparable<ShelfLevel>
 		return sum;
 	}
 
+	/**
+	 * Gets the list of all {@link ProductBox} objects in this shelf level.
+	 *
+	 * @return the list of product boxes in this shelf level
+	 */
 	public List<ProductBox> getProductBoxes()
 	{
 		final List<ProductBox> boxes = new ArrayList<ProductBox>();
@@ -213,13 +252,36 @@ public class ShelfLevel implements Comparable<ShelfLevel>
 		return boxes;
 	}
 
+	/**
+	 * Gets the parent {@link Shelf} of this shelf level.
+	 *
+	 * @return the parent shelf
+	 */
 	public Shelf getParentShelf()
 	{
 		return parentShelf;
 	}
 
+	/**
+	 * Sets the parent {@link Shelf} for this shelf level.
+	 *
+	 * @param parentShelf the parent shelf object
+	 */
 	public void setParentShelf(final Shelf parentShelf)
 	{
+		if (parentShelf == null)
+			this.parentShelf.removeLevel(this);
+
 		this.parentShelf = parentShelf;
+	}
+
+	/**
+	 * Removes the given {@link ShelfSlot} from this shelf level.
+	 *
+	 * @param shelfSlot the shelf slot to remove
+	 */
+	public void removeSlot(final ShelfSlot shelfSlot)
+	{
+		shelfSlots.remove(shelfSlot);
 	}
 }

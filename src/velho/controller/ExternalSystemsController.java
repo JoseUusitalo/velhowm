@@ -14,6 +14,7 @@ import velho.model.Printer;
 import velho.model.ProductBox;
 import velho.model.ProductBoxSearchResultRow;
 import velho.model.Shelf;
+import velho.model.ShelfSlot;
 
 /**
  * Controller handling the communication with systems outside the VELHO Warehouse Management.
@@ -126,15 +127,12 @@ public class ExternalSystemsController
 	 * Moves the specified box to the given shelf.
 	 *
 	 * @param productBoxCode the database ID of the box to move
-	 * @param newShelfSlotID the ID of the shelf slot to move the box to
+	 * @param newShelfSlot the shelf slot to move the box to
 	 * @param showPopup show popup messages about failure/success?
 	 * @return <code>true</code> if the box was moved successfully
 	 */
-	public static boolean move(final int productBoxCode, final String newShelfSlotID, final boolean showPopup)
+	public static boolean move(final int productBoxCode, final ShelfSlot newShelfSlot, final boolean showPopup)
 	{
-		final String newShelfIDString = (String) Shelf.tokenizeShelfSlotID(newShelfSlotID)[0];
-		final int newShelfID = Integer.parseInt(newShelfIDString.substring(1));
-
 		String oldShelfIDString = null;
 		int oldShelfID = -1;
 		Shelf oldShelf = null;
@@ -142,11 +140,11 @@ public class ExternalSystemsController
 		ProductBox boxToMove = null;
 		final boolean success = true;
 
-		newShelf = DatabaseController.getShelfByID(newShelfID);
+		newShelf = newShelfSlot.getParentShelfLevel().getParentShelf();
 		boxToMove = DatabaseController.getProductBoxByID(productBoxCode);
 
 		SYSLOG.debug("Moving box: " + boxToMove);
-		SYSLOG.debug("To shelf: " + newShelfID);
+		SYSLOG.debug("To shelf: " + newShelf);
 
 		if (boxToMove == null)
 		{
@@ -173,7 +171,7 @@ public class ExternalSystemsController
 		{
 			return false;
 		}
-		if (newShelf.addToSlot(newShelfSlotID, boxToMove) == false)
+		if (newShelf.addToSlot(newShelfSlot.getSlotID(), boxToMove) == false)
 		{
 			return false;
 		}
@@ -181,10 +179,10 @@ public class ExternalSystemsController
 		if (showPopup)
 		{
 			if (success)
-				PopupController.info(productBoxCode + " was moved to " + newShelfSlotID + ".");
+				PopupController.info(productBoxCode + " was moved to " + newShelfSlot + ".");
 			else
-				PopupController.error(
-						productBoxCode + " was not moved to " + newShelfSlotID + ". Either the product box or the shelf does not exist in the database!");
+				PopupController
+						.error(productBoxCode + " was not moved to " + newShelfSlot + ". Either the product box or the shelf does not exist in the database!");
 		}
 
 		return success;
