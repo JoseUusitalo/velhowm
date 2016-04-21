@@ -17,7 +17,6 @@ import org.junit.Test;
 
 import javafx.collections.ObservableList;
 import velho.controller.DatabaseController;
-import velho.model.HibernateSessionFactory;
 import velho.model.ProductBox;
 import velho.model.RemovalList;
 import velho.model.RemovalListState;
@@ -139,47 +138,42 @@ public class RemovalListTest
 	{
 		final RemovalList rl = existingRemovalList = DatabaseController.getRemovalListByID(1);
 
-		System.out.println("RemovalList testSaveToDatabase()");
+		System.out.println("\nRemovalList testSaveToDatabase()");
+		System.out.println(rl);
 		System.out.println(rl.getBoxes());
 		final ProductBox first = rl.getBoxes().iterator().next();
-		System.out.println(first);
-		System.out.println();
+		System.out.println("Box to remove: " + first);
 
 		assertEquals(3, rl.getSize());
+
+		System.out.println("\nRemoving");
 		assertTrue(rl.removeProductBox(first));
 		assertFalse(rl.getBoxes().contains(first));
-
-		System.out.println("Removed");
 		System.out.println(rl.getBoxes());
+
+		System.out.println("\nRemoved box");
+		System.out.println(first);
+		System.out.println(first.getRemovalList());
 
 		System.out.println("\nAll lists");
 		System.out.println(DatabaseController.getAllRemovalLists());
 
-		// Save.
+		System.out.println("\nSave box and list");
+		DatabaseController.saveOrUpdate(first);
 		final int saveID = DatabaseController.saveOrUpdate(rl);
 		assertEquals(saveID, rl.getDatabaseID());
 
 		System.out.println("\nAll lists");
 		System.out.println(DatabaseController.getAllRemovalLists());
 
-		System.out.println("Evict");
-		HibernateSessionFactory.getInstance().getCurrentSession().beginTransaction();
-		HibernateSessionFactory.getInstance().getCurrentSession().evict(rl);
-		HibernateSessionFactory.getInstance().getCurrentSession().getTransaction().commit();
-
-		HibernateSessionFactory.getInstance().getCurrentSession().beginTransaction();
-		HibernateSessionFactory.getInstance().getCurrentSession().clear();
-		HibernateSessionFactory.getInstance().getCurrentSession().getTransaction().commit();
-
-		System.out.println("\n\n");
 		final RemovalList dblist = DatabaseController.getRemovalListByID(saveID);
-		System.out.println("\n\n");
 
 		assertEquals(dblist.getUuid(), rl.getUuid());
 
-		System.out.println("From DB: " + dblist);
-		System.out.println("Existing: " + rl.getBoxes());
+		System.out.println("\nFrom DB: " + dblist);
 		System.out.println("DB list: " + dblist.getBoxes());
+		System.out.println("Existing: " + rl);
+		System.out.println("Existing list: " + rl.getBoxes());
 
 		// Database was updated.
 		assertEquals(2, dblist.getSize());

@@ -1844,7 +1844,6 @@ public class DatabaseController
 		try
 		{
 			sessionFactory.getCurrentSession().getTransaction().commit();
-
 		}
 		catch (final HibernateException e)
 		{
@@ -1878,10 +1877,23 @@ public class DatabaseController
 	 */
 	public static void deleteRemovalList(final RemovalList list) throws HibernateException
 	{
+		/*
+		 * HIBERNATE NOTICE
+		 *
+		 * The child elements must be manually removed from the removal list collection before deleting the collection.
+		 * If this is not done, Hibernate will attempt to delete all the child elements as well.
+		 *
+		 */
+
+		if (list != null)
+			list.clear();
+
 		delete(list);
 
-		// Update the observable list.
-		getAllRemovalLists();
+		if (list != null)
+		{// Update the observable list.
+			getAllRemovalLists();
+		}
 	}
 
 	/*
@@ -1921,6 +1933,7 @@ public class DatabaseController
 		{
 			sessionFactory.getCurrentSession().getTransaction().rollback();
 
+			System.err.println(e.getMessage());
 			throw e;
 		}
 

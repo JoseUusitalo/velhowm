@@ -2,6 +2,7 @@ package test.model;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 import java.text.ParseException;
@@ -347,8 +348,13 @@ public class ShelfTest
 		// Remove.
 		assertTrue(BOX_ID_21.getShelfSlot().removeBox(BOX_ID_21));
 
+		// Update database.
+		DatabaseController.saveOrUpdate(BOX_ID_21);
+
+		// Fetch the updated shelf.
+		shelf_FREE_LVL_2 = DatabaseController.getShelfByID(SHELF_FREE_LVL_2_ID);
+
 		// Check.
-		// FIXME: Fails because the shelf has a different instance of the shelf slot object than the box has.
 		assertFalse(shelf_FREE_LVL_2.getShelfSlot(slotid).contains(BOX_ID_21));
 
 		// Save.
@@ -369,10 +375,16 @@ public class ShelfTest
 		int oldBoxCount = shelf_FREE_LVL_2.getProductBoxes().size();
 		int oldProductCount = shelf_FREE_LVL_2.getProductCountInBoxes();
 
+		// Box is not in a slot.
+		assertEquals(BOX_ID_21.getShelfSlot(), null);
+
 		// Add a box to the shelf.
 		assertTrue(shelf_FREE_LVL_2.addToSlot(slotid, BOX_ID_21));
 
-		// Save to database.
+		// Box is now in the correct slot.
+		assertEquals(BOX_ID_21.getShelfSlot(), shelf_FREE_LVL_2.getShelfSlot(slotid));
+
+		// Save shelf to database.
 		DatabaseController.saveOrUpdate(shelf_FREE_LVL_2);
 
 		// Product box is in the shelf.
@@ -387,10 +399,15 @@ public class ShelfTest
 		// Number of products in the shelf has increased.
 		assertEquals(oldProductCount + BOX_ID_21_PRODUCT_COUNT, shelf_FREE_LVL_2.getProductCountInBoxes());
 
-		// Removal is a success.
+		// Removal from box is a success.
 		assertTrue(BOX_ID_21.getShelfSlot().removeBox(BOX_ID_21));
 
-		// FIXME: Doing this does not update the shelf.
+		/*
+		 * HIBERNATE NOTICE
+		 * 
+		 * Doing this does not update the shelf.
+		 * Shelf must be fetched from database again to get the updated version.
+		 */
 
 		// Product box is not in the shelf.
 		assertFalse(shelf_FREE_LVL_2.getProductBoxes().contains(BOX_ID_21));
@@ -405,12 +422,27 @@ public class ShelfTest
 		assertEquals(oldProductCount, shelf_FREE_LVL_2.getProductCountInBoxes());
 
 		// -- Save to database --
-		DatabaseController.saveOrUpdate(shelf_FREE_LVL_2);
+
+		/*
+		 *
+		 * HIBERNATE NOTICE
+		 *
+		 * For some unknown reason my collections mappings do not work as intended.
+		 * The cascading does not work correctly.
+		 * When a child element in a collection is changed YOU MUST SAVE THE CHILD AND NOT THE PARENT SET.
+		 * Saving the parent set simply does not update the database EVEN IF THE PARENT OBJECT INSTANCE WAS CHANGED.
+		 *
+		 */
+
+		// I.e. save the box, not the shelf(slot/level).
+		DatabaseController.saveOrUpdate(BOX_ID_21);
 
 		// Check that database has been updated.
 		shelf_FREE_LVL_2 = DatabaseController.getShelfByID(SHELF_FREE_LVL_2_ID);
+		BOX_ID_21 = DatabaseController.getProductBoxByID(21);
 
 		// Product box is not in the shelf.
+		assertNull(BOX_ID_21.getShelfSlot());
 		assertFalse(shelf_FREE_LVL_2.getProductBoxes().contains(BOX_ID_21));
 
 		// Product box is not in the slot.
