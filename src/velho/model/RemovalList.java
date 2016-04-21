@@ -216,7 +216,33 @@ public class RemovalList extends AbstractDatabaseObject
 	public void reset()
 	{
 		state = DatabaseController.getRemovalListStateByID(1);
-		boxes.clear();
+		clear();
+	}
+
+	/**
+	 * Deletes all items from this removal list and also removes the reference from the {@link ProductBox} children to
+	 * this list.
+	 */
+	public void clear()
+	{
+		SYSLOG.debug("Clearing removal list " + this + " of boxes: " + boxes);
+
 		observableBoxes.clear();
+
+		for (final ProductBox box : boxes)
+		{
+			box.setRemovalList(null);
+
+			/*
+			 * HIBERNATE NOTICE
+			 *
+			 * There is no better way of doing this at the moment.
+			 * Saving collections only works when saving the children and not the parents.
+			 */
+
+			DatabaseController.saveOrUpdate(box);
+		}
+
+		boxes.clear();
 	}
 }

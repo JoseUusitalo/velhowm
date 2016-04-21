@@ -3,10 +3,12 @@ package velho.model;
 import java.util.Date;
 import java.util.UUID;
 
+import org.apache.log4j.Logger;
+
 /**
  * An abstract container that can hold any number of {@link Product} objects.
  *
- * @author Joona Silvennoinen &amp; Jose Uusitalo
+ * @author Jose Uusitalo &amp; Joona Silvennoinen
  */
 public abstract class ProductContainer extends AbstractDatabaseObject
 {
@@ -220,14 +222,14 @@ public abstract class ProductContainer extends AbstractDatabaseObject
 		return removalList;
 	}
 
-	public Manifest getManifest()
-	{
-		return manifest;
-	}
-
 	public void setRemovalList(final RemovalList removalList)
 	{
 		this.removalList = removalList;
+	}
+
+	public Manifest getManifest()
+	{
+		return manifest;
 	}
 
 	public void setManifest(final Manifest manifest)
