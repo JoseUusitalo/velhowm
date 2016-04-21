@@ -2,14 +2,11 @@ package velho.view;
 
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
-import javafx.geometry.Pos;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
-import javafx.scene.control.Label;
 import javafx.scene.control.Spinner;
 import javafx.scene.control.SpinnerValueFactory;
 import javafx.scene.control.TextField;
-import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
 import velho.controller.DatabaseController;
@@ -17,6 +14,8 @@ import velho.controller.LocalizationController;
 import velho.controller.ProductController;
 import velho.controller.UIController;
 import velho.model.Product;
+import velho.model.exceptions.NoDatabaseLinkException;
+import velho.model.interfaces.GenericView;
 
 /**
  * Creates tab for "Product Edit View".
@@ -24,7 +23,7 @@ import velho.model.Product;
  * @author Edward Puustinen
  *
  */
-public class AddProductView
+public class AddProductView implements GenericView
 {
 	/**
 	 * The product controller.
@@ -55,11 +54,6 @@ public class AddProductView
 	 * A combobox for category list.
 	 */
 	private ComboBox<Object> categoryList;
-
-	/**
-	 * A spinner that shows the product popularity.
-	 */
-	private Spinner<Integer> popularity;
 
 	/**
 	 * The {@link UIController}.
@@ -133,39 +127,6 @@ public class AddProductView
 			categoryList.getSelectionModel().selectFirst();
 			grid.add(categoryList, 3, 0);
 
-			Label popularityLabel = new Label(LocalizationController.getString("productPopularitySpinnerLabel"));
-			popularityLabel.setAlignment(Pos.CENTER_RIGHT);
-			// grid.add(popularityLabel, 4, 0);
-
-			popularity = new Spinner<Integer>();
-			// popularity.setValueFactory(new
-			// SpinnerValueFactory.IntegerSpinnerValueFactory(-1, 10000));
-
-			popularity.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(-1, 10000, Integer.parseInt("-1")));
-			popularity.setEditable(true);
-
-			final EventHandler<KeyEvent> keyboardHandler = new EventHandler<KeyEvent>()
-			{
-				@Override
-				public void handle(final KeyEvent event)
-				{
-					try
-					{
-						if (Integer.parseInt(popularity.getEditor().textProperty().get()) < -1)
-						{
-							throw new NumberFormatException();
-						}
-					}
-					catch (NumberFormatException e)
-					{
-						popularity.getEditor().textProperty().set("-1");
-					}
-				}
-			};
-
-			popularity.getEditor().addEventHandler(KeyEvent.KEY_RELEASED, keyboardHandler);
-			// grid.add(popularity, 5, 0);
-
 			final Button cancelButton = new Button(LocalizationController.getString("cancelButtonBackToList"));
 
 			cancelButton.setOnAction(new EventHandler<ActionEvent>()
@@ -189,7 +150,7 @@ public class AddProductView
 					Object brand = brandList.valueProperty().getValue();
 					Object category = categoryList.valueProperty().getValue();
 
-					final Product newProduct = productController.saveProduct(databaseID.getValueFactory().getValue().intValue(), nameField.getText(), brand, category, popularity.getValue().intValue());
+					final Product newProduct = productController.saveProduct(databaseID.getValueFactory().getValue().intValue(), nameField.getText(), brand, category);
 
 					if (editProduct)
 						productController.showProductView(newProduct);
@@ -201,6 +162,7 @@ public class AddProductView
 			grid.getStyleClass().add("standard-padding");
 
 			bPane.setCenter(grid);
+			UIController.recordView(this);
 		}
 		return bPane;
 	}
@@ -216,6 +178,13 @@ public class AddProductView
 		nameField.setText(product.getName());
 		brandList.getSelectionModel().select(product.getBrand());
 		categoryList.getSelectionModel().select(product.getCategory());
-		popularity.getValueFactory().setValue(product.getPopularity());
+	}
+
+	@Override
+	public void reCreate()
+	{
+		bPane = null;
+		getView(false);
+
 	}
 }

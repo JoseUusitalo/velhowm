@@ -8,9 +8,11 @@ import javafx.scene.control.Label;
 import javafx.scene.layout.GridPane;
 import velho.controller.LocalizationController;
 import velho.controller.ProductController;
+import velho.controller.UIController;
 import velho.model.Product;
+import velho.model.interfaces.GenericView;
 
-public class ProductDataView
+public class ProductDataView implements GenericView
 {
 
 	/**
@@ -19,6 +21,8 @@ public class ProductDataView
 	private GridPane grid;
 
 	private ProductController controller;
+
+	private Product currentProduct;
 
 	public ProductDataView(final ProductController controller)
 	{
@@ -29,6 +33,8 @@ public class ProductDataView
 	{
 		if (grid == null)
 		{
+			currentProduct = product;
+
 			grid = new GridPane();
 
 			grid.setAlignment(Pos.CENTER);
@@ -48,9 +54,6 @@ public class ProductDataView
 			Label productCategory = new Label(LocalizationController.getString("productCategoryLabel"));
 			grid.add(productCategory, 0, 3);
 
-			// Label productPopularity = new Label("Popularity: ");
-			// grid.add(productPopularity, 0, 4);
-
 			Label productIDValue = new Label(String.valueOf(product.getDatabaseID()));
 			grid.add(productIDValue, 1, 1);
 
@@ -59,10 +62,6 @@ public class ProductDataView
 
 			Label productCategoryValue = new Label(product.getCategory().getName());
 			grid.add(productCategoryValue, 1, 3);
-
-			// Label productPopularityValue = new
-			// Label(String.valueOf(product.getPopularity()));
-			// grid.add(productPopularityValue, 1, 4);
 
 			Button editButton = new Button(LocalizationController.getString("editButton"));
 			editButton.setMaxWidth(Double.MAX_VALUE);
@@ -91,8 +90,16 @@ public class ProductDataView
 					controller.showList();
 				}
 			});
+			UIController.recordView(this);
 		}
 
 		return grid;
+	}
+
+	@Override
+	public void reCreate()
+	{
+		grid = null;
+		getView(currentProduct);
 	}
 }

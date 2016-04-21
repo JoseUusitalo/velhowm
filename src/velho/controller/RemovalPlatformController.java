@@ -70,7 +70,7 @@ public class RemovalPlatformController
 		SYSLOG.debug(getPlatform() + " free space decreased by " + percentagePoints);
 		getPlatform().modifyFreeSpace(percentagePoints);
 
-		DatabaseController.save(getPlatform());
+		DatabaseController.saveOrUpdate(getPlatform());
 		checkWarning();
 	}
 

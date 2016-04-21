@@ -59,13 +59,13 @@ public class UserController implements UIActionController
 			User newUser;
 			// If no pin is defined, use badge ID.
 			if (userPIN == null || userPIN.isEmpty())
-				newUser = new User(badgeID, userFirstName, userLastName, userRole);
+				newUser = new User(userFirstName, userLastName, null, badgeID, userRole);
 			else
-				newUser = new User(userPIN, userFirstName, userLastName, userRole);
+				newUser = new User(userFirstName, userLastName, userPIN, null, userRole);
 
 			try
 			{
-				DatabaseController.save(newUser);
+				DatabaseController.saveOrUpdate(newUser);
 				USRLOG.debug("Created a user.");
 
 				if (showPopup)
@@ -154,7 +154,7 @@ public class UserController implements UIActionController
 	 */
 	public void destroyView()
 	{
-		view.destroy();
+		view.reCreate();
 	}
 
 	/**
@@ -167,7 +167,7 @@ public class UserController implements UIActionController
 	public static User getDebugUser(final UserRole role)
 	{
 		if (MainWindow.DEBUG_MODE)
-			return new User(-1, "Debug", "Account", role);
+			return new User(-1, "Debug", "Account", "000000", null, role);
 
 		return null;
 	}

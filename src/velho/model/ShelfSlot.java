@@ -3,6 +3,7 @@ package velho.model;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
+import java.util.UUID;
 
 import org.apache.log4j.Logger;
 
@@ -11,7 +12,7 @@ import org.apache.log4j.Logger;
  *
  * @author Jose Uusitalo
  */
-public class ShelfSlot extends AbstractDatabaseObject implements Comparable<ShelfSlot>
+public class ShelfSlot extends AbstractDatabaseObject
 {
 	/**
 	 * Apache log4j logger: System.
@@ -38,17 +39,22 @@ public class ShelfSlot extends AbstractDatabaseObject implements Comparable<Shel
 	 */
 	private Set<ProductBox> productBoxes;
 
+	/**
+	 * The {@link ShelfLevel} that this shelf slot is on.
+	 */
 	private ShelfLevel parentShelfLevel;
 
 	/**
 	 * @param databaseID
+	 * @param uuid
 	 * @param parentShelfLevel
 	 * @param levelPosition
 	 * @param maxBoxesInSlot
 	 */
-	public ShelfSlot(final int databaseID, final int levelPosition, final int maxBoxesInSlot, final ShelfLevel parentShelfLevel)
+	public ShelfSlot(final int databaseID, final UUID uuid, final ShelfLevel parentShelfLevel, final int levelPosition, final int maxBoxesInSlot)
 	{
 		setDatabaseID(databaseID);
+		setUuid(uuid);
 		this.parentShelfLevel = parentShelfLevel;
 
 		if (maxBoxesInSlot < 1)
@@ -64,14 +70,24 @@ public class ShelfSlot extends AbstractDatabaseObject implements Comparable<Shel
 		productBoxes = new HashSet<ProductBox>();
 	}
 
-	public ShelfSlot(final int levelPosition, final int maxBoxesInSlot, final ShelfLevel parentShelfLevel)
+	/**
+	 * @param databaseID
+	 * @param parentShelfLevel
+	 * @param levelPosition
+	 * @param maxBoxesInSlot
+	 */
+	public ShelfSlot(final int databaseID, final ShelfLevel parentShelfLevel, final int levelPosition, final int maxBoxesInSlot)
 	{
-		this(0, levelPosition, maxBoxesInSlot, parentShelfLevel);
+		this(databaseID, UUID.randomUUID(), parentShelfLevel, levelPosition, maxBoxesInSlot);
 	}
 
+	/**
+	 */
 	public ShelfSlot()
 	{
 		// For Hibernate.
+		setUuid(UUID.randomUUID());
+		productBoxes = new HashSet<ProductBox>();
 	}
 
 	@Override
@@ -81,39 +97,57 @@ public class ShelfSlot extends AbstractDatabaseObject implements Comparable<Shel
 	}
 
 	@Override
-	public boolean equals(final Object o)
+	public int compareTo(final AbstractDatabaseObject slot)
 	{
-		if (!(o instanceof ShelfSlot))
-			return false;
+		if (slot instanceof ShelfSlot)
+			return getSlotID().compareToIgnoreCase(((ShelfSlot) slot).getSlotID());
 
-		final ShelfSlot ss = (ShelfSlot) o;
-
-		return this.getSlotID().equals(ss.getSlotID());
+		return super.compareTo(slot);
 	}
 
-	@Override
-	public int compareTo(final ShelfSlot slot)
-	{
-		return getSlotID().compareToIgnoreCase(slot.getSlotID());
-	}
-
+	/**
+	 * Gets the position (greater than 1) of this shelf slot in the parent {@link ShelfLevel}.
+	 *
+	 * @return the position of this shelf slot in the parent shelf level
+	 */
 	public int getLevelPosition()
 	{
 		return levelPosition;
 	}
 
+	/**
+	 * Sets the position of this shelf slot in the parent {@link ShelfLevel}.
+	 *
+	 * @param levelPosition the new position in the parent level in the range [1, {@link Integer#MAX_VALUE}]
+	 */
 	public void setLevelPosition(final int levelPosition)
 	{
+		if (levelPosition < 1)
+			throw new IllegalArgumentException("Shelf slot position was less than 1.");
+
 		this.levelPosition = levelPosition;
 	}
 
+	/**
+	 * Gets the maximum number of product boxes in this shelf slot.
+	 *
+	 * @return the maximum product boxes this slot can hold
+	 */
 	public int getMaxProductBoxes()
 	{
 		return maxProductBoxes;
 	}
 
+	/**
+	 * Sets the maximum number of {@link ProductBox} objects this shelf slot can hold.
+	 *
+	 * @param maxProductBoxes the new maximum number of product boxes (greater than or equal to 0)
+	 */
 	public void setMaxProductBoxes(final int maxProductBoxes)
 	{
+		if (maxProductBoxes < 0)
+			throw new IllegalArgumentException("Maximum product boxes was less than 0.");
+
 		this.maxProductBoxes = maxProductBoxes;
 	}
 
@@ -128,14 +162,32 @@ public class ShelfSlot extends AbstractDatabaseObject implements Comparable<Shel
 		return parentShelfLevel.getParentShelf().getShelfID() + ID_SEPARATOR + parentShelfLevel.getShelfPosition() + ID_SEPARATOR + levelPosition;
 	}
 
+	/**
+	 * Gets the set of {@link ProductBox} objects on this shelf slot.
+	 *
+	 * @return the set of product boxes in this slot
+	 */
 	public Set<ProductBox> getProductBoxes()
 	{
 		return productBoxes;
 	}
 
+	/**
+	 * Sets the set of {@link ProductBox} objects in this shelf slot.
+	 *
+	 * @param productBoxes the new set of product boxes, <code>null</code> to clear
+	 */
 	public void setProductBoxes(final Set<ProductBox> productBoxes)
 	{
-		this.productBoxes = productBoxes;
+		if (productBoxes == null)
+		{
+			for (final ProductBox b : this.productBoxes)
+				b.setShelfSlot(null);
+
+			this.productBoxes.clear();
+		}
+		else
+			this.productBoxes = productBoxes;
 	}
 
 	/**
@@ -185,6 +237,7 @@ public class ShelfSlot extends AbstractDatabaseObject implements Comparable<Shel
 		{
 			box.setShelfSlot(this);
 			SYSLOG.trace("Product box + " + box + " was successfully added.");
+
 			return true;
 		}
 
@@ -203,24 +256,45 @@ public class ShelfSlot extends AbstractDatabaseObject implements Comparable<Shel
 		if (productBoxes.remove(box))
 		{
 			box.setShelfSlot(null);
+
 			return true;
 		}
 
 		return false;
 	}
 
+	/**
+	 * Checks if this shelf slot contains the given {@link ProductBox} object.
+	 *
+	 * @param box product box to check
+	 * @return <code>true</code> if the product box is in this shelf slot
+	 */
 	public boolean contains(final ProductBox box)
 	{
+		System.out.println("BOXES IN " + this + ": " + productBoxes);
 		return productBoxes.contains(box);
 	}
 
+	/**
+	 * Gets the parent {@link ShelfLevel} object this shelf slot is in.
+	 *
+	 * @return the parent shelf level
+	 */
 	public ShelfLevel getParentShelfLevel()
 	{
 		return parentShelfLevel;
 	}
 
+	/**
+	 * Sets the parent {@link ShelfLevel} object for this shelf slot.
+	 *
+	 * @param parentShelfLevel the new parent shelf level
+	 */
 	public void setParentShelfLevel(final ShelfLevel parentShelfLevel)
 	{
+		if (parentShelfLevel == null)
+			this.parentShelfLevel.removeSlot(this);
+
 		this.parentShelfLevel = parentShelfLevel;
 	}
 }

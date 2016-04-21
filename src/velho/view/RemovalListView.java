@@ -17,16 +17,18 @@ import velho.controller.DatabaseController;
 import velho.controller.ListController;
 import velho.controller.LocalizationController;
 import velho.controller.RemovalListController;
+import velho.controller.UIController;
 import velho.model.RemovalList;
 import velho.model.RemovalListState;
 import velho.model.exceptions.NoDatabaseLinkException;
+import velho.model.interfaces.GenericView;
 
 /**
  * View for creating new removal lists
  *
  * @author Jose Uusitalo
  */
-public class RemovalListView
+public class RemovalListView implements GenericView
 {
 	/**
 	 * Apache log4j logger: System.
@@ -120,6 +122,7 @@ public class RemovalListView
 
 			bpane.setTop(top);
 			bpane.setCenter(thisList);
+			UIController.recordView(this);
 		}
 
 		return bpane;
@@ -128,9 +131,11 @@ public class RemovalListView
 	/**
 	 * Destroys the view.
 	 */
-	public void destroy()
+	@Override
+	public void reCreate()
 	{
 		bpane = null;
+		getView();
 	}
 
 	/**

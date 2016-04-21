@@ -4,7 +4,8 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
-import org.junit.AfterClass;
+import java.text.ParseException;
+
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -12,8 +13,6 @@ import velho.controller.DatabaseController;
 import velho.controller.UserController;
 import velho.model.User;
 import velho.model.enums.UserRole;
-import velho.model.exceptions.NoDatabaseException;
-import velho.model.exceptions.NoDatabaseLinkException;
 
 /**
  * Tests for the {@link velho.model.User} class.
@@ -39,18 +38,17 @@ public class UserTest
 	private final UserRole VALID_ROLE = UserRole.MANAGER;
 	private final UserRole NULL_ROLE = null;
 
-	private final User user = new User(-1, "f", "l", UserRole.MANAGER);
+	private final User user = new User(-1, "f", "l", "000000", null, UserRole.MANAGER);
 
+	/**
+	 * Loads the sample data into the database if it does not yet exist.
+	 *
+	 * @throws ParseException
+	 */
 	@BeforeClass
-	public final static void linkDatabase() throws NoDatabaseLinkException, NoDatabaseException
+	public static final void loadSampleData() throws ParseException
 	{
-		DatabaseController.resetDatabase();
-	}
-
-	@AfterClass
-	public final static void unlinkDatabase() throws NoDatabaseLinkException
-	{
-		DatabaseController.unlink();
+		DatabaseController.loadSampleData();
 	}
 
 	@Test

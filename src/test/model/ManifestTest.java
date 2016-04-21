@@ -6,10 +6,12 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 import java.sql.Date;
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 import velho.controller.DatabaseController;
@@ -28,12 +30,23 @@ public class ManifestTest
 	private static Manifest newManifest = new Manifest();
 	private static Manifest existingManifest = DatabaseController.getManifestByID(2);
 
+	/**
+	 * Loads the sample data into the database if it does not yet exist.
+	 *
+	 * @throws ParseException
+	 */
+	@BeforeClass
+	public static final void loadSampleData() throws ParseException
+	{
+		DatabaseController.loadSampleData();
+	}
+
 	@Test
 	public final void testToString()
 	{
 		Date order = new Date(1234);
 		Date rec = new Date(12341234);
-		Manifest anotherManifest = new Manifest(new ManifestState(-1, "Whatever"), 123, order, rec);
+		Manifest anotherManifest = new Manifest(123, new ManifestState(-1, "Whatever"), order, rec);
 		assertEquals("[0] State: Whatever Driver: 123 Ordered/Received: " + DatabaseController.getH2DateFormat(order) + "/"
 				+ DatabaseController.getH2DateFormat(rec) + " (0)", anotherManifest.toString());
 	}
@@ -91,7 +104,7 @@ public class ManifestTest
 		assertEquals(newState, existingManifest.getState());
 
 		// Save.
-		final int saveID = DatabaseController.save(existingManifest);
+		final int saveID = DatabaseController.saveOrUpdate(existingManifest);
 		assertTrue(saveID > 0);
 
 		// Check that that the object was updated, not inserted.
@@ -102,7 +115,7 @@ public class ManifestTest
 
 		// TODO: Figure out a better way to roll back changes.
 		existingManifest.setState(oldState);
-		DatabaseController.save(existingManifest);
+		DatabaseController.saveOrUpdate(existingManifest);
 	}
 
 	@Test
@@ -112,7 +125,7 @@ public class ManifestTest
 				Arrays.asList(DatabaseController.getProductBoxByID(35), DatabaseController.getProductBoxByID(36), DatabaseController.getProductBoxByID(37)));
 
 		/*
-		 * FIXME: This is not transitive and does not when the list is a set.
+		 * FIXME: This is not transitive and does not work when the list is a set.
 		 * list.containsAll(existingManifest.getBoxes()) = true
 		 * existingManifest.getBoxes().containsAll(list) = false
 		 */

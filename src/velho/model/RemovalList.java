@@ -2,17 +2,26 @@ package velho.model;
 
 import java.util.LinkedHashSet;
 import java.util.Set;
+import java.util.UUID;
+
+import org.apache.log4j.Logger;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import velho.controller.DatabaseController;
 
 /**
  * A list of product boxes to be thrown away.
  *
  * @author Jose Uusitalo
  */
-public class RemovalList extends AbstractDatabaseObject implements Comparable<RemovalList>
+public class RemovalList extends AbstractDatabaseObject
 {
+	/**
+	 * Apache log4j logger: System.
+	 */
+	private static final Logger SYSLOG = Logger.getLogger(RemovalList.class.getName());
+
 	/**
 	 * The set of {@link ProductBox} objects.
 	 */
@@ -30,18 +39,28 @@ public class RemovalList extends AbstractDatabaseObject implements Comparable<Re
 
 	/**
 	 * @param databaseID
+	 * @param uuid
 	 * @param state
 	 */
-	public RemovalList(final int databaseID, final RemovalListState state)
+	public RemovalList(final int databaseID, final UUID uuid, final RemovalListState state)
 	{
 		setDatabaseID(databaseID);
+		setUuid(uuid);
 		this.state = state;
 		this.boxes = new LinkedHashSet<ProductBox>();
 		this.observableBoxes = FXCollections.observableArrayList();
 	}
 
 	/**
-	 * Creates a new empty removal list in the active state.
+	 * @param databaseID
+	 * @param state
+	 */
+	public RemovalList(final int databaseID, final RemovalListState state)
+	{
+		this(databaseID, UUID.randomUUID(), state);
+	}
+
+	/**
 	 */
 	public RemovalList()
 	{
@@ -50,6 +69,7 @@ public class RemovalList extends AbstractDatabaseObject implements Comparable<Re
 		 * pointer exception.
 		 */
 		this.state = new RemovalListState(1, "Active");
+		setUuid(UUID.randomUUID());
 		this.boxes = new LinkedHashSet<ProductBox>();
 		this.observableBoxes = FXCollections.observableArrayList();
 	}
@@ -58,26 +78,6 @@ public class RemovalList extends AbstractDatabaseObject implements Comparable<Re
 	public String toString()
 	{
 		return "[" + getDatabaseID() + "] " + state + ": " + boxes.size() + " boxes";
-	}
-
-	@Override
-	public boolean equals(final Object o)
-	{
-		if (!(o instanceof RemovalList))
-			return false;
-
-		final RemovalList pt = (RemovalList) o;
-
-		if (this.getDatabaseID() <= 0)
-			return this == pt;
-
-		return this.getDatabaseID() == pt.getDatabaseID();
-	}
-
-	@Override
-	public int compareTo(final RemovalList removallist)
-	{
-		return this.getDatabaseID() - removallist.getDatabaseID();
 	}
 
 	/**
@@ -137,15 +137,23 @@ public class RemovalList extends AbstractDatabaseObject implements Comparable<Re
 	/**
 	 * Sets the set of actual product boxes in this removal list.
 	 *
-	 * @param boxes the set of boxes on this removal list
+	 * @param boxes the set of boxes on this removal list, <code>null</code> to clear
+	 * @return <code>true</code> if all boxes were added to this manifest
 	 */
-	public boolean setBoxes(final Set<ProductBox> boxes)
+	public boolean setBoxes(final Set<ProductBox> productBoxes)
 	{
-		this.boxes = boxes;
+		if (productBoxes == null)
+			this.boxes.clear();
+		else
+			this.boxes = productBoxes;
+
 		boolean bswitch = true;
 
-		for (final ProductBox box : boxes)
-			bswitch = bswitch && (observableBoxes.add(new ProductBoxSearchResultRow(box)));
+		for (final ProductBox box : this.boxes)
+		{
+			if (box != null)
+				bswitch = bswitch && (observableBoxes.add(new ProductBoxSearchResultRow(box)));
+		}
 
 		return bswitch;
 	}
@@ -159,7 +167,14 @@ public class RemovalList extends AbstractDatabaseObject implements Comparable<Re
 	public boolean addProductBox(final ProductBox productBox)
 	{
 		if (boxes.add(productBox))
+		{
+			productBox.setRemovalList(this);
+			SYSLOG.trace(productBox + " added to removal list " + this);
+
 			return observableBoxes.add(new ProductBoxSearchResultRow(productBox));
+		}
+
+		SYSLOG.error("Failed to add " + productBox + " to removal list " + this);
 
 		return false;
 	}
@@ -174,14 +189,23 @@ public class RemovalList extends AbstractDatabaseObject implements Comparable<Re
 	{
 		if (boxes.remove(productBox))
 		{
+			SYSLOG.trace(productBox + " removed from removal list " + this);
+
+			productBox.setRemovalList(null);
+
 			for (final Object row : observableBoxes)
 			{
 				if (((ProductBoxSearchResultRow) row).getBox().equals(productBox))
 				{
+					SYSLOG.trace("Observable list updated");
 					return observableBoxes.remove(row);
 				}
 			}
+
+			SYSLOG.warn(productBox + " was not in the observable list!");
 		}
+
+		SYSLOG.error("Failed to remove " + productBox + " from removal list " + this);
 
 		return false;
 	}
@@ -191,8 +215,34 @@ public class RemovalList extends AbstractDatabaseObject implements Comparable<Re
 	 */
 	public void reset()
 	{
-		state = new RemovalListState(1, "Active");
-		boxes.clear();
+		state = DatabaseController.getRemovalListStateByID(1);
+		clear();
+	}
+
+	/**
+	 * Deletes all items from this removal list and also removes the reference from the {@link ProductBox} children to
+	 * this list.
+	 */
+	public void clear()
+	{
+		SYSLOG.debug("Clearing removal list " + this + " of boxes: " + boxes);
+
 		observableBoxes.clear();
+
+		for (final ProductBox box : boxes)
+		{
+			box.setRemovalList(null);
+
+			/*
+			 * HIBERNATE NOTICE
+			 *
+			 * There is no better way of doing this at the moment.
+			 * Saving collections only works when saving the children and not the parents.
+			 */
+
+			DatabaseController.saveOrUpdate(box);
+		}
+
+		boxes.clear();
 	}
 }

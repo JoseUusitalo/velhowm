@@ -3,6 +3,7 @@ package velho.model;
 import java.util.Date;
 import java.util.LinkedHashSet;
 import java.util.Set;
+import java.util.UUID;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -12,7 +13,7 @@ import javafx.collections.ObservableList;
  *
  * @author Jose Uusitalo
  */
-public class Manifest extends AbstractDatabaseObject implements Comparable<Manifest>
+public class Manifest extends AbstractDatabaseObject
 {
 	// TODO: Generalize products lists into an abstract class. Removal lists and Manifests are basically identical.
 
@@ -48,14 +49,16 @@ public class Manifest extends AbstractDatabaseObject implements Comparable<Manif
 
 	/**
 	 * @param databaseID
-	 * @param state
+	 * @param uuid
 	 * @param driverID
+	 * @param state
 	 * @param ordered
 	 * @param received
 	 */
-	public Manifest(final int databaseID, final ManifestState state, final int driverID, final Date ordered, final Date received)
+	public Manifest(final int databaseID, final UUID uuid, final int driverID, final ManifestState state, final Date ordered, final Date received)
 	{
 		setDatabaseID(databaseID);
+		setUuid(uuid);
 		this.state = state;
 		this.driverID = driverID;
 		this.orderedDate = ordered;
@@ -65,16 +68,26 @@ public class Manifest extends AbstractDatabaseObject implements Comparable<Manif
 	}
 
 	/**
-	 * Creates a new manifest with the given data that does not exist in the database.
-	 *
+	 * @param databaseID
 	 * @param state
 	 * @param driverID
 	 * @param ordered
 	 * @param received
 	 */
-	public Manifest(final ManifestState state, final int driverID, final Date ordered, final Date received)
+	public Manifest(final int databaseID, final int driverID, final ManifestState state, final Date ordered, final Date received)
 	{
-		this(0, state, driverID, ordered, received);
+		this(databaseID, UUID.randomUUID(), driverID, state, ordered, received);
+	}
+
+	/**
+	 * @param state
+	 * @param driverID
+	 * @param ordered
+	 * @param received
+	 */
+	public Manifest(final int driverID, final ManifestState state, final Date ordered, final Date received)
+	{
+		this(0, UUID.randomUUID(), driverID, state, ordered, received);
 	}
 
 	/**
@@ -82,6 +95,7 @@ public class Manifest extends AbstractDatabaseObject implements Comparable<Manif
 	public Manifest()
 	{
 		// For Hibernate.
+		setUuid(UUID.randomUUID());
 		this.boxes = new LinkedHashSet<ProductBox>();
 		this.observableBoxes = FXCollections.observableArrayList();
 	}
@@ -89,28 +103,12 @@ public class Manifest extends AbstractDatabaseObject implements Comparable<Manif
 	@Override
 	public String toString()
 	{
+		/*
+		 * Note: Using getter on purpose because of Hibernate. Without it apparently there may be issues where the ID is
+		 * 0 when it should not be.
+		 */
 		return "[" + getDatabaseID() + "] State: " + state + " Driver: " + driverID + " Ordered/Received: " + orderedDate.toString() + "/"
 				+ receivedDate.toString() + " (" + boxes.size() + ")";
-	}
-
-	@Override
-	public boolean equals(final Object o)
-	{
-		if (!(o instanceof Manifest))
-			return false;
-
-		final Manifest m = (Manifest) o;
-
-		if (this.getDatabaseID() <= 0)
-			return this == m;
-
-		return this.getDatabaseID() == m.getDatabaseID();
-	}
-
-	@Override
-	public int compareTo(final Manifest manifest)
-	{
-		return this.getDatabaseID() - manifest.getDatabaseID();
 	}
 
 	/**
@@ -211,16 +209,32 @@ public class Manifest extends AbstractDatabaseObject implements Comparable<Manif
 	/**
 	 * Adds the specified {@link ProductBox} objects to this manifest.
 	 *
-	 * @param productBoxes set of boxes to add to this list
+	 * @param productBoxes set of boxes to add to this list, <code>null</code> to clear
 	 * @return <code>true</code> if all boxes were added to this manifest
 	 */
 	public boolean setBoxes(final Set<ProductBox> productBoxes)
 	{
-		this.boxes = productBoxes;
+		if (productBoxes == null)
+		{
+			for (final ProductBox box : this.boxes)
+				box.setManifest(null);
+
+			this.boxes.clear();
+			this.observableBoxes.clear();
+		}
+		else
+			this.boxes = productBoxes;
+
 		boolean bswitch = true;
 
-		for (final ProductBox box : productBoxes)
-			bswitch = bswitch && (observableBoxes.add(new ProductBoxSearchResultRow(box)));
+		for (final ProductBox box : this.boxes)
+		{
+			if (box != null)
+			{
+				box.setManifest(this);
+				bswitch = bswitch && (observableBoxes.add(new ProductBoxSearchResultRow(box)));
+			}
+		}
 
 		return bswitch;
 	}

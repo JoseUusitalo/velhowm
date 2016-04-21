@@ -1,5 +1,6 @@
 package velho.view;
 
+import java.text.ParseException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -7,6 +8,7 @@ import org.apache.log4j.AppenderSkeleton;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
+import org.hibernate.HibernateException;
 
 import javafx.application.Application;
 import javafx.beans.property.ReadOnlyDoubleProperty;
@@ -46,16 +48,15 @@ import velho.controller.UIController;
 import velho.controller.UserController;
 import velho.model.enums.SupportedTranslation;
 import velho.model.exceptions.ExistingDatabaseLinkException;
-import velho.model.exceptions.NoDatabaseException;
 import velho.model.exceptions.NoDatabaseLinkException;
-import velho.model.exceptions.UniqueKeyViolationException;
+import velho.model.interfaces.GenericView;
 
 /**
  * The main window and class for VELHO Warehouse Management.
  *
  * @author Jose Uusitalo &amp; Joona Silvennoinen
  */
-public class MainWindow extends Application
+public class MainWindow extends Application implements GenericView
 {
 	/**
 	 * Relative file path to the Apache log4j logger properties file.
@@ -70,7 +71,7 @@ public class MainWindow extends Application
 	/**
 	 * Enable or disable debug features.
 	 */
-	public static final boolean DEBUG_MODE = true;
+	public static final boolean DEBUG_MODE = false;
 
 	/**
 	 * Enable or disable showing windows. DEBUG_MODE must be <code>true</code>
@@ -209,10 +210,9 @@ public class MainWindow extends Application
 		try
 		{
 			DatabaseController.link();
-			DatabaseController.openSession();
 			DatabaseController.loadSampleData();
 		}
-		catch (ClassNotFoundException | ExistingDatabaseLinkException | NoDatabaseException | NoDatabaseLinkException | UniqueKeyViolationException e)
+		catch (ClassNotFoundException | HibernateException | ParseException e)
 		{
 			e.printStackTrace();
 		}
@@ -280,14 +280,7 @@ public class MainWindow extends Application
 
 		try
 		{
-			try
-			{
-				DatabaseController.link();
-			}
-			catch (ExistingDatabaseLinkException e)
-			{
-				// Ignore.
-			}
+			DatabaseController.link();
 
 			if (DatabaseController.isLinked())
 			{
@@ -406,6 +399,7 @@ public class MainWindow extends Application
 				}
 
 			});
+
 		}
 
 		// Force log in to see main menu.
@@ -458,6 +452,7 @@ public class MainWindow extends Application
 			statusBar.add(userStatus, 1, 0);
 			GridPane.setHgrow(platformStatus, Priority.ALWAYS);
 			rootBorderPane.setBottom(statusBar);
+			UIController.recordView(this);
 		}
 		rootBorderPane.setCenter(mainTabPane);
 	}
@@ -482,10 +477,7 @@ public class MainWindow extends Application
 			scene.getStylesheets().add(getClass().getResource("velho.css").toExternalForm());
 			WIDTH_PROPERTY = scene.widthProperty();
 
-			rootBorderPane = new BorderPane();
-			rootBorderPane.getStyleClass().add("standard-background-color");
-			rootBorderPane.prefHeightProperty().bind(scene.heightProperty());
-			rootBorderPane.prefWidthProperty().bind(scene.widthProperty());
+			rootBorderPane = getRootBorderPane();
 
 			root.getChildren().add(rootBorderPane);
 
@@ -521,6 +513,18 @@ public class MainWindow extends Application
 		LocalizationController.setScene(scene);
 	}
 
+	private BorderPane getRootBorderPane()
+	{
+		if (rootBorderPane == null)
+		{
+			rootBorderPane = new BorderPane();
+			rootBorderPane.getStyleClass().add("standard-background-color");
+			rootBorderPane.prefHeightProperty().bind(scene.heightProperty());
+			rootBorderPane.prefWidthProperty().bind(scene.widthProperty());
+		}
+		return rootBorderPane;
+	}
+
 	/**
 	 * A method called to shut down the software and perform any necessary
 	 * cleanup.
@@ -537,17 +541,8 @@ public class MainWindow extends Application
 				debugStage.close();
 		}
 
-		DatabaseController.closeSession();
 		DatabaseController.closeSessionFactory();
-
-		try
-		{
-			DatabaseController.unlink();
-		}
-		catch (final NoDatabaseLinkException e)
-		{
-			// Ignore.
-		}
+		DatabaseController.unlink();
 
 		SYSLOG.info("Exit.");
 
@@ -622,11 +617,10 @@ public class MainWindow extends Application
 		removalPlatformStatus.setText(percent + "%");
 	}
 
-	/**
-	 * Destroys the main tab panel.
-	 */
-	public void destroy()
+	@Override
+	public void reCreate()
 	{
-		mainTabPane = null;
+		rootBorderPane = null;
+		getRootBorderPane();
 	}
 }

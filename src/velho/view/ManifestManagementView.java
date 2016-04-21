@@ -12,13 +12,15 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import velho.controller.LocalizationController;
 import velho.controller.ManifestController;
+import velho.controller.UIController;
+import velho.model.interfaces.GenericView;
 
 /**
  * View for managing manifests.
  *
  * @author Jose Uusitalo
  */
-public class ManifestManagementView
+public class ManifestManagementView implements GenericView
 {
 	/**
 	 * The root BorderPane for this view.
@@ -80,6 +82,7 @@ public class ManifestManagementView
 			});
 
 			bpane.setTop(managementPanel);
+			UIController.recordView(this);
 		}
 
 		return bpane;
@@ -130,5 +133,12 @@ public class ManifestManagementView
 		{
 			managementPanel.getChildren().add(node);
 		}
+	}
+
+	@Override
+	public void reCreate()
+	{
+		bpane = null;
+		getView();
 	}
 }

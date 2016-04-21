@@ -1,10 +1,14 @@
 package velho.controller;
 
+import java.util.HashSet;
+import java.util.Set;
+
 import org.apache.log4j.Logger;
 
 import javafx.scene.Node;
 import velho.model.enums.Position;
 import velho.model.enums.UserRole;
+import velho.model.interfaces.GenericView;
 import velho.view.MainWindow;
 
 /**
@@ -58,6 +62,8 @@ public class UIController
 	 * The {@link RemovalPlatformController}.
 	 */
 	private RemovalPlatformController removalPlatformController;
+
+	private static Set<GenericView> viewSet = new HashSet<GenericView>();
 
 	/**
 	 * @param mainWindow
@@ -186,18 +192,15 @@ public class UIController
 	 */
 	public void resetMainMenu()
 	{
-		mainView.destroy();
+		mainView.reCreate();
 	}
 
-	/**
-	 * Resets all views to their initial state.
-	 */
-	public void destroyViews()
+	public void destroyAllViews()
 	{
-		// TODO: We need to destroy all of the views.
-
-		mainView.destroy();
-		userController.destroyView();
+		for (GenericView view : viewSet)
+		{
+			view.reCreate();
+		}
 	}
 
 	/**
@@ -210,4 +213,10 @@ public class UIController
 	{
 		mainView.selectTab(tabName);
 	}
+
+	public static void recordView(final GenericView view)
+	{
+		viewSet.add(view);
+	}
+
 }

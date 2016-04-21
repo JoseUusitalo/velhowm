@@ -197,7 +197,7 @@ public class RemovalListController implements UIActionController
 		{
 			SYSLOG.info("Saving Removal List: " + newRemovalList.getBoxes());
 
-			if (DatabaseController.save(newRemovalList) > 0)
+			if (DatabaseController.saveOrUpdate(newRemovalList) > 0)
 			{
 				DatabaseController.clearSearchResults();
 

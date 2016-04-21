@@ -1,5 +1,8 @@
 package velho.model;
 
+import java.util.UUID;
+
+import velho.controller.UserController;
 import velho.model.enums.UserRole;
 
 /**
@@ -7,7 +10,7 @@ import velho.model.enums.UserRole;
  *
  * @author Jose Uusitalo
  */
-public class User extends AbstractDatabaseObject implements Comparable<User>
+public class User extends AbstractDatabaseObject
 {
 	/**
 	 * The maximum number of characters a first or last name may have.
@@ -61,31 +64,52 @@ public class User extends AbstractDatabaseObject implements Comparable<User>
 
 	/**
 	 * @param databaseID
+	 * @param uuid
 	 * @param firstName
 	 * @param lastName
+	 * @param badgeID
+	 * @param pin
 	 * @param role
 	 */
-	public User(final int databaseID, final String firstName, final String lastName, final UserRole role)
+	public User(final int databaseID, final UUID uuid, final String firstName, final String lastName, final String pin, final String badgeID,
+			final UserRole role)
 	{
 		setDatabaseID(databaseID);
+		setUuid(uuid);
 		this.firstName = firstName;
 		this.lastName = lastName;
+		this.badgeID = badgeID;
+		this.pin = pin;
 		this.role = role;
+
+		if (!UserController.validateUserData(this.badgeID, this.pin, firstName, lastName, role))
+			throw new IllegalArgumentException("Invalid user data");
 	}
 
-	public User(final String identifier, final String firstName, final String lastName, final UserRole role)
+	/**
+	 * @param databaseID
+	 * @param firstName
+	 * @param lastName
+	 * @param badgeID
+	 * @param pin
+	 * @param role
+	 */
+	public User(final int databaseID, final String firstName, final String lastName, final String pin, final String badgeID, final UserRole role)
 	{
-		if (identifier == null || identifier.isEmpty())
-			throw new IllegalArgumentException("Invalid badge ID or PIN.");
+		this(databaseID, UUID.randomUUID(), firstName, lastName, pin, badgeID, role);
+	}
 
-		if (identifier.length() > 6)
-			this.badgeID = identifier;
-		else
-			this.pin = identifier;
-
-		this.firstName = firstName;
-		this.lastName = lastName;
-		this.role = role;
+	/**
+	 * @param databaseID
+	 * @param firstName
+	 * @param lastName
+	 * @param badgeID
+	 * @param pin
+	 * @param role
+	 */
+	public User(final String firstName, final String lastName, final String pin, final String badgeID, final UserRole role)
+	{
+		this(0, firstName, lastName, pin, badgeID, role);
 	}
 
 	/**
@@ -93,6 +117,7 @@ public class User extends AbstractDatabaseObject implements Comparable<User>
 	public User()
 	{
 		// For Hibernate.
+		setUuid(UUID.randomUUID());
 	}
 
 	/**
@@ -106,23 +131,12 @@ public class User extends AbstractDatabaseObject implements Comparable<User>
 	}
 
 	@Override
-	public boolean equals(final Object o)
+	public int compareTo(final AbstractDatabaseObject user)
 	{
-		if (!(o instanceof User))
-			return false;
+		if (user instanceof User)
+			return this.getFullName().compareToIgnoreCase(((User) user).getFullName());
 
-		final User u = (User) o;
-
-		if (this.getDatabaseID() <= 0)
-			return this == u;
-
-		return this.getDatabaseID() == u.getDatabaseID();
-	}
-
-	@Override
-	public int compareTo(final User user)
-	{
-		return this.getFullName().compareToIgnoreCase(user.getFullName());
+		return super.compareTo(user);
 	}
 
 	/**

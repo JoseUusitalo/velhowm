@@ -1,11 +1,13 @@
 package velho.model;
 
+import java.util.UUID;
+
 /**
  * A state of a {@link Manifest}.
  *
  * @author Jose Uusitalo
  */
-public class ManifestState extends AbstractDatabaseObject implements Comparable<ManifestState>
+public class ManifestState extends AbstractDatabaseObject
 {
 	/**
 	 * The name of this state.
@@ -14,12 +16,23 @@ public class ManifestState extends AbstractDatabaseObject implements Comparable<
 
 	/**
 	 * @param databaseID
+	 * @param uuid
+	 * @param name
+	 */
+	public ManifestState(final int databaseID, final UUID uuid, final String name)
+	{
+		setDatabaseID(databaseID);
+		setUuid(uuid);
+		this.name = name;
+	}
+
+	/**
+	 * @param databaseID
 	 * @param name
 	 */
 	public ManifestState(final int databaseID, final String name)
 	{
-		setDatabaseID(databaseID);
-		this.name = name;
+		this(databaseID, UUID.randomUUID(), name);
 	}
 
 	/**
@@ -27,32 +40,13 @@ public class ManifestState extends AbstractDatabaseObject implements Comparable<
 	public ManifestState()
 	{
 		// For Hibernate.
+		setUuid(UUID.randomUUID());
 	}
 
 	@Override
 	public String toString()
 	{
 		return name;
-	}
-
-	@Override
-	public boolean equals(final Object o)
-	{
-		if (!(o instanceof ManifestState))
-			return false;
-
-		final ManifestState ms = (ManifestState) o;
-
-		if (this.getDatabaseID() <= 0)
-			return this == ms;
-
-		return this.getDatabaseID() == ms.getDatabaseID();
-	}
-
-	@Override
-	public int compareTo(final ManifestState state)
-	{
-		return this.getDatabaseID() - state.getDatabaseID();
 	}
 
 	/**

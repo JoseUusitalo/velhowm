@@ -47,9 +47,9 @@ public class ProductBoxSearchResultRow
 	 *
 	 * @return the shelf slot of this product box
 	 */
-	public String getBoxShelfSlot()
+	public ShelfSlot getBoxShelfSlot()
 	{
-		return box.getShelfSlot().getSlotID();
+		return box.getShelfSlot();
 	}
 
 	/**

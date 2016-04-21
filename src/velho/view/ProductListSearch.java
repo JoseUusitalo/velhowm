@@ -14,13 +14,15 @@ import velho.controller.DatabaseController;
 import velho.controller.ExternalSystemsController;
 import velho.controller.LocalizationController;
 import velho.controller.SearchController;
+import velho.controller.UIController;
+import velho.model.interfaces.GenericView;
 
 /**
  * A view for searching multiple products at once.
  *
  * @author Jose Uusitalo
  */
-public class ProductListSearch
+public class ProductListSearch implements GenericView
 {
 	/**
 	 * The root border pane.
@@ -53,7 +55,6 @@ public class ProductListSearch
 			Button sendToScannerButton = new Button(LocalizationController.getString("sendToScannerButton"));
 
 			final TextArea textArea = new TextArea();
-			// fixme
 			textArea.setPromptText((LocalizationController.getString("productSearchByNameOrCodeFirstRowText")) + (LocalizationController.getString("productSearchByNameOrCodeSecondRowText")) + (LocalizationController.getString("productSearchByNameOrCodeThirdRowText")));
 			textArea.setPrefWidth(MainWindow.WINDOW_WIDTH / 5);
 			printButton.setMaxWidth(Double.MAX_VALUE);
@@ -97,7 +98,15 @@ public class ProductListSearch
 
 			pane.setLeft(left);
 			pane.setCenter(list);
+			UIController.recordView(this);
 		}
 		return pane;
+	}
+
+	@Override
+	public void reCreate()
+	{
+		pane = null;
+		getView(null);
 	}
 }
