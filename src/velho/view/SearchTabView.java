@@ -12,8 +12,10 @@ import javafx.scene.layout.VBox;
 import velho.controller.DatabaseController;
 import velho.controller.ExternalSystemsController;
 import velho.controller.SearchController;
+import velho.controller.UIController;
+import velho.model.interfaces.GenericView;
 
-public class SearchTabView
+public class SearchTabView implements GenericView
 
 {
 	/**
@@ -79,6 +81,7 @@ public class SearchTabView
 			bPane.setTop(top);
 			bPane.setCenter(searchController.getResultsView());
 
+			UIController.recordView(this);
 		}
 		return bPane;
 	}
@@ -87,8 +90,10 @@ public class SearchTabView
 	 * Destroys the view.
 	 */
 
-	public void destroy()
+	@Override
+	public void reCreate()
 	{
 		bPane = null;
+		getView();
 	}
 }

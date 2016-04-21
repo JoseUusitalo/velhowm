@@ -13,6 +13,8 @@ import velho.controller.DatabaseController;
 import velho.controller.ProductController;
 import velho.controller.UIController;
 import velho.model.Product;
+import velho.model.exceptions.NoDatabaseLinkException;
+import velho.model.interfaces.GenericView;
 
 /**
  * Creates tab for "Product Edit View".
@@ -20,7 +22,7 @@ import velho.model.Product;
  * @author Edward Puustinen
  *
  */
-public class AddProductView
+public class AddProductView implements GenericView
 {
 	/**
 	 * The product controller.
@@ -99,7 +101,8 @@ public class AddProductView
 			brandList.setMaxWidth(Double.MAX_VALUE);
 
 			/*
-			 * TODO: Fix combobox selection mechanic breaking on the second try because the selection is converted from
+			 * TODO: Fix combobox selection mechanic breaking on the second try
+			 * because the selection is converted from
 			 * object to string.
 			 */
 			// brandList.setEditable(true);
@@ -114,7 +117,8 @@ public class AddProductView
 			categoryList.setMaxWidth(Double.MAX_VALUE);
 
 			/*
-			 * TODO: Fix combobox selection mechanic breaking on the second try because the selection is converted from
+			 * TODO: Fix combobox selection mechanic breaking on the second try
+			 * because the selection is converted from
 			 * object to string.
 			 */
 			// categoryList.setEditable(true);
@@ -145,8 +149,7 @@ public class AddProductView
 					Object brand = brandList.valueProperty().getValue();
 					Object category = categoryList.valueProperty().getValue();
 
-					final Product newProduct = productController.saveProduct(databaseID.getValueFactory().getValue().intValue(), nameField.getText(), brand,
-							category);
+					final Product newProduct = productController.saveProduct(databaseID.getValueFactory().getValue().intValue(), nameField.getText(), brand, category);
 
 					if (editProduct)
 						productController.showProductView(newProduct);
@@ -158,6 +161,7 @@ public class AddProductView
 			grid.getStyleClass().add("standard-padding");
 
 			bPane.setCenter(grid);
+			UIController.recordView(this);
 		}
 		return bPane;
 	}
@@ -173,5 +177,13 @@ public class AddProductView
 		nameField.setText(product.getName());
 		brandList.getSelectionModel().select(product.getBrand());
 		categoryList.getSelectionModel().select(product.getCategory());
+	}
+
+	@Override
+	public void reCreate()
+	{
+		bPane = null;
+		getView(false);
+
 	}
 }

@@ -16,15 +16,18 @@ import javafx.scene.layout.Priority;
 import velho.controller.DatabaseController;
 import velho.controller.ListController;
 import velho.controller.RemovalListController;
+import velho.controller.UIController;
 import velho.model.RemovalList;
 import velho.model.RemovalListState;
+import velho.model.exceptions.NoDatabaseLinkException;
+import velho.model.interfaces.GenericView;
 
 /**
  * View for creating new removal lists
  *
  * @author Jose Uusitalo
  */
-public class RemovalListView
+public class RemovalListView implements GenericView
 {
 	/**
 	 * Apache log4j logger: System.
@@ -107,8 +110,7 @@ public class RemovalListView
 				}
 			});
 
-			thisList = (BorderPane) ListController.getTableView(removalListController, DatabaseController.getProductSearchDataColumns(false, false),
-					removalList.getObservableBoxes());
+			thisList = (BorderPane) ListController.getTableView(removalListController, DatabaseController.getProductSearchDataColumns(false, false), removalList.getObservableBoxes());
 
 			// Make the list always take up the full vertical space.
 			GridPane.setVgrow(thisList, Priority.ALWAYS);
@@ -119,6 +121,7 @@ public class RemovalListView
 
 			bpane.setTop(top);
 			bpane.setCenter(thisList);
+			UIController.recordView(this);
 		}
 
 		return bpane;
@@ -127,13 +130,16 @@ public class RemovalListView
 	/**
 	 * Destroys the view.
 	 */
-	public void destroy()
+	@Override
+	public void reCreate()
 	{
 		bpane = null;
+		getView();
 	}
 
 	/**
-	 * Gets the search results list and the current new removal list views again.
+	 * Gets the search results list and the current new removal list views
+	 * again.
 	 */
 	public void refresh()
 	{

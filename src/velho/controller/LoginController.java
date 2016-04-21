@@ -52,7 +52,7 @@ public class LoginController
 	 */
 	private static void destroyView()
 	{
-		view.destroy();
+		view.reCreate();
 		view = null;
 	}
 
@@ -170,7 +170,7 @@ public class LoginController
 		MDC.remove("user_id");
 
 		currentUser = null;
-		uiController.destroyViews();
+		uiController.destroyAllViews();
 		checkLogin();
 	}
 

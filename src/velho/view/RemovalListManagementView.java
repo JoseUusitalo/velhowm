@@ -10,13 +10,15 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Priority;
 import velho.controller.RemovalListController;
+import velho.controller.UIController;
+import velho.model.interfaces.GenericView;
 
 /**
  * View for managing removal lists
  *
  * @author Jose Uusitalo
  */
-public class RemovalListManagementView
+public class RemovalListManagementView implements GenericView
 {
 	/**
 	 * The root BorderPane for this view.
@@ -94,6 +96,7 @@ public class RemovalListManagementView
 			});
 
 			bpane.setTop(managementPanel);
+			UIController.recordView(this);
 		}
 
 		return bpane;
@@ -121,9 +124,11 @@ public class RemovalListManagementView
 	/**
 	 * Destroys the view.
 	 */
-	public void destroy()
+	@Override
+	public void reCreate()
 	{
 		bpane = null;
+		getView();
 	}
 
 	/**

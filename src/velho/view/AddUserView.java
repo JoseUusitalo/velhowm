@@ -10,15 +10,17 @@ import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.GridPane;
+import velho.controller.UIController;
 import velho.controller.UserController;
 import velho.model.enums.UserRole;
+import velho.model.interfaces.GenericView;
 
 /**
  * The add user view class.
  *
  * @author Joona Silvennoinen
  */
-public class AddUserView
+public class AddUserView implements GenericView
 {
 	/**
 	 * The add user controller.
@@ -111,15 +113,15 @@ public class AddUserView
 					controller.createUser(badgeIDField.getText(), pinField.getText(), userFnameField.getText(), userLNameField.getText(), listbox.getValue());
 				}
 			});
+			UIController.recordView(this);
 		}
 		return grid;
 	}
 
-	/**
-	 * Destroys the view.
-	 */
-	public void destroy()
+	@Override
+	public void reCreate()
 	{
 		grid = null;
+		getView();
 	}
 }

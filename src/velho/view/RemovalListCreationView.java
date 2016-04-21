@@ -17,14 +17,17 @@ import javafx.scene.layout.Priority;
 import velho.controller.DatabaseController;
 import velho.controller.RemovalListController;
 import velho.controller.SearchController;
+import velho.controller.UIController;
 import velho.model.RemovalListState;
+import velho.model.exceptions.NoDatabaseLinkException;
+import velho.model.interfaces.GenericView;
 
 /**
  * View for creating new removal lists
  *
  * @author Jose Uusitalo
  */
-public class RemovalListCreationView
+public class RemovalListCreationView implements GenericView
 {
 	/**
 	 * Apache log4j logger: System.
@@ -148,6 +151,7 @@ public class RemovalListCreationView
 
 			bpane.setLeft(left);
 			bpane.setCenter(center);
+			UIController.recordView(this);
 		}
 
 		return bpane;
@@ -156,13 +160,16 @@ public class RemovalListCreationView
 	/**
 	 * Destroys the view.
 	 */
-	public void destroy()
+	@Override
+	public void reCreate()
 	{
 		bpane = null;
+		getView();
 	}
 
 	/**
-	 * Gets the search results list and the current new removal list views again.
+	 * Gets the search results list and the current new removal list views
+	 * again.
 	 */
 	public void refresh()
 	{

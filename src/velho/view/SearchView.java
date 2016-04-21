@@ -14,12 +14,14 @@ import javafx.scene.control.TextField;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.GridPane;
 import velho.controller.SearchController;
+import velho.controller.UIController;
+import velho.model.interfaces.GenericView;
 
 /**
  *
  * @author Joona Silvennoinen &amp; Jose Uusitalo
  */
-public class SearchView
+public class SearchView implements GenericView
 {
 	/**
 	 * The root GridPane for this view.
@@ -43,8 +45,7 @@ public class SearchView
 	 * @param productBrands
 	 * @param productCategories
 	 */
-	public SearchView(final SearchController searchController, final String limits, final ObservableList<Object> productBrands,
-			final ObservableList<Object> productCategories)
+	public SearchView(final SearchController searchController, final String limits, final ObservableList<Object> productBrands, final ObservableList<Object> productCategories)
 	{
 		this.searchController = searchController;
 		this.limits = limits;
@@ -75,7 +76,8 @@ public class SearchView
 			grid.add(countSpinnerLabel, 2, 1, 1, 1);
 
 			final Spinner<Integer> productCountField = new Spinner<Integer>();
-			// productCountField.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(-1, 10000));
+			// productCountField.setValueFactory(new
+			// SpinnerValueFactory.IntegerSpinnerValueFactory(-1, 10000));
 			productCountField.setEditable(true);
 			productCountField.setPrefWidth(75.0);
 
@@ -147,13 +149,14 @@ public class SearchView
 					}
 					catch (final NumberFormatException e)
 					{
-						// Although badge IDs are stored as string, they are still numbers.
+						// Although badge IDs are stored as string, they are
+						// still numbers.
 					}
 
-					searchController.productSearch(limits, nameField.getText(), productCountField.getValue(), brandbox.getValue(), categorybox.getValue(),
-							dpStart.getValue(), dpEnd.getValue());
+					searchController.productSearch(limits, nameField.getText(), productCountField.getValue(), brandbox.getValue(), categorybox.getValue(), dpStart.getValue(), dpEnd.getValue());
 				}
 			});
+			UIController.recordView(this);
 		}
 
 		return grid;
@@ -163,8 +166,10 @@ public class SearchView
 	 * Destroys the view.
 	 */
 
-	public void destroy()
+	@Override
+	public void reCreate()
 	{
 		grid = null;
+		getView();
 	}
 }

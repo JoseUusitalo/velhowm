@@ -12,13 +12,15 @@ import javafx.scene.image.ImageView;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.VBox;
 import velho.controller.LoginController;
+import velho.controller.UIController;
+import velho.model.interfaces.GenericView;
 
 /**
  * Allows the users to log in to the system.
  *
  * @author Jose Uusitalo &amp; Edward Puustinen
  */
-public class LoginView
+public class LoginView implements GenericView
 {
 	/**
 	 * The root VBox for this view.
@@ -81,6 +83,7 @@ public class LoginView
 					LoginController.login(firstNameField.getText(), lastNameField.getText(), authenticationStringField.getText());
 				}
 			});
+			UIController.recordView(this);
 		}
 
 		return vbox;
@@ -89,8 +92,10 @@ public class LoginView
 	/**
 	 * Destroys the view.
 	 */
-	public void destroy()
+	@Override
+	public void reCreate()
 	{
 		vbox = null;
+		getView();
 	}
 }

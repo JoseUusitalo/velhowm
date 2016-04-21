@@ -1,10 +1,14 @@
 package velho.controller;
 
+import java.util.HashSet;
+import java.util.Set;
+
 import org.apache.log4j.Logger;
 
 import javafx.scene.Node;
 import velho.model.enums.Position;
 import velho.model.enums.UserRole;
+import velho.model.interfaces.GenericView;
 import velho.view.MainWindow;
 
 /**
@@ -59,6 +63,8 @@ public class UIController
 	 */
 	private RemovalPlatformController removalPlatformController;
 
+	private static Set<GenericView> viewSet = new HashSet<GenericView>();
+
 	/**
 	 * @param mainWindow
 	 * @param userController
@@ -69,9 +75,7 @@ public class UIController
 	 * @param productController
 	 * @param removalPlatformController
 	 */
-	public void setControllers(final MainWindow mainWindow, final UserController userController, final RemovalListController removalListController,
-			final SearchController searchController, final LogController logController, final ManifestController manifestController,
-			final ProductController productController, final RemovalPlatformController removalPlatformController)
+	public void setControllers(final MainWindow mainWindow, final UserController userController, final RemovalListController removalListController, final SearchController searchController, final LogController logController, final ManifestController manifestController, final ProductController productController, final RemovalPlatformController removalPlatformController)
 	{
 		this.mainView = mainWindow;
 		this.userController = userController;
@@ -149,13 +153,15 @@ public class UIController
 		}
 
 		/*
-		 * Check the state the of the removal platform when the main menu is shown after user has logged in.
+		 * Check the state the of the removal platform when the main menu is
+		 * shown after user has logged in.
 		 */
 		removalPlatformController.checkWarning();
 	}
 
 	/**
-	 * Creates the user list view. The list contents change depending on who is logged in.
+	 * Creates the user list view. The list contents change depending on who is
+	 * logged in.
 	 *
 	 * @param currentUserRole the role of the user who is currently logged in
 	 * @return the user list view
@@ -186,18 +192,15 @@ public class UIController
 	 */
 	public void resetMainMenu()
 	{
-		mainView.destroy();
+		mainView.reCreate();
 	}
 
-	/**
-	 * Resets all views to their initial state.
-	 */
-	public void destroyViews()
+	public void destroyAllViews()
 	{
-		// TODO: We need to destroy all of the views.
-
-		mainView.destroy();
-		userController.destroyView();
+		for (GenericView view : viewSet)
+		{
+			view.reCreate();
+		}
 	}
 
 	/**
@@ -210,4 +213,10 @@ public class UIController
 	{
 		mainView.selectTab(tabName);
 	}
+
+	public static void recordView(final GenericView view)
+	{
+		viewSet.add(view);
+	}
+
 }

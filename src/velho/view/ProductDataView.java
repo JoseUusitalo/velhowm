@@ -7,9 +7,11 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.layout.GridPane;
 import velho.controller.ProductController;
+import velho.controller.UIController;
 import velho.model.Product;
+import velho.model.interfaces.GenericView;
 
-public class ProductDataView
+public class ProductDataView implements GenericView
 {
 
 	/**
@@ -18,6 +20,8 @@ public class ProductDataView
 	private GridPane grid;
 
 	private ProductController controller;
+
+	private Product currentProduct;
 
 	public ProductDataView(final ProductController controller)
 	{
@@ -28,6 +32,8 @@ public class ProductDataView
 	{
 		if (grid == null)
 		{
+			currentProduct = product;
+
 			grid = new GridPane();
 
 			grid.setAlignment(Pos.CENTER);
@@ -83,8 +89,16 @@ public class ProductDataView
 					controller.showList();
 				}
 			});
+			UIController.recordView(this);
 		}
 
 		return grid;
+	}
+
+	@Override
+	public void reCreate()
+	{
+		grid = null;
+		getView(currentProduct);
 	}
 }

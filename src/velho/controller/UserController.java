@@ -157,7 +157,7 @@ public class UserController implements UIActionController
 	 */
 	public void destroyView()
 	{
-		view.destroy();
+		view.reCreate();
 	}
 
 	/**
