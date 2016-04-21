@@ -12,39 +12,46 @@
 			<generator class="native" />
 		</id>
 		
+		<property	name="uuid"
+					column="uuid"
+					type="java.util.UUID"
+					unique="true"
+					not-null="true" />
+		
 		<property	name="driverID"
 					column="driver_id"
 					type="int" />
-		
+
 		<property	name="orderedDate"
 					column="date_ordered"
 					type="date" />
-		
+
 		<property	name="receivedDate"
 					column="date_received"
 					type="date" />
-		
-		<!-- Many-to-one: This object can have one referenced object, the referenced object can be referenced from many objects.  
+
+		<!-- Many-to-one: This object can have one referenced object, the referenced object can be referenced from many objects.
 			 Cascade changes.
 			 "Select" eager fetching: load the referenced object when this object is loaded. -->
 		<many-to-one	name="state"
 						class="velho.model.ManifestState"
 						column="state"
-						not-null="true"
 						cascade="all"
+						not-null="true"
 						fetch="select"
 						lazy="false" />
-		
-		<set name="boxes"
-			 cascade="all"
-			 table="manifest_productboxes"
-			 fetch="select"
-			 lazy="false" >
-			<key column="manifest" />
-			<many-to-many column="productbox"
-						  class="velho.model.ProductBox" />
+
+		<set	name="boxes"
+				table="PRODUCTBOXES"
+				inverse="true"
+				cascade="all"
+				fetch="select"
+				lazy="false">
+
+			<key column="manifest" not-null="false"/>
+			<one-to-many class="velho.model.ProductBox" />
 		</set>
-		
+
 		<!-- TODO: CHECK (`date_received`>=`date_ordered`) -->
 	</class>
 </hibernate-mapping>

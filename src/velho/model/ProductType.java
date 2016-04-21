@@ -1,17 +1,14 @@
 package velho.model;
 
+import java.util.UUID;
+
 /**
  * A class representing the type of the product.
  *
  * @author Jose Uusitalo
  */
-public class ProductType implements Comparable<ProductType>
+public class ProductType extends AbstractDatabaseObject
 {
-	/**
-	 * The database ID of this product category.
-	 */
-	private int databaseID;
-
 	/**
 	 * The product category name.
 	 */
@@ -21,10 +18,20 @@ public class ProductType implements Comparable<ProductType>
 	 * @param databaseID
 	 * @param name
 	 */
+	public ProductType(final int databaseID, final UUID uuid, final String name)
+	{
+		setDatabaseID(databaseID);
+		setUuid(uuid);
+		this.name = name;
+	}
+
+	/**
+	 * @param databaseID
+	 * @param name
+	 */
 	public ProductType(final int databaseID, final String name)
 	{
-		this.name = name;
-		this.databaseID = databaseID;
+		this(databaseID, UUID.randomUUID(), name);
 	}
 
 	/**
@@ -32,7 +39,7 @@ public class ProductType implements Comparable<ProductType>
 	 */
 	public ProductType(final String name)
 	{
-		this(-1, name);
+		this(0, name);
 	}
 
 	/**
@@ -40,26 +47,16 @@ public class ProductType implements Comparable<ProductType>
 	public ProductType()
 	{
 		// For Hibernate.
+		setUuid(UUID.randomUUID());
 	}
 
 	@Override
-	public boolean equals(final Object o)
+	public int compareTo(final AbstractDatabaseObject type)
 	{
-		if (!(o instanceof ProductType))
-			return false;
+		if (type instanceof ProductType)
+			return this.getName().compareTo(((ProductType) type).getName());
 
-		final ProductType pt = (ProductType) o;
-
-		if (this.getDatabaseID() <= 0)
-			return this == pt;
-
-		return this.getDatabaseID() == pt.getDatabaseID();
-	}
-
-	@Override
-	public int compareTo(final ProductType type)
-	{
-		return this.getName().compareTo(type.getName());
+		return super.compareTo(type);
 	}
 
 	/**
@@ -72,16 +69,6 @@ public class ProductType implements Comparable<ProductType>
 	}
 
 	/**
-	 * Gets the database ID of this category.
-	 *
-	 * @return the database id
-	 */
-	public int getDatabaseID()
-	{
-		return databaseID;
-	}
-
-	/**
 	 * Gets the name of this product type.
 	 *
 	 * @return the name of this product type
@@ -89,16 +76,6 @@ public class ProductType implements Comparable<ProductType>
 	public String getName()
 	{
 		return name;
-	}
-
-	/**
-	 * Sets a new database ID for this product type.
-	 *
-	 * @param databaseID the new database ID
-	 */
-	public void setDatabaseID(final int databaseID)
-	{
-		this.databaseID = databaseID;
 	}
 
 	/**

@@ -1,17 +1,14 @@
 package velho.model;
 
+import java.util.UUID;
+
 /**
  * A basic removal platform implementation.
  *
  * @author Jose Uusitalo
  */
-public class RemovalPlatform implements Comparable<RemovalPlatform>
+public class RemovalPlatform extends AbstractDatabaseObject
 {
-	/**
-	 * The database ID of this removal platform.
-	 */
-	private int databaseID;
-
 	/**
 	 * The amount of free space left on this removal platform as a percentage.
 	 */
@@ -24,14 +21,26 @@ public class RemovalPlatform implements Comparable<RemovalPlatform>
 
 	/**
 	 * @param databaseID
+	 * @param uuid
+	 * @param freeSpacePercent
+	 * @param freeSpaceLeftWarningPercent
+	 */
+	public RemovalPlatform(final int databaseID, final UUID uuid, final double freeSpacePercent, final double freeSpaceLeftWarningPercent)
+	{
+		setDatabaseID(databaseID);
+		setUuid(uuid);
+		this.freeSpacePercent = freeSpacePercent;
+		this.freeSpaceLeftWarningPercent = freeSpaceLeftWarningPercent;
+	}
+
+	/**
+	 * @param databaseID
 	 * @param freeSpacePercent
 	 * @param freeSpaceLeftWarningPercent
 	 */
 	public RemovalPlatform(final int databaseID, final double freeSpacePercent, final double freeSpaceLeftWarningPercent)
 	{
-		this.databaseID = databaseID;
-		this.freeSpacePercent = freeSpacePercent;
-		this.freeSpaceLeftWarningPercent = freeSpaceLeftWarningPercent;
+		this(databaseID, UUID.randomUUID(), freeSpacePercent, freeSpaceLeftWarningPercent);
 	}
 
 	/**
@@ -39,52 +48,13 @@ public class RemovalPlatform implements Comparable<RemovalPlatform>
 	public RemovalPlatform()
 	{
 		// For Hibernate.
+		setUuid(UUID.randomUUID());
 	}
 
 	@Override
 	public String toString()
 	{
-		return "[" + databaseID + "] Removal Platform: " + freeSpacePercent * 100.0 + "% (" + freeSpaceLeftWarningPercent * 100.0 + "%)";
-	}
-
-	@Override
-	public boolean equals(final Object o)
-	{
-		if (!(o instanceof RemovalPlatform))
-			return false;
-
-		final RemovalPlatform rp = (RemovalPlatform) o;
-
-		if (this.getDatabaseID() <= 0)
-			return this == rp;
-
-		return this.getDatabaseID() == rp.getDatabaseID();
-	}
-
-	@Override
-	public int compareTo(final RemovalPlatform platform)
-	{
-		return this.getDatabaseID() - platform.getDatabaseID();
-	}
-
-	/**
-	 * Gets the database ID of this removal platform.
-	 *
-	 * @return the database ID
-	 */
-	public int getDatabaseID()
-	{
-		return databaseID;
-	}
-
-	/**
-	 * Sets the database ID of this removal platform.
-	 *
-	 * @param databaseID the new database ID
-	 */
-	public void setDatabaseID(final int databaseID)
-	{
-		this.databaseID = databaseID;
+		return "[" + getDatabaseID() + "] Removal Platform: " + freeSpacePercent * 100.0 + "% (" + freeSpaceLeftWarningPercent * 100.0 + "%)";
 	}
 
 	/**
