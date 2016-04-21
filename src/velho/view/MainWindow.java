@@ -19,6 +19,7 @@ import javafx.scene.Group;
 import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
+import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
@@ -43,6 +44,7 @@ import velho.controller.RemovalPlatformController;
 import velho.controller.SearchController;
 import velho.controller.UIController;
 import velho.controller.UserController;
+import velho.model.enums.SupportedTranslation;
 import velho.model.exceptions.ExistingDatabaseLinkException;
 import velho.model.exceptions.NoDatabaseException;
 import velho.model.exceptions.NoDatabaseLinkException;
@@ -412,10 +414,28 @@ public class MainWindow extends Application
 			final GridPane statusBar = new GridPane();
 			statusBar.getStyleClass().add("status-bar");
 
+			final ComboBox<SupportedTranslation> languageBox = new ComboBox<SupportedTranslation>();
+			final Label languageChange = new Label(LocalizationController.getString("changeTranslationLabel"));
+			languageBox.getItems().addAll(SupportedTranslation.values());
+			languageBox.getSelectionModel().selectFirst();
+			languageBox.valueProperty().addListener(new ChangeListener<SupportedTranslation>()
+			{
+				@SuppressWarnings("rawtypes")
+				@Override
+				public void changed(final ObservableValue ov, final SupportedTranslation oldValue, final SupportedTranslation newValue)
+				{
+					if (!oldValue.equals(newValue))
+					{
+						LocalizationController.changeTranslation(newValue);
+					}
+				}
+			});
+
 			final HBox platformStatus = new HBox(3);
 			final Label removalPlatform = new Label(LocalizationController.getString("removalPlatformStatusLabel"));
+			removalPlatform.setId("removalPlatformStatusLabel");
 			removalPlatformStatus = new Label();
-			platformStatus.getChildren().addAll(removalPlatform, removalPlatformStatus);
+			platformStatus.getChildren().addAll(languageChange, languageBox, removalPlatform, removalPlatformStatus);
 			platformStatus.setAlignment(Pos.CENTER_LEFT);
 
 			final HBox userStatus = new HBox(10);
@@ -498,6 +518,7 @@ public class MainWindow extends Application
 				}
 			});
 		}
+		LocalizationController.setScene(scene);
 	}
 
 	/**

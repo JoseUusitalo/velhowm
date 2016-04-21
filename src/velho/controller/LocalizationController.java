@@ -4,31 +4,54 @@ import java.text.MessageFormat;
 import java.util.Locale;
 import java.util.ResourceBundle;
 
+import javafx.scene.Scene;
+import velho.model.enums.SupportedTranslation;
+
 public class LocalizationController
 {
 	private static ResourceBundle msgBundle;
-	private static Locale locale;
+	private static Locale localeEnglish;
+	private static Locale localeGerman;
+
+	private final static String languageEnglish = "en";
+	private final static String countryEnglish = "US";
+
+	private final static String languageGerman = "de";
+	private final static String countryGerman = "DE";
+	private static Scene scene;
 
 	public static void initializeBundle()
 	{
-		String language = "en";
-		String country = "US";
 
-		locale = new Locale(language, country);
+		localeEnglish = new Locale(languageEnglish, countryEnglish);
+		localeGerman = new Locale(languageGerman, countryGerman);
 
-		msgBundle = ResourceBundle.getBundle("res.en-US", locale);
+		msgBundle = getResourceBundle(localeEnglish);
+	}
 
+	public static void setScene(final Scene mainScene)
+	{
+		scene = mainScene;
+	}
+
+	private static ResourceBundle getResourceBundle(final Locale locale)
+	{
+		if (locale.equals(localeEnglish))
+		{
+			return ResourceBundle.getBundle("res.en-US", locale);
+		}
+		return ResourceBundle.getBundle("res.de-DE", locale);
 	}
 
 	public static void setLocale(final Locale locale)
 	{
-		LocalizationController.locale = locale;
+		LocalizationController.localeEnglish = locale;
 	}
 
 	public static String getCompoundString(final String key, final Object[] messageArguments)
 	{
 		MessageFormat formatter = new MessageFormat("");
-		formatter.setLocale(locale);
+		formatter.setLocale(localeEnglish);
 		formatter.applyPattern(msgBundle.getString(key));
 		return formatter.format(messageArguments);
 	}
@@ -40,7 +63,25 @@ public class LocalizationController
 
 	public static Locale getLocale()
 	{
-		return locale;
+		return localeEnglish;
+	}
+
+	public static void changeTranslation(final SupportedTranslation newTranslation)
+	{
+		if (newTranslation.equals(SupportedTranslation.ENGLISH))
+		{
+			msgBundle = getResourceBundle(localeEnglish);
+		}
+		else
+		{
+			msgBundle = getResourceBundle(localeGerman);
+		}
+
+		// ((Label) ).setText(getString("removalPlatformStatusLabel"));
+		// Node sceneLookup = scene.lookup("#asd");
+		// System.out.println(sceneLookup.getClass());
+		// System.out.println(sceneLookup.getId());
+		// System.out.println(sceneLookup.getParent().getClass());
 	}
 
 }

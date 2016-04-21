@@ -19,6 +19,7 @@ import velho.controller.LocalizationController;
 import velho.controller.RemovalListController;
 import velho.model.RemovalList;
 import velho.model.RemovalListState;
+import velho.model.exceptions.NoDatabaseLinkException;
 
 /**
  * View for creating new removal lists
@@ -138,7 +139,7 @@ public class RemovalListView
 	 */
 	public void refresh()
 	{
-		SYSLOG.trace(LocalizationController.getString("refreshRemovalListViewingView"));
+		SYSLOG.trace("Refreshing removal list viewing view.");
 		thisList = removalListController.getNewRemovalListView();
 	}
 }

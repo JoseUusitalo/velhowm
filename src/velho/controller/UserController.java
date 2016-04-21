@@ -69,7 +69,7 @@ public class UserController implements UIActionController
 				USRLOG.debug("Created a user.");
 
 				if (showPopup)
-					PopupController.info("User created.");
+					PopupController.info(LocalizationController.getString("userCreatedPopUpNotice"));
 
 				return newUser;
 

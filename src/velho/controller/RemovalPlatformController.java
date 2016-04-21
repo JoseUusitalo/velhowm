@@ -93,7 +93,7 @@ public class RemovalPlatformController
 
 			// Warning is only showed when logged in.
 			if (LoginController.isLoggedIn())
-				PopupController.warning("The removal platform is " + percentFull + "% full. Please contact the waste disposal services.");
+				PopupController.warning(LocalizationController.getCompoundString("removalPlatformFullnessPopUpNotice", new Object[] { percentFull }));
 		}
 	}
 
