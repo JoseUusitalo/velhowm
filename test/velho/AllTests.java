@@ -1,4 +1,4 @@
-package test;
+package velho;
 
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
@@ -6,8 +6,8 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 import org.junit.runners.Suite.SuiteClasses;
 
-import test.controller.AllControllerTests;
-import test.model.AllModelTests;
+import velho.controller.AllControllerTests;
+import velho.model.AllModelTests;
 
 /**
  * A class for running all tests in the project.
