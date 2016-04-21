@@ -195,12 +195,15 @@ public class UIController
 		mainView.reCreate();
 	}
 
-	public void destroyAllViews()
+	public void reCreateAllViews()
 	{
-		for (GenericView view : viewSet)
+		SYSLOG.debug("recreating all views");
+		Set<GenericView> temp = new HashSet<GenericView>(viewSet);
+		for (GenericView view : temp)
 		{
 			view.reCreate();
 		}
+		showMainMenu(LoginController.getCurrentUser().getRole());
 	}
 
 	/**

@@ -71,7 +71,7 @@ public class MainWindow extends Application implements GenericView
 	/**
 	 * Enable or disable debug features.
 	 */
-	public static final boolean DEBUG_MODE = false;
+	public static final boolean DEBUG_MODE = true;
 
 	/**
 	 * Enable or disable showing windows. DEBUG_MODE must be <code>true</code>
@@ -301,6 +301,7 @@ public class MainWindow extends Application implements GenericView
 
 				ExternalSystemsController.setControllers(manifestController);
 				LoginController.setControllers(uiController, debugController);
+				LocalizationController.setControllers(uiController);
 
 				//@formatter:off
 				uiController.setControllers(this,
@@ -399,7 +400,6 @@ public class MainWindow extends Application implements GenericView
 				}
 
 			});
-
 		}
 
 		// Force log in to see main menu.
@@ -510,7 +510,6 @@ public class MainWindow extends Application implements GenericView
 				}
 			});
 		}
-		LocalizationController.setScene(scene);
 	}
 
 	private BorderPane getRootBorderPane()
@@ -620,7 +619,6 @@ public class MainWindow extends Application implements GenericView
 	@Override
 	public void reCreate()
 	{
-		rootBorderPane = null;
-		getRootBorderPane();
+		mainTabPane = null;
 	}
 }

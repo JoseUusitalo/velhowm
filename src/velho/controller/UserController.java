@@ -34,12 +34,8 @@ public class UserController implements UIActionController
 	 */
 	private AddUserView view;
 
-	/**
-	 * @throws NoDatabaseLinkException
-	 */
 	public UserController()
 	{
-		view = new AddUserView(this, DatabaseController.getAllUserRoles());
 	}
 
 	/**
@@ -146,6 +142,8 @@ public class UserController implements UIActionController
 	 */
 	public Node getView()
 	{
+		if (view == null)
+			view = new AddUserView(this, DatabaseController.getAllUserRoles());
 		return view.getView();
 	}
 
@@ -154,7 +152,8 @@ public class UserController implements UIActionController
 	 */
 	public void destroyView()
 	{
-		view.reCreate();
+		view = null;
+		getView();
 	}
 
 	/**

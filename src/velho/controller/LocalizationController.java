@@ -4,7 +4,6 @@ import java.text.MessageFormat;
 import java.util.Locale;
 import java.util.ResourceBundle;
 
-import javafx.scene.Scene;
 import velho.model.enums.SupportedTranslation;
 
 public class LocalizationController
@@ -18,7 +17,7 @@ public class LocalizationController
 
 	private final static String languageGerman = "de";
 	private final static String countryGerman = "DE";
-	private static Scene scene;
+	private static UIController uiController;
 
 	public static void initializeBundle()
 	{
@@ -27,11 +26,6 @@ public class LocalizationController
 		localeGerman = new Locale(languageGerman, countryGerman);
 
 		msgBundle = getResourceBundle(localeEnglish);
-	}
-
-	public static void setScene(final Scene mainScene)
-	{
-		scene = mainScene;
 	}
 
 	private static ResourceBundle getResourceBundle(final Locale locale)
@@ -71,17 +65,19 @@ public class LocalizationController
 		if (newTranslation.equals(SupportedTranslation.ENGLISH))
 		{
 			msgBundle = getResourceBundle(localeEnglish);
+
 		}
 		else
 		{
+			System.out.println("new lang german");
 			msgBundle = getResourceBundle(localeGerman);
+			uiController.reCreateAllViews();
 		}
+	}
 
-		// ((Label) ).setText(getString("removalPlatformStatusLabel"));
-		// Node sceneLookup = scene.lookup("#asd");
-		// System.out.println(sceneLookup.getClass());
-		// System.out.println(sceneLookup.getId());
-		// System.out.println(sceneLookup.getParent().getClass());
+	public static void setControllers(final UIController uiController)
+	{
+		LocalizationController.uiController = uiController;
 	}
 
 }

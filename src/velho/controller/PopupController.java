@@ -68,7 +68,7 @@ public class PopupController
 	public static void error(final String msg)
 	{
 		Alert alert = new Alert(AlertType.ERROR);
-		alert.setTitle(LocalizationController.getString("popUpErrorTitle"));
+		alert.setTitle(LocalizationController.getString("popUpDatabaseInUse"));
 		alert.setHeaderText(null);
 		alert.setContentText(msg);
 
