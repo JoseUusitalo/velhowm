@@ -32,28 +32,12 @@ public class AllTests
 	}
 
 	@AfterClass
-	public final static void after()
+	public final static void after() throws NoDatabaseLinkException
 	{
+		DatabaseController.closeSessionFactory();
+		LogDatabaseController.shutdown();
+
 		System.out.println("---------------");
 		System.out.println("All Tests Done.\n");
-		
-		// In case a link was left open.
-		if (DatabaseController.isLinked())
-		{
-			DatabaseController.unlink();
-			System.out.println("Badly written tests, a database link is open after tests!");
-		}
-
-		try
-		{
-			// Just in case.
-			LogDatabaseController.unlink();
-		}
-		catch (NoDatabaseLinkException e)
-		{
-			// Ignore.
-		}
-		
-		System.out.println("Database links closed in preparation for main application.\n");
 	}
 }
