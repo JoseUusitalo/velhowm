@@ -66,7 +66,10 @@ public class UserController implements UIActionController
 			try
 			{
 				DatabaseController.saveOrUpdate(newUser);
-				USRLOG.debug("Created a user.");
+
+				if (LoginController.getCurrentUser() != null)
+					USRLOG.debug("Created a user.");
+				// Else: running a JUnit test -> above line causes a null pointer error.
 
 				if (showPopup)
 					PopupController.info("User created.");
