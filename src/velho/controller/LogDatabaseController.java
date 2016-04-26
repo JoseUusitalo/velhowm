@@ -474,7 +474,6 @@ public class LogDatabaseController
 		final DatabaseFileState state = link();
 		boolean initialized = true;
 
-		System.out.println("state is " + state);
 		switch (state)
 		{
 			case DOES_NOT_EXIST:
