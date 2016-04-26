@@ -27,7 +27,7 @@
 		<pathelement location="${dist.src.dir}" />
 	</path>
 	
-	<target name="clean" description="delete old files">
+	<target name="clean" description="delete old build files">
 		<delete dir="${dist.dir}" />
 		<delete dir="${build.lib.dir}" />
 		<delete dir="${test.report.dir}" />
@@ -43,7 +43,7 @@
 		<mkdir dir="${test.report.dir}" />
 	</target>
 
-	<target name="compile" depends="clean, init" description="compile the classes">
+	<target name="compile" depends="clean, init" description="compile the source and test classes">
 		<javac srcdir="${src.dir}" destdir="${dist.src.dir}" includeantruntime="false" source="${source}" target="${target}">
 			<classpath refid="velho.classpath" />
 		</javac>
@@ -62,11 +62,21 @@
 			<fileset dir="${src.hibernatemappings.dir}" includes="**/*.xml"/>
 		</copy>
 	</target>
+		
+	<target name="dependencies" description="copy all dependencies into a single jar">
+		<jar jarfile="${build.lib.dir}/dependencies.jar">
+			<zipgroupfileset dir="${lib.dir}">
+				<include name="**/*.jar" />
+			</zipgroupfileset>
+		</jar>
+	</target>
 
 	<target name="test" depends="compile" description="run the tests">
-		<junit printsummary="yes" haltonerror="yes" haltonfailure="no">
-
+		<junit showoutput="true" printsummary="yes" haltonerror="yes" haltonfailure="no">
+			<!-- Plain text for console. -->
 			<formatter type="plain" usefile="false" />
+
+			<!-- XML for file. -->
 			<formatter type="xml" />
 
 			<classpath refid="velho.classpath" />
@@ -76,23 +86,14 @@
 			</classpath>
 
 			<batchtest todir="${test.report.dir}">
-				<fileset dir="${test.dir}">
-					<include name="**/*Test.java" />
-					<exclude name="**/All*Tests.java" />
+				<fileset dir="${dist.test.dir}">
+					<include name="**/AllTests.class" />
 				</fileset>
 			</batchtest>
 		</junit>
 	</target>
-		
-	<target name="dependencies" description="copy all dependencies into a single jar">
-		<jar jarfile="${build.lib.dir}/dependencies.jar">
-			<zipgroupfileset dir="${lib.dir}">
-				<include name="**/*.jar" />
-			</zipgroupfileset>
-		</jar>
-	</target>
-					
-	<target name="jar" depends="compile, dependencies" description="make the jar">
+
+	<target name="jar" depends="compile, test, dependencies" description="make the jar">
 		<jar destfile="${dist.dir}/${projectName}_${DSTAMP}.jar" basedir="${dist.src.dir}">
 		    <manifest>
 		        <attribute name="Main-Class" value="${main.class}"/>
