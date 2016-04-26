@@ -1,7 +1,10 @@
-package test.model;
+package velhotest.model;
 
 import static org.junit.Assert.assertEquals;
 
+import java.text.ParseException;
+
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 import velho.controller.DatabaseController;
@@ -19,6 +22,17 @@ public class ProductBoxSearchResultRowTest
 {
 	private static ProductBox box = DatabaseController.getProductBoxByID(1);
 	private static ProductBoxSearchResultRow row = new ProductBoxSearchResultRow(box);
+
+	/**
+	 * Loads the sample data into the database if it does not yet exist.
+	 *
+	 * @throws ParseException
+	 */
+	@BeforeClass
+	public static final void loadSampleData() throws ParseException
+	{
+		DatabaseController.loadSampleData();
+	}
 
 	@Test
 	public final void testGetBox()

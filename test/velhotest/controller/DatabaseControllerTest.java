@@ -1,32 +1,26 @@
-package test.controller;
+package velhotest.controller;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
 
-import java.util.ArrayList;
+import java.text.ParseException;
 import java.util.Arrays;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Set;
 
 import org.hibernate.HibernateException;
-import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
 import javafx.collections.ObservableList;
 import velho.controller.DatabaseController;
 import velho.model.ProductBox;
-import velho.model.ProductBoxSearchResultRow;
 import velho.model.RemovalList;
 import velho.model.User;
-import velho.model.exceptions.NoDatabaseException;
-import velho.model.exceptions.NoDatabaseLinkException;
-import velho.model.exceptions.UniqueKeyViolationException;
+import velho.model.enums.UserRole;
 
 /**
  * Tests for the {@link DatabaseController} class.
@@ -36,56 +30,22 @@ import velho.model.exceptions.UniqueKeyViolationException;
 @SuppressWarnings("static-method")
 public class DatabaseControllerTest
 {
+	/**
+	 * Loads the sample data into the database if it does not yet exist.
+	 *
+	 * @throws ParseException
+	 */
 	@BeforeClass
-	public final static void connectAndInitializeDatabase() throws NoDatabaseException, NoDatabaseLinkException
+	public static final void loadSampleData() throws ParseException, ClassNotFoundException
 	{
-		assertTrue(DatabaseController.resetDatabase());
-	}
-
-	@AfterClass
-	public final static void unlink() throws NoDatabaseLinkException
-	{
-		DatabaseController.unlink();
+		DatabaseController.link();
+		DatabaseController.loadSampleData();
 	}
 
 	@Test
 	public final void testIsLinked()
 	{
 		assertTrue(DatabaseController.isLinked());
-	}
-
-	@Test
-	public final void testFailInitialization() throws NoDatabaseException
-	{
-		try
-		{
-			DatabaseController.unlink();
-			assertFalse(DatabaseController.isLinked());
-		}
-		catch (final NoDatabaseLinkException e)
-		{
-			fail(e.toString());
-		}
-
-		try
-		{
-			assertFalse(DatabaseController.loadSampleData());
-		}
-		catch (final NoDatabaseLinkException e)
-		{
-			try
-			{
-				connectAndInitializeDatabase();
-			}
-			catch (final NoDatabaseLinkException e1)
-			{
-				fail(e1.toString());
-			}
-		}
-		catch (UniqueKeyViolationException e)
-		{
-			e.printStackTrace();
-		}
 	}
 
 	@Test
@@ -99,7 +59,7 @@ public class DatabaseControllerTest
 	@Test
 	public final void testAuthenticate_ValidPin()
 	{
-		final User user = DatabaseController.getUserByNamesAndPIN("Admin", "Test", "111111");
+		final User user = DatabaseController.authenticatePIN("Admin", "Test", "111111");
 		assertEquals("Admin", user.getFirstName());
 		assertEquals("Test", user.getLastName());
 	}
@@ -107,25 +67,25 @@ public class DatabaseControllerTest
 	@Test
 	public final void testAuthenticate_InvalidPinLong()
 	{
-		assertEquals(null, DatabaseController.getUserByBadgeID("1111112"));
+		assertEquals(null, DatabaseController.authenticateBadgeID("1111112"));
 	}
 
 	@Test
 	public final void testAuthenticate_InvalidPinShort()
 	{
-		assertEquals(null, DatabaseController.getUserByBadgeID("0"));
+		assertEquals(null, DatabaseController.authenticateBadgeID("0"));
 	}
 
 	@Test
 	public final void testAuthenticate_InvalidString()
 	{
-		assertEquals(null, DatabaseController.getUserByBadgeID("this is NOT a valid pin or badge number"));
+		assertEquals(null, DatabaseController.authenticateBadgeID("this is NOT a valid pin or badge number"));
 	}
 
 	@Test
 	public final void testAuthenticate_ValidBadge()
 	{
-		final User user = DatabaseController.getUserByBadgeID("12345678");
+		final User user = DatabaseController.authenticateBadgeID("12345678");
 		assertEquals("Badger", user.getFirstName());
 		assertEquals("Testaccount", user.getLastName());
 	}
@@ -133,27 +93,21 @@ public class DatabaseControllerTest
 	@Test
 	public final void testAuthenticate_InvalidBadgeLong()
 	{
-		assertEquals(null, DatabaseController.getUserByBadgeID("100000000"));
+		assertEquals(null, DatabaseController.authenticateBadgeID("100000000"));
 	}
 
 	@Test
 	public final void testAuthenticate_InvalidBadgeShort()
 	{
-		assertEquals(null, DatabaseController.getUserByBadgeID("2222222"));
+		assertEquals(null, DatabaseController.authenticateBadgeID("2222222"));
 	}
 
 	@Test
-	public final void testGetProductCodeList() throws NoDatabaseLinkException
+	public final void testGetProductCodeList()
 	{
 		final List<Integer> list = DatabaseController.getProductCodeList();
 		assertEquals(12, list.size());
 		assertTrue(list.containsAll(Arrays.asList(1, 2, 3, 4, 5, 6, 7, 8, 9, 10)));
-	}
-
-	@Test
-	public final void testGetPublicUserDataList()
-	{
-		assertEquals(4, DatabaseController.getAllUsers().size());
 	}
 
 	@Test
@@ -171,10 +125,13 @@ public class DatabaseControllerTest
 		assertEquals(null, DatabaseController.getUserByID(-128));
 	}
 
+	/**
+	 * Tests that a non-existent user cannot be deleted.
+	 */
 	@Test(expected = HibernateException.class)
 	public final void testDelete_Invalid()
 	{
-		DatabaseController.deleteUser(new User(-123, "A", "B", null));
+		DatabaseController.deleteUser(new User(-123, "A", "B", "000000", null, UserRole.ADMINISTRATOR));
 	}
 
 	@Test(expected = IllegalArgumentException.class)
@@ -184,7 +141,7 @@ public class DatabaseControllerTest
 	}
 
 	@Test
-	public final void testDeleteUser1() throws NoDatabaseLinkException, NoDatabaseException
+	public final void testDeleteUser1()
 	{
 		final ObservableList<Object> users = DatabaseController.getAllUsers();
 		final User user = DatabaseController.getUserByID(1);
@@ -192,7 +149,7 @@ public class DatabaseControllerTest
 		DatabaseController.deleteUser(user);
 		assertFalse(users.contains(user));
 
-		assertTrue(DatabaseController.resetDatabase());
+		// TODO: Rollback.
 	}
 
 	@Test
@@ -205,7 +162,6 @@ public class DatabaseControllerTest
 		cols.put("name", "Name");
 		cols.put("brand", "Brand");
 		cols.put("category", "Category");
-		// cols.put("popularity", "Popularity");
 		cols.put("viewButton", "");
 
 		assertEquals(cols, DatabaseController.getProductDataColumns(false, false));
@@ -223,7 +179,6 @@ public class DatabaseControllerTest
 		cols.put("name", "Name");
 		cols.put("brand", "Brand");
 		cols.put("category", "Category");
-		// cols.put("popularity", "Popularity");
 		cols.put("viewButton", "");
 
 		assertEquals(cols, DatabaseController.getProductDataColumns(true, true));
@@ -270,7 +225,7 @@ public class DatabaseControllerTest
 	@Test
 	public final void testAuthenticatePIN_Invalid()
 	{
-		assertEquals(null, DatabaseController.getUserByNamesAndPIN("Admin", "Test", "-1"));
+		assertEquals(null, DatabaseController.authenticatePIN("Admin", "Test", "-1"));
 	}
 
 	@Test
@@ -280,25 +235,13 @@ public class DatabaseControllerTest
 	}
 
 	@Test
-	public final void testgetProductIDFromName_Invalid() throws NoDatabaseLinkException
+	public final void testgetProductIDFromName_Invalid()
 	{
-		assertEquals(-1, DatabaseController.getProductIDFromName("just some random text here not a product name"));
+		assertEquals(null, DatabaseController.getProductByName("just some random text here not a product name"));
 	}
 
 	@Test
-	public final void testGetRemovalListByID_ForceLoad()
-	{
-		assertEquals("[1] Active: 3 boxes", DatabaseController.getRemovalListByID(1).toString());
-	}
-
-	@Test
-	public final void testGetRemovalListByID_Cached()
-	{
-		assertEquals("[1] Active: 3 boxes", DatabaseController.getRemovalListByID(1).toString());
-	}
-
-	@Test
-	public final void testGetRemovalListByID_LoadAndCache()
+	public final void testGetRemovalListByID()
 	{
 		assertEquals("[1] Active: 3 boxes", DatabaseController.getRemovalListByID(1).toString());
 	}
@@ -313,18 +256,24 @@ public class DatabaseControllerTest
 	@Test
 	public final void testInsertRemovalList()
 	{
-		final RemovalList list = new RemovalList();
 		final ProductBox box = DatabaseController.getProductBoxByID(1);
-		list.addProductBox(box);
+		RemovalList list = new RemovalList();
+		assertTrue(list.addProductBox(box));
 
-		assertTrue(DatabaseController.save(list) > 0);
-		final ObservableList<Object> obsboxes = DatabaseController.getRemovalListByID(6).getObservableBoxes();
-		final List<ProductBox> boxes = new ArrayList<ProductBox>();
-		final Iterator<Object> it = obsboxes.iterator();
+		assertTrue(list.getBoxes().contains(box));
 
-		while (it.hasNext())
-			boxes.add(((ProductBoxSearchResultRow) it.next()).getBox());
+		final int newid = DatabaseController.saveOrUpdate(list);
 
-		assertTrue(boxes.contains(box));
+		assertTrue(newid > 0);
+
+		list = DatabaseController.getRemovalListByID(newid);
+
+		assertTrue(list.getBoxes().contains(box));
+
+		/*
+		 * Rollback.
+		 */
+
+		DatabaseController.deleteRemovalList(list);
 	}
 }

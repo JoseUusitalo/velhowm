@@ -11,7 +11,13 @@
 			type="int">
 			<generator class="native" />
 		</id>
-
+		
+		<property	name="uuid"
+					column="uuid"
+					type="java.util.UUID"
+					unique="true"
+					not-null="true" />
+		
 		<property	name="levelPosition"
 					column="level_position"
 					type="int" />
@@ -20,26 +26,25 @@
 					column="max_productboxes"
 					type="int" />
 
-		<set		name="productBoxes"
-					table="SHELFSLOT_PRODUCTBOXES"
-					cascade="all"
-					lazy="false">
-			<key column="shelfslot" />
-			<!-- The unique="true" makes this a one-to-many mapping. -->
-			<many-to-many	class="velho.model.ProductBox"
-							column="productbox"
-							unique="true" />
+		<set	name="productBoxes"
+				table="PRODUCTBOXES"
+				inverse="true"
+				cascade="all"
+				fetch="select"
+				lazy="false">
+
+			<key column="slot_id" not-null="false"/>
+			<one-to-many class="velho.model.ProductBox" />
 		</set>
 
-		<!-- This is the inverse "child" side. Updates here do not cascade? -->
-		<join		table="SHELFLEVEL_SHELFSLOTS"
-					optional="true"
-					inverse="true">
-			<key	column="shelfslot"
-					unique="true"
+		<!-- Bidirectional relationship, child side.
+			 "Select" eager fetching: load the referenced object when this object is loaded. -->
+		<many-to-one	name="parentShelfLevel"
+						class="velho.model.ShelfLevel"
+						fetch="select"
+						lazy="false">
+			<column	name="level_id"
 					not-null="true" />
-			<many-to-one	name="parentShelfLevel"
-							column="shelflevel" />
-		</join>
+		</many-to-one>
 	</class>
 </hibernate-mapping>

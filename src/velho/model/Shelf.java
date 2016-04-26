@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
+import java.util.UUID;
 
 import javax.naming.directory.InvalidAttributesException;
 
@@ -14,7 +15,7 @@ import org.apache.log4j.Logger;
  *
  * @author Jose Uusitalo
  */
-public class Shelf implements Comparable<Shelf>
+public class Shelf extends AbstractDatabaseObject
 {
 	/**
 	 * Apache log4j logger: System.
@@ -25,11 +26,6 @@ public class Shelf implements Comparable<Shelf>
 	 * The identifier of a shelf in IDs.
 	 */
 	public static final String SHELF_IDENTIFIER = "S";
-
-	/**
-	 * The database ID of this shelf.
-	 */
-	private int databaseID;
 
 	/**
 	 * Number of levels on this shelf.
@@ -43,24 +39,27 @@ public class Shelf implements Comparable<Shelf>
 
 	/**
 	 * @param databaseID
+	 * @param uuid
 	 * @param levelCount
 	 */
-	public Shelf(final int databaseID, final int levelCount)
+	public Shelf(final int databaseID, final UUID uuid, final int levelCount)
 	{
 		if (levelCount < 1)
 			throw new IllegalArgumentException("Number of levels on a shelf must be greater than 0.");
 
-		this.databaseID = databaseID;
+		setDatabaseID(databaseID);
+		setUuid(uuid);
 		this.levelCount = levelCount;
 		this.shelfLevels = new TreeSet<ShelfLevel>();
 	}
 
 	/**
+	 * @param databaseID
 	 * @param levelCount
 	 */
-	public Shelf(final int levelCount)
+	public Shelf(final int databaseID, final int levelCount)
 	{
-		this(0, levelCount);
+		this(databaseID, UUID.randomUUID(), levelCount);
 	}
 
 	/**
@@ -68,6 +67,7 @@ public class Shelf implements Comparable<Shelf>
 	public Shelf()
 	{
 		// For Hibernate.
+		setUuid(UUID.randomUUID());
 	}
 
 	/**
@@ -222,7 +222,7 @@ public class Shelf implements Comparable<Shelf>
 		final int[] tokens = shelfSlotIDTokenizer(shelfSlotID);
 
 		// Correct shelf?
-		if (databaseID != tokens[0])
+		if (getDatabaseID() != tokens[0])
 			throw new IllegalArgumentException("Invalid shelf slot ID '" + shelfSlotID + "': invalid shelf " + tokens[0]);
 
 		// Enough levels?
@@ -239,28 +239,8 @@ public class Shelf implements Comparable<Shelf>
 	@Override
 	public String toString()
 	{
-		return "[" + databaseID + "] Lvls: " + levelCount + ", Boxs: " + getProductBoxes().size() + ", Slts: " + getShelfSlotCount() + ", Free: "
+		return "[" + getDatabaseID() + "] Lvls: " + levelCount + ", Boxs: " + getProductBoxes().size() + ", Slts: " + getShelfSlotCount() + ", Free: "
 				+ getFreeShelfSlots().size();
-	}
-
-	@Override
-	public boolean equals(final Object o)
-	{
-		if (!(o instanceof Shelf))
-			return false;
-
-		final Shelf s = (Shelf) o;
-
-		if (this.getDatabaseID() <= 0)
-			return this == s;
-
-		return this.getDatabaseID() == s.getDatabaseID();
-	}
-
-	@Override
-	public int compareTo(final Shelf shelf)
-	{
-		return this.getDatabaseID() - shelf.getDatabaseID();
 	}
 
 	/**
@@ -270,29 +250,7 @@ public class Shelf implements Comparable<Shelf>
 	 */
 	public String getShelfID()
 	{
-		return SHELF_IDENTIFIER + databaseID;
-	}
-
-	/**
-	 * Gets the database ID of this shelf.
-	 *
-	 * @return the database ID
-	 */
-	public int getDatabaseID()
-	{
-		return databaseID;
-	}
-
-	/**
-	 * Sets the database ID of this shelf.
-	 *
-	 * @param databaseID the new database ID
-	 */
-	public void setDatabaseID(final int databaseID)
-	{
-		// TODO: It would be nice to handle this in an abstract class.
-
-		this.databaseID = databaseID;
+		return SHELF_IDENTIFIER + getDatabaseID();
 	}
 
 	/**
@@ -316,11 +274,21 @@ public class Shelf implements Comparable<Shelf>
 		this.levelCount = levels;
 	}
 
+	/**
+	 * Gets all {@link ShelfLevel} objects in this shelf.
+	 *
+	 * @return a set of all shelf levels
+	 */
 	public Set<ShelfLevel> getShelfLevels()
 	{
 		return shelfLevels;
 	}
 
+	/**
+	 * Assign a new set of {@link ShelfLevel} objects to this shelf.
+	 *
+	 * @param shelfLevels the set of shelf levels
+	 */
 	public void setShelfLevels(final Set<ShelfLevel> shelfLevels)
 	{
 		this.shelfLevels = shelfLevels;
@@ -441,6 +409,12 @@ public class Shelf implements Comparable<Shelf>
 		return false;
 	}
 
+	/**
+	 * Gets the {@link ShelfLevel} object according to its position in this shelf from the bottom starting at 1.
+	 *
+	 * @param shelfPosition the shelf position integer
+	 * @return the corresponding shelf level object
+	 */
 	public ShelfLevel getShelfLevel(final int shelfPosition)
 	{
 		for (final ShelfLevel level : shelfLevels)
@@ -452,6 +426,12 @@ public class Shelf implements Comparable<Shelf>
 		return null;
 	}
 
+	/**
+	 * Gets the {@link ShelfSlot} object according to its {@link ShelfSlot#getSlotID()}.
+	 *
+	 * @param shelfSlotID the shelf slot ID string
+	 * @return the corresponding shelf slot object
+	 */
 	public ShelfSlot getShelfSlot(final String shelfSlotID)
 	{
 		final int[] tokens = tokenizeAndValidateShelfSlotID(shelfSlotID);
@@ -467,5 +447,15 @@ public class Shelf implements Comparable<Shelf>
 		}
 
 		return null;
+	}
+
+	/**
+	 * Removes the given {@link ShelfLevel} from this shelf.
+	 *
+	 * @param shelfLevel the shelf level to remove
+	 */
+	public void removeLevel(final ShelfLevel shelfLevel)
+	{
+		shelfLevels.remove(shelfLevel);
 	}
 }

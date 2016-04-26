@@ -60,13 +60,13 @@ public class LogDatabaseController
 	 * @param columns columns to select (can be <code>null</code>)
 	 * @param where conditions (can be <code>null</code>)
 	 * @return
-	 * <ul>
-	 * <li>if type is {@link DatabaseQueryType#UPDATE} or
-	 * {@link DatabaseQueryType#DELETE}: the number of rows that were
-	 * changed as a result of the query as an {@link Integer}</li>
-	 * <li>if type is {@link DatabaseQueryType#SELECT}: a Set containing
-	 * the selected data</li>
-	 * </ul>
+	 *         <ul>
+	 *         <li>if type is {@link DatabaseQueryType#UPDATE} or
+	 *         {@link DatabaseQueryType#DELETE}: the number of rows that were
+	 *         changed as a result of the query as an {@link Integer}</li>
+	 *         <li>if type is {@link DatabaseQueryType#SELECT}: a Set containing
+	 *         the selected data</li>
+	 *         </ul>
 	 * @throws NoDatabaseLinkException
 	 */
 	private static List<Object> runQuery(final DatabaseQueryType type, final LogDatabaseTable tableName, final Map<DatabaseTable, String> joinOnValues,
@@ -368,9 +368,9 @@ public class LogDatabaseController
 	 *
 	 * @return <code>true</code> if the link was created successfully
 	 * @throws ClassNotFoundException
-	 * when the H2 driver was unable to load
+	 *             when the H2 driver was unable to load
 	 * @throws ExistingDatabaseLinkException
-	 * when a database link already exists
+	 *             when a database link already exists
 	 */
 	public static DatabaseFileState link() throws ClassNotFoundException, ExistingDatabaseLinkException
 	{
@@ -450,8 +450,8 @@ public class LogDatabaseController
 	 * to the database again.
 	 *
 	 * @throws NoDatabaseLinkException
-	 * when attempting unlink a database when no database link
-	 * exists
+	 *             when attempting unlink a database when no database link
+	 *             exists
 	 */
 	public static void unlink() throws NoDatabaseLinkException
 	{
@@ -468,9 +468,13 @@ public class LogDatabaseController
 	 */
 	public static boolean connectAndInitialize() throws ClassNotFoundException, ExistingDatabaseLinkException, NoDatabaseLinkException
 	{
+		if (isLinked())
+			return true;
+
 		final DatabaseFileState state = link();
 		boolean initialized = true;
 
+		System.out.println("state is " + state);
 		switch (state)
 		{
 			case DOES_NOT_EXIST:
@@ -565,6 +569,81 @@ public class LogDatabaseController
 			SYSLOG.info("Log database initialized.");
 
 		return changed;
+	}
+
+	/**
+	 * Closes the database permanently.
+	 *
+	 * @throws NoDatabaseLinkException
+	 */
+	public static void shutdown() throws NoDatabaseLinkException
+	{
+		if (MainWindow.DEBUG_MODE)
+			System.out.println("Shutting down log database..");
+
+		if (!isLinked())
+		{
+			try
+			{
+				link();
+			}
+			catch (ClassNotFoundException e1)
+			{
+				e1.printStackTrace();
+			}
+			catch (ExistingDatabaseLinkException e1)
+			{
+				e1.printStackTrace();
+			}
+		}
+
+		Connection connection = null;
+		try
+		{
+			connection = getConnection();
+		}
+		catch (NoDatabaseLinkException e1)
+		{
+			// Ignore.
+		}
+
+		try
+		{
+			if (connection != null)
+				connection.createStatement().execute("SHUTDOWN;");
+		}
+		catch (final IllegalStateException e)
+		{
+			// Close all resources.
+
+			try
+			{
+				if (connection != null)
+					connection.close();
+			}
+			catch (final SQLException e2)
+			{
+				e.printStackTrace();
+			}
+
+			// Connection pool has been disposed = no database connection.
+			throw new NoDatabaseLinkException();
+		}
+		catch (final SQLException e)
+		{
+			e.printStackTrace();
+		}
+
+		// Close all resources.
+		try
+		{
+			if (connection != null)
+				connection.close();
+		}
+		catch (final SQLException e)
+		{
+			e.printStackTrace();
+		}
 	}
 
 	/*
