@@ -1,4 +1,4 @@
-package velho.model;
+package velhotest.model;
 
 import org.junit.AfterClass;
 import org.junit.BeforeClass;

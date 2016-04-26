@@ -1,4 +1,4 @@
-package velho.controller;
+package velhotest.controller;
 
 import org.junit.AfterClass;
 import org.junit.BeforeClass;

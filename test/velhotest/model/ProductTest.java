@@ -1,4 +1,4 @@
-package velho.model;
+package velhotest.model;
 
 import static org.junit.Assert.assertEquals;
 
