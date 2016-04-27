@@ -1,4 +1,4 @@
-package test.controller;
+package velhotest.controller;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -6,13 +6,20 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
+import java.text.ParseException;
+
+import org.junit.AfterClass;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 import javafx.collections.ObservableList;
 import velho.controller.DatabaseController;
+import velho.controller.LogDatabaseController;
 import velho.controller.UserController;
 import velho.model.User;
 import velho.model.enums.UserRole;
+import velho.model.exceptions.ExistingDatabaseLinkException;
+import velho.model.exceptions.NoDatabaseLinkException;
 
 /**
  * Test for the {@link velho.controller.UserController} class.
@@ -29,6 +36,47 @@ public class UserControllerTest
 	private final String VALID_NAME = "First-Name";
 	private final UserRole VALID_ROLE = UserRole.MANAGER;
 	private final UserRole NULL_ROLE = null;
+
+	/**
+	 * Connects to the log database.
+	 * Loads the sample data into the database if it does not yet exist.
+	 *
+	 * @throws ParseException
+	 */
+	@BeforeClass
+	public static final void loadSampleData() throws ParseException, ClassNotFoundException, NoDatabaseLinkException
+	{
+		DatabaseController.link();
+
+		try
+		{
+			assertTrue(LogDatabaseController.connectAndInitialize());
+		}
+		catch (ExistingDatabaseLinkException e)
+		{
+			// Ignore.
+		}
+
+		DatabaseController.loadSampleData();
+	}
+
+	/**
+	 * Unlinks from both databases.
+	 */
+	@AfterClass
+	public static final void unlinkDatabases()
+	{
+		DatabaseController.unlink();
+		try
+		{
+			// This test uses the log database so we need to shut it down after using it.
+			LogDatabaseController.shutdown();
+		}
+		catch (NoDatabaseLinkException e)
+		{
+			// Ignore.
+		}
+	}
 
 	@Test
 	public final void testAddUserValid()
@@ -63,6 +111,8 @@ public class UserControllerTest
 		assertNotNull(newUser);
 
 		final User newUser2 = controller.createUser(VALID_BADGE_ID, null, VALID_NAME, VALID_NAME, VALID_ROLE, false);
+
+		// TODO: Test fails because the database has no unique constraints.
 		assertNull(newUser2);
 
 		DatabaseController.deleteUser(newUser);

@@ -24,12 +24,17 @@ public class DebugWindow
 	/**
 	 * Button has been tagged logInButton and named as "Log In" on the scene.
 	 */
-	private Button logInButton = new Button("Log In");
+	private Button logInButton;
 
 	/**
 	 * Button has been tagged logOutButton and named as "Log Out" on the scene.
 	 */
-	public Button logOutButton = new Button("Log Out");
+	public Button logOutButton;
+
+	/**
+	 * Button for sending a badge ID from the debug window.
+	 */
+	public Button scanBadgeButton;
 
 	/**
 	 * Button has been tagged scannerMoveValid and named as "Scanner Move Valid"
@@ -43,30 +48,30 @@ public class DebugWindow
 	private DebugController debugController;
 
 	/**
-	 * The grid panel.
-	 */
-	private GridPane grid;
-
-	/**
-	 * rolenameSet is a Set for the unique values in the code.
+	 * A list of for the unique roles in the database.
 	 */
 	private List<UserRole> roles;
+
+	/**
+	 * A list of unique badge numbers in the database.
+	 */
+	private List<String> badgeNumbers;
 
 	/**
 	 * @param debugController
 	 * @param rolelist
 	 */
-	public DebugWindow(final DebugController debugController, final List<UserRole> userRoles)
+	public DebugWindow(final DebugController debugController, final List<UserRole> userRoles, final List<String> badges)
 	{
 		roles = userRoles;
+		badgeNumbers = badges;
 		this.debugController = debugController;
-		grid = null;
 	}
 
 	/**
-	 * Sets the value as either true or false to show in the scene.
+	 * Changes the visiblity of the log in button.
 	 *
-	 * @param visibility
+	 * @param visibility show log in button?
 	 */
 	public void setLogInButton(final boolean visibility)
 	{
@@ -74,13 +79,23 @@ public class DebugWindow
 	}
 
 	/**
-	 * sets the value as either true or false to show in the scene.
+	 * Changes the visiblity of the log out button.
 	 *
-	 * @param visibility
+	 * @param visibility show scan badge button?
 	 */
 	public void setLogOutButton(final boolean visibility)
 	{
 		logOutButton.setVisible(visibility);
+	}
+
+	/**
+	 * Changes the visiblity of the scan badge button.
+	 *
+	 * @param visibility show scan badge button?
+	 */
+	public void setScanBadgeButton(final boolean visibility)
+	{
+		scanBadgeButton.setVisible(visibility);
 	}
 
 	/**
@@ -91,28 +106,35 @@ public class DebugWindow
 	public void start(final Stage primaryStage)
 	{
 		primaryStage.setTitle("VELHO WM DEBUG");
-		Group root = new Group();
-		Scene scene = new Scene(root, 300, 150);
+		final Group root = new Group();
+		final Scene scene = new Scene(root, 300, 150);
 		scene.getStylesheets().add(getClass().getResource("velho.css").toExternalForm());
 
-		BorderPane rootBorderPane = new BorderPane();
+		final BorderPane rootBorderPane = new BorderPane();
 		rootBorderPane.prefHeightProperty().bind(scene.heightProperty());
 		rootBorderPane.prefWidthProperty().bind(scene.widthProperty());
 		rootBorderPane.getStyleClass().add("standard-background-color");
 		rootBorderPane.getStyleClass().add("standard-padding-half");
 
-		final ComboBox<UserRole> roleListBox = new ComboBox<UserRole>();
-
-		grid = new GridPane();
+		final GridPane grid = new GridPane();
 		grid.setVgap(5);
 		grid.setHgap(10);
 
+		final ComboBox<UserRole> roleListBox = new ComboBox<UserRole>();
 		roleListBox.getItems().addAll(roles);
 		roleListBox.getSelectionModel().selectFirst();
 
+		logInButton = new Button("Log In");
+		logOutButton = new Button("Log Out");
 		logOutButton.setVisible(false);
 
-		Button sendRandomShipmentButton = new Button("Send Random Shipment");
+		final ComboBox<String> badgeList = new ComboBox<String>();
+		badgeList.getItems().addAll(badgeNumbers);
+		badgeList.getSelectionModel().selectFirst();
+
+		scanBadgeButton = new Button("Scan Badge");
+
+		final Button sendRandomShipmentButton = new Button("Send Random Shipment");
 
 		final Button fillUpPlatformButton = new Button("Fill Up Removal Platform");
 		final Button emptyPlatformButton = new Button("Empty");
@@ -135,6 +157,16 @@ public class DebugWindow
 
 				debugController.logout();
 			}
+		});
+
+		scanBadgeButton.setOnAction(new EventHandler<ActionEvent>()
+		{
+			@Override
+			public void handle(final ActionEvent event)
+			{
+				DebugController.scanBadge(badgeList.getValue());
+			}
+
 		});
 
 		scannerMoveValid.setOnAction(new EventHandler<ActionEvent>()
@@ -177,11 +209,15 @@ public class DebugWindow
 
 		grid.add(roleListBox, 0, 0);
 		grid.add(logInButton, 1, 0);
-		grid.add(logOutButton, 1, 1);
-		grid.add(scannerMoveValid, 0, 1);
-		grid.add(sendRandomShipmentButton, 0, 2);
-		grid.add(fillUpPlatformButton, 0, 3);
-		grid.add(emptyPlatformButton, 1, 3);
+		grid.add(logOutButton, 1, 0);
+
+		grid.add(badgeList, 0, 1);
+		grid.add(scanBadgeButton, 1, 1);
+
+		grid.add(scannerMoveValid, 0, 2);
+		grid.add(sendRandomShipmentButton, 0, 3);
+		grid.add(fillUpPlatformButton, 0, 4);
+		grid.add(emptyPlatformButton, 1, 4);
 
 		rootBorderPane.setCenter(grid);
 		root.getChildren().add(rootBorderPane);

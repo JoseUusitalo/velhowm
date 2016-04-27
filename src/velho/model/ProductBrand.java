@@ -1,17 +1,14 @@
 package velho.model;
 
+import java.util.UUID;
+
 /**
  * A brand associated with a {@link Product}.
  *
  * @author Joona Silvennoinen &amp; Jose Uusitalo
  */
-public class ProductBrand implements Comparable<ProductBrand>
+public class ProductBrand extends AbstractDatabaseObject
 {
-	/**
-	 * The database ID of this product brand.
-	 */
-	private int databaseID;
-
 	/**
 	 * The name of this product brand.
 	 */
@@ -19,12 +16,22 @@ public class ProductBrand implements Comparable<ProductBrand>
 
 	/**
 	 * @param databaseID
+	 * @param uuid
+	 * @param name
+	 */
+	public ProductBrand(final int databaseID, final UUID uuid, final String name)
+	{
+		setDatabaseID(databaseID);
+		setUuid(uuid);
+		this.name = name;
+	}
+
+	/**
 	 * @param name
 	 */
 	public ProductBrand(final int databaseID, final String name)
 	{
-		this.databaseID = databaseID;
-		this.name = name;
+		this(databaseID, UUID.randomUUID(), name);
 	}
 
 	/**
@@ -32,7 +39,7 @@ public class ProductBrand implements Comparable<ProductBrand>
 	 */
 	public ProductBrand(final String name)
 	{
-		this(0, name);
+		this(0, UUID.randomUUID(), name);
 	}
 
 	/**
@@ -41,6 +48,7 @@ public class ProductBrand implements Comparable<ProductBrand>
 	public ProductBrand()
 	{
 		// For Hibernate.
+		setUuid(UUID.randomUUID());
 	}
 
 	/**
@@ -56,26 +64,12 @@ public class ProductBrand implements Comparable<ProductBrand>
 	 * Gets Product Brand and returns DatabaseID
 	 */
 	@Override
-	public boolean equals(final Object o)
+	public int compareTo(final AbstractDatabaseObject brand)
 	{
-		if (!(o instanceof ProductBrand))
-			return false;
+		if (brand instanceof ProductBrand)
+			return this.getName().compareTo(((ProductBrand) brand).getName());
 
-		final ProductBrand pb = (ProductBrand) o;
-
-		if (this.getDatabaseID() <= 0)
-			return this == pb;
-
-		return this.getDatabaseID() == pb.getDatabaseID();
-	}
-
-	/**
-	 * Compares brand to another brand
-	 */
-	@Override
-	public int compareTo(final ProductBrand brand)
-	{
-		return this.getName().compareTo(brand.getName());
+		return super.compareTo(brand);
 	}
 
 	/**
@@ -86,24 +80,6 @@ public class ProductBrand implements Comparable<ProductBrand>
 	public String getName()
 	{
 		return name;
-	}
-
-	/**
-	 * Gets the database ID of this product brand.
-	 *
-	 * @return the database ID of this product brand
-	 */
-	public int getDatabaseID()
-	{
-		return databaseID;
-	}
-
-	/**
-	 * Sets a new database ID for this product brand.
-	 */
-	public void setDatabaseID(final int id)
-	{
-		databaseID = id;
 	}
 
 	/**

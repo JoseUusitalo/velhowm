@@ -1,4 +1,4 @@
-package test;
+package velhotest;
 
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
@@ -6,8 +6,11 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 import org.junit.runners.Suite.SuiteClasses;
 
-import test.controller.AllControllerTests;
-import test.model.AllModelTests;
+import velho.controller.DatabaseController;
+import velho.controller.LogDatabaseController;
+import velho.model.exceptions.NoDatabaseLinkException;
+import velhotest.controller.AllControllerTests;
+import velhotest.model.AllModelTests;
 
 /**
  * A class for running all tests in the project.
@@ -29,9 +32,12 @@ public class AllTests
 	}
 
 	@AfterClass
-	public final static void after()
+	public final static void after() throws NoDatabaseLinkException
 	{
+		DatabaseController.closeSessionFactory();
+		LogDatabaseController.shutdown();
+
 		System.out.println("---------------");
-		System.out.println("All Tests Done.");
+		System.out.println("All Tests Done.\n");
 	}
 }

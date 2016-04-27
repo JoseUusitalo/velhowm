@@ -1,15 +1,18 @@
-package test.model;
+package velhotest.model;
 
 import static org.junit.Assert.assertEquals;
 
+import java.text.ParseException;
+
 import org.junit.After;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
+import velho.controller.DatabaseController;
 import velho.model.Product;
 import velho.model.ProductBrand;
 import velho.model.ProductCategory;
-import velho.model.ProductType;
 
 /**
  * Tests for the {@link Product} class.
@@ -18,17 +21,27 @@ import velho.model.ProductType;
  */
 public class ProductTest
 {
-	private ProductBrand brand = new ProductBrand(1, "jotain");
-	private ProductType regular = new ProductType(2, "Regular");
-	private ProductCategory category = new ProductCategory(3, "jahas", regular);
+	private ProductBrand brand = DatabaseController.getProductBrandByID(1);
+	private ProductCategory category = DatabaseController.getProductCategoryByID(3);
 	private Product product;
 	private String name = "porkkana";
 	private int id = 20;
 
+	/**
+	 * Loads the sample data into the database if it does not yet exist.
+	 *
+	 * @throws ParseException
+	 */
+	@BeforeClass
+	public static final void loadSampleData() throws ParseException
+	{
+		DatabaseController.loadSampleData();
+	}
+
 	@Before
 	public void createProduct()
 	{
-		product = new Product(id, name, brand, category, -1);
+		product = new Product(id, name, brand, category);
 	}
 
 	@After
@@ -41,12 +54,6 @@ public class ProductTest
 	public void testGetName()
 	{
 		assertEquals(name, product.getName());
-	}
-
-	@Test
-	public void testGetPopularity()
-	{
-		assertEquals(-1, product.getPopularity());
 	}
 
 	@Test
@@ -64,7 +71,7 @@ public class ProductTest
 	@Test
 	public void testGetBrandName()
 	{
-		assertEquals("jotain", product.getBrand().getName());
+		assertEquals("Test Brand #1", product.getBrand().getName());
 	}
 
 	@Test
@@ -88,20 +95,12 @@ public class ProductTest
 	@Test
 	public void testGetTypeID()
 	{
-		assertEquals(2, product.getCategory().getType().getDatabaseID());
-	}
-
-	@Test
-	public void testSetPopularity()
-	{
-		int popularity = 10;
-		product.setPopularity(popularity);
-		assertEquals(popularity, product.getPopularity());
+		assertEquals(3, product.getCategory().getType().getDatabaseID());
 	}
 
 	@Test
 	public final void testToString()
 	{
-		assertEquals("[20] porkkana (jotain / jahas (Regular)), Popularity: -1", product.toString());
+		assertEquals("[20] porkkana (Test Brand #1 / Frozen Things (Frozen))", product.toString());
 	}
 }

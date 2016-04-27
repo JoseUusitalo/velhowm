@@ -1,16 +1,18 @@
-package test.model;
+package velhotest.model;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertTrue;
 
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 import javafx.collections.ObservableList;
@@ -27,9 +29,23 @@ import velho.model.RemovalListState;
 @SuppressWarnings("static-method")
 public class RemovalListTest
 {
-	private static RemovalList newlist = new RemovalList();
-	private static RemovalList existingRemovalList = DatabaseController.getRemovalListByID(1);
-	private static ProductBox box1 = DatabaseController.getProductBoxByID(1);
+	private static RemovalList newlist;
+	private static RemovalList existingRemovalList;
+	private static ProductBox box1;
+
+	/**
+	 * Loads the sample data into the database if it does not yet exist.
+	 *
+	 * @throws ParseException
+	 */
+	@BeforeClass
+	public static final void loadSampleData() throws ParseException
+	{
+		DatabaseController.loadSampleData();
+		box1 = DatabaseController.getProductBoxByID(1);
+		existingRemovalList = DatabaseController.getRemovalListByID(1);
+		newlist = new RemovalList();
+	}
 
 	@Test
 	public final void testToString()
@@ -76,7 +92,7 @@ public class RemovalListTest
 		assertEquals(newState, existingRemovalList.getState());
 
 		// Save.
-		final int saveID = DatabaseController.save(existingRemovalList);
+		final int saveID = DatabaseController.saveOrUpdate(existingRemovalList);
 		assertTrue(saveID > 0);
 
 		// Check that that the object was updated, not inserted.
@@ -87,7 +103,7 @@ public class RemovalListTest
 
 		// TODO: Figure out a better way to roll back changes.
 		existingRemovalList.setState(oldState);
-		DatabaseController.save(existingRemovalList);
+		DatabaseController.saveOrUpdate(existingRemovalList);
 	}
 
 	@Test
@@ -106,7 +122,7 @@ public class RemovalListTest
 
 		// Rollback.
 		assertTrue(existingRemovalList.setBoxes(boxes));
-		DatabaseController.save(existingRemovalList);
+		DatabaseController.saveOrUpdate(existingRemovalList);
 	}
 
 	@Test
@@ -120,27 +136,54 @@ public class RemovalListTest
 	@Test
 	public final void testSaveToDatabase()
 	{
-		System.out.println();
-		System.out.println(existingRemovalList.getBoxes());
-		final ProductBox first = existingRemovalList.getBoxes().iterator().next();
+		final RemovalList rl = existingRemovalList = DatabaseController.getRemovalListByID(1);
+
+		System.out.println("\nRemovalList testSaveToDatabase()");
+		System.out.println(rl);
+		System.out.println(rl.getBoxes());
+		final ProductBox first = rl.getBoxes().iterator().next();
+		System.out.println("Box to remove: " + first);
+
+		assertEquals(3, rl.getSize());
+
+		System.out.println("\nRemoving");
+		assertTrue(rl.removeProductBox(first));
+		assertFalse(rl.getBoxes().contains(first));
+		System.out.println(rl.getBoxes());
+
+		System.out.println("\nRemoved box");
 		System.out.println(first);
-		System.out.println();
+		System.out.println(first.getRemovalList());
 
-		assertEquals(3, existingRemovalList.getSize());
-		assertTrue(existingRemovalList.removeProductBox(first));
-		assertFalse(existingRemovalList.getBoxes().contains(first));
+		System.out.println("\nAll lists");
+		System.out.println(DatabaseController.getAllRemovalLists());
 
-		// Save.
-		final int saveID = DatabaseController.save(existingRemovalList);
-		assertTrue(saveID > 0);
+		System.out.println("\nSave box and list");
+		DatabaseController.saveOrUpdate(first);
+		final int saveID = DatabaseController.saveOrUpdate(rl);
+		assertEquals(saveID, rl.getDatabaseID());
+
+		System.out.println("\nAll lists");
+		System.out.println(DatabaseController.getAllRemovalLists());
+
+		final RemovalList dblist = DatabaseController.getRemovalListByID(saveID);
+
+		assertEquals(dblist.getUuid(), rl.getUuid());
+
+		System.out.println("\nFrom DB: " + dblist);
+		System.out.println("DB list: " + dblist.getBoxes());
+		System.out.println("Existing: " + rl);
+		System.out.println("Existing list: " + rl.getBoxes());
 
 		// Database was updated.
-		assertEquals(2, DatabaseController.getRemovalListByID(saveID).getSize());
+		assertEquals(2, dblist.getSize());
 
-		// TODO: Figure out a better way to roll back changes.
+		/*
+		 * Rollback.
+		 */
 		assertTrue(existingRemovalList.addProductBox(first));
 		assertTrue(existingRemovalList.getBoxes().contains(first));
-		DatabaseController.save(existingRemovalList);
+		DatabaseController.saveOrUpdate(existingRemovalList);
 	}
 
 	@Test
@@ -194,6 +237,6 @@ public class RemovalListTest
 		// Roll back.
 		existingRemovalList.setState(oldState);
 		assertTrue(existingRemovalList.setBoxes(boxes));
-		DatabaseController.save(existingRemovalList);
+		DatabaseController.saveOrUpdate(existingRemovalList);
 	}
 }

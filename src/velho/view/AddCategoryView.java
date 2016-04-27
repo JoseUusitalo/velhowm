@@ -60,13 +60,6 @@ public class AddCategoryView
 	private ComboBox<Object> typeList;
 
 	/**
-	 * A spinner that shows the product popularity.
-	 */
-	private Spinner<Integer> popularity;
-
-	// *************************************************
-
-	/**
 	 * Makes the Brands tab call for table and make it viewable
 	 */
 	private final TableView<Object> table = new TableView<Object>();
@@ -179,6 +172,5 @@ public class AddCategoryView
 		nameField.setText(product.getName());
 		brandList.getSelectionModel().select(product.getBrand());
 		typeList.getSelectionModel().select(product.getCategory());
-		popularity.getValueFactory().setValue(product.getPopularity());
 	}
 }

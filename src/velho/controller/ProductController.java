@@ -128,10 +128,9 @@ public class ProductController implements UIActionController
 	 * @param name name of the of product
 	 * @param brand brand of the product
 	 * @param category category of the product
-	 * @param popularity popularity of the product
 	 */
 	@SuppressWarnings("static-method")
-	public Product saveProduct(final int databaseID, final String name, final Object brand, final Object category, final int popularity)
+	public Product saveProduct(final int databaseID, final String name, final Object brand, final Object category)
 	{
 		ProductBrand bran = null;
 		ProductCategory cat = null;
@@ -139,13 +138,13 @@ public class ProductController implements UIActionController
 		{
 			SYSLOG.trace("creating new brand from " + brand.toString());
 
-			bran = DatabaseController.getProductBrandByID(DatabaseController.save(new ProductBrand((String) brand)));
+			bran = DatabaseController.getProductBrandByID(DatabaseController.saveOrUpdate(new ProductBrand((String) brand)));
 		}
 
 		if (category instanceof String)
 		{
 			SYSLOG.trace("creating new category from " + category.toString());
-			cat = DatabaseController.getProductCategoryByID(DatabaseController.save(new ProductCategory((String) category)));
+			cat = DatabaseController.getProductCategoryByID(DatabaseController.saveOrUpdate(new ProductCategory((String) category)));
 		}
 
 		if (brand instanceof ProductBrand)
@@ -160,11 +159,11 @@ public class ProductController implements UIActionController
 			SYSLOG.trace("new product category is " + cat.toString());
 		}
 
-		Product newProduct = new Product(databaseID, name, bran, cat, popularity);
+		Product newProduct = new Product(databaseID, name, bran, cat);
 		System.out.println(newProduct.toString());
 		System.out.println(newProduct.toString());
 
-		final int dbID = DatabaseController.save(newProduct);
+		final int dbID = DatabaseController.saveOrUpdate(newProduct);
 
 		if (dbID < 0)
 		{

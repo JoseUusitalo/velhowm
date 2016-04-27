@@ -1,47 +1,111 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<project name="VelhoWM" basedir="." default="use">
-	<description>Group #1 Project: Velho Warehouse Management</description>
+<project name="VELHOWM" basedir="." default="use">
+	<description>Group #1 Project: VELHO Warehouse Management</description>
 	<property name="target" value="1.8"/>
 	<property name="source" value="1.8"/>
-	<property name="src" location="src"/>
-	<property name="classes" location="bin"/>
-	<property name="main-class" value="velho.view.MainWindow"/>
+	<property name="projectName" value="VELHOWM" />
+	<property name="main.class" value="velho.view.MainWindow"/>
+
+	<property name="src.dir" location="src" />
+	<property name="test.dir" location="test" />
+	<property name="dist.dir" location="dist" />
+	<property name="lib.dir" location="lib" />
+	<property name="test.report.dir" location="testreport" />
+	<property name="dist.src.dir" location="dist/src" />
+	<property name="dist.test.dir" location="dist/test" />
+	<property name="build.lib.dir" location="bin/lib" />
+	<property name="src.hibernatemappings.dir" location="src/velho/model" />
+	<property name="dist.src.hibernatemappings.dir" location="dist/src/velho/model" />
 
 	<path id="velho.classpath">
-        <pathelement location="bin"/>
-        <pathelement location="lib/h2-1.4.191.jar"/>
-        <pathelement location="lib/apache-log4j-1.2.17/log4j-1.2.17.jar"/>
-        <pathelement location="lib/eclipse/*"/>
-		<pathelement location="lib/hibernate/java8/*"/>
-        <pathelement location="lib/hibernate/jpa/*"/>
-        <pathelement location="lib/hibernate/required/*"/>
-    </path>
+		<fileset dir="${lib.dir}" includes="h2-1.4.191.jar" />
+		<fileset dir="${lib.dir}" includes="apache-log4j-1.2.17/*.jar" />
+		<fileset dir="${lib.dir}" includes="eclipse/*.jar" />
+		<fileset dir="${lib.dir}" includes="hibernate/java8/*.jar" />
+		<fileset dir="${lib.dir}" includes="hibernate/jpa/*.jar" />
+		<fileset dir="${lib.dir}" includes="hibernate/required/*.jar" />
+		<pathelement location="${dist.src.dir}" />
+	</path>
+	
+	<target name="clean" description="delete old build files">
+		<delete dir="${dist.dir}" />
+		<delete dir="${build.lib.dir}" />
+		<delete dir="${test.report.dir}" />
+	</target>
 
-	<target name="init" description="make the classes folder">
+	<target name="init" description="create the directories">
 		<tstamp/>
-		<mkdir dir="${classes}"/>
+		<pathconvert property="classpathProp" refid="velho.classpath"/>
+		<echo>Classpath is: ${classpathProp}</echo>
+		<mkdir dir="${dist.src.dir}" />
+		<mkdir dir="${dist.test.dir}" />
+		<mkdir dir="${build.lib.dir}" />
+		<mkdir dir="${test.report.dir}" />
 	</target>
 
-	<target name="compile" depends="init" description="compile the source">
-		<javac source="${source}" destdir="${classes}" target="${target}" includeantruntime="false">
-            <src path="${src}"/>
-            <classpath refid="velho.classpath"/>
-        </javac>
-	</target>
+	<target name="compile" depends="clean, init" description="compile the source and test classes">
+		<javac srcdir="${src.dir}" destdir="${dist.src.dir}" includeantruntime="false" source="${source}" target="${target}">
+			<classpath refid="velho.classpath" />
+		</javac>
 
-	<target name="jar" depends="compile" description="make the jar">
-		<jar destfile="VelhoWM_${DSTAMP}.jar" basedir="${classes}">
-			<manifest>
-				<attribute name="Main-Class" value="${main-class}"/>
-			</manifest>
+		<javac srcdir="${test.dir}" destdir="${dist.test.dir}" includeantruntime="false">
+			<classpath refid="velho.classpath" />
+		</javac>
+		
+		<!-- Copy configuration files. -->
+		<copy todir="${dist.src.dir}">
+			<fileset dir="${src.dir}" includes="**/*.xml,**/*.properties"/>
+		</copy>
+
+		<!-- Copy Hibernate mappings into the correct folder. -->
+		<copy todir="${dist.src.hibernatemappings.dir}">
+			<fileset dir="${src.hibernatemappings.dir}" includes="**/*.xml"/>
+		</copy>
+	</target>
+		
+	<target name="dependencies" description="copy all dependencies into a single jar">
+		<jar jarfile="${build.lib.dir}/dependencies.jar">
+			<zipgroupfileset dir="${lib.dir}">
+				<include name="**/*.jar" />
+			</zipgroupfileset>
 		</jar>
 	</target>
 
-	<target name="use" depends="jar" description="use the task">
-		<java classname="${main-class}" fork="true">
-		  <classpath>
-		    <path refid="velho.classpath"/>
-		  </classpath>
+	<target name="test" depends="compile" description="run the tests">
+		<junit showoutput="true" printsummary="yes" haltonerror="yes" haltonfailure="no">
+			<!-- Plain text for console. -->
+			<formatter type="plain" usefile="false" />
+
+			<!-- XML for file. -->
+			<formatter type="xml" />
+
+			<classpath refid="velho.classpath" />
+
+			<classpath>
+				<pathelement location="${dist.test.dir}"/>
+			</classpath>
+
+			<batchtest todir="${test.report.dir}">
+				<fileset dir="${dist.test.dir}">
+					<include name="**/AllTests.class" />
+				</fileset>
+			</batchtest>
+		</junit>
+	</target>
+
+	<target name="jar" depends="compile, test, dependencies" description="make the jar">
+		<jar destfile="${dist.dir}/${projectName}_${DSTAMP}.jar" basedir="${dist.src.dir}">
+		    <manifest>
+		        <attribute name="Main-Class" value="${main.class}"/>
+		    </manifest>
+
+			<zipfileset src="${build.lib.dir}/dependencies.jar" excludes="META-INF/*.SF" />
+		</jar>
+	</target>
+
+	<target name="use" depends="jar" description="use the jar">
+ 		<java jar="${dist.dir}/${projectName}_${DSTAMP}.jar" fork="true">
+			<classpath refid="velho.classpath" />
 		</java>
 	</target>
 </project>

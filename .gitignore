@@ -3,6 +3,9 @@
 .classpath
 /.settings/
 /log/
-/VelhoWM_*.jar
+/VELHOWM_*.jar
 /dev/
 /doc/
+/junit*.properties
+/dist/
+/testreport/
