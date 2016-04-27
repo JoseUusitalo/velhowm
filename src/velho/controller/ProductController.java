@@ -5,6 +5,7 @@ import org.apache.log4j.Logger;
 import javafx.scene.Node;
 import velho.controller.interfaces.UIActionController;
 import velho.model.Product;
+import velho.model.ProductBox;
 import velho.model.ProductBrand;
 import velho.model.ProductCategory;
 import velho.model.ProductType;
@@ -13,6 +14,7 @@ import velho.view.AddProductView;
 import velho.view.BrandsTab;
 import velho.view.CategoryTab;
 import velho.view.GenericTabView;
+import velho.view.ProductBoxTabView;
 import velho.view.ProductDataView;
 import velho.view.ProductManagementView;
 import velho.view.ProductsTypeTabView;
@@ -79,6 +81,8 @@ public class ProductController implements UIActionController
 	 */
 	private CategoryTab categoryTabView;
 
+	private ProductBoxTabView productBoxTabView;
+
 	/**
 	 * @param uiController
 	 */
@@ -91,6 +95,7 @@ public class ProductController implements UIActionController
 		this.addProductView = new AddProductView(this, uiController);
 		this.brandsTabView = new BrandsTab(this, uiController);
 		this.categoryTabView = new CategoryTab(this, uiController);
+		this.productBoxTabView = new ProductBoxTabView(this, uiController);
 		listTab = new GenericTabView();
 		addTab = new GenericTabView();
 		showList();
@@ -407,5 +412,17 @@ public class ProductController implements UIActionController
 	{
 		// TODO Auto-generated method stub
 		return categoryTabView.getView();
+	}
+
+	public Node getProductBox()
+	{
+		// TODO Auto-generated method stub
+		return productBoxTabView.getView();
+	}
+
+	public void saveProductBox(final ProductBox productBox)
+	{
+		// TODO Need validation
+		// DatabaseController.save(productBox);
 	}
 }

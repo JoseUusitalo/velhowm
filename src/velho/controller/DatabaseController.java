@@ -2661,7 +2661,7 @@ public class DatabaseController
 
 	/**
 	 * Makes the product types and observable in the Hibernate
-	 * 
+	 *
 	 * @return Observable Product Types
 	 * @throws HibernateException this should be the new database to get the information from
 	 */
@@ -2672,4 +2672,5 @@ public class DatabaseController
 
 		return observableProductTypes;
 	}
+
 }

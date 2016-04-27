@@ -1,16 +1,19 @@
 package velho.view;
 
+import java.time.LocalDate;
+import java.util.Date;
+
 import javafx.beans.value.ObservableValue;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.geometry.Insets;
 import javafx.scene.control.Button;
+import javafx.scene.control.DatePicker;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableColumn.CellEditEvent;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
-import javafx.scene.control.cell.ComboBoxTableCell;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
@@ -18,12 +21,11 @@ import javafx.util.Callback;
 import velho.controller.DatabaseController;
 import velho.controller.ProductController;
 import velho.controller.UIController;
+import velho.model.ProductBox;
 import velho.model.ProductCategory;
-import velho.model.ProductType;
 
-public class CategoryTab
+public class ProductBoxTabView
 {
-
 	/**
 	 * ProductCntroller neeeded when saving to database
 	 */
@@ -42,7 +44,7 @@ public class CategoryTab
 	/**
 	 * Makes the Categories and ObservableList
 	 */
-	private ObservableList<Object> data = DatabaseController.getAllProductCategories();
+	private ObservableList<Object> data = DatabaseController.getAllProductBoxes();
 
 	/**
 	 * Adds info to Product Controller about brands
@@ -50,7 +52,7 @@ public class CategoryTab
 	 * @param productController Product Controller handles the database work
 	 * @param uiController links UIController to the productController
 	 */
-	public CategoryTab(final ProductController productController, final UIController uiController)
+	public ProductBoxTabView(final ProductController productController, final UIController uiController)
 	{
 		this.productController = productController;
 	}
@@ -70,47 +72,49 @@ public class CategoryTab
 
 			Callback<TableColumn<Object, Object>, TableCell<Object, Object>> cellFactory = (final TableColumn<Object, Object> p) -> new EditingCell();
 
-			TableColumn<Object, Object> nameColumn = new TableColumn<Object, Object>("Name");
+			TableColumn<Object, Object> maxSizeColumn = new TableColumn<Object, Object>("Max Size");
 
-			nameColumn.setMinWidth(100);
-			nameColumn.setCellValueFactory(new PropertyValueFactory<>("name"));
-			nameColumn.setCellFactory(cellFactory);
+			maxSizeColumn.setMinWidth(100);
+			maxSizeColumn.setCellValueFactory(new PropertyValueFactory<>("maxSize"));
+			maxSizeColumn.setCellFactory(cellFactory);
 
-			nameColumn.setOnEditCommit((final CellEditEvent<Object, Object> t) ->
+			maxSizeColumn.setOnEditCommit((final CellEditEvent<Object, Object> t) ->
 			{
 				final ProductCategory editCategory = ((ProductCategory) t.getTableView().getItems().get(t.getTablePosition().getRow()));
 				editCategory.setName(t.getNewValue().toString());
 				productController.saveProductCategory(editCategory);
 			});
 			table.setItems(data);
-			table.getColumns().add(nameColumn);
+			table.getColumns().add(maxSizeColumn);
 
-			ObservableList<Object> cbValues = DatabaseController.getAllProductTypes();
-			TableColumn<Object, Object> comboBoxColumn = new TableColumn<>("Types Combobox");
-			comboBoxColumn.setMinWidth(150);
-			comboBoxColumn.setCellValueFactory(new PropertyValueFactory<>("type"));
-			comboBoxColumn.setCellFactory(ComboBoxTableCell.forTableColumn(cbValues));
-			comboBoxColumn.setOnEditCommit((final CellEditEvent<Object, Object> t) ->
+			Callback<TableColumn<Object, Object>, TableCell<Object, Object>> pickerFactory = (final TableColumn<Object, Object> p) -> new DatePickerCell();
+			TableColumn<Object, Object> datePickerColumn = new TableColumn<>("Expiration Date");
+			datePickerColumn.setMinWidth(150);
+			datePickerColumn.setCellValueFactory(new PropertyValueFactory<>("expirationDate"));
+			datePickerColumn.setCellFactory(pickerFactory);
+			datePickerColumn.setOnEditCommit((final CellEditEvent<Object, Object> t) ->
 			{
-				final ProductCategory editCategory = ((ProductCategory) t.getTableView().getItems().get(t.getTablePosition().getRow()));
-				editCategory.setType((ProductType) t.getNewValue());
-				productController.saveProductCategory(editCategory);
+				final ProductBox productBox = ((ProductBox) t.getTableView().getItems().get(t.getTablePosition().getRow()));
+				productBox.setExpirationDate((Date) t.getNewValue());
+				productController.saveProductBox(productBox);
 			});
-			table.getColumns().add(comboBoxColumn);
+			table.getColumns().add(datePickerColumn);
 
-			final TextField categoryName = new TextField();
-			categoryName.setPromptText("Category Name");
-			categoryName.setMaxWidth(nameColumn.getPrefWidth());
+			final TextField productBoxName = new TextField();
+			productBoxName.setPromptText("Product box Name");
+			productBoxName.setMaxWidth(maxSizeColumn.getPrefWidth());
 			final Button addButton = new Button("Create");
 			addButton.setOnAction((final ActionEvent e) ->
 			{
-				final ProductCategory saveCategory = new ProductCategory(categoryName.getText());
+				final ProductCategory saveCategory = new ProductCategory(productBoxName.getText());
 				data.add(saveCategory);
-				categoryName.clear();
+				productBoxName.clear();
 				productController.saveProductCategory(saveCategory);
 			});
 
-			hb.getChildren().addAll(categoryName, addButton);
+			final DatePicker datePickerBox = new DatePicker();
+
+			hb.getChildren().addAll(productBoxName, addButton);
 			hb.setSpacing(3);
 
 			vbox = new VBox();
@@ -124,8 +128,7 @@ public class CategoryTab
 
 	/**
 	 *
-	 * @author Edward
-	 *         Enables editing a cell, nameley the textField
+	 * @author Edward Enables editing a cell, nameley the textField
 	 */
 	class EditingCell extends TableCell<Object, Object>
 	{
@@ -203,6 +206,86 @@ public class CategoryTab
 		private String getString()
 		{
 			return getItem() == null ? "" : getItem().toString();
+		}
+	}
+
+	class DatePickerCell extends TableCell<Object, Object>
+	{
+
+		private DatePicker datePicker;
+
+		public DatePickerCell()
+		{
+		}
+
+		@Override
+		public void startEdit()
+		{
+			if (!isEmpty())
+			{
+				super.startEdit();
+				createTextField();
+				setText(null);
+				setGraphic(datePicker);
+			}
+		}
+
+		@Override
+		public void cancelEdit()
+		{
+			super.cancelEdit();
+
+			setText(getItem().toString());
+			setGraphic(null);
+		}
+
+		@Override
+		public void updateItem(final Object item, final boolean empty)
+		{
+			super.updateItem(item, empty);
+
+			if (empty)
+			{
+				setText(null);
+				setGraphic(null);
+			}
+			else
+			{
+				if (isEditing())
+				{
+					if (datePicker != null)
+					{
+						datePicker.setValue(getDateValue());
+					}
+					setText(null);
+					setGraphic(datePicker);
+				}
+				else
+				{
+					setText("Hey Listen!");
+					setGraphic(null);
+				}
+			}
+		}
+
+		private void createTextField()
+		{
+			datePicker = new DatePicker(getDateValue());
+			datePicker.setMinWidth(this.getWidth() - this.getGraphicTextGap() * 2);
+			datePicker.focusedProperty().addListener((final ObservableValue<? extends Boolean> arg0, final Boolean arg1, final Boolean arg2) ->
+			{
+				if (!arg2)
+				{
+					commitEdit(datePicker.getValue());
+				}
+			});
+		}
+
+		private LocalDate getDateValue()
+		{
+			if (getItem() == null)
+				return null;
+			return ((DatePicker) getItem()).getValue();
 		}
 	}
 }

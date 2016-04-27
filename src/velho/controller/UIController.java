@@ -141,6 +141,7 @@ public class UIController
 				mainView.addTab("Brands", productController.getBrandsTab());
 				mainView.addTab("Categories", productController.getCategoryTab());
 				mainView.addTab("Product Types", productController.getProductTypesTab());
+				mainView.addTab("Product Box", productController.getProductBox());
 				mainView.addTab("User List", getUserListView(currentUserRole));
 				break;
 			case GUEST:
