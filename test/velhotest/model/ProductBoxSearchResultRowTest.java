@@ -2,12 +2,12 @@ package velhotest.model;
 
 import static org.junit.Assert.assertEquals;
 
-import java.text.ParseException;
-
+import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
 import velho.controller.DatabaseController;
+import velho.controller.LogDatabaseController;
 import velho.model.ProductBox;
 import velho.model.ProductBoxSearchResultRow;
 
@@ -24,14 +24,27 @@ public class ProductBoxSearchResultRowTest
 	private static ProductBoxSearchResultRow row = new ProductBoxSearchResultRow(box);
 
 	/**
+	 * Creates the log database if needed and connects to it.
 	 * Loads the sample data into the database if it does not yet exist.
 	 *
-	 * @throws ParseException
+	 * @throws Exception
 	 */
 	@BeforeClass
-	public static final void loadSampleData() throws ParseException
+	public static final void init() throws Exception
 	{
+		LogDatabaseController.connectAndInitialize();
+		DatabaseController.link();
 		DatabaseController.loadSampleData();
+	}
+
+	/**
+	 * Unlinks from both databases.
+	 */
+	@AfterClass
+	public static final void unlinkDatabases() throws Exception
+	{
+		DatabaseController.unlink();
+		LogDatabaseController.unlink();
 	}
 
 	@Test

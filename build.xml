@@ -82,7 +82,7 @@
 	</target>
 
 	<target name="test" depends="compile" description="run the tests">
-		<junit showoutput="true" printsummary="yes" haltonerror="yes" haltonfailure="no">
+		<junit showoutput="true" printsummary="yes" haltonerror="no" haltonfailure="no">
 			<!-- Plain text for console. -->
 			<formatter type="plain" usefile="false" />
 

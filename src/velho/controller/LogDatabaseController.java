@@ -529,8 +529,7 @@ public class LogDatabaseController
 
 	/**
 	 * Closes the database permanently.
-	 *
-	 * @throws NoDatabaseLinkException
+	 * Additionally disposes the old connection pool.
 	 */
 	public static void shutdown() throws Exception
 	{
@@ -588,6 +587,9 @@ public class LogDatabaseController
 		{
 			e.printStackTrace();
 		}
+
+		connectionPool.dispose();
+		connectionPool = null;
 	}
 
 	/*
@@ -621,7 +623,6 @@ public class LogDatabaseController
 	 * Gets the full user log with user names.
 	 *
 	 * @return the user log
-	 * @throws NoDatabaseLinkException
 	 */
 	public static ArrayList<Object> getUserLog() throws Exception
 	{

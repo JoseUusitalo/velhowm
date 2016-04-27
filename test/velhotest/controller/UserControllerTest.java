@@ -34,19 +34,19 @@ public class UserControllerTest
 	private final UserRole NULL_ROLE = null;
 
 	/**
-	 * Connects to the log database.
+	 * Creates the log database if needed and connects to it.
 	 * Loads the sample data into the database if it does not yet exist.
 	 *
-	 * @throws ParseException
+	 * @throws Exception
 	 */
 	@BeforeClass
-	public static final void loadSampleData() throws Exception
+	public static final void init() throws Exception
 	{
+		System.out.println("\n\n---- UserControllerTest BeforeClass ----\n\n");
+		LogDatabaseController.connectAndInitialize();
 		DatabaseController.link();
-
-		assertTrue(LogDatabaseController.connectAndInitialize());
-
 		DatabaseController.loadSampleData();
+		System.out.println("\n\n---- UserControllerTest Start ----\n\n");
 	}
 
 	/**
@@ -55,8 +55,10 @@ public class UserControllerTest
 	@AfterClass
 	public static final void unlinkDatabases() throws Exception
 	{
+		System.out.println("\n\n---- UserControllerTest AfterClass ----\n\n");
 		DatabaseController.unlink();
-		LogDatabaseController.shutdown();
+		LogDatabaseController.unlink();
+		System.out.println("\n\n---- UserControllerTest Done ----\n\n");
 	}
 
 	@Test

@@ -4,8 +4,12 @@ import static org.junit.Assert.assertEquals;
 
 import java.sql.Date;
 
+import org.junit.AfterClass;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
+import velho.controller.DatabaseController;
+import velho.controller.LogDatabaseController;
 import velho.model.Freezer;
 import velho.model.Product;
 import velho.model.ProductBrand;
@@ -36,6 +40,30 @@ public class FreezerTest
 	private Product product1 = new Product(id1, name1, brand1, category);
 	private Product product2 = new Product(id2, name2, brand2, category2);
 	private Product product3 = new Product(id2, name2, brand2, category3);
+
+	/**
+	 * Creates the log database if needed and connects to it.
+	 * Loads the sample data into the database if it does not yet exist.
+	 *
+	 * @throws Exception
+	 */
+	@BeforeClass
+	public static final void init() throws Exception
+	{
+		LogDatabaseController.connectAndInitialize();
+		DatabaseController.link();
+		DatabaseController.loadSampleData();
+	}
+
+	/**
+	 * Unlinks from both databases.
+	 */
+	@AfterClass
+	public static final void unlinkDatabases() throws Exception
+	{
+		DatabaseController.unlink();
+		LogDatabaseController.unlink();
+	}
 
 	@SuppressWarnings("unused")
 	@Test(expected = IllegalArgumentException.class)
