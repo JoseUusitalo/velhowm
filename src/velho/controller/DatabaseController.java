@@ -50,7 +50,6 @@ import velho.model.enums.DatabaseQueryType;
 import velho.model.enums.DatabaseTable;
 import velho.model.enums.UserRole;
 import velho.model.exceptions.NoDatabaseException;
-import velho.model.exceptions.NoDatabaseLinkException;
 import velho.model.exceptions.UniqueKeyViolationException;
 import velho.model.interfaces.DatabaseObject;
 import velho.view.MainWindow;
@@ -196,7 +195,7 @@ public class DatabaseController
 	 */
 	@Deprecated
 	private static Object runQuery(final DatabaseQueryType type, final DatabaseTable tableName, final Map<DatabaseTable, String> joinOnValues,
-			final String[] columns, final Map<String, Object> columnValues, final List<String> where) throws NoDatabaseLinkException
+			final String[] columns, final Map<String, Object> columnValues, final List<String> where) throws Exception
 	{
 		final Connection connection = getConnection();
 		Statement statement = null;
@@ -421,8 +420,7 @@ public class DatabaseController
 				e.printStackTrace();
 			}
 
-			// Connection pool has been disposed = no database connection.
-			throw new NoDatabaseLinkException();
+			throw new Exception("Connection pool has been disposed, no database connection.");
 		}
 		catch (final SQLException e)
 		{
@@ -494,7 +492,7 @@ public class DatabaseController
 	 * @return an Object containing the appropriate data
 	 * @throws NoDatabaseLinkException
 	 */
-	private static Object runQuery(final String sql) throws NoDatabaseLinkException, UniqueKeyViolationException
+	private static Object runQuery(final String sql) throws Exception
 	{
 		final Connection connection = getConnection();
 		Statement statement = null;
@@ -534,8 +532,7 @@ public class DatabaseController
 				e.printStackTrace();
 			}
 
-			// Connection pool has been disposed = no database connection.
-			throw new NoDatabaseLinkException();
+			throw new Exception("Connection pool has been disposed, no database connection.");
 		}
 		catch (final SQLException e)
 		{
@@ -610,10 +607,8 @@ public class DatabaseController
 	 *
 	 * @return a database connection
 	 */
-	private static Connection getConnection() throws NoDatabaseLinkException
+	private static Connection getConnection()
 	{
-		checkLink();
-
 		Connection connection = null;
 		try
 		{
@@ -806,19 +801,6 @@ public class DatabaseController
 	}
 
 	/**
-	 * Checks if a database link exists and throws a
-	 * {@link NoDatabaseLinkException} exception if it doesn't. To be used
-	 * when a database link must exist.
-	 *
-	 * @throws NoDatabaseLinkException
-	 */
-	public static void checkLink() throws NoDatabaseLinkException
-	{
-		if (connectionPool == null)
-			throw new NoDatabaseLinkException();
-	}
-
-	/**
 	 * Attempts to re-link the database.
 	 */
 	public static void tryReLink()
@@ -888,10 +870,6 @@ public class DatabaseController
 
 			if (c != null)
 				c.close();
-		}
-		catch (final NoDatabaseLinkException e)
-		{
-			e.printStackTrace();
 		}
 		catch (final SQLException e)
 		{
@@ -1702,7 +1680,7 @@ public class DatabaseController
 	 *         {@link ProductBoxSearchResultRow} objects
 	 * @throws NoDatabaseLinkException
 	 */
-	public static List<ProductBoxSearchResultRow> searchProductBox(final List<String> where) throws NoDatabaseLinkException
+	public static List<ProductBoxSearchResultRow> searchProductBox(final List<String> where) throws Exception
 	{
 		return searchProductBox(where, null);
 	}
@@ -1717,8 +1695,7 @@ public class DatabaseController
 	 *         {@link ProductBoxSearchResultRow} objects
 	 * @throws NoDatabaseLinkException
 	 */
-	public static List<ProductBoxSearchResultRow> searchProductBox(final List<String> where, final Map<DatabaseTable, String> joins)
-			throws NoDatabaseLinkException
+	public static List<ProductBoxSearchResultRow> searchProductBox(final List<String> where, final Map<DatabaseTable, String> joins) throws Exception
 	{
 		final List<ProductBoxSearchResultRow> foundProducts = FXCollections.observableArrayList();
 
@@ -1794,7 +1771,7 @@ public class DatabaseController
 	 * @return <code>true</code> if database changed as a result of this call
 	 * @throws NoDatabaseLinkException
 	 */
-	public static boolean initializeDatabase() throws NoDatabaseException, NoDatabaseException, NoDatabaseLinkException
+	public static boolean initializeDatabase() throws NoDatabaseException
 	{
 		DBLOG.debug("Loading sample data to database...");
 
@@ -1806,7 +1783,7 @@ public class DatabaseController
 		{
 			changed = (0 != (Integer) runQuery("RUNSCRIPT FROM './data/init.sql';"));
 		}
-		catch (UniqueKeyViolationException e)
+		catch (Exception e)
 		{
 			e.printStackTrace();
 		}
