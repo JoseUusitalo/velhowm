@@ -44,8 +44,6 @@ import velho.controller.RemovalPlatformController;
 import velho.controller.SearchController;
 import velho.controller.UIController;
 import velho.controller.UserController;
-import velho.model.exceptions.ExistingDatabaseLinkException;
-import velho.model.exceptions.NoDatabaseLinkException;
 
 /**
  * The main window and class for Velho Warehouse Management.
@@ -259,7 +257,7 @@ public class MainWindow extends Application
 				System.exit(0);
 			}
 		}
-		catch (ClassNotFoundException | ExistingDatabaseLinkException | NoDatabaseLinkException e)
+		catch (Exception e)
 		{
 			e.printStackTrace();
 		}
@@ -510,14 +508,7 @@ public class MainWindow extends Application
 
 		SYSLOG.info("Exit.");
 
-		try
-		{
-			LogDatabaseController.unlink();
-		}
-		catch (final NoDatabaseLinkException e)
-		{
-			// Ignore.
-		}
+		LogDatabaseController.unlink();
 	}
 
 	/**
