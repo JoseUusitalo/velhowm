@@ -10,6 +10,7 @@
 	<property name="test.dir" location="test" />
 	<property name="dist.dir" location="dist" />
 	<property name="lib.dir" location="lib" />
+	<property name="javadoc.dir" location="javadoc" />
 	<property name="test.report.dir" location="testreport" />
 	<property name="dist.src.dir" location="dist/src" />
 	<property name="dist.test.dir" location="dist/test" />
@@ -26,11 +27,12 @@
 		<fileset dir="${lib.dir}" includes="hibernate/required/*.jar" />
 		<pathelement location="${dist.src.dir}" />
 	</path>
-	
+
 	<target name="clean" description="delete old build files">
 		<delete dir="${dist.dir}" />
 		<delete dir="${build.lib.dir}" />
 		<delete dir="${test.report.dir}" />
+		<delete dir="${javadoc.dir}" />
 	</target>
 
 	<target name="init" description="create the directories">
@@ -41,9 +43,17 @@
 		<mkdir dir="${dist.test.dir}" />
 		<mkdir dir="${build.lib.dir}" />
 		<mkdir dir="${test.report.dir}" />
+		<mkdir dir="${javadoc.dir}" />
 	</target>
 
-	<target name="compile" depends="clean, init" description="compile the source and test classes">
+	<target name="javadoc" depends="clean, init" description="generate javadocs">
+		<javadoc destdir="${javadoc.dir}" packagenames="*.*" author="true" private="true" version="true" windowtitle="VELHO Warehouse Management Documentation">
+			<packageset dir="${src.dir}" />
+			<classpath refid="velho.classpath" />
+		</javadoc>
+	</target>
+
+	<target name="compile" depends="clean, init, javadoc" description="compile the source and test classes">
 		<javac srcdir="${src.dir}" destdir="${dist.src.dir}" includeantruntime="false" source="${source}" target="${target}">
 			<classpath refid="velho.classpath" />
 		</javac>
@@ -51,7 +61,7 @@
 		<javac srcdir="${test.dir}" destdir="${dist.test.dir}" includeantruntime="false">
 			<classpath refid="velho.classpath" />
 		</javac>
-		
+
 		<!-- Copy configuration files. -->
 		<copy todir="${dist.src.dir}">
 			<fileset dir="${src.dir}" includes="**/*.xml,**/*.properties"/>
@@ -62,7 +72,7 @@
 			<fileset dir="${src.hibernatemappings.dir}" includes="**/*.xml"/>
 		</copy>
 	</target>
-		
+
 	<target name="dependencies" description="copy all dependencies into a single jar">
 		<jar jarfile="${build.lib.dir}/dependencies.jar">
 			<zipgroupfileset dir="${lib.dir}">
@@ -72,7 +82,7 @@
 	</target>
 
 	<target name="test" depends="compile" description="run the tests">
-		<junit showoutput="true" printsummary="yes" haltonerror="yes" haltonfailure="no">
+		<junit showoutput="true" printsummary="yes" haltonerror="no" haltonfailure="no">
 			<!-- Plain text for console. -->
 			<formatter type="plain" usefile="false" />
 

@@ -3,20 +3,20 @@ package velhotest.controller;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
-import java.text.ParseException;
-
+import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
 import velho.controller.DatabaseController;
 import velho.controller.ExternalSystemsController;
+import velho.controller.LogDatabaseController;
 import velho.model.ProductBox;
 import velho.model.Shelf;
 
 /**
- * Tests for the {@link Shelf} class.
+ * Tests for the {@link ExternalSystemsController} class.
  *
- * @author Jose Uusitalo
+ * @author Edward Puustinen
  */
 @SuppressWarnings("static-method")
 public class ExternalSystemsControllerTest
@@ -27,15 +27,31 @@ public class ExternalSystemsControllerTest
 	private static final int BOX_DBID_2 = 2;
 
 	/**
+	 * Creates the log database if needed and connects to it.
 	 * Loads the sample data into the database if it does not yet exist.
 	 *
-	 * @throws ParseException
+	 * @throws Exception
 	 */
 	@BeforeClass
-	public static final void loadSampleData() throws ParseException
+	public static final void init() throws Exception
 	{
+		System.out.println("\n\n---- ExternalSystemsControllerTest BeforeClass ----\n\n");
+		LogDatabaseController.connectAndInitialize();
+		DatabaseController.link();
 		DatabaseController.loadSampleData();
-		newShelf_ID2 = DatabaseController.getShelfByID(2);
+		System.out.println("\n\n---- ExternalSystemsControllerTest Start ----\n\n");
+	}
+
+	/**
+	 * Unlinks from both databases.
+	 */
+	@AfterClass
+	public static final void unlinkDatabases() throws Exception
+	{
+		System.out.println("\n\n---- ExternalSystemsControllerTest AfterClass ----\n\n");
+		DatabaseController.unlink();
+		LogDatabaseController.unlink();
+		System.out.println("\n\n---- ExternalSystemsControllerTest Done ----\n\n");
 	}
 
 	@Test
