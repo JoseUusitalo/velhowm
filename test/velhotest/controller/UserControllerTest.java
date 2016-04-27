@@ -6,8 +6,6 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
-import java.text.ParseException;
-
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -18,8 +16,6 @@ import velho.controller.LogDatabaseController;
 import velho.controller.UserController;
 import velho.model.User;
 import velho.model.enums.UserRole;
-import velho.model.exceptions.ExistingDatabaseLinkException;
-import velho.model.exceptions.NoDatabaseLinkException;
 
 /**
  * Test for the {@link velho.controller.UserController} class.
@@ -44,18 +40,11 @@ public class UserControllerTest
 	 * @throws ParseException
 	 */
 	@BeforeClass
-	public static final void loadSampleData() throws ParseException, ClassNotFoundException, NoDatabaseLinkException
+	public static final void loadSampleData() throws Exception
 	{
 		DatabaseController.link();
 
-		try
-		{
-			assertTrue(LogDatabaseController.connectAndInitialize());
-		}
-		catch (ExistingDatabaseLinkException e)
-		{
-			// Ignore.
-		}
+		assertTrue(LogDatabaseController.connectAndInitialize());
 
 		DatabaseController.loadSampleData();
 	}
@@ -64,18 +53,10 @@ public class UserControllerTest
 	 * Unlinks from both databases.
 	 */
 	@AfterClass
-	public static final void unlinkDatabases()
+	public static final void unlinkDatabases() throws Exception
 	{
 		DatabaseController.unlink();
-		try
-		{
-			// This test uses the log database so we need to shut it down after using it.
-			LogDatabaseController.shutdown();
-		}
-		catch (NoDatabaseLinkException e)
-		{
-			// Ignore.
-		}
+		LogDatabaseController.shutdown();
 	}
 
 	@Test

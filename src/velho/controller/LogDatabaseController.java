@@ -58,13 +58,13 @@ public class LogDatabaseController
 	 * @param columns columns to select (can be <code>null</code>)
 	 * @param where conditions (can be <code>null</code>)
 	 * @return
-	 *         <ul>
-	 *         <li>if type is {@link DatabaseQueryType#UPDATE} or
-	 *         {@link DatabaseQueryType#DELETE}: the number of rows that were
-	 *         changed as a result of the query as an {@link Integer}</li>
-	 *         <li>if type is {@link DatabaseQueryType#SELECT}: a Set containing
-	 *         the selected data</li>
-	 *         </ul>
+	 * <ul>
+	 * <li>if type is {@link DatabaseQueryType#UPDATE} or
+	 * {@link DatabaseQueryType#DELETE}: the number of rows that were
+	 * changed as a result of the query as an {@link Integer}</li>
+	 * <li>if type is {@link DatabaseQueryType#SELECT}: a Set containing
+	 * the selected data</li>
+	 * </ul>
 	 * @throws NoDatabaseLinkException
 	 */
 	private static List<Object> runQuery(final DatabaseQueryType type, final LogDatabaseTable tableName, final Map<DatabaseTable, String> joinOnValues,
@@ -331,9 +331,9 @@ public class LogDatabaseController
 	 *
 	 * @return <code>true</code> if the link was created successfully
 	 * @throws ClassNotFoundException
-	 *             when the H2 driver was unable to load
+	 * when the H2 driver was unable to load
 	 * @throws ExistingDatabaseLinkException
-	 *             when a database link already exists
+	 * when a database link already exists
 	 */
 	public static DatabaseFileState link() throws ClassNotFoundException
 	{
@@ -406,8 +406,8 @@ public class LogDatabaseController
 	 * to the database again.
 	 *
 	 * @throws NoDatabaseLinkException
-	 *             when attempting unlink a database when no database link
-	 *             exists
+	 * when attempting unlink a database when no database link
+	 * exists
 	 */
 	public static void unlink()
 	{
@@ -532,7 +532,7 @@ public class LogDatabaseController
 	 *
 	 * @throws NoDatabaseLinkException
 	 */
-	public static void shutdown() throws NoDatabaseLinkException
+	public static void shutdown() throws Exception
 	{
 		if (MainWindow.DEBUG_MODE)
 			System.out.println("Shutting down log database..");
@@ -547,21 +547,10 @@ public class LogDatabaseController
 			{
 				e1.printStackTrace();
 			}
-			catch (ExistingDatabaseLinkException e1)
-			{
-				e1.printStackTrace();
-			}
 		}
 
 		Connection connection = null;
-		try
-		{
-			connection = getConnection();
-		}
-		catch (NoDatabaseLinkException e1)
-		{
-			// Ignore.
-		}
+		connection = getConnection();
 
 		try
 		{
@@ -582,8 +571,7 @@ public class LogDatabaseController
 				e.printStackTrace();
 			}
 
-			// Connection pool has been disposed = no database connection.
-			throw new NoDatabaseLinkException();
+			throw new Exception("Connection pool has been disposed, no database connection.");
 		}
 		catch (final SQLException e)
 		{
