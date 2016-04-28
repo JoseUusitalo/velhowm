@@ -422,7 +422,7 @@ public class LogDatabaseController
 	}
 
 	/**
-	 * Links and initializes the database.
+	 * Links to the log database and initializes if it does not exist.
 	 */
 	public static boolean connectAndInitialize() throws Exception
 	{
@@ -536,6 +536,8 @@ public class LogDatabaseController
 		if (MainWindow.DEBUG_MODE)
 			System.out.println("Shutting down log database..");
 
+		unlink();
+
 		if (!isLinked())
 		{
 			try
@@ -548,8 +550,7 @@ public class LogDatabaseController
 			}
 		}
 
-		Connection connection = null;
-		connection = getConnection();
+		Connection connection = getConnection();
 
 		try
 		{

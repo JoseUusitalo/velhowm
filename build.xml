@@ -27,16 +27,17 @@
 		<fileset dir="${lib.dir}" includes="hibernate/java8/*.jar" />
 		<fileset dir="${lib.dir}" includes="hibernate/jpa/*.jar" />
 		<fileset dir="${lib.dir}" includes="hibernate/required/*.jar" />
+		<pathelement location="${dist.test.dir}" />
 		<pathelement location="${dist.src.dir}" />
 	</path>
-	
+
 	<path id="pmd.classpath">
 		<pathelement location="${build.dir}"/>
 		<fileset dir="${lib.dir}/pmd/">
 			<include name="*.jar"/>
 		</fileset>
 	</path>
-	
+
 	<target name="clean" description="delete old build files">
 		<delete dir="${dist.dir}" />
 		<delete dir="${build.lib.dir}" />
@@ -46,10 +47,10 @@
 
 	<target name="init" description="create the directories">
 		<tstamp/>
-		
+
 		<pathconvert property="classpathProp" refid="velho.classpath"/>
 		<echo>Classpath is: ${classpathProp}</echo>
-		
+
 		<mkdir dir="${dist.src.dir}" />
 		<mkdir dir="${dist.test.dir}" />
 		<mkdir dir="${build.lib.dir}" />
@@ -60,9 +61,9 @@
 	<target name="pmd" description="do static code analysis">
 		<pathconvert property="classpathPMDProp" refid="pmd.classpath"/>
 		<echo>PMD classpath is: ${classpathPMDProp}</echo>
-			
+
 		<taskdef name="pmd" classname="net.sourceforge.pmd.ant.PMDTask" classpathref="pmd.classpath"/>
-		
+
 		<pmd shortFilenames="true" rulesetfiles="rulesets/java/basic.xml,
 												 rulesets/java/clone.xml,
 												 rulesets/java/codesize.xml,
@@ -83,7 +84,7 @@
 			<formatter type="html" toFile="${report.dir}/pmd_report.html">
 				<param name="linePrefix" value=".line"/>
 			</formatter>
-			
+
 			<fileset dir="${src.dir}">
 				<include name="**/*.java"/>
 			</fileset>
@@ -92,7 +93,7 @@
 
 	<target name="checkstyle" description="generates a report of code convention violations">
 		<taskdef resource="com/puppycrawl/tools/checkstyle/ant/checkstyle-ant-task.properties" classpath="${lib.checkstyle.dir}/checkstyle-6.17-all.jar"/>
-		
+
 		<checkstyle config="${lib.checkstyle.dir}/sun_checks_tweaked.xml" failureProperty="checkstyle.failure" failOnViolation="false">
 			<classpath refid="velho.classpath" />
 			<formatter type="xml" tofile="${build.dir}/checkstyle_report.xml"/>
@@ -110,8 +111,8 @@
 	</target>
 
 	<target name="extra" depends="clean, init, pmd, checkstyle, javadoc" description="perform extra actions not directly related to compiling the software" />
- 			
-	<target name="compile" depends="clean, init, extra" description="compile the source and test classes">
+
+	<target name="compile" depends="clean, init" description="compile the source and test classes">
 		<javac srcdir="${src.dir}" destdir="${dist.src.dir}" includeantruntime="false" source="${source}" target="${target}">
 			<classpath refid="velho.classpath" />
 		</javac>
@@ -138,9 +139,9 @@
 			</zipgroupfileset>
 		</jar>
 	</target>
-	
+
 	<target name="test" depends="compile" description="run the tests">
-		<junit showoutput="true" printsummary="yes" haltonerror="no" haltonfailure="no">
+		<junit showoutput="true" printsummary="false" haltonerror="no" haltonfailure="no">
 			<!-- Plain text for console. -->
 			<formatter type="plain" usefile="false" />
 
@@ -155,13 +156,20 @@
 
 			<batchtest todir="${report.dir}">
 				<fileset dir="${dist.test.dir}">
+					<!--<exclude name="**/All*Tests.class" />-->
 					<include name="**/AllTests.class" />
 				</fileset>
 			</batchtest>
 		</junit>
 	</target>
 
-	<target name="jar" depends="compile, test, dependencies" description="make the jar">
+	<target name="shutdown" depends="test" description="shuts down both database connections">
+ 		<java classname="velhotest.ShutdownDatabases">
+			<classpath refid="velho.classpath" />
+		</java>
+	</target>
+
+	<target name="jar" depends="compile, shutdown, dependencies" description="make the jar">
 		<jar destfile="${dist.dir}/${projectName}_${DSTAMP}.jar" basedir="${dist.src.dir}">
 			<manifest>
 				<attribute name="Main-Class" value="${main.class}"/>
