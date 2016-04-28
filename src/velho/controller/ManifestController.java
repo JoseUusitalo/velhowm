@@ -60,6 +60,7 @@ public class ManifestController implements UIActionController
 	public ManifestController(final MainWindow mainWindow)
 	{
 		this.mainWindow = mainWindow;
+		tabView = new GenericTabView();
 	}
 
 	/**
@@ -104,15 +105,12 @@ public class ManifestController implements UIActionController
 	 */
 	public Node getView()
 	{
-		if (tabView == null)
-		{
-			tabView = new GenericTabView();
-			managementView = new ManifestManagementView(this);
-			tabView.setView(managementView.getView());
+		managementView = new ManifestManagementView(this);
+		tabView.setView(managementView.getView());
 
-			// Manifest list is shown by default.
+		// Manifest list is shown by default.
+		if (managementView.getView().getCenter() == null)
 			showBrowseManifestsView();
-		}
 
 		return tabView.getView();
 	}
@@ -170,7 +168,6 @@ public class ManifestController implements UIActionController
 				}
 			}
 		}
-
 	}
 
 	@Override
