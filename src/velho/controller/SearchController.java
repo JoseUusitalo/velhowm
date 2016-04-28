@@ -13,7 +13,6 @@ import javafx.scene.layout.BorderPane;
 import velho.model.ProductBrand;
 import velho.model.ProductCategory;
 import velho.model.enums.DatabaseTable;
-import velho.model.exceptions.NoDatabaseLinkException;
 import velho.view.ProductListSearch;
 import velho.view.SearchTabView;
 import velho.view.SearchView;
@@ -128,9 +127,9 @@ public class SearchController
 		{
 			DatabaseController.searchProductBox(where, joins);
 		}
-		catch (final NoDatabaseLinkException e)
+		catch (Exception e)
 		{
-			DatabaseController.tryReLink();
+			e.printStackTrace();
 		}
 	}
 
@@ -253,7 +252,7 @@ public class SearchController
 	 *
 	 * @param line String to parse
 	 * @return an object array where the first element is the integer and the
-	 *         second element is the product name
+	 * second element is the product name
 	 */
 	public static Object[] parseProductLine(final String line)
 	{

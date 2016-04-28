@@ -20,7 +20,6 @@ import velho.controller.RemovalListController;
 import velho.controller.UIController;
 import velho.model.RemovalList;
 import velho.model.RemovalListState;
-import velho.model.exceptions.NoDatabaseLinkException;
 import velho.model.interfaces.GenericView;
 
 /**
@@ -111,7 +110,8 @@ public class RemovalListView implements GenericView
 				}
 			});
 
-			thisList = (BorderPane) ListController.getTableView(removalListController, DatabaseController.getProductSearchDataColumns(false, false), removalList.getObservableBoxes());
+			thisList = (BorderPane) ListController.getTableView(removalListController, DatabaseController.getProductSearchDataColumns(false, false),
+					removalList.getObservableBoxes());
 
 			// Make the list always take up the full vertical space.
 			GridPane.setVgrow(thisList, Priority.ALWAYS);

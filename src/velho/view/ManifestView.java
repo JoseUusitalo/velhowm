@@ -14,7 +14,6 @@ import velho.controller.ManifestController;
 import velho.controller.UIController;
 import velho.model.Manifest;
 import velho.model.ManifestState;
-import velho.model.exceptions.NoDatabaseLinkException;
 import velho.model.interfaces.GenericView;
 
 /**
@@ -61,7 +60,8 @@ public class ManifestView implements GenericView
 		{
 			bpane = new BorderPane();
 
-			BorderPane boxlist = (BorderPane) ListController.getTableView(manifestController, DatabaseController.getProductSearchDataColumns(false, false), manifest.getObservableBoxes());
+			BorderPane boxlist = (BorderPane) ListController.getTableView(manifestController, DatabaseController.getProductSearchDataColumns(false, false),
+					manifest.getObservableBoxes());
 
 			HBox stateBox = new HBox(10);
 			Label stateLabel = new Label(LocalizationController.getString("manifestStateLabel"));

@@ -47,8 +47,6 @@ import velho.controller.SearchController;
 import velho.controller.UIController;
 import velho.controller.UserController;
 import velho.model.enums.SupportedTranslation;
-import velho.model.exceptions.ExistingDatabaseLinkException;
-import velho.model.exceptions.NoDatabaseLinkException;
 import velho.model.interfaces.GenericView;
 
 /**
@@ -266,7 +264,7 @@ public class MainWindow extends Application implements GenericView
 				System.exit(0);
 			}
 		}
-		catch (ClassNotFoundException | ExistingDatabaseLinkException | NoDatabaseLinkException e)
+		catch (Exception e)
 		{
 			e.printStackTrace();
 		}
@@ -545,14 +543,7 @@ public class MainWindow extends Application implements GenericView
 
 		SYSLOG.info("Exit.");
 
-		try
-		{
-			LogDatabaseController.unlink();
-		}
-		catch (final NoDatabaseLinkException e)
-		{
-			// Ignore.
-		}
+		LogDatabaseController.unlink();
 	}
 
 	/**

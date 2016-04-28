@@ -20,7 +20,6 @@ import velho.controller.RemovalListController;
 import velho.controller.SearchController;
 import velho.controller.UIController;
 import velho.model.RemovalListState;
-import velho.model.exceptions.NoDatabaseLinkException;
 import velho.model.interfaces.GenericView;
 
 /**

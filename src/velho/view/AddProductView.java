@@ -14,7 +14,6 @@ import velho.controller.LocalizationController;
 import velho.controller.ProductController;
 import velho.controller.UIController;
 import velho.model.Product;
-import velho.model.exceptions.NoDatabaseLinkException;
 import velho.model.interfaces.GenericView;
 
 /**
@@ -150,7 +149,8 @@ public class AddProductView implements GenericView
 					Object brand = brandList.valueProperty().getValue();
 					Object category = categoryList.valueProperty().getValue();
 
-					final Product newProduct = productController.saveProduct(databaseID.getValueFactory().getValue().intValue(), nameField.getText(), brand, category);
+					final Product newProduct = productController.saveProduct(databaseID.getValueFactory().getValue().intValue(), nameField.getText(), brand,
+							category);
 
 					if (editProduct)
 						productController.showProductView(newProduct);

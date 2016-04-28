@@ -3,8 +3,6 @@ package velho.model;
 import java.util.Date;
 import java.util.UUID;
 
-import org.apache.log4j.Logger;
-
 /**
  * An abstract container that can hold any number of {@link Product} objects.
  *
