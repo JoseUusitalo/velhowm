@@ -1198,7 +1198,7 @@ public class DatabaseController
 		if (withDeleteColumn)
 			cols.put("deleteButton", LocalizationController.getString("buttonDelete"));
 
-		cols.put("productID", "ID");
+		cols.put("databaseID", "ID");
 		cols.put("name", "Name");
 		cols.put("brand", "Brand");
 		cols.put("category", "Category");
@@ -1249,7 +1249,7 @@ public class DatabaseController
 		if (withRemoveColumn)
 			cols.put("removeButton", LocalizationController.getString("buttonRemove"));
 
-		cols.put("productID", LocalizationController.getString("publicProductSearchTableHeaderID"));
+		cols.put("databaseID", LocalizationController.getString("publicProductSearchTableHeaderID"));
 		cols.put("productName", LocalizationController.getString("publicProductSearchTableHeaderName"));
 		cols.put("productBrand", LocalizationController.getString("publicProductSearchTableHeaderBrand"));
 		cols.put("productCategory", LocalizationController.getString("publicProductSearchTableHeaderCategory"));
