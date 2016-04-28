@@ -2,6 +2,7 @@ package velho.view;
 
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
+import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
 import java.util.Date;
 
@@ -11,11 +12,14 @@ import javafx.event.ActionEvent;
 import javafx.geometry.Insets;
 import javafx.scene.control.Button;
 import javafx.scene.control.DatePicker;
+import javafx.scene.control.Spinner;
+import javafx.scene.control.SpinnerValueFactory;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableColumn.CellEditEvent;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
+import javafx.scene.control.cell.ComboBoxTableCell;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
@@ -23,6 +27,7 @@ import javafx.util.Callback;
 import velho.controller.DatabaseController;
 import velho.controller.ProductController;
 import velho.controller.UIController;
+import velho.model.Product;
 import velho.model.ProductBox;
 import velho.model.ProductCategory;
 
@@ -72,22 +77,54 @@ public class ProductBoxTabView
 
 			table.setEditable(true);
 
-			Callback<TableColumn<Object, Object>, TableCell<Object, Object>> cellFactory = (final TableColumn<Object, Object> p) -> new EditingCell();
+			Callback<TableColumn<Object, Object>, TableCell<Object, Object>> cellFactory = (final TableColumn<Object, Object> p) -> new SpinnerCell();
+
+			TableColumn<Object, Object> sizeColumn = new TableColumn<Object, Object>("Size");
+
+			sizeColumn.setMinWidth(100);
+			sizeColumn.setCellValueFactory(new PropertyValueFactory<>("productCount"));
+			sizeColumn.setCellFactory(cellFactory);
+
+			sizeColumn.setOnEditCommit((final CellEditEvent<Object, Object> t) ->
+			{
+				final ProductBox productBox = ((ProductBox) t.getTableView().getItems().get(t.getTablePosition().getRow()));
+				productBox.setProductCount((int) t.getNewValue());
+				productController.saveProductBox(productBox);
+			});
+			table.setItems(data);
+			table.getColumns().add(sizeColumn);
+
+			Callback<TableColumn<Object, Object>, TableCell<Object, Object>> cellFactory2 = (final TableColumn<Object, Object> p) -> new SpinnerCell();
 
 			TableColumn<Object, Object> maxSizeColumn = new TableColumn<Object, Object>("Max Size");
 
 			maxSizeColumn.setMinWidth(100);
 			maxSizeColumn.setCellValueFactory(new PropertyValueFactory<>("maxSize"));
-			maxSizeColumn.setCellFactory(cellFactory);
+			maxSizeColumn.setCellFactory(cellFactory2);
 
 			maxSizeColumn.setOnEditCommit((final CellEditEvent<Object, Object> t) ->
 			{
-				final ProductCategory editCategory = ((ProductCategory) t.getTableView().getItems().get(t.getTablePosition().getRow()));
-				editCategory.setName(t.getNewValue().toString());
-				productController.saveProductCategory(editCategory);
+				final ProductBox productBox = ((ProductBox) t.getTableView().getItems().get(t.getTablePosition().getRow()));
+				productBox.setMaxSize((int) t.getNewValue());
+				productController.saveProductBox(productBox);
 			});
 			table.setItems(data);
 			table.getColumns().add(maxSizeColumn);
+
+			ObservableList<Object> cbValues = DatabaseController.getAllProducts();
+			TableColumn<Object, Object> product = new TableColumn<Object, Object>("Product");
+
+			product.setMinWidth(370);
+			product.setCellValueFactory(new PropertyValueFactory<>("product"));
+			product.setCellFactory(ComboBoxTableCell.forTableColumn(cbValues));
+			product.setOnEditCommit((final CellEditEvent<Object, Object> t) ->
+			{
+				final ProductBox editProductBox = ((ProductBox) t.getTableView().getItems().get(t.getTablePosition().getRow()));
+				editProductBox.setProduct((Product) t.getNewValue());
+				productController.saveProductBox(editProductBox);
+			});
+			table.setItems(data);
+			table.getColumns().add(product);
 
 			Callback<TableColumn<Object, Object>, TableCell<Object, Object>> pickerFactory = (final TableColumn<Object, Object> p) -> new DatePickerCell();
 			TableColumn<Object, Object> datePickerColumn = new TableColumn<>("Expiration Date");
@@ -98,10 +135,9 @@ public class ProductBoxTabView
 			{
 				final ProductBox productBox = ((ProductBox) t.getTableView().getItems().get(t.getTablePosition().getRow()));
 
-				long saveDate = ((LocalDate) t.getNewValue()).toEpochDay();
-				Date date = new Date(saveDate);
+				LocalDate saveDate = ((LocalDate) t.getNewValue());
+				Date date = Date.from(saveDate.atTime(0, 0).toInstant(ZoneOffset.of("Z")));
 				productBox.setExpirationDate(date);
-				System.out.println("new exp date " + productBox.getExpirationDate());
 				productController.saveProductBox(productBox);
 			});
 			table.getColumns().add(datePickerColumn);
@@ -117,8 +153,6 @@ public class ProductBoxTabView
 				productBoxName.clear();
 				productController.saveProductCategory(saveCategory);
 			});
-
-			final DatePicker datePickerBox = new DatePicker();
 
 			hb.getChildren().addAll(productBoxName, addButton);
 			hb.setSpacing(3);
@@ -212,6 +246,95 @@ public class ProductBoxTabView
 		private String getString()
 		{
 			return getItem() == null ? "" : getItem().toString();
+		}
+	}
+
+	class SpinnerCell extends TableCell<Object, Object>
+	{
+
+		private Spinner<Integer> spinner;
+
+		public SpinnerCell()
+		{
+		}
+
+		@Override
+		public void startEdit()
+		{
+			if (!isEmpty())
+			{
+				super.startEdit();
+				createSpinner();
+				setText("");
+				setGraphic(spinner);
+			}
+		}
+
+		@Override
+		public void cancelEdit()
+		{
+			super.cancelEdit();
+
+			setText(getItem().toString());
+			setGraphic(null);
+		}
+
+		@Override
+		public void updateItem(final Object item, final boolean empty)
+		{
+			super.updateItem(item, empty);
+
+			if (empty)
+			{
+				setText(null);
+				setGraphic(null);
+			}
+			else
+			{
+				if (isEditing())
+				{
+					if (spinner != null)
+					{
+						spinner.getValueFactory().setValue(getValue());
+					}
+					setText(null);
+					setGraphic(spinner);
+				}
+				else
+				{
+
+					setGraphic(null);
+
+					if (getItem() == null)
+					{
+						setText("");
+					}
+					else
+					{
+						setText(getValue().toString());
+					}
+				}
+			}
+		}
+
+		private void createSpinner()
+		{
+			spinner = new Spinner<Integer>();
+			spinner.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(1, Integer.MAX_VALUE, getValue()));
+			spinner.setEditable(true);
+			spinner.setMinWidth(this.getWidth() - this.getGraphicTextGap() * 2);
+			spinner.focusedProperty().addListener((final ObservableValue<? extends Boolean> arg0, final Boolean arg1, final Boolean arg2) ->
+			{
+				if (!arg2)
+				{
+					commitEdit(spinner.getValue());
+				}
+			});
+		}
+
+		private Integer getValue()
+		{
+			return (Integer) getItem();
 		}
 	}
 

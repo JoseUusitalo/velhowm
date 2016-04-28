@@ -422,6 +422,6 @@ public class ProductController implements UIActionController
 	public void saveProductBox(final ProductBox productBox)
 	{
 		// TODO Need validation
-		// DatabaseController.save(productBox);
+		DatabaseController.save(productBox);
 	}
 }
