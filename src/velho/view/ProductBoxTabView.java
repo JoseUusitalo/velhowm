@@ -1,6 +1,8 @@
 package velho.view;
 
+import java.text.SimpleDateFormat;
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.Date;
 
 import javafx.beans.value.ObservableValue;
@@ -95,7 +97,11 @@ public class ProductBoxTabView
 			datePickerColumn.setOnEditCommit((final CellEditEvent<Object, Object> t) ->
 			{
 				final ProductBox productBox = ((ProductBox) t.getTableView().getItems().get(t.getTablePosition().getRow()));
-				productBox.setExpirationDate((Date) t.getNewValue());
+
+				long saveDate = ((LocalDate) t.getNewValue()).toEpochDay();
+				Date date = new Date(saveDate);
+				productBox.setExpirationDate(date);
+				System.out.println("new exp date " + productBox.getExpirationDate());
 				productController.saveProductBox(productBox);
 			});
 			table.getColumns().add(datePickerColumn);
@@ -225,7 +231,7 @@ public class ProductBoxTabView
 			{
 				super.startEdit();
 				createTextField();
-				setText(null);
+				setText("");
 				setGraphic(datePicker);
 			}
 		}
@@ -262,8 +268,17 @@ public class ProductBoxTabView
 				}
 				else
 				{
-					setText("Hey Listen!");
+
 					setGraphic(null);
+
+					if (getItem() == null)
+					{
+						setText("");
+					}
+					else
+					{
+						setText(getDateValue().toString());
+					}
 				}
 			}
 		}
@@ -285,7 +300,15 @@ public class ProductBoxTabView
 		{
 			if (getItem() == null)
 				return null;
-			return ((DatePicker) getItem()).getValue();
+
+			if (getItem() instanceof LocalDate)
+				return (LocalDate) getItem();
+
+			Date aDate = ((Date) getItem());
+			SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd");
+			DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+			LocalDate date = LocalDate.parse(df.format(aDate), formatter);
+			return date;
 		}
 	}
 }

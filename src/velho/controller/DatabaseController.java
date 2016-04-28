@@ -24,7 +24,6 @@ import org.h2.jdbcx.JdbcConnectionPool;
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
-import org.hibernate.Transaction;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -1971,32 +1970,6 @@ public class DatabaseController
 		DBLOG.debug("Saved: " + object);
 
 		// TODO: Update observable lists.
-
-		return object.getDatabaseID();
-	}
-
-	public static int save(final ProductType object)
-	{
-		// TODO: Generalize when all tests have been updated to manually rollback.
-
-		final Session session = sessionFactory.openSession();
-		final Transaction transaction = session.beginTransaction();
-
-		session.saveOrUpdate(object);
-
-		try
-		{
-			transaction.commit();
-			session.close();
-		}
-		catch (final HibernateException e)
-		{
-			transaction.rollback();
-			session.close();
-			throw new HibernateException("Failed to commit.");
-		}
-
-		DBLOG.debug("Saved/Updated: " + object);
 
 		return object.getDatabaseID();
 	}
