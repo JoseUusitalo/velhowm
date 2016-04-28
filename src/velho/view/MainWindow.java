@@ -409,6 +409,7 @@ public class MainWindow extends Application implements GenericView
 			final ComboBox<SupportedTranslation> languageBox = new ComboBox<SupportedTranslation>();
 			final Label languageChange = new Label(LocalizationController.getString("changeTranslationLabel"));
 			languageBox.getItems().addAll(SupportedTranslation.values());
+			languageBox.getSelectionModel().select(LocalizationController.getCurrentTranslation());
 			languageBox.valueProperty().addListener(new ChangeListener<SupportedTranslation>()
 			{
 				@SuppressWarnings("rawtypes")

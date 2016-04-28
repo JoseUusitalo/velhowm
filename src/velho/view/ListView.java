@@ -18,6 +18,7 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.text.Font;
 import javafx.util.Callback;
+import velho.controller.LocalizationController;
 import velho.controller.LoginController;
 import velho.controller.UIController;
 import velho.controller.interfaces.UIActionController;
@@ -102,7 +103,7 @@ public class ListView implements GenericView
 						@Override
 						public TableCell<Object, String> call(final TableColumn<Object, String> p)
 						{
-							final TableCellDeleteButton button = new TableCellDeleteButton(parentController, "Delete");
+							final TableCellDeleteButton button = new TableCellDeleteButton(parentController, (LocalizationController.getString("buttonDelete")));
 							button.setAlignment(Pos.CENTER);
 							return button;
 						}
@@ -178,7 +179,7 @@ public class ListView implements GenericView
 						@Override
 						public TableCell<Object, String> call(final TableColumn<Object, String> p)
 						{
-							final TableCellViewButton button = new TableCellViewButton(parentController, "View");
+							final TableCellViewButton button = new TableCellViewButton(parentController, (LocalizationController.getString("buttonView")));
 							button.setAlignment(Pos.CENTER);
 							return button;
 						}
@@ -428,6 +429,6 @@ public class ListView implements GenericView
 	public void reCreate()
 	{
 		pane = null;
-		getView();
+		parentController.recreateViews(this);
 	}
 }

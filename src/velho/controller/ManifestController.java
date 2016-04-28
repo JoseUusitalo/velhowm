@@ -13,6 +13,7 @@ import velho.model.ManifestState;
 import velho.model.ProductBox;
 import velho.model.enums.UserRole;
 import velho.view.GenericTabView;
+import velho.view.ListView;
 import velho.view.MainWindow;
 import velho.view.ManifestManagementView;
 import velho.view.ManifestView;
@@ -204,5 +205,13 @@ public class ManifestController implements UIActionController
 	public void viewAction(final Object data)
 	{
 		showManifestView((Manifest) data);
+	}
+
+	@Override
+	public void recreateViews(final ListView node)
+	{
+		// TODO check for correct view
+		showBrowseManifestsView();
+
 	}
 }

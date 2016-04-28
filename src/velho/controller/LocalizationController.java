@@ -18,10 +18,12 @@ public class LocalizationController
 	private final static String languageGerman = "de";
 	private final static String countryGerman = "DE";
 	private static UIController uiController;
+	private static SupportedTranslation currentTranslation;
 
 	public static void initializeBundle()
 	{
 
+		currentTranslation = SupportedTranslation.ENGLISH;
 		localeEnglish = new Locale(languageEnglish, countryEnglish);
 		localeGerman = new Locale(languageGerman, countryGerman);
 
@@ -73,6 +75,12 @@ public class LocalizationController
 			msgBundle = getResourceBundle(localeGerman);
 			uiController.reCreateAllViews();
 		}
+		currentTranslation = newTranslation;
+	}
+
+	public static SupportedTranslation getCurrentTranslation()
+	{
+		return currentTranslation;
 	}
 
 	public static void setControllers(final UIController uiController)

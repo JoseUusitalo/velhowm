@@ -8,6 +8,7 @@ import velho.controller.interfaces.UIActionController;
 import velho.model.User;
 import velho.model.enums.UserRole;
 import velho.view.AddUserView;
+import velho.view.ListView;
 import velho.view.MainWindow;
 
 /**
@@ -47,8 +48,7 @@ public class UserController implements UIActionController
 	 * @param showPopup show popups?
 	 * @return the created user or <code>null</code> if data was invalid
 	 */
-	public User createUser(final String badgeID, final String userPIN, final String userFirstName, final String userLastName, final UserRole userRole,
-			final boolean showPopup)
+	public User createUser(final String badgeID, final String userPIN, final String userFirstName, final String userLastName, final UserRole userRole, final boolean showPopup)
 	{
 		if (validateUserData(badgeID, userPIN, userFirstName, userLastName, userRole))
 		{
@@ -65,7 +65,8 @@ public class UserController implements UIActionController
 
 				if (LoginController.getCurrentUser() != null)
 					USRLOG.debug("Created a user.");
-				// Else: running a JUnit test -> above line causes a null pointer error.
+				// Else: running a JUnit test -> above line causes a null
+				// pointer error.
 
 				if (showPopup)
 					PopupController.info(LocalizationController.getString("userCreatedPopUpNotice"));
@@ -79,9 +80,7 @@ public class UserController implements UIActionController
 
 				if (showPopup)
 				{
-					PopupController.info("User already exists. Please make sure that the following criteria are met:\n" + "Every Badge ID must be unique.\n"
-							+ "People with the same first and last name are allowed if their roles are different.\n"
-							+ "The combination of the PIN, first name, and last name must be unique.");
+					PopupController.info("User already exists. Please make sure that the following criteria are met:\n" + "Every Badge ID must be unique.\n" + "People with the same first and last name are allowed if their roles are different.\n" + "The combination of the PIN, first name, and last name must be unique.");
 				}
 
 				return null;
@@ -121,8 +120,7 @@ public class UserController implements UIActionController
 
 		if (LoginController.getCurrentUser().getDatabaseID() == user.getDatabaseID())
 		{
-			if (PopupController.confirmation(
-					"Are you sure you wish the delete your own user account? You will be logged out and be unable to log in again as a result of this action."))
+			if (PopupController.confirmation("Are you sure you wish the delete your own user account? You will be logged out and be unable to log in again as a result of this action."))
 			{
 				DatabaseController.deleteUser(user);
 				LoginController.logout();
@@ -167,7 +165,7 @@ public class UserController implements UIActionController
 	 *
 	 * @param role the role to create the user as
 	 * @return a {@link User} object or <code>null</code> if
-	 * {@link MainWindow#DEBUG_MODE} is <code>false</code>
+	 *         {@link MainWindow#DEBUG_MODE} is <code>false</code>
 	 */
 	public static User getDebugUser(final UserRole role)
 	{
@@ -245,7 +243,7 @@ public class UserController implements UIActionController
 	 *
 	 * @param badgeID RFID identification string of the user's RFID badge
 	 * @param pin the pin string used to log in to the system if no RFID badge
-	 * ID is provided
+	 *            ID is provided
 	 * @param firstName the first name of the user
 	 * @param lastName the last name of the user
 	 * @param roleName the name of the role of the user
@@ -321,5 +319,34 @@ public class UserController implements UIActionController
 		{
 			return false;
 		}
+	}
+
+	public Node getUserListView(final UserRole currentUserRole)
+	{
+		// TODO refactor into tabview
+		/*
+		 * What is shown in the user list depends on your role.
+		 */
+		switch (currentUserRole)
+		{
+			case ADMINISTRATOR:
+			case MANAGER:
+				return ListController.getTableView(this, DatabaseController.getPublicUserDataColumns(true), DatabaseController.getAllUsers());
+			case LOGISTICIAN:
+				return ListController.getTableView(this, DatabaseController.getPublicUserDataColumns(false), DatabaseController.getAllUsers());
+			case GUEST:
+				break;
+			default:
+				SYSLOG.error("Unknown user role '" + currentUserRole.getName() + "'.");
+		}
+
+		return null;
+	}
+
+	@Override
+	public void recreateViews(final ListView listView)
+	{
+		// TODO refactor userlist into tabview
+
 	}
 }

@@ -144,7 +144,7 @@ public class UIController
 				mainView.addTab(LocalizationController.getString("addRemovalListsTab"), removalListController.getView());
 				mainView.addTab(LocalizationController.getString("addProductTab"), productController.getAddProductView());
 				mainView.addTab(LocalizationController.getString("addProductListTab"), productController.getTabView());
-				mainView.addTab(LocalizationController.getString("addUserListTab"), getUserListView(currentUserRole));
+				mainView.addTab(LocalizationController.getString("addUserListTab"), userController.getUserListView(currentUserRole));
 				break;
 			case GUEST:
 				break;
@@ -166,26 +166,6 @@ public class UIController
 	 * @param currentUserRole the role of the user who is currently logged in
 	 * @return the user list view
 	 */
-	private Node getUserListView(final UserRole currentUserRole)
-	{
-		/*
-		 * What is shown in the user list depends on your role.
-		 */
-		switch (currentUserRole)
-		{
-			case ADMINISTRATOR:
-			case MANAGER:
-				return ListController.getTableView(userController, DatabaseController.getPublicUserDataColumns(true), DatabaseController.getAllUsers());
-			case LOGISTICIAN:
-				return ListController.getTableView(userController, DatabaseController.getPublicUserDataColumns(false), DatabaseController.getAllUsers());
-			case GUEST:
-				break;
-			default:
-				SYSLOG.error("Unknown user role '" + currentUserRole.getName() + "'.");
-		}
-
-		return null;
-	}
 
 	/**
 	 * Resets the main menu to it's initial state.

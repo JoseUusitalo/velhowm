@@ -9,6 +9,7 @@ import velho.model.ProductBrand;
 import velho.model.ProductCategory;
 import velho.view.AddProductView;
 import velho.view.GenericTabView;
+import velho.view.ListView;
 import velho.view.ProductDataView;
 
 /**
@@ -154,6 +155,7 @@ public class ProductController implements UIActionController
 	 */
 	public void showList()
 	{
+		// TODO ei päivity oikein
 		listTab.setView(ListController.getTableView(this, DatabaseController.getProductDataColumns(false, false), DatabaseController.getAllProducts()));
 	}
 
@@ -214,5 +216,12 @@ public class ProductController implements UIActionController
 	{
 		USRLOG.info("Viewing: " + ((Product) data).toString());
 		listTab.setView(new ProductDataView(this).getView(((Product) data)));
+	}
+
+	@Override
+	public void recreateViews(final ListView node)
+	{
+		// TODO check for correct view
+		showList();
 	}
 }
