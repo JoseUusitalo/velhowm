@@ -135,6 +135,7 @@ public class RemovalListView implements GenericView
 	public void reCreate()
 	{
 		bpane = null;
+		thisList = null;
 		getView();
 	}
 

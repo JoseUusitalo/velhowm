@@ -139,6 +139,7 @@ public class ManifestManagementView implements GenericView
 	public void reCreate()
 	{
 		bpane = null;
+		managementPanel = null;
 		getView();
 	}
 }
