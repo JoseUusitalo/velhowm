@@ -411,14 +411,14 @@ public class MainWindow extends Application implements GenericView
 			final ComboBox<SupportedTranslation> languageBox = new ComboBox<SupportedTranslation>();
 			final Label languageChange = new Label(LocalizationController.getString("changeTranslationLabel"));
 			languageBox.getItems().addAll(SupportedTranslation.values());
-			languageBox.getSelectionModel().selectFirst();
 			languageBox.valueProperty().addListener(new ChangeListener<SupportedTranslation>()
 			{
 				@SuppressWarnings("rawtypes")
 				@Override
 				public void changed(final ObservableValue ov, final SupportedTranslation oldValue, final SupportedTranslation newValue)
 				{
-					if (!oldValue.equals(newValue))
+					System.out.println(oldValue + " " + newValue);
+					if (oldValue == null || !oldValue.equals(newValue))
 					{
 						LocalizationController.changeTranslation(newValue);
 					}

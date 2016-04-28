@@ -32,7 +32,11 @@ public class GenericTabView implements GenericView
 	 */
 	public BorderPane getView()
 	{
-		UIController.recordView(this);
+		if (bPane == null)
+		{
+			bPane = new BorderPane();
+			UIController.recordView(this);
+		}
 		return bPane;
 
 	}

@@ -65,7 +65,7 @@ public class LocalizationController
 		if (newTranslation.equals(SupportedTranslation.ENGLISH))
 		{
 			msgBundle = getResourceBundle(localeEnglish);
-
+			uiController.reCreateAllViews();
 		}
 		else
 		{
