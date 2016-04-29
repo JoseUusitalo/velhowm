@@ -33,10 +33,13 @@ public class AllTests
 	@AfterClass
 	public final static void after() throws Exception
 	{
-		DatabaseController.closeSessionFactory();
-		LogDatabaseController.shutdown();
-
 		System.out.println("---------------");
 		System.out.println("All Tests Done.\n");
+
+		System.out.println("Close session factory");
+		DatabaseController.closeSessionFactory();
+
+		System.out.println("\n\nClose log database.");
+		LogDatabaseController.shutdown();
 	}
 }
