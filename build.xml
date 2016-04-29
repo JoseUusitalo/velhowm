@@ -112,7 +112,7 @@
 
 	<target name="extra" depends="clean, init, pmd, checkstyle, javadoc" description="perform extra actions not directly related to compiling the software" />
 
-	<target name="compile" depends="clean, init" description="compile the source and test classes">
+	<target name="compile" depends="clean, extra, init" description="compile the source and test classes">
 		<javac srcdir="${src.dir}" destdir="${dist.src.dir}" includeantruntime="false" source="${source}" target="${target}">
 			<classpath refid="velho.classpath" />
 		</javac>
@@ -156,20 +156,21 @@
 
 			<batchtest todir="${report.dir}">
 				<fileset dir="${dist.test.dir}">
-					<!--<exclude name="**/All*Tests.class" />-->
-					<include name="**/AllTests.class" />
+					<!--<exclude name="**/AllTests.class" />-->
+					<include name="**/*Test.class" />
 				</fileset>
 			</batchtest>
 		</junit>
 	</target>
 
 	<target name="shutdown" depends="test" description="shuts down both database connections">
+		<!-- This does not work. -->
  		<java classname="velhotest.ShutdownDatabases">
 			<classpath refid="velho.classpath" />
 		</java>
 	</target>
 
-	<target name="jar" depends="compile, shutdown, dependencies" description="make the jar">
+	<target name="jar" depends="compile, dependencies, test" description="make the jar">
 		<jar destfile="${dist.dir}/${projectName}_${DSTAMP}.jar" basedir="${dist.src.dir}">
 			<manifest>
 				<attribute name="Main-Class" value="${main.class}"/>
