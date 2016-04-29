@@ -415,13 +415,12 @@ public class ProductController implements UIActionController
 
 	public Node getProductBox()
 	{
-		// TODO Auto-generated method stub
-		return productBoxTabView.getView();
+		return productBoxTabView.getView(DatabaseController.getAllProducts());
 	}
 
 	public void saveProductBox(final ProductBox productBox)
 	{
 		// TODO Need validation
-		DatabaseController.save(productBox);
+		DatabaseController.saveOrUpdate(productBox);
 	}
 }
