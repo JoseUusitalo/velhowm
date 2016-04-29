@@ -36,6 +36,7 @@ import velho.model.ProductBox;
 import velho.model.ProductBoxSearchResultRow;
 import velho.model.ProductBrand;
 import velho.model.ProductCategory;
+import velho.model.ProductContainer;
 import velho.model.ProductType;
 import velho.model.RemovalList;
 import velho.model.RemovalListState;
@@ -184,7 +185,7 @@ public class DatabaseController
 	 * @param columnValues values to set to the specified columns
 	 * @param where conditions (can be <code>null</code>)
 	 * @return
-	 *         <ul>
+	 * 		<ul>
 	 *         <li>if type is {@link DatabaseQueryType#UPDATE} or
 	 *         {@link DatabaseQueryType#DELETE}: the number of rows that were
 	 *         changed as a result of the query as an {@link Integer}</li>
@@ -194,8 +195,7 @@ public class DatabaseController
 	 * @throws NoDatabaseLinkException
 	 */
 	@Deprecated
-	private static Object runQuery(final DatabaseQueryType type, final DatabaseTable tableName, final Map<DatabaseTable, String> joinOnValues,
-			final String[] columns, final Map<String, Object> columnValues, final List<String> where) throws Exception
+	private static Object runQuery(final DatabaseQueryType type, final DatabaseTable tableName, final Map<DatabaseTable, String> joinOnValues, final String[] columns, final Map<String, Object> columnValues, final List<String> where) throws Exception
 	{
 		final Connection connection = getConnection();
 		Statement statement = null;
@@ -275,8 +275,7 @@ public class DatabaseController
 						{
 							case USERS:
 								while (result.next())
-									dataSet.add(new User(result.getInt("user_id"), result.getString("first_name"), result.getString("last_name"),
-											result.getString("pin"), result.getString("badge_id"), getRoleByID(result.getInt("role"))));
+									dataSet.add(new User(result.getInt("user_id"), result.getString("first_name"), result.getString("last_name"), result.getString("pin"), result.getString("badge_id"), getRoleByID(result.getInt("role"))));
 								break;
 
 							/*
@@ -678,8 +677,7 @@ public class DatabaseController
 	 * @return an SQL query string
 	 */
 	@Deprecated
-	public static String sqlBuilder(final DatabaseQueryType type, final String tableName, final Map<DatabaseTable, String> joinOnCondition,
-			final String[] columns, final Map<String, Object> columnValues, final List<String> where)
+	public static String sqlBuilder(final DatabaseQueryType type, final String tableName, final Map<DatabaseTable, String> joinOnCondition, final String[] columns, final Map<String, Object> columnValues, final List<String> where)
 	{
 		final StringBuilder sb = new StringBuilder();
 
@@ -1063,8 +1061,7 @@ public class DatabaseController
 		// product count.
 		while (productCountSum < wantedProductCount)
 		{
-			DBLOG.trace("Search status | Count: " + productCountSum + " / " + wantedProductCount + " | Would Be Index: " + wantedWouldBeIndex + " | Add Index: "
-					+ addCountIndex + " / " + boxProductCount.size());
+			DBLOG.trace("Search status | Count: " + productCountSum + " / " + wantedProductCount + " | Would Be Index: " + wantedWouldBeIndex + " | Add Index: " + addCountIndex + " / " + boxProductCount.size());
 
 			// Looking for too few products, show the smallest box of that
 			// product instead.
@@ -1152,8 +1149,7 @@ public class DatabaseController
 				else
 				{
 					DBLOG.error("Spooky untested code.");
-					DBLOG.error("Search status | Count: " + productCountSum + " / " + wantedProductCount + " | Would Be Index: " + wantedWouldBeIndex
-							+ " | Add Index: " + addCountIndex + " / " + boxProductCount.size());
+					DBLOG.error("Search status | Count: " + productCountSum + " / " + wantedProductCount + " | Would Be Index: " + wantedWouldBeIndex + " | Add Index: " + addCountIndex + " / " + boxProductCount.size());
 				}
 			}
 		}
@@ -1729,8 +1725,7 @@ public class DatabaseController
 		if (joins != null)
 			join.putAll(joins);
 
-		@SuppressWarnings("unchecked")
-		final Set<ProductBox> result = (LinkedHashSet<ProductBox>) (runQuery(DatabaseQueryType.SELECT, DatabaseTable.CONTAINERS, join, columns, null, where));
+		@SuppressWarnings("unchecked") final Set<ProductBox> result = (LinkedHashSet<ProductBox>) (runQuery(DatabaseQueryType.SELECT, DatabaseTable.CONTAINERS, join, columns, null, where));
 
 		for (final ProductBox box : result)
 			foundProducts.add(new ProductBoxSearchResultRow(box));
@@ -1985,8 +1980,7 @@ public class DatabaseController
 
 		sessionFactory.getCurrentSession().beginTransaction();
 
-		@SuppressWarnings("unchecked")
-		final List<Object> result = sessionFactory.getCurrentSession().createQuery("from " + className).list();
+		@SuppressWarnings("unchecked") final List<Object> result = sessionFactory.getCurrentSession().createQuery("from " + className).list();
 
 		try
 		{
@@ -2036,8 +2030,7 @@ public class DatabaseController
 		// Transaction is created and closed automatically with the session.
 		session.beginTransaction();
 
-		@SuppressWarnings("unchecked")
-		final List<String> result = session.createQuery("select badgeID from User where badgeID is not null").list();
+		@SuppressWarnings("unchecked") final List<String> result = session.createQuery("select badgeID from User where badgeID is not null").list();
 
 		session.close();
 
@@ -2244,5 +2237,23 @@ public class DatabaseController
 	{
 		DBLOG.info("Closing session factory.");
 		sessionFactory.close();
+	}
+
+	public static ProductType getProductTypeByName(final String string)
+	{
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public static ProductBrand getProductBrandByName(final String string)
+	{
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public static ProductCategory getProductCategoryByName(final String string)
+	{
+		// TODO Auto-generated method stub
+		return null;
 	}
 }
