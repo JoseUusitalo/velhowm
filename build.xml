@@ -13,10 +13,10 @@
 	<property name="build.dir" location="bin" />
 	<property name="javadoc.dir" location="javadoc" />
 	<property name="report.dir" location="report" />
-	<property name="dist.src.dir" location="dist/src" />
-	<property name="dist.test.dir" location="dist/test" />
+	<property name="build.dist.src.dir" location="bin/dist/src" />
+	<property name="build.dist.test.dir" location="bin/dist/test" />
 	<property name="lib.checkstyle.dir" location="lib/checkstyle" />
-	<property name="build.lib.dir" location="bin/lib" />
+	<property name="build.dist.lib.dir" location="bin/dist/lib" />
 	<property name="src.hibernatemappings.dir" location="src/velho/model" />
 	<property name="dist.src.hibernatemappings.dir" location="dist/src/velho/model" />
 
@@ -27,8 +27,8 @@
 		<fileset dir="${lib.dir}" includes="hibernate/java8/*.jar" />
 		<fileset dir="${lib.dir}" includes="hibernate/jpa/*.jar" />
 		<fileset dir="${lib.dir}" includes="hibernate/required/*.jar" />
-		<pathelement location="${dist.test.dir}" />
-		<pathelement location="${dist.src.dir}" />
+		<pathelement location="${build.dist.test.dir}" />
+		<pathelement location="${build.dist.src.dir}" />
 	</path>
 
 	<path id="pmd.classpath">
@@ -40,7 +40,7 @@
 
 	<target name="clean" description="delete old build files">
 		<delete dir="${dist.dir}" />
-		<delete dir="${build.lib.dir}" />
+		<delete dir="${build.dir}" />
 		<delete dir="${report.dir}" />
 		<delete dir="${javadoc.dir}" />
 	</target>
@@ -51,9 +51,10 @@
 		<pathconvert property="classpathProp" refid="velho.classpath"/>
 		<echo>Classpath is: ${classpathProp}</echo>
 
-		<mkdir dir="${dist.src.dir}" />
-		<mkdir dir="${dist.test.dir}" />
-		<mkdir dir="${build.lib.dir}" />
+		<mkdir dir="${dist.dir}" />
+		<mkdir dir="${build.dist.src.dir}" />
+		<mkdir dir="${build.dist.test.dir}" />
+		<mkdir dir="${build.dist.lib.dir}" />
 		<mkdir dir="${report.dir}" />
 		<mkdir dir="${javadoc.dir}" />
 	</target>
@@ -110,21 +111,23 @@
 		</javadoc>
 	</target>
 
-	<target name="extra" depends="clean, init, pmd, checkstyle, javadoc" description="Performs extra actions not directly related to compiling the software." />
+	<target name="extra" depends="clean, init, pmd, checkstyle, javadoc" description="Performs extra actions not directly related to compiling the software.">
+		<echo>PMD and checkstyle run, Javadoc generated.</echo>
+	</target>
 
 	<target name="compile" depends="clean, init, extra" description="Compiles the source and test classes.">
-		<javac srcdir="${src.dir}" destdir="${dist.src.dir}" includeantruntime="false" source="${source}" target="${target}">
+		<javac srcdir="${src.dir}" destdir="${build.dist.src.dir}" includeantruntime="false" source="${source}" target="${target}">
 			<classpath refid="velho.classpath" />
 		</javac>
 
-		<javac srcdir="${test.dir}" destdir="${dist.test.dir}" includeantruntime="false">
+		<javac srcdir="${test.dir}" destdir="${build.dist.test.dir}" includeantruntime="false">
 			<classpath refid="velho.classpath" />
 		</javac>
 	</target>
 
 	<target name="compile-debug" depends="clean, init" description="Compiles the source and test classes with debug information.">
 		<javac srcdir="${src.dir}"
-				destdir="${dist.src.dir}"
+				destdir="${build.dist.src.dir}"
 				includeantruntime="false"
 				source="${source}"
 				target="${target}"
@@ -134,7 +137,7 @@
 		</javac>
 
 		<javac srcdir="${test.dir}"
-				destdir="${dist.test.dir}"
+				destdir="${build.dist.test.dir}"
 				includeantruntime="false"
 				source="${source}"
 				target="${target}"
@@ -145,20 +148,20 @@
 	</target>
 
 	<target name="resources" description="Copy all configuration files, Hibernate mappings, and resources into the distribution.">
-		<copy todir="${dist.src.dir}">
+		<copy todir="${build.dist.src.dir}">
 			<fileset dir="${src.dir}" includes="**/*.xml,**/*.properties,**/*.css"/>
 		</copy>
 	</target>
 
 	<target name="dependencies" description="Copies all dependencies into a single jar.">
-		<jar jarfile="${build.lib.dir}/dependencies.jar">
+		<jar jarfile="${build.dist.lib.dir}/dependencies.jar">
 			<zipgroupfileset dir="${lib.dir}">
 				<include name="**/*.jar" />
 			</zipgroupfileset>
 		</jar>
 	</target>
 
-	<target name="test" depends="compile-debug, resources" description="run the tests">
+	<target name="test" depends="compile, resources" description="run the tests">
 		<junit showoutput="true" printsummary="true" haltonerror="no" haltonfailure="yes">
 			<!-- Plain text for console. -->
 			<formatter type="plain" usefile="false" />
@@ -169,11 +172,11 @@
 			<classpath refid="velho.classpath" />
 
 			<classpath>
-				<pathelement location="${dist.test.dir}"/>
+				<pathelement location="${build.dist.test.dir}"/>
 			</classpath>
 
 			<batchtest todir="${report.dir}">
-				<fileset dir="${dist.test.dir}">
+				<fileset dir="${build.dist.test.dir}">
 					<!-- If this is used the main database is still in use and cannot be used in the application.
 					<include name="**/*Tests.class" />-->
 					<include name="**/AllTests.class" />
@@ -182,13 +185,14 @@
 		</junit>
 	</target>
 
-	<target name="jar" depends="compile-debug, resources, test, dependencies" description="Creates the jar.">
-		<jar destfile="${dist.dir}/${projectName}_${DSTAMP}.jar" basedir="${dist.src.dir}">
+	<target name="jar" depends="compile, resources, test, dependencies" description="Creates the jar.">
+		<jar destfile="${dist.dir}/${projectName}_${DSTAMP}.jar" basedir="${build.dist.src.dir}">
 			<manifest>
 				<attribute name="Main-Class" value="${main.class}"/>
 			</manifest>
 
-			<zipfileset src="${build.lib.dir}/dependencies.jar" excludes="META-INF/*.SF" />
+			<!-- Copy dependencies into the jar. Do not copy manifest files as they cause an error when running. -->
+			<zipfileset src="${build.dist.lib.dir}/dependencies.jar" excludes="META-INF/*.SF" />
 		</jar>
 	</target>
 
