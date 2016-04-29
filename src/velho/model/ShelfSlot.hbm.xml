@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+ "-//Hibernate/Hibernate Mapping DTD//EN"
+ "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+	<class name="velho.model.ShelfSlot" table="SHELFSLOTS">
+		<meta attribute="class-description">A Shelf Slot represents an indexed area with {@link ProductBox} objects on a shelf level.</meta>
+
+		<id name="databaseID"
+			column="slot_id"
+			type="int">
+			<generator class="native" />
+		</id>
+		
+		<property	name="uuid"
+					column="uuid"
+					type="java.util.UUID"
+					unique="true"
+					not-null="true" />
+		
+		<property	name="levelPosition"
+					column="level_position"
+					type="int" />
+
+		<property	name="maxProductBoxes"
+					column="max_productboxes"
+					type="int" />
+
+		<set	name="productBoxes"
+				table="PRODUCTBOXES"
+				inverse="true"
+				cascade="all"
+				fetch="select"
+				lazy="false">
+
+			<key column="slot_id" not-null="false"/>
+			<one-to-many class="velho.model.ProductBox" />
+		</set>
+
+		<!-- Bidirectional relationship, child side.
+			 "Select" eager fetching: load the referenced object when this object is loaded. -->
+		<many-to-one	name="parentShelfLevel"
+						class="velho.model.ShelfLevel"
+						fetch="select"
+						lazy="false">
+			<column	name="level_id"
+					not-null="true" />
+		</many-to-one>
+	</class>
+</hibernate-mapping>

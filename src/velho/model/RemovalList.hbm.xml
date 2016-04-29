@@ -12,25 +12,32 @@
 			<generator class="native" />
 		</id>
 		
-		<!-- Many-to-one: This object can have one referenced object, the referenced object can be referenced from many objects.  
+		<property	name="uuid"
+					column="uuid"
+					type="java.util.UUID"
+					unique="true"
+					not-null="true" />
+		
+		<!-- No cascade solves an exception. -->
+		<!-- Many-to-one: This object can have one referenced object, the referenced object can be referenced from many objects.
 			 Cascade changes.
 			 "Select" eager fetching: load the referenced object when this object is loaded. -->
 		<many-to-one	name="state"
 						class="velho.model.RemovalListState"
 						column="liststate"
 						not-null="true"
-						cascade="all"
 						fetch="select"
 						lazy="false" />
-		
-		<set name="boxes"
-			 cascade="all"
-			 table="removallist_productboxes"
-			 fetch="select"
-			 lazy="false" >
-			<key column="removallist" />
-			<many-to-many column="productbox"
-						  class="velho.model.ProductBox" />
+
+		<set	name="boxes"
+				table="PRODUCTBOXES"
+				inverse="true"
+				cascade="all"
+				fetch="select"
+				lazy="false">
+
+			<key column="removallist" not-null="false"/>
+			<one-to-many class="velho.model.ProductBox" />
 		</set>
 	</class>
 </hibernate-mapping>

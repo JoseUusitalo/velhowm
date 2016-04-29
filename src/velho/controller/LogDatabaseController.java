@@ -15,8 +15,7 @@ import org.h2.jdbcx.JdbcConnectionPool;
 import velho.model.enums.DatabaseFileState;
 import velho.model.enums.DatabaseQueryType;
 import velho.model.enums.DatabaseTable;
-import velho.model.exceptions.ExistingDatabaseLinkException;
-import velho.model.exceptions.NoDatabaseLinkException;
+import velho.model.enums.LogDatabaseTable;
 import velho.view.MainWindow;
 
 /**
@@ -68,8 +67,8 @@ public class LogDatabaseController
 	 * </ul>
 	 * @throws NoDatabaseLinkException
 	 */
-	private static List<Object> runQuery(final DatabaseQueryType type, final DatabaseTable tableName, final Map<DatabaseTable, String> joinOnValues,
-			final String[] columns, final Map<String, Object> columnValues, final List<String> where) throws NoDatabaseLinkException
+	private static List<Object> runQuery(final DatabaseQueryType type, final LogDatabaseTable tableName, final Map<DatabaseTable, String> joinOnValues,
+			final String[] columns, final Map<String, Object> columnValues, final List<String> where) throws Exception
 	{
 		final Connection connection = getConnection();
 		Statement statement = null;
@@ -84,7 +83,8 @@ public class LogDatabaseController
 			// Initialize a statement.
 			statement = connection.createStatement();
 
-			statement.execute(DatabaseController.sqlBuilder(type, tableName, joinOnValues, columns, columnValues, where), Statement.RETURN_GENERATED_KEYS);
+			statement.execute(DatabaseController.sqlBuilder(type, tableName.toString(), joinOnValues, columns, columnValues, where),
+					Statement.RETURN_GENERATED_KEYS);
 
 			switch (type)
 			{
@@ -196,8 +196,7 @@ public class LogDatabaseController
 				e.printStackTrace();
 			}
 
-			// Connection pool has been disposed = no database connection.
-			throw new NoDatabaseLinkException();
+			throw new Exception("Connection pool has been disposed, no database connection.");
 		}
 		catch (final SQLException e)
 		{
@@ -239,25 +238,14 @@ public class LogDatabaseController
 		if (MainWindow.DEBUG_MODE)
 			System.out.println("Attempting to relink log database.");
 
-		try
-		{
-			// Just in case.
-			unlink();
-		}
-		catch (final NoDatabaseLinkException e)
-		{
-			// Do nothing. This is expected.
-		}
+		// Just in case.
+		unlink();
 
 		try
 		{
 			link();
 		}
 		catch (final ClassNotFoundException e)
-		{
-			e.printStackTrace();
-		}
-		catch (final ExistingDatabaseLinkException e)
 		{
 			e.printStackTrace();
 		}
@@ -280,10 +268,8 @@ public class LogDatabaseController
 	 *
 	 * @return a database connection
 	 */
-	private static Connection getConnection() throws NoDatabaseLinkException
+	private static Connection getConnection()
 	{
-		checkLink();
-
 		Connection connection = null;
 		try
 		{
@@ -320,39 +306,18 @@ public class LogDatabaseController
 	}
 
 	/**
-	 * Checks if a database link exists and throws a {@link NoDatabaseLinkException} exception if it doesn't.
-	 * To be used when a database link must exist.
-	 */
-	public static void checkLink() throws NoDatabaseLinkException
-	{
-		if (connectionPool == null)
-			throw new NoDatabaseLinkException();
-	}
-
-	/**
 	 * Attempts to re-link the database.
 	 */
 	public static void tryReLink()
 	{
-		try
-		{
-			// Just in case.
-			unlink();
-		}
-		catch (final NoDatabaseLinkException e)
-		{
-			// Do nothing. This is expected.
-		}
+		// Just in case.
+		unlink();
 
 		try
 		{
 			link();
 		}
 		catch (final ClassNotFoundException e)
-		{
-			e.printStackTrace();
-		}
-		catch (final ExistingDatabaseLinkException e)
 		{
 			e.printStackTrace();
 		}
@@ -370,11 +335,8 @@ public class LogDatabaseController
 	 * @throws ExistingDatabaseLinkException
 	 * when a database link already exists
 	 */
-	public static DatabaseFileState link() throws ClassNotFoundException, ExistingDatabaseLinkException
+	public static DatabaseFileState link() throws ClassNotFoundException
 	{
-		if (connectionPool != null)
-			throw new ExistingDatabaseLinkException();
-
 		// Load the driver.
 		Class.forName("org.h2.Driver");
 
@@ -408,10 +370,6 @@ public class LogDatabaseController
 
 			if (c != null)
 				c.close();
-		}
-		catch (final NoDatabaseLinkException e)
-		{
-			e.printStackTrace();
 		}
 		catch (final SQLException e)
 		{
@@ -451,21 +409,26 @@ public class LogDatabaseController
 	 * when attempting unlink a database when no database link
 	 * exists
 	 */
-	public static void unlink() throws NoDatabaseLinkException
+	public static void unlink()
 	{
-		if (connectionPool == null)
-			throw new NoDatabaseLinkException();
-
-		SYSLOG.debug("Unlinking log database.");
-		connectionPool.dispose();
-		connectionPool = null;
+		if (connectionPool != null)
+		{
+			SYSLOG.debug("Unlinking log database.");
+			connectionPool.dispose();
+			connectionPool = null;
+		}
+		else
+			SYSLOG.debug("Log database already unlinked.");
 	}
 
 	/**
 	 * Links and initializes the database.
 	 */
-	public static boolean connectAndInitialize() throws ClassNotFoundException, ExistingDatabaseLinkException, NoDatabaseLinkException
+	public static boolean connectAndInitialize() throws Exception
 	{
+		if (isLinked())
+			return true;
+
 		final DatabaseFileState state = link();
 		boolean initialized = true;
 
@@ -491,7 +454,7 @@ public class LogDatabaseController
 	 * @return <code>true</code> if database changed as a result of this call
 	 * @throws NoDatabaseLinkException
 	 */
-	public static boolean initializeDatabase() throws NoDatabaseLinkException
+	public static boolean initializeDatabase() throws Exception
 	{
 		if (MainWindow.DEBUG_MODE)
 			System.out.println("Initializing log database...");
@@ -531,8 +494,7 @@ public class LogDatabaseController
 				e.printStackTrace();
 			}
 
-			// Connection pool has been disposed = no database connection.
-			throw new NoDatabaseLinkException();
+			throw new Exception("Connection pool has been disposed, no database connection.");
 		}
 		catch (final SQLException e)
 		{
@@ -565,6 +527,71 @@ public class LogDatabaseController
 		return changed;
 	}
 
+	/**
+	 * Closes the database permanently.
+	 * Additionally disposes the old connection pool.
+	 */
+	public static void shutdown() throws Exception
+	{
+		if (MainWindow.DEBUG_MODE)
+			System.out.println("Shutting down log database..");
+
+		if (!isLinked())
+		{
+			try
+			{
+				link();
+			}
+			catch (ClassNotFoundException e1)
+			{
+				e1.printStackTrace();
+			}
+		}
+
+		Connection connection = null;
+		connection = getConnection();
+
+		try
+		{
+			if (connection != null)
+				connection.createStatement().execute("SHUTDOWN;");
+		}
+		catch (final IllegalStateException e)
+		{
+			// Close all resources.
+
+			try
+			{
+				if (connection != null)
+					connection.close();
+			}
+			catch (final SQLException e2)
+			{
+				e.printStackTrace();
+			}
+
+			throw new Exception("Connection pool has been disposed, no database connection.");
+		}
+		catch (final SQLException e)
+		{
+			e.printStackTrace();
+		}
+
+		// Close all resources.
+		try
+		{
+			if (connection != null)
+				connection.close();
+		}
+		catch (final SQLException e)
+		{
+			e.printStackTrace();
+		}
+
+		connectionPool.dispose();
+		connectionPool = null;
+	}
+
 	/*
 	 * -------------------------------- PUBLIC GETTER METHODS --------------------------------
 	 */
@@ -575,7 +602,7 @@ public class LogDatabaseController
 	 * @return the system log
 	 * @throws NoDatabaseLinkException
 	 */
-	public static ArrayList<Object> getSystemLog() throws NoDatabaseLinkException
+	public static ArrayList<Object> getSystemLog() throws Exception
 	{
 		final String[] columns = { "time", "level", "message" };
 		final List<String> where = new ArrayList<String>();
@@ -583,33 +610,32 @@ public class LogDatabaseController
 
 		// If not in debug mode return just the info.
 		if (!MainWindow.DEBUG_MODE)
-			return (ArrayList<Object>) runQuery(DatabaseQueryType.SELECT, DatabaseTable.SYSLOGS, null, columns, null, where);
+			return (ArrayList<Object>) runQuery(DatabaseQueryType.SELECT, LogDatabaseTable.SYSLOGS, null, columns, null, where);
 
 		// Else get debug too.
 		where.clear();
 		where.add("level = 'INFO' OR level = 'DEBUG'");
 
-		return (ArrayList<Object>) runQuery(DatabaseQueryType.SELECT, DatabaseTable.SYSLOGS, null, columns, null, where);
+		return (ArrayList<Object>) runQuery(DatabaseQueryType.SELECT, LogDatabaseTable.SYSLOGS, null, columns, null, where);
 	}
 
 	/**
 	 * Gets the full user log with user names.
 	 *
 	 * @return the user log
-	 * @throws NoDatabaseLinkException
 	 */
-	public static ArrayList<Object> getUserLog() throws NoDatabaseLinkException
+	public static ArrayList<Object> getUserLog() throws Exception
 	{
 		final String[] columns = { "user_id", "time", "level", "message" };
 		final List<String> where = new ArrayList<String>();
 		where.add("level = 'INFO'");
 
 		if (!MainWindow.DEBUG_MODE)
-			return (ArrayList<Object>) runQuery(DatabaseQueryType.SELECT, DatabaseTable.USRLOGS, null, columns, null, where);
+			return (ArrayList<Object>) runQuery(DatabaseQueryType.SELECT, LogDatabaseTable.USRLOGS, null, columns, null, where);
 
 		where.clear();
 		where.add("level = 'INFO' OR level = 'DEBUG'");
 
-		return (ArrayList<Object>) runQuery(DatabaseQueryType.SELECT, DatabaseTable.USRLOGS, null, columns, null, where);
+		return (ArrayList<Object>) runQuery(DatabaseQueryType.SELECT, LogDatabaseTable.USRLOGS, null, columns, null, where);
 	}
 }

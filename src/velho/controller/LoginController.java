@@ -80,7 +80,7 @@ public class LoginController
 
 		if (UserController.isValidBadgeID(badgeString))
 		{
-			currentUser = DatabaseController.getUserByBadgeID(badgeString);
+			currentUser = DatabaseController.authenticateBadgeID(badgeString);
 
 			// Valid credentials.
 			if (currentUser != null)
@@ -126,7 +126,7 @@ public class LoginController
 
 		if (UserController.isValidPIN(authenticationString))
 		{
-			currentUser = DatabaseController.getUserByNamesAndPIN(firstName, lastName, authenticationString);
+			currentUser = DatabaseController.authenticatePIN(firstName, lastName, authenticationString);
 
 			// Valid credentials.
 			if (currentUser != null)

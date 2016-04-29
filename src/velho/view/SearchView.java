@@ -74,10 +74,6 @@ public class SearchView
 			countSpinnerLabel.setAlignment(Pos.CENTER);
 			grid.add(countSpinnerLabel, 2, 1, 1, 1);
 
-			final Label popularitySpinnerLabel = new Label("Product Popularity: ");
-			popularitySpinnerLabel.setAlignment(Pos.CENTER);
-			// grid.add(popularitySpinnerLabel, 2, 2, 1, 1);
-
 			final Spinner<Integer> productCountField = new Spinner<Integer>();
 			// productCountField.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(-1, 10000));
 			productCountField.setEditable(true);
@@ -109,37 +105,6 @@ public class SearchView
 			productCountField.getEditor().addEventHandler(KeyEvent.KEY_RELEASED, keyboardHandler);
 
 			grid.add(productCountField, 3, 1, 1, 1);
-
-			final Spinner<Integer> popularityField = new Spinner<Integer>();
-			// popularityField.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(-1, 10000));
-			popularityField.setEditable(true);
-			popularityField.setPrefWidth(75.0);
-
-			popularityField.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(-1, 10000, Integer.parseInt("-1")));
-			popularityField.setEditable(true);
-
-			final EventHandler<KeyEvent> keyboardHandler2 = new EventHandler<KeyEvent>()
-			{
-				@Override
-				public void handle(final KeyEvent event)
-				{
-					try
-					{
-						if (Integer.parseInt(popularityField.getEditor().textProperty().get()) < -1)
-						{
-							throw new NumberFormatException();
-						}
-					}
-					catch (NumberFormatException e)
-					{
-						popularityField.getEditor().textProperty().set("-1");
-					}
-				}
-			};
-
-			popularityField.getEditor().addEventHandler(KeyEvent.KEY_RELEASED, keyboardHandler2);
-
-			// grid.add(popularityField, 3, 2, 1, 1);
 
 			final ComboBox<Object> brandbox = new ComboBox<Object>();
 			brandbox.getItems().add(null);
@@ -185,16 +150,8 @@ public class SearchView
 						// Although badge IDs are stored as string, they are still numbers.
 					}
 
-					try
-					{
-						Integer.parseInt(popularityField.getValue().toString());
-					}
-					catch (final NumberFormatException e)
-					{
-						// Although badge IDs are stored as string, they are still numbers.
-					}
-					searchController.productSearch(limits, nameField.getText(), productCountField.getValue(), popularityField.getValue(), brandbox.getValue(),
-							categorybox.getValue(), dpStart.getValue(), dpEnd.getValue());
+					searchController.productSearch(limits, nameField.getText(), productCountField.getValue(), brandbox.getValue(), categorybox.getValue(),
+							dpStart.getValue(), dpEnd.getValue());
 				}
 			});
 		}

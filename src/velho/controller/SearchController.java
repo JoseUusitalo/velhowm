@@ -13,7 +13,6 @@ import javafx.scene.layout.BorderPane;
 import velho.model.ProductBrand;
 import velho.model.ProductCategory;
 import velho.model.enums.DatabaseTable;
-import velho.model.exceptions.NoDatabaseLinkException;
 import velho.view.ProductListSearch;
 import velho.view.SearchTabView;
 import velho.view.SearchView;
@@ -56,15 +55,14 @@ public class SearchController
 	 * @param limits internal string representing the search target
 	 * @param name the name of the product
 	 * @param productCount how many products of this type of find in the product boxes
-	 * @param popularity how popular the product is
 	 * @param brand the {@link ProductBrand}
 	 * @param category the {@link ProductCategory}
 	 * @param expiresStart the expiration date range start
 	 * @param expiresEnd the expiration date range end
 	 */
 	@SuppressWarnings("static-method")
-	public void productSearch(final String limits, final String name, final Integer productCount, final Integer popularity, final Object brand,
-			final Object category, final LocalDate expiresStart, final LocalDate expiresEnd)
+	public void productSearch(final String limits, final String name, final Integer productCount, final Object brand, final Object category,
+			final LocalDate expiresStart, final LocalDate expiresEnd)
 	{
 		final List<String> where = new ArrayList<String>();
 
@@ -83,11 +81,6 @@ public class SearchController
 		if (productCount != null && productCount >= 0)
 		{
 			where.add("containers.product_count = " + productCount.intValue());
-		}
-
-		if (popularity != null && popularity >= 0)
-		{
-			where.add("products.popularity = " + popularity.intValue());
 		}
 
 		if (brand != null)
@@ -117,10 +110,8 @@ public class SearchController
 			switch (limits)
 			{
 				case "removal-list":
-					joins.put(DatabaseTable.REMOVALLIST_PRODUCTBOXES, "containers.container_id = removallist_productboxes.productbox");
-
 					// Only finds products that are not already on a removal list.
-					where.add("removallist_productboxes.removallist IS NULL");
+					where.add("productboxes.removallist IS NULL");
 					break;
 				default:
 					break;
@@ -136,9 +127,9 @@ public class SearchController
 		{
 			DatabaseController.searchProductBox(where, joins);
 		}
-		catch (final NoDatabaseLinkException e)
+		catch (Exception e)
 		{
-			DatabaseController.tryReLink();
+			e.printStackTrace();
 		}
 	}
 
@@ -230,14 +221,7 @@ public class SearchController
 				}
 				catch (final NumberFormatException e)
 				{
-					try
-					{
-						productID = DatabaseController.getProductIDFromName((String) countName[1]);
-					}
-					catch (final NoDatabaseLinkException e1)
-					{
-						DatabaseController.tryReLink();
-					}
+					productID = DatabaseController.getProductByName((String) countName[1]).getDatabaseID();
 				}
 
 				// If the product already exists, add the new count to the
