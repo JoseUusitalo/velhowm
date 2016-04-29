@@ -91,7 +91,7 @@
 		</pmd>
 	</target>
 
-	<target name="checkstyle" description="generates a report of code convention violations">
+	<target name="checkstyle" description="Generates a report of code convention violations.">
 		<taskdef resource="com/puppycrawl/tools/checkstyle/ant/checkstyle-ant-task.properties" classpath="${lib.checkstyle.dir}/checkstyle-6.17-all.jar"/>
 
 		<checkstyle config="${lib.checkstyle.dir}/sun_checks_tweaked.xml" failureProperty="checkstyle.failure" failOnViolation="false">
@@ -103,16 +103,16 @@
 		<style in="${build.dir}/checkstyle_report.xml" out="${report.dir}/checkstyle_report.html" style="${lib.checkstyle.dir}/checkstyle-noframes-sorted.xsl"/>
 	</target>
 
-	<target name="javadoc" description="generate javadocs">
+	<target name="javadoc" description="Generate Javadocs.">
 		<javadoc destdir="${javadoc.dir}" packagenames="*.*" author="true" private="true" version="true" windowtitle="VELHO Warehouse Management Documentation">
 			<packageset dir="${src.dir}" />
 			<classpath refid="velho.classpath" />
 		</javadoc>
 	</target>
 
-	<target name="extra" depends="clean, init, pmd, checkstyle, javadoc" description="perform extra actions not directly related to compiling the software" />
+	<target name="extra" depends="clean, init, pmd, checkstyle, javadoc" description="Performs extra actions not directly related to compiling the software." />
 
-	<target name="compile" depends="clean, init, extra" description="compile the source and test classes">
+	<target name="compile" depends="clean, init, extra" description="Compiles the source and test classes.">
 		<javac srcdir="${src.dir}" destdir="${dist.src.dir}" includeantruntime="false" source="${source}" target="${target}">
 			<classpath refid="velho.classpath" />
 		</javac>
@@ -120,19 +120,37 @@
 		<javac srcdir="${test.dir}" destdir="${dist.test.dir}" includeantruntime="false">
 			<classpath refid="velho.classpath" />
 		</javac>
+	</target>
 
-		<!-- Copy configuration files. -->
+	<target name="compile-debug" depends="clean, init" description="Compiles the source and test classes with debug information.">
+		<javac srcdir="${src.dir}"
+				destdir="${dist.src.dir}"
+				includeantruntime="false"
+				source="${source}"
+				target="${target}"
+				debug="true"
+				debuglevel="lines,vars,source">
+			<classpath refid="velho.classpath" />
+		</javac>
+
+		<javac srcdir="${test.dir}"
+				destdir="${dist.test.dir}"
+				includeantruntime="false"
+				source="${source}"
+				target="${target}"
+				debug="true"
+				debuglevel="lines,vars,source">
+			<classpath refid="velho.classpath" />
+		</javac>
+	</target>
+
+	<target name="resources" description="Copy all configuration files, Hibernate mappings, and resources into the distribution.">
 		<copy todir="${dist.src.dir}">
-			<fileset dir="${src.dir}" includes="**/*.xml,**/*.properties"/>
-		</copy>
-
-		<!-- Copy Hibernate mappings into the correct folder. -->
-		<copy todir="${dist.src.hibernatemappings.dir}">
-			<fileset dir="${src.hibernatemappings.dir}" includes="**/*.xml"/>
+			<fileset dir="${src.dir}" includes="**/*.xml,**/*.properties,**/*.css"/>
 		</copy>
 	</target>
 
-	<target name="dependencies" description="copy all dependencies into a single jar">
+	<target name="dependencies" description="Copies all dependencies into a single jar.">
 		<jar jarfile="${build.lib.dir}/dependencies.jar">
 			<zipgroupfileset dir="${lib.dir}">
 				<include name="**/*.jar" />
@@ -140,8 +158,8 @@
 		</jar>
 	</target>
 
-	<target name="test" depends="compile" description="run the tests">
-		<junit showoutput="true" printsummary="false" haltonerror="no" haltonfailure="no">
+	<target name="test" depends="compile-debug, resources" description="run the tests">
+		<junit showoutput="true" printsummary="true" haltonerror="no" haltonfailure="yes">
 			<!-- Plain text for console. -->
 			<formatter type="plain" usefile="false" />
 
@@ -164,14 +182,7 @@
 		</junit>
 	</target>
 
-	<target name="shutdown" depends="test" description="shuts down both database connections">
-		<!-- This does not work. -->
- 		<java classname="velhotest.ShutdownDatabases">
-			<classpath refid="velho.classpath" />
-		</java>
-	</target>
-
-	<target name="jar" depends="compile, test, dependencies" description="make the jar">
+	<target name="jar" depends="compile-debug, resources, test, dependencies" description="Creates the jar.">
 		<jar destfile="${dist.dir}/${projectName}_${DSTAMP}.jar" basedir="${dist.src.dir}">
 			<manifest>
 				<attribute name="Main-Class" value="${main.class}"/>
@@ -181,7 +192,7 @@
 		</jar>
 	</target>
 
-	<target name="use" depends="jar" description="use the jar">
+	<target name="use" depends="jar" description="Runs the software.">
  		<java jar="${dist.dir}/${projectName}_${DSTAMP}.jar" fork="true">
 			<classpath refid="velho.classpath" />
 		</java>

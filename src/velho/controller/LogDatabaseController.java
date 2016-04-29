@@ -545,18 +545,17 @@ public class LogDatabaseController
 			{
 				link();
 			}
-			catch (ClassNotFoundException e1)
+			catch (final ClassNotFoundException e)
 			{
-				e1.printStackTrace();
+				e.printStackTrace();
 			}
 		}
 
-		Connection connection = getConnection();
+		final Connection connection = getConnection();
 
 		try
 		{
-			if (connection != null)
-				connection.createStatement().execute("SHUTDOWN;");
+			connection.createStatement().execute("SHUTDOWN;");
 		}
 		catch (final IllegalStateException e)
 		{
@@ -582,8 +581,7 @@ public class LogDatabaseController
 		// Close all resources.
 		try
 		{
-			if (connection != null)
-				connection.close();
+			connection.close();
 		}
 		catch (final SQLException e)
 		{
@@ -592,6 +590,8 @@ public class LogDatabaseController
 
 		connectionPool.dispose();
 		connectionPool = null;
+
+		System.out.println("Log database shut down.");
 	}
 
 	/*
