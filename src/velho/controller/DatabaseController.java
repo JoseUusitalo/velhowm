@@ -2226,4 +2226,15 @@ public class DatabaseController
 		DBLOG.info("Closing session factory.");
 		sessionFactory.close();
 	}
+
+	/**
+	 * Gets the {@link ShelfSlot} object by a the {@link ShelfSlot#getSlotID()} string.
+	 *
+	 * @param shelfSlotID shelf slot ID string
+	 * @return the shelf slot object
+	 */
+	public static ShelfSlot getShelfSlotBySlotID(final String shelfSlotID)
+	{
+		return getShelfByID(Shelf.shelfSlotIDToShelfDatabaseID(shelfSlotID)).getShelfSlot(shelfSlotID);
+	}
 }
