@@ -231,27 +231,6 @@ public class LogDatabaseController
 	 */
 
 	/**
-	 * Attempts to re-link the database.
-	 */
-	private static void relink()
-	{
-		if (MainWindow.DEBUG_MODE)
-			System.out.println("Attempting to relink log database.");
-
-		// Just in case.
-		unlink();
-
-		try
-		{
-			link();
-		}
-		catch (final ClassNotFoundException e)
-		{
-			e.printStackTrace();
-		}
-	}
-
-	/**
 	 * Checks if the database file exists.
 	 *
 	 * @return <code>true</code> if the database file exists
