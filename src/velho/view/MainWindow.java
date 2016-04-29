@@ -46,7 +46,7 @@ import velho.controller.UIController;
 import velho.controller.UserController;
 
 /**
- * The main window and class for Velho Warehouse Management.
+ * The main window and class for VELHO Warehouse Management.
  *
  * @author Jose Uusitalo &amp; Joona Silvennoinen
  */
@@ -65,7 +65,7 @@ public class MainWindow extends Application
 	/**
 	 * Enable or disable debug features.
 	 */
-	public static final boolean DEBUG_MODE = true;
+	public static final boolean DEBUG_MODE = false;
 
 	/**
 	 * Enable or disable showing windows. DEBUG_MODE must be <code>true</code>
@@ -223,7 +223,8 @@ public class MainWindow extends Application
 				{
 					/*
 					 * This is how we prevent Logisticians from reading logs.
-					 * Logs can now only be read through the database, access to which can easily be limited.
+					 * Logs can now only be read through the database, access to
+					 * which can easily be limited.
 					 */
 					SYSLOG.info("Debug mode not enabled, disabling file and console appenders for all loggers.");
 
@@ -320,7 +321,7 @@ public class MainWindow extends Application
 	}
 
 	/**
-	 * The main method of Velho Warehouse Management.
+	 * The main method of VELHO Warehouse Management.
 	 *
 	 * @param args
 	 */
@@ -443,7 +444,7 @@ public class MainWindow extends Application
 		{
 			setUserAgentStylesheet(STYLESHEET_MODENA);
 
-			primaryStage.setTitle("Velho Warehouse Management");
+			primaryStage.setTitle("VELHO Warehouse Management");
 			final Group root = new Group();
 			scene = new Scene(root, WINDOW_WIDTH, WINDOW_HEIGHT);
 			scene.getStylesheets().add(getClass().getResource("velho.css").toExternalForm());

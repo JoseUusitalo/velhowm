@@ -426,6 +426,9 @@ public class LogDatabaseController
 	 */
 	public static boolean connectAndInitialize() throws Exception
 	{
+		if (isLinked())
+			return true;
+
 		final DatabaseFileState state = link();
 		boolean initialized = true;
 
@@ -524,6 +527,71 @@ public class LogDatabaseController
 		return changed;
 	}
 
+	/**
+	 * Closes the database permanently.
+	 * Additionally disposes the old connection pool.
+	 */
+	public static void shutdown() throws Exception
+	{
+		if (MainWindow.DEBUG_MODE)
+			System.out.println("Shutting down log database..");
+
+		if (!isLinked())
+		{
+			try
+			{
+				link();
+			}
+			catch (ClassNotFoundException e1)
+			{
+				e1.printStackTrace();
+			}
+		}
+
+		Connection connection = null;
+		connection = getConnection();
+
+		try
+		{
+			if (connection != null)
+				connection.createStatement().execute("SHUTDOWN;");
+		}
+		catch (final IllegalStateException e)
+		{
+			// Close all resources.
+
+			try
+			{
+				if (connection != null)
+					connection.close();
+			}
+			catch (final SQLException e2)
+			{
+				e.printStackTrace();
+			}
+
+			throw new Exception("Connection pool has been disposed, no database connection.");
+		}
+		catch (final SQLException e)
+		{
+			e.printStackTrace();
+		}
+
+		// Close all resources.
+		try
+		{
+			if (connection != null)
+				connection.close();
+		}
+		catch (final SQLException e)
+		{
+			e.printStackTrace();
+		}
+
+		connectionPool.dispose();
+		connectionPool = null;
+	}
+
 	/*
 	 * -------------------------------- PUBLIC GETTER METHODS --------------------------------
 	 */
@@ -555,7 +623,6 @@ public class LogDatabaseController
 	 * Gets the full user log with user names.
 	 *
 	 * @return the user log
-	 * @throws NoDatabaseLinkException
 	 */
 	public static ArrayList<Object> getUserLog() throws Exception
 	{

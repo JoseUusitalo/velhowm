@@ -2,6 +2,7 @@ package velho.model;
 
 import java.util.UUID;
 
+import velho.controller.UserController;
 import velho.model.enums.UserRole;
 
 /**
@@ -14,27 +15,27 @@ public class User extends AbstractDatabaseObject
 	/**
 	 * The maximum number of characters a first or last name may have.
 	 */
-	private static final int MAX_NAME_LENGTH = 128;
+	public static final int MAX_NAME_LENGTH = 128;
 
 	/**
 	 * The maximum value for a PIN code.
 	 */
-	private static final int MAX_PIN_VALUE = 999999;
+	public static final int MAX_PIN_VALUE = 999999;
 
 	/**
 	 * The maximum value for a badge ID code.
 	 */
-	private static final int MAX_BADGE_ID_VALUE = 99999999;
+	public static final int MAX_BADGE_ID_VALUE = 99999999;
 
 	/**
 	 * The number of digits a badge ID must have.
 	 */
-	private static final int BADGE_ID_LENGTH = 8;
+	public static final int BADGE_ID_LENGTH = 8;
 
 	/**
 	 * The number of digits a PIN must have.
 	 */
-	private static final int PIN_LENGTH = 6;
+	public static final int PIN_LENGTH = 6;
 
 	/**
 	 * The first name of this user.
@@ -81,7 +82,7 @@ public class User extends AbstractDatabaseObject
 		this.pin = pin;
 		this.role = role;
 
-		if (!validateUserData(this.badgeID, this.pin, firstName, lastName, role))
+		if (!UserController.validateUserData(this.badgeID, this.pin, firstName, lastName, role))
 			throw new IllegalArgumentException("Invalid user data");
 	}
 
@@ -118,99 +119,6 @@ public class User extends AbstractDatabaseObject
 		// For Hibernate.
 		setUuid(UUID.randomUUID());
 	}
-
-	/*
-	 * STATIC METHODS
-	 */
-
-	/**
-	 * Validates the user data against the database requirements.
-	 * Either a badge ID or a PIN must be defined.
-	 * Both cannot be null.
-	 * Both cannot be defined.
-	 *
-	 * @param badgeID RFID identification string of the user's RFID badge
-	 * @param pin the pin string used to log in to the system if no RFID badge ID is provided
-	 * @param firstName the first name of the user
-	 * @param lastName the last name of the user
-	 * @param roleName the name of the role of the user
-	 *
-	 * @return <code>true</code> if given information is valid
-	 * @throws NoDatabaseLinkException
-	 */
-	public static boolean validateUserData(final String badgeID, final String pin, final String firstName, final String lastName, final UserRole role)
-	{
-		final boolean hasBadgeID = isValidBadgeID(badgeID);
-		final boolean hasPIN = isValidPIN(pin);
-
-		// Must have exactly one.
-		if ((hasBadgeID && hasPIN) || (!hasBadgeID && !hasPIN))
-			return false;
-
-		// Name cannot be null, empty, or longer than maximum and length.
-		if (firstName == null || firstName.isEmpty() || firstName.length() > MAX_NAME_LENGTH)
-			return false;
-
-		// Name cannot be null, empty, or longer than maximum and length.
-		if (lastName == null || lastName.isEmpty() || lastName.length() > MAX_NAME_LENGTH)
-			return false;
-
-		// TODO: The role is not in the database at the moment.
-		if (role == null)
-			return false;
-
-		return true;
-	}
-
-	/**
-	 * Checks if the given PIN is valid.
-	 * PINs must be numerical.
-	 *
-	 * @param pin PIN to check
-	 * @return <code>true</code> if the pin is valid
-	 */
-	public static boolean isValidPIN(final String pin)
-	{
-		if (pin == null || pin.length() != PIN_LENGTH)
-			return false;
-
-		try
-		{
-			int value = Integer.parseInt(pin);
-			return (value >= 0 && value <= MAX_PIN_VALUE);
-		}
-		catch (NumberFormatException e)
-		{
-			return false;
-		}
-	}
-
-	/**
-	 * Checks if the given badge ID is valid.
-	 * Badge IDs must be numerical.
-	 *
-	 * @param badgeID badge ID to check
-	 * @return <code>true</code> if the badge ID is valid
-	 */
-	public static boolean isValidBadgeID(final String badgeID)
-	{
-		if (badgeID == null || badgeID.length() != BADGE_ID_LENGTH)
-			return false;
-
-		try
-		{
-			int value = Integer.parseInt(badgeID);
-			return (value >= 0 && value <= MAX_BADGE_ID_VALUE);
-		}
-		catch (NumberFormatException e)
-		{
-			return false;
-		}
-	}
-
-	/*
-	 * INSTANCE METHODS
-	 */
 
 	/**
 	 * Returns the user data in the following format:

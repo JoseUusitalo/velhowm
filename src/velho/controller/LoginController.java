@@ -3,7 +3,7 @@ package velho.controller;
 import org.apache.log4j.Logger;
 import org.apache.log4j.MDC;
 
-import javafx.scene.layout.GridPane;
+import javafx.scene.layout.VBox;
 import velho.model.User;
 import velho.model.enums.Position;
 import velho.model.enums.UserRole;
@@ -69,82 +69,91 @@ public class LoginController
 	}
 
 	/**
-	 * This will "identify" the user and allow access to the system.
+	 * Validates the badge ID and logs the user into the system.
 	 *
-	 * @param authenticationString is set at LoginView for authentication
+	 * @param badgeString use RFID badge identification number
+	 * @return <code>true</code> if login was successful, or <code>false</code> if debug mode was disabled
 	 */
-	public static void login(final String firstName, final String lastName, final String authenticationString)
+	public static boolean login(final String badgeString)
 	{
-		SYSLOG.info("Attempting to log in with: " + firstName + " " + lastName + " " + authenticationString);
+		SYSLOG.info("Attempting to log in with: " + badgeString);
 
-		if (firstName.isEmpty() && lastName.isEmpty())
+		if (UserController.isValidBadgeID(badgeString))
 		{
-			if (User.isValidBadgeID(authenticationString))
+			currentUser = DatabaseController.authenticateBadgeID(badgeString);
+
+			// Valid credentials.
+			if (currentUser != null)
 			{
-				currentUser = DatabaseController.authenticateBadgeID(authenticationString);
+				// Put the user database ID into the MDC thing for log4j.
+				MDC.put("user_id", currentUser.getDatabaseID());
 
-				// Valid credentials.
-				if (currentUser != null)
-				{
-					// Put the user database ID into the MDC thing for log4j.
-					MDC.put("user_id", currentUser.getDatabaseID());
+				USRLOG.info(currentUser.toString() + " logged in with a badge.");
+				uiController.showMainMenu(currentUser.getRole());
+				destroyView();
 
-					USRLOG.info(currentUser.toString() + " logged in with a badge.");
-					uiController.showMainMenu(currentUser.getRole());
-					destroyView();
+				if (MainWindow.DEBUG_MODE)
+					debugController.setLogInButtonVisiblity(false);
 
-					if (MainWindow.DEBUG_MODE)
-					{
-						debugController.setLogInButton(false);
-						debugController.setLogOutButton(true);
-					}
-				}
-				else
-				{
-					SYSLOG.debug("Incorrect Badge ID.");
-					PopupController.warning("Incorrect Badge ID.");
-				}
+				return true;
 			}
-			else
-			{
-				SYSLOG.debug("Invalid Badge ID.");
-				PopupController.warning("Invalid Badge ID.");
-			}
+
+			SYSLOG.debug("Incorrect Badge ID.");
+			PopupController.warning("Incorrect Badge ID.");
 		}
 		else
 		{
-			if (User.isValidPIN(authenticationString))
-			{
-				currentUser = DatabaseController.authenticatePIN(firstName, lastName, authenticationString);
-
-				// Valid credentials.
-				if (currentUser != null)
-				{
-					// Put the user database ID into the MDC thing for log4j.
-					MDC.put("user_id", currentUser.getDatabaseID());
-
-					USRLOG.info(currentUser.toString() + " logged in with PIN.");
-					uiController.showMainMenu(currentUser.getRole());
-					destroyView();
-
-					if (MainWindow.DEBUG_MODE)
-					{
-						debugController.setLogInButton(false);
-						debugController.setLogOutButton(true);
-					}
-				}
-				else
-				{
-					SYSLOG.info("Incorrect PIN or Names.");
-					PopupController.warning("Incorrect PIN or names.");
-				}
-			}
-			else
-			{
-				SYSLOG.info("Invalid PIN.");
-				PopupController.warning("Invalid PIN.");
-			}
+			SYSLOG.debug("Invalid Badge ID.");
+			PopupController.warning("Invalid Badge ID.");
 		}
+
+		return false;
+	}
+
+	/**
+	 * Validates the given authentication data and logs the user into the system.
+	 *
+	 * @param firstName the first name of the user
+	 * @param lastName the last name of the user
+	 * @param pin login PIN string
+	 */
+	public static boolean login(final String firstName, final String lastName, final String authenticationString)
+	{
+		if (firstName.isEmpty() || lastName.isEmpty())
+			return login(authenticationString);
+
+		SYSLOG.info("Attempting to log in with: " + firstName + " " + lastName + " : " + authenticationString);
+
+		if (UserController.isValidPIN(authenticationString))
+		{
+			currentUser = DatabaseController.authenticatePIN(firstName, lastName, authenticationString);
+
+			// Valid credentials.
+			if (currentUser != null)
+			{
+				// Put the user database ID into the MDC thing for log4j.
+				MDC.put("user_id", currentUser.getDatabaseID());
+
+				USRLOG.info(currentUser.toString() + " logged in with PIN.");
+				uiController.showMainMenu(currentUser.getRole());
+				destroyView();
+
+				if (MainWindow.DEBUG_MODE)
+					debugController.setLogInButtonVisiblity(false);
+
+				return true;
+			}
+
+			SYSLOG.info("Incorrect PIN or Names.");
+			PopupController.warning("Incorrect PIN or names.");
+		}
+		else
+		{
+			SYSLOG.info("Invalid PIN.");
+			PopupController.warning("Invalid PIN.");
+		}
+
+		return false;
 	}
 
 	/**
@@ -153,10 +162,7 @@ public class LoginController
 	public static void logout()
 	{
 		if (MainWindow.DEBUG_MODE)
-		{
-			debugController.setLogInButton(true);
-			debugController.setLogOutButton(false);
-		}
+			debugController.setLogInButtonVisiblity(true);
 
 		USRLOG.info(currentUser.toString() + " logged out.");
 
@@ -174,7 +180,6 @@ public class LoginController
 	 *
 	 * @param userRoleName name of the role
 	 * @return <code>true</code> if login was successful, or <code>false</code> if debug mode was disabled
-	 * @throws NoDatabaseLinkException
 	 */
 	public static boolean debugLogin(final UserRole role)
 	{
@@ -210,7 +215,7 @@ public class LoginController
 	 *
 	 * @return the login view
 	 */
-	public static GridPane getView()
+	public static VBox getView()
 	{
 		if (view == null)
 			view = new LoginView();
@@ -255,7 +260,7 @@ public class LoginController
 	 *
 	 * @param role role to check against
 	 * @return <code>true</code> if logged in user's role is greater than or equal to the given role, <code>false</code>
-	 *         if user is not logged in
+	 * if user is not logged in
 	 */
 	public static boolean userRoleIsGreaterOrEqualTo(final UserRole role)
 	{

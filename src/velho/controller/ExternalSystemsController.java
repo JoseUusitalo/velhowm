@@ -17,7 +17,7 @@ import velho.model.Shelf;
 import velho.model.ShelfSlot;
 
 /**
- * Controller handling the communication with systems outside the Velho Warehouse Management.
+ * Controller handling the communication with systems outside the VELHO Warehouse Management.
  *
  * @author Edward Puustinen &amp; Jose Uusitalo
  */
@@ -197,7 +197,21 @@ public class ExternalSystemsController
 	 */
 	public static void receiveManifestBarcode(final Set<ProductBox> boxSet, final Date orderDate, final int driverID)
 	{
-		SYSLOG.info("VelhoWM has received a manifest by driver " + driverID + " with " + boxSet.size() + " product boxes.");
+		SYSLOG.info("VELHOWM has received a manifest by driver " + driverID + " with " + boxSet.size() + " product boxes.");
 		manifestController.receiveShipment(boxSet, orderDate, driverID);
+	}
+
+	/**
+	 * Receives a badge ID from the badge scanner.
+	 *
+	 * @param badgeID badge identification string
+	 * @return
+	 */
+	public static void receiveBadgeID(final String badgeID)
+	{
+		// TODO: Observer model.
+
+		SYSLOG.info("VELHOWM has received an RFID badge ID: " + badgeID);
+		LoginController.login(badgeID);
 	}
 }
