@@ -112,7 +112,7 @@
 
 	<target name="extra" depends="clean, init, pmd, checkstyle, javadoc" description="perform extra actions not directly related to compiling the software" />
 
-	<target name="compile" depends="clean, extra, init" description="compile the source and test classes">
+	<target name="compile" depends="clean, init, extra" description="compile the source and test classes">
 		<javac srcdir="${src.dir}" destdir="${dist.src.dir}" includeantruntime="false" source="${source}" target="${target}">
 			<classpath refid="velho.classpath" />
 		</javac>
@@ -156,8 +156,9 @@
 
 			<batchtest todir="${report.dir}">
 				<fileset dir="${dist.test.dir}">
-					<!--<exclude name="**/AllTests.class" />-->
-					<include name="**/*Test.class" />
+					<!-- If this is used the main database is still in use and cannot be used in the application.
+					<include name="**/*Tests.class" />-->
+					<include name="**/AllTests.class" />
 				</fileset>
 			</batchtest>
 		</junit>
@@ -170,7 +171,7 @@
 		</java>
 	</target>
 
-	<target name="jar" depends="compile, dependencies, test" description="make the jar">
+	<target name="jar" depends="compile, test, dependencies" description="make the jar">
 		<jar destfile="${dist.dir}/${projectName}_${DSTAMP}.jar" basedir="${dist.src.dir}">
 			<manifest>
 				<attribute name="Main-Class" value="${main.class}"/>
