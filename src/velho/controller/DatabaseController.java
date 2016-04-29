@@ -184,13 +184,13 @@ public class DatabaseController
 	 * @param columnValues values to set to the specified columns
 	 * @param where conditions (can be <code>null</code>)
 	 * @return
-	 *         <ul>
-	 *         <li>if type is {@link DatabaseQueryType#UPDATE} or
-	 *         {@link DatabaseQueryType#DELETE}: the number of rows that were
-	 *         changed as a result of the query as an {@link Integer}</li>
-	 *         <li>if type is {@link DatabaseQueryType#SELECT}: a Set containing
-	 *         the selected data</li>
-	 *         </ul>
+	 * <ul>
+	 * <li>if type is {@link DatabaseQueryType#UPDATE} or
+	 * {@link DatabaseQueryType#DELETE}: the number of rows that were
+	 * changed as a result of the query as an {@link Integer}</li>
+	 * <li>if type is {@link DatabaseQueryType#SELECT}: a Set containing
+	 * the selected data</li>
+	 * </ul>
 	 * @throws NoDatabaseLinkException
 	 */
 	@Deprecated
@@ -978,10 +978,10 @@ public class DatabaseController
 	 *
 	 * @param boxes list of product box objects to search from
 	 * @param wantedProductCount number of products wanted from the given
-	 *            product boxes
+	 * product boxes
 	 * @return a list of product boxes that either contains at least the wanted
-	 *         number of products, or if there were not
-	 *         enough products, the same list that was given
+	 * number of products, or if there were not
+	 * enough products, the same list that was given
 	 */
 	private static List<ProductBox> getBoxesContainingAtLeastProducts(final List<ProductBox> boxes, final Integer wantedProductCount)
 	{
@@ -1153,7 +1153,7 @@ public class DatabaseController
 	 * @param withDeleteColumn get the delete button column?
 	 *
 	 * @return a map where the key is the column value and value is the column
-	 *         name
+	 * name
 	 */
 	public static Map<String, String> getPublicUserDataColumns(final boolean withDeleteColumn)
 	{
@@ -1176,7 +1176,7 @@ public class DatabaseController
 	 * @param withDeleteColumn get the delete button column?
 	 *
 	 * @return a map where the key is the column value and value is the column
-	 *         name
+	 * name
 	 */
 	public static Map<String, String> getProductDataColumns(final boolean withAddColumn, final boolean withDeleteColumn)
 	{
@@ -1202,7 +1202,7 @@ public class DatabaseController
 	 * objects in table views.
 	 *
 	 * @return a map where the key is the column value and value is the column
-	 *         name
+	 * name
 	 */
 	public static Map<String, String> getRemovalListDataColumns()
 	{
@@ -1227,7 +1227,7 @@ public class DatabaseController
 	 * @param withRemoveColumn get the remove button column?
 	 *
 	 * @return a map where the key is the column value and value is the column
-	 *         name
+	 * name
 	 */
 	public static Map<String, String> getProductSearchDataColumns(final boolean withAddColumn, final boolean withRemoveColumn)
 	{
@@ -1256,7 +1256,7 @@ public class DatabaseController
 	 * objects in table views.
 	 *
 	 * @return a map where the key is the column value and value is the column
-	 *         name
+	 * name
 	 */
 	public static Map<String, String> getManifestDataColumns()
 	{
@@ -1333,7 +1333,7 @@ public class DatabaseController
 	 *
 	 * @param badgeID a badge ID string
 	 * @return a {@link User} object representing the authenticated user or
-	 *         <code>null</code> for invalid credentials
+	 * <code>null</code> for invalid credentials
 	 * @see User#isValidBadgeID(String)
 	 */
 	public static User authenticateBadgeID(final String badgeID)
@@ -1370,7 +1370,7 @@ public class DatabaseController
 	 *
 	 * @param pin is a PIN string
 	 * @return a {@link User} object representing the authenticated user or
-	 *         <code>null</code> for invalid credentials
+	 * <code>null</code> for invalid credentials
 	 * @see User#isValidPIN(String)
 	 */
 	public static User authenticatePIN(final String firstName, final String lastName, final String pin)
@@ -1436,7 +1436,7 @@ public class DatabaseController
 	 *
 	 * @param id the user database ID (use a negative number to denote a debug account)
 	 * @return the corresponding user object, <code>null</code> if a user with that ID does not exist, or the currently
-	 *         logged in user (i.e. debug user) if the ID was negative
+	 * logged in user (i.e. debug user) if the ID was negative
 	 * @throws HibernateException when the query failed to commit and has been rolled back
 	 */
 	public static User getUserByID(final int id) throws HibernateException
@@ -1577,8 +1577,8 @@ public class DatabaseController
 	 * Searches the database for product boxes of the specified size.
 	 *
 	 * @param productData a map of data to search for where the key is the
-	 *            product box
-	 *            database ID and the value is the number of products
+	 * product box
+	 * database ID and the value is the number of products
 	 * @throws NoDatabaseLinkException
 	 */
 	@SuppressWarnings("unchecked")
@@ -1677,7 +1677,7 @@ public class DatabaseController
 	 *
 	 * @param where conditions in SQL format
 	 * @return a list of found product boxes as
-	 *         {@link ProductBoxSearchResultRow} objects
+	 * {@link ProductBoxSearchResultRow} objects
 	 * @throws NoDatabaseLinkException
 	 */
 	public static List<ProductBoxSearchResultRow> searchProductBox(final List<String> where) throws Exception
@@ -1692,7 +1692,7 @@ public class DatabaseController
 	 * @param where conditions in SQL format
 	 * @param joins SQL join statements
 	 * @return a list of found product boxes as
-	 *         {@link ProductBoxSearchResultRow} objects
+	 * {@link ProductBoxSearchResultRow} objects
 	 * @throws NoDatabaseLinkException
 	 */
 	public static List<ProductBoxSearchResultRow> searchProductBox(final List<String> where, final Map<DatabaseTable, String> joins) throws Exception

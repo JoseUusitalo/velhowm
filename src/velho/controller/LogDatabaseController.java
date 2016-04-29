@@ -33,7 +33,7 @@ public class LogDatabaseController
 	/**
 	 * The database URI on the local machine.
 	 */
-	private final static String DB_URI = "jdbc:h2:./data/velholog;MV_STORE=FALSE;MVCC=FALSE;";
+	private final static String DB_URI = "jdbc:h2:./data/velholog;MV_STORE=FALSE;MVCC=TRUE;";
 
 	/**
 	 * User name for the system itself.
@@ -285,9 +285,10 @@ public class LogDatabaseController
 			}
 			else
 			{
-				relink();
+				e.printStackTrace();
 			}
 		}
+
 		return connection;
 	}
 
