@@ -120,7 +120,7 @@ public class RemovalListController implements UIActionController
 	{
 		// Create a new removal list if it does not exist.
 		if (newRemovalList == null)
-			newRemovalList = new RemovalList();
+			newRemovalList = new RemovalList(DatabaseController.getRemovalListStateByID(1));
 
 		if (managementView.getContent().equals(getRemovalListCreationView()))
 		{
@@ -173,7 +173,8 @@ public class RemovalListController implements UIActionController
 	public BorderPane getSearchResultsListView()
 	{
 		SYSLOG.trace("Getting search result list: " + DatabaseController.getObservableProductSearchResults());
-		return (BorderPane) ListController.getTableView(this, DatabaseController.getProductSearchDataColumns(true, false), DatabaseController.getObservableProductSearchResults());
+		return (BorderPane) ListController.getTableView(this, DatabaseController.getProductSearchDataColumns(true, false),
+				DatabaseController.getObservableProductSearchResults());
 	}
 
 	/**
