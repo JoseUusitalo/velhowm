@@ -2535,4 +2535,177 @@ public class DatabaseController
 
 		return observableProductTypes;
 	}
+
+	/**
+	 * Checks if the table of the specified class has at least one entry in it.
+	 *
+	 * @param className name of the class whose table to check
+	 * @return <code>true</code> if at least one record was found
+	 */
+	private static boolean tableHasEntries(final String className)
+	{
+		sessionFactory.getCurrentSession().beginTransaction();
+
+		//@formatter:off
+		@SuppressWarnings("unchecked")
+		final List<Object> result = sessionFactory.getCurrentSession()
+							.createQuery("from " + className)
+							.setFetchSize(1)
+							.setFirstResult(0)
+							.setMaxResults(1)
+							.list();
+		//@formatter:on
+
+		try
+		{
+			sessionFactory.getCurrentSession().getTransaction().commit();
+		}
+		catch (final HibernateException e)
+		{
+			sessionFactory.getCurrentSession().getTransaction().rollback();
+			throw e;
+		}
+
+		return !result.isEmpty();
+	}
+
+	/**
+	 * Checks if the database has user objects stored.
+	 *
+	 * @return <code>true</code> if database has users
+	 */
+	public static boolean hasUsers()
+	{
+		return tableHasEntries("User");
+	}
+
+	/**
+	 * Checks if the database has product brand objects stored.
+	 *
+	 * @return <code>true</code> if database has product brands
+	 */
+	public static boolean hasProductBrands()
+	{
+		return tableHasEntries("ProductBrand");
+	}
+
+	/**
+	 * Checks if the database has product type objects stored.
+	 *
+	 * @return <code>true</code> if database has product types
+	 */
+	public static boolean hasProductTypes()
+	{
+		return tableHasEntries("ProductType");
+	}
+
+	/**
+	 * Checks if the database has product category objects stored.
+	 *
+	 * @return <code>true</code> if database has product categories
+	 */
+	public static boolean hasProductCategories()
+	{
+		return tableHasEntries("ProductCategory");
+	}
+
+	/**
+	 * Checks if the database has product objects stored.
+	 *
+	 * @return <code>true</code> if database has products
+	 */
+	public static boolean hasProducts()
+	{
+		return tableHasEntries("Product");
+	}
+
+	/**
+	 * Checks if the database has shelf objects stored.
+	 *
+	 * @return <code>true</code> if database has shelves
+	 */
+	public static boolean hasShelves()
+	{
+		return tableHasEntries("Shelf");
+	}
+
+	/**
+	 * Checks if the database has shelf level objects stored.
+	 *
+	 * @return <code>true</code> if database has shelf levels
+	 */
+	public static boolean hasShelfLevels()
+	{
+		return tableHasEntries("ShelfLevel");
+	}
+
+	/**
+	 * Checks if the database has shelf slot objects stored.
+	 *
+	 * @return <code>true</code> if database has shelf slots
+	 */
+	public static boolean hasShelfSlots()
+	{
+		return tableHasEntries("ShelfSlot");
+	}
+
+	/**
+	 * Checks if the database has manifest state objects stored.
+	 *
+	 * @return <code>true</code> if database has manifest states
+	 */
+	public static boolean hasManifestStates()
+	{
+		return tableHasEntries("ManifestState");
+	}
+
+	/**
+	 * Checks if the database has manifest objects stored.
+	 *
+	 * @return <code>true</code> if database has manifests
+	 */
+	public static boolean hasManifests()
+	{
+		return tableHasEntries("Manifest");
+	}
+
+	/**
+	 * Checks if the database has removal list state objects stored.
+	 *
+	 * @return <code>true</code> if database has removal list states
+	 */
+	public static boolean hasRemovalListStates()
+	{
+		return tableHasEntries("RemovalListState");
+	}
+
+	/**
+	 * Checks if the database has removal list objects stored.
+	 *
+	 * @return <code>true</code> if database has removal lists
+	 */
+	public static boolean hasRemovalLists()
+	{
+		return tableHasEntries("RemovalList");
+	}
+
+	/**
+	 * Checks if the database has product box objects stored.
+	 *
+	 * @return <code>true</code> if database has product boxes
+	 */
+	public static boolean hasProductBoxes()
+	{
+		return tableHasEntries("ProductBox");
+	}
+
+	/**
+	 * Checks if the database has removal platform objects stored.
+	 *
+	 * @return <code>true</code> if database has removal platforms
+	 */
+	public static boolean hasRemovalPlatforms()
+	{
+		return tableHasEntries("RemovalPlatform");
+	}
 }

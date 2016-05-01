@@ -17,7 +17,7 @@
 
 		<property name="connection.pool_size">10</property>
 		<property name="show_sql">false</property>
-		<property name="hbm2ddl.auto">create-drop</property>
+		<property name="hbm2ddl.auto">update</property>
 		<property name="hibernate.jdbc.batch_size">30</property>
 
 		<!--  I have no idea what this does but it fixes an error. -->
