@@ -138,8 +138,12 @@ public class UIController
 				mainView.addTab("Product List Search", searchController.getProductListSearchView());
 				mainView.addTab("Manifests", manifestController.getView());
 				mainView.addTab("Removal Lists", removalListController.getView());
-				mainView.addTab("Add Product", productController.getAddProductView());
+				mainView.addTab("Products", productController.getProductManagementView());
 				mainView.addTab("Product List", productController.getTabView());
+				mainView.addTab("Brands", productController.getBrandsTab());
+				mainView.addTab("Categories", productController.getCategoryTab());
+				mainView.addTab("Product Types", productController.getProductTypesTab());
+				mainView.addTab("Product Boxes", productController.getProductBoxesTab());
 				mainView.addTab("User List", getUserListView(currentUserRole));
 				break;
 			case GUEST:
@@ -167,6 +171,7 @@ public class UIController
 		 */
 		switch (currentUserRole)
 		{
+
 			case ADMINISTRATOR:
 			case MANAGER:
 				return ListController.getTableView(userController, DatabaseController.getPublicUserDataColumns(true), DatabaseController.getAllUsers());
@@ -176,6 +181,7 @@ public class UIController
 				break;
 			default:
 				SYSLOG.error("Unknown user role '" + currentUserRole.getName() + "'.");
+
 		}
 
 		return null;

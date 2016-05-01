@@ -24,6 +24,7 @@ import org.h2.jdbcx.JdbcConnectionPool;
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
+import org.hibernate.exception.ConstraintViolationException;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -113,6 +114,12 @@ public class DatabaseController
 	private static ObservableList<Object> observableProducts = FXCollections.observableArrayList();
 
 	/**
+	 * An observable list of {@link ProductType} objects for display in the user
+	 * interface.
+	 */
+	private static ObservableList<Object> observableProductTypes = FXCollections.observableArrayList();
+
+	/**
 	 * An observable list of {@link Product} search results for display in the
 	 * user interface.
 	 */
@@ -184,13 +191,13 @@ public class DatabaseController
 	 * @param columnValues values to set to the specified columns
 	 * @param where conditions (can be <code>null</code>)
 	 * @return
-	 * <ul>
-	 * <li>if type is {@link DatabaseQueryType#UPDATE} or
-	 * {@link DatabaseQueryType#DELETE}: the number of rows that were
-	 * changed as a result of the query as an {@link Integer}</li>
-	 * <li>if type is {@link DatabaseQueryType#SELECT}: a Set containing
-	 * the selected data</li>
-	 * </ul>
+	 *         <ul>
+	 *         <li>if type is {@link DatabaseQueryType#UPDATE} or
+	 *         {@link DatabaseQueryType#DELETE}: the number of rows that were
+	 *         changed as a result of the query as an {@link Integer}</li>
+	 *         <li>if type is {@link DatabaseQueryType#SELECT}: a Set containing
+	 *         the selected data</li>
+	 *         </ul>
 	 * @throws NoDatabaseLinkException
 	 */
 	@Deprecated
@@ -978,10 +985,10 @@ public class DatabaseController
 	 *
 	 * @param boxes list of product box objects to search from
 	 * @param wantedProductCount number of products wanted from the given
-	 * product boxes
+	 *            product boxes
 	 * @return a list of product boxes that either contains at least the wanted
-	 * number of products, or if there were not
-	 * enough products, the same list that was given
+	 *         number of products, or if there were not
+	 *         enough products, the same list that was given
 	 */
 	private static List<ProductBox> getBoxesContainingAtLeastProducts(final List<ProductBox> boxes, final Integer wantedProductCount)
 	{
@@ -1153,7 +1160,7 @@ public class DatabaseController
 	 * @param withDeleteColumn get the delete button column?
 	 *
 	 * @return a map where the key is the column value and value is the column
-	 * name
+	 *         name
 	 */
 	public static Map<String, String> getPublicUserDataColumns(final boolean withDeleteColumn)
 	{
@@ -1176,7 +1183,7 @@ public class DatabaseController
 	 * @param withDeleteColumn get the delete button column?
 	 *
 	 * @return a map where the key is the column value and value is the column
-	 * name
+	 *         name
 	 */
 	public static Map<String, String> getProductDataColumns(final boolean withAddColumn, final boolean withDeleteColumn)
 	{
@@ -1202,7 +1209,7 @@ public class DatabaseController
 	 * objects in table views.
 	 *
 	 * @return a map where the key is the column value and value is the column
-	 * name
+	 *         name
 	 */
 	public static Map<String, String> getRemovalListDataColumns()
 	{
@@ -1227,7 +1234,7 @@ public class DatabaseController
 	 * @param withRemoveColumn get the remove button column?
 	 *
 	 * @return a map where the key is the column value and value is the column
-	 * name
+	 *         name
 	 */
 	public static Map<String, String> getProductSearchDataColumns(final boolean withAddColumn, final boolean withRemoveColumn)
 	{
@@ -1256,7 +1263,7 @@ public class DatabaseController
 	 * objects in table views.
 	 *
 	 * @return a map where the key is the column value and value is the column
-	 * name
+	 *         name
 	 */
 	public static Map<String, String> getManifestDataColumns()
 	{
@@ -1333,7 +1340,7 @@ public class DatabaseController
 	 *
 	 * @param badgeID a badge ID string
 	 * @return a {@link User} object representing the authenticated user or
-	 * <code>null</code> for invalid credentials
+	 *         <code>null</code> for invalid credentials
 	 * @see User#isValidBadgeID(String)
 	 */
 	public static User authenticateBadgeID(final String badgeID)
@@ -1370,7 +1377,7 @@ public class DatabaseController
 	 *
 	 * @param pin is a PIN string
 	 * @return a {@link User} object representing the authenticated user or
-	 * <code>null</code> for invalid credentials
+	 *         <code>null</code> for invalid credentials
 	 * @see User#isValidPIN(String)
 	 */
 	public static User authenticatePIN(final String firstName, final String lastName, final String pin)
@@ -1436,7 +1443,7 @@ public class DatabaseController
 	 *
 	 * @param id the user database ID (use a negative number to denote a debug account)
 	 * @return the corresponding user object, <code>null</code> if a user with that ID does not exist, or the currently
-	 * logged in user (i.e. debug user) if the ID was negative
+	 *         logged in user (i.e. debug user) if the ID was negative
 	 * @throws HibernateException when the query failed to commit and has been rolled back
 	 */
 	public static User getUserByID(final int id) throws HibernateException
@@ -1577,8 +1584,8 @@ public class DatabaseController
 	 * Searches the database for product boxes of the specified size.
 	 *
 	 * @param productData a map of data to search for where the key is the
-	 * product box
-	 * database ID and the value is the number of products
+	 *            product box
+	 *            database ID and the value is the number of products
 	 * @throws NoDatabaseLinkException
 	 */
 	@SuppressWarnings("unchecked")
@@ -1677,7 +1684,7 @@ public class DatabaseController
 	 *
 	 * @param where conditions in SQL format
 	 * @return a list of found product boxes as
-	 * {@link ProductBoxSearchResultRow} objects
+	 *         {@link ProductBoxSearchResultRow} objects
 	 * @throws NoDatabaseLinkException
 	 */
 	public static List<ProductBoxSearchResultRow> searchProductBox(final List<String> where) throws Exception
@@ -1692,7 +1699,7 @@ public class DatabaseController
 	 * @param where conditions in SQL format
 	 * @param joins SQL join statements
 	 * @return a list of found product boxes as
-	 * {@link ProductBoxSearchResultRow} objects
+	 *         {@link ProductBoxSearchResultRow} objects
 	 * @throws NoDatabaseLinkException
 	 */
 	public static List<ProductBoxSearchResultRow> searchProductBox(final List<String> where, final Map<DatabaseTable, String> joins) throws Exception
@@ -1812,8 +1819,9 @@ public class DatabaseController
 	 *
 	 * @param object object to delete
 	 * @throws HibernateException when the object was not deleted
+	 * @throws ConstraintViolationException when the object could not be deleted because it is referenced by a <code>not-null</code> property
 	 */
-	private static void delete(final Object object) throws HibernateException
+	private static void delete(final Object object) throws HibernateException, ConstraintViolationException
 	{
 		sessionFactory.getCurrentSession().beginTransaction();
 
@@ -1822,10 +1830,14 @@ public class DatabaseController
 		try
 		{
 			sessionFactory.getCurrentSession().getTransaction().commit();
+
+			DBLOG.debug("Deleted :" + object);
 		}
 		catch (final HibernateException e)
 		{
 			sessionFactory.getCurrentSession().getTransaction().rollback();
+
+			DBLOG.debug("Failed to delete: " + object);
 
 			throw e;
 		}
@@ -1836,24 +1848,33 @@ public class DatabaseController
 	/**
 	 * Deletes a user from the database.
 	 *
-	 * @param user user to delete
-	 * @throws HibernateException when the user was not deleted
+	 * @param user user to be deleted
+	 * @return <code>true</code> if the specified user was deleted, <code>false</code> if the object is being referenced by another object that cannot have a
+	 *         null value in that property
 	 */
-	public static void deleteUser(final User user) throws HibernateException
+	public static boolean deleteUser(final User user)
 	{
-		delete(user);
+		try
+		{
+			delete(user);
+			observableUsers.remove(user);
 
-		// Update the observable list.
-		getAllUsers();
+			return true;
+		}
+		catch (final HibernateException e)
+		{
+			return false;
+		}
 	}
 
 	/**
 	 * Deletes a removal list from the database.
 	 *
-	 * @param list removal list to delete
-	 * @throws HibernateException when the removal list was not deleted
+	 * @param list removal list to be deleted
+	 * @return <code>true</code> if the specified removal list was deleted, <code>false</code> if the object is being referenced by another object that cannot
+	 *         have a null value in that property
 	 */
-	public static void deleteRemovalList(final RemovalList list) throws HibernateException
+	public static boolean deleteRemovalList(final RemovalList list) throws HibernateException, ConstraintViolationException
 	{
 		/*
 		 * HIBERNATE NOTICE
@@ -1864,11 +1885,126 @@ public class DatabaseController
 		if (list != null)
 			list.clear();
 
-		delete(list);
+		try
+		{
+			delete(list);
+			observableRemovalLists.remove(list);
 
-		if (list != null)
-		{// Update the observable list.
-			getAllRemovalLists();
+			return true;
+		}
+		catch (final HibernateException e)
+		{
+			return false;
+		}
+	}
+
+	/**
+	 * Deletes a product from the database.
+	 *
+	 * @param product product to be deleted
+	 * @return <code>true</code> if the specified product was deleted, <code>false</code> if the object is being referenced by another object that cannot have a
+	 *         null value in that property
+	 */
+	public static boolean deleteProduct(final Product product)
+	{
+		try
+		{
+			delete(product);
+			observableProducts.remove(product);
+
+			return true;
+		}
+		catch (final HibernateException e)
+		{
+			return false;
+		}
+	}
+
+	/**
+	 * Deletes a product brand from the database.
+	 *
+	 * @param brand brand to be deleted
+	 * @return <code>true</code> if the specified brand was deleted, <code>false</code> if the object is being referenced by another object that cannot have a
+	 *         null value in that property
+	 */
+	public static boolean deleteProductBrand(final ProductBrand brand)
+	{
+		try
+		{
+			delete(brand);
+			observableProductBrands.remove(brand);
+
+			return true;
+		}
+		catch (final HibernateException e)
+		{
+			return false;
+		}
+	}
+
+	/**
+	 * Deletes a product category from the database.
+	 *
+	 * @param category category to be deleted
+	 * @return <code>true</code> if the specified category was deleted, <code>false</code> if the object is being referenced by another object that cannot have
+	 *         a null value in that property
+	 */
+	public static boolean deleteProductCategory(final ProductCategory category)
+	{
+		try
+		{
+			delete(category);
+			observableProductCategories.remove(category);
+
+			return true;
+		}
+		catch (final HibernateException e)
+		{
+			return false;
+		}
+	}
+
+	/**
+	 * Deletes a product box from the database.
+	 *
+	 * @param box box to be deleted
+	 * @return <code>true</code> if the specified box was deleted, <code>false</code> if the object is being referenced by another object that cannot have a
+	 *         null value in that property
+	 */
+	public static boolean deleteProductBox(final ProductBox box)
+	{
+		try
+		{
+			delete(box);
+			observableProductBoxes.remove(box);
+
+			return true;
+		}
+		catch (final HibernateException e)
+		{
+			return false;
+		}
+	}
+
+	/**
+	 * Deletes a product type from the database.
+	 *
+	 * @param type type to be deleted
+	 * @return <code>true</code> if the specified type was deleted, <code>false</code> if the object is being referenced by another object that cannot have a
+	 *         null value in that property
+	 */
+	public static boolean deleteProductType(final ProductType type)
+	{
+		try
+		{
+			delete(type);
+			observableProductTypes.remove(type);
+
+			return true;
+		}
+		catch (final HibernateException e)
+		{
+			return false;
 		}
 	}
 
@@ -1891,13 +2027,13 @@ public class DatabaseController
 
 			if (object.getDatabaseID() < 1)
 			{
-				DBLOG.debug("Saving: " + object);
 				sessionFactory.getCurrentSession().save(object);
+				DBLOG.debug("Saved: " + object);
 			}
 			else
 			{
-				DBLOG.debug("Updating: " + object);
 				sessionFactory.getCurrentSession().update(object);
+				DBLOG.debug("Updated: " + object);
 			}
 
 			sessionFactory.getCurrentSession().flush();
@@ -2236,5 +2372,19 @@ public class DatabaseController
 	public static ShelfSlot getShelfSlotBySlotID(final String shelfSlotID)
 	{
 		return getShelfByID(Shelf.shelfSlotIDToShelfDatabaseID(shelfSlotID)).getShelfSlot(shelfSlotID);
+	}
+
+	/**
+	 * Makes the product types and observable in the Hibernate
+	 *
+	 * @return Observable Product Types
+	 * @throws HibernateException this should be the new database to get the information from
+	 */
+	public static ObservableList<Object> getAllProductTypes() throws HibernateException
+	{
+		observableProductTypes.clear();
+		observableProductTypes.addAll(getAll("ProductType"));
+
+		return observableProductTypes;
 	}
 }

@@ -30,14 +30,15 @@
 		<many-to-one	name="brand"
 						class="velho.model.ProductBrand"
 						column="brand"
+						cascade="save-update"
 						not-null="true"
 						fetch="select"
 						lazy="false" />
 
-		<!-- No cascade solves an exception. -->
 		<many-to-one	name="category"
 						class="velho.model.ProductCategory"
 						column="category"
+						cascade="save-update"
 						not-null="true"
 						fetch="select"
 						lazy="false" />

@@ -22,6 +22,7 @@
 					column="levels"
 					type="int" />
 
+		<!-- Levels should be deleted when the parent shelf is deleted. -->
 		<set	name="shelfLevels"
 				table="SHELFLEVELS"
 				inverse="true"

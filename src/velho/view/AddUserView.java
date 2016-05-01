@@ -49,7 +49,7 @@ public class AddUserView
 	/**
 	 * Creates a grid for adding a new user.
 	 *
-	 * @return
+	 * @return the grid
 	 */
 	public GridPane getView()
 	{
