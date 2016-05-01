@@ -32,12 +32,8 @@ public class UserController implements UIActionController
 	 */
 	private AddUserView view;
 
-	/**
-	 * @throws NoDatabaseLinkException
-	 */
 	public UserController()
 	{
-		view = new AddUserView(this, DatabaseController.getAllUserRoles());
 	}
 
 	/**
@@ -84,7 +80,7 @@ public class UserController implements UIActionController
 			// Else: running a JUnit test -> above line causes a null pointer error.
 
 			if (showPopup)
-				PopupController.info("User created.");
+				PopupController.info(LocalizationController.getString("userCreatedPopUpNotice"));
 
 			return newUser;
 		}
@@ -149,6 +145,8 @@ public class UserController implements UIActionController
 	 */
 	public Node getView()
 	{
+		if (view == null)
+			view = new AddUserView(this, DatabaseController.getAllUserRoles());
 		return view.getView();
 	}
 
@@ -157,14 +155,16 @@ public class UserController implements UIActionController
 	 */
 	public void destroyView()
 	{
-		view.destroy();
+		view = null;
+		getView();
 	}
 
 	/**
 	 * Creates the temporary debug user for logging in through the debug window.
 	 *
 	 * @param role the role to create the user as
-	 * @return a {@link User} object or <code>null</code> if {@link MainWindow#DEBUG_MODE} is <code>false</code>
+	 * @return a {@link User} object or <code>null</code> if
+	 *         {@link MainWindow#DEBUG_MODE} is <code>false</code>
 	 */
 	public static User getDebugUser(final UserRole role)
 	{
@@ -241,7 +241,8 @@ public class UserController implements UIActionController
 	 * Both cannot be defined.
 	 *
 	 * @param badgeID RFID identification string of the user's RFID badge
-	 * @param pin the pin string used to log in to the system if no RFID badge ID is provided
+	 * @param pin the pin string used to log in to the system if no RFID badge
+	 *            ID is provided
 	 * @param firstName the first name of the user
 	 * @param lastName the last name of the user
 	 * @param roleName the name of the role of the user

@@ -15,16 +15,19 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Priority;
 import velho.controller.DatabaseController;
+import velho.controller.LocalizationController;
 import velho.controller.RemovalListController;
 import velho.controller.SearchController;
+import velho.controller.UIController;
 import velho.model.RemovalListState;
+import velho.model.interfaces.GenericView;
 
 /**
  * View for creating new removal lists
  *
  * @author Jose Uusitalo
  */
-public class RemovalListCreationView
+public class RemovalListCreationView implements GenericView
 {
 	/**
 	 * Apache log4j logger: System.
@@ -84,7 +87,7 @@ public class RemovalListCreationView
 
 			final GridPane left = new GridPane();
 
-			final Label resultsLabel = new Label("Search Results");
+			final Label resultsLabel = new Label(LocalizationController.getString("searchResultsLabel"));
 			resultsLabel.getStyleClass().add("centered-title-medium");
 			resultsLabel.setPadding(new Insets(7, 0, 0, 0));
 			resultsLabel.setAlignment(Pos.CENTER);
@@ -101,7 +104,7 @@ public class RemovalListCreationView
 
 			final GridPane center = new GridPane();
 
-			final Label removalListLabel = new Label("New Removal List");
+			final Label removalListLabel = new Label(LocalizationController.getString("newRemovalListLabel"));
 			removalListLabel.getStyleClass().add("centered-title-medium");
 			removalListLabel.setAlignment(Pos.CENTER);
 			removalListLabel.setMaxWidth(Double.MAX_VALUE);
@@ -129,7 +132,7 @@ public class RemovalListCreationView
 				}
 			});
 
-			final Button saveButton = new Button("Save");
+			final Button saveButton = new Button(LocalizationController.getString("saveButton"));
 			center.add(saveButton, 2, 0);
 
 			saveButton.setOnAction(new EventHandler<ActionEvent>()
@@ -148,6 +151,7 @@ public class RemovalListCreationView
 
 			bpane.setLeft(left);
 			bpane.setCenter(center);
+			UIController.recordView(this);
 		}
 
 		return bpane;
@@ -156,17 +160,22 @@ public class RemovalListCreationView
 	/**
 	 * Destroys the view.
 	 */
-	public void destroy()
+	@Override
+	public void reCreate()
 	{
 		bpane = null;
+		resultList = null;
+		newList = null;
+		getView();
 	}
 
 	/**
-	 * Gets the search results list and the current new removal list views again.
+	 * Gets the search results list and the current new removal list views
+	 * again.
 	 */
 	public void refresh()
 	{
-		SYSLOG.trace("Refreshing removal list creation view.");
+		SYSLOG.trace(LocalizationController.getString("refreshRemovalListNotice"));
 		resultList = removalListController.getSearchResultsListView();
 		newList = removalListController.getNewRemovalListView();
 	}

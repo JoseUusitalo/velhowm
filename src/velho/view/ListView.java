@@ -18,7 +18,9 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.text.Font;
 import javafx.util.Callback;
+import velho.controller.UIController;
 import velho.controller.interfaces.UIActionController;
+import velho.model.interfaces.GenericView;
 import velho.view.components.TableCellDeleteButton;
 
 /**
@@ -26,7 +28,7 @@ import velho.view.components.TableCellDeleteButton;
  *
  * @author Jose Uusitalo &amp; Joona Silvennoinen
  */
-public class ListView
+public class ListView implements GenericView
 {
 	/**
 	 * The root border pane.
@@ -188,6 +190,8 @@ public class ListView
 			tableView.setItems(datalist);
 			tableView.getColumns().addAll(cols);
 			pane.setCenter(tableView);
+
+			UIController.recordView(this);
 		}
 		return pane;
 	}
@@ -342,5 +346,12 @@ public class ListView
 			else
 				setGraphic(null);
 		}
+	}
+
+	@Override
+	public void reCreate()
+	{
+		pane = null;
+		getView();
 	}
 }

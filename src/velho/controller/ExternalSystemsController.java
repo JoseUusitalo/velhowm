@@ -17,7 +17,8 @@ import velho.model.Shelf;
 import velho.model.ShelfSlot;
 
 /**
- * Controller handling the communication with systems outside the VELHO Warehouse Management.
+ * Controller handling the communication with systems outside the VELHO
+ * Warehouse Management.
  *
  * @author Edward Puustinen &amp; Jose Uusitalo
  */
@@ -42,7 +43,8 @@ public class ExternalSystemsController
 	}
 
 	/**
-	 * Attempts to print the received data, if the data is empty it shows "List is empty." to the user.
+	 * Attempts to print the received data, if the data is empty it shows
+	 * "List is empty." to the user.
 	 *
 	 * @param data data to print
 	 */
@@ -214,7 +216,7 @@ public class ExternalSystemsController
 		SYSLOG.debug("Successfully moved " + boxToMove + " to " + newShelfSlot);
 
 		if (showPopup)
-			PopupController.info("Product box " + productBoxCode + " moved to shelf slot " + newShelfSlotID + ".");
+			PopupController.info(LocalizationController.getCompoundString("productBoxTransferSuccessMessage", new Object[] { productBoxCode, newShelfSlot }));
 
 		return true;
 	}

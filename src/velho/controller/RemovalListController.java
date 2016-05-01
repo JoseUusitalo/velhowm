@@ -137,7 +137,8 @@ public class RemovalListController implements UIActionController
 	}
 
 	/**
-	 * Changes the removal list management view to the removal list browsing view for Managers and greater.
+	 * Changes the removal list management view to the removal list browsing
+	 * view for Managers and greater.
 	 * Other see the plain browsing view.
 	 */
 	public void showBrowseRemovalListsView()
@@ -164,15 +165,15 @@ public class RemovalListController implements UIActionController
 	}
 
 	/**
-	 * Gets a view showing the search results for adding/removing product boxes to/from a new removal list.
+	 * Gets a view showing the search results for adding/removing product boxes
+	 * to/from a new removal list.
 	 *
 	 * @return the search results
 	 */
 	public BorderPane getSearchResultsListView()
 	{
 		SYSLOG.trace("Getting search result list: " + DatabaseController.getObservableProductSearchResults());
-		return (BorderPane) ListController.getTableView(this, DatabaseController.getProductSearchDataColumns(true, false),
-				DatabaseController.getObservableProductSearchResults());
+		return (BorderPane) ListController.getTableView(this, DatabaseController.getProductSearchDataColumns(true, false), DatabaseController.getObservableProductSearchResults());
 	}
 
 	/**
@@ -203,9 +204,11 @@ public class RemovalListController implements UIActionController
 				USRLOG.info("Created a new Removal List: " + newRemovalList.getBoxes());
 
 				/*
-				 * I would much rather create a new object rather than reset the old one but I can't figure out why
+				 * I would much rather create a new object rather than reset the
+				 * old one but I can't figure out why
 				 * it doesn't work.
-				 * When a new removal list object is created the UI new list view never updates after that even
+				 * When a new removal list object is created the UI new list
+				 * view never updates after that even
 				 * though I'm refreshing the view after creating the object.
 				 */
 				newRemovalList.reset();
@@ -214,12 +217,12 @@ public class RemovalListController implements UIActionController
 			}
 			else
 			{
-				PopupController.error("Removal list saving failed.");
+				PopupController.error(LocalizationController.getString("removalListSavingFailPopUp"));
 			}
 		}
 		else
 		{
-			PopupController.info("Please add some product boxes first.");
+			PopupController.info(LocalizationController.getString("addProductBoxesFirstNotice"));
 		}
 	}
 
@@ -245,8 +248,8 @@ public class RemovalListController implements UIActionController
 	{
 		removalList.setState(state);
 
-		if (DatabaseController.saveOrUpdate(removalList) < 0)
-			PopupController.error("Unable to save removal list state.");
+		if (DatabaseController.save(removalList) < 0)
+			PopupController.error(LocalizationController.getString("unableToSaveRemovalListStateNotice"));
 	}
 
 	@Override
@@ -268,7 +271,7 @@ public class RemovalListController implements UIActionController
 		if (!newRemovalList.removeProductBox(((ProductBoxSearchResultRow) data).getBox()))
 		{
 			USRLOG.debug("Failed to remove product box from removal list.");
-			PopupController.error("Failed to remove product box from removal list.");
+			PopupController.error(LocalizationController.getString("failedToRemoveProductBoxFromRemovalListNotice"));
 		}
 	}
 
@@ -286,7 +289,7 @@ public class RemovalListController implements UIActionController
 		if (!newRemovalList.addProductBox(((ProductBoxSearchResultRow) data).getBox()))
 		{
 			USRLOG.trace("Product box is already on the list.");
-			PopupController.error("That product box is already on the removal list.");
+			PopupController.error(LocalizationController.getString("productBoxExistsOnRemovalList"));
 		}
 	}
 

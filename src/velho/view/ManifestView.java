@@ -9,16 +9,19 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import velho.controller.DatabaseController;
 import velho.controller.ListController;
+import velho.controller.LocalizationController;
 import velho.controller.ManifestController;
+import velho.controller.UIController;
 import velho.model.Manifest;
 import velho.model.ManifestState;
+import velho.model.interfaces.GenericView;
 
 /**
  * A view showing the data of a single {@link Manifest} object.
  *
  * @author Jose Uusitalo
  */
-public class ManifestView
+public class ManifestView implements GenericView
 {
 	/**
 	 * The root border pane for this view.
@@ -61,7 +64,7 @@ public class ManifestView
 					manifest.getObservableBoxes());
 
 			HBox stateBox = new HBox(10);
-			Label stateLabel = new Label("State:");
+			Label stateLabel = new Label(LocalizationController.getString("manifestStateLabel"));
 			ComboBox<Object> manifestState = new ComboBox<Object>();
 
 			manifestState.getItems().addAll(DatabaseController.getManifestStateChangeList(manifest.getState()));
@@ -81,8 +84,16 @@ public class ManifestView
 
 			manifestController.showStateSelector(stateBox);
 			bpane.setCenter(boxlist);
+			UIController.recordView(this);
 		}
 
 		return bpane;
+	}
+
+	@Override
+	public void reCreate()
+	{
+		bpane = null;
+		getView();
 	}
 }
