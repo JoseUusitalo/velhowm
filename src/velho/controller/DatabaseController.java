@@ -1842,6 +1842,7 @@ public class DatabaseController
 	 *
 	 * @param object object to delete
 	 * @throws HibernateException when the object was not deleted
+	 * @throws ConstraintViolationException when the object could not be deleted because it is referenced by a <code>not-null</code> property
 	 */
 	private static void delete(final Object object) throws HibernateException, ConstraintViolationException
 	{
@@ -1852,10 +1853,14 @@ public class DatabaseController
 		try
 		{
 			sessionFactory.getCurrentSession().getTransaction().commit();
+
+			DBLOG.debug("Deleted :" + object);
 		}
 		catch (final HibernateException e)
 		{
 			sessionFactory.getCurrentSession().getTransaction().rollback();
+
+			DBLOG.debug("Failed to delete: " + object);
 
 			throw e;
 		}
@@ -1866,24 +1871,33 @@ public class DatabaseController
 	/**
 	 * Deletes a user from the database.
 	 *
-	 * @param user user to delete
-	 * @throws HibernateException when the user was not deleted
+	 * @param user user to be deleted
+	 * @return <code>true</code> if the specified user was deleted, <code>false</code> if the object is being referenced by another object that cannot have a
+	 *         null value in that property
 	 */
-	public static void deleteUser(final User user) throws HibernateException
+	public static boolean deleteUser(final User user)
 	{
-		delete(user);
+		try
+		{
+			delete(user);
+			observableUsers.remove(user);
 
-		// Update the observable list.
-		getAllUsers();
+			return true;
+		}
+		catch (final HibernateException e)
+		{
+			return false;
+		}
 	}
 
 	/**
 	 * Deletes a removal list from the database.
 	 *
-	 * @param list removal list to delete
-	 * @throws HibernateException when the removal list was not deleted
+	 * @param list removal list to be deleted
+	 * @return <code>true</code> if the specified removal list was deleted, <code>false</code> if the object is being referenced by another object that cannot
+	 *         have a null value in that property
 	 */
-	public static void deleteRemovalList(final RemovalList list) throws HibernateException
+	public static boolean deleteRemovalList(final RemovalList list) throws HibernateException, ConstraintViolationException
 	{
 		/*
 		 * HIBERNATE NOTICE
@@ -1894,11 +1908,38 @@ public class DatabaseController
 		if (list != null)
 			list.clear();
 
-		delete(list);
-
-		if (list != null)
+		try
 		{
+			delete(list);
 			observableRemovalLists.remove(list);
+
+			return true;
+		}
+		catch (final HibernateException e)
+		{
+			return false;
+		}
+	}
+
+	/**
+	 * Deletes a product from the database.
+	 *
+	 * @param product product to be deleted
+	 * @return <code>true</code> if the specified product was deleted, <code>false</code> if the object is being referenced by another object that cannot have a
+	 *         null value in that property
+	 */
+	public static boolean deleteProduct(final Product product)
+	{
+		try
+		{
+			delete(product);
+			observableProducts.remove(product);
+
+			return true;
+		}
+		catch (final HibernateException e)
+		{
+			return false;
 		}
 	}
 
@@ -1914,16 +1955,11 @@ public class DatabaseController
 		try
 		{
 			delete(brand);
-
-			if (brand != null)
-			{
-				// Update the observable list.
-				observableProductBrands.remove(brand);
-			}
+			observableProductBrands.remove(brand);
 
 			return true;
 		}
-		catch (final ConstraintViolationException e)
+		catch (final HibernateException e)
 		{
 			return false;
 		}
@@ -1941,16 +1977,11 @@ public class DatabaseController
 		try
 		{
 			delete(category);
-
-			if (category != null)
-			{
-				// Update the observable list.
-				observableProductCategories.remove(category);
-			}
+			observableProductCategories.remove(category);
 
 			return true;
 		}
-		catch (final ConstraintViolationException e)
+		catch (final HibernateException e)
 		{
 			return false;
 		}
@@ -1968,16 +1999,11 @@ public class DatabaseController
 		try
 		{
 			delete(box);
-
-			if (box != null)
-			{
-				// Update the observable list.
-				observableProductBoxes.remove(box);
-			}
+			observableProductBoxes.remove(box);
 
 			return true;
 		}
-		catch (final ConstraintViolationException e)
+		catch (final HibernateException e)
 		{
 			return false;
 		}
@@ -1995,16 +2021,11 @@ public class DatabaseController
 		try
 		{
 			delete(type);
-
-			if (type != null)
-			{
-				// Update the observable list.
-				observableProductTypes.remove(type);
-			}
+			observableProductTypes.remove(type);
 
 			return true;
 		}
-		catch (final ConstraintViolationException e)
+		catch (final HibernateException e)
 		{
 			return false;
 		}
