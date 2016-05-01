@@ -1,6 +1,7 @@
 package velhotest.controller;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
@@ -83,7 +84,7 @@ public class UserControllerTest
 		if (!exists)
 			fail("User was not added to the database.");
 
-		DatabaseController.deleteUser(newUser);
+		assertTrue(DatabaseController.deleteUser(newUser));
 	}
 
 	@Test
@@ -97,7 +98,7 @@ public class UserControllerTest
 
 		assertNull(newUser2);
 
-		DatabaseController.deleteUser(newUser);
+		assertTrue(DatabaseController.deleteUser(newUser));
 	}
 
 	@Test
@@ -120,10 +121,7 @@ public class UserControllerTest
 		}
 
 		if (exists)
-		{
-			DatabaseController.deleteUser(newUser);
-			fail("Invalid user added to the database.");
-		}
+			assertFalse(DatabaseController.deleteUser(newUser));
 	}
 
 	@Test
@@ -134,7 +132,7 @@ public class UserControllerTest
 
 		assertTrue(dbUser.getFirstName().equals("A very UNIQUE! n4m3"));
 
-		DatabaseController.deleteUser(dbUser);
+		assertTrue(DatabaseController.deleteUser(dbUser));
 		assertEquals(null, DatabaseController.getUserByID(newUserID));
 	}
 

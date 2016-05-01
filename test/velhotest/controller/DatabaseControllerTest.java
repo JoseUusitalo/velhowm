@@ -160,15 +160,22 @@ public class DatabaseControllerTest
 	}
 
 	@Test
-	public final void testDeleteUser1()
+	public final void testDeleteUser()
 	{
+		/*
+		 * I cannot delete one of the sample data users because I cannot add them back into the database with the same ID and that breaks other tests, including
+		 * this one on the second run.
+		 */
+
+		final User newUser = new User("a", "b", "123321", "", UserRole.ADMINISTRATOR);
+		final int id = DatabaseController.save(newUser);
+
 		final ObservableList<Object> users = DatabaseController.getAllUsers();
-		final User user = DatabaseController.getUserByID(1);
+		final User user = DatabaseController.getUserByID(id);
+
 		assertTrue(users.contains(user));
 		assertTrue(DatabaseController.deleteUser(user));
 		assertFalse(users.contains(user));
-
-		DatabaseController.save(user);
 	}
 
 	@Test

@@ -121,21 +121,33 @@ public class UserController implements UIActionController
 			if (PopupController.confirmation(
 					"Are you sure you wish the delete your own user account? You will be logged out and be unable to log in again as a result of this action."))
 			{
-				DatabaseController.deleteUser(user);
-				LoginController.logout();
-				USRLOG.debug("User deleted themselves: " + user.getFullDetails());
-				PopupController.info("Deleted user: " + user.getFullDetails());
-				return true;
+				if (DatabaseController.deleteUser(user))
+				{
+					LoginController.logout();
+					USRLOG.debug("User deleted themselves: " + user.getFullDetails());
+					PopupController.info("Deleted user: " + user.getFullDetails());
+					return true;
+				}
+
+				USRLOG.debug("Failed to delete user: " + user.getFullDetails());
+				PopupController.info("Failed to delete user: " + user.getFullDetails());
 			}
 
 			USRLOG.trace("Cancelled self-deletion confirmation.");
 			return false;
 		}
 
-		DatabaseController.deleteUser(user);
-		USRLOG.debug("User removed: " + user.getFullDetails());
-		PopupController.info("User removed: " + user.getFullDetails());
-		return true;
+		if (DatabaseController.deleteUser(user))
+		{
+			USRLOG.debug("User removed: " + user.getFullDetails());
+			PopupController.info("User removed: " + user.getFullDetails());
+			return true;
+		}
+
+		USRLOG.debug("Failed to delete user: " + user.getFullDetails());
+		PopupController.info("Failed to delete user: " + user.getFullDetails());
+
+		return false;
 	}
 
 	/**
