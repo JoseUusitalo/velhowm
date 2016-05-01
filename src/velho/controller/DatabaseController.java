@@ -7,6 +7,8 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -22,6 +24,7 @@ import java.util.TreeMap;
 import org.apache.log4j.Logger;
 import org.h2.jdbcx.JdbcConnectionPool;
 import org.hibernate.HibernateException;
+import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.exception.ConstraintViolationException;
@@ -1680,19 +1683,6 @@ public class DatabaseController
 	}
 
 	/**
-	 * Searches the database for product boxes with the given conditions.
-	 *
-	 * @param where conditions in SQL format
-	 * @return a list of found product boxes as
-	 *         {@link ProductBoxSearchResultRow} objects
-	 * @throws NoDatabaseLinkException
-	 */
-	public static List<ProductBoxSearchResultRow> searchProductBox(final List<String> where) throws Exception
-	{
-		return searchProductBox(where, null);
-	}
-
-	/**
 	 * Searches the database for product boxes with the given conditions and
 	 * additionally from the given tables.
 	 *
@@ -1702,28 +1692,186 @@ public class DatabaseController
 	 *         {@link ProductBoxSearchResultRow} objects
 	 * @throws NoDatabaseLinkException
 	 */
-	public static List<ProductBoxSearchResultRow> searchProductBox(final List<String> where, final Map<DatabaseTable, String> joins) throws Exception
+	public static List<ProductBoxSearchResultRow> searchProductBox(final String identifier, final int productCount, final ProductBrand brand,
+			final ProductCategory category, final LocalDate expiresStart, final LocalDate expiresEnd, final boolean canBeInRemovalList)
 	{
 		final List<ProductBoxSearchResultRow> foundProducts = FXCollections.observableArrayList();
 
-		if (MainWindow.DEBUG_MODE)
-			DBLOG.debug("Searching for a product box where: " + escape(where.toString()));
+		final StringBuilder sb = new StringBuilder();
 
-		final String[] columns = { "*" };
+		sb.append("from ProductBox as pb ");
 
-		final Map<DatabaseTable, String> join = new LinkedHashMap<DatabaseTable, String>();
-		join.put(DatabaseTable.PRODUCTS, "containers.product = products.product_id");
+		final int emptyLength = sb.length();
 
-		if (joins != null)
-			join.putAll(joins);
+		if (identifier != null && !identifier.trim().isEmpty())
+		{
+			try
+			{
+				Integer.parseInt(identifier.trim());
+
+				sb.append("where pb.databaseID = :boxID ");
+			}
+			catch (NumberFormatException e)
+			{
+				sb.append("where pb.product.name like :productName ");
+			}
+		}
+
+		if (productCount >= 0)
+		{
+			if (sb.length() == emptyLength)
+				sb.append("where ");
+			else
+				sb.append("and ");
+
+			sb.append("pb.productCount = :productCount ");
+		}
+
+		if (brand != null)
+		{
+			if (sb.length() == emptyLength)
+				sb.append("where ");
+			else
+				sb.append("and ");
+
+			sb.append("pb.product.brand.databaseID = :brandID ");
+		}
+
+		if (category != null)
+		{
+			if (sb.length() == emptyLength)
+				sb.append("where ");
+			else
+				sb.append("and ");
+
+			sb.append("pb.product.category.databaseID = :categoryID ");
+		}
+
+		if (expiresStart != null)
+		{
+			if (sb.length() == emptyLength)
+				sb.append("where ");
+			else
+				sb.append("and ");
+
+			sb.append("pb.expirationDate >= :expDateStart ");
+		}
+
+		if (expiresEnd != null)
+		{
+			if (sb.length() == emptyLength)
+				sb.append("where ");
+			else
+				sb.append("and ");
+
+			sb.append("pb.expirationDate <= :expDateEnd ");
+		}
+
+		if (!canBeInRemovalList)
+		{
+			if (sb.length() == emptyLength)
+				sb.append("where ");
+			else
+				sb.append("and ");
+
+			sb.append("pb.removalList is null ");
+		}
+
+		sessionFactory.getCurrentSession().beginTransaction();
+
+		final Query query = sessionFactory.getCurrentSession().createQuery(sb.toString().trim());
+
+		final StringBuilder logsb = new StringBuilder();
+
+		if (DBLOG.isDebugEnabled())
+			logsb.append("Searching for a product box with query: " + sb.toString().trim() + "\n");
+
+		if (identifier != null && !identifier.trim().isEmpty())
+		{
+			try
+			{
+				query.setParameter("boxID", Integer.parseInt(identifier.trim()));
+
+				if (DBLOG.isDebugEnabled())
+					logsb.append("\tboxID = " + Integer.parseInt(identifier.trim()) + "\n");
+			}
+			catch (NumberFormatException e)
+			{
+				query.setString("productName", "%%" + identifier.trim() + "%%");
+
+				if (DBLOG.isDebugEnabled())
+					logsb.append("\tproductName like %%" + identifier.trim() + "%%\n");
+			}
+		}
+
+		if (productCount >= 0)
+		{
+			query.setParameter("productCount", productCount);
+
+			if (DBLOG.isDebugEnabled())
+				logsb.append("\tproductCount = " + productCount + "\n");
+		}
+
+		if (brand != null)
+		{
+			query.setParameter("brandID", brand.getDatabaseID());
+
+			if (DBLOG.isDebugEnabled())
+				logsb.append("\tbrandID = " + brand.getDatabaseID() + "\n");
+		}
+
+		if (category != null)
+		{
+			query.setParameter("categoryID", category.getDatabaseID());
+
+			if (DBLOG.isDebugEnabled())
+				logsb.append("\tcategoryID = " + category.getDatabaseID() + "\n");
+		}
+
+		if (expiresStart != null)
+		{
+			final Date date = Date.from(expiresStart.atTime(0, 0).toInstant(ZoneOffset.of("Z")));
+			query.setParameter("expDateStart", date);
+
+			if (DBLOG.isDebugEnabled())
+				logsb.append("\texpDateStart = " + expiresStart + "\n");
+		}
+
+		if (expiresEnd != null)
+		{
+			final Date date = Date.from(expiresEnd.atTime(0, 0).toInstant(ZoneOffset.of("Z")));
+			query.setParameter("expDateEnd", date);
+
+			if (DBLOG.isDebugEnabled())
+				logsb.append("\texpDateEnd = " + date + "\n");
+		}
+
+		if (!canBeInRemovalList)
+		{
+			if (DBLOG.isDebugEnabled())
+				logsb.append("\tremovalList is null\n");
+		}
+
+		if (DBLOG.isDebugEnabled())
+			DBLOG.debug(logsb.toString());
 
 		@SuppressWarnings("unchecked")
-		final Set<ProductBox> result = (LinkedHashSet<ProductBox>) (runQuery(DatabaseQueryType.SELECT, DatabaseTable.CONTAINERS, join, columns, null, where));
+		List<ProductBox> result = query.list();
+
+		try
+		{
+			sessionFactory.getCurrentSession().getTransaction().commit();
+		}
+		catch (final HibernateException e)
+		{
+			sessionFactory.getCurrentSession().getTransaction().rollback();
+			throw e;
+		}
 
 		for (final ProductBox box : result)
 			foundProducts.add(new ProductBoxSearchResultRow(box));
 
-		DBLOG.trace("Updating product box search results.");
+		DBLOG.trace("Updating product box search with " + result.size() + " results.");
 		observableProductBoxSearchResults.clear();
 		observableProductBoxSearchResults.addAll(foundProducts);
 

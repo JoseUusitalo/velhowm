@@ -78,7 +78,7 @@ public class RemovalListCreationView
 		if (bpane == null)
 		{
 			bpane = new BorderPane();
-			final GridPane searchView = (GridPane) searchController.getSearchView("removal-list");
+			final GridPane searchView = (GridPane) searchController.getSearchView(false);
 			searchView.setPadding(new Insets(0, 10, 10, 10));
 			bpane.setTop(searchView);
 
