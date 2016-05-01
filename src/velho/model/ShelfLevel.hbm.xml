@@ -42,10 +42,10 @@
 			 "Select" eager fetching: load the referenced object when this object is loaded. -->
 		<many-to-one	name="parentShelf"
 						class="velho.model.Shelf"
+						column="shelf_id"
+						cascade="save-update"
 						fetch="select"
-						lazy="false">
-			<column	name="shelf_id"
-					not-null="true" />
-		</many-to-one>
+						lazy="false"
+						not-null="true" />
 	</class>
 </hibernate-mapping>
