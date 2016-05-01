@@ -436,13 +436,13 @@ public class ProductController implements UIActionController
 
 	public Node getProductBoxesTab()
 	{
-		return productBoxTabView.getView();
+		return productBoxTabView.getView(DatabaseController.getAllProducts());
 	}
 
 	@SuppressWarnings("static-method")
 	public void saveProductBox(final ProductBox productBox)
 	{
 		// TODO Need validation
-		DatabaseController.save(productBox);
+		DatabaseController.saveOrUpdate(productBox);
 	}
 }

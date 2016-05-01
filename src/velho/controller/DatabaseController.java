@@ -2029,13 +2029,13 @@ public class DatabaseController
 
 			if (object.getDatabaseID() < 1)
 			{
-				DBLOG.debug("Saving: " + object);
 				sessionFactory.getCurrentSession().save(object);
+				DBLOG.debug("Saved: " + object);
 			}
 			else
 			{
-				DBLOG.debug("Updating: " + object);
 				sessionFactory.getCurrentSession().update(object);
+				DBLOG.debug("Updated: " + object);
 			}
 
 			sessionFactory.getCurrentSession().flush();

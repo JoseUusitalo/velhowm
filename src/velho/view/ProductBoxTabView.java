@@ -6,16 +6,17 @@ import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
 import java.util.Date;
 
-import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.geometry.Insets;
-import javafx.geometry.Pos;
 import javafx.scene.control.Button;
+import javafx.scene.control.ComboBox;
 import javafx.scene.control.DatePicker;
+import javafx.scene.control.Label;
 import javafx.scene.control.Spinner;
 import javafx.scene.control.SpinnerValueFactory;
+import javafx.scene.control.SpinnerValueFactory.IntegerSpinnerValueFactory;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableColumn.CellEditEvent;
@@ -30,10 +31,8 @@ import velho.controller.DatabaseController;
 import velho.controller.ProductController;
 import velho.model.Product;
 import velho.model.ProductBox;
-import velho.model.ProductCategory;
-import velho.view.components.TableCellDeleteButton;
 
-public class ProductBoxesTabView
+public class ProductBoxTabView
 {
 	/**
 	 * ProductCntroller neeeded when saving to database
@@ -51,12 +50,17 @@ public class ProductBoxesTabView
 	private VBox vbox;
 
 	/**
+	 * Makes the Categories and ObservableList
+	 */
+	private ObservableList<Object> data = DatabaseController.getAllProductBoxes();
+
+	/**
 	 * Adds info to Product Controller about brands
 	 *
 	 * @param productController Product Controller handles the database work
 	 * @param uiController links UIController to the productController
 	 */
-	public ProductBoxesTabView(final ProductController productController)
+	public ProductBoxTabView(final ProductController productController)
 	{
 		this.productController = productController;
 	}
@@ -64,19 +68,23 @@ public class ProductBoxesTabView
 	/**
 	 * VBox grid view make it visible
 	 *
+	 * @param productList
+	 *
 	 * @return the VBox
 	 */
-	public VBox getView(final ObservableList<Object> productdata)
+	public VBox getView(final ObservableList<Object> productList)
 	{
 		if (vbox == null)
 		{
 			HBox hb = new HBox();
 
 			table.setEditable(true);
-			table.setItems(productdata);
 
-			final Callback<TableColumn<Object, Object>, TableCell<Object, Object>> cellFactory = (final TableColumn<Object, Object> p) -> new SpinnerCell();
-			final TableColumn<Object, Object> sizeColumn = new TableColumn<Object, Object>("Size");
+			table.setItems(data);
+
+			Callback<TableColumn<Object, Object>, TableCell<Object, Object>> cellFactory = (final TableColumn<Object, Object> p) -> new SpinnerCell();
+
+			TableColumn<Object, Object> sizeColumn = new TableColumn<Object, Object>("Size");
 
 			sizeColumn.setMinWidth(100);
 			sizeColumn.setCellValueFactory(new PropertyValueFactory<>("productCount"));
@@ -90,8 +98,9 @@ public class ProductBoxesTabView
 			});
 			table.getColumns().add(sizeColumn);
 
-			final Callback<TableColumn<Object, Object>, TableCell<Object, Object>> cellFactory2 = (final TableColumn<Object, Object> p) -> new SpinnerCell();
-			final TableColumn<Object, Object> maxSizeColumn = new TableColumn<Object, Object>("Max Size");
+			Callback<TableColumn<Object, Object>, TableCell<Object, Object>> cellFactory2 = (final TableColumn<Object, Object> p) -> new SpinnerCell();
+
+			TableColumn<Object, Object> maxSizeColumn = new TableColumn<Object, Object>("Max Size");
 
 			maxSizeColumn.setMinWidth(100);
 			maxSizeColumn.setCellValueFactory(new PropertyValueFactory<>("maxSize"));
@@ -105,10 +114,9 @@ public class ProductBoxesTabView
 			});
 			table.getColumns().add(maxSizeColumn);
 
-			final ObservableList<Object> cbValues = DatabaseController.getAllProducts();
-			final TableColumn<Object, Object> product = new TableColumn<Object, Object>("Product");
+			ObservableList<Object> cbValues = DatabaseController.getAllProducts();
+			TableColumn<Object, Object> product = new TableColumn<Object, Object>("Product");
 
-			product.setMinWidth(370);
 			product.setCellValueFactory(new PropertyValueFactory<>("product"));
 			product.setCellFactory(ComboBoxTableCell.forTableColumn(cbValues));
 			product.setOnEditCommit((final CellEditEvent<Object, Object> t) ->
@@ -119,9 +127,8 @@ public class ProductBoxesTabView
 			});
 			table.getColumns().add(product);
 
-			final Callback<TableColumn<Object, Object>, TableCell<Object, Object>> pickerFactory = (
-					final TableColumn<Object, Object> p) -> new DatePickerCell();
-			final TableColumn<Object, Object> datePickerColumn = new TableColumn<>("Expiration Date");
+			Callback<TableColumn<Object, Object>, TableCell<Object, Object>> pickerFactory = (final TableColumn<Object, Object> p) -> new DatePickerCell();
+			TableColumn<Object, Object> datePickerColumn = new TableColumn<>("Expiration Date");
 			datePickerColumn.setMinWidth(150);
 			datePickerColumn.setCellValueFactory(new PropertyValueFactory<>("expirationDate"));
 			datePickerColumn.setCellFactory(pickerFactory);
@@ -130,50 +137,53 @@ public class ProductBoxesTabView
 				final ProductBox productBox = ((ProductBox) t.getTableView().getItems().get(t.getTablePosition().getRow()));
 
 				LocalDate saveDate = ((LocalDate) t.getNewValue());
-				Date date = Date.from(saveDate.atTime(0, 0).toInstant(ZoneOffset.of("Z")));
+
+				Date date = null;
+				if (saveDate != null)
+				{
+					date = Date.from(saveDate.atTime(0, 0).toInstant(ZoneOffset.of("Z")));
+				}
 				productBox.setExpirationDate(date);
 				productController.saveProductBox(productBox);
 			});
 			table.getColumns().add(datePickerColumn);
 
-			final TableColumn<Object, String> deleteColumn = new TableColumn<Object, String>("");
-			deleteColumn.setCellValueFactory(new PropertyValueFactory<Object, String>(""));
-			deleteColumn.setSortType(TableColumn.SortType.ASCENDING);
+			final Label maxSizeLabel = new Label("Max Products: ");
+			final Spinner<Integer> productBoxMaxSize = new Spinner<Integer>();
+			productBoxMaxSize.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(1, Integer.MAX_VALUE));
+			productBoxMaxSize.setMaxWidth(maxSizeColumn.getPrefWidth());
 
-			deleteColumn.setCellValueFactory(new Callback<TableColumn.CellDataFeatures<Object, String>, ObservableValue<String>>()
-			{
-				@Override
-				public ObservableValue<String> call(final TableColumn.CellDataFeatures<Object, String> p)
-				{
-					return new SimpleStringProperty(p.getValue(), "Delete");
-				}
-			});
+			final Label sizeLabel = new Label("Product Count: ");
+			final Spinner<Integer> productBoxSize = new Spinner<Integer>();
+			final IntegerSpinnerValueFactory sizeFactory = new SpinnerValueFactory.IntegerSpinnerValueFactory(1, productBoxMaxSize.getValue());
+			sizeFactory.maxProperty().bind(productBoxMaxSize.getValueFactory().valueProperty());
+			productBoxSize.setValueFactory(sizeFactory);
+			productBoxSize.setMaxWidth(sizeColumn.getPrefWidth());
 
-			deleteColumn.setCellFactory(new Callback<TableColumn<Object, String>, TableCell<Object, String>>()
-			{
-				@Override
-				public TableCell<Object, String> call(final TableColumn<Object, String> p)
-				{
-					final TableCellDeleteButton button = new TableCellDeleteButton(productController, "Delete");
-					button.setAlignment(Pos.CENTER);
-					return button;
-				}
-			});
-			table.getColumns().add(deleteColumn);
+			final Label productLabel = new Label("Product: ");
+			final ComboBox<Object> productItem = new ComboBox<Object>();
+			productItem.getItems().addAll(productList);
+			productItem.getSelectionModel().selectFirst();
+			productItem.setMaxWidth(product.getPrefWidth());
 
-			final TextField productBoxName = new TextField();
-			productBoxName.setPromptText("Product box Name");
-			productBoxName.setMaxWidth(maxSizeColumn.getPrefWidth());
+			final Label calendarLabel = new Label("Expiration Date: ");
+			final DatePicker expirationDate = new DatePicker();
+
 			final Button addButton = new Button("Create");
 			addButton.setOnAction((final ActionEvent e) ->
 			{
-				final ProductCategory saveCategory = new ProductCategory(productBoxName.getText());
-				productdata.add(saveCategory);
-				productBoxName.clear();
-				productController.saveProductCategory(saveCategory);
+				Date date = null;
+				if (expirationDate.getValue() != null)
+					date = Date.from(expirationDate.getValue().atTime(0, 0).toInstant(ZoneOffset.of("Z")));
+				final ProductBox saveProductBox = new ProductBox((Product) productItem.getValue(), productBoxMaxSize.getValue(), productBoxSize.getValue(),
+						date);
+				System.out.println("New product box: " + saveProductBox);
+				data.add(saveProductBox);
+				productController.saveProductBox(saveProductBox);
 			});
 
-			hb.getChildren().addAll(productBoxName, addButton);
+			hb.getChildren().addAll(sizeLabel, productBoxSize, maxSizeLabel, productBoxMaxSize, productLabel, productItem, calendarLabel, expirationDate,
+					addButton);
 			hb.setSpacing(3);
 
 			vbox = new VBox();
