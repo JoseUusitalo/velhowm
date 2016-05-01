@@ -3,15 +3,16 @@ package velhotest.controller;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
-import java.text.ParseException;
 import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
 import velho.controller.DatabaseController;
+import velho.controller.LogDatabaseController;
 import velho.controller.SearchController;
 
 /**
@@ -32,15 +33,31 @@ public class SearchControllerTest
 	private SearchController searchController = new SearchController(null);
 
 	/**
+	 * Creates the log database if needed and connects to it.
 	 * Loads the sample data into the database if it does not yet exist.
 	 *
-	 * @throws ParseException
+	 * @throws Exception
 	 */
 	@BeforeClass
-	public static final void loadSampleData() throws ParseException, ClassNotFoundException
+	public static final void init() throws Exception
 	{
+		System.out.println("\n\n---- SearchControllerTest BeforeClass ----\n\n");
+		LogDatabaseController.connectAndInitialize();
 		DatabaseController.link();
 		DatabaseController.loadSampleData();
+		System.out.println("\n\n---- SearchControllerTest Start ----\n\n");
+	}
+
+	/**
+	 * Unlinks from both databases.
+	 */
+	@AfterClass
+	public static final void unlinkDatabases() throws Exception
+	{
+		System.out.println("\n\n---- SearchControllerTest AfterClass ----\n\n");
+		DatabaseController.unlink();
+		LogDatabaseController.unlink();
+		System.out.println("\n\n---- SearchControllerTest Done ----\n\n");
 	}
 
 	@Test

@@ -9,3 +9,5 @@
 /junit*.properties
 /dist/
 /testreport/
+/javadoc/
+/report/

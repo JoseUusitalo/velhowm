@@ -115,9 +115,11 @@ public class ProductController implements UIActionController
 	}
 
 	/**
-	 * Saves the new or existing product to database and returns the updated object.
+	 * Saves the new or existing product to database and returns the updated
+	 * object.
 	 *
-	 * @param databaseID database ID of the product (<code>-1</code> for a new one)
+	 * @param databaseID database ID of the product (<code>-1</code> for a new
+	 *            one)
 	 * @param name name of the of product
 	 * @param brand brand of the product
 	 * @param category category of the product
@@ -160,7 +162,7 @@ public class ProductController implements UIActionController
 
 		if (dbID < 0)
 		{
-			PopupController.error("Failed to save product data!");
+			PopupController.error(LocalizationController.getString("failedToSaveProductDataPopUpWarning"));
 			return null;
 		}
 
@@ -208,7 +210,8 @@ public class ProductController implements UIActionController
 	}
 
 	/**
-	 * Changes the view in the product list tab to display the data from the given product.
+	 * Changes the view in the product list tab to display the data from the
+	 * given product.
 	 *
 	 * @param product product to display
 	 */

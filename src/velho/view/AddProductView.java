@@ -12,9 +12,11 @@ import javafx.scene.control.TextField;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
 import velho.controller.DatabaseController;
+import velho.controller.LocalizationController;
 import velho.controller.ProductController;
 import velho.controller.UIController;
 import velho.model.Product;
+import velho.model.interfaces.GenericView;
 
 /**
  * Creates tab for "Product Edit View".
@@ -22,7 +24,7 @@ import velho.model.Product;
  * @author Edward Puustinen
  *
  */
-public class AddProductView
+public class AddProductView implements GenericView
 {
 	/**
 	 * The product controller.
@@ -97,19 +99,20 @@ public class AddProductView
 			grid.add(productLabel, 1, 0);
 
 			nameField = new TextField();
-			nameField.setPromptText("Product name");
+			nameField.setPromptText(LocalizationController.getString("promtTextProductName"));
 			nameField.setPrefWidth(MainWindow.WINDOW_WIDTH / 5);
 			nameField.setMaxWidth(Double.MAX_VALUE);
 			grid.add(nameField, 2, 0);
 
 			brandList = new ComboBox<Object>();
 			// TODO make it so that you dont need to press enter
-			brandList.setPromptText("Brand");
+			brandList.setPromptText(LocalizationController.getString("promtTextBrand"));
 			brandList.getItems().addAll(DatabaseController.getAllProductBrands());
 			brandList.setMaxWidth(Double.MAX_VALUE);
 
 			/*
-			 * TODO: Fix combobox selection mechanic breaking on the second try because the selection is converted from
+			 * TODO: Fix combobox selection mechanic breaking on the second try
+			 * because the selection is converted from
 			 * object to string.
 			 */
 			// brandList.setEditable(true);
@@ -119,12 +122,13 @@ public class AddProductView
 
 			categoryList = new ComboBox<Object>();
 			// TODO make it so that you dont need to press enter
-			categoryList.setPromptText("Category");
+			categoryList.setPromptText(LocalizationController.getString("promtTextCategory"));
 			categoryList.getItems().addAll(DatabaseController.getAllProductCategories());
 			categoryList.setMaxWidth(Double.MAX_VALUE);
 
 			/*
-			 * TODO: Fix combobox selection mechanic breaking on the second try because the selection is converted from
+			 * TODO: Fix combobox selection mechanic breaking on the second try
+			 * because the selection is converted from
 			 * object to string.
 			 */
 			// categoryList.setEditable(true);
@@ -132,7 +136,7 @@ public class AddProductView
 			categoryList.getSelectionModel().selectFirst();
 			grid.add(categoryList, 4, 0);
 
-			final Button cancelButton = new Button("Back to List");
+			final Button cancelButton = new Button(LocalizationController.getString("cancelButtonBackToList"));
 
 			cancelButton.setOnAction(new EventHandler<ActionEvent>()
 			{
@@ -140,12 +144,12 @@ public class AddProductView
 				public void handle(final ActionEvent event)
 				{
 					productController.showList();
-					uiController.selectTab("Product List");
+					uiController.selectTab(LocalizationController.getString("productListTabName"));
 				}
 			});
 			grid.add(cancelButton, 6, 0);
 
-			Button saveButton = new Button("Save");
+			Button saveButton = new Button(LocalizationController.getString("saveButton"));
 
 			saveButton.setOnAction(new EventHandler<ActionEvent>()
 			{
@@ -167,6 +171,7 @@ public class AddProductView
 			grid.getStyleClass().add("standard-padding");
 
 			bPane.setCenter(grid);
+			UIController.recordView(this);
 		}
 		return bPane;
 	}
@@ -182,5 +187,13 @@ public class AddProductView
 		nameField.setText(product.getName());
 		brandList.getSelectionModel().select(product.getBrand());
 		categoryList.getSelectionModel().select(product.getCategory());
+	}
+
+	@Override
+	public void reCreate()
+	{
+		bPane = null;
+		getView(false);
+
 	}
 }

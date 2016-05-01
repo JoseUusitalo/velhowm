@@ -5,15 +5,16 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
-import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
 import velho.controller.DatabaseController;
+import velho.controller.LogDatabaseController;
 import velho.model.ProductBox;
 import velho.model.Shelf;
 
@@ -47,15 +48,16 @@ public class ShelfTest
 	private static final int BOX_ID_21_PRODUCT_COUNT = 2;
 
 	/**
+	 * Creates the log database if needed and connects to it.
 	 * Loads the sample data into the database if it does not yet exist.
 	 *
-	 * @throws NoDatabaseException
-	 * @throws NoDatabaseLinkException
+	 * @throws Exception
 	 */
 	@BeforeClass
-	public static final void loadSampleData() throws ParseException
+	public static final void init() throws Exception
 	{
-		System.out.println("------beforeclass----------");
+		LogDatabaseController.connectAndInitialize();
+		DatabaseController.link();
 		DatabaseController.loadSampleData();
 
 		fullShelf_LVL_1_SLTPOS_1 = DatabaseController.getShelfByID(FULLSHELF_LVL_1_SLTPOS_1_ID);
@@ -71,6 +73,16 @@ public class ShelfTest
 		System.out.println(shelf_FREE_LVL_2);
 		System.out.println(emptyShelf_1_1_to_1_2);
 		System.out.println("------beforeclass----------\n\n\n");
+	}
+
+	/**
+	 * Unlinks from both databases.
+	 */
+	@AfterClass
+	public static final void unlinkDatabases() throws Exception
+	{
+		DatabaseController.unlink();
+		LogDatabaseController.unlink();
 	}
 
 	/**
@@ -404,7 +416,7 @@ public class ShelfTest
 
 		/*
 		 * HIBERNATE NOTICE
-		 * 
+		 *
 		 * Doing this does not update the shelf.
 		 * Shelf must be fetched from database again to get the updated version.
 		 */

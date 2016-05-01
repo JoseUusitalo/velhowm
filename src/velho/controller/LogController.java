@@ -5,7 +5,6 @@ import java.util.ArrayList;
 import org.apache.log4j.Logger;
 
 import javafx.scene.Node;
-import velho.model.exceptions.NoDatabaseLinkException;
 import velho.view.LogView;
 import velho.view.MainWindow;
 
@@ -55,13 +54,14 @@ public class LogController
 		ArrayList<Object> log = new ArrayList<Object>();
 
 		SYSLOG.info("Loading the full system log.");
+
 		try
 		{
 			log = LogDatabaseController.getSystemLog();
 		}
-		catch (NoDatabaseLinkException e)
+		catch (Exception e)
 		{
-			LogDatabaseController.tryReLink();
+			e.printStackTrace();
 		}
 
 		for (Object line : log)
@@ -85,13 +85,14 @@ public class LogController
 		ArrayList<Object> log = new ArrayList<Object>();
 
 		SYSLOG.info("Loading the full user log.");
+
 		try
 		{
 			log = LogDatabaseController.getUserLog();
 		}
-		catch (NoDatabaseLinkException e)
+		catch (Exception e)
 		{
-			LogDatabaseController.tryReLink();
+			e.printStackTrace();
 		}
 
 		for (Object line : log)

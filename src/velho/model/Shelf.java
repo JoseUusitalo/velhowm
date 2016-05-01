@@ -458,4 +458,15 @@ public class Shelf extends AbstractDatabaseObject
 	{
 		shelfLevels.remove(shelfLevel);
 	}
+
+	/**
+	 * Gets the database ID of the shelf from the given {@link ShelfSlot#getSlotID()}.
+	 *
+	 * @param shelfSlotID shelf slot ID string
+	 * @return the database ID of the shelf it shelf slot is in
+	 */
+	public static int shelfSlotIDToShelfDatabaseID(final String shelfSlotID)
+	{
+		return Integer.valueOf(String.valueOf(shelfSlotID.subSequence(1, shelfSlotID.indexOf(ShelfSlot.ID_SEPARATOR))));
+	}
 }

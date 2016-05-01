@@ -1,103 +1,162 @@
 package velhotest.controller;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
-import java.text.ParseException;
-
+import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
 import velho.controller.DatabaseController;
 import velho.controller.ExternalSystemsController;
+import velho.controller.LogDatabaseController;
 import velho.model.ProductBox;
 import velho.model.Shelf;
 
 /**
- * Tests for the {@link Shelf} class.
+ * Tests for the {@link ExternalSystemsController} class.
  *
- * @author Jose Uusitalo
+ * @author Jose Uusitalo &amp; Edward Puustinen
  */
 @SuppressWarnings("static-method")
 public class ExternalSystemsControllerTest
 {
-	private static Shelf newShelf_ID2;
-	private static final String NEWSHELFID = "S2-1-1";
+	private static final String NEW_SHELFSLOT_ID = "S5-1-1";
 	private static final int BOX_DBID_1 = 1;
-	private static final int BOX_DBID_2 = 2;
+	private static final int BOX_NOT_IN_SLOT = 21;
 
 	/**
+	 * Creates the log database if needed and connects to it.
 	 * Loads the sample data into the database if it does not yet exist.
 	 *
-	 * @throws ParseException
+	 * @throws Exception
 	 */
 	@BeforeClass
-	public static final void loadSampleData() throws ParseException
+	public static final void init() throws Exception
 	{
+		System.out.println("\n\n---- ExternalSystemsControllerTest BeforeClass ----\n\n");
+		LogDatabaseController.connectAndInitialize();
+		DatabaseController.link();
 		DatabaseController.loadSampleData();
-		newShelf_ID2 = DatabaseController.getShelfByID(2);
+		System.out.println("\n\n---- ExternalSystemsControllerTest Start ----\n\n");
+	}
+
+	/**
+	 * Unlinks from both databases.
+	 */
+	@AfterClass
+	public static final void unlinkDatabases() throws Exception
+	{
+		System.out.println("\n\n---- ExternalSystemsControllerTest AfterClass ----\n\n");
+		DatabaseController.unlink();
+		LogDatabaseController.unlink();
+		System.out.println("\n\n---- ExternalSystemsControllerTest Done ----\n\n");
 	}
 
 	@Test
 	public final void testMoveValid()
 	{
-		final ProductBox box = DatabaseController.getProductBoxByID(BOX_DBID_1);
+		ProductBox box = DatabaseController.getProductBoxByID(BOX_DBID_1);
 
 		final String oldShelfSlot = box.getShelfSlot().getSlotID();
-		final String oldShelfIDString = (String) Shelf.tokenizeShelfSlotID(box.getShelfSlot().getSlotID())[0];
-		final int oldShelfID = Integer.parseInt(oldShelfIDString.substring(1));
-		final Shelf oldShelf = DatabaseController.getShelfByID(oldShelfID);
+		Shelf oldShelf = box.getShelfSlot().getParentShelfLevel().getParentShelf();
+		Shelf newShelf = DatabaseController.getShelfByID(Shelf.shelfSlotIDToShelfDatabaseID(NEW_SHELFSLOT_ID));
 
-		assertTrue(oldShelf.getShelfSlot(oldShelfSlot).contains(box));
+		// Box is in the old shelf.
+		assertTrue(oldShelf.getProductBoxes().contains(box));
 
-		final String newShelfIDString = (String) Shelf.tokenizeShelfSlotID(NEWSHELFID)[0];
-		final int newShelfID = Integer.parseInt(newShelfIDString.substring(1));
-		final Shelf newShelf = DatabaseController.getShelfByID(newShelfID);
+		// Box is not in the new shelf.
+		assertFalse(newShelf.getProductBoxes().contains(box));
 
-		assertTrue(ExternalSystemsController.move(BOX_DBID_1, newShelf_ID2.getShelfSlot(NEWSHELFID), false));
+		// Move is a success.
+		assertTrue(ExternalSystemsController.move(box.getDatabaseID(), NEW_SHELFSLOT_ID, false));
 
-		final String newShelfSlot = box.getShelfSlot().getSlotID();
+		// TODO: Refresh private method
+		oldShelf = DatabaseController.getShelfByID(oldShelf.getDatabaseID());
+		newShelf = DatabaseController.getShelfByID(newShelf.getDatabaseID());
+		box = DatabaseController.getProductBoxByID(BOX_DBID_1);
 
-		assertFalse(oldShelf.getShelfSlot(oldShelfSlot).contains(box));
-		assertTrue(newShelf.getShelfSlot(newShelfSlot).contains(box));
+		// Box is not in the old shelf.
+		assertFalse(oldShelf.getProductBoxes().contains(box));
+
+		// Box is in the new shelf.
+		assertTrue(newShelf.getProductBoxes().contains(box));
+
+		// Box has been updated.
+		assertEquals(box.getShelfSlot(), newShelf.getShelfSlot(NEW_SHELFSLOT_ID));
+
+		/*
+		 * Rollback.
+		 */
+
+		assertTrue(ExternalSystemsController.move(box.getDatabaseID(), oldShelfSlot, false));
+
+		// TODO: Refresh private method
+		oldShelf = DatabaseController.getShelfByID(oldShelf.getDatabaseID());
+		newShelf = DatabaseController.getShelfByID(newShelf.getDatabaseID());
+		box = DatabaseController.getProductBoxByID(BOX_DBID_1);
+
+		// Box is in the old shelf.
+		assertTrue(oldShelf.getProductBoxes().contains(box));
+
+		// Box is not in the new shelf.
+		assertFalse(newShelf.getProductBoxes().contains(box));
 	}
 
 	@Test
-	public final void testMoveFull()
+	public final void testMoveToFullSlot()
 	{
-		// TODO: Fails because the shelf slot reference in the box is a different instance from the shelf slot in the
-		// shelf.
-		assertTrue(ExternalSystemsController.move(BOX_DBID_1, DatabaseController.getShelfByID(1).getShelfSlot("S1-1-1"), false));
+		assertFalse(ExternalSystemsController.move(BOX_NOT_IN_SLOT, "S1-1-1", false));
 	}
 
 	@Test
-	public final void testMoveInValidBox()
+	public final void testMoveBackToSameSlot()
 	{
-		assertFalse(ExternalSystemsController.move(99999, DatabaseController.getShelfByID(4).getShelfSlot("S4-1-1"), false));
+		assertFalse(ExternalSystemsController.move(BOX_DBID_1, "S1-1-1", false));
 	}
 
 	@Test
-	public final void testMoveValid2()
+	public final void testMoveInvalidBox()
 	{
-		System.out.println("Test Move Valid 2");
-		final ProductBox box = DatabaseController.getProductBoxByID(BOX_DBID_2);
+		assertFalse(ExternalSystemsController.move(99999, "S4-1-1", false));
+	}
 
-		final String oldShelfIDString = (String) Shelf.tokenizeShelfSlotID(box.getShelfSlot().getSlotID())[0];
-		final int oldShelfID = Integer.parseInt(oldShelfIDString.substring(1));
-		final Shelf oldShelf = DatabaseController.getShelfByID(oldShelfID);
-		final String oldShelfSlot = box.getShelfSlot().getSlotID();
+	@Test
+	public final void testMoveValid_NotInSlot()
+	{
+		ProductBox box = DatabaseController.getProductBoxByID(BOX_NOT_IN_SLOT);
 
-		// assertTrue(oldShelf.getShelfSlotBoxes(oldShelfSlot).contains(box));
-		System.out.println("move");
+		Shelf newShelf = DatabaseController.getShelfByID(Shelf.shelfSlotIDToShelfDatabaseID(NEW_SHELFSLOT_ID));
 
-		assertTrue(ExternalSystemsController.move(BOX_DBID_2, newShelf_ID2.getShelfSlot(NEWSHELFID), false));
-		assertFalse(oldShelf.getShelfSlot(oldShelfSlot).contains(box));
+		// Box is not in the new shelf.
+		assertFalse(newShelf.getProductBoxes().contains(box));
 
-		final String newShelfIDString = (String) Shelf.tokenizeShelfSlotID(NEWSHELFID)[0];
-		final int newShelfID = Integer.parseInt(newShelfIDString.substring(1));
-		final Shelf newShelf = DatabaseController.getShelfByID(newShelfID);
+		// Move is a success.
+		assertTrue(ExternalSystemsController.move(box.getDatabaseID(), NEW_SHELFSLOT_ID, false));
 
-		assertTrue(newShelf.getShelfSlot(NEWSHELFID).contains(box));
+		// TODO: Refresh private method
+		newShelf = DatabaseController.getShelfByID(newShelf.getDatabaseID());
+		box = DatabaseController.getProductBoxByID(BOX_NOT_IN_SLOT);
+
+		// Box is in the new shelf.
+		assertTrue(newShelf.getProductBoxes().contains(box));
+
+		// Box has been updated.
+		assertEquals(box.getShelfSlot(), newShelf.getShelfSlot(NEW_SHELFSLOT_ID));
+
+		/*
+		 * Rollback.
+		 */
+
+		assertTrue(ExternalSystemsController.move(box.getDatabaseID(), null, false));
+
+		// TODO: Refresh private method
+		newShelf = DatabaseController.getShelfByID(newShelf.getDatabaseID());
+		box = DatabaseController.getProductBoxByID(BOX_NOT_IN_SLOT);
+
+		// Box is not in the new shelf.
+		assertFalse(newShelf.getProductBoxes().contains(box));
 	}
 
 }
