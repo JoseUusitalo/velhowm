@@ -65,11 +65,12 @@
 		</many-to-one>
 
 		<!-- Many-to-one: This object can have one referenced object, the referenced object can be referenced from many objects.
-			 Do not cascade changes.
+			 Cascade changes.
 			 "Select" eager fetching: load the referenced object when this object is loaded. -->
 		<many-to-one	name="product"
 						class="velho.model.Product"
 						column="product"
+						cascade="save-update"
 						not-null="true"
 						fetch="select"
 						lazy="false" />
