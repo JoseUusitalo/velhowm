@@ -275,8 +275,6 @@ public class MainWindow extends Application implements GenericView
 	{
 		SYSLOG.info("Running VELHO Warehouse Management.");
 
-		// FIXME: Database is not created correctly on first run.
-
 		try
 		{
 			DatabaseController.link();

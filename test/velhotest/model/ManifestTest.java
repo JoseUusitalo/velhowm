@@ -127,7 +127,6 @@ public class ManifestTest
 		// Database was updated.
 		assertEquals(newState, DatabaseController.getManifestByID(saveID).getState());
 
-		// TODO: Figure out a better way to roll back changes.
 		existingManifest.setState(oldState);
 		DatabaseController.saveOrUpdate(existingManifest);
 	}
@@ -139,7 +138,7 @@ public class ManifestTest
 				Arrays.asList(DatabaseController.getProductBoxByID(35), DatabaseController.getProductBoxByID(36), DatabaseController.getProductBoxByID(37)));
 
 		/*
-		 * FIXME: This is not transitive and does not work when the list is a set.
+		 * TODO: This is not transitive and does not work when the list is a set.
 		 * list.containsAll(existingManifest.getBoxes()) = true
 		 * existingManifest.getBoxes().containsAll(list) = false
 		 */

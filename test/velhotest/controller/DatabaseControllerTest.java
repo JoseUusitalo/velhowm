@@ -10,13 +10,13 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Set;
 
-import org.hibernate.HibernateException;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
 import javafx.collections.ObservableList;
 import velho.controller.DatabaseController;
+import velho.controller.LocalizationController;
 import velho.controller.LogDatabaseController;
 import velho.model.ProductBox;
 import velho.model.RemovalList;
@@ -44,6 +44,7 @@ public class DatabaseControllerTest
 		LogDatabaseController.connectAndInitialize();
 		DatabaseController.link();
 		DatabaseController.loadSampleData();
+		LocalizationController.initializeBundle();
 		System.out.println("\n\n---- DatabaseControllerTest Start ----\n\n");
 	}
 
@@ -76,6 +77,7 @@ public class DatabaseControllerTest
 	@Test
 	public final void testAuthenticate_ValidPin()
 	{
+		System.out.println(DatabaseController.getAllUsers());
 		final User user = DatabaseController.authenticatePIN("Admin", "Test", "111111");
 		assertEquals("Admin", user.getFirstName());
 		assertEquals("Test", user.getLastName());
@@ -145,10 +147,10 @@ public class DatabaseControllerTest
 	/**
 	 * Tests that a non-existent user cannot be deleted.
 	 */
-	@Test(expected = HibernateException.class)
+	@Test
 	public final void testDelete_Invalid()
 	{
-		DatabaseController.deleteUser(new User(-123, "A", "B", "000000", null, UserRole.ADMINISTRATOR));
+		assertFalse(DatabaseController.deleteUser(new User(-123, "A", "B", "000000", null, UserRole.ADMINISTRATOR)));
 	}
 
 	@Test(expected = IllegalArgumentException.class)
@@ -163,10 +165,10 @@ public class DatabaseControllerTest
 		final ObservableList<Object> users = DatabaseController.getAllUsers();
 		final User user = DatabaseController.getUserByID(1);
 		assertTrue(users.contains(user));
-		DatabaseController.deleteUser(user);
+		assertTrue(DatabaseController.deleteUser(user));
 		assertFalse(users.contains(user));
 
-		// TODO: Rollback.
+		DatabaseController.save(user);
 	}
 
 	@Test
@@ -175,7 +177,7 @@ public class DatabaseControllerTest
 		// This test is worthless but it exists to improve coverage.
 
 		final LinkedHashMap<String, String> cols = new LinkedHashMap<String, String>();
-		cols.put("productID", "ID");
+		cols.put("databaseID", "ID");
 		cols.put("name", "Name");
 		cols.put("brand", "Brand");
 		cols.put("category", "Category");
@@ -192,7 +194,7 @@ public class DatabaseControllerTest
 		final LinkedHashMap<String, String> cols = new LinkedHashMap<String, String>();
 		cols.put("addButton", "Add");
 		cols.put("deleteButton", "Delete");
-		cols.put("productID", "ID");
+		cols.put("databaseID", "ID");
 		cols.put("name", "Name");
 		cols.put("brand", "Brand");
 		cols.put("category", "Category");
@@ -204,10 +206,10 @@ public class DatabaseControllerTest
 	@Test
 	public final void testGetProductSearchDataColumns()
 	{
-		// This test is worhtless but it exists to improve coverage.
+		// This test is worthless but it exists to improve coverage.
 
 		final LinkedHashMap<String, String> cols = new LinkedHashMap<String, String>();
-		cols.put("productID", "ID");
+		cols.put("databaseID", "ID");
 		cols.put("productName", "Name");
 		cols.put("productBrand", "Brand");
 		cols.put("productCategory", "Category");
@@ -227,7 +229,7 @@ public class DatabaseControllerTest
 		final LinkedHashMap<String, String> cols = new LinkedHashMap<String, String>();
 		cols.put("addButton", "Add");
 		cols.put("removeButton", "Remove");
-		cols.put("productID", "ID");
+		cols.put("databaseID", "ID");
 		cols.put("productName", "Name");
 		cols.put("productBrand", "Brand");
 		cols.put("productCategory", "Category");
@@ -274,7 +276,7 @@ public class DatabaseControllerTest
 	public final void testInsertRemovalList()
 	{
 		final ProductBox box = DatabaseController.getProductBoxByID(1);
-		RemovalList list = new RemovalList();
+		RemovalList list = new RemovalList(DatabaseController.getRemovalListStateByID(1));
 		assertTrue(list.addProductBox(box));
 
 		assertTrue(list.getBoxes().contains(box));
@@ -290,7 +292,6 @@ public class DatabaseControllerTest
 		/*
 		 * Rollback.
 		 */
-
 		DatabaseController.deleteRemovalList(list);
 	}
 }
