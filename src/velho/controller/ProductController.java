@@ -9,7 +9,6 @@ import velho.model.ProductBox;
 import velho.model.ProductBrand;
 import velho.model.ProductCategory;
 import velho.model.ProductType;
-import velho.view.AddCategoryView;
 import velho.view.AddProductView;
 import velho.view.BrandsTabView;
 import velho.view.CategoriesTabView;
@@ -67,11 +66,6 @@ public class ProductController implements UIActionController
 	private ProductTypesTabView productsTypeTabView;
 
 	/**
-	 * The tab for creating add category view
-	 */
-	private AddCategoryView addCategoryView;
-
-	/**
 	 * The tab for creating brands view
 	 */
 	private BrandsTabView brandsTabView;
@@ -91,7 +85,6 @@ public class ProductController implements UIActionController
 		this.uiController = uiController;
 		this.productManagementView = new ProductManagementView();
 		this.productsTypeTabView = new ProductTypesTabView(this);
-		this.addCategoryView = new AddCategoryView(this);
 		this.addProductView = new AddProductView(this, uiController);
 		this.brandsTabView = new BrandsTabView(this);
 		this.categoryTabView = new CategoriesTabView(this);
@@ -319,7 +312,7 @@ public class ProductController implements UIActionController
 	 */
 	public Node getProductManagementView()
 	{
-		productManagementView.setContents(getProductEditView(), addCategoryView.getView());
+		productManagementView.setContents(getProductEditView());
 		return productManagementView.getView();
 	}
 
