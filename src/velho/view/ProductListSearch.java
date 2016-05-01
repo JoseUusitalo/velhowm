@@ -34,6 +34,11 @@ public class ProductListSearch implements GenericView
 	 */
 	private SearchController searchController;
 
+	/**
+	 * Searches the list of products
+	 *
+	 * @param searchController embodies SearchController
+	 */
 	public ProductListSearch(final SearchController searchController)
 	{
 		this.searchController = searchController;
@@ -55,7 +60,9 @@ public class ProductListSearch implements GenericView
 			Button sendToScannerButton = new Button(LocalizationController.getString("sendToScannerButton"));
 
 			final TextArea textArea = new TextArea();
-			textArea.setPromptText((LocalizationController.getString("productSearchByNameOrCodeFirstRowText")) + (LocalizationController.getString("productSearchByNameOrCodeSecondRowText")) + (LocalizationController.getString("productSearchByNameOrCodeThirdRowText")));
+			textArea.setPromptText((LocalizationController.getString("productSearchByNameOrCodeFirstRowText"))
+					+ (LocalizationController.getString("productSearchByNameOrCodeSecondRowText"))
+					+ (LocalizationController.getString("productSearchByNameOrCodeThirdRowText")));
 			textArea.setPrefWidth(MainWindow.WINDOW_WIDTH / 5);
 			printButton.setMaxWidth(Double.MAX_VALUE);
 			printButton.setAlignment(Pos.CENTER);

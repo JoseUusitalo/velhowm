@@ -31,14 +31,7 @@ public class SearchView implements GenericView
 	private SearchController searchController;
 	private ObservableList<Object> productCategories;
 	private ObservableList<Object> productBrands;
-	private String limits;
-
-	public SearchView(final SearchController searchController, final ObservableList<Object> productBrands, final ObservableList<Object> productCategories)
-	{
-		this.searchController = searchController;
-		this.productBrands = productBrands;
-		this.productCategories = productCategories;
-	}
+	private boolean canBeInRemovalList;
 
 	/**
 	 * @param searchController
@@ -46,10 +39,11 @@ public class SearchView implements GenericView
 	 * @param productBrands
 	 * @param productCategories
 	 */
-	public SearchView(final SearchController searchController, final String limits, final ObservableList<Object> productBrands, final ObservableList<Object> productCategories)
+	public SearchView(final SearchController searchController, final boolean canBeInRemovalList, final ObservableList<Object> productBrands,
+			final ObservableList<Object> productCategories)
 	{
 		this.searchController = searchController;
-		this.limits = limits;
+		this.canBeInRemovalList = canBeInRemovalList;
 		this.productBrands = productBrands;
 		this.productCategories = productCategories;
 	}
@@ -154,7 +148,8 @@ public class SearchView implements GenericView
 						// still numbers.
 					}
 
-					searchController.productSearch(limits, nameField.getText(), productCountField.getValue(), brandbox.getValue(), categorybox.getValue(), dpStart.getValue(), dpEnd.getValue());
+					searchController.productBoxSearch(canBeInRemovalList, nameField.getText(), productCountField.getValue(), brandbox.getValue(),
+							categorybox.getValue(), dpStart.getValue(), dpEnd.getValue());
 				}
 			});
 			UIController.recordView(this);

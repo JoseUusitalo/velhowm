@@ -75,7 +75,9 @@ public class UIController
 	 * @param productController
 	 * @param removalPlatformController
 	 */
-	public void setControllers(final MainWindow mainWindow, final UserController userController, final RemovalListController removalListController, final SearchController searchController, final LogController logController, final ManifestController manifestController, final ProductController productController, final RemovalPlatformController removalPlatformController)
+	public void setControllers(final MainWindow mainWindow, final UserController userController, final RemovalListController removalListController,
+			final SearchController searchController, final LogController logController, final ManifestController manifestController,
+			final ProductController productController, final RemovalPlatformController removalPlatformController)
 	{
 		this.mainView = mainWindow;
 		this.userController = userController;
@@ -144,6 +146,10 @@ public class UIController
 				mainView.addTab(LocalizationController.getString("addRemovalListsTab"), removalListController.getView());
 				mainView.addTab(LocalizationController.getString("addProductTab"), productController.getAddProductView());
 				mainView.addTab(LocalizationController.getString("addProductListTab"), productController.getTabView());
+				mainView.addTab("Brands", productController.getBrandsTab());
+				mainView.addTab("Categories", productController.getCategoryTab());
+				mainView.addTab("Product Types", productController.getProductTypesTab());
+				mainView.addTab("Product Boxes", productController.getProductBoxesTab());
 				mainView.addTab(LocalizationController.getString("addUserListTab"), getUserListView(currentUserRole));
 				break;
 			case GUEST:
@@ -173,6 +179,7 @@ public class UIController
 		 */
 		switch (currentUserRole)
 		{
+
 			case ADMINISTRATOR:
 			case MANAGER:
 				return ListController.getTableView(userController, DatabaseController.getPublicUserDataColumns(true), DatabaseController.getAllUsers());
@@ -182,6 +189,7 @@ public class UIController
 				break;
 			default:
 				SYSLOG.error("Unknown user role '" + currentUserRole.getName() + "'.");
+
 		}
 
 		return null;

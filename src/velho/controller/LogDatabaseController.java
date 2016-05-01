@@ -33,7 +33,7 @@ public class LogDatabaseController
 	/**
 	 * The database URI on the local machine.
 	 */
-	private final static String DB_URI = "jdbc:h2:./data/velholog;MV_STORE=FALSE;MVCC=FALSE;";
+	private final static String DB_URI = "jdbc:h2:./data/velholog;MV_STORE=FALSE;MVCC=TRUE;";
 
 	/**
 	 * User name for the system itself.
@@ -231,27 +231,6 @@ public class LogDatabaseController
 	 */
 
 	/**
-	 * Attempts to re-link the database.
-	 */
-	private static void relink()
-	{
-		if (MainWindow.DEBUG_MODE)
-			System.out.println("Attempting to relink log database.");
-
-		// Just in case.
-		unlink();
-
-		try
-		{
-			link();
-		}
-		catch (final ClassNotFoundException e)
-		{
-			e.printStackTrace();
-		}
-	}
-
-	/**
 	 * Checks if the database file exists.
 	 *
 	 * @return <code>true</code> if the database file exists
@@ -285,9 +264,10 @@ public class LogDatabaseController
 			}
 			else
 			{
-				relink();
+				e.printStackTrace();
 			}
 		}
+
 		return connection;
 	}
 
@@ -422,7 +402,7 @@ public class LogDatabaseController
 	}
 
 	/**
-	 * Links and initializes the database.
+	 * Links to the log database and initializes if it does not exist.
 	 */
 	public static boolean connectAndInitialize() throws Exception
 	{
@@ -536,25 +516,25 @@ public class LogDatabaseController
 		if (MainWindow.DEBUG_MODE)
 			System.out.println("Shutting down log database..");
 
+		unlink();
+
 		if (!isLinked())
 		{
 			try
 			{
 				link();
 			}
-			catch (ClassNotFoundException e1)
+			catch (final ClassNotFoundException e)
 			{
-				e1.printStackTrace();
+				e.printStackTrace();
 			}
 		}
 
-		Connection connection = null;
-		connection = getConnection();
+		final Connection connection = getConnection();
 
 		try
 		{
-			if (connection != null)
-				connection.createStatement().execute("SHUTDOWN;");
+			connection.createStatement().execute("SHUTDOWN;");
 		}
 		catch (final IllegalStateException e)
 		{
@@ -580,8 +560,7 @@ public class LogDatabaseController
 		// Close all resources.
 		try
 		{
-			if (connection != null)
-				connection.close();
+			connection.close();
 		}
 		catch (final SQLException e)
 		{
@@ -590,6 +569,8 @@ public class LogDatabaseController
 
 		connectionPool.dispose();
 		connectionPool = null;
+
+		System.out.println("Log database shut down.");
 	}
 
 	/*

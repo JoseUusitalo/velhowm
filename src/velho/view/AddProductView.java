@@ -2,8 +2,10 @@ package velho.view;
 
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
+import javafx.geometry.Pos;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
+import javafx.scene.control.Label;
 import javafx.scene.control.Spinner;
 import javafx.scene.control.SpinnerValueFactory;
 import javafx.scene.control.TextField;
@@ -45,6 +47,11 @@ public class AddProductView implements GenericView
 	private TextField nameField;
 
 	/**
+	 * A label for Add Product
+	 */
+	private Label productLabel;
+
+	/**
 	 * A combobox for brand list.
 	 */
 	private ComboBox<Object> brandList;
@@ -54,9 +61,6 @@ public class AddProductView implements GenericView
 	 */
 	private ComboBox<Object> categoryList;
 
-	/**
-	 * The {@link UIController}.
-	 */
 	private UIController uiController;
 
 	/**
@@ -86,13 +90,19 @@ public class AddProductView implements GenericView
 			final GridPane grid = new GridPane();
 
 			databaseID = new Spinner<Integer>();
-			databaseID.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(-1, Integer.MAX_VALUE, Integer.parseInt("-1")));
+			databaseID.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(0, Integer.MAX_VALUE, Integer.parseInt("-1")));
+
+			productLabel = new Label();
+			productLabel.setText("Product: ");
+			productLabel.setAlignment(Pos.BASELINE_RIGHT);
+			productLabel.setMinWidth(MainWindow.WINDOW_WIDTH / 10);
+			grid.add(productLabel, 1, 0);
 
 			nameField = new TextField();
 			nameField.setPromptText(LocalizationController.getString("promtTextProductName"));
 			nameField.setPrefWidth(MainWindow.WINDOW_WIDTH / 5);
 			nameField.setMaxWidth(Double.MAX_VALUE);
-			grid.add(nameField, 1, 0);
+			grid.add(nameField, 2, 0);
 
 			brandList = new ComboBox<Object>();
 			// TODO make it so that you dont need to press enter
@@ -108,7 +118,7 @@ public class AddProductView implements GenericView
 			// brandList.setEditable(true);
 
 			brandList.getSelectionModel().selectFirst();
-			grid.add(brandList, 2, 0);
+			grid.add(brandList, 3, 0);
 
 			categoryList = new ComboBox<Object>();
 			// TODO make it so that you dont need to press enter
@@ -124,7 +134,7 @@ public class AddProductView implements GenericView
 			// categoryList.setEditable(true);
 
 			categoryList.getSelectionModel().selectFirst();
-			grid.add(categoryList, 3, 0);
+			grid.add(categoryList, 4, 0);
 
 			final Button cancelButton = new Button(LocalizationController.getString("cancelButtonBackToList"));
 
@@ -151,7 +161,6 @@ public class AddProductView implements GenericView
 
 					final Product newProduct = productController.saveProduct(databaseID.getValueFactory().getValue().intValue(), nameField.getText(), brand,
 							category);
-
 					if (editProduct)
 						productController.showProductView(newProduct);
 				}

@@ -36,7 +36,7 @@
 		<many-to-one	name="state"
 						class="velho.model.ManifestState"
 						column="state"
-						cascade="all"
+						cascade="save-update"
 						not-null="true"
 						fetch="select"
 						lazy="false" />
@@ -44,7 +44,7 @@
 		<set	name="boxes"
 				table="PRODUCTBOXES"
 				inverse="true"
-				cascade="all"
+				cascade="save-update"
 				fetch="select"
 				lazy="false">
 

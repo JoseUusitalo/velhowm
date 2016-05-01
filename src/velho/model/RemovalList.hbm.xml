@@ -25,6 +25,7 @@
 		<many-to-one	name="state"
 						class="velho.model.RemovalListState"
 						column="liststate"
+						cascade="save-update"
 						not-null="true"
 						fetch="select"
 						lazy="false" />
@@ -32,7 +33,7 @@
 		<set	name="boxes"
 				table="PRODUCTBOXES"
 				inverse="true"
-				cascade="all"
+				cascade="save-update"
 				fetch="select"
 				lazy="false">
 

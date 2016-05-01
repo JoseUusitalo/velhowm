@@ -70,7 +70,7 @@
 		<many-to-one	name="product"
 						class="velho.model.Product"
 						column="product"
-						cascade="all"
+						cascade="save-update"
 						not-null="true"
 						fetch="select"
 						lazy="false" />
