@@ -18,9 +18,8 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.text.Font;
 import javafx.util.Callback;
-import velho.controller.LoginController;
 import velho.controller.interfaces.UIActionController;
-import velho.model.User;
+import velho.view.components.TableCellDeleteButton;
 
 /**
  * A class for creating lists and tables of data.
@@ -194,80 +193,6 @@ public class ListView
 	}
 
 	/**
-	 * A table cell with a built-in delete button.
-	 *
-	 * @author Jose Uusitalo
-	 */
-	private class TableCellDeleteButton extends TableCell<Object, String>
-	{
-		/**
-		 * The button itself.
-		 */
-		private Button button;
-
-		/**
-		 * The controller to send information to when this button is pressed.
-		 */
-		private UIActionController controller;
-
-		/**
-		 * @param text
-		 * button text
-		 */
-		private TableCellDeleteButton(final UIActionController parentController, final String text)
-		{
-			this.controller = parentController;
-			button = new Button(text);
-			button.setFont(new Font(12));
-
-			/**
-			 * Handles the button press event.
-			 */
-			button.setOnAction(new EventHandler<ActionEvent>()
-			{
-				@Override
-				public void handle(final ActionEvent t)
-				{
-					// Get selected object and send information to parent
-					// controller.
-					controller.deleteAction(TableCellDeleteButton.this.getTableView().getItems().get(TableCellDeleteButton.this.getIndex()));
-				}
-			});
-		}
-
-		/**
-		 *
-		 */
-		@Override
-		protected void updateItem(final String string, final boolean empty)
-		{
-			super.updateItem(string, empty);
-
-			// Display button only if the row is not empty.
-			if (!empty)
-			{
-				final Object rowObject = TableCellDeleteButton.this.getTableView().getItems().get(TableCellDeleteButton.this.getIndex());
-
-				if (rowObject instanceof User)
-				{
-					// Permission check.
-
-					// Show delete button for users that have a lower or equal
-					// role than current user.
-					if (((User) rowObject).getRole().compareTo(LoginController.getCurrentUser().getRole()) <= 0)
-						setGraphic(button);
-				}
-				else
-				{
-					setGraphic(button);
-				}
-			}
-			else
-				setGraphic(null);
-		}
-	}
-
-	/**
 	 * A table cell with a built-in add button.
 	 *
 	 * @author Jose Uusitalo
@@ -285,8 +210,7 @@ public class ListView
 		protected UIActionController controller;
 
 		/**
-		 * @param text
-		 * button text
+		 * @param text button text
 		 */
 		private TableCellAddButton(final UIActionController parentController, final String text)
 		{

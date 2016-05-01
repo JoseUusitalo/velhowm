@@ -24,6 +24,7 @@ import org.h2.jdbcx.JdbcConnectionPool;
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
+import org.hibernate.exception.ConstraintViolationException;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -36,7 +37,6 @@ import velho.model.ProductBox;
 import velho.model.ProductBoxSearchResultRow;
 import velho.model.ProductBrand;
 import velho.model.ProductCategory;
-import velho.model.ProductContainer;
 import velho.model.ProductType;
 import velho.model.RemovalList;
 import velho.model.RemovalListState;
@@ -50,7 +50,6 @@ import velho.model.enums.DatabaseFileState;
 import velho.model.enums.DatabaseQueryType;
 import velho.model.enums.DatabaseTable;
 import velho.model.enums.UserRole;
-import velho.model.exceptions.ExistingDatabaseLinkException;
 import velho.model.exceptions.NoDatabaseException;
 import velho.model.exceptions.NoDatabaseLinkException;
 import velho.model.exceptions.UniqueKeyViolationException;
@@ -193,7 +192,7 @@ public class DatabaseController
 	 * @param columnValues values to set to the specified columns
 	 * @param where conditions (can be <code>null</code>)
 	 * @return
-	 * 		<ul>
+	 *         <ul>
 	 *         <li>if type is {@link DatabaseQueryType#UPDATE} or
 	 *         {@link DatabaseQueryType#DELETE}: the number of rows that were
 	 *         changed as a result of the query as an {@link Integer}</li>
@@ -203,7 +202,8 @@ public class DatabaseController
 	 * @throws NoDatabaseLinkException
 	 */
 	@Deprecated
-	private static Object runQuery(final DatabaseQueryType type, final DatabaseTable tableName, final Map<DatabaseTable, String> joinOnValues, final String[] columns, final Map<String, Object> columnValues, final List<String> where) throws NoDatabaseLinkException
+	private static Object runQuery(final DatabaseQueryType type, final DatabaseTable tableName, final Map<DatabaseTable, String> joinOnValues,
+			final String[] columns, final Map<String, Object> columnValues, final List<String> where) throws NoDatabaseLinkException
 	{
 		final Connection connection = getConnection();
 		Statement statement = null;
@@ -283,7 +283,8 @@ public class DatabaseController
 						{
 							case USERS:
 								while (result.next())
-									dataSet.add(new User(result.getInt("user_id"), result.getString("first_name"), result.getString("last_name"), result.getString("pin"), result.getString("badge_id"), getRoleByID(result.getInt("role"))));
+									dataSet.add(new User(result.getInt("user_id"), result.getString("first_name"), result.getString("last_name"),
+											result.getString("pin"), result.getString("badge_id"), getRoleByID(result.getInt("role"))));
 								break;
 
 							/*
@@ -689,7 +690,8 @@ public class DatabaseController
 	 * @return an SQL query string
 	 */
 	@Deprecated
-	public static String sqlBuilder(final DatabaseQueryType type, final String tableName, final Map<DatabaseTable, String> joinOnCondition, final String[] columns, final Map<String, Object> columnValues, final List<String> where)
+	public static String sqlBuilder(final DatabaseQueryType type, final String tableName, final Map<DatabaseTable, String> joinOnCondition,
+			final String[] columns, final Map<String, Object> columnValues, final List<String> where)
 	{
 		final StringBuilder sb = new StringBuilder();
 
@@ -1071,7 +1073,8 @@ public class DatabaseController
 		// product count.
 		while (productCountSum < wantedProductCount)
 		{
-			DBLOG.trace("Search status | Count: " + productCountSum + " / " + wantedProductCount + " | Would Be Index: " + wantedWouldBeIndex + " | Add Index: " + addCountIndex + " / " + boxProductCount.size());
+			DBLOG.trace("Search status | Count: " + productCountSum + " / " + wantedProductCount + " | Would Be Index: " + wantedWouldBeIndex + " | Add Index: "
+					+ addCountIndex + " / " + boxProductCount.size());
 
 			// Looking for too few products, show the smallest box of that
 			// product instead.
@@ -1159,7 +1162,8 @@ public class DatabaseController
 				else
 				{
 					DBLOG.error("Spooky untested code.");
-					DBLOG.error("Search status | Count: " + productCountSum + " / " + wantedProductCount + " | Would Be Index: " + wantedWouldBeIndex + " | Add Index: " + addCountIndex + " / " + boxProductCount.size());
+					DBLOG.error("Search status | Count: " + productCountSum + " / " + wantedProductCount + " | Would Be Index: " + wantedWouldBeIndex
+							+ " | Add Index: " + addCountIndex + " / " + boxProductCount.size());
 				}
 			}
 		}
@@ -1720,7 +1724,8 @@ public class DatabaseController
 	 *         {@link ProductBoxSearchResultRow} objects
 	 * @throws NoDatabaseLinkException
 	 */
-	public static List<ProductBoxSearchResultRow> searchProductBox(final List<String> where, final Map<DatabaseTable, String> joins) throws NoDatabaseLinkException
+	public static List<ProductBoxSearchResultRow> searchProductBox(final List<String> where, final Map<DatabaseTable, String> joins)
+			throws NoDatabaseLinkException
 	{
 		final List<ProductBoxSearchResultRow> foundProducts = FXCollections.observableArrayList();
 
@@ -1735,7 +1740,8 @@ public class DatabaseController
 		if (joins != null)
 			join.putAll(joins);
 
-		@SuppressWarnings("unchecked") final Set<ProductBox> result = (LinkedHashSet<ProductBox>) (runQuery(DatabaseQueryType.SELECT, DatabaseTable.CONTAINERS, join, columns, null, where));
+		@SuppressWarnings("unchecked")
+		final Set<ProductBox> result = (LinkedHashSet<ProductBox>) (runQuery(DatabaseQueryType.SELECT, DatabaseTable.CONTAINERS, join, columns, null, where));
 
 		for (final ProductBox box : result)
 			foundProducts.add(new ProductBoxSearchResultRow(box));
@@ -1837,7 +1843,7 @@ public class DatabaseController
 	 * @param object object to delete
 	 * @throws HibernateException when the object was not deleted
 	 */
-	private static void delete(final Object object) throws HibernateException
+	private static void delete(final Object object) throws HibernateException, ConstraintViolationException
 	{
 		sessionFactory.getCurrentSession().beginTransaction();
 
@@ -1891,8 +1897,116 @@ public class DatabaseController
 		delete(list);
 
 		if (list != null)
-		{// Update the observable list.
-			getAllRemovalLists();
+		{
+			observableRemovalLists.remove(list);
+		}
+	}
+
+	/**
+	 * Deletes a product brand from the database.
+	 *
+	 * @param brand brand to be deleted
+	 * @return <code>true</code> if the specified brand was deleted, <code>false</code> if the object is being referenced by another object that cannot have a
+	 *         null value in that property
+	 */
+	public static boolean deleteProductBrand(final ProductBrand brand)
+	{
+		try
+		{
+			delete(brand);
+
+			if (brand != null)
+			{
+				// Update the observable list.
+				observableProductBrands.remove(brand);
+			}
+
+			return true;
+		}
+		catch (final ConstraintViolationException e)
+		{
+			return false;
+		}
+	}
+
+	/**
+	 * Deletes a product category from the database.
+	 *
+	 * @param category category to be deleted
+	 * @return <code>true</code> if the specified category was deleted, <code>false</code> if the object is being referenced by another object that cannot have
+	 *         a null value in that property
+	 */
+	public static boolean deleteProductCategory(final ProductCategory category)
+	{
+		try
+		{
+			delete(category);
+
+			if (category != null)
+			{
+				// Update the observable list.
+				observableProductCategories.remove(category);
+			}
+
+			return true;
+		}
+		catch (final ConstraintViolationException e)
+		{
+			return false;
+		}
+	}
+
+	/**
+	 * Deletes a product box from the database.
+	 *
+	 * @param box box to be deleted
+	 * @return <code>true</code> if the specified box was deleted, <code>false</code> if the object is being referenced by another object that cannot have a
+	 *         null value in that property
+	 */
+	public static boolean deleteProductBox(final ProductBox box)
+	{
+		try
+		{
+			delete(box);
+
+			if (box != null)
+			{
+				// Update the observable list.
+				observableProductBoxes.remove(box);
+			}
+
+			return true;
+		}
+		catch (final ConstraintViolationException e)
+		{
+			return false;
+		}
+	}
+
+	/**
+	 * Deletes a product type from the database.
+	 *
+	 * @param type type to be deleted
+	 * @return <code>true</code> if the specified type was deleted, <code>false</code> if the object is being referenced by another object that cannot have a
+	 *         null value in that property
+	 */
+	public static boolean deleteProductType(final ProductType type)
+	{
+		try
+		{
+			delete(type);
+
+			if (type != null)
+			{
+				// Update the observable list.
+				observableProductTypes.remove(type);
+			}
+
+			return true;
+		}
+		catch (final ConstraintViolationException e)
+		{
+			return false;
 		}
 	}
 
@@ -1990,7 +2104,8 @@ public class DatabaseController
 
 		sessionFactory.getCurrentSession().beginTransaction();
 
-		@SuppressWarnings("unchecked") final List<Object> result = sessionFactory.getCurrentSession().createQuery("from " + className).list();
+		@SuppressWarnings("unchecked")
+		final List<Object> result = sessionFactory.getCurrentSession().createQuery("from " + className).list();
 
 		try
 		{
@@ -2040,7 +2155,8 @@ public class DatabaseController
 		// Transaction is created and closed automatically with the session.
 		session.beginTransaction();
 
-		@SuppressWarnings("unchecked") final List<String> result = session.createQuery("select badgeID from User where badgeID is not null").list();
+		@SuppressWarnings("unchecked")
+		final List<String> result = session.createQuery("select badgeID from User where badgeID is not null").list();
 
 		session.close();
 
@@ -2262,5 +2378,4 @@ public class DatabaseController
 
 		return observableProductTypes;
 	}
-
 }

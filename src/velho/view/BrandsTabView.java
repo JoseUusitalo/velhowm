@@ -1,9 +1,11 @@
 package velho.view;
 
+import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.geometry.Insets;
+import javafx.geometry.Pos;
 import javafx.scene.control.Button;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
@@ -16,10 +18,10 @@ import javafx.scene.layout.VBox;
 import javafx.util.Callback;
 import velho.controller.DatabaseController;
 import velho.controller.ProductController;
-import velho.controller.UIController;
 import velho.model.ProductBrand;
+import velho.view.components.TableCellDeleteButton;
 
-public class BrandsTab
+public class BrandsTabView
 {
 
 	/**
@@ -44,18 +46,18 @@ public class BrandsTab
 
 	/**
 	 * Adds info to Product Controller about brands
-	 * 
+	 *
 	 * @param productController Product Controller handles the database work
 	 * @param uiController links UIController to the productController
 	 */
-	public BrandsTab(final ProductController productController, final UIController uiController)
+	public BrandsTabView(final ProductController productController)
 	{
 		this.productController = productController;
 	}
 
 	/**
 	 * VBox grid view make it visible
-	 * 
+	 *
 	 * @return the VBox
 	 */
 	public VBox getView()
@@ -65,10 +67,10 @@ public class BrandsTab
 			HBox hb = new HBox();
 
 			table.setEditable(true);
+			table.setItems(data);
 
-			Callback<TableColumn<Object, String>, TableCell<Object, String>> cellFactory = (final TableColumn<Object, String> p) -> new EditingCell();
-
-			TableColumn<Object, String> nameColumn = new TableColumn<Object, String>("Name");
+			final Callback<TableColumn<Object, String>, TableCell<Object, String>> cellFactory = (final TableColumn<Object, String> p) -> new EditingCell();
+			final TableColumn<Object, String> nameColumn = new TableColumn<Object, String>("Name");
 
 			nameColumn.setMinWidth(100);
 			nameColumn.setCellValueFactory(new PropertyValueFactory<>("name"));
@@ -80,8 +82,33 @@ public class BrandsTab
 				editBrand.setName(t.getNewValue());
 				productController.saveBrand(editBrand);
 			});
-			table.setItems(data);
 			table.getColumns().add(nameColumn);
+
+			final TableColumn<Object, String> deleteColumn = new TableColumn<Object, String>("");
+			deleteColumn.setCellValueFactory(new PropertyValueFactory<Object, String>(""));
+			deleteColumn.setSortType(TableColumn.SortType.ASCENDING);
+
+			deleteColumn.setCellValueFactory(new Callback<TableColumn.CellDataFeatures<Object, String>, ObservableValue<String>>()
+			{
+				@Override
+				public ObservableValue<String> call(final TableColumn.CellDataFeatures<Object, String> p)
+				{
+					return new SimpleStringProperty(p.getValue(), "Delete");
+				}
+			});
+
+			// Adding the button to the cell
+			deleteColumn.setCellFactory(new Callback<TableColumn<Object, String>, TableCell<Object, String>>()
+			{
+				@Override
+				public TableCell<Object, String> call(final TableColumn<Object, String> p)
+				{
+					final TableCellDeleteButton button = new TableCellDeleteButton(productController, "Delete");
+					button.setAlignment(Pos.CENTER);
+					return button;
+				}
+			});
+			table.getColumns().add(deleteColumn);
 
 			final TextField brandName = new TextField();
 			brandName.setPromptText("Brand Name");

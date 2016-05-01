@@ -69,7 +69,9 @@ public class UIController
 	 * @param productController
 	 * @param removalPlatformController
 	 */
-	public void setControllers(final MainWindow mainWindow, final UserController userController, final RemovalListController removalListController, final SearchController searchController, final LogController logController, final ManifestController manifestController, final ProductController productController, final RemovalPlatformController removalPlatformController)
+	public void setControllers(final MainWindow mainWindow, final UserController userController, final RemovalListController removalListController,
+			final SearchController searchController, final LogController logController, final ManifestController manifestController,
+			final ProductController productController, final RemovalPlatformController removalPlatformController)
 	{
 		this.mainView = mainWindow;
 		this.userController = userController;
@@ -141,7 +143,7 @@ public class UIController
 				mainView.addTab("Brands", productController.getBrandsTab());
 				mainView.addTab("Categories", productController.getCategoryTab());
 				mainView.addTab("Product Types", productController.getProductTypesTab());
-				mainView.addTab("Product Box", productController.getProductBox());
+				mainView.addTab("Product Boxes", productController.getProductBoxesTab());
 				mainView.addTab("User List", getUserListView(currentUserRole));
 				break;
 			case GUEST:

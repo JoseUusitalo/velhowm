@@ -15,7 +15,6 @@ import velho.controller.DatabaseController;
 import velho.controller.ProductController;
 import velho.controller.UIController;
 import velho.model.Product;
-import velho.model.exceptions.NoDatabaseLinkException;
 
 /**
  * Creates tab for "Product Edit View".
@@ -156,7 +155,8 @@ public class AddProductView
 					Object brand = brandList.valueProperty().getValue();
 					Object category = categoryList.valueProperty().getValue();
 
-					final Product newProduct = productController.saveProduct(databaseID.getValueFactory().getValue().intValue(), nameField.getText(), brand, category);
+					final Product newProduct = productController.saveProduct(databaseID.getValueFactory().getValue().intValue(), nameField.getText(), brand,
+							category);
 					if (editProduct)
 						productController.showProductView(newProduct);
 				}
@@ -182,15 +182,5 @@ public class AddProductView
 		nameField.setText(product.getName());
 		brandList.getSelectionModel().select(product.getBrand());
 		categoryList.getSelectionModel().select(product.getCategory());
-	}
-
-	/**
-	 * Deletes data from database
-	 *
-	 * @param product to enable the removing from database
-	 */
-	public void removeFromViewData(final Product product)
-	{
-		// TODO Here to be the remove method missing implements
 	}
 }

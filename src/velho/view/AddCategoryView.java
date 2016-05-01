@@ -18,11 +18,9 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
 import velho.controller.DatabaseController;
 import velho.controller.ProductController;
-import velho.controller.UIController;
 import velho.model.Product;
 import velho.model.ProductBrand;
 import velho.model.ProductType;
-import velho.model.exceptions.NoDatabaseLinkException;
 
 public class AddCategoryView
 {
@@ -75,7 +73,7 @@ public class AddCategoryView
 	 * @param productController
 	 * @param uiController
 	 */
-	public AddCategoryView(final ProductController productController, final UIController uiController)
+	public AddCategoryView(final ProductController productController)
 	{
 		this.productController = productController;
 	}
@@ -88,7 +86,7 @@ public class AddCategoryView
 	 * @return the bPane
 	 * @throws NoDatabaseLinkException to get the data
 	 */
-	public BorderPane getView(final boolean editProduct)
+	public BorderPane getView()
 	{
 		if (bPane == null)
 		{
@@ -97,8 +95,9 @@ public class AddCategoryView
 			// *************************************************
 
 			table.setEditable(true);
+			table.setItems(data);
 
-			TableColumn<Object, String> nameColumn = new TableColumn<Object, String>("Name");
+			final TableColumn<Object, String> nameColumn = new TableColumn<Object, String>("Name");
 
 			nameColumn.setMinWidth(100);
 			nameColumn.setCellValueFactory(new PropertyValueFactory<>("name"));
@@ -109,7 +108,6 @@ public class AddCategoryView
 				editBrand.setName(t.getNewValue());
 				productController.saveBrand(editBrand);
 			});
-			table.setItems(data);
 			table.getColumns().add(nameColumn);
 
 			// *************************************************
