@@ -132,7 +132,7 @@ public class RemovalListView implements GenericView
 	 * Destroys the view.
 	 */
 	@Override
-	public void reCreate()
+	public void recreate()
 	{
 		bpane = null;
 		thisList = null;
@@ -147,5 +147,11 @@ public class RemovalListView implements GenericView
 	{
 		SYSLOG.trace("Refreshing removal list viewing view.");
 		thisList = removalListController.getNewRemovalListView();
+	}
+
+	@Override
+	public void destroy()
+	{
+		bpane = null;
 	}
 }

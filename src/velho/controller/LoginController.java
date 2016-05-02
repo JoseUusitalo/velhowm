@@ -52,7 +52,7 @@ public class LoginController
 	 */
 	private static void destroyView()
 	{
-		view.reCreate();
+		view.recreate();
 	}
 
 	/**
@@ -72,7 +72,7 @@ public class LoginController
 	 *
 	 * @param badgeString use RFID badge identification number
 	 * @return <code>true</code> if login was successful, or <code>false</code>
-	 *         if debug mode was disabled
+	 * if debug mode was disabled
 	 */
 	public static boolean login(final String badgeString)
 	{
@@ -171,7 +171,6 @@ public class LoginController
 		MDC.remove("user_id");
 
 		currentUser = null;
-		// UIController.reCreateAllViews();
 		checkLogin();
 	}
 
@@ -181,7 +180,7 @@ public class LoginController
 	 *
 	 * @param userRoleName name of the role
 	 * @return <code>true</code> if login was successful, or <code>false</code>
-	 *         if debug mode was disabled
+	 * if debug mode was disabled
 	 */
 	public static boolean debugLogin(final UserRole role)
 	{
@@ -236,7 +235,7 @@ public class LoginController
 		{
 			uiController.setView(Position.CENTER, getView());
 			uiController.setView(Position.BOTTOM, null);
-			uiController.resetMainMenu();
+			UIController.destroyAllViews();
 			SYSLOG.debug("Login check failed.");
 
 			return false;
@@ -263,8 +262,8 @@ public class LoginController
 	 *
 	 * @param role role to check against
 	 * @return <code>true</code> if logged in user's role is greater than or
-	 *         equal to the given role, <code>false</code>
-	 *         if user is not logged in
+	 * equal to the given role, <code>false</code>
+	 * if user is not logged in
 	 */
 	public static boolean userRoleIsGreaterOrEqualTo(final UserRole role)
 	{
@@ -278,7 +277,7 @@ public class LoginController
 	 *
 	 * @param role role to check against
 	 * @return <code>true</code> if logged in user's role is the given role,
-	 *         <code>false</code> if user is not logged in
+	 * <code>false</code> if user is not logged in
 	 */
 	public static boolean userRoleIs(final UserRole role)
 	{

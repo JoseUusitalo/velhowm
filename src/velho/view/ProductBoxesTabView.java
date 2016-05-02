@@ -33,9 +33,10 @@ import velho.controller.DatabaseController;
 import velho.controller.ProductController;
 import velho.model.Product;
 import velho.model.ProductBox;
+import velho.model.interfaces.GenericView;
 import velho.view.components.TableCellDeleteButton;
 
-public class ProductBoxesTabView
+public class ProductBoxesTabView implements GenericView
 {
 	/**
 	 * ProductCntroller neeeded when saving to database
@@ -205,7 +206,6 @@ public class ProductBoxesTabView
 					date = Date.from(expirationDate.getValue().atTime(0, 0).toInstant(ZoneOffset.of("Z")));
 				final ProductBox saveProductBox = new ProductBox((Product) productItem.getValue(), productBoxMaxSize.getValue(), productBoxSize.getValue(),
 						date);
-				System.out.println("New product box: " + saveProductBox);
 				data.add(saveProductBox);
 				productController.saveProductBox(saveProductBox);
 			});
@@ -491,5 +491,19 @@ public class ProductBoxesTabView
 			LocalDate date = LocalDate.parse(df.format(aDate), formatter);
 			return date;
 		}
+	}
+
+	@Override
+	public void recreate()
+	{
+		vbox = null;
+		// TODO: Use old data.
+		getView(null);
+	}
+
+	@Override
+	public void destroy()
+	{
+		vbox = null;
 	}
 }

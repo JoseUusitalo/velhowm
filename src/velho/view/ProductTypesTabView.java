@@ -19,9 +19,10 @@ import javafx.util.Callback;
 import velho.controller.DatabaseController;
 import velho.controller.ProductController;
 import velho.model.ProductType;
+import velho.model.interfaces.GenericView;
 import velho.view.components.TableCellDeleteButton;
 
-public class ProductTypesTabView
+public class ProductTypesTabView implements GenericView
 {
 	private ProductController productController;
 
@@ -187,5 +188,18 @@ public class ProductTypesTabView
 		{
 			return getItem() == null ? "" : getItem().toString();
 		}
+	}
+
+	@Override
+	public void destroy()
+	{
+		vbox = null;
+	}
+
+	@Override
+	public void recreate()
+	{
+		vbox = null;
+		getView();
 	}
 }

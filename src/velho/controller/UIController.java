@@ -199,18 +199,28 @@ public class UIController
 	 */
 	public void resetMainMenu()
 	{
-		mainView.reCreate();
+		mainView.recreate();
 	}
 
-	public void reCreateAllViews()
+	public void recreateAllViews()
 	{
 		SYSLOG.debug("recreating all views");
 		Set<GenericView> temp = new HashSet<GenericView>(viewSet);
 		for (GenericView view : temp)
 		{
-			view.reCreate();
+			view.recreate();
 		}
 		showMainMenu(LoginController.getCurrentUser().getRole());
+	}
+
+	public static void destroyAllViews()
+	{
+		SYSLOG.debug("destroying all views");
+		Set<GenericView> temp = new HashSet<GenericView>(viewSet);
+		for (GenericView view : temp)
+		{
+			view.destroy();
+		}
 	}
 
 	/**

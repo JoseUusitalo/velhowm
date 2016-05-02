@@ -136,10 +136,17 @@ public class ManifestManagementView implements GenericView
 	}
 
 	@Override
-	public void reCreate()
+	public void recreate()
 	{
 		bpane = null;
 		managementPanel = null;
 		getView();
+	}
+
+	@Override
+	public void destroy()
+	{
+		bpane = null;
+		managementPanel = null;
 	}
 }

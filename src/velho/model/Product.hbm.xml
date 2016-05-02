@@ -25,20 +25,17 @@
 
 		<!-- No cascade solves an exception. -->
 		<!-- Many-to-one: This object can have one referenced object, the referenced object can be referenced from many objects.
-			 Cascade changes.
 			 "Select" eager fetching: load the referenced object when this object is loaded. -->
 		<many-to-one	name="brand"
 						class="velho.model.ProductBrand"
-						column="brand"
-						cascade="save-update"
+						column="brand_id"
 						not-null="true"
 						fetch="select"
 						lazy="false" />
 
 		<many-to-one	name="category"
 						class="velho.model.ProductCategory"
-						column="category"
-						cascade="save-update"
+						column="category_id"
 						not-null="true"
 						fetch="select"
 						lazy="false" />

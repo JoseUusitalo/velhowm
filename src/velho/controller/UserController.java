@@ -122,21 +122,34 @@ public class UserController implements UIActionController
 		{
 			if (PopupController.confirmation(LocalizationController.getString("yourAccountDeletationConfirmationPopUp")))
 			{
-				DatabaseController.deleteUser(user);
-				LoginController.logout();
-				USRLOG.debug("User deleted themselves: " + user.getFullDetails());
-				PopupController.info(LocalizationController.getString("deletedUserInfoPopUp") + user.getFullDetails());
-				return true;
+
+				if (DatabaseController.deleteUser(user))
+				{
+					LoginController.logout();
+					USRLOG.debug("User deleted themselves: " + user.getFullDetails());
+					PopupController.info(LocalizationController.getString("deletedUserInfoPopUp") + user.getFullDetails());
+					return true;
+				}
+
+				USRLOG.debug("Failed to delete user: " + user.getFullDetails());
+				PopupController.info("Failed to delete user: " + user.getFullDetails());
 			}
 
 			USRLOG.trace("Cancelled self-deletion confirmation.");
 			return false;
 		}
 
-		DatabaseController.deleteUser(user);
-		USRLOG.debug("User removed: " + user.getFullDetails());
-		PopupController.info(LocalizationController.getString("userRemovedInfoPopUp") + user.getFullDetails());
-		return true;
+		if (DatabaseController.deleteUser(user))
+		{
+			USRLOG.debug("User removed: " + user.getFullDetails());
+			PopupController.info(LocalizationController.getString("userRemovedInfoPopUp") + user.getFullDetails());
+			return true;
+		}
+
+		USRLOG.debug("Failed to delete user: " + user.getFullDetails());
+		PopupController.info("Failed to delete user: " + user.getFullDetails());
+
+		return false;
 	}
 
 	/**

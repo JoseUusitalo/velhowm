@@ -19,9 +19,10 @@ import javafx.util.Callback;
 import velho.controller.DatabaseController;
 import velho.controller.ProductController;
 import velho.model.ProductBrand;
+import velho.model.interfaces.GenericView;
 import velho.view.components.TableCellDeleteButton;
 
-public class BrandsTabView
+public class BrandsTabView implements GenericView
 {
 
 	/**
@@ -137,7 +138,7 @@ public class BrandsTabView
 	/**
 	 *
 	 * @author Edward
-	 *         Enables editing a cell, nameley the textField
+	 * Enables editing a cell, nameley the textField
 	 */
 	class EditingCell extends TableCell<Object, String>
 	{
@@ -216,5 +217,18 @@ public class BrandsTabView
 		{
 			return getItem() == null ? "" : getItem().toString();
 		}
+	}
+
+	@Override
+	public void recreate()
+	{
+		vbox = null;
+		getView();
+	}
+
+	@Override
+	public void destroy()
+	{
+		vbox = null;
 	}
 }

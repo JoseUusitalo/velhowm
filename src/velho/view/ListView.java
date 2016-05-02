@@ -350,9 +350,15 @@ public class ListView implements GenericView
 	}
 
 	@Override
-	public void reCreate()
+	public void recreate()
 	{
 		pane = null;
 		parentController.recreateViews(this);
+	}
+
+	@Override
+	public void destroy()
+	{
+		pane = null;
 	}
 }

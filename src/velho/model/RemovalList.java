@@ -61,14 +61,25 @@ public class RemovalList extends AbstractDatabaseObject
 	}
 
 	/**
+	 * @param state
 	 */
-	public RemovalList()
+	public RemovalList(final RemovalListState state)
 	{
+		this(0, UUID.randomUUID(), state);
+	}
+
+	/**
+	 */
+	@SuppressWarnings("unused")
+	private RemovalList()
+	{
+		// I'm hoping Hibernate still uses this.
+
 		/*
 		 * I have to create a new object here because attempting to get one from the database causes a weird null
 		 * pointer exception.
 		 */
-		this.state = new RemovalListState(1, "Active");
+		// this.state = DatabaseController.getRemovalListStateByID(1);
 		setUuid(UUID.randomUUID());
 		this.boxes = new LinkedHashSet<ProductBox>();
 		this.observableBoxes = FXCollections.observableArrayList();
@@ -135,27 +146,43 @@ public class RemovalList extends AbstractDatabaseObject
 	}
 
 	/**
-	 * Sets the set of actual product boxes in this removal list.
+	 * Adds the specified {@link ProductBox} objects to this removal list.
 	 *
-	 * @param boxes the set of boxes on this removal list, <code>null</code> to clear
-	 * @return <code>true</code> if all boxes were added to this manifest
+	 * @param productBoxes the set of boxes to add
+	 * @return <code>true</code> if all boxes were added to this list
 	 */
-	public boolean setBoxes(final Set<ProductBox> productBoxes)
+	public boolean addAllBoxes(final Set<ProductBox> productBoxes)
 	{
-		if (productBoxes == null)
-			this.boxes.clear();
-		else
-			this.boxes = productBoxes;
-
 		boolean bswitch = true;
 
-		for (final ProductBox box : this.boxes)
-		{
-			if (box != null)
-				bswitch = bswitch && (observableBoxes.add(new ProductBoxSearchResultRow(box)));
-		}
+		for (final ProductBox box : productBoxes)
+			bswitch = bswitch && addProductBox(box);
 
 		return bswitch;
+	}
+
+	/**
+	 * <p>
+	 * <b>DO NOT USE</b>
+	 * </p>
+	 * <p>
+	 * For use by Hibernate only.
+	 * </p>
+	 * <p>
+	 * To add a set of boxes, use {@link #addAllBoxes(Set)}.
+	 * </p>
+	 * <p>
+	 * To remove all boxes use {@link #clear()}.
+	 * </p>
+	 *
+	 * @param productBoxes
+	 */
+	public void setBoxes(final Set<ProductBox> productBoxes)
+	{
+		this.boxes = productBoxes;
+
+		// Update observable list.
+		getObservableBoxes();
 	}
 
 	/**
@@ -166,12 +193,15 @@ public class RemovalList extends AbstractDatabaseObject
 	 */
 	public boolean addProductBox(final ProductBox productBox)
 	{
-		if (boxes.add(productBox))
+		if (productBox != null)
 		{
-			productBox.setRemovalList(this);
-			SYSLOG.trace(productBox + " added to removal list " + this);
+			if (boxes.add(productBox))
+			{
+				productBox.setRemovalList(this);
+				SYSLOG.trace(productBox + " added to removal list " + this);
 
-			return observableBoxes.add(new ProductBoxSearchResultRow(productBox));
+				return observableBoxes.add(new ProductBoxSearchResultRow(productBox));
+			}
 		}
 
 		SYSLOG.error("Failed to add " + productBox + " to removal list " + this);
@@ -235,7 +265,6 @@ public class RemovalList extends AbstractDatabaseObject
 
 			/*
 			 * HIBERNATE NOTICE
-			 *
 			 * There is no better way of doing this at the moment.
 			 * Saving collections only works when saving the children and not the parents.
 			 */

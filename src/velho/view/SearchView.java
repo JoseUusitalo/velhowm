@@ -164,9 +164,15 @@ public class SearchView implements GenericView
 	 */
 
 	@Override
-	public void reCreate()
+	public void recreate()
 	{
 		grid = null;
 		getView();
+	}
+
+	@Override
+	public void destroy()
+	{
+		grid = null;
 	}
 }

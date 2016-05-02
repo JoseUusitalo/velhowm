@@ -21,11 +21,11 @@ import velho.controller.DatabaseController;
 import velho.controller.ProductController;
 import velho.model.ProductCategory;
 import velho.model.ProductType;
+import velho.model.interfaces.GenericView;
 import velho.view.components.TableCellDeleteButton;
 
-public class CategoriesTabView
+public class CategoriesTabView implements GenericView
 {
-
 	/**
 	 * ProductCntroller neeeded when saving to database
 	 */
@@ -151,7 +151,7 @@ public class CategoriesTabView
 	/**
 	 *
 	 * @author Edward
-	 *         Enables editing a cell, nameley the textField
+	 * Enables editing a cell, nameley the textField
 	 */
 	class EditingCell extends TableCell<Object, Object>
 	{
@@ -230,5 +230,18 @@ public class CategoriesTabView
 		{
 			return getItem() == null ? "" : getItem().toString();
 		}
+	}
+
+	@Override
+	public void recreate()
+	{
+		vbox = null;
+		getView();
+	}
+
+	@Override
+	public void destroy()
+	{
+		vbox = null;
 	}
 }

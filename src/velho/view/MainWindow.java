@@ -70,7 +70,7 @@ public class MainWindow extends Application implements GenericView
 	/**
 	 * Enable or disable debug features.
 	 */
-	public static final boolean DEBUG_MODE = true;
+	public static final boolean DEBUG_MODE = false;
 
 	/**
 	 * Enable or disable showing windows. DEBUG_MODE must be <code>true</code>
@@ -82,7 +82,7 @@ public class MainWindow extends Application implements GenericView
 	 * Enable TRACE level logging. DEBUG_MODE must be <code>true</code> for this
 	 * to affect anything.
 	 */
-	public static final boolean SHOW_TRACE = true;
+	public static final boolean SHOW_TRACE = false;
 
 	/**
 	 * Skips the entire main application code. DEBUG_MODE must be
@@ -275,8 +275,6 @@ public class MainWindow extends Application implements GenericView
 	{
 		SYSLOG.info("Running VELHO Warehouse Management.");
 
-		// FIXME: Database is not created correctly on first run.
-
 		try
 		{
 			DatabaseController.link();
@@ -417,7 +415,6 @@ public class MainWindow extends Application implements GenericView
 				@Override
 				public void changed(final ObservableValue ov, final SupportedTranslation oldValue, final SupportedTranslation newValue)
 				{
-					System.out.println(oldValue + " " + newValue);
 					if (oldValue == null || !oldValue.equals(newValue))
 					{
 						LocalizationController.changeTranslation(newValue);
@@ -610,7 +607,13 @@ public class MainWindow extends Application implements GenericView
 	}
 
 	@Override
-	public void reCreate()
+	public void recreate()
+	{
+		mainTabPane = null;
+	}
+
+	@Override
+	public void destroy()
 	{
 		mainTabPane = null;
 	}

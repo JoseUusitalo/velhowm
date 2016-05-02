@@ -120,7 +120,7 @@ public class ProductController implements UIActionController
 	 * object.
 	 *
 	 * @param databaseID database ID of the product (<code>-1</code> for a new
-	 *            one)
+	 * one)
 	 * @param name name of the of product
 	 * @param brand brand of the product
 	 * @param category category of the product
@@ -156,8 +156,6 @@ public class ProductController implements UIActionController
 		}
 
 		Product newProduct = new Product(databaseID, name, bran, cat);
-		System.out.println(newProduct.toString());
-		System.out.println(newProduct.toString());
 
 		final int dbID = DatabaseController.saveOrUpdate(newProduct);
 
