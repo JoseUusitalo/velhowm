@@ -1,3 +1,6 @@
-88888888,,a,b,Logistician
-,666666,ABC,XYZ,Manager
-,000006,a,b,Administrator
+100,valid,user,,88888888,Logistician
+101,ok,manager,616161,,Manager
+asd,wrong,dbid,,88888888,Logistician
+102,has,both,888888,09090909,Logistician
+103,wrong,pin,8,,Logistician
+104,incorrect,role,888888,09090909,Thing

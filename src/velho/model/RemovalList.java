@@ -74,6 +74,11 @@ public class RemovalList extends AbstractDatabaseObject
 		this.observableBoxes = FXCollections.observableArrayList();
 	}
 
+	public RemovalList(final Integer valueOf, final Integer valueOf2)
+	{
+		// TODO CSV removal list items needed
+	}
+
 	@Override
 	public String toString()
 	{

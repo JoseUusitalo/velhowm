@@ -79,6 +79,11 @@ public class ShelfLevel extends AbstractDatabaseObject
 		this.shelfSlots = new TreeSet<ShelfSlot>();
 	}
 
+	public ShelfLevel(final Integer valueOf, final Integer valueOf2, final Integer valueOf3)
+	{
+		// TODO need shelf for shel level in CSV
+	}
+
 	@Override
 	public String toString()
 	{

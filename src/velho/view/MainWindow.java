@@ -1,5 +1,6 @@
 package velho.view;
 
+import java.io.FileNotFoundException;
 import java.text.ParseException;
 import java.util.HashMap;
 import java.util.Map;
@@ -31,6 +32,7 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
+import velho.controller.CSVController;
 import velho.controller.DatabaseController;
 import velho.controller.DebugController;
 import velho.controller.ExternalSystemsController;
@@ -65,7 +67,7 @@ public class MainWindow extends Application
 	/**
 	 * Enable or disable debug features.
 	 */
-	public static final boolean DEBUG_MODE = false;
+	public static final boolean DEBUG_MODE = true;
 
 	/**
 	 * Enable or disable showing windows. DEBUG_MODE must be <code>true</code>
@@ -83,7 +85,7 @@ public class MainWindow extends Application
 	 * Skips the entire main application code. DEBUG_MODE must be <code>true</code> for this
 	 * to affect anything.
 	 */
-	public static final boolean SKIP_MAIN_CODE = false;
+	public static final boolean SKIP_MAIN_CODE = true;
 
 	/**
 	 * The height of the window.
@@ -195,6 +197,18 @@ public class MainWindow extends Application
 		}
 		else
 			runApp();
+
+		try
+		{
+			Object[] data = CSVController.readSampleUsersCSV();
+			System.out.println("valid: " + data[0]);
+			System.out.println("invalid: " + data[1]);
+		}
+		catch (FileNotFoundException e)
+		{
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 
 	private static void prepareDatabase()

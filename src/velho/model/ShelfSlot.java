@@ -90,6 +90,11 @@ public class ShelfSlot extends AbstractDatabaseObject
 		productBoxes = new HashSet<ProductBox>();
 	}
 
+	public ShelfSlot(final Integer valueOf, final Integer valueOf2, final Integer valueOf3)
+	{
+		// TODO ShelfSlot needs Shelf information for the CSV
+	}
+
 	@Override
 	public String toString()
 	{
