@@ -7,7 +7,7 @@
 	<property name="main.class" value="velho.view.MainWindow"/>
 
 	<property name="src.dir" location="src" />
-	<property name="res.dir" location="res" />
+	<property name="src.res.dir" location="src/res" />
 	<property name="test.dir" location="test" />
 	<property name="report.dir" location="report" />
 	<property name="javadoc.dir" location="javadoc" />
@@ -154,11 +154,7 @@
 
 	<target name="resources" description="Copies all configuration files, Hibernate mappings, and resources into the distribution.">
 		<copy todir="${build.dist.src.dir}">
-			<fileset dir="${src.dir}" includes="**/*.xml,**/*.properties,**/*.css"/>
-		</copy>
-		
-		<copy todir="${dist.res.dir}">
-		    <fileset dir="${res.dir}"/>
+			<fileset dir="${src.dir}" includes="**/*.xml,**/*.properties,**/*.css,**/*.png" />
 		</copy>
 	</target>
 
