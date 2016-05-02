@@ -94,9 +94,15 @@ public class LoginView implements GenericView
 	 * Destroys the view.
 	 */
 	@Override
-	public void reCreate()
+	public void recreate()
 	{
 		vbox = null;
 		getView();
+	}
+
+	@Override
+	public void destroy()
+	{
+		vbox = null;
 	}
 }

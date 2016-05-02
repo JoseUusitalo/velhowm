@@ -65,13 +65,13 @@ public class LocalizationController
 		if (newTranslation.equals(SupportedTranslation.ENGLISH))
 		{
 			msgBundle = getResourceBundle(localeEnglish);
-			uiController.reCreateAllViews();
+			uiController.recreateAllViews();
 		}
 		else
 		{
 			System.out.println("new lang german");
 			msgBundle = getResourceBundle(localeGerman);
-			uiController.reCreateAllViews();
+			uiController.recreateAllViews();
 		}
 	}
 

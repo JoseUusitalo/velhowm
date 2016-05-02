@@ -52,9 +52,15 @@ public class GenericTabView implements GenericView
 	}
 
 	@Override
-	public void reCreate()
+	public void recreate()
 	{
 		bPane = null;
 		getView();
+	}
+
+	@Override
+	public void destroy()
+	{
+		bPane = null;
 	}
 }

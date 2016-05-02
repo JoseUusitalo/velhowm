@@ -349,9 +349,15 @@ public class ListView implements GenericView
 	}
 
 	@Override
-	public void reCreate()
+	public void recreate()
 	{
 		pane = null;
 		getView();
+	}
+
+	@Override
+	public void destroy()
+	{
+		pane = null;
 	}
 }

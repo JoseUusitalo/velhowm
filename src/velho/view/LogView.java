@@ -78,7 +78,7 @@ public class LogView implements GenericView
 	}
 
 	@Override
-	public void reCreate()
+	public void recreate()
 	{
 		bpane = null;
 		getView();
@@ -92,5 +92,11 @@ public class LogView implements GenericView
 		SYSLOG.trace("Refreshing logs view.");
 		syslog = new Text(logController.getSystemLog());
 		usrlog = new Text(logController.getUserLog());
+	}
+
+	@Override
+	public void destroy()
+	{
+		bpane = null;
 	}
 }

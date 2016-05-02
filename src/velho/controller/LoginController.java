@@ -52,7 +52,7 @@ public class LoginController
 	 */
 	private static void destroyView()
 	{
-		view.reCreate();
+		view.recreate();
 	}
 
 	/**

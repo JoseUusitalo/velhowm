@@ -91,9 +91,15 @@ public class ManifestView implements GenericView
 	}
 
 	@Override
-	public void reCreate()
+	public void recreate()
 	{
 		bpane = null;
 		getView();
+	}
+
+	@Override
+	public void destroy()
+	{
+		bpane = null;
 	}
 }

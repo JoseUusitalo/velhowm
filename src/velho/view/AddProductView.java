@@ -190,10 +190,16 @@ public class AddProductView implements GenericView
 	}
 
 	@Override
-	public void reCreate()
+	public void recreate()
 	{
 		bPane = null;
 		getView(false);
 
+	}
+
+	@Override
+	public void destroy()
+	{
+		bPane = null;
 	}
 }

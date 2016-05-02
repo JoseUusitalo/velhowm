@@ -607,7 +607,13 @@ public class MainWindow extends Application implements GenericView
 	}
 
 	@Override
-	public void reCreate()
+	public void recreate()
+	{
+		mainTabPane = null;
+	}
+
+	@Override
+	public void destroy()
 	{
 		mainTabPane = null;
 	}

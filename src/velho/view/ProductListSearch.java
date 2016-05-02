@@ -111,9 +111,15 @@ public class ProductListSearch implements GenericView
 	}
 
 	@Override
-	public void reCreate()
+	public void recreate()
 	{
 		pane = null;
 		getView(null);
+	}
+
+	@Override
+	public void destroy()
+	{
+		pane = null;
 	}
 }
