@@ -58,17 +58,16 @@ public class LogDatabaseController
 	 * @param columns columns to select (can be <code>null</code>)
 	 * @param where conditions (can be <code>null</code>)
 	 * @return
-	 * <ul>
-	 * <li>if type is {@link DatabaseQueryType#UPDATE} or
-	 * {@link DatabaseQueryType#DELETE}: the number of rows that were
-	 * changed as a result of the query as an {@link Integer}</li>
-	 * <li>if type is {@link DatabaseQueryType#SELECT}: a Set containing
-	 * the selected data</li>
-	 * </ul>
+	 * 		<ul>
+	 *         <li>if type is {@link DatabaseQueryType#UPDATE} or
+	 *         {@link DatabaseQueryType#DELETE}: the number of rows that were
+	 *         changed as a result of the query as an {@link Integer}</li>
+	 *         <li>if type is {@link DatabaseQueryType#SELECT}: a Set containing
+	 *         the selected data</li>
+	 *         </ul>
 	 * @throws NoDatabaseLinkException
 	 */
-	private static List<Object> runQuery(final DatabaseQueryType type, final LogDatabaseTable tableName, final Map<DatabaseTable, String> joinOnValues,
-			final String[] columns, final Map<String, Object> columnValues, final List<String> where) throws Exception
+	private static List<Object> runQuery(final DatabaseQueryType type, final LogDatabaseTable tableName, final Map<DatabaseTable, String> joinOnValues, final String[] columns, final Map<String, Object> columnValues, final List<String> where) throws Exception
 	{
 		final Connection connection = getConnection();
 		Statement statement = null;
@@ -83,8 +82,7 @@ public class LogDatabaseController
 			// Initialize a statement.
 			statement = connection.createStatement();
 
-			statement.execute(DatabaseController.sqlBuilder(type, tableName.toString(), joinOnValues, columns, columnValues, where),
-					Statement.RETURN_GENERATED_KEYS);
+			statement.execute(DatabaseController.sqlBuilder(type, tableName.toString(), joinOnValues, columns, columnValues, where), Statement.RETURN_GENERATED_KEYS);
 
 			switch (type)
 			{
@@ -108,8 +106,7 @@ public class LogDatabaseController
 
 							case USRLOGS:
 								while (result.next())
-									datalist.add(result.getTimestamp("time") + " [" + result.getString("level") + "] "
-											+ DatabaseController.getUserByID(result.getInt("user_id")).getFullDetails() + ": " + result.getString("message"));
+									datalist.add(result.getTimestamp("time") + " [" + result.getString("level") + "] " + DatabaseController.getUserByID(result.getInt("user_id")).getFullDetails() + ": " + result.getString("message"));
 								break;
 							default:
 								// Close all resources.
@@ -227,7 +224,8 @@ public class LogDatabaseController
 	}
 
 	/*
-	 * -------------------------------- PUBLIC DATABASE METHODS --------------------------------
+	 * -------------------------------- PUBLIC DATABASE METHODS
+	 * --------------------------------
 	 */
 
 	/**
@@ -260,7 +258,7 @@ public class LogDatabaseController
 			{
 				if (MainWindow.DEBUG_MODE)
 					System.out.println("Log database is already in use.");
-				PopupController.error("Log database is already in use. Please close the open application.");
+				PopupController.error(LocalizationController.getString("databaseAlreadyInUsePopUp"));
 			}
 			else
 			{
@@ -272,7 +270,8 @@ public class LogDatabaseController
 	}
 
 	/*
-	 * -------------------------------- PUBLIC DATABASE METHODS --------------------------------
+	 * -------------------------------- PUBLIC DATABASE METHODS
+	 * --------------------------------
 	 */
 
 	/**
@@ -302,7 +301,7 @@ public class LogDatabaseController
 			e.printStackTrace();
 		}
 
-		PopupController.warning("Log database connection was temporarily lost. Please try again or restart the application.");
+		PopupController.warning(LocalizationController.getString("databaseConnectionTemporarilyLostPopUp"));
 	}
 
 	/**
@@ -311,9 +310,9 @@ public class LogDatabaseController
 	 *
 	 * @return <code>true</code> if the link was created successfully
 	 * @throws ClassNotFoundException
-	 * when the H2 driver was unable to load
+	 *             when the H2 driver was unable to load
 	 * @throws ExistingDatabaseLinkException
-	 * when a database link already exists
+	 *             when a database link already exists
 	 */
 	public static DatabaseFileState link() throws ClassNotFoundException
 	{
@@ -324,7 +323,8 @@ public class LogDatabaseController
 		DatabaseFileState state = null;
 
 		/*
-		 * If the database does not exists, it will be created with the connection pool.
+		 * If the database does not exists, it will be created with the
+		 * connection pool.
 		 * Otherwise add this check after the URI for extra security.
 		 */
 		if (databaseExists())
@@ -343,7 +343,8 @@ public class LogDatabaseController
 		// Create a connection pool.
 		connectionPool = JdbcConnectionPool.create(uri, USERNAME, "gottaKeepEmL0G5safe");
 
-		// Try getting a connection. If the database does not exist, it is created.
+		// Try getting a connection. If the database does not exist, it is
+		// created.
 		try
 		{
 			final Connection c = getConnection();
@@ -386,8 +387,8 @@ public class LogDatabaseController
 	 * to the database again.
 	 *
 	 * @throws NoDatabaseLinkException
-	 * when attempting unlink a database when no database link
-	 * exists
+	 *             when attempting unlink a database when no database link
+	 *             exists
 	 */
 	public static void unlink()
 	{
@@ -574,7 +575,8 @@ public class LogDatabaseController
 	}
 
 	/*
-	 * -------------------------------- PUBLIC GETTER METHODS --------------------------------
+	 * -------------------------------- PUBLIC GETTER METHODS
+	 * --------------------------------
 	 */
 
 	/**

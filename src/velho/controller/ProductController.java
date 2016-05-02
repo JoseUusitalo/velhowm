@@ -278,22 +278,22 @@ public class ProductController implements UIActionController
 		if (data instanceof ProductBrand)
 		{
 			if (!DatabaseController.deleteProductBrand((ProductBrand) data))
-				PopupController.error("Unable to delete product brand " + ((ProductBrand) data).getName() + ", it is being used by one or more products.");
+				PopupController.error(LocalizationController.getCompoundString("unableToDeleteBrandPopUp", new Object[] { ((ProductBrand) data).getName() }));
 		}
 		else if (data instanceof ProductCategory)
 		{
 			if (!DatabaseController.deleteProductCategory((ProductCategory) data))
-				PopupController.error("Unable to delete product category " + ((ProductCategory) data).getName() + ", it is being used by one or more products.");
+				PopupController.error(LocalizationController.getCompoundString("unableToDeleteCategory", new Object[] { ((ProductCategory) data).getName() }));
 		}
 		else if (data instanceof ProductBox)
 		{
 			if (!DatabaseController.deleteProductBox((ProductBox) data))
-				PopupController.error("Unable to delete product box.");
+				PopupController.error(LocalizationController.getString("unableToDeleteProductBoxPopUp"));
 		}
 		else if (data instanceof ProductType)
 		{
 			if (!DatabaseController.deleteProductType((ProductType) data))
-				PopupController.error("Unable to delete product type " + ((ProductType) data).getName() + ", it is being used by one or more categories.");
+				PopupController.error(LocalizationController.getCompoundString("unableToDeleteProductTypePopUp", new Object[] { ((ProductType) data).getName() }));
 		}
 		else
 		{

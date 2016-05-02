@@ -71,7 +71,7 @@ public class ExternalSystemsController
 			}
 			else
 			{
-				PopupController.info("List is empty.");
+				PopupController.info(LocalizationController.getString("listIsEmptyPopUp"));
 			}
 		}
 		else
@@ -116,7 +116,7 @@ public class ExternalSystemsController
 			}
 			else
 			{
-				PopupController.info("List is empty.");
+				PopupController.info(LocalizationController.getString("listIsEmptyPopUp"));
 			}
 		}
 		else
@@ -142,7 +142,7 @@ public class ExternalSystemsController
 			SYSLOG.warn("Attempted to move null product box to " + newShelfSlotID + ".");
 
 			if (showPopup)
-				PopupController.error("Attempted to move non-existent product box.");
+				PopupController.error(LocalizationController.getString("attemptToMoveNotExistingProductBoxPopUp"));
 
 			return false;
 		}
@@ -166,7 +166,7 @@ public class ExternalSystemsController
 				SYSLOG.debug("Product box " + boxToMove + " is already in the slot " + newShelfSlotID + ".");
 
 				if (showPopup)
-					PopupController.info("Unable to move product box back to the same slot '" + newShelfSlot + "'.");
+					PopupController.info(LocalizationController.getString("unableToMoveProductBoxToSameSlotPopUp") + newShelfSlot + "'.");
 
 				return false;
 			}
@@ -186,7 +186,7 @@ public class ExternalSystemsController
 			SYSLOG.error("Failed to remove product box " + boxToMove + " from shelf slot " + boxToMove.getShelfSlot());
 
 			if (showPopup)
-				PopupController.error("System error. Failure to remove product box from shelf slot.");
+				PopupController.error(LocalizationController.getString("failureToRemoveProductBoxErrorPopUp"));
 
 			return false;
 		}
@@ -200,7 +200,7 @@ public class ExternalSystemsController
 				oldShelfSlot.addBox(boxToMove);
 
 			if (showPopup)
-				PopupController.error("System error. Failure to add product box to new shelf slot '" + newShelfSlotID + "'.");
+				PopupController.error(LocalizationController.getString("failureToAddProductBoxToNewShelfSlotErrorPopUp") + newShelfSlotID + "'.");
 
 			return false;
 		}

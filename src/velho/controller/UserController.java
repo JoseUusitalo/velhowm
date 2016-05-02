@@ -67,7 +67,7 @@ public class UserController implements UIActionController
 
 				if (showPopup)
 				{
-					PopupController.info("User already exists. Please make sure that the following criteria are met:\n" + "Every Badge ID must be unique.\n" + "People with the same first and last name are allowed if their roles are different.\n" + "The combination of the PIN, first name, and last name must be unique.");
+					PopupController.info(LocalizationController.getString("userAlreadyExistInfoPopUp"));
 				}
 
 				return null;
@@ -90,7 +90,7 @@ public class UserController implements UIActionController
 		SYSLOG.debug("Invalid user data.");
 
 		if (showPopup)
-			PopupController.warning("Invalid user data.");
+			PopupController.warning(LocalizationController.getString("invalidUserDataPopUp"));
 
 		return null;
 	}
@@ -120,12 +120,12 @@ public class UserController implements UIActionController
 
 		if (LoginController.getCurrentUser().getDatabaseID() == user.getDatabaseID())
 		{
-			if (PopupController.confirmation("Are you sure you wish the delete your own user account? You will be logged out and be unable to log in again as a result of this action."))
+			if (PopupController.confirmation(LocalizationController.getString("yourAccountDeletationConfirmationPopUp")))
 			{
 				DatabaseController.deleteUser(user);
 				LoginController.logout();
 				USRLOG.debug("User deleted themselves: " + user.getFullDetails());
-				PopupController.info("Deleted user: " + user.getFullDetails());
+				PopupController.info(LocalizationController.getString("deletedUserInfoPopUp") + user.getFullDetails());
 				return true;
 			}
 
@@ -135,7 +135,7 @@ public class UserController implements UIActionController
 
 		DatabaseController.deleteUser(user);
 		USRLOG.debug("User removed: " + user.getFullDetails());
-		PopupController.info("User removed: " + user.getFullDetails());
+		PopupController.info(LocalizationController.getString("userRemovedInfoPopUp") + user.getFullDetails());
 		return true;
 	}
 
