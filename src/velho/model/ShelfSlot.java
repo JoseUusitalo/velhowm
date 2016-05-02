@@ -229,19 +229,19 @@ public class ShelfSlot extends AbstractDatabaseObject
 
 		if (productBoxes.size() + 1 > maxProductBoxes)
 		{
-			SYSLOG.trace("Adding product box + " + box + " failed: shelf slot was full.");
+			SYSLOG.trace("Failed to add product box + " + box + ": shelf slot was full.");
 			return false;
 		}
 
 		if (productBoxes.add(box))
 		{
 			box.setShelfSlot(this);
-			SYSLOG.trace("Product box + " + box + " was successfully added.");
+			SYSLOG.trace("Successfully added product box + " + box + ".");
 
 			return true;
 		}
 
-		SYSLOG.trace("Adding product box + " + box + " failed: box set already contains the box.");
+		SYSLOG.trace("Failed to add product box + " + box + ": box set already contains the box.");
 		return false;
 	}
 
@@ -253,12 +253,17 @@ public class ShelfSlot extends AbstractDatabaseObject
 	 */
 	public boolean removeBox(final ProductBox box)
 	{
+		SYSLOG.trace("Removing product box " + box + " from shelf slot: " + this);
+
 		if (productBoxes.remove(box))
 		{
 			box.setShelfSlot(null);
 
+			SYSLOG.trace("Successfully removed product box + " + box + ".");
 			return true;
 		}
+
+		SYSLOG.trace("Failed to remove product box + " + box + ": box set did not contain box.");
 
 		return false;
 	}
@@ -271,7 +276,6 @@ public class ShelfSlot extends AbstractDatabaseObject
 	 */
 	public boolean contains(final ProductBox box)
 	{
-		System.out.println("BOXES IN " + this + ": " + productBoxes);
 		return productBoxes.contains(box);
 	}
 

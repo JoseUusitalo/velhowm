@@ -1,10 +1,14 @@
 package velho.controller;
 
+import java.util.HashSet;
+import java.util.Set;
+
 import org.apache.log4j.Logger;
 
 import javafx.scene.Node;
 import velho.model.enums.Position;
 import velho.model.enums.UserRole;
+import velho.model.interfaces.GenericView;
 import velho.view.MainWindow;
 
 /**
@@ -58,6 +62,8 @@ public class UIController
 	 * The {@link RemovalPlatformController}.
 	 */
 	private RemovalPlatformController removalPlatformController;
+
+	private static Set<GenericView> viewSet = new HashSet<GenericView>();
 
 	/**
 	 * @param mainWindow
@@ -130,17 +136,21 @@ public class UIController
 		{
 			case ADMINISTRATOR:
 			case MANAGER:
-				mainView.addTab("Add User", userController.getView());
-				mainView.addTab("Logs", logController.getView());
+				mainView.addTab(LocalizationController.getString("addUserTab"), userController.getView());
+				mainView.addTab(LocalizationController.getString("addLogsTab"), logController.getView());
 				//$FALL-THROUGH$
 			case LOGISTICIAN:
-				mainView.addTab("Search", searchController.getSearchTabView());
-				mainView.addTab("Product List Search", searchController.getProductListSearchView());
-				mainView.addTab("Manifests", manifestController.getView());
-				mainView.addTab("Removal Lists", removalListController.getView());
-				mainView.addTab("Add Product", productController.getAddProductView());
-				mainView.addTab("Product List", productController.getTabView());
-				mainView.addTab("User List", getUserListView(currentUserRole));
+				mainView.addTab(LocalizationController.getString("addSearchTab"), searchController.getSearchTabView());
+				mainView.addTab(LocalizationController.getString("addProductListSearchTab"), searchController.getProductListSearchView());
+				mainView.addTab(LocalizationController.getString("addManifestsTab"), manifestController.getView());
+				mainView.addTab(LocalizationController.getString("addRemovalListsTab"), removalListController.getView());
+				mainView.addTab(LocalizationController.getString("addProductTab"), productController.getAddProductView());
+				mainView.addTab(LocalizationController.getString("addProductListTab"), productController.getTabView());
+				mainView.addTab("Brands", productController.getBrandsTab());
+				mainView.addTab("Categories", productController.getCategoryTab());
+				mainView.addTab("Product Types", productController.getProductTypesTab());
+				mainView.addTab("Product Boxes", productController.getProductBoxesTab());
+				mainView.addTab(LocalizationController.getString("addUserListTab"), getUserListView(currentUserRole));
 				break;
 			case GUEST:
 				break;
@@ -149,13 +159,15 @@ public class UIController
 		}
 
 		/*
-		 * Check the state the of the removal platform when the main menu is shown after user has logged in.
+		 * Check the state the of the removal platform when the main menu is
+		 * shown after user has logged in.
 		 */
 		removalPlatformController.checkWarning();
 	}
 
 	/**
-	 * Creates the user list view. The list contents change depending on who is logged in.
+	 * Creates the user list view. The list contents change depending on who is
+	 * logged in.
 	 *
 	 * @param currentUserRole the role of the user who is currently logged in
 	 * @return the user list view
@@ -167,6 +179,7 @@ public class UIController
 		 */
 		switch (currentUserRole)
 		{
+
 			case ADMINISTRATOR:
 			case MANAGER:
 				return ListController.getTableView(userController, DatabaseController.getPublicUserDataColumns(true), DatabaseController.getAllUsers());
@@ -176,6 +189,7 @@ public class UIController
 				break;
 			default:
 				SYSLOG.error("Unknown user role '" + currentUserRole.getName() + "'.");
+
 		}
 
 		return null;
@@ -186,18 +200,28 @@ public class UIController
 	 */
 	public void resetMainMenu()
 	{
-		mainView.destroy();
+		mainView.recreate();
 	}
 
-	/**
-	 * Resets all views to their initial state.
-	 */
-	public void destroyViews()
+	public void recreateAllViews()
 	{
-		// TODO: We need to destroy all of the views.
+		SYSLOG.debug("recreating all views");
+		Set<GenericView> temp = new HashSet<GenericView>(viewSet);
+		for (GenericView view : temp)
+		{
+			view.recreate();
+		}
+		showMainMenu(LoginController.getCurrentUser().getRole());
+	}
 
-		mainView.destroy();
-		userController.destroyView();
+	public static void destroyAllViews()
+	{
+		SYSLOG.debug("destroying all views");
+		Set<GenericView> temp = new HashSet<GenericView>(viewSet);
+		for (GenericView view : temp)
+		{
+			view.destroy();
+		}
 	}
 
 	/**
@@ -210,4 +234,10 @@ public class UIController
 	{
 		mainView.selectTab(tabName);
 	}
+
+	public static void recordView(final GenericView view)
+	{
+		viewSet.add(view);
+	}
+
 }

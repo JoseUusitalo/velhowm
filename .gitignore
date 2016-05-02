@@ -6,3 +6,8 @@
 /VELHOWM_*.jar
 /dev/
 /doc/
+/junit*.properties
+/dist/
+/testreport/
+/javadoc/
+/report/

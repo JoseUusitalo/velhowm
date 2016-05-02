@@ -15,16 +15,19 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Priority;
 import velho.controller.DatabaseController;
 import velho.controller.ListController;
+import velho.controller.LocalizationController;
 import velho.controller.RemovalListController;
+import velho.controller.UIController;
 import velho.model.RemovalList;
 import velho.model.RemovalListState;
+import velho.model.interfaces.GenericView;
 
 /**
  * View for creating new removal lists
  *
  * @author Jose Uusitalo
  */
-public class RemovalListView
+public class RemovalListView implements GenericView
 {
 	/**
 	 * Apache log4j logger: System.
@@ -76,7 +79,7 @@ public class RemovalListView
 			final GridPane top = new GridPane();
 			top.getStyleClass().add("standard-padding");
 
-			final Button browseListsButton = new Button("Browse Removal Lists");
+			final Button browseListsButton = new Button(LocalizationController.getString("browseRemovalListsButton"));
 			browseListsButton.setAlignment(Pos.CENTER_LEFT);
 
 			browseListsButton.setOnAction(new EventHandler<ActionEvent>()
@@ -88,7 +91,7 @@ public class RemovalListView
 				}
 			});
 
-			final Label removalListLabel = new Label("Removal List #" + removalList.getDatabaseID());
+			final Label removalListLabel = new Label((LocalizationController.getString("removalListLabel")) + removalList.getDatabaseID());
 			removalListLabel.getStyleClass().add("centered-title-small");
 			removalListLabel.setAlignment(Pos.CENTER);
 			removalListLabel.setMaxWidth(Double.MAX_VALUE);
@@ -119,6 +122,7 @@ public class RemovalListView
 
 			bpane.setTop(top);
 			bpane.setCenter(thisList);
+			UIController.recordView(this);
 		}
 
 		return bpane;
@@ -127,17 +131,27 @@ public class RemovalListView
 	/**
 	 * Destroys the view.
 	 */
-	public void destroy()
+	@Override
+	public void recreate()
 	{
 		bpane = null;
+		thisList = null;
+		getView();
 	}
 
 	/**
-	 * Gets the search results list and the current new removal list views again.
+	 * Gets the search results list and the current new removal list views
+	 * again.
 	 */
 	public void refresh()
 	{
 		SYSLOG.trace("Refreshing removal list viewing view.");
 		thisList = removalListController.getNewRemovalListView();
+	}
+
+	@Override
+	public void destroy()
+	{
+		bpane = null;
 	}
 }

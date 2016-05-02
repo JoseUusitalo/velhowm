@@ -43,6 +43,16 @@ public class RemovalListState extends AbstractDatabaseObject
 		setUuid(UUID.randomUUID());
 	}
 
+	/**
+	 * @param state
+	 */
+	public RemovalListState(final RemovalListState state)
+	{
+		setDatabaseID(state.getDatabaseID());
+		setUuid(state.getUuid());
+		this.name = state.getName();
+	}
+
 	@Override
 	public String toString()
 	{

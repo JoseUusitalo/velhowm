@@ -6,13 +6,15 @@ import javafx.scene.control.ScrollPane;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.text.Text;
 import velho.controller.LogController;
+import velho.controller.UIController;
+import velho.model.interfaces.GenericView;
 
 /**
  * View for reading logs.
  *
  * @author Jose Uusitalo
  */
-public class LogView
+public class LogView implements GenericView
 {
 	/**
 	 * Apache log4j logger: System.
@@ -69,17 +71,17 @@ public class LogView
 
 			bpane.setLeft(leftlog);
 			bpane.setCenter(rightlog);
+			UIController.recordView(this);
 		}
 
 		return bpane;
 	}
 
-	/**
-	 * Destroys the view.
-	 */
-	public void destroy()
+	@Override
+	public void recreate()
 	{
 		bpane = null;
+		getView();
 	}
 
 	/**
@@ -90,5 +92,11 @@ public class LogView
 		SYSLOG.trace("Refreshing logs view.");
 		syslog = new Text(logController.getSystemLog());
 		usrlog = new Text(logController.getUserLog());
+	}
+
+	@Override
+	public void destroy()
+	{
+		bpane = null;
 	}
 }
