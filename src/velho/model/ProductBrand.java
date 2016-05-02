@@ -43,6 +43,7 @@ public class ProductBrand extends AbstractDatabaseObject
 	}
 
 	/**
+	 * Product Brand for Hibernate
 	 */
 	public ProductBrand()
 	{
@@ -59,6 +60,9 @@ public class ProductBrand extends AbstractDatabaseObject
 		return name;
 	}
 
+	/**
+	 * Gets Product Brand and returns DatabaseID
+	 */
 	@Override
 	public int compareTo(final AbstractDatabaseObject brand)
 	{

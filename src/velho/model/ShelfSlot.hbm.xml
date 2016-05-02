@@ -29,7 +29,7 @@
 		<set	name="productBoxes"
 				table="PRODUCTBOXES"
 				inverse="true"
-				cascade="all"
+				cascade="save-update"
 				fetch="select"
 				lazy="false">
 

@@ -92,13 +92,6 @@ public class ProductBoxTest
 
 	@SuppressWarnings("unused")
 	@Test(expected = IllegalArgumentException.class)
-	public void testCreateProductBox_COLD()
-	{
-		ProductBox productBox3 = new ProductBox(1, product3, 1, 0, date);
-	}
-
-	@SuppressWarnings("unused")
-	@Test(expected = IllegalArgumentException.class)
 	public void testCreateProductBox_MaxSize_1()
 	{
 		ProductBox productBox4 = new ProductBox(1, product3, maxSize, maxSize + 1, date);
@@ -146,13 +139,6 @@ public class ProductBoxTest
 	{
 		ProductBox box2 = new ProductBox(id1, product2, maxSize, 0, date);
 		assertEquals(product2, box2.getProduct());
-	}
-
-	@Test(expected = IllegalArgumentException.class)
-	public void testGetProduct3()
-	{
-		ProductBox box3 = new ProductBox(id1, product3, maxSize, 0, date);
-		assertEquals(product3, box3.getProduct());
 	}
 
 	@Test

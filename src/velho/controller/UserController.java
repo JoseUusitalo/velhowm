@@ -1,7 +1,6 @@
 package velho.controller;
 
 import org.apache.log4j.Logger;
-import org.hibernate.exception.ConstraintViolationException;
 
 import javafx.scene.Node;
 import velho.controller.interfaces.UIActionController;
@@ -46,36 +45,24 @@ public class UserController implements UIActionController
 	 * @param userLastName user's last name
 	 * @param userRole user's role in the company
 	 * @param showPopup show popups?
-	 * @return the created user or <code>null</code> if data was invalid
+	 * @return the created user or <code>null</code> if data was invalid or user
+	 *         already existed in the database
 	 */
 	public User createUser(final String badgeID, final String userPIN, final String userFirstName, final String userLastName, final UserRole userRole, final boolean showPopup)
 	{
 		if (validateUserData(badgeID, userPIN, userFirstName, userLastName, userRole))
 		{
 			User newUser;
+
 			// If no pin is defined, use badge ID.
 			if (userPIN == null || userPIN.isEmpty())
 				newUser = new User(userFirstName, userLastName, null, badgeID, userRole);
 			else
 				newUser = new User(userFirstName, userLastName, userPIN, null, userRole);
 
-			try
+			if (DatabaseController.getAllUsers().contains(newUser))
 			{
-				DatabaseController.saveOrUpdate(newUser);
 
-				if (LoginController.getCurrentUser() != null)
-					USRLOG.debug("Created a user.");
-				// Else: running a JUnit test -> above line causes a null
-				// pointer error.
-
-				if (showPopup)
-					PopupController.info(LocalizationController.getString("userCreatedPopUpNotice"));
-
-				return newUser;
-
-			}
-			catch (final ConstraintViolationException e)
-			{
 				SYSLOG.debug("User already exists.");
 
 				if (showPopup)
@@ -84,10 +71,23 @@ public class UserController implements UIActionController
 				}
 
 				return null;
+
 			}
+
+			DatabaseController.saveOrUpdate(newUser);
+
+			if (LoginController.getCurrentUser() != null)
+				USRLOG.debug("Created a user.");
+			// Else: running a JUnit test -> above line causes a null pointer
+			// error.
+
+			if (showPopup)
+				PopupController.info(LocalizationController.getString("userCreatedPopUpNotice"));
+
+			return newUser;
 		}
 
-		SYSLOG.trace("Invalid user data.");
+		SYSLOG.debug("Invalid user data.");
 
 		if (showPopup)
 			PopupController.warning("Invalid user data.");

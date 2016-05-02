@@ -30,7 +30,7 @@
 		<many-to-one	name="type"
 						class="velho.model.ProductType"
 						column="type"
-						cascade="all"
+						cascade="save-update"
 						not-null="true"
 						fetch="select"
 						lazy="false" />

@@ -20,15 +20,29 @@ public class ProductDataView implements GenericView
 	 */
 	private GridPane grid;
 
+	/**
+	 * To save Product based data to ProductController
+	 */
 	private ProductController controller;
 
 	private Product currentProduct;
 
+	/**
+	 * Views the data in ProductData
+	 * 
+	 * @param controller enables ProductController
+	 */
 	public ProductDataView(final ProductController controller)
 	{
 		this.controller = controller;
 	}
 
+	/**
+	 * GridPane is the viewable textfields and comboboxes
+	 * 
+	 * @param product Product based grid pane
+	 * @return the grid
+	 */
 	public GridPane getView(final Product product)
 	{
 		if (grid == null)

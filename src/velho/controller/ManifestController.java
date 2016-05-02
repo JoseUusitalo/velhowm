@@ -171,36 +171,54 @@ public class ManifestController implements UIActionController
 		}
 	}
 
+	/**
+	 * creates new Object to data
+	 */
 	@Override
 	public void createAction(final Object data)
 	{
 		throw new UnsupportedOperationException();
 	}
 
+	/**
+	 * Updates the new created Object
+	 */
 	@Override
 	public void updateAction(final Object data)
 	{
 		throw new UnsupportedOperationException();
 	}
 
+	/**
+	 * Adds the new Object as an action
+	 */
 	@Override
 	public void addAction(final Object data)
 	{
 		throw new UnsupportedOperationException();
 	}
 
+	/**
+	 * Removes new Object
+	 */
 	@Override
 	public void removeAction(final Object data)
 	{
 		throw new UnsupportedOperationException();
 	}
 
+	/**
+	 * Deletes new Object
+	 */
 	@Override
 	public void deleteAction(final Object data)
 	{
 		throw new UnsupportedOperationException();
 	}
 
+	/**
+	 * Views the Object
+	 */
 	@Override
 	public void viewAction(final Object data)
 	{
