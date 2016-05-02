@@ -206,7 +206,6 @@ public class ProductBoxesTabView implements GenericView
 					date = Date.from(expirationDate.getValue().atTime(0, 0).toInstant(ZoneOffset.of("Z")));
 				final ProductBox saveProductBox = new ProductBox((Product) productItem.getValue(), productBoxMaxSize.getValue(), productBoxSize.getValue(),
 						date);
-				System.out.println("New product box: " + saveProductBox);
 				data.add(saveProductBox);
 				productController.saveProductBox(saveProductBox);
 			});

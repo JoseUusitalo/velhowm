@@ -171,7 +171,6 @@ public class LoginController
 		MDC.remove("user_id");
 
 		currentUser = null;
-		// UIController.reCreateAllViews();
 		checkLogin();
 	}
 

@@ -69,7 +69,6 @@ public class LocalizationController
 		}
 		else
 		{
-			System.out.println("new lang german");
 			msgBundle = getResourceBundle(localeGerman);
 			uiController.recreateAllViews();
 		}
