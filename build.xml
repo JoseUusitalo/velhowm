@@ -180,7 +180,7 @@
 				<pathelement location="${build.dist.test.dir}"/>
 			</classpath>
 
-			<batchtest todir="${build.report.dir}">
+			<batchtest todir="${report.dir}">
 				<fileset dir="${build.dist.test.dir}">
 					<!-- If this is used the main database is still in use after tests and cannot be used in the application. -->
 					<!-- <include name="**/*Test.class" /> -->
@@ -191,14 +191,14 @@
 	</target>
 
 	<target name="test" depends="run-test" description="Creates the test report.">
-		<junitreport todir="${build.report.dir}">
-			<fileset dir="${build.report.dir}">
+		<junitreport todir="${report.dir}">
+			<fileset dir="${report.dir}">
 				<include name="TEST-*.xml" />
 			</fileset>
 			<report format="noframes" todir="${report.dir}" styledir="${lib.dir}/eclipse" />
 		</junitreport>
 	</target>
-	
+
 	<target name="jar" depends="compile, resources, test, dependencies" description="Creates the jar.">
 		<jar destfile="${dist.dir}/${projectName}_${DSTAMP}.jar" basedir="${build.dist.src.dir}">
 			<manifest>
