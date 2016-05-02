@@ -214,13 +214,13 @@ public class UIController
 		showMainMenu(LoginController.getCurrentUser().getRole());
 	}
 
-	public void destroyAllViews()
+	public static void destroyAllViews()
 	{
 		SYSLOG.debug("destroying all views");
 		Set<GenericView> temp = new HashSet<GenericView>(viewSet);
 		for (GenericView view : temp)
 		{
-			view.recreate();
+			view.destroy();
 		}
 	}
 
