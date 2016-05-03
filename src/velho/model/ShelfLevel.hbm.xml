@@ -26,6 +26,7 @@
 					column="max_shelfslots"
 					type="int" />
 
+		<!-- Slots should be deleted when the parent level is deleted. -->
 		<set	name="shelfSlots"
 				table="SHELFSLOTS"
 				inverse="true"

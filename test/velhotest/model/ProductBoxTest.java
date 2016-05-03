@@ -5,14 +5,15 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import java.sql.Date;
-import java.text.ParseException;
 
 import org.junit.After;
+import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
 import velho.controller.DatabaseController;
+import velho.controller.LogDatabaseController;
 import velho.model.Product;
 import velho.model.ProductBox;
 import velho.model.ProductBrand;
@@ -47,14 +48,27 @@ public class ProductBoxTest
 	private Product product3 = new Product(id2, name2, brand2, category3);
 
 	/**
+	 * Creates the log database if needed and connects to it.
 	 * Loads the sample data into the database if it does not yet exist.
 	 *
-	 * @throws ParseException
+	 * @throws Exception
 	 */
 	@BeforeClass
-	public static final void loadSampleData() throws ParseException
+	public static final void init() throws Exception
 	{
+		LogDatabaseController.connectAndInitialize();
+		DatabaseController.link();
 		DatabaseController.loadSampleData();
+	}
+
+	/**
+	 * Unlinks from both databases.
+	 */
+	@AfterClass
+	public static final void unlinkDatabases() throws Exception
+	{
+		DatabaseController.unlink();
+		LogDatabaseController.unlink();
 	}
 
 	@Before
@@ -74,13 +88,6 @@ public class ProductBoxTest
 	public void testCreateProductBox_RAW()
 	{
 		ProductBox productBox2 = new ProductBox(1, product2, 1, 0, date);
-	}
-
-	@SuppressWarnings("unused")
-	@Test(expected = IllegalArgumentException.class)
-	public void testCreateProductBox_COLD()
-	{
-		ProductBox productBox3 = new ProductBox(1, product3, 1, 0, date);
 	}
 
 	@SuppressWarnings("unused")
@@ -132,13 +139,6 @@ public class ProductBoxTest
 	{
 		ProductBox box2 = new ProductBox(id1, product2, maxSize, 0, date);
 		assertEquals(product2, box2.getProduct());
-	}
-
-	@Test(expected = IllegalArgumentException.class)
-	public void testGetProduct3()
-	{
-		ProductBox box3 = new ProductBox(id1, product3, maxSize, 0, date);
-		assertEquals(product3, box3.getProduct());
 	}
 
 	@Test

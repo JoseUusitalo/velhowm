@@ -1,10 +1,14 @@
 package velho.controller;
 
+import java.util.HashSet;
+import java.util.Set;
+
 import org.apache.log4j.Logger;
 
 import javafx.scene.Node;
 import velho.model.enums.Position;
 import velho.model.enums.UserRole;
+import velho.model.interfaces.GenericView;
 import velho.view.MainWindow;
 
 /**
@@ -59,6 +63,8 @@ public class UIController
 	 */
 	private RemovalPlatformController removalPlatformController;
 
+	private static Set<GenericView> viewSet = new HashSet<GenericView>();
+
 	/**
 	 * @param mainWindow
 	 * @param userController
@@ -69,7 +75,9 @@ public class UIController
 	 * @param productController
 	 * @param removalPlatformController
 	 */
-	public void setControllers(final MainWindow mainWindow, final UserController userController, final RemovalListController removalListController, final SearchController searchController, final LogController logController, final ManifestController manifestController, final ProductController productController, final RemovalPlatformController removalPlatformController)
+	public void setControllers(final MainWindow mainWindow, final UserController userController, final RemovalListController removalListController,
+			final SearchController searchController, final LogController logController, final ManifestController manifestController,
+			final ProductController productController, final RemovalPlatformController removalPlatformController)
 	{
 		this.mainView = mainWindow;
 		this.userController = userController;
@@ -128,21 +136,21 @@ public class UIController
 		{
 			case ADMINISTRATOR:
 			case MANAGER:
-				mainView.addTab("Add User", userController.getView());
-				mainView.addTab("Logs", logController.getView());
+				mainView.addTab(LocalizationController.getString("addUserTab"), userController.getView());
+				mainView.addTab(LocalizationController.getString("addLogsTab"), logController.getView());
 				//$FALL-THROUGH$
 			case LOGISTICIAN:
-				mainView.addTab("Search", searchController.getSearchTabView());
-				mainView.addTab("Product List Search", searchController.getProductListSearchView());
-				mainView.addTab("Manifests", manifestController.getView());
-				mainView.addTab("Removal Lists", removalListController.getView());
-				mainView.addTab("Products", productController.getProductManagementView());
-				mainView.addTab("Product List", productController.getTabView());
+				mainView.addTab(LocalizationController.getString("addSearchTab"), searchController.getSearchTabView());
+				mainView.addTab(LocalizationController.getString("addProductListSearchTab"), searchController.getProductListSearchView());
+				mainView.addTab(LocalizationController.getString("addManifestsTab"), manifestController.getView());
+				mainView.addTab(LocalizationController.getString("addRemovalListsTab"), removalListController.getView());
+				mainView.addTab(LocalizationController.getString("addProductTab"), productController.getAddProductView());
+				mainView.addTab(LocalizationController.getString("addProductListTab"), productController.getTabView());
 				mainView.addTab("Brands", productController.getBrandsTab());
 				mainView.addTab("Categories", productController.getCategoryTab());
 				mainView.addTab("Product Types", productController.getProductTypesTab());
-				mainView.addTab("Product Box", productController.getProductBox());
-				mainView.addTab("User List", getUserListView(currentUserRole));
+				mainView.addTab("Product Boxes", productController.getProductBoxesTab());
+				mainView.addTab(LocalizationController.getString("addUserListTab"), getUserListView(currentUserRole));
 				break;
 			case GUEST:
 				break;
@@ -151,13 +159,15 @@ public class UIController
 		}
 
 		/*
-		 * Check the state the of the removal platform when the main menu is shown after user has logged in.
+		 * Check the state the of the removal platform when the main menu is
+		 * shown after user has logged in.
 		 */
 		removalPlatformController.checkWarning();
 	}
 
 	/**
-	 * Creates the user list view. The list contents change depending on who is logged in.
+	 * Creates the user list view. The list contents change depending on who is
+	 * logged in.
 	 *
 	 * @param currentUserRole the role of the user who is currently logged in
 	 * @return the user list view
@@ -190,18 +200,18 @@ public class UIController
 	 */
 	public void resetMainMenu()
 	{
-		mainView.destroy();
+		mainView.reCreate();
 	}
 
-	/**
-	 * Resets all views to their initial state.
-	 */
-	public void destroyViews()
+	public void reCreateAllViews()
 	{
-		// TODO: We need to destroy all of the views.
-
-		mainView.destroy();
-		userController.destroyView();
+		SYSLOG.debug("recreating all views");
+		Set<GenericView> temp = new HashSet<GenericView>(viewSet);
+		for (GenericView view : temp)
+		{
+			view.reCreate();
+		}
+		showMainMenu(LoginController.getCurrentUser().getRole());
 	}
 
 	/**
@@ -214,4 +224,10 @@ public class UIController
 	{
 		mainView.selectTab(tabName);
 	}
+
+	public static void recordView(final GenericView view)
+	{
+		viewSet.add(view);
+	}
+
 }

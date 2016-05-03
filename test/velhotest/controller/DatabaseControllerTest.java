@@ -4,7 +4,6 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
-import java.text.ParseException;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
@@ -12,11 +11,13 @@ import java.util.List;
 import java.util.Set;
 
 import org.hibernate.HibernateException;
+import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
 import javafx.collections.ObservableList;
 import velho.controller.DatabaseController;
+import velho.controller.LogDatabaseController;
 import velho.model.ProductBox;
 import velho.model.RemovalList;
 import velho.model.User;
@@ -31,15 +32,31 @@ import velho.model.enums.UserRole;
 public class DatabaseControllerTest
 {
 	/**
+	 * Creates the log database if needed and connects to it.
 	 * Loads the sample data into the database if it does not yet exist.
 	 *
-	 * @throws ParseException
+	 * @throws Exception
 	 */
 	@BeforeClass
-	public static final void loadSampleData() throws ParseException, ClassNotFoundException
+	public static final void init() throws Exception
 	{
+		System.out.println("\n\n---- DatabaseControllerTest BeforeClass ----\n\n");
+		LogDatabaseController.connectAndInitialize();
 		DatabaseController.link();
 		DatabaseController.loadSampleData();
+		System.out.println("\n\n---- DatabaseControllerTest Start ----\n\n");
+	}
+
+	/**
+	 * Unlinks from both databases.
+	 */
+	@AfterClass
+	public static final void unlinkDatabases() throws Exception
+	{
+		System.out.println("\n\n---- DatabaseControllerTest AfterClass ----\n\n");
+		DatabaseController.unlink();
+		LogDatabaseController.unlink();
+		System.out.println("\n\n---- DatabaseControllerTest Done ----\n\n");
 	}
 
 	@Test

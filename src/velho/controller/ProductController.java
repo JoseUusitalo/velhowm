@@ -9,15 +9,14 @@ import velho.model.ProductBox;
 import velho.model.ProductBrand;
 import velho.model.ProductCategory;
 import velho.model.ProductType;
-import velho.view.AddCategoryView;
 import velho.view.AddProductView;
-import velho.view.BrandsTab;
-import velho.view.CategoryTab;
+import velho.view.BrandsTabView;
+import velho.view.CategoriesTabView;
 import velho.view.GenericTabView;
-import velho.view.ProductBoxTabView;
+import velho.view.ProductBoxesTabView;
 import velho.view.ProductDataView;
 import velho.view.ProductManagementView;
-import velho.view.ProductsTypeTabView;
+import velho.view.ProductTypesTabView;
 
 /**
  * Controller for handling {@link Product} objects
@@ -64,24 +63,19 @@ public class ProductController implements UIActionController
 	/**
 	 * The tab for creating product type view
 	 */
-	private ProductsTypeTabView productsTypeTabView;
-
-	/**
-	 * The tab for creating add category view
-	 */
-	private AddCategoryView addCategoryView;
+	private ProductTypesTabView productsTypeTabView;
 
 	/**
 	 * The tab for creating brands view
 	 */
-	private BrandsTab brandsTabView;
+	private BrandsTabView brandsTabView;
 
 	/**
 	 * The tab for creating categories view
 	 */
-	private CategoryTab categoryTabView;
+	private CategoriesTabView categoryTabView;
 
-	private ProductBoxTabView productBoxTabView;
+	private ProductBoxesTabView productBoxTabView;
 
 	/**
 	 * @param uiController
@@ -90,12 +84,11 @@ public class ProductController implements UIActionController
 	{
 		this.uiController = uiController;
 		this.productManagementView = new ProductManagementView();
-		this.productsTypeTabView = new ProductsTypeTabView(this, uiController);
-		this.addCategoryView = new AddCategoryView(this, uiController);
+		this.productsTypeTabView = new ProductTypesTabView(this);
 		this.addProductView = new AddProductView(this, uiController);
-		this.brandsTabView = new BrandsTab(this, uiController);
-		this.categoryTabView = new CategoryTab(this, uiController);
-		this.productBoxTabView = new ProductBoxTabView(this, uiController);
+		this.brandsTabView = new BrandsTabView(this);
+		this.categoryTabView = new CategoriesTabView(this);
+		this.productBoxTabView = new ProductBoxesTabView(this);
 		listTab = new GenericTabView();
 		addTab = new GenericTabView();
 		showList();
@@ -122,9 +115,11 @@ public class ProductController implements UIActionController
 	}
 
 	/**
-	 * Saves the new or existing product to database and returns the updated object.
+	 * Saves the new or existing product to database and returns the updated
+	 * object.
 	 *
-	 * @param databaseID database ID of the product (<code>-1</code> for a new one)
+	 * @param databaseID database ID of the product (<code>-1</code> for a new
+	 *            one)
 	 * @param name name of the of product
 	 * @param brand brand of the product
 	 * @param category category of the product
@@ -167,7 +162,7 @@ public class ProductController implements UIActionController
 
 		if (dbID < 0)
 		{
-			PopupController.error("Failed to save product data!");
+			PopupController.error(LocalizationController.getString("failedToSaveProductDataPopUpWarning"));
 			return null;
 		}
 
@@ -184,14 +179,6 @@ public class ProductController implements UIActionController
 		AddProductView editView = new AddProductView(this, uiController);
 		listTab.setView(editView.getView(true));
 		editView.setViewData(product);
-	}
-
-	/**
-	 * @param product {@demolish Product} to destroy product
-	 */
-	public void deleteProduct(final Product product)
-	{
-		// TODO implement a method to delete product
 	}
 
 	/**
@@ -223,7 +210,8 @@ public class ProductController implements UIActionController
 	}
 
 	/**
-	 * Changes the view in the product list tab to display the data from the given product.
+	 * Changes the view in the product list tab to display the data from the
+	 * given product.
 	 *
 	 * @param product product to display
 	 */
@@ -285,7 +273,31 @@ public class ProductController implements UIActionController
 	@Override
 	public void deleteAction(final Object data)
 	{
-		throw new UnsupportedOperationException();
+		if (data instanceof ProductBrand)
+		{
+			if (!DatabaseController.deleteProductBrand((ProductBrand) data))
+				PopupController.error("Unable to delete product brand " + ((ProductBrand) data).getName() + ", it is being used by one or more products.");
+		}
+		else if (data instanceof ProductCategory)
+		{
+			if (!DatabaseController.deleteProductCategory((ProductCategory) data))
+				PopupController
+						.error("Unable to delete product category " + ((ProductCategory) data).getName() + ", it is being used by one or more products.");
+		}
+		else if (data instanceof ProductBox)
+		{
+			if (!DatabaseController.deleteProductBox((ProductBox) data))
+				PopupController.error("Unable to delete product box.");
+		}
+		else if (data instanceof ProductType)
+		{
+			if (!DatabaseController.deleteProductType((ProductType) data))
+				PopupController.error("Unable to delete product type " + ((ProductType) data).getName() + ", it is being used by one or more categories.");
+		}
+		else
+		{
+			throw new UnsupportedOperationException();
+		}
 	}
 
 	/**
@@ -303,7 +315,7 @@ public class ProductController implements UIActionController
 	 */
 	public Node getProductManagementView()
 	{
-		productManagementView.setContents(getProductEditView(), addCategoryView.getView(true));
+		productManagementView.setContents(getProductEditView());
 		return productManagementView.getView();
 	}
 
@@ -313,10 +325,10 @@ public class ProductController implements UIActionController
 	 * @param name placeholder for the brand
 	 * @return a product brand when called
 	 */
+	@SuppressWarnings("static-method")
 	public ProductBrand saveBrand(final String name)
 	{
 		ProductBrand productBrand = new ProductBrand(name);
-		System.out.println("+++" + productBrand);
 		DatabaseController.save(productBrand);
 		return productBrand;
 
@@ -330,6 +342,7 @@ public class ProductController implements UIActionController
 	 * @param type the type of the new category
 	 * @return what ever is in the product category
 	 */
+	@SuppressWarnings("static-method")
 	public ProductCategory saveCategory(final String name, final ProductType type)
 	{
 		ProductCategory productCategory = new ProductCategory(name, type);
@@ -345,6 +358,7 @@ public class ProductController implements UIActionController
 	 * @param name The new name of the product
 	 * @return what ever is in the product type
 	 */
+	@SuppressWarnings("static-method")
 	public ProductType saveProductType(final String name)
 	{
 		ProductType productType = new ProductType(name);
@@ -378,6 +392,7 @@ public class ProductController implements UIActionController
 	 *
 	 * @param editBrand allows to edit the new brand
 	 */
+	@SuppressWarnings("static-method")
 	public void saveBrand(final ProductBrand editBrand)
 	{
 		DatabaseController.save(editBrand);
@@ -390,6 +405,7 @@ public class ProductController implements UIActionController
 	 *
 	 * @param saveProductType saves the new Product Type written in the TextField
 	 */
+	@SuppressWarnings("static-method")
 	public void saveProductType(final ProductType saveProductType)
 	{
 		// TODO Validate data
@@ -401,6 +417,7 @@ public class ProductController implements UIActionController
 	 *
 	 * @param saveProductCategory saves the new data written in the TextField
 	 */
+	@SuppressWarnings("static-method")
 	public void saveProductCategory(final ProductCategory saveProductCategory)
 	{
 		// TODO Need validation
@@ -413,11 +430,12 @@ public class ProductController implements UIActionController
 		return categoryTabView.getView();
 	}
 
-	public Node getProductBox()
+	public Node getProductBoxesTab()
 	{
 		return productBoxTabView.getView(DatabaseController.getAllProducts());
 	}
 
+	@SuppressWarnings("static-method")
 	public void saveProductBox(final ProductBox productBox)
 	{
 		// TODO Need validation

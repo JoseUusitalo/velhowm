@@ -11,14 +11,17 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.VBox;
+import velho.controller.LocalizationController;
 import velho.controller.LoginController;
+import velho.controller.UIController;
+import velho.model.interfaces.GenericView;
 
 /**
  * Allows the users to log in to the system.
  *
  * @author Jose Uusitalo &amp; Edward Puustinen
  */
-public class LoginView
+public class LoginView implements GenericView
 {
 	/**
 	 * The root VBox for this view.
@@ -48,24 +51,24 @@ public class LoginView
 			grid.setHgap(10);
 			grid.setAlignment(Pos.CENTER);
 
-			final Label infoText = new Label("Scan badge or log in with your name and PIN");
+			final Label infoText = new Label(LocalizationController.getString("infoTextScanBadgeOrLogInWithName"));
 			infoText.setMaxWidth(Double.MAX_VALUE);
 			infoText.setAlignment(Pos.CENTER);
 			grid.add(infoText, 0, 0, 2, 1);
 
 			final TextField firstNameField = new TextField();
-			firstNameField.setPromptText("First Name");
+			firstNameField.setPromptText(LocalizationController.getString("promptTextFirstName"));
 			grid.add(firstNameField, 0, 1, 1, 1);
 
 			final TextField lastNameField = new TextField();
-			lastNameField.setPromptText("Last Name");
+			lastNameField.setPromptText(LocalizationController.getString("promptTextLastName"));
 			grid.add(lastNameField, 1, 1, 1, 1);
 
 			final PasswordField authenticationStringField = new PasswordField();
-			authenticationStringField.setPromptText("Scan Badge or Write PIN");
+			authenticationStringField.setPromptText(LocalizationController.getString("passWordPromptText"));
 			grid.add(authenticationStringField, 0, 2, 2, 1);
 
-			Button logInButton = new Button("Log In");
+			Button logInButton = new Button(LocalizationController.getString("logInButton"));
 			logInButton.setMaxWidth(Double.MAX_VALUE);
 			logInButton.setPrefHeight(50.0);
 			grid.add(logInButton, 0, 3, 2, 1);
@@ -81,6 +84,7 @@ public class LoginView
 					LoginController.login(firstNameField.getText(), lastNameField.getText(), authenticationStringField.getText());
 				}
 			});
+			UIController.recordView(this);
 		}
 
 		return vbox;
@@ -89,8 +93,10 @@ public class LoginView
 	/**
 	 * Destroys the view.
 	 */
-	public void destroy()
+	@Override
+	public void reCreate()
 	{
 		vbox = null;
+		getView();
 	}
 }
