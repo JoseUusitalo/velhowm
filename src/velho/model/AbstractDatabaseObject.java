@@ -42,9 +42,9 @@ public abstract class AbstractDatabaseObject implements DatabaseObject, Comparab
 	}
 
 	@Override
-	public int compareTo(final AbstractDatabaseObject o)
+	public int compareTo(final AbstractDatabaseObject object)
 	{
-		return this.getDatabaseID() - o.getDatabaseID();
+		return this.getDatabaseID() - object.getDatabaseID();
 	}
 
 	@Override

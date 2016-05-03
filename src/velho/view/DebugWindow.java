@@ -40,7 +40,7 @@ public class DebugWindow
 	 * Button has been tagged scannerMoveValid and named as "Scanner Move Valid"
 	 * on the scene.
 	 */
-	public Button scannerMoveValid = new Button("Scanner Move Valid");
+	public Button scannerMoveValid;
 
 	/**
 	 * The DebugController has been tagged as controller.
@@ -50,12 +50,12 @@ public class DebugWindow
 	/**
 	 * A list of for the unique roles in the database.
 	 */
-	private List<UserRole> roles;
+	private final List<UserRole> roles;
 
 	/**
 	 * A list of unique badge numbers in the database.
 	 */
-	private List<String> badgeNumbers;
+	private final List<String> badgeNumbers;
 
 	/**
 	 * @param debugController
@@ -138,6 +138,8 @@ public class DebugWindow
 
 		final Button fillUpPlatformButton = new Button("Fill Up Removal Platform");
 		final Button emptyPlatformButton = new Button("Empty");
+
+		scannerMoveValid = new Button("Scanner Move Valid");
 
 		logInButton.setOnAction(new EventHandler<ActionEvent>()
 		{

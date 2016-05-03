@@ -216,7 +216,7 @@ public class ExternalSystemsController
 		SYSLOG.debug("Successfully moved " + boxToMove + " to " + newShelfSlot);
 
 		if (showPopup)
-			PopupController.info(LocalizationController.getCompoundString("productBoxTransferSuccessMessage", new Object[] { productBoxCode, newShelfSlot }));
+			PopupController.info(LocalizationController.getCompoundString("productBoxTransferSuccessMessage", productBoxCode, newShelfSlot));
 
 		return true;
 	}

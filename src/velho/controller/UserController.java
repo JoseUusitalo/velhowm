@@ -178,7 +178,7 @@ public class UserController implements UIActionController
 	 *
 	 * @param role the role to create the user as
 	 * @return a {@link User} object or <code>null</code> if
-	 *         {@link MainWindow#DEBUG_MODE} is <code>false</code>
+	 * {@link MainWindow#DEBUG_MODE} is <code>false</code>
 	 */
 	public static User getDebugUser(final UserRole role)
 	{
@@ -256,7 +256,7 @@ public class UserController implements UIActionController
 	 *
 	 * @param badgeID RFID identification string of the user's RFID badge
 	 * @param pin the pin string used to log in to the system if no RFID badge
-	 *            ID is provided
+	 * ID is provided
 	 * @param firstName the first name of the user
 	 * @param lastName the last name of the user
 	 * @param roleName the name of the role of the user
@@ -270,7 +270,7 @@ public class UserController implements UIActionController
 		final boolean hasPIN = isValidPIN(pin);
 
 		// Must have exactly one.
-		if ((hasBadgeID && hasPIN) || (!hasBadgeID && !hasPIN))
+		if (hasBadgeID && hasPIN || !hasBadgeID && !hasPIN)
 			return false;
 
 		// Name cannot be null, empty, or longer than maximum and length.
@@ -303,7 +303,7 @@ public class UserController implements UIActionController
 		try
 		{
 			int value = Integer.parseInt(pin);
-			return (value >= 0 && value <= User.MAX_PIN_VALUE);
+			return value >= 0 && value <= User.MAX_PIN_VALUE;
 		}
 		catch (NumberFormatException e)
 		{
@@ -326,7 +326,7 @@ public class UserController implements UIActionController
 		try
 		{
 			int value = Integer.parseInt(badgeID);
-			return (value >= 0 && value <= User.MAX_BADGE_ID_VALUE);
+			return value >= 0 && value <= User.MAX_BADGE_ID_VALUE;
 		}
 		catch (NumberFormatException e)
 		{

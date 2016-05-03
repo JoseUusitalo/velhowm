@@ -29,7 +29,7 @@ import velho.model.enums.UserRole;
  *
  * @author Jose Uusitalo
  */
-public class SampleData
+public abstract class SampleData
 {
 	/**
 	 * Apache log4j logger: System.
@@ -58,27 +58,27 @@ public class SampleData
 			 * The order of these methods calls must never be changed in order to not break the referential integrity of the database.
 			 */
 
-			createSample_Users();
+			createSampleUsers();
 
-			createSample_Brands();
-			createSample_ProductTypes();
+			createSampleBrands();
+			createSampleProductTypes();
 
-			createSample_ProductCategories();
-			createSample_Products();
+			createSampleProductCategories();
+			createSampleProducts();
 
-			createSample_Shelves();
-			createSample_ShelfLevels();
-			createSample_ShelfSlots();
+			createSampleShelves();
+			createSampleShelfLevels();
+			createSampleShelfSlots();
 
-			createSample_ManifestStates();
-			createSample_Manifests();
+			createSampleManifestStates();
+			createSampleManifests();
 
-			createSample_RemovalListStates();
-			createSample_RemovalLists();
+			createSampleRemovalListStates();
+			createSampleRemovalLists();
 
-			createSample_ProductBoxes();
+			createSampleProductBoxes();
 
-			createSample_RemovalPlatforms();
+			createSampleRemovalPlatforms();
 
 			dataLoaded = true;
 			SYSLOG.info("Sample data loaded.");
@@ -89,7 +89,7 @@ public class SampleData
 		return dataLoaded;
 	}
 
-	private static void createSample_Users()
+	private static void createSampleUsers()
 	{
 		if (!DatabaseController.hasUsers())
 		{
@@ -102,7 +102,7 @@ public class SampleData
 			SYSLOG.trace("Database already has users.");
 	}
 
-	private static void createSample_Brands()
+	private static void createSampleBrands()
 	{
 		if (!DatabaseController.hasProductBrands())
 		{
@@ -115,7 +115,7 @@ public class SampleData
 			SYSLOG.trace("Database already has brands.");
 	}
 
-	private static void createSample_ProductTypes()
+	private static void createSampleProductTypes()
 	{
 		if (!DatabaseController.hasProductTypes())
 		{
@@ -127,7 +127,7 @@ public class SampleData
 			SYSLOG.trace("Database already has types.");
 	}
 
-	private static void createSample_ProductCategories()
+	private static void createSampleProductCategories()
 	{
 		if (!DatabaseController.hasProductCategories())
 		{
@@ -140,7 +140,7 @@ public class SampleData
 			SYSLOG.trace("Database already has categories.");
 	}
 
-	private static void createSample_Products()
+	private static void createSampleProducts()
 	{
 		if (!DatabaseController.hasProducts())
 		{
@@ -165,7 +165,7 @@ public class SampleData
 			SYSLOG.trace("Database already has products.");
 	}
 
-	private static void createSample_Shelves()
+	private static void createSampleShelves()
 	{
 		if (!DatabaseController.hasShelves())
 		{
@@ -184,7 +184,7 @@ public class SampleData
 			SYSLOG.trace("Database already has shelves.");
 	}
 
-	private static void createSample_ShelfLevels()
+	private static void createSampleShelfLevels()
 	{
 		if (!DatabaseController.hasShelfLevels())
 		{
@@ -207,7 +207,7 @@ public class SampleData
 			SYSLOG.trace("Database already has shelf levels.");
 	}
 
-	private static void createSample_ShelfSlots()
+	private static void createSampleShelfSlots()
 	{
 		if (!DatabaseController.hasShelfSlots())
 		{
@@ -387,7 +387,7 @@ public class SampleData
 			SYSLOG.trace("Database already has shelf slots.");
 	}
 
-	private static void createSample_ManifestStates()
+	private static void createSampleManifestStates()
 	{
 		if (!DatabaseController.hasManifestStates())
 		{
@@ -401,7 +401,7 @@ public class SampleData
 			SYSLOG.trace("Database already has manifest states.");
 	}
 
-	private static void createSample_Manifests() throws HibernateException, ParseException
+	private static void createSampleManifests() throws HibernateException, ParseException
 	{
 		if (!DatabaseController.hasManifests())
 		{
@@ -418,7 +418,7 @@ public class SampleData
 			SYSLOG.trace("Database already has manifests.");
 	}
 
-	private static void createSample_RemovalListStates()
+	private static void createSampleRemovalListStates()
 	{
 		if (!DatabaseController.hasRemovalListStates())
 		{
@@ -430,7 +430,7 @@ public class SampleData
 			SYSLOG.trace("Database already has removal list states.");
 	}
 
-	private static void createSample_RemovalLists()
+	private static void createSampleRemovalLists()
 	{
 		if (!DatabaseController.hasRemovalLists())
 		{
@@ -446,7 +446,7 @@ public class SampleData
 			SYSLOG.trace("Database already has removal lists.");
 	}
 
-	private static void createSample_ProductBoxes() throws HibernateException, ParseException
+	private static void createSampleProductBoxes() throws HibernateException, ParseException
 	{
 		if (!DatabaseController.hasProductBoxes())
 		{
@@ -527,7 +527,7 @@ public class SampleData
 			SYSLOG.trace("Database already has product boxes.");
 	}
 
-	private static void createSample_RemovalPlatforms()
+	private static void createSampleRemovalPlatforms()
 	{
 		if (!DatabaseController.hasRemovalPlatforms())
 		{

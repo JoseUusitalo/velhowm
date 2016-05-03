@@ -19,7 +19,6 @@ import velho.controller.UIController;
 import velho.model.interfaces.GenericView;
 
 /**
- *
  * @author Joona Silvennoinen &amp; Jose Uusitalo
  */
 public class SearchView implements GenericView
@@ -29,9 +28,9 @@ public class SearchView implements GenericView
 	 * The root GridPane for this view.
 	 */
 	private GridPane grid;
-	private SearchController searchController;
-	private ObservableList<Object> productCategories;
-	private ObservableList<Object> productBrands;
+	private final SearchController searchController;
+	private final ObservableList<Object> productCategories;
+	private final ObservableList<Object> productBrands;
 	private boolean canBeInRemovalList;
 
 	/**

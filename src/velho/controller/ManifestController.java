@@ -38,7 +38,7 @@ public class ManifestController implements UIActionController
 	/**
 	 * The manifests tab.
 	 */
-	private GenericTabView tabView;
+	private final GenericTabView tabView;
 
 	/**
 	 * The panel in the manifest tab.
@@ -53,7 +53,7 @@ public class ManifestController implements UIActionController
 	/**
 	 * The {@link MainWindow}.
 	 */
-	private MainWindow mainWindow;
+	private final MainWindow mainWindow;
 
 	/**
 	 * @param mainWindow

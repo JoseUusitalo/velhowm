@@ -16,7 +16,7 @@ import velho.view.GenericTabView;
 import velho.view.ListView;
 import velho.view.ProductBoxesTabView;
 import velho.view.ProductDataView;
-import velho.view.ProductManagementView;
+import velho.view.VerticalViewGroup;
 import velho.view.ProductTypesTabView;
 
 /**
@@ -59,7 +59,7 @@ public class ProductController implements UIActionController
 	/**
 	 * The tab for creating product management view
 	 */
-	private ProductManagementView productManagementView;
+	private VerticalViewGroup productManagementView;
 
 	/**
 	 * The tab for creating product type view
@@ -84,7 +84,7 @@ public class ProductController implements UIActionController
 	public ProductController(final UIController uiController)
 	{
 		this.uiController = uiController;
-		this.productManagementView = new ProductManagementView();
+		this.productManagementView = new VerticalViewGroup();
 		this.productsTypeTabView = new ProductTypesTabView(this);
 		this.addProductView = new AddProductView(this, uiController);
 		this.brandsTabView = new BrandsTabView(this);

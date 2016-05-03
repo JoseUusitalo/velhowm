@@ -11,7 +11,7 @@ import javafx.scene.control.ButtonType;
  *
  * @author Joona Silvennoinen
  */
-public class PopupController
+public abstract class PopupController
 {
 	/**
 	 * Displays a popup alert with the given message asking the user a yes/no
@@ -27,7 +27,7 @@ public class PopupController
 		alert.setContentText(msg);
 
 		Optional<ButtonType> result = alert.showAndWait();
-		return (result.get() == ButtonType.OK);
+		return result.get() == ButtonType.OK;
 	}
 
 	/**
