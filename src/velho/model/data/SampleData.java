@@ -29,7 +29,7 @@ import velho.model.enums.UserRole;
  *
  * @author Jose Uusitalo
  */
-public class SampleData
+public abstract class SampleData
 {
 	/**
 	 * Apache log4j logger: System.

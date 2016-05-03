@@ -2,9 +2,20 @@ package velho.model.enums;
 
 import velho.controller.LocalizationController;
 
+/**
+ * @author Joona Silvennoinen
+ */
 public enum SupportedTranslation
 {
-	ENGLISH, GERMAN;
+	/**
+	 * The English language.
+	 */
+	ENGLISH,
+
+	/**
+	 * The German language.
+	 */
+	GERMAN;
 
 	@Override
 	public String toString()
