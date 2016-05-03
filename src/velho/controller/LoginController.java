@@ -15,7 +15,7 @@ import velho.view.MainWindow;
  *
  * @author Jose Uusitalo &amp; Edward Puustinen
  */
-public class LoginController
+public abstract class LoginController
 {
 	/**
 	 * Apache log4j logger: System.

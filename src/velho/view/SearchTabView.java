@@ -16,8 +16,10 @@ import velho.controller.SearchController;
 import velho.controller.UIController;
 import velho.model.interfaces.GenericView;
 
+/**
+ * @author Edward Puustinen
+ */
 public class SearchTabView implements GenericView
-
 {
 	/**
 	 * The root BorderPane for this view.

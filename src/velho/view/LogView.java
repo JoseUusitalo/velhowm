@@ -39,8 +39,11 @@ public class LogView implements GenericView
 	/**
 	 * The {@link LogController}
 	 */
-	private LogController logController;
+	private final LogController logController;
 
+	/**
+	 * @param logController
+	 */
 	public LogView(final LogController logController)
 	{
 		this.logController = logController;
@@ -58,7 +61,7 @@ public class LogView implements GenericView
 			bpane = new BorderPane();
 			ScrollPane leftlog = new ScrollPane();
 			leftlog.setFitToHeight(true);
-			leftlog.prefWidthProperty().bind(MainWindow.WIDTH_PROPERTY.divide(2.0));
+			leftlog.prefWidthProperty().bind(MainWindow.widthProperty.divide(2.0));
 			syslog = new Text(logController.getSystemLog());
 			leftlog.setFitToWidth(true);
 			leftlog.setContent(syslog);
