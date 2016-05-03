@@ -12,18 +12,18 @@ public class LocalizationController
 	private static Locale localeEnglish;
 	private static Locale localeGerman;
 
-	private final static String languageEnglish = "en";
-	private final static String countryEnglish = "US";
+	private final static String LANGUAGE_ENGLISH = "en";
+	private final static String COUNTRY_USA = "US";
 
-	private final static String languageGerman = "de";
-	private final static String countryGerman = "DE";
+	private final static String LANGUAGE_GERMAN = "de";
+	private final static String COUNTRY_GERMANY = "DE";
 	private static UIController uiController;
 
 	public static void initializeBundle()
 	{
 
-		localeEnglish = new Locale(languageEnglish, countryEnglish);
-		localeGerman = new Locale(languageGerman, countryGerman);
+		localeEnglish = new Locale(LANGUAGE_ENGLISH, COUNTRY_USA);
+		localeGerman = new Locale(LANGUAGE_GERMAN, COUNTRY_GERMANY);
 
 		msgBundle = getResourceBundle(localeEnglish);
 	}

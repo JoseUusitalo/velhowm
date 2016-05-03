@@ -98,7 +98,7 @@ public class DatabaseController
 	/**
 	 * The Hibernate session factory.
 	 */
-	private static final SessionFactory sessionFactory = HibernateSessionFactory.getInstance();
+	private static final SessionFactory SESSION_FACTORY = HibernateSessionFactory.getInstance();
 
 	/*
 	 * ---- UI LISTS ----
@@ -943,18 +943,18 @@ public class DatabaseController
 		if (databaseID < 1)
 			return null;
 
-		sessionFactory.getCurrentSession().beginTransaction();
+		SESSION_FACTORY.getCurrentSession().beginTransaction();
 
-		final Object result = sessionFactory.getCurrentSession().get(objectClass, databaseID);
+		final Object result = SESSION_FACTORY.getCurrentSession().get(objectClass, databaseID);
 
 		try
 		{
-			sessionFactory.getCurrentSession().getTransaction().commit();
+			SESSION_FACTORY.getCurrentSession().getTransaction().commit();
 
 		}
 		catch (final HibernateException e)
 		{
-			sessionFactory.getCurrentSession().getTransaction().rollback();
+			SESSION_FACTORY.getCurrentSession().getTransaction().rollback();
 
 			throw new HibernateException("Failed to commit.");
 		}
@@ -1365,22 +1365,22 @@ public class DatabaseController
 	 */
 	public static User authenticateBadgeID(final String badgeID)
 	{
-		sessionFactory.getCurrentSession().beginTransaction();
+		SESSION_FACTORY.getCurrentSession().beginTransaction();
 
 		// @formatter:off
 		@SuppressWarnings("unchecked")
-		List<User> result = sessionFactory.getCurrentSession().createQuery("from User where badgeID = :id")
+		List<User> result = SESSION_FACTORY.getCurrentSession().createQuery("from User where badgeID = :id")
 			   	   	   .setParameter("id", badgeID)
 			   	   	   .list();
 		// @formatter:on
 
 		try
 		{
-			sessionFactory.getCurrentSession().getTransaction().commit();
+			SESSION_FACTORY.getCurrentSession().getTransaction().commit();
 		}
 		catch (final HibernateException e)
 		{
-			sessionFactory.getCurrentSession().getTransaction().rollback();
+			SESSION_FACTORY.getCurrentSession().getTransaction().rollback();
 			throw e;
 		}
 
@@ -1402,11 +1402,11 @@ public class DatabaseController
 	 */
 	public static User authenticatePIN(final String firstName, final String lastName, final String pin)
 	{
-		sessionFactory.getCurrentSession().beginTransaction();
+		SESSION_FACTORY.getCurrentSession().beginTransaction();
 
 		// @formatter:off
 		@SuppressWarnings("unchecked")
-		List<User> result = sessionFactory.getCurrentSession().createQuery("from User "
+		List<User> result = SESSION_FACTORY.getCurrentSession().createQuery("from User "
 																		 + "where firstName = :fn "
 																		 + "and lastName = :ln "
 																		 + "and pin = :pin")
@@ -1418,11 +1418,11 @@ public class DatabaseController
 
 		try
 		{
-			sessionFactory.getCurrentSession().getTransaction().commit();
+			SESSION_FACTORY.getCurrentSession().getTransaction().commit();
 		}
 		catch (final HibernateException e)
 		{
-			sessionFactory.getCurrentSession().getTransaction().rollback();
+			SESSION_FACTORY.getCurrentSession().getTransaction().rollback();
 			throw e;
 		}
 
@@ -1476,11 +1476,11 @@ public class DatabaseController
 		if (id < 0)
 			return LoginController.getCurrentUser();
 
-		sessionFactory.getCurrentSession().beginTransaction();
+		SESSION_FACTORY.getCurrentSession().beginTransaction();
 
-		final User user = sessionFactory.getCurrentSession().get(User.class, id);
+		final User user = SESSION_FACTORY.getCurrentSession().get(User.class, id);
 
-		sessionFactory.getCurrentSession().getTransaction().commit();
+		SESSION_FACTORY.getCurrentSession().getTransaction().commit();
 
 		return user;
 	}
@@ -1494,22 +1494,22 @@ public class DatabaseController
 	 */
 	public static Product getProductByName(final String name)
 	{
-		sessionFactory.getCurrentSession().beginTransaction();
+		SESSION_FACTORY.getCurrentSession().beginTransaction();
 
 		// @formatter:off
 		@SuppressWarnings("unchecked")
-		List<Product> result = sessionFactory.getCurrentSession().createQuery("from Product where name = :name")
+		List<Product> result = SESSION_FACTORY.getCurrentSession().createQuery("from Product where name = :name")
 			   	   	   .setParameter("name", name)
 			   	   	   .list();
 		// @formatter:on
 
 		try
 		{
-			sessionFactory.getCurrentSession().getTransaction().commit();
+			SESSION_FACTORY.getCurrentSession().getTransaction().commit();
 		}
 		catch (final HibernateException e)
 		{
-			sessionFactory.getCurrentSession().getTransaction().rollback();
+			SESSION_FACTORY.getCurrentSession().getTransaction().rollback();
 			throw e;
 		}
 
@@ -1638,11 +1638,11 @@ public class DatabaseController
 
 			DBLOG.debug("Looking for [" + productID + "] of size " + wantedProductCount);
 
-			sessionFactory.getCurrentSession().beginTransaction();
+			SESSION_FACTORY.getCurrentSession().beginTransaction();
 
 			// First look for an exact amount.
 			// @formatter:off
-			boxes = sessionFactory.getCurrentSession().createQuery("from ProductBox as pb"
+			boxes = SESSION_FACTORY.getCurrentSession().createQuery("from ProductBox as pb"
 									  + " where pb.product.databaseID = :id"
 									  + " and pb.productCount = :count"
 									  + " order by pb.expirationDate asc")
@@ -1651,7 +1651,7 @@ public class DatabaseController
 				   	   	   .list();
 			// @formatter:on
 
-			sessionFactory.getCurrentSession().getTransaction().commit();
+			SESSION_FACTORY.getCurrentSession().getTransaction().commit();
 
 			// Couldn't find a box with exactly the number of products wanted.
 			if (boxes.isEmpty())
@@ -1659,21 +1659,21 @@ public class DatabaseController
 				if (MainWindow.DEBUG_MODE)
 					DBLOG.debug("Unable to find a product box with the wanted size of " + wantedProductCount + ". Looking from multiple boxes.");
 
-				sessionFactory.getCurrentSession().beginTransaction();
+				SESSION_FACTORY.getCurrentSession().beginTransaction();
 
 				/*
 				 * Remove the product count condition and find all product boxes
 				 * with the wanted product ID.
 				 */
 				// @formatter:off
-				boxes = sessionFactory.getCurrentSession().createQuery("from ProductBox as pb"
+				boxes = SESSION_FACTORY.getCurrentSession().createQuery("from ProductBox as pb"
 										  + " where pb.product.databaseID = :id"
 										  + " order by pb.expirationDate asc")
 						   	   .setParameter("id", productID)
 						   	   .list();
 				// @formatter:on
 
-				sessionFactory.getCurrentSession().getTransaction().commit();
+				SESSION_FACTORY.getCurrentSession().getTransaction().commit();
 
 				// for (ProductBox b : boxes)
 				// System.out.println(b.getExpirationDate());
@@ -1811,9 +1811,9 @@ public class DatabaseController
 			sb.append("pb.removalList is null ");
 		}
 
-		sessionFactory.getCurrentSession().beginTransaction();
+		SESSION_FACTORY.getCurrentSession().beginTransaction();
 
-		final Query query = sessionFactory.getCurrentSession().createQuery(sb.toString().trim());
+		final Query query = SESSION_FACTORY.getCurrentSession().createQuery(sb.toString().trim());
 
 		final StringBuilder logsb = new StringBuilder();
 
@@ -1894,11 +1894,11 @@ public class DatabaseController
 
 		try
 		{
-			sessionFactory.getCurrentSession().getTransaction().commit();
+			SESSION_FACTORY.getCurrentSession().getTransaction().commit();
 		}
 		catch (final HibernateException e)
 		{
-			sessionFactory.getCurrentSession().getTransaction().rollback();
+			SESSION_FACTORY.getCurrentSession().getTransaction().rollback();
 			throw e;
 		}
 
@@ -2015,19 +2015,19 @@ public class DatabaseController
 	 */
 	private static void delete(final Object object) throws HibernateException, ConstraintViolationException
 	{
-		sessionFactory.getCurrentSession().beginTransaction();
+		SESSION_FACTORY.getCurrentSession().beginTransaction();
 
-		sessionFactory.getCurrentSession().delete(object);
+		SESSION_FACTORY.getCurrentSession().delete(object);
 
 		try
 		{
-			sessionFactory.getCurrentSession().getTransaction().commit();
+			SESSION_FACTORY.getCurrentSession().getTransaction().commit();
 
 			DBLOG.debug("Deleted :" + object);
 		}
 		catch (final HibernateException e)
 		{
-			sessionFactory.getCurrentSession().getTransaction().rollback();
+			SESSION_FACTORY.getCurrentSession().getTransaction().rollback();
 
 			DBLOG.debug("Failed to delete: " + object);
 
@@ -2217,27 +2217,27 @@ public class DatabaseController
 	{
 		try
 		{
-			sessionFactory.getCurrentSession().beginTransaction();
+			SESSION_FACTORY.getCurrentSession().beginTransaction();
 
 			if (object.getDatabaseID() < 1)
 			{
-				sessionFactory.getCurrentSession().save(object);
+				SESSION_FACTORY.getCurrentSession().save(object);
 				DBLOG.debug("Saved: " + object);
 			}
 			else
 			{
-				sessionFactory.getCurrentSession().update(object);
+				SESSION_FACTORY.getCurrentSession().update(object);
 				DBLOG.debug("Updated: " + object);
 			}
 
-			sessionFactory.getCurrentSession().flush();
-			sessionFactory.getCurrentSession().clear();
+			SESSION_FACTORY.getCurrentSession().flush();
+			SESSION_FACTORY.getCurrentSession().clear();
 
-			sessionFactory.getCurrentSession().getTransaction().commit();
+			SESSION_FACTORY.getCurrentSession().getTransaction().commit();
 		}
 		catch (final Exception e)
 		{
-			sessionFactory.getCurrentSession().getTransaction().rollback();
+			SESSION_FACTORY.getCurrentSession().getTransaction().rollback();
 
 			System.err.println(e.getMessage());
 			throw e;
@@ -2257,18 +2257,18 @@ public class DatabaseController
 	 */
 	public static int save(final DatabaseObject object)
 	{
-		sessionFactory.getCurrentSession().beginTransaction();
+		SESSION_FACTORY.getCurrentSession().beginTransaction();
 
-		sessionFactory.getCurrentSession().save(object);
-		sessionFactory.getCurrentSession().flush();
+		SESSION_FACTORY.getCurrentSession().save(object);
+		SESSION_FACTORY.getCurrentSession().flush();
 
 		try
 		{
-			sessionFactory.getCurrentSession().getTransaction().commit();
+			SESSION_FACTORY.getCurrentSession().getTransaction().commit();
 		}
 		catch (final HibernateException e)
 		{
-			sessionFactory.getCurrentSession().getTransaction().rollback();
+			SESSION_FACTORY.getCurrentSession().getTransaction().rollback();
 
 			throw new HibernateException("Failed to commit.");
 		}
@@ -2295,18 +2295,18 @@ public class DatabaseController
 	private static List<Object> getAll(final String className) throws HibernateException
 	{
 
-		sessionFactory.getCurrentSession().beginTransaction();
+		SESSION_FACTORY.getCurrentSession().beginTransaction();
 
 		@SuppressWarnings("unchecked")
-		final List<Object> result = sessionFactory.getCurrentSession().createQuery("from " + className).list();
+		final List<Object> result = SESSION_FACTORY.getCurrentSession().createQuery("from " + className).list();
 
 		try
 		{
-			sessionFactory.getCurrentSession().getTransaction().commit();
+			SESSION_FACTORY.getCurrentSession().getTransaction().commit();
 		}
 		catch (final HibernateException e)
 		{
-			sessionFactory.getCurrentSession().getTransaction().rollback();
+			SESSION_FACTORY.getCurrentSession().getTransaction().rollback();
 			throw e;
 		}
 
@@ -2344,7 +2344,7 @@ public class DatabaseController
 	 */
 	public static List<String> getAllBadgeIDS()
 	{
-		final Session session = sessionFactory.openSession();
+		final Session session = SESSION_FACTORY.openSession();
 
 		// Transaction is created and closed automatically with the session.
 		session.beginTransaction();
@@ -2568,7 +2568,7 @@ public class DatabaseController
 	public static void closeSessionFactory()
 	{
 		DBLOG.info("Closing session factory.");
-		sessionFactory.close();
+		SESSION_FACTORY.close();
 	}
 
 	/**
@@ -2604,11 +2604,11 @@ public class DatabaseController
 	 */
 	private static boolean tableHasEntries(final String className)
 	{
-		sessionFactory.getCurrentSession().beginTransaction();
+		SESSION_FACTORY.getCurrentSession().beginTransaction();
 
 		//@formatter:off
 		@SuppressWarnings("unchecked")
-		final List<Object> result = sessionFactory.getCurrentSession()
+		final List<Object> result = SESSION_FACTORY.getCurrentSession()
 							.createQuery("from " + className)
 							.setFetchSize(1)
 							.setFirstResult(0)
@@ -2618,11 +2618,11 @@ public class DatabaseController
 
 		try
 		{
-			sessionFactory.getCurrentSession().getTransaction().commit();
+			SESSION_FACTORY.getCurrentSession().getTransaction().commit();
 		}
 		catch (final HibernateException e)
 		{
-			sessionFactory.getCurrentSession().getTransaction().rollback();
+			SESSION_FACTORY.getCurrentSession().getTransaction().rollback();
 			throw e;
 		}
 

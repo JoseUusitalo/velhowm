@@ -144,7 +144,7 @@ public class MainWindow extends Application implements GenericView
 	/**
 	 * The current width of the window.
 	 */
-	public static ReadOnlyDoubleProperty WIDTH_PROPERTY;
+	public static ReadOnlyDoubleProperty widthProperty;
 
 	/**
 	 * The root layout of the main window.
@@ -471,7 +471,7 @@ public class MainWindow extends Application implements GenericView
 			final Group root = new Group();
 			scene = new Scene(root, WINDOW_WIDTH, WINDOW_HEIGHT);
 			scene.getStylesheets().add(getClass().getResource("velho.css").toExternalForm());
-			WIDTH_PROPERTY = scene.widthProperty();
+			widthProperty = scene.widthProperty();
 
 			rootBorderPane = getRootBorderPane();
 
