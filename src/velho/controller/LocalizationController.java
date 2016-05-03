@@ -6,6 +6,9 @@ import java.util.ResourceBundle;
 
 import velho.model.enums.SupportedTranslation;
 
+/**
+ * @author Joona Silvennoinen
+ */
 public class LocalizationController
 {
 	private static ResourceBundle msgBundle;
@@ -42,7 +45,7 @@ public class LocalizationController
 		LocalizationController.localeEnglish = locale;
 	}
 
-	public static String getCompoundString(final String key, final Object[] messageArguments)
+	public static String getCompoundString(final String key, final Object... messageArguments)
 	{
 		MessageFormat formatter = new MessageFormat("");
 		formatter.setLocale(localeEnglish);
