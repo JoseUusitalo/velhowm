@@ -95,7 +95,7 @@ public class AddProductView implements GenericView
 			databaseID.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(0, Integer.MAX_VALUE, Integer.parseInt("-1")));
 
 			productLabel = new Label();
-			productLabel.setText("Product: ");
+			productLabel.setText(LocalizationController.getString("productPromtTextAddProductView"));
 			productLabel.setAlignment(Pos.BASELINE_RIGHT);
 			productLabel.setMinWidth(MainWindow.WINDOW_WIDTH / 10);
 			grid.add(productLabel, 1, 0);
@@ -161,8 +161,7 @@ public class AddProductView implements GenericView
 					Object brand = brandList.valueProperty().getValue();
 					Object category = categoryList.valueProperty().getValue();
 
-					final Product newProduct = productController.saveProduct(databaseID.getValueFactory().getValue().intValue(), nameField.getText(), brand,
-							category);
+					final Product newProduct = productController.saveProduct(databaseID.getValueFactory().getValue().intValue(), nameField.getText(), brand, category);
 					if (editProduct)
 						productController.showProductView(newProduct);
 				}

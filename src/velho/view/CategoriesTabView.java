@@ -18,7 +18,9 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.util.Callback;
 import velho.controller.DatabaseController;
+import velho.controller.LocalizationController;
 import velho.controller.ProductController;
+import velho.controller.UIController;
 import velho.model.ProductCategory;
 import velho.model.ProductType;
 import velho.model.interfaces.GenericView;
@@ -71,9 +73,12 @@ public class CategoriesTabView implements GenericView
 	{
 		if (vbox == null)
 		{
+			table.getColumns().clear();
+
 			HBox hbox = new HBox();
 
 			table.setEditable(true);
+			table.getItems().clear();
 			table.setItems(data);
 
 			final Callback<TableColumn<Object, Object>, TableCell<Object, Object>> cellFactory = (final TableColumn<Object, Object> p) -> new EditingCell();
@@ -92,7 +97,7 @@ public class CategoriesTabView implements GenericView
 			table.getColumns().add(nameColumn);
 
 			final ObservableList<Object> cbValues = DatabaseController.getAllProductTypes();
-			final TableColumn<Object, Object> comboBoxColumn = new TableColumn<>("Types Combobox");
+			final TableColumn<Object, Object> comboBoxColumn = new TableColumn<>(LocalizationController.getString("typesComboboxTabName"));
 			comboBoxColumn.setMinWidth(150);
 			comboBoxColumn.setCellValueFactory(new PropertyValueFactory<>("type"));
 			comboBoxColumn.setCellFactory(ComboBoxTableCell.forTableColumn(cbValues));
@@ -122,7 +127,7 @@ public class CategoriesTabView implements GenericView
 				@Override
 				public TableCell<Object, String> call(final TableColumn<Object, String> tcolumn)
 				{
-					final TableCellDeleteButton button = new TableCellDeleteButton(productController, "Delete");
+					final TableCellDeleteButton button = new TableCellDeleteButton(productController, (LocalizationController.getString("buttonDelete")));
 					button.setAlignment(Pos.CENTER);
 					return button;
 				}
@@ -130,9 +135,9 @@ public class CategoriesTabView implements GenericView
 			table.getColumns().add(deleteColumn);
 
 			final TextField categoryName = new TextField();
-			categoryName.setPromptText("Category Name");
+			categoryName.setPromptText(LocalizationController.getString("categoryNamePromtText"));
 			categoryName.setMaxWidth(nameColumn.getPrefWidth());
-			final Button addButton = new Button("Create");
+			final Button addButton = new Button(LocalizationController.getString("buttonCreate"));
 			addButton.setOnAction((final ActionEvent e) ->
 			{
 				final ProductCategory saveCategory = new ProductCategory(categoryName.getText());
@@ -149,6 +154,7 @@ public class CategoriesTabView implements GenericView
 			vbox.setPadding(new Insets(10, 0, 0, 10));
 			vbox.getChildren().addAll(table, hbox);
 
+			UIController.recordView(this);
 		}
 		return vbox;
 	}
@@ -156,7 +162,7 @@ public class CategoriesTabView implements GenericView
 	/**
 	 *
 	 * @author Edward
-	 * Enables editing a cell, nameley the textField
+	 *         Enables editing a cell, nameley the textField
 	 */
 	class EditingCell extends TableCell<Object, Object>
 	{

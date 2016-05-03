@@ -17,7 +17,9 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.util.Callback;
 import velho.controller.DatabaseController;
+import velho.controller.LocalizationController;
 import velho.controller.ProductController;
+import velho.controller.UIController;
 import velho.model.ProductBrand;
 import velho.model.interfaces.GenericView;
 import velho.view.components.TableCellDeleteButton;
@@ -45,8 +47,7 @@ public class BrandsTabView implements GenericView
 	/**
 	 * Makes the Brands and ObservableList
 	 */
-	private final ObservableList<Object> data = DatabaseController.getAllProductBrands();
-	// TODO: Set in constructor.
+	private ObservableList<Object> data;
 
 	/**
 	 * Adds info to Product Controller about brands
@@ -56,6 +57,7 @@ public class BrandsTabView implements GenericView
 	 */
 	public BrandsTabView(final ProductController productController)
 	{
+		data = DatabaseController.getAllProductBrands();
 		this.productController = productController;
 		this.table = new TableView<Object>();
 	}
@@ -77,6 +79,7 @@ public class BrandsTabView implements GenericView
 			final Callback<TableColumn<Object, String>, TableCell<Object, String>> cellFactory = (final TableColumn<Object, String> p) -> new EditingCell();
 			final TableColumn<Object, String> nameColumn = new TableColumn<Object, String>("Name");
 
+			table.getColumns().clear();
 			nameColumn.setMinWidth(100);
 			nameColumn.setCellValueFactory(new PropertyValueFactory<>("name"));
 			nameColumn.setCellFactory(cellFactory);
@@ -108,7 +111,7 @@ public class BrandsTabView implements GenericView
 				@Override
 				public TableCell<Object, String> call(final TableColumn<Object, String> tcolumn)
 				{
-					final TableCellDeleteButton button = new TableCellDeleteButton(productController, "Delete");
+					final TableCellDeleteButton button = new TableCellDeleteButton(productController, (LocalizationController.getString("buttonDelete")));
 					button.setAlignment(Pos.CENTER);
 					return button;
 				}
@@ -116,9 +119,9 @@ public class BrandsTabView implements GenericView
 			table.getColumns().add(deleteColumn);
 
 			final TextField brandName = new TextField();
-			brandName.setPromptText("Brand Name");
+			brandName.setPromptText(LocalizationController.getString("brandNamePromtText"));
 			brandName.setMaxWidth(nameColumn.getPrefWidth());
-			final Button addButton = new Button("Create");
+			final Button addButton = new Button(LocalizationController.getString("buttonCreate"));
 			addButton.setOnAction((final ActionEvent event) ->
 			{
 				final ProductBrand saveBrand = new ProductBrand(brandName.getText());
@@ -135,6 +138,7 @@ public class BrandsTabView implements GenericView
 			vbox.setPadding(new Insets(10, 0, 0, 10));
 			vbox.getChildren().addAll(table, hbox);
 
+			UIController.recordView(this);
 		}
 		return vbox;
 	}
@@ -142,7 +146,7 @@ public class BrandsTabView implements GenericView
 	/**
 	 *
 	 * @author Edward
-	 * Enables editing a cell, nameley the textField
+	 *         Enables editing a cell, nameley the textField
 	 */
 	class EditingCell extends TableCell<Object, String>
 	{

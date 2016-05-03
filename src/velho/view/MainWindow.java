@@ -70,7 +70,7 @@ public class MainWindow extends Application implements GenericView
 	/**
 	 * Enable or disable debug features.
 	 */
-	public static final boolean DEBUG_MODE = false;
+	public static final boolean DEBUG_MODE = true;
 
 	/**
 	 * Enable or disable showing windows. DEBUG_MODE must be <code>true</code>
