@@ -13,15 +13,27 @@ import velho.controller.DatabaseController;
 import velho.controller.ExternalSystemsController;
 import velho.controller.SearchController;
 
+/**
+ *
+ * @author Joona Silvennoinen
+ */
 public class SearchTabView
-
 {
 	/**
 	 * The root BorderPane for this view.
 	 */
 	private BorderPane bPane;
+
+	/**
+	 * Calls SearchControllers
+	 */
 	private SearchController searchController;
 
+	/**
+	 * Gets the information to SearchTabView form SearchController
+	 * 
+	 * @param searchController
+	 */
 	public SearchTabView(final SearchController searchController)
 	{
 		this.searchController = searchController;

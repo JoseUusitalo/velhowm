@@ -25,11 +25,26 @@ public class SearchView
 	 * The root GridPane for this view.
 	 */
 	private GridPane grid;
+
+	/**
+	 * Calls SearchController
+	 */
 	private SearchController searchController;
+
+	/**
+	 * An observable list of productCategories
+	 */
 	private ObservableList<Object> productCategories;
 	private ObservableList<Object> productBrands;
 	private String limits;
 
+	/**
+	 * Brings the information to the SearchVies from these parameters
+	 *
+	 * @param searchController
+	 * @param productBrands
+	 * @param productCategories
+	 */
 	public SearchView(final SearchController searchController, final ObservableList<Object> productBrands, final ObservableList<Object> productCategories)
 	{
 		this.searchController = searchController;
@@ -43,8 +58,7 @@ public class SearchView
 	 * @param productBrands
 	 * @param productCategories
 	 */
-	public SearchView(final SearchController searchController, final String limits, final ObservableList<Object> productBrands,
-			final ObservableList<Object> productCategories)
+	public SearchView(final SearchController searchController, final String limits, final ObservableList<Object> productBrands, final ObservableList<Object> productCategories)
 	{
 		this.searchController = searchController;
 		this.limits = limits;
@@ -150,8 +164,7 @@ public class SearchView
 						// Although badge IDs are stored as string, they are still numbers.
 					}
 
-					searchController.productSearch(limits, nameField.getText(), productCountField.getValue(), brandbox.getValue(), categorybox.getValue(),
-							dpStart.getValue(), dpEnd.getValue());
+					searchController.productSearch(limits, nameField.getText(), productCountField.getValue(), brandbox.getValue(), categorybox.getValue(), dpStart.getValue(), dpEnd.getValue());
 				}
 			});
 		}
