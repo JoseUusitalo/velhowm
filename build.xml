@@ -20,6 +20,7 @@
 	<property name="build.dist.src.dir" location="bin/dist/src" />
 	<property name="build.dist.lib.dir" location="bin/dist/lib" />
 	<property name="build.dist.test.dir" location="bin/dist/test" />
+	<property name="build.dist.report.dir" location="bin/dist/report" />
 
 	<path id="velho.classpath">
 		<fileset dir="${lib.dir}" includes="h2-1.4.191.jar" />
@@ -57,6 +58,7 @@
 		<mkdir dir="${build.dist.lib.dir}" />
 		<mkdir dir="${build.dist.src.dir}" />
 		<mkdir dir="${build.dist.test.dir}" />
+		<mkdir dir="${build.dist.report.dir}" />
 		<mkdir dir="${dist.dir}" />
 		<mkdir dir="${report.dir}" />
 		<mkdir dir="${report.xml.dir}" />
@@ -194,7 +196,7 @@
 	</target>
 
 	<target name="test" depends="run-test" description="Creates the test report.">
-		<junitreport todir="${report.xml.dir}">
+		<junitreport todir="${build.dist.report.dir}">
 			<fileset dir="${report.xml.dir}">
 				<include name="TEST-*.xml" />
 			</fileset>
