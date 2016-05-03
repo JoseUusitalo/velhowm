@@ -39,8 +39,11 @@ public class LogView implements GenericView
 	/**
 	 * The {@link LogController}
 	 */
-	private LogController logController;
+	private final LogController logController;
 
+	/**
+	 * @param logController
+	 */
 	public LogView(final LogController logController)
 	{
 		this.logController = logController;

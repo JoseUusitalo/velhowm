@@ -32,7 +32,7 @@ public class ProductListSearch implements GenericView
 	/**
 	 * The {@link SearchController}.
 	 */
-	private SearchController searchController;
+	private final SearchController searchController;
 
 	/**
 	 * Searches the list of products

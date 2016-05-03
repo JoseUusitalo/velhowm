@@ -30,7 +30,7 @@ public class ManifestManagementView implements GenericView
 	/**
 	 * The {@link ManifestController}.
 	 */
-	private ManifestController manifestController;
+	private final ManifestController manifestController;
 
 	/**
 	 * The header of the view in the tab.

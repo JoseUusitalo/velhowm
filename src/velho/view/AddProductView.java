@@ -22,14 +22,13 @@ import velho.model.interfaces.GenericView;
  * Creates tab for "Product Edit View".
  *
  * @author Edward Puustinen
- *
  */
 public class AddProductView implements GenericView
 {
 	/**
 	 * The product controller.
 	 */
-	private ProductController productController;
+	private final ProductController productController;
 
 	/**
 	 * The border panel.
@@ -61,7 +60,10 @@ public class AddProductView implements GenericView
 	 */
 	private ComboBox<Object> categoryList;
 
-	private UIController uiController;
+	/**
+	 * The {@link UIController}.
+	 */
+	private final UIController uiController;
 
 	/**
 	 * @param productController

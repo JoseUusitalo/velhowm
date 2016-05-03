@@ -42,12 +42,12 @@ public class RemovalListCreationView implements GenericView
 	/**
 	 * The {@link RemovalListController}.
 	 */
-	private RemovalListController removalListController;
+	private final RemovalListController removalListController;
 
 	/**
 	 * The {@link SearchController}.
 	 */
-	private SearchController searchController;
+	private final SearchController searchController;
 
 	/**
 	 * The new removal list view.
