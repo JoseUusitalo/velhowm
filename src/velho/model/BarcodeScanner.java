@@ -19,7 +19,7 @@ import velho.controller.ExternalSystemsController;
  *
  * @author Edward Puustinen
  */
-public class BarcodeScanner
+public abstract class BarcodeScanner
 {
 	/**
 	 * Apache log4j logger: System.

@@ -126,7 +126,7 @@ public class RemovalListManagementView implements GenericView
 	 * Destroys the view.
 	 */
 	@Override
-	public void reCreate()
+	public void recreate()
 	{
 		bpane = null;
 		getView();
@@ -140,5 +140,11 @@ public class RemovalListManagementView implements GenericView
 	public void setBrowseListsButtonVisiblity(final boolean visible)
 	{
 		browseListsButton.setVisible(visible);
+	}
+
+	@Override
+	public void destroy()
+	{
+		bpane = null;
 	}
 }

@@ -6,20 +6,21 @@
 	<property name="projectName" value="VELHOWM" />
 	<property name="main.class" value="velho.view.MainWindow"/>
 
-	<property name="src.dir" location="src" />
-	<property name="res.dir" location="res" />
 	<property name="test.dir" location="test" />
-	<property name="report.dir" location="report" />
 	<property name="javadoc.dir" location="javadoc" />
+	<property name="src.dir" location="src" />
+	<property name="src.res.dir" location="src/res" />
+	<property name="report.dir" location="report" />
+	<property name="report.xml.dir" location="report/xml" />
 	<property name="dist.dir" location="dist" />
 	<property name="dist.res.dir" location="dist/res" />
 	<property name="lib.dir" location="lib" />
 	<property name="lib.checkstyle.dir" location="lib/checkstyle" />
 	<property name="build.dir" location="bin" />
-	<property name="build.report.dir" location="bin/report" />
 	<property name="build.dist.src.dir" location="bin/dist/src" />
 	<property name="build.dist.lib.dir" location="bin/dist/lib" />
 	<property name="build.dist.test.dir" location="bin/dist/test" />
+	<property name="build.dist.report.dir" location="bin/dist/report" />
 
 	<path id="velho.classpath">
 		<fileset dir="${lib.dir}" includes="h2-1.4.191.jar" />
@@ -43,7 +44,6 @@
 		<delete dir="${build.dist.lib.dir}" />
 		<delete dir="${build.dist.src.dir}" />
 		<delete dir="${build.dist.test.dir}" />
-		<delete dir="${build.report.dir}" />
 		<delete dir="${dist.dir}" />
 		<delete dir="${report.dir}" />
 		<delete dir="${javadoc.dir}" />
@@ -58,9 +58,10 @@
 		<mkdir dir="${build.dist.lib.dir}" />
 		<mkdir dir="${build.dist.src.dir}" />
 		<mkdir dir="${build.dist.test.dir}" />
-		<mkdir dir="${build.report.dir}" />
+		<mkdir dir="${build.dist.report.dir}" />
 		<mkdir dir="${dist.dir}" />
 		<mkdir dir="${report.dir}" />
+		<mkdir dir="${report.xml.dir}" />
 		<mkdir dir="${javadoc.dir}" />
 	</target>
 
@@ -87,6 +88,10 @@
 												 rulesets/java/unusedcode.xml">
 			<sourceLanguage name="java" version="${target}"/>
 
+			<formatter type="xml" toFile="${report.xml.dir}/pmd_report.xml">
+				<param name="linePrefix" value=".line"/>
+			</formatter>
+
 			<formatter type="html" toFile="${report.dir}/pmd_report.html">
 				<param name="linePrefix" value=".line"/>
 			</formatter>
@@ -102,11 +107,11 @@
 
 		<checkstyle config="${lib.checkstyle.dir}/sun_checks_tweaked.xml" failureProperty="checkstyle.failure" failOnViolation="false">
 			<classpath refid="velho.classpath" />
-			<formatter type="xml" tofile="${build.report.dir}/checkstyle_report.xml"/>
+			<formatter type="xml" tofile="${report.xml.dir}/checkstyle_report.xml"/>
 			<fileset dir="${src.dir}" includes="**/*.java"/>
 		</checkstyle>
 
-		<xslt in="${build.report.dir}/checkstyle_report.xml" out="${report.dir}/checkstyle_report.html" style="${lib.checkstyle.dir}/checkstyle-noframes-sorted.xsl"/>
+		<xslt in="${report.xml.dir}/checkstyle_report.xml" out="${report.dir}/checkstyle_report.html" style="${lib.checkstyle.dir}/checkstyle-noframes-sorted.xsl"/>
 	</target>
 
 	<target name="javadoc" description="Generates Javadocs.">
@@ -154,11 +159,7 @@
 
 	<target name="resources" description="Copies all configuration files, Hibernate mappings, and resources into the distribution.">
 		<copy todir="${build.dist.src.dir}">
-			<fileset dir="${src.dir}" includes="**/*.xml,**/*.properties,**/*.css"/>
-		</copy>
-		
-		<copy todir="${dist.res.dir}">
-		    <fileset dir="${res.dir}"/>
+			<fileset dir="${src.dir}" includes="**/*.xml,**/*.properties,**/*.css,**/*.png" />
 		</copy>
 	</target>
 
@@ -184,7 +185,7 @@
 				<pathelement location="${build.dist.test.dir}"/>
 			</classpath>
 
-			<batchtest todir="${build.report.dir}">
+			<batchtest todir="${report.xml.dir}">
 				<fileset dir="${build.dist.test.dir}">
 					<!-- If this is used the main database is still in use after tests and cannot be used in the application. -->
 					<!-- <include name="**/*Test.class" /> -->
@@ -195,14 +196,14 @@
 	</target>
 
 	<target name="test" depends="run-test" description="Creates the test report.">
-		<junitreport todir="${build.report.dir}">
-			<fileset dir="${build.report.dir}">
+		<junitreport todir="${build.dist.report.dir}">
+			<fileset dir="${report.xml.dir}">
 				<include name="TEST-*.xml" />
 			</fileset>
 			<report format="noframes" todir="${report.dir}" styledir="${lib.dir}/eclipse" />
 		</junitreport>
 	</target>
-	
+
 	<target name="jar" depends="compile, resources, test, dependencies" description="Creates the jar.">
 		<jar destfile="${dist.dir}/${projectName}_${DSTAMP}.jar" basedir="${build.dist.src.dir}">
 			<manifest>

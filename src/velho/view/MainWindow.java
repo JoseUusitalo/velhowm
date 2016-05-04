@@ -70,7 +70,7 @@ public class MainWindow extends Application implements GenericView
 	/**
 	 * Enable or disable debug features.
 	 */
-	public static final boolean DEBUG_MODE = true;
+	public static final boolean DEBUG_MODE = false;
 
 	/**
 	 * Enable or disable showing windows. DEBUG_MODE must be <code>true</code>
@@ -82,7 +82,7 @@ public class MainWindow extends Application implements GenericView
 	 * Enable TRACE level logging. DEBUG_MODE must be <code>true</code> for this
 	 * to affect anything.
 	 */
-	public static final boolean SHOW_TRACE = true;
+	public static final boolean SHOW_TRACE = false;
 
 	/**
 	 * Skips the entire main application code. DEBUG_MODE must be
@@ -144,7 +144,7 @@ public class MainWindow extends Application implements GenericView
 	/**
 	 * The current width of the window.
 	 */
-	public static ReadOnlyDoubleProperty WIDTH_PROPERTY;
+	public static ReadOnlyDoubleProperty widthProperty;
 
 	/**
 	 * The root layout of the main window.
@@ -274,8 +274,6 @@ public class MainWindow extends Application implements GenericView
 	private void runApp()
 	{
 		SYSLOG.info("Running VELHO Warehouse Management.");
-
-		// FIXME: Database is not created correctly on first run.
 
 		try
 		{
@@ -416,7 +414,6 @@ public class MainWindow extends Application implements GenericView
 				@Override
 				public void changed(final ObservableValue ov, final SupportedTranslation oldValue, final SupportedTranslation newValue)
 				{
-					System.out.println(oldValue + " " + newValue);
 					if (oldValue == null || !oldValue.equals(newValue))
 					{
 						LocalizationController.changeTranslation(newValue);
@@ -474,7 +471,7 @@ public class MainWindow extends Application implements GenericView
 			final Group root = new Group();
 			scene = new Scene(root, WINDOW_WIDTH, WINDOW_HEIGHT);
 			scene.getStylesheets().add(getClass().getResource("velho.css").toExternalForm());
-			WIDTH_PROPERTY = scene.widthProperty();
+			widthProperty = scene.widthProperty();
 
 			rootBorderPane = getRootBorderPane();
 
@@ -609,7 +606,13 @@ public class MainWindow extends Application implements GenericView
 	}
 
 	@Override
-	public void reCreate()
+	public void recreate()
+	{
+		mainTabPane = null;
+	}
+
+	@Override
+	public void destroy()
 	{
 		mainTabPane = null;
 	}

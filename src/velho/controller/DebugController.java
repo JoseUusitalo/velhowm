@@ -38,7 +38,7 @@ public class DebugController
 	/**
 	 * A pseudo-random number generator.
 	 */
-	private Random r = new Random();
+	private final Random random;
 
 	/**
 	 * DebugController should call the RemovalPlatform
@@ -47,6 +47,7 @@ public class DebugController
 	 */
 	public DebugController(final RemovalPlatformController removalPlatformController)
 	{
+		this.random = new Random();
 		this.removalPlatformController = removalPlatformController;
 		List<UserRole> roles = new ArrayList<UserRole>();
 		roles.addAll(Arrays.asList(UserRole.values()));
@@ -137,7 +138,7 @@ public class DebugController
 	 */
 	public void fillUpPlatform()
 	{
-		removalPlatformController.modifyFreeSpace(-1.0 * ((r.nextDouble() * 0.15 + 0.2) - 0.1));
+		removalPlatformController.modifyFreeSpace(-1.0 * (random.nextDouble() * 0.15 + 0.2 - 0.1));
 	}
 
 	/**

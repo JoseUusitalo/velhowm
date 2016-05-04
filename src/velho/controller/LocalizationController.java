@@ -6,24 +6,27 @@ import java.util.ResourceBundle;
 
 import velho.model.enums.SupportedTranslation;
 
+/**
+ * @author Joona Silvennoinen
+ */
 public class LocalizationController
 {
 	private static ResourceBundle msgBundle;
 	private static Locale localeEnglish;
 	private static Locale localeGerman;
 
-	private final static String languageEnglish = "en";
-	private final static String countryEnglish = "US";
+	private final static String LANGUAGE_ENGLISH = "en";
+	private final static String COUNTRY_USA = "US";
 
-	private final static String languageGerman = "de";
-	private final static String countryGerman = "DE";
+	private final static String LANGUAGE_GERMAN = "de";
+	private final static String COUNTRY_GERMANY = "DE";
 	private static UIController uiController;
 
 	public static void initializeBundle()
 	{
 
-		localeEnglish = new Locale(languageEnglish, countryEnglish);
-		localeGerman = new Locale(languageGerman, countryGerman);
+		localeEnglish = new Locale(LANGUAGE_ENGLISH, COUNTRY_USA);
+		localeGerman = new Locale(LANGUAGE_GERMAN, COUNTRY_GERMANY);
 
 		msgBundle = getResourceBundle(localeEnglish);
 	}
@@ -42,7 +45,7 @@ public class LocalizationController
 		LocalizationController.localeEnglish = locale;
 	}
 
-	public static String getCompoundString(final String key, final Object[] messageArguments)
+	public static String getCompoundString(final String key, final Object... messageArguments)
 	{
 		MessageFormat formatter = new MessageFormat("");
 		formatter.setLocale(localeEnglish);
@@ -65,13 +68,12 @@ public class LocalizationController
 		if (newTranslation.equals(SupportedTranslation.ENGLISH))
 		{
 			msgBundle = getResourceBundle(localeEnglish);
-			uiController.reCreateAllViews();
+			uiController.recreateAllViews();
 		}
 		else
 		{
-			System.out.println("new lang german");
 			msgBundle = getResourceBundle(localeGerman);
-			uiController.reCreateAllViews();
+			uiController.recreateAllViews();
 		}
 	}
 

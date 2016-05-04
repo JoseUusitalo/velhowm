@@ -20,20 +20,23 @@ import javafx.util.Callback;
 import velho.controller.DatabaseController;
 import velho.controller.ProductController;
 import velho.model.ProductBrand;
+import velho.model.interfaces.GenericView;
 import velho.view.components.TableCellDeleteButton;
 
-public class BrandsTabView
+/**
+ * @author Edward Puustinen
+ */
+public class BrandsTabView implements GenericView
 {
-
 	/**
 	 * ProductCntroller neeeded when saving to database
 	 */
-	private ProductController productController;
+	private final ProductController productController;
 
 	/**
 	 * Makes the Brands tab call for table and make it viewable
 	 */
-	private final TableView<Object> table = new TableView<Object>();
+	private final TableView<Object> table;
 
 	/**
 	 * this is a VBox we use like a grid
@@ -43,7 +46,8 @@ public class BrandsTabView
 	/**
 	 * Makes the Brands and ObservableList
 	 */
-	private ObservableList<Object> data = DatabaseController.getAllProductBrands();
+	private final ObservableList<Object> data = DatabaseController.getAllProductBrands();
+	// TODO: Set in constructor.
 
 	/**
 	 * Adds info to Product Controller about brands
@@ -54,6 +58,7 @@ public class BrandsTabView
 	public BrandsTabView(final ProductController productController)
 	{
 		this.productController = productController;
+		this.table = new TableView<Object>();
 	}
 
 	/**
@@ -65,7 +70,7 @@ public class BrandsTabView
 	{
 		if (vbox == null)
 		{
-			HBox hb = new HBox();
+			HBox hbox = new HBox();
 
 			table.setEditable(true);
 			table.setItems(data);
@@ -77,10 +82,10 @@ public class BrandsTabView
 			nameColumn.setCellValueFactory(new PropertyValueFactory<>("name"));
 			nameColumn.setCellFactory(cellFactory);
 
-			nameColumn.setOnEditCommit((final CellEditEvent<Object, String> t) ->
+			nameColumn.setOnEditCommit((final CellEditEvent<Object, String> event) ->
 			{
-				final ProductBrand editBrand = ((ProductBrand) t.getTableView().getItems().get(t.getTablePosition().getRow()));
-				editBrand.setName(t.getNewValue());
+				final ProductBrand editBrand = ((ProductBrand) event.getTableView().getItems().get(event.getTablePosition().getRow()));
+				editBrand.setName(event.getNewValue());
 				productController.saveBrand(editBrand);
 			});
 			table.getColumns().add(nameColumn);
@@ -92,9 +97,9 @@ public class BrandsTabView
 			deleteColumn.setCellValueFactory(new Callback<TableColumn.CellDataFeatures<Object, String>, ObservableValue<String>>()
 			{
 				@Override
-				public ObservableValue<String> call(final TableColumn.CellDataFeatures<Object, String> p)
+				public ObservableValue<String> call(final TableColumn.CellDataFeatures<Object, String> celldata)
 				{
-					return new SimpleStringProperty(p.getValue(), "Delete");
+					return new SimpleStringProperty(celldata.getValue(), "Delete");
 				}
 			});
 
@@ -102,7 +107,7 @@ public class BrandsTabView
 			deleteColumn.setCellFactory(new Callback<TableColumn<Object, String>, TableCell<Object, String>>()
 			{
 				@Override
-				public TableCell<Object, String> call(final TableColumn<Object, String> p)
+				public TableCell<Object, String> call(final TableColumn<Object, String> tcolumn)
 				{
 					final TableCellDeleteButton button = new TableCellDeleteButton(productController, "Delete");
 					button.setAlignment(Pos.CENTER);
@@ -115,7 +120,7 @@ public class BrandsTabView
 			final TextField brandName = new TextField();
 			brandName.setMaxWidth(nameColumn.getPrefWidth());
 			final Button addButton = new Button("Create");
-			addButton.setOnAction((final ActionEvent e) ->
+			addButton.setOnAction((final ActionEvent event) ->
 			{
 				final ProductBrand saveBrand = new ProductBrand(brandName.getText());
 				data.add(saveBrand);
@@ -123,14 +128,14 @@ public class BrandsTabView
 				productController.saveBrand(saveBrand);
 			});
 
-			hb.getChildren().addAll(brandLabel, brandName, addButton);
-			hb.setSpacing(10);
-			hb.setAlignment(Pos.CENTER_LEFT);
+			hbox.getChildren().addAll(brandLabel, brandName, addButton);
+			hbox.setSpacing(10);
+			hbox.setAlignment(Pos.CENTER_LEFT);
 
 			vbox = new VBox();
 			vbox.setSpacing(5);
 			vbox.setPadding(new Insets(10, 0, 0, 10));
-			vbox.getChildren().addAll(table, hb);
+			vbox.getChildren().addAll(table, hbox);
 
 		}
 		return vbox;
@@ -148,6 +153,7 @@ public class BrandsTabView
 
 		public EditingCell()
 		{
+			// Silencing PMD.
 		}
 
 		@Override
@@ -218,5 +224,18 @@ public class BrandsTabView
 		{
 			return getItem() == null ? "" : getItem().toString();
 		}
+	}
+
+	@Override
+	public void recreate()
+	{
+		vbox = null;
+		getView();
+	}
+
+	@Override
+	public void destroy()
+	{
+		vbox = null;
 	}
 }

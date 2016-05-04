@@ -42,7 +42,7 @@ public class RemovalListView implements GenericView
 	/**
 	 * The {@link RemovalListController}.
 	 */
-	private RemovalListController removalListController;
+	private final RemovalListController removalListController;
 
 	/**
 	 * The new removal list view.
@@ -91,7 +91,7 @@ public class RemovalListView implements GenericView
 				}
 			});
 
-			final Label removalListLabel = new Label((LocalizationController.getString("removalListLabel")) + removalList.getDatabaseID());
+			final Label removalListLabel = new Label(LocalizationController.getString("removalListLabel") + removalList.getDatabaseID());
 			removalListLabel.getStyleClass().add("centered-title-small");
 			removalListLabel.setAlignment(Pos.CENTER);
 			removalListLabel.setMaxWidth(Double.MAX_VALUE);
@@ -132,7 +132,7 @@ public class RemovalListView implements GenericView
 	 * Destroys the view.
 	 */
 	@Override
-	public void reCreate()
+	public void recreate()
 	{
 		bpane = null;
 		thisList = null;
@@ -147,5 +147,11 @@ public class RemovalListView implements GenericView
 	{
 		SYSLOG.trace("Refreshing removal list viewing view.");
 		thisList = removalListController.getNewRemovalListView();
+	}
+
+	@Override
+	public void destroy()
+	{
+		bpane = null;
 	}
 }

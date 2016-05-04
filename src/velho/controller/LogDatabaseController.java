@@ -23,7 +23,7 @@ import velho.view.MainWindow;
  *
  * @author Jose Uusitalo
  */
-public class LogDatabaseController
+public abstract class LogDatabaseController
 {
 	/**
 	 * Apache log4j logger: System.
@@ -91,7 +91,7 @@ public class LogDatabaseController
 				case SELECT:
 					result = statement.getResultSet();
 
-					if (columns.length == 1 && columns[0] != "*")
+					if (columns.length == 1 && !columns[0].equals("*"))
 					{
 						while (result.next())
 							datalist.add(result.getObject(columns[0]));
@@ -196,7 +196,7 @@ public class LogDatabaseController
 				e.printStackTrace();
 			}
 
-			throw new Exception("Connection pool has been disposed, no database connection.");
+			throw new RuntimeException("Connection pool has been disposed, no database connection.");
 		}
 		catch (final SQLException e)
 		{
@@ -238,7 +238,7 @@ public class LogDatabaseController
 	private static boolean databaseExists()
 	{
 		final File db = new File(DB_FILEPATH);
-		return (db.exists() && !db.isDirectory());
+		return db.exists() && !db.isDirectory();
 	}
 
 	/**
@@ -346,10 +346,10 @@ public class LogDatabaseController
 		// Try getting a connection. If the database does not exist, it is created.
 		try
 		{
-			final Connection c = getConnection();
+			final Connection connection = getConnection();
 
-			if (c != null)
-				c.close();
+			if (connection != null)
+				connection.close();
 		}
 		catch (final SQLException e)
 		{
@@ -404,7 +404,7 @@ public class LogDatabaseController
 	/**
 	 * Links to the log database and initializes if it does not exist.
 	 */
-	public static boolean connectAndInitialize() throws Exception
+	public static boolean connectAndInitialize() throws ClassNotFoundException
 	{
 		if (isLinked())
 			return true;
@@ -434,7 +434,7 @@ public class LogDatabaseController
 	 * @return <code>true</code> if database changed as a result of this call
 	 * @throws NoDatabaseLinkException
 	 */
-	public static boolean initializeDatabase() throws Exception
+	public static boolean initializeDatabase()
 	{
 		if (MainWindow.DEBUG_MODE)
 			System.out.println("Initializing log database...");
@@ -449,7 +449,7 @@ public class LogDatabaseController
 			// Initialize a statement.
 			statement = connection.createStatement();
 			statement.execute("RUNSCRIPT FROM './data/loginit.sql';");
-			changed = (statement.getUpdateCount() > 0);
+			changed = statement.getUpdateCount() > 0;
 		}
 		catch (final IllegalStateException e)
 		{
@@ -474,7 +474,7 @@ public class LogDatabaseController
 				e.printStackTrace();
 			}
 
-			throw new Exception("Connection pool has been disposed, no database connection.");
+			throw new RuntimeException("Connection pool has been disposed, no database connection.");
 		}
 		catch (final SQLException e)
 		{

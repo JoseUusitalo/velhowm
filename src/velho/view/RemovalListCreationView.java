@@ -42,12 +42,12 @@ public class RemovalListCreationView implements GenericView
 	/**
 	 * The {@link RemovalListController}.
 	 */
-	private RemovalListController removalListController;
+	private final RemovalListController removalListController;
 
 	/**
 	 * The {@link SearchController}.
 	 */
-	private SearchController searchController;
+	private final SearchController searchController;
 
 	/**
 	 * The new removal list view.
@@ -161,7 +161,7 @@ public class RemovalListCreationView implements GenericView
 	 * Destroys the view.
 	 */
 	@Override
-	public void reCreate()
+	public void recreate()
 	{
 		bpane = null;
 		resultList = null;
@@ -178,5 +178,11 @@ public class RemovalListCreationView implements GenericView
 		SYSLOG.trace(LocalizationController.getString("refreshRemovalListNotice"));
 		resultList = removalListController.getSearchResultsListView();
 		newList = removalListController.getNewRemovalListView();
+	}
+
+	@Override
+	public void destroy()
+	{
+		bpane = null;
 	}
 }

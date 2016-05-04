@@ -27,7 +27,7 @@ public class SearchController
 	/**
 	 * The {@link ProductController}.
 	 */
-	private ProductController productController;
+	private final ProductController productController;
 
 	/**
 	 * @param productController
@@ -183,7 +183,7 @@ public class SearchController
 	 *
 	 * @param line String to parse
 	 * @return an object array where the first element is the integer and the
-	 *         second element is the product name
+	 * second element is the product name
 	 */
 	public static Object[] parseProductLine(final String line)
 	{

@@ -19,12 +19,12 @@ public class TableCellDeleteButton extends TableCell<Object, String>
 	/**
 	 * The button itself.
 	 */
-	private Button button;
+	private final Button button;
 
 	/**
 	 * The controller to send information to when this button is pressed.
 	 */
-	private UIActionController controller;
+	private final UIActionController controller;
 
 	/**
 	 * @param text button text
@@ -41,7 +41,7 @@ public class TableCellDeleteButton extends TableCell<Object, String>
 		button.setOnAction(new EventHandler<ActionEvent>()
 		{
 			@Override
-			public void handle(final ActionEvent t)
+			public void handle(final ActionEvent event)
 			{
 				// Get selected object and send information to parent
 				// controller.
@@ -61,7 +61,7 @@ public class TableCellDeleteButton extends TableCell<Object, String>
 		// Display button only if the row is not empty.
 		if (!empty)
 		{
-			final Object rowObject = TableCellDeleteButton.this.getTableView().getItems().get(TableCellDeleteButton.this.getIndex());
+			final Object rowObject = getTableView().getItems().get(getIndex());
 
 			if (rowObject instanceof User)
 			{

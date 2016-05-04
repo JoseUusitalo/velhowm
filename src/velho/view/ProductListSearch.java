@@ -32,7 +32,7 @@ public class ProductListSearch implements GenericView
 	/**
 	 * The {@link SearchController}.
 	 */
-	private SearchController searchController;
+	private final SearchController searchController;
 
 	/**
 	 * Searches the list of products
@@ -111,9 +111,15 @@ public class ProductListSearch implements GenericView
 	}
 
 	@Override
-	public void reCreate()
+	public void recreate()
 	{
 		pane = null;
 		getView(null);
+	}
+
+	@Override
+	public void destroy()
+	{
+		pane = null;
 	}
 }

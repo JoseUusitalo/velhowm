@@ -20,28 +20,34 @@ import javafx.util.Callback;
 import velho.controller.DatabaseController;
 import velho.controller.ProductController;
 import velho.model.ProductType;
+import velho.model.interfaces.GenericView;
 import velho.view.components.TableCellDeleteButton;
 
-public class ProductTypesTabView
+/**
+ * @author Edward Puustinen
+ */
+public class ProductTypesTabView implements GenericView
 {
-	private ProductController productController;
+	private final ProductController productController;
 
-	private final TableView<Object> table = new TableView<Object>();
+	private final TableView<Object> table;
 
 	private VBox vbox;
 
 	private ObservableList<Object> data = DatabaseController.getAllProductTypes();
+	// TODO: Set in constructor.
 
 	public ProductTypesTabView(final ProductController productController)
 	{
 		this.productController = productController;
+		this.table = new TableView<Object>();
 	}
 
 	public VBox getView()
 	{
 		if (vbox == null)
 		{
-			HBox hb = new HBox();
+			HBox hbox = new HBox();
 
 			table.setEditable(true);
 			table.setItems(data);
@@ -53,10 +59,10 @@ public class ProductTypesTabView
 			nameColumn.setCellValueFactory(new PropertyValueFactory<>("name"));
 			nameColumn.setCellFactory(cellFactory);
 
-			nameColumn.setOnEditCommit((final CellEditEvent<Object, String> t) ->
+			nameColumn.setOnEditCommit((final CellEditEvent<Object, String> event) ->
 			{
-				final ProductType editProductType = ((ProductType) t.getTableView().getItems().get(t.getTablePosition().getRow()));
-				editProductType.setName(t.getNewValue());
+				final ProductType editProductType = ((ProductType) event.getTableView().getItems().get(event.getTablePosition().getRow()));
+				editProductType.setName(event.getNewValue());
 				productController.saveProductType(editProductType);
 			});
 			table.getColumns().add(nameColumn);
@@ -68,9 +74,9 @@ public class ProductTypesTabView
 			deleteColumn.setCellValueFactory(new Callback<TableColumn.CellDataFeatures<Object, String>, ObservableValue<String>>()
 			{
 				@Override
-				public ObservableValue<String> call(final TableColumn.CellDataFeatures<Object, String> p)
+				public ObservableValue<String> call(final TableColumn.CellDataFeatures<Object, String> celldata)
 				{
-					return new SimpleStringProperty(p.getValue(), "Delete");
+					return new SimpleStringProperty(celldata.getValue(), "Delete");
 				}
 			});
 
@@ -78,7 +84,7 @@ public class ProductTypesTabView
 			deleteColumn.setCellFactory(new Callback<TableColumn<Object, String>, TableCell<Object, String>>()
 			{
 				@Override
-				public TableCell<Object, String> call(final TableColumn<Object, String> p)
+				public TableCell<Object, String> call(final TableColumn<Object, String> tcolumn)
 				{
 					final TableCellDeleteButton button = new TableCellDeleteButton(productController, "Delete");
 					button.setAlignment(Pos.CENTER);
@@ -91,7 +97,7 @@ public class ProductTypesTabView
 			final TextField productTypeName = new TextField();
 			productTypeName.setMaxWidth(nameColumn.getPrefWidth());
 			final Button addButton = new Button("Create");
-			addButton.setOnAction((final ActionEvent e) ->
+			addButton.setOnAction((final ActionEvent event) ->
 			{
 				final ProductType saveProductType = new ProductType(productTypeName.getText());
 				data.add(saveProductType);
@@ -99,14 +105,14 @@ public class ProductTypesTabView
 				productController.saveProductType(saveProductType);
 			});
 
-			hb.getChildren().addAll(typeLabel, productTypeName, addButton);
-			hb.setSpacing(10);
-			hb.setAlignment(Pos.CENTER_LEFT);
+			hbox.getChildren().addAll(typeLabel, productTypeName, addButton);
+			hbox.setSpacing(10);
+			hbox.setAlignment(Pos.CENTER_LEFT);
 
 			vbox = new VBox();
 			vbox.setSpacing(5);
 			vbox.setPadding(new Insets(10, 0, 0, 10));
-			vbox.getChildren().addAll(table, hb);
+			vbox.getChildren().addAll(table, hbox);
 
 		}
 		return vbox;
@@ -119,6 +125,7 @@ public class ProductTypesTabView
 
 		public EditingCell()
 		{
+			// Silencing PMD.
 		}
 
 		@Override
@@ -189,5 +196,18 @@ public class ProductTypesTabView
 		{
 			return getItem() == null ? "" : getItem().toString();
 		}
+	}
+
+	@Override
+	public void destroy()
+	{
+		vbox = null;
+	}
+
+	@Override
+	public void recreate()
+	{
+		vbox = null;
+		getView();
 	}
 }

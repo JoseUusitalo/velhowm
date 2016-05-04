@@ -11,6 +11,7 @@ public class UniqueKeyViolationException extends Exception
 
 	public UniqueKeyViolationException()
 	{
+		// Silencing PMD.
 	}
 
 	public UniqueKeyViolationException(final String message)

@@ -39,38 +39,37 @@
 			 "Select" eager fetching: load the referenced object when this object is loaded. -->
 		<many-to-one	name="manifest"
 						class="velho.model.Manifest"
+						column="manifest_id"
+						cascade="save-update"
 						fetch="select"
-						lazy="false">
-			<column	name="manifest"
-					not-null="false" />
-		</many-to-one>
+						lazy="false"
+						not-null="false" />
 
 		<!-- Bidirectional relationship, child side.
 			 "Select" eager fetching: load the referenced object when this object is loaded. -->
 		<many-to-one	name="removalList"
 						class="velho.model.RemovalList"
+						column="removallist_id"
+						cascade="save-update"
 						fetch="select"
 						lazy="false"
-						column="removallist"
 						not-null="false" />
 
 		<!-- Bidirectional relationship, child side.
 			 "Select" eager fetching: load the referenced object when this object is loaded. -->
 		<many-to-one	name="shelfSlot"
 						class="velho.model.ShelfSlot"
+						column="slot_id"
+						cascade="save-update"
 						fetch="select"
-						lazy="false">
-			<column	name="slot_id"
-					not-null="false" />
-		</many-to-one>
+						lazy="false"
+						not-null="false" />
 
 		<!-- Many-to-one: This object can have one referenced object, the referenced object can be referenced from many objects.
-			 Cascade changes.
 			 "Select" eager fetching: load the referenced object when this object is loaded. -->
 		<many-to-one	name="product"
 						class="velho.model.Product"
-						column="product"
-						cascade="save-update"
+						column="product_id"
 						not-null="true"
 						fetch="select"
 						lazy="false" />

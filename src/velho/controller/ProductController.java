@@ -15,7 +15,7 @@ import velho.view.CategoriesTabView;
 import velho.view.GenericTabView;
 import velho.view.ProductBoxesTabView;
 import velho.view.ProductDataView;
-import velho.view.ProductManagementView;
+import velho.view.VerticalViewGroup;
 import velho.view.ProductTypesTabView;
 
 /**
@@ -58,7 +58,7 @@ public class ProductController implements UIActionController
 	/**
 	 * The tab for creating product management view
 	 */
-	private ProductManagementView productManagementView;
+	private VerticalViewGroup productManagementView;
 
 	/**
 	 * The tab for creating product type view
@@ -83,7 +83,7 @@ public class ProductController implements UIActionController
 	public ProductController(final UIController uiController)
 	{
 		this.uiController = uiController;
-		this.productManagementView = new ProductManagementView();
+		this.productManagementView = new VerticalViewGroup();
 		this.productsTypeTabView = new ProductTypesTabView(this);
 		this.addProductView = new AddProductView(this, uiController);
 		this.brandsTabView = new BrandsTabView(this);
@@ -119,7 +119,7 @@ public class ProductController implements UIActionController
 	 * object.
 	 *
 	 * @param databaseID database ID of the product (<code>-1</code> for a new
-	 *            one)
+	 * one)
 	 * @param name name of the of product
 	 * @param brand brand of the product
 	 * @param category category of the product
@@ -155,8 +155,6 @@ public class ProductController implements UIActionController
 		}
 
 		Product newProduct = new Product(databaseID, name, bran, cat);
-		System.out.println(newProduct.toString());
-		System.out.println(newProduct.toString());
 
 		final int dbID = DatabaseController.saveOrUpdate(newProduct);
 

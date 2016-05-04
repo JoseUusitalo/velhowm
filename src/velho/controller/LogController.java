@@ -23,7 +23,7 @@ public class LogController
 	/**
 	 * The {@link LogView}.
 	 */
-	private LogView logView;
+	private final LogView logView;
 
 	/**
 	 */

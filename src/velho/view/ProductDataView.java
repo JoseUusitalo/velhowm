@@ -29,7 +29,7 @@ public class ProductDataView implements GenericView
 
 	/**
 	 * Views the data in ProductData
-	 * 
+	 *
 	 * @param controller enables ProductController
 	 */
 	public ProductDataView(final ProductController controller)
@@ -39,7 +39,7 @@ public class ProductDataView implements GenericView
 
 	/**
 	 * GridPane is the viewable textfields and comboboxes
-	 * 
+	 *
 	 * @param product Product based grid pane
 	 * @return the grid
 	 */
@@ -111,9 +111,15 @@ public class ProductDataView implements GenericView
 	}
 
 	@Override
-	public void reCreate()
+	public void recreate()
 	{
 		grid = null;
 		getView(currentProduct);
+	}
+
+	@Override
+	public void destroy()
+	{
+		grid = null;
 	}
 }

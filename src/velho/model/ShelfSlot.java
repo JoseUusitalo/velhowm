@@ -276,7 +276,6 @@ public class ShelfSlot extends AbstractDatabaseObject
 	 */
 	public boolean contains(final ProductBox box)
 	{
-		System.out.println("BOXES IN " + this + ": " + productBoxes);
 		return productBoxes.contains(box);
 	}
 

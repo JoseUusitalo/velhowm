@@ -26,7 +26,7 @@ public class AddUserView implements GenericView
 	/**
 	 * The add user controller.
 	 */
-	private UserController controller;
+	private final UserController controller;
 
 	/**
 	 * The grid panel.
@@ -36,7 +36,7 @@ public class AddUserView implements GenericView
 	/**
 	 * A set of user role names.
 	 */
-	private Set<UserRole> roleSet;
+	private final Set<UserRole> roleSet;
 
 	/**
 	 * @param mcontroller
@@ -109,7 +109,7 @@ public class AddUserView implements GenericView
 			createButton.setOnAction(new EventHandler<ActionEvent>()
 			{
 				@Override
-				public void handle(final ActionEvent e)
+				public void handle(final ActionEvent event)
 				{
 					controller.createUser(badgeIDField.getText(), pinField.getText(), userFnameField.getText(), userLNameField.getText(), listbox.getValue());
 				}
@@ -120,9 +120,15 @@ public class AddUserView implements GenericView
 	}
 
 	@Override
-	public void reCreate()
+	public void recreate()
 	{
 		grid = null;
 		getView();
+	}
+
+	@Override
+	public void destroy()
+	{
+		grid = null;
 	}
 }

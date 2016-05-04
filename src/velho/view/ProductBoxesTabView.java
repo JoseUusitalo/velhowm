@@ -33,19 +33,23 @@ import velho.controller.DatabaseController;
 import velho.controller.ProductController;
 import velho.model.Product;
 import velho.model.ProductBox;
+import velho.model.interfaces.GenericView;
 import velho.view.components.TableCellDeleteButton;
 
-public class ProductBoxesTabView
+/**
+ * @author Edward Puustinen
+ */
+public class ProductBoxesTabView implements GenericView
 {
 	/**
 	 * ProductCntroller neeeded when saving to database
 	 */
-	private ProductController productController;
+	private final ProductController productController;
 
 	/**
 	 * Makes the Categories tab call for table and make it viewable
 	 */
-	private final TableView<Object> table = new TableView<Object>();
+	private final TableView<Object> table;
 
 	/**
 	 * this is a VBox we use like a grid
@@ -66,6 +70,7 @@ public class ProductBoxesTabView
 	public ProductBoxesTabView(final ProductController productController)
 	{
 		this.productController = productController;
+		this.table = new TableView<Object>();
 	}
 
 	/**
@@ -490,5 +495,19 @@ public class ProductBoxesTabView
 			LocalDate date = LocalDate.parse(df.format(aDate), formatter);
 			return date;
 		}
+	}
+
+	@Override
+	public void recreate()
+	{
+		vbox = null;
+		// TODO: Use old data.
+		getView(null);
+	}
+
+	@Override
+	public void destroy()
+	{
+		vbox = null;
 	}
 }

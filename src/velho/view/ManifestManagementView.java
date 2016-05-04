@@ -30,7 +30,7 @@ public class ManifestManagementView implements GenericView
 	/**
 	 * The {@link ManifestController}.
 	 */
-	private ManifestController manifestController;
+	private final ManifestController manifestController;
 
 	/**
 	 * The header of the view in the tab.
@@ -136,10 +136,17 @@ public class ManifestManagementView implements GenericView
 	}
 
 	@Override
-	public void reCreate()
+	public void recreate()
 	{
 		bpane = null;
 		managementPanel = null;
 		getView();
+	}
+
+	@Override
+	public void destroy()
+	{
+		bpane = null;
+		managementPanel = null;
 	}
 }

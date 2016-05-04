@@ -17,7 +17,6 @@ import velho.controller.UIController;
 import velho.model.interfaces.GenericView;
 
 /**
- *
  * @author Joona Silvennoinen
  */
 public class SearchTabView implements GenericView
@@ -104,9 +103,15 @@ public class SearchTabView implements GenericView
 	 */
 
 	@Override
-	public void reCreate()
+	public void recreate()
 	{
 		bPane = null;
 		getView();
+	}
+
+	@Override
+	public void destroy()
+	{
+		bPane = null;
 	}
 }
