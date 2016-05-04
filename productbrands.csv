@@ -1,0 +1,5 @@
+asd,notvalid
+123,valid
+0,This is also invalid
+-133,So is this
+100, But This           is ok                  

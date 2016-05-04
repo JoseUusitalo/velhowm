@@ -2,6 +2,7 @@ package velho.controller;
 
 import java.io.FileNotFoundException;
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -10,6 +11,9 @@ import java.util.List;
 import java.util.Set;
 
 import com.opencsv.CSVReader;
+import com.opencsv.CSVWriter;
+import com.opencsv.bean.ColumnPositionMappingStrategy;
+import com.opencsv.bean.CsvToBean;
 
 import velho.model.Manifest;
 import velho.model.ManifestState;
@@ -166,7 +170,8 @@ public class CSVController
 		{
 			for (String[] line : csvLines)
 			{
-				DatabaseController.saveOrUpdate(new Product(Integer.valueOf(line[0]), (line[1]), DatabaseController.getProductBrandByName(line[2]), DatabaseController.getProductCategoryByName(line[3])));
+				DatabaseController.saveOrUpdate(new Product(Integer.valueOf(line[0]), (line[1]), DatabaseController.getProductBrandByName(line[2]),
+						DatabaseController.getProductCategoryByName(line[3])));
 			}
 			return true;
 		}
@@ -334,7 +339,8 @@ public class CSVController
 		{
 			for (String[] line : csvLines)
 			{
-				DatabaseController.saveOrUpdate(new ProductBox(Integer.valueOf(line[0]), Integer.valueOf(line[1]), Integer.valueOf(line[2]), Integer.valueOf(line[3]), Integer.valueOf(line[4]), Integer.valueOf(line[5]), Integer.valueOf(line[6]), line[7]));
+				DatabaseController.saveOrUpdate(new ProductBox(Integer.valueOf(line[0]), Integer.valueOf(line[1]), Integer.valueOf(line[2]),
+						Integer.valueOf(line[3]), Integer.valueOf(line[4]), Integer.valueOf(line[5]), Integer.valueOf(line[6]), line[7]));
 			}
 			return true;
 		}
@@ -370,4 +376,52 @@ public class CSVController
 
 	}
 
+	public static void readBeansCSV()
+	{
+		CSVReader reader = null;
+
+		try
+		{
+			reader = new CSVReader(new FileReader("data/users.csv"));
+		}
+		catch (FileNotFoundException e)
+		{
+			e.printStackTrace();
+		}
+
+		final List<List<String>> invalidData = new ArrayList<List<String>>();
+
+		ColumnPositionMappingStrategy<User> strat = new ColumnPositionMappingStrategy<User>();
+		strat.setType(User.class);
+		String[] columns = new String[] { "databaseID", "firstName", "lastName", "pin", "badgeID", "role" };
+		strat.setColumnMapping(columns);
+
+		CsvToBean<User> csv = new CsvToBean<User>();
+		List<User> list = new ArrayList<User>();
+
+		list = csv.parse(strat, reader);
+
+		System.out.println(list);
+	}
+
+	public static void writeCSV()
+	{
+		CSVWriter writer = null;
+		try
+		{
+			writer = new CSVWriter(new FileWriter("productbrands.csv"), '@');
+
+			// feed in your array (or convert your data to an array)
+			String[] entries = new String[] { "asd,u348g" };
+
+			writer.writeNext(entries);
+
+			writer.close();
+		}
+		catch (IOException e)
+		{
+			e.printStackTrace();
+		}
+
+	}
 }

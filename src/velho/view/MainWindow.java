@@ -1,6 +1,5 @@
 package velho.view;
 
-import java.io.FileNotFoundException;
 import java.text.ParseException;
 import java.util.HashMap;
 import java.util.Map;
@@ -198,17 +197,9 @@ public class MainWindow extends Application
 		else
 			runApp();
 
-		try
-		{
-			Object[] data = CSVController.readSampleUsersCSV();
-			System.out.println("valid: " + data[0]);
-			System.out.println("invalid: " + data[1]);
-		}
-		catch (FileNotFoundException e)
-		{
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		CSVController.readBeansCSV();
+		System.out.println();
+		CSVController.writeCSV();
 	}
 
 	private static void prepareDatabase()

@@ -2,6 +2,7 @@ package velho.model;
 
 import java.util.UUID;
 
+import velho.controller.DatabaseController;
 import velho.controller.UserController;
 import velho.model.enums.UserRole;
 
@@ -71,7 +72,8 @@ public class User extends AbstractDatabaseObject
 	 * @param pin
 	 * @param role
 	 */
-	public User(final int databaseID, final UUID uuid, final String firstName, final String lastName, final String pin, final String badgeID, final UserRole role)
+	public User(final int databaseID, final UUID uuid, final String firstName, final String lastName, final String pin, final String badgeID,
+			final UserRole role)
 	{
 		setDatabaseID(databaseID);
 		setUuid(uuid);
@@ -80,6 +82,8 @@ public class User extends AbstractDatabaseObject
 		this.badgeID = badgeID;
 		this.pin = pin;
 		this.role = role;
+
+		System.out.println("new user " + firstName + " " + pin + " " + role);
 
 		if (!UserController.validateUserData(this.badgeID, this.pin, firstName, lastName, role))
 			throw new IllegalArgumentException("Invalid user data");
@@ -96,6 +100,11 @@ public class User extends AbstractDatabaseObject
 	public User(final int databaseID, final String firstName, final String lastName, final String pin, final String badgeID, final UserRole role)
 	{
 		this(databaseID, UUID.randomUUID(), firstName, lastName, pin, badgeID, role);
+	}
+
+	public User(final int databaseID, final String firstName, final String lastName, final String pin, final String badgeID, final String roleName)
+	{
+		this(databaseID, UUID.randomUUID(), firstName, lastName, pin, badgeID, DatabaseController.getUserByName(roleName));
 	}
 
 	/**
