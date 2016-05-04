@@ -154,9 +154,6 @@ public class CategoriesTabView implements GenericView
 				productController.saveProductCategory(saveCategory);
 			});
 
-			hbox.getChildren().addAll(categoryName, addButton);
-			hbox.setSpacing(3);
-
 			vbox = new VBox();
 			vbox.setSpacing(5);
 			vbox.setPadding(new Insets(10, 0, 0, 10));
