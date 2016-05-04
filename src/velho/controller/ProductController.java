@@ -13,6 +13,7 @@ import velho.view.AddProductView;
 import velho.view.BrandsTabView;
 import velho.view.CategoriesTabView;
 import velho.view.GenericTabView;
+import velho.view.ListView;
 import velho.view.ProductBoxesTabView;
 import velho.view.ProductDataView;
 import velho.view.VerticalViewGroup;
@@ -194,6 +195,7 @@ public class ProductController implements UIActionController
 	 */
 	public void showList()
 	{
+		// TODO ei päivity oikein
 		listTab.setView(ListController.getTableView(this, DatabaseController.getProductDataColumns(false, false), DatabaseController.getAllProducts()));
 	}
 
@@ -274,23 +276,22 @@ public class ProductController implements UIActionController
 		if (data instanceof ProductBrand)
 		{
 			if (!DatabaseController.deleteProductBrand((ProductBrand) data))
-				PopupController.error("Unable to delete product brand " + ((ProductBrand) data).getName() + ", it is being used by one or more products.");
+				PopupController.error(LocalizationController.getCompoundString("unableToDeleteBrandPopUp", new Object[] { ((ProductBrand) data).getName() }));
 		}
 		else if (data instanceof ProductCategory)
 		{
 			if (!DatabaseController.deleteProductCategory((ProductCategory) data))
-				PopupController
-						.error("Unable to delete product category " + ((ProductCategory) data).getName() + ", it is being used by one or more products.");
+				PopupController.error(LocalizationController.getCompoundString("unableToDeleteCategory", new Object[] { ((ProductCategory) data).getName() }));
 		}
 		else if (data instanceof ProductBox)
 		{
 			if (!DatabaseController.deleteProductBox((ProductBox) data))
-				PopupController.error("Unable to delete product box.");
+				PopupController.error(LocalizationController.getString("unableToDeleteProductBoxPopUp"));
 		}
 		else if (data instanceof ProductType)
 		{
 			if (!DatabaseController.deleteProductType((ProductType) data))
-				PopupController.error("Unable to delete product type " + ((ProductType) data).getName() + ", it is being used by one or more categories.");
+				PopupController.error(LocalizationController.getCompoundString("unableToDeleteProductTypePopUp", new Object[] { ((ProductType) data).getName() }));
 		}
 		else
 		{
@@ -308,6 +309,13 @@ public class ProductController implements UIActionController
 		listTab.setView(new ProductDataView(this).getView(((Product) data)));
 	}
 
+	@Override
+	public void recreateViews(final ListView node)
+	{
+		// TODO check for correct view
+		showList();
+	}
+
 	/**
 	 * Directs the addCategoryView and makes it viewable in tabs
 	 */
@@ -318,7 +326,8 @@ public class ProductController implements UIActionController
 	}
 
 	/**
-	 * Saves the new or existing ProductBrand to database and returns the updated object.
+	 * Saves the new or existing ProductBrand to database and returns the
+	 * updated object.
 	 *
 	 * @param name placeholder for the brand
 	 * @return a product brand when called
@@ -333,7 +342,8 @@ public class ProductController implements UIActionController
 	}
 
 	/**
-	 * Saves the category however since category is not observable system does not update on fly
+	 * Saves the category however since category is not observable system does
+	 * not update on fly
 	 * Restart required to view new set category
 	 *
 	 * @param name the name of the new category
@@ -350,7 +360,8 @@ public class ProductController implements UIActionController
 	}
 
 	/**
-	 * Saves the new ProductType into databasecontroller idea is that this should minimize the tasks that product
+	 * Saves the new ProductType into databasecontroller idea is that this
+	 * should minimize the tasks that product
 	 * controller already is running
 	 *
 	 * @param name The new name of the product
@@ -399,9 +410,11 @@ public class ProductController implements UIActionController
 	}
 
 	/**
-	 * Controlls the action the new Product Type to Product Controller when action is performed
+	 * Controlls the action the new Product Type to Product Controller when
+	 * action is performed
 	 *
-	 * @param saveProductType saves the new Product Type written in the TextField
+	 * @param saveProductType saves the new Product Type written in the
+	 *            TextField
 	 */
 	@SuppressWarnings("static-method")
 	public void saveProductType(final ProductType saveProductType)
@@ -411,7 +424,8 @@ public class ProductController implements UIActionController
 	}
 
 	/**
-	 * Controlls the action of a new Category to Product Controller when action is performed
+	 * Controlls the action of a new Category to Product Controller when action
+	 * is performed
 	 *
 	 * @param saveProductCategory saves the new data written in the TextField
 	 */

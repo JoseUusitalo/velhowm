@@ -30,7 +30,9 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.util.Callback;
 import velho.controller.DatabaseController;
+import velho.controller.LocalizationController;
 import velho.controller.ProductController;
+import velho.controller.UIController;
 import velho.model.Product;
 import velho.model.ProductBox;
 import velho.model.interfaces.GenericView;
@@ -61,6 +63,8 @@ public class ProductBoxesTabView implements GenericView
 	 */
 	private ObservableList<Object> data = DatabaseController.getAllProductBoxes();
 
+	private ObservableList<Object> pList;
+
 	/**
 	 * Adds info to Product Controller about brands
 	 *
@@ -84,6 +88,9 @@ public class ProductBoxesTabView implements GenericView
 	{
 		if (vbox == null)
 		{
+			table.getColumns().clear();
+
+			pList = productList;
 			HBox hb = new HBox();
 
 			table.setEditable(true);
@@ -92,7 +99,7 @@ public class ProductBoxesTabView implements GenericView
 
 			Callback<TableColumn<Object, Object>, TableCell<Object, Object>> cellFactory = (final TableColumn<Object, Object> p) -> new SpinnerCell();
 
-			TableColumn<Object, Object> sizeColumn = new TableColumn<Object, Object>("Size");
+			TableColumn<Object, Object> sizeColumn = new TableColumn<Object, Object>(LocalizationController.getString("publicRemovalTableHeaderSize"));
 
 			sizeColumn.setMinWidth(100);
 			sizeColumn.setCellValueFactory(new PropertyValueFactory<>("productCount"));
@@ -108,7 +115,7 @@ public class ProductBoxesTabView implements GenericView
 
 			Callback<TableColumn<Object, Object>, TableCell<Object, Object>> cellFactory2 = (final TableColumn<Object, Object> p) -> new SpinnerCell();
 
-			TableColumn<Object, Object> maxSizeColumn = new TableColumn<Object, Object>("Max Size");
+			TableColumn<Object, Object> maxSizeColumn = new TableColumn<Object, Object>(LocalizationController.getString("maxSizeTabName"));
 
 			maxSizeColumn.setMinWidth(100);
 			maxSizeColumn.setCellValueFactory(new PropertyValueFactory<>("maxSize"));
@@ -123,7 +130,7 @@ public class ProductBoxesTabView implements GenericView
 			table.getColumns().add(maxSizeColumn);
 
 			ObservableList<Object> cbValues = DatabaseController.getAllProducts();
-			TableColumn<Object, Object> product = new TableColumn<Object, Object>("Product");
+			TableColumn<Object, Object> product = new TableColumn<Object, Object>(LocalizationController.getString("productProduct"));
 
 			product.setCellValueFactory(new PropertyValueFactory<>("product"));
 			product.setCellFactory(ComboBoxTableCell.forTableColumn(cbValues));
@@ -136,7 +143,7 @@ public class ProductBoxesTabView implements GenericView
 			table.getColumns().add(product);
 
 			Callback<TableColumn<Object, Object>, TableCell<Object, Object>> pickerFactory = (final TableColumn<Object, Object> p) -> new DatePickerCell();
-			TableColumn<Object, Object> datePickerColumn = new TableColumn<>("Expiration Date");
+			TableColumn<Object, Object> datePickerColumn = new TableColumn<>(LocalizationController.getString("expirationDateExpirationDate"));
 			datePickerColumn.setMinWidth(150);
 			datePickerColumn.setCellValueFactory(new PropertyValueFactory<>("expirationDate"));
 			datePickerColumn.setCellFactory(pickerFactory);
@@ -174,48 +181,47 @@ public class ProductBoxesTabView implements GenericView
 				@Override
 				public TableCell<Object, String> call(final TableColumn<Object, String> p)
 				{
-					final TableCellDeleteButton button = new TableCellDeleteButton(productController, "Delete");
+					final TableCellDeleteButton button = new TableCellDeleteButton(productController, (LocalizationController.getString("buttonDelete")));
 					button.setAlignment(Pos.CENTER);
 					return button;
 				}
 			});
 			table.getColumns().add(deleteColumn);
 
-			final Label maxSizeLabel = new Label("Max Products: ");
+			final Label maxSizeLabel = new Label(LocalizationController.getString("maxProductsLabel"));
 			final Spinner<Integer> productBoxMaxSize = new Spinner<Integer>();
 			productBoxMaxSize.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(1, Integer.MAX_VALUE));
 			productBoxMaxSize.setMaxWidth(maxSizeColumn.getPrefWidth());
 
-			final Label sizeLabel = new Label("Product Count: ");
+			final Label sizeLabel = new Label(LocalizationController.getString("productCountLabel"));
 			final Spinner<Integer> productBoxSize = new Spinner<Integer>();
 			final IntegerSpinnerValueFactory sizeFactory = new SpinnerValueFactory.IntegerSpinnerValueFactory(1, productBoxMaxSize.getValue());
 			sizeFactory.maxProperty().bind(productBoxMaxSize.getValueFactory().valueProperty());
 			productBoxSize.setValueFactory(sizeFactory);
 			productBoxSize.setMaxWidth(sizeColumn.getPrefWidth());
 
-			final Label productLabel = new Label("Product: ");
+			final Label productLabel = new Label(LocalizationController.getString("productPromtTextAddProductView"));
 			final ComboBox<Object> productItem = new ComboBox<Object>();
-			productItem.getItems().addAll(productList);
+			productItem.getItems().clear();
+			productItem.getItems().addAll(pList);
 			productItem.getSelectionModel().selectFirst();
 			productItem.setMaxWidth(product.getPrefWidth());
 
-			final Label calendarLabel = new Label("Expiration Date: ");
+			final Label calendarLabel = new Label(LocalizationController.getString("expirationDateLabel"));
 			final DatePicker expirationDate = new DatePicker();
 
-			final Button addButton = new Button("Create");
+			final Button addButton = new Button(LocalizationController.getString("buttonCreate"));
 			addButton.setOnAction((final ActionEvent e) ->
 			{
 				Date date = null;
 				if (expirationDate.getValue() != null)
 					date = Date.from(expirationDate.getValue().atTime(0, 0).toInstant(ZoneOffset.of("Z")));
-				final ProductBox saveProductBox = new ProductBox((Product) productItem.getValue(), productBoxMaxSize.getValue(), productBoxSize.getValue(),
-						date);
+				final ProductBox saveProductBox = new ProductBox((Product) productItem.getValue(), productBoxMaxSize.getValue(), productBoxSize.getValue(), date);
 				data.add(saveProductBox);
 				productController.saveProductBox(saveProductBox);
 			});
 
-			hb.getChildren().addAll(sizeLabel, productBoxSize, maxSizeLabel, productBoxMaxSize, productLabel, productItem, calendarLabel, expirationDate,
-					addButton);
+			hb.getChildren().addAll(sizeLabel, productBoxSize, maxSizeLabel, productBoxMaxSize, productLabel, productItem, calendarLabel, expirationDate, addButton);
 			hb.setSpacing(3);
 
 			vbox = new VBox();
@@ -223,6 +229,7 @@ public class ProductBoxesTabView implements GenericView
 			vbox.setPadding(new Insets(10, 0, 0, 10));
 			vbox.getChildren().addAll(table, hb);
 
+			UIController.recordView(this);
 		}
 		return vbox;
 	}
@@ -501,8 +508,7 @@ public class ProductBoxesTabView implements GenericView
 	public void recreate()
 	{
 		vbox = null;
-		// TODO: Use old data.
-		getView(null);
+		getView(pList);
 	}
 
 	@Override

@@ -17,7 +17,9 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.util.Callback;
 import velho.controller.DatabaseController;
+import velho.controller.LocalizationController;
 import velho.controller.ProductController;
+import velho.controller.UIController;
 import velho.model.ProductType;
 import velho.model.interfaces.GenericView;
 import velho.view.components.TableCellDeleteButton;
@@ -46,9 +48,12 @@ public class ProductTypesTabView implements GenericView
 	{
 		if (vbox == null)
 		{
+			table.getColumns().clear();
+
 			HBox hbox = new HBox();
 
 			table.setEditable(true);
+			table.getItems().clear();
 			table.setItems(data);
 
 			final Callback<TableColumn<Object, String>, TableCell<Object, String>> cellFactory = (final TableColumn<Object, String> p) -> new EditingCell();
@@ -85,7 +90,7 @@ public class ProductTypesTabView implements GenericView
 				@Override
 				public TableCell<Object, String> call(final TableColumn<Object, String> tcolumn)
 				{
-					final TableCellDeleteButton button = new TableCellDeleteButton(productController, "Delete");
+					final TableCellDeleteButton button = new TableCellDeleteButton(productController, (LocalizationController.getString("buttonDelete")));
 					button.setAlignment(Pos.CENTER);
 					return button;
 				}
@@ -93,9 +98,9 @@ public class ProductTypesTabView implements GenericView
 			table.getColumns().add(deleteColumn);
 
 			final TextField productTypeName = new TextField();
-			productTypeName.setPromptText("Product Type Name");
+			productTypeName.setPromptText(LocalizationController.getString("productTypeNamePromtText"));
 			productTypeName.setMaxWidth(nameColumn.getPrefWidth());
-			final Button addButton = new Button("Create");
+			final Button addButton = new Button(LocalizationController.getString("buttonCreate"));
 			addButton.setOnAction((final ActionEvent event) ->
 			{
 				final ProductType saveProductType = new ProductType(productTypeName.getText());
@@ -112,6 +117,7 @@ public class ProductTypesTabView implements GenericView
 			vbox.setPadding(new Insets(10, 0, 0, 10));
 			vbox.getChildren().addAll(table, hbox);
 
+			UIController.recordView(this);
 		}
 		return vbox;
 	}

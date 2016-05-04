@@ -70,7 +70,7 @@ public class MainWindow extends Application implements GenericView
 	/**
 	 * Enable or disable debug features.
 	 */
-	public static final boolean DEBUG_MODE = false;
+	public static final boolean DEBUG_MODE = true;
 
 	/**
 	 * Enable or disable showing windows. DEBUG_MODE must be <code>true</code>
@@ -408,6 +408,7 @@ public class MainWindow extends Application implements GenericView
 			final ComboBox<SupportedTranslation> languageBox = new ComboBox<SupportedTranslation>();
 			final Label languageChange = new Label(LocalizationController.getString("changeTranslationLabel"));
 			languageBox.getItems().addAll(SupportedTranslation.values());
+			languageBox.getSelectionModel().select(LocalizationController.getCurrentTranslation());
 			languageBox.valueProperty().addListener(new ChangeListener<SupportedTranslation>()
 			{
 				@SuppressWarnings("rawtypes")
@@ -429,7 +430,7 @@ public class MainWindow extends Application implements GenericView
 			platformStatus.setAlignment(Pos.CENTER_LEFT);
 
 			final HBox userStatus = new HBox(10);
-			final Label userName = new Label("Hello, " + LoginController.getCurrentUser().getRoleName() + " " + LoginController.getCurrentUser().getFullName());
+			final Label userName = new Label(LocalizationController.getCompoundString("helloUserMessage", LoginController.getCurrentUser().getRoleName(), LoginController.getCurrentUser().getFullName()));
 			final Button logoutButton = new Button(LocalizationController.getString("logOutButton"));
 			logoutButton.setPrefHeight(5.0);
 			userStatus.getChildren().addAll(userName, logoutButton);

@@ -10,6 +10,7 @@ import velho.model.RemovalList;
 import velho.model.RemovalListState;
 import velho.model.enums.UserRole;
 import velho.view.GenericTabView;
+import velho.view.ListView;
 import velho.view.RemovalListCreationView;
 import velho.view.RemovalListManagementView;
 import velho.view.RemovalListView;
@@ -303,5 +304,13 @@ public class RemovalListController implements UIActionController
 			managementView.setContent(new RemovalListView((RemovalList) data, this).getView());
 		else
 			tabView.setView(new RemovalListView((RemovalList) data, this).getView());
+	}
+
+	@Override
+	public void recreateViews(final ListView node)
+	{
+		browseView = null;
+		showBrowseRemovalListsView();
+
 	}
 }

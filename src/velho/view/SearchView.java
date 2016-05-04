@@ -23,6 +23,7 @@ import velho.model.interfaces.GenericView;
  */
 public class SearchView implements GenericView
 {
+	// TODO search button doesnt work right
 	/**
 	 * The root GridPane for this view.
 	 */

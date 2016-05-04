@@ -21,10 +21,11 @@ public class LocalizationController
 	private final static String LANGUAGE_GERMAN = "de";
 	private final static String COUNTRY_GERMANY = "DE";
 	private static UIController uiController;
+	private static SupportedTranslation currentTranslation;
 
 	public static void initializeBundle()
 	{
-
+		currentTranslation = SupportedTranslation.ENGLISH;
 		localeEnglish = new Locale(LANGUAGE_ENGLISH, COUNTRY_USA);
 		localeGerman = new Locale(LANGUAGE_GERMAN, COUNTRY_GERMANY);
 
@@ -68,13 +69,19 @@ public class LocalizationController
 		if (newTranslation.equals(SupportedTranslation.ENGLISH))
 		{
 			msgBundle = getResourceBundle(localeEnglish);
-			uiController.recreateAllViews();
 		}
 		else
 		{
 			msgBundle = getResourceBundle(localeGerman);
-			uiController.recreateAllViews();
+
 		}
+		currentTranslation = newTranslation;
+		uiController.recreateAllViews();
+	}
+
+	public static SupportedTranslation getCurrentTranslation()
+	{
+		return currentTranslation;
 	}
 
 	public static void setControllers(final UIController uiController)
