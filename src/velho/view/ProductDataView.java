@@ -7,7 +7,6 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.layout.GridPane;
 import velho.controller.LocalizationController;
-import velho.controller.ProductController;
 import velho.controller.UIController;
 import velho.model.Product;
 import velho.model.interfaces.GenericView;
@@ -20,11 +19,6 @@ public class ProductDataView implements GenericView
 	 */
 	private GridPane grid;
 
-	/**
-	 * To save Product based data to ProductController
-	 */
-	private ProductController controller;
-
 	private Product currentProduct;
 
 	/**
@@ -32,9 +26,9 @@ public class ProductDataView implements GenericView
 	 *
 	 * @param controller enables ProductController
 	 */
-	public ProductDataView(final ProductController controller)
+	public ProductDataView()
 	{
-		this.controller = controller;
+
 	}
 
 	/**
@@ -87,7 +81,7 @@ public class ProductDataView implements GenericView
 				@Override
 				public void handle(final ActionEvent event)
 				{
-					controller.editProduct(product);
+					// controller.editProduct(product);
 				}
 			});
 
@@ -101,7 +95,7 @@ public class ProductDataView implements GenericView
 				@Override
 				public void handle(final ActionEvent event)
 				{
-					controller.showList();
+					// controller.showList();
 				}
 			});
 			UIController.recordView(this);

@@ -145,7 +145,7 @@ public class AddProductView implements GenericView
 				@Override
 				public void handle(final ActionEvent event)
 				{
-					productController.showList();
+					// productController.showList();
 					uiController.selectTab(LocalizationController.getString("productListTabName"));
 				}
 			});
@@ -161,8 +161,7 @@ public class AddProductView implements GenericView
 					Object brand = brandList.valueProperty().getValue();
 					Object category = categoryList.valueProperty().getValue();
 
-					final Product newProduct = productController.saveProduct(databaseID.getValueFactory().getValue().intValue(), nameField.getText(), brand,
-							category);
+					final Product newProduct = productController.saveProduct(databaseID.getValueFactory().getValue().intValue(), nameField.getText(), brand, category);
 					if (editProduct)
 						productController.showProductView(newProduct);
 				}

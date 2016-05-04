@@ -14,9 +14,9 @@ import velho.view.BrandsTabView;
 import velho.view.CategoriesTabView;
 import velho.view.GenericTabView;
 import velho.view.ProductBoxesTabView;
-import velho.view.ProductDataView;
-import velho.view.VerticalViewGroup;
+import velho.view.ProductTabView;
 import velho.view.ProductTypesTabView;
+import velho.view.VerticalViewGroup;
 
 /**
  * Controller for handling {@link Product} objects
@@ -31,19 +31,9 @@ public class ProductController implements UIActionController
 	private static final Logger SYSLOG = Logger.getLogger(ProductController.class.getName());
 
 	/**
-	 * Apache log4j logger: User.
-	 */
-	private static final Logger USRLOG = Logger.getLogger("userLogger");
-
-	/**
 	 * The {@link AddProductView}.
 	 */
 	private AddProductView addProductView;
-
-	/**
-	 * The tab view for the product list view.
-	 */
-	private GenericTabView listTab;
 
 	/**
 	 * The {@link UIController}.
@@ -77,6 +67,8 @@ public class ProductController implements UIActionController
 
 	private ProductBoxesTabView productBoxTabView;
 
+	private ProductTabView productTabView;
+
 	/**
 	 * @param uiController
 	 */
@@ -89,9 +81,8 @@ public class ProductController implements UIActionController
 		this.brandsTabView = new BrandsTabView(this);
 		this.categoryTabView = new CategoriesTabView(this);
 		this.productBoxTabView = new ProductBoxesTabView(this);
-		listTab = new GenericTabView();
+		this.productTabView = new ProductTabView(this);
 		addTab = new GenericTabView();
-		showList();
 	}
 
 	/**
@@ -99,9 +90,9 @@ public class ProductController implements UIActionController
 	 *
 	 * @return the product list tab view
 	 */
-	public Node getTabView()
+	public Node getProductTabView()
 	{
-		return listTab.getView();
+		return productTabView.getView(DatabaseController.getAllProductBrands(), DatabaseController.getAllProductCategories());
 	}
 
 	/**
@@ -119,7 +110,7 @@ public class ProductController implements UIActionController
 	 * object.
 	 *
 	 * @param databaseID database ID of the product (<code>-1</code> for a new
-	 * one)
+	 *            one)
 	 * @param name name of the of product
 	 * @param brand brand of the product
 	 * @param category category of the product
@@ -168,18 +159,6 @@ public class ProductController implements UIActionController
 	}
 
 	/**
-	 * Changes the view in the product list tab to the edit view.
-	 *
-	 * @param product {@link Product} to edit
-	 */
-	public void editProduct(final Product product)
-	{
-		AddProductView editView = new AddProductView(this, uiController);
-		listTab.setView(editView.getView(true));
-		editView.setViewData(product);
-	}
-
-	/**
 	 * Gets the view for creating new products.
 	 *
 	 * @return the product creation view
@@ -187,14 +166,6 @@ public class ProductController implements UIActionController
 	public Node getAddProductView()
 	{
 		return new AddProductView(this, uiController).getView(false);
-	}
-
-	/**
-	 * Changes the view in the product list tab to the list.
-	 */
-	public void showList()
-	{
-		listTab.setView(ListController.getTableView(this, DatabaseController.getProductDataColumns(false, false), DatabaseController.getAllProducts()));
 	}
 
 	/**
@@ -215,7 +186,6 @@ public class ProductController implements UIActionController
 	 */
 	public void showProductView(final Product product)
 	{
-		listTab.setView(new ProductDataView(this).getView(product));
 	}
 
 	/**
@@ -279,13 +249,17 @@ public class ProductController implements UIActionController
 		else if (data instanceof ProductCategory)
 		{
 			if (!DatabaseController.deleteProductCategory((ProductCategory) data))
-				PopupController
-						.error("Unable to delete product category " + ((ProductCategory) data).getName() + ", it is being used by one or more products.");
+				PopupController.error("Unable to delete product category " + ((ProductCategory) data).getName() + ", it is being used by one or more products.");
 		}
 		else if (data instanceof ProductBox)
 		{
 			if (!DatabaseController.deleteProductBox((ProductBox) data))
 				PopupController.error("Unable to delete product box.");
+		}
+		else if (data instanceof Product)
+		{
+			if (!DatabaseController.deleteProduct((Product) data))
+				PopupController.error("Unable to delete product " + ((Product) data).getName() + ", it is being used by one or more product boxes.");
 		}
 		else if (data instanceof ProductType)
 		{
@@ -304,8 +278,7 @@ public class ProductController implements UIActionController
 	@Override
 	public void viewAction(final Object data)
 	{
-		USRLOG.info("Viewing: " + ((Product) data).toString());
-		listTab.setView(new ProductDataView(this).getView(((Product) data)));
+		throw new UnsupportedOperationException();
 	}
 
 	/**

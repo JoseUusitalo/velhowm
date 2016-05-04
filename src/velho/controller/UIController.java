@@ -75,9 +75,7 @@ public class UIController
 	 * @param productController
 	 * @param removalPlatformController
 	 */
-	public void setControllers(final MainWindow mainWindow, final UserController userController, final RemovalListController removalListController,
-			final SearchController searchController, final LogController logController, final ManifestController manifestController,
-			final ProductController productController, final RemovalPlatformController removalPlatformController)
+	public void setControllers(final MainWindow mainWindow, final UserController userController, final RemovalListController removalListController, final SearchController searchController, final LogController logController, final ManifestController manifestController, final ProductController productController, final RemovalPlatformController removalPlatformController)
 	{
 		this.mainView = mainWindow;
 		this.userController = userController;
@@ -145,7 +143,7 @@ public class UIController
 				mainView.addTab(LocalizationController.getString("addManifestsTab"), manifestController.getView());
 				mainView.addTab(LocalizationController.getString("addRemovalListsTab"), removalListController.getView());
 				mainView.addTab(LocalizationController.getString("addProductTab"), productController.getAddProductView());
-				mainView.addTab(LocalizationController.getString("addProductListTab"), productController.getTabView());
+				mainView.addTab(LocalizationController.getString("addProductListTab"), productController.getProductTabView());
 				mainView.addTab("Brands", productController.getBrandsTab());
 				mainView.addTab("Categories", productController.getCategoryTab());
 				mainView.addTab("Product Types", productController.getProductTypesTab());
