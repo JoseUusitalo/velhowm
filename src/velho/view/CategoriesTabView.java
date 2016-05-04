@@ -7,6 +7,8 @@ import javafx.event.ActionEvent;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
+import javafx.scene.control.ComboBox;
+import javafx.scene.control.Label;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableColumn.CellEditEvent;
@@ -60,6 +62,8 @@ public class CategoriesTabView
 	/**
 	 * VBox grid view make it visible
 	 *
+	 * @param productList
+	 *
 	 * @return the VBox
 	 */
 	public VBox getView()
@@ -87,7 +91,7 @@ public class CategoriesTabView
 			table.getColumns().add(nameColumn);
 
 			final ObservableList<Object> cbValues = DatabaseController.getAllProductTypes();
-			final TableColumn<Object, Object> comboBoxColumn = new TableColumn<>("Types Combobox");
+			final TableColumn<Object, Object> comboBoxColumn = new TableColumn<>("Types");
 			comboBoxColumn.setMinWidth(150);
 			comboBoxColumn.setCellValueFactory(new PropertyValueFactory<>("type"));
 			comboBoxColumn.setCellFactory(ComboBoxTableCell.forTableColumn(cbValues));
@@ -124,20 +128,26 @@ public class CategoriesTabView
 			});
 			table.getColumns().add(deleteColumn);
 
+			final Label categoryLabel = new Label("Category Name: ");
 			final TextField categoryName = new TextField();
-			categoryName.setPromptText("Category Name");
-			categoryName.setMaxWidth(nameColumn.getPrefWidth());
 			final Button addButton = new Button("Create");
+
+			final Label typeLabel = new Label("Type: ");
+			final ComboBox<Object> categoryType = new ComboBox<Object>();
+			categoryType.getItems().addAll(cbValues);
+			categoryType.getSelectionModel().selectFirst();
+
+			hb.getChildren().addAll(categoryLabel, categoryName, typeLabel, categoryType, addButton);
+			hb.setSpacing(10);
+			hb.setAlignment(Pos.CENTER_LEFT);
+
 			addButton.setOnAction((final ActionEvent e) ->
 			{
-				final ProductCategory saveCategory = new ProductCategory(categoryName.getText());
+				final ProductCategory saveCategory = new ProductCategory(categoryName.getText(), (ProductType) categoryType.getValue());
 				data.add(saveCategory);
 				categoryName.clear();
 				productController.saveProductCategory(saveCategory);
 			});
-
-			hb.getChildren().addAll(categoryName, addButton);
-			hb.setSpacing(3);
 
 			vbox = new VBox();
 			vbox.setSpacing(5);

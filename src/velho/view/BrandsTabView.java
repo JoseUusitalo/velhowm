@@ -7,6 +7,7 @@ import javafx.event.ActionEvent;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
+import javafx.scene.control.Label;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableColumn.CellEditEvent;
@@ -110,8 +111,8 @@ public class BrandsTabView
 			});
 			table.getColumns().add(deleteColumn);
 
+			final Label brandLabel = new Label("Brand Name: ");
 			final TextField brandName = new TextField();
-			brandName.setPromptText("Brand Name");
 			brandName.setMaxWidth(nameColumn.getPrefWidth());
 			final Button addButton = new Button("Create");
 			addButton.setOnAction((final ActionEvent e) ->
@@ -122,8 +123,9 @@ public class BrandsTabView
 				productController.saveBrand(saveBrand);
 			});
 
-			hb.getChildren().addAll(brandName, addButton);
-			hb.setSpacing(3);
+			hb.getChildren().addAll(brandLabel, brandName, addButton);
+			hb.setSpacing(10);
+			hb.setAlignment(Pos.CENTER_LEFT);
 
 			vbox = new VBox();
 			vbox.setSpacing(5);
