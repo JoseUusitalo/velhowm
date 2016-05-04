@@ -69,14 +69,14 @@ public class LocalizationController
 		if (newTranslation.equals(SupportedTranslation.ENGLISH))
 		{
 			msgBundle = getResourceBundle(localeEnglish);
-			uiController.recreateAllViews();
 		}
 		else
 		{
 			msgBundle = getResourceBundle(localeGerman);
-			uiController.recreateAllViews();
+
 		}
 		currentTranslation = newTranslation;
+		uiController.recreateAllViews();
 	}
 
 	public static SupportedTranslation getCurrentTranslation()
