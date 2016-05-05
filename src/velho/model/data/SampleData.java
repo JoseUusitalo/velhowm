@@ -2,12 +2,17 @@ package velho.model.data;
 
 import java.text.ParseException;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.hibernate.HibernateException;
 
+import velho.controller.CSVController;
 import velho.controller.DatabaseController;
+import velho.controller.UserController;
+import velho.controller.VelhoCsvParser;
 import velho.model.Manifest;
 import velho.model.ManifestState;
 import velho.model.Product;
@@ -22,7 +27,6 @@ import velho.model.Shelf;
 import velho.model.ShelfLevel;
 import velho.model.ShelfSlot;
 import velho.model.User;
-import velho.model.enums.UserRole;
 
 /**
  * Example data to test the software.
@@ -89,14 +93,28 @@ public abstract class SampleData
 		return dataLoaded;
 	}
 
+	/**
+	 * Loads the sample users from the CSV file and saves them into the database.
+	 */
 	private static void createSampleUsers()
 	{
 		if (!DatabaseController.hasUsers())
 		{
-			DatabaseController.save(new User(1, "Admin", "Test", "111111", null, UserRole.ADMINISTRATOR));
-			DatabaseController.save(new User(2, "Boss", "Test", "222222", null, UserRole.MANAGER));
-			DatabaseController.save(new User(3, "Worker", "Test", "333333", null, UserRole.LOGISTICIAN));
-			DatabaseController.save(new User(4, "Badger", "Testaccount", null, "12345678", UserRole.LOGISTICIAN));
+			final VelhoCsvParser<User> parser = CSVController.readCSVFile("data/sample_users.csv", User.class);
+
+			if (parser.hasInvalidData())
+				SYSLOG.debug("Sample users has invalid data, skipped: " + parser.getInvalidData());
+
+			final Set<User> users = new HashSet<User>(parser.getData());
+			final Set<User> invalidUsers = UserController.getInvalidUsers(users);
+
+			if (!invalidUsers.isEmpty())
+			{
+				SYSLOG.debug("Sample users has invalid users, skipped: " + invalidUsers);
+				users.removeAll(invalidUsers);
+			}
+
+			DatabaseController.batchSave(users);
 		}
 		else
 			SYSLOG.trace("Database already has users.");

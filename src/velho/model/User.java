@@ -2,7 +2,6 @@ package velho.model;
 
 import java.util.UUID;
 
-import velho.controller.DatabaseController;
 import velho.controller.UserController;
 import velho.model.enums.UserRole;
 
@@ -100,11 +99,6 @@ public class User extends AbstractDatabaseObject
 	public User(final int databaseID, final String firstName, final String lastName, final String pin, final String badgeID, final UserRole role)
 	{
 		this(databaseID, UUID.randomUUID(), firstName, lastName, pin, badgeID, role);
-	}
-
-	public User(final int databaseID, final String firstName, final String lastName, final String pin, final String badgeID, final String roleName)
-	{
-		this(databaseID, UUID.randomUUID(), firstName, lastName, pin, badgeID, DatabaseController.getUserByName(roleName));
 	}
 
 	/**
@@ -270,6 +264,9 @@ public class User extends AbstractDatabaseObject
 	 */
 	public void setRole(final UserRole role)
 	{
+		if (role == null)
+			throw new IllegalArgumentException("User role can not be null.");
+
 		this.role = role;
 	}
 

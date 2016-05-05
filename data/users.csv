@@ -1,7 +1,0 @@
-databa,firstName,lastName,pin,badgeID,role
-100,valid,user,,88888888,LOGISTICIAN
-101,ok,manager,616161,,MANAGER
-asd,wrong,dbid,,88888888,LOGISTICIAN
-102,no good has,both,888888,09090909,LOGISTICIAN
-103,wrong,pin,8,,LOGISTICIAN
-104,incorrect,role,888888,09090909,THING
