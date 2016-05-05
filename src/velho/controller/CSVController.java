@@ -11,15 +11,22 @@ import com.opencsv.bean.HeaderColumnNameMappingStrategy;
  *
  * @author Jose Uusitalo
  */
-public class CSVController
+public abstract class CSVController
 {
-
-	public static <T extends Object> VelhoCsvReader<T> readCSVFile(final String filePath, final Class<T> type)
+	/**
+	 * Reads the specified CSV file and parses the data into objects of the specified type.
+	 *
+	 * @param <T> the type of the object a single line in the file represent
+	 * @param filePath path to the csv file
+	 * @param type the class the objects will instantiated as
+	 * @return a {@link VelhoCsvParser} object containing the valid and invalid data
+	 */
+	public static <T extends Object> VelhoCsvParser<T> readCSVFile(final String filePath, final Class<T> type)
 	{
 		final HeaderColumnNameMappingStrategy<T> strategy = new HeaderColumnNameMappingStrategy<T>();
 		strategy.setType(type);
 
-		final VelhoCsvReader<T> csvReader = new VelhoCsvReader<T>();
+		final VelhoCsvParser<T> csvReader = new VelhoCsvParser<T>();
 
 		try
 		{
@@ -51,6 +58,5 @@ public class CSVController
 		{
 			e.printStackTrace();
 		}
-
 	}
 }

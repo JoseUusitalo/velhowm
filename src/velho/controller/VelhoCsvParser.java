@@ -1,5 +1,6 @@
 package velho.controller;
 
+import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -8,9 +9,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.log4j.Logger;
+
 import com.opencsv.CSVReader;
 import com.opencsv.bean.CsvToBean;
 import com.opencsv.bean.MappingStrategy;
+import com.sun.media.sound.InvalidDataException;
 
 /**
  * A stripped down customized version of {@link CsvToBean} for use in VELHO Warehouse Management.
@@ -18,8 +22,13 @@ import com.opencsv.bean.MappingStrategy;
  * @author Jose Uusitalo
  * @param <T> the type a line in the csv file represents
  */
-public class VelhoCsvReader<T> extends CsvToBean<T>
+public class VelhoCsvParser<T> extends CsvToBean<T>
 {
+	/**
+	 * Apache log4j logger: System.
+	 */
+	private static final Logger SYSLOG = Logger.getLogger(VelhoCsvParser.class.getName());
+
 	/**
 	 * The list of data read from the CSV file.
 	 */
@@ -32,7 +41,7 @@ public class VelhoCsvReader<T> extends CsvToBean<T>
 
 	/**
 	 */
-	public VelhoCsvReader()
+	public VelhoCsvParser()
 	{
 		datalist = new ArrayList<T>();
 		invalidData = new HashMap<Long, List<String>>();
@@ -72,7 +81,6 @@ public class VelhoCsvReader<T> extends CsvToBean<T>
 
 	/**
 	 * Clears previous data from memory and parses values from the specified CSV file to a list of data.
-	 * Reader is automatically closed.
 	 *
 	 * @param mapper mapping strategy for the bean.
 	 * @param filePath path to the csv file to read
@@ -84,6 +92,8 @@ public class VelhoCsvReader<T> extends CsvToBean<T>
 		datalist.clear();
 		invalidData.clear();
 
+		SYSLOG.debug("Parsing: " + new File(filePath).getAbsolutePath());
+
 		final CSVReader reader = new CSVReader(new FileReader(filePath));
 
 		long lineProcessed = 0;
@@ -93,10 +103,10 @@ public class VelhoCsvReader<T> extends CsvToBean<T>
 		{
 			mapper.captureHeader(reader);
 		}
-		catch (Exception e)
+		catch (final IOException e)
 		{
 			reader.close();
-			throw new RuntimeException("Error capturing CSV header!", e);
+			throw new InvalidDataException("Error capturing CSV header.");
 		}
 
 		while (null != (line = reader.readNext()))
