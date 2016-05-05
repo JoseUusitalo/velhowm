@@ -48,6 +48,7 @@ import velho.controller.RemovalPlatformController;
 import velho.controller.SearchController;
 import velho.controller.UIController;
 import velho.controller.UserController;
+import velho.model.User;
 import velho.model.enums.SupportedTranslation;
 import velho.model.interfaces.GenericView;
 
@@ -630,7 +631,7 @@ public class MainWindow extends Application implements GenericView
 	{
 		SYSLOG.info("Main application code skipped.");
 
-		CSVController.readBeansCSV();
+		System.out.println(CSVController.readCSVFile("data/users.csv", User.class).getData());
 		System.out.println();
 		CSVController.writeCSV();
 	}

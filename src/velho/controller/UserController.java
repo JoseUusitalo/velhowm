@@ -1,7 +1,7 @@
 package velho.controller;
 
+import java.util.Collection;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
@@ -266,7 +266,7 @@ public class UserController implements UIActionController
 	 * @return a set of invalid users
 	 * @see #validateUserData(String, String, String, String, UserRole)
 	 */
-	public static Set<User> getInvalidUsers(final List<User> users)
+	public static Set<User> getInvalidUsers(final Collection<User> users)
 	{
 		final Set<User> invalids = new HashSet<User>();
 

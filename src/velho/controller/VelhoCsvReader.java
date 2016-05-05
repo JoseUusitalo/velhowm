@@ -21,6 +21,11 @@ import com.opencsv.bean.MappingStrategy;
 public class VelhoCsvReader<T> extends CsvToBean<T>
 {
 	/**
+	 * The list of data read from the CSV file.
+	 */
+	private List<T> datalist;
+
+	/**
 	 * A map of invalid CSV data where the key is the line number and the value contains a list of invalid values on that line.
 	 */
 	private Map<Long, List<String>> invalidData;
@@ -29,6 +34,7 @@ public class VelhoCsvReader<T> extends CsvToBean<T>
 	 */
 	public VelhoCsvReader()
 	{
+		datalist = new ArrayList<T>();
 		invalidData = new HashMap<Long, List<String>>();
 	}
 
@@ -55,20 +61,30 @@ public class VelhoCsvReader<T> extends CsvToBean<T>
 	}
 
 	/**
-	 * Parses values from the specified CSV file to a list of data.
+	 * Gets the data parsed with the {@link #parseFile(MappingStrategy, String)} method.
+	 *
+	 * @return a list of objects of the specified type parsed from the file
+	 */
+	public List<T> getData()
+	{
+		return datalist;
+	}
+
+	/**
+	 * Clears previous data from memory and parses values from the specified CSV file to a list of data.
 	 * Reader is automatically closed.
 	 *
 	 * @param mapper mapping strategy for the bean.
 	 * @param filePath path to the csv file to read
-	 * @return a list of objects of the specified type parsed from the file
+	 * @see #getData()
 	 */
 	@SuppressWarnings("resource")
-	public List<T> parseFile(final MappingStrategy<T> mapper, final String filePath) throws IOException
+	public void parseFile(final MappingStrategy<T> mapper, final String filePath) throws IOException
 	{
+		datalist.clear();
 		invalidData.clear();
 
 		final CSVReader reader = new CSVReader(new FileReader(filePath));
-		final List<T> datalist = new ArrayList<T>();
 
 		long lineProcessed = 0;
 		String[] line = null;
@@ -98,7 +114,5 @@ public class VelhoCsvReader<T> extends CsvToBean<T>
 		}
 
 		reader.close();
-
-		return datalist;
 	}
 }
