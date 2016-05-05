@@ -10,6 +10,7 @@ import org.hibernate.HibernateException;
 
 import velho.controller.DatabaseController;
 import velho.controller.ProductController;
+import velho.controller.ShelfController;
 import velho.controller.UserController;
 import velho.model.CSVLoader;
 import velho.model.Manifest;
@@ -210,15 +211,23 @@ public abstract class SampleData
 		if (!DatabaseController.hasShelves())
 		{
 			/* 1 - Tiny Full Shelf: 1-4 */
-			DatabaseController.save(new Shelf(1, 1));
 			/* 2 - Slot Full Shelf: 5-9 */
-			DatabaseController.save(new Shelf(2, 2));
 			/* 3 - One Slot Level: 10-13 */
-			DatabaseController.save(new Shelf(3, 3));
 			/* 4 - Many Slot Level: 14-20 */
-			DatabaseController.save(new Shelf(4, 2));
 			/* 5 - Empty Shelf 2-slot */
-			DatabaseController.save(new Shelf(5, 1));
+			SYSLOG.debug("Loading sample shelves.");
+
+			final CSVLoader<Shelf> csvLoader = new CSVLoader<Shelf>(Shelf.class)
+			{
+				@Override
+				protected Set<Shelf> getInvalidDataObjects(final Set<Shelf> validDataSet)
+				{
+					return ShelfController.getInvalidShelves(validDataSet);
+				}
+			};
+
+			csvLoader.load("data/sample_shelves.csv");
+			csvLoader.save();
 		}
 		else
 			SYSLOG.trace("Database already has shelves.");
@@ -228,20 +237,19 @@ public abstract class SampleData
 	{
 		if (!DatabaseController.hasShelfLevels())
 		{
-			DatabaseController.save(new ShelfLevel(1, DatabaseController.getShelfByID(1), 1, 4));
+			SYSLOG.debug("Loading sample shelf levels.");
 
-			DatabaseController.save(new ShelfLevel(2, DatabaseController.getShelfByID(2), 1, 20));
-			DatabaseController.save(new ShelfLevel(3, DatabaseController.getShelfByID(2), 2, 20));
+			final CSVLoader<ShelfLevel> csvLoader = new CSVLoader<ShelfLevel>(ShelfLevel.class)
+			{
+				@Override
+				protected Set<ShelfLevel> getInvalidDataObjects(final Set<ShelfLevel> validDataSet)
+				{
+					return ShelfController.getInvalidShelfLevels(validDataSet);
+				}
+			};
 
-			DatabaseController.save(new ShelfLevel(4, DatabaseController.getShelfByID(3), 1, 1));
-			DatabaseController.save(new ShelfLevel(5, DatabaseController.getShelfByID(3), 2, 1));
-			DatabaseController.save(new ShelfLevel(6, DatabaseController.getShelfByID(3), 3, 1));
-
-			DatabaseController.save(new ShelfLevel(7, DatabaseController.getShelfByID(4), 1, 50));
-			DatabaseController.save(new ShelfLevel(8, DatabaseController.getShelfByID(4), 2, 50));
-
-			DatabaseController.save(new ShelfLevel(9, DatabaseController.getShelfByID(5), 1, 2));
-			DatabaseController.save(new ShelfLevel(10, DatabaseController.getShelfByID(5), 2, 2));
+			csvLoader.load("data/sample_shelf_levels.csv");
+			csvLoader.save();
 		}
 		else
 			SYSLOG.trace("Database already has shelf levels.");

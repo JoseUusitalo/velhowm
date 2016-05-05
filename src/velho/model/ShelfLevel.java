@@ -10,6 +10,8 @@ import javax.naming.directory.InvalidAttributesException;
 
 import org.apache.log4j.Logger;
 
+import velho.controller.DatabaseController;
+
 /**
  * A horizontal level in a {@link Shelf} that contains one or more {@link ShelfSlot}s.
  *
@@ -283,5 +285,20 @@ public class ShelfLevel extends AbstractDatabaseObject
 	public void removeSlot(final ShelfSlot shelfSlot)
 	{
 		shelfSlots.remove(shelfSlot);
+	}
+
+	/**
+	 * Sets the new parent shelf for this shelf level by the database ID of the shelf.
+	 * Intended for use with loading data from CSV files.
+	 *
+	 * @param parentShelfID the database ID of the new parent shelf of this shelf level
+	 * @see DatabaseController#getShelfByID(int)
+	 */
+	public void setParentShelfID(final int parentShelfID)
+	{
+		if (parentShelfID < 1)
+			throw new IllegalArgumentException("Parent shelf ID must be greater than 0, was '" + parentShelfID + "'.");
+
+		this.parentShelf = DatabaseController.getShelfByID(parentShelfID);
 	}
 }

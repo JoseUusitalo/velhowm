@@ -334,8 +334,7 @@ public abstract class DatabaseController
 	}
 
 	/*
-	 * -------------------------------- PUBLIC DATABASE METHODS
-	 * --------------------------------
+	 * -------------------------------- PUBLIC DATABASE METHODS --------------------------------
 	 */
 
 	/**
@@ -2005,6 +2004,16 @@ public abstract class DatabaseController
 
 		for (final Object obj : objects)
 		{
+			/*
+			 * HIBERNATE NOTE 2016-05-05
+			 *
+			 * This would have been nice to know a few weeks ago. In hindsight it is quite obvious.
+			 *
+			 * Saving an object to the database with SESSION_FACTORY.getCurrentSession().save(obj) causes the databaseID of the object to be recalculated
+			 * because all mappings have the databaseID column set to <generator class="native" /> instead of <generator class="assigned" />.
+			 *
+			 * In short. This cannot be used to save sample data where the database ID is set manually.
+			 */
 			SESSION_FACTORY.getCurrentSession().save(obj);
 			count++;
 
@@ -2019,7 +2028,8 @@ public abstract class DatabaseController
 		SESSION_FACTORY.getCurrentSession().getTransaction().commit();
 
 		// The log message will be wrong if the set contains objects of different types but whatever.
-		DBLOG.debug("Batch saved " + objects.size() + " " + objects.iterator().next().getClass().getSimpleName() + " objects.");
+		if (!objects.isEmpty())
+			DBLOG.debug("Batch saved " + objects.size() + " " + objects.iterator().next().getClass().getSimpleName() + " objects.");
 	}
 
 	/**
@@ -2050,7 +2060,8 @@ public abstract class DatabaseController
 		SESSION_FACTORY.getCurrentSession().getTransaction().commit();
 
 		// The log message will be wrong if the set contains objects of different types but whatever.
-		DBLOG.debug("Batch updated " + objects.size() + " " + objects.iterator().next().getClass().getSimpleName() + " objects.");
+		if (!objects.isEmpty())
+			DBLOG.debug("Batch updated " + objects.size() + " " + objects.iterator().next().getClass().getSimpleName() + " objects.");
 	}
 
 	/*

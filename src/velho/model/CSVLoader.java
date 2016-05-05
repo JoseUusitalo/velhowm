@@ -20,7 +20,7 @@ import velho.controller.VelhoCsvParser;
  * NOTE: The method {@link #getInvalidDataObjects(Set)} must be overridden for the loader to work.
  * </p>
  *
- * @author Demian Wright
+ * @author Jose Uusitalo
  * @param <T> the type of the object a single line in the CSV file represents
  */
 public class CSVLoader<T extends AbstractDatabaseObject>
@@ -120,7 +120,7 @@ public class CSVLoader<T extends AbstractDatabaseObject>
 
 		if (!invalidDataSet.isEmpty())
 		{
-			SYSLOG.warn("Sample " + objectClass.getSimpleName() + " objects has " + invalidDataSet.size() + " invalid objects, removed: " + invalidDataSet);
+			SYSLOG.warn("Sample " + objectClass.getSimpleName() + " objects has " + invalidDataSet.size() + "/" + dataset.size() + " invalid objects.");
 			dataset.removeAll(invalidDataSet);
 		}
 	}
@@ -130,6 +130,6 @@ public class CSVLoader<T extends AbstractDatabaseObject>
 	 */
 	public void save()
 	{
-		DatabaseController.batchSave(dataset);
+		DatabaseController.batchUpdate(dataset);
 	}
 }
