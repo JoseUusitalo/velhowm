@@ -99,6 +99,11 @@ public abstract class DatabaseController
 	 */
 	private static final SessionFactory SESSION_FACTORY = HibernateSessionFactory.getInstance();
 
+	/**
+	 * The value of hibernate.jdbc.batch_size property in hibernate.cfg.xml file.
+	 */
+	private static final int HIBERNATE_BATCH_SIZE = 30;
+
 	/*
 	 * ---- UI LISTS ----
 	 */
@@ -1986,6 +1991,68 @@ public abstract class DatabaseController
 		return object.getDatabaseID();
 	}
 
+	/**
+	 * Batch saves the given set of {@link AbstractDatabaseObject}s.
+	 * Batch saving is noticeable faster than saving each object in a collection individually.
+	 *
+	 * @param objects a set of objects to be saved to the database
+	 */
+	public static <T extends AbstractDatabaseObject> void batchSave(final Set<T> objects)
+	{
+		SESSION_FACTORY.getCurrentSession().beginTransaction();
+
+		int count = 0;
+
+		for (final Object obj : objects)
+		{
+			SESSION_FACTORY.getCurrentSession().save(obj);
+			count++;
+
+			if (count % HIBERNATE_BATCH_SIZE == 0)
+			{
+				// Flush a batch of inserts and release memory, improving batch insert speed.
+				SESSION_FACTORY.getCurrentSession().flush();
+				SESSION_FACTORY.getCurrentSession().clear();
+			}
+		}
+
+		SESSION_FACTORY.getCurrentSession().getTransaction().commit();
+
+		// The log message will be wrong if the set contains objects of different types but whatever.
+		DBLOG.debug("Batch saved " + objects.size() + " " + objects.iterator().next().getClass().getSimpleName() + " objects.");
+	}
+
+	/**
+	 * Batch updates the given set of {@link AbstractDatabaseObject}s.
+	 * Batch updating is noticeable faster than updating each object in a collection individually.
+	 *
+	 * @param objects a set of objects to be updated in the database
+	 */
+	public static <T extends AbstractDatabaseObject> void batchUpdate(final Set<T> objects)
+	{
+		SESSION_FACTORY.getCurrentSession().beginTransaction();
+
+		int count = 0;
+
+		for (final Object obj : objects)
+		{
+			SESSION_FACTORY.getCurrentSession().update(obj);
+			count++;
+
+			if (count % HIBERNATE_BATCH_SIZE == 0)
+			{
+				// Flush a batch of inserts and release memory, improving batch insert speed.
+				SESSION_FACTORY.getCurrentSession().flush();
+				SESSION_FACTORY.getCurrentSession().clear();
+			}
+		}
+
+		SESSION_FACTORY.getCurrentSession().getTransaction().commit();
+
+		// The log message will be wrong if the set contains objects of different types but whatever.
+		DBLOG.debug("Batch updated " + objects.size() + " " + objects.iterator().next().getClass().getSimpleName() + " objects.");
+	}
+
 	/*
 	 * -------------------------------- GETTERS --------------------------------
 	 */
@@ -2473,24 +2540,6 @@ public abstract class DatabaseController
 	public static boolean hasRemovalPlatforms()
 	{
 		return tableHasEntries("RemovalPlatform");
-	}
-
-	public static ProductType getProductTypeByName(final String string)
-	{
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	public static ProductBrand getProductBrandByName(final String string)
-	{
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	public static ProductCategory getProductCategoryByName(final String string)
-	{
-		// TODO Auto-generated method stub
-		return null;
 	}
 
 	public static UserRole getUserByName(final String roleName)
