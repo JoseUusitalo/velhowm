@@ -12,6 +12,7 @@ import velho.controller.ProductController;
 import velho.controller.ShelfController;
 import velho.controller.UserController;
 import velho.controller.database.DatabaseController;
+import velho.model.AbstractDatabaseObject;
 import velho.model.CSVLoader;
 import velho.model.Manifest;
 import velho.model.ManifestState;
@@ -113,6 +114,9 @@ public abstract class SampleData
 
 			csvLoader.load("data/sample_users.csv");
 			csvLoader.save();
+
+			for (Object obj : DatabaseController.getAllUsers())
+				System.out.println("User: " + ((AbstractDatabaseObject) obj).getDatabaseID() + " " + obj);
 		}
 		else
 			SYSLOG.trace("Database already has users.");
@@ -135,6 +139,9 @@ public abstract class SampleData
 
 			csvLoader.load("data/sample_product_brands.csv");
 			csvLoader.save();
+
+			for (Object obj : DatabaseController.getAllProductBrands())
+				System.out.println("Brand: " + ((AbstractDatabaseObject) obj).getDatabaseID() + " " + obj);
 		}
 		else
 			SYSLOG.trace("Database already has product brands.");
@@ -157,6 +164,9 @@ public abstract class SampleData
 
 			csvLoader.load("data/sample_product_types.csv");
 			csvLoader.save();
+
+			for (Object obj : DatabaseController.getAllProductTypes())
+				System.out.println("Type: " + ((AbstractDatabaseObject) obj).getDatabaseID() + " " + obj);
 		}
 		else
 			SYSLOG.trace("Database already has product types.");
@@ -179,6 +189,9 @@ public abstract class SampleData
 
 			csvLoader.load("data/sample_product_categories.csv");
 			csvLoader.save();
+
+			for (Object obj : DatabaseController.getAllProductCategories())
+				System.out.println("Category: " + ((AbstractDatabaseObject) obj).getDatabaseID() + " " + obj);
 		}
 		else
 			SYSLOG.trace("Database already has product categories.");
@@ -201,6 +214,9 @@ public abstract class SampleData
 
 			csvLoader.load("data/sample_products.csv");
 			csvLoader.save();
+
+			for (Object obj : DatabaseController.getAllProducts())
+				System.out.println("Product: " + ((AbstractDatabaseObject) obj).getDatabaseID() + " " + obj);
 		}
 		else
 			SYSLOG.trace("Database already has products.");

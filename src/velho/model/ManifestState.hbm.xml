@@ -9,7 +9,7 @@
 		<id name="databaseID"
 			column="manifest_state_id"
 			type="int">
-			<generator class="native" />
+			<generator class="velho.controller.database.AssignedIdentifierGenerator" />
 		</id>
 		
 		<property	name="uuid"

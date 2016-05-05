@@ -3,3 +3,4 @@ databaseID,firstName,lastName,pin,badgeID,role
 2,Boss,Test,222222,,MANAGER
 3,Worker,Test,333333,,LOGISTICIAN
 4,Badger,Testaccount,,12345678,LOGISTICIAN
+999888777,Verybig,Idperson,,99999999,ADMINISTRATOR

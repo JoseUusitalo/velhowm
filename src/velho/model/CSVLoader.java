@@ -130,6 +130,6 @@ public class CSVLoader<T extends AbstractDatabaseObject>
 	 */
 	public void save()
 	{
-		DatabaseController.batchUpdate(dataset);
+		DatabaseController.batchSave(dataset);
 	}
 }
