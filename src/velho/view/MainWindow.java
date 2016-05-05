@@ -199,29 +199,30 @@ public class MainWindow extends Application implements GenericView
 				runApp();
 			}
 			else
-				SYSLOG.info("Skipping main application code.");
+				skip();
 		}
 		else
 			runApp();
-
-		CSVController.readBeansCSV();
-		System.out.println();
-		CSVController.writeCSV();
 	}
 
+	/**
+	 * Prepares the main database by loading the sample data if needed.
+	 */
 	private static void prepareDatabase()
 	{
 		try
 		{
-			DatabaseController.link();
 			DatabaseController.loadSampleData();
 		}
-		catch (ClassNotFoundException | HibernateException | ParseException e)
+		catch (HibernateException | ParseException e)
 		{
 			e.printStackTrace();
 		}
 	}
 
+	/**
+	 * Prepares the logger by configuring it and connecting to the database.
+	 */
 	private static void prepareLogger()
 	{
 		// Load the logger properties.
@@ -276,6 +277,9 @@ public class MainWindow extends Application implements GenericView
 		}
 	}
 
+	/**
+	 * The main method for running the application.
+	 */
 	private void runApp()
 	{
 		SYSLOG.info("Running VELHO Warehouse Management.");
@@ -435,7 +439,8 @@ public class MainWindow extends Application implements GenericView
 			platformStatus.setAlignment(Pos.CENTER_LEFT);
 
 			final HBox userStatus = new HBox(10);
-			final Label userName = new Label(LocalizationController.getCompoundString("helloUserMessage", LoginController.getCurrentUser().getRoleName(), LoginController.getCurrentUser().getFullName()));
+			final Label userName = new Label(LocalizationController.getCompoundString("helloUserMessage", LoginController.getCurrentUser().getRoleName(),
+					LoginController.getCurrentUser().getFullName()));
 			final Button logoutButton = new Button(LocalizationController.getString("logOutButton"));
 			logoutButton.setPrefHeight(5.0);
 			userStatus.getChildren().addAll(userName, logoutButton);
@@ -469,6 +474,7 @@ public class MainWindow extends Application implements GenericView
 		if (SKIP_MAIN_CODE || (!SHOW_WINDOWS && DEBUG_MODE))
 		{
 			SYSLOG.debug("Windows are disabled.");
+			shutdown(primaryStage);
 		}
 		else
 		{
@@ -514,6 +520,11 @@ public class MainWindow extends Application implements GenericView
 		}
 	}
 
+	/**
+	 * Gets the root {@link BorderPane} of the main window.
+	 *
+	 * @return the root node
+	 */
 	private BorderPane getRootBorderPane()
 	{
 		if (rootBorderPane == null)
@@ -609,6 +620,19 @@ public class MainWindow extends Application implements GenericView
 	public void setRemovalPlatformFullPercent(final String percent)
 	{
 		removalPlatformStatus.setText(percent + "%");
+	}
+
+	/**
+	 * Called when the main application code is skipped.
+	 */
+	@SuppressWarnings("static-method")
+	private void skip()
+	{
+		SYSLOG.info("Main application code skipped.");
+
+		CSVController.readBeansCSV();
+		System.out.println();
+		CSVController.writeCSV();
 	}
 
 	@Override

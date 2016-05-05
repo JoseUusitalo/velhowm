@@ -12,8 +12,7 @@ import java.util.Set;
 
 import com.opencsv.CSVReader;
 import com.opencsv.CSVWriter;
-import com.opencsv.bean.ColumnPositionMappingStrategy;
-import com.opencsv.bean.CsvToBean;
+import com.opencsv.bean.HeaderColumnNameMappingStrategy;
 
 import velho.model.Manifest;
 import velho.model.ManifestState;
@@ -380,30 +379,29 @@ public class CSVController
 
 	public static void readBeansCSV()
 	{
-		CSVReader reader = null;
+		final HeaderColumnNameMappingStrategy<User> strategy = new HeaderColumnNameMappingStrategy<User>();
+		strategy.setType(User.class);
+		// strat.setColumnMapping(new String[] { "databaseID", "firstName", "lastName", "pin", "badgeID", "role" });
+
+		final VelhoCsvReader<User> csvReader = new VelhoCsvReader<User>();
+		List<User> data = null;
 
 		try
 		{
-			reader = new CSVReader(new FileReader("data/users.csv"));
+			data = csvReader.parseFile(strategy, "data/users.csv");
 		}
-		catch (FileNotFoundException e)
+		catch (IOException e)
 		{
 			e.printStackTrace();
 		}
 
-		final List<List<String>> invalidData = new ArrayList<List<String>>();
+		final Set<User> validUsers = new HashSet<User>(data);
+		final Set<User> invalidUsers = UserController.getInvalidUsers(data);
+		validUsers.removeAll(invalidUsers);
 
-		ColumnPositionMappingStrategy<User> strat = new ColumnPositionMappingStrategy<User>();
-		strat.setType(User.class);
-		String[] columns = new String[] { "databaseID", "firstName", "lastName", "pin", "badgeID", "role" };
-		strat.setColumnMapping(columns);
-
-		CsvToBean<User> csv = new CsvToBean<User>();
-		List<User> list = new ArrayList<User>();
-
-		list = csv.parse(strat, reader);
-
-		System.out.println(list);
+		System.out.println("valid users: " + validUsers);
+		System.out.println("invalid users: " + invalidUsers);
+		System.out.println("invalid data: " + csvReader.getInvalidData());
 	}
 
 	public static void writeCSV()
@@ -414,7 +412,7 @@ public class CSVController
 			writer = new CSVWriter(new FileWriter("productbrands.csv"), '@');
 
 			// feed in your array (or convert your data to an array)
-			String[] entries = new String[] { "asd,u348g" };
+			String[] entries = new String[] { "asd", "u348g" };
 
 			writer.writeNext(entries);
 
