@@ -33,7 +33,6 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
-import velho.controller.CSVController;
 import velho.controller.DatabaseController;
 import velho.controller.DebugController;
 import velho.controller.ExternalSystemsController;
@@ -48,7 +47,6 @@ import velho.controller.RemovalPlatformController;
 import velho.controller.SearchController;
 import velho.controller.UIController;
 import velho.controller.UserController;
-import velho.model.User;
 import velho.model.enums.SupportedTranslation;
 import velho.model.interfaces.GenericView;
 
@@ -70,28 +68,22 @@ public class MainWindow extends Application implements GenericView
 	private static final Logger SYSLOG = Logger.getLogger(MainWindow.class.getName());
 
 	/**
-	 * Enable or disable debug features.
-	 */
-	public static final boolean DEBUG_MODE = true;
-
-	/**
-	 * Enable or disable showing windows. DEBUG_MODE must be <code>true</code>
-	 * for this to affect anything.
-	 */
-	public static final boolean SHOW_WINDOWS = false;
-
-	/**
 	 * Enable TRACE level logging. DEBUG_MODE must be <code>true</code> for this
 	 * to affect anything.
 	 */
 	public static final boolean SHOW_TRACE = false;
 
 	/**
+	 * Enable or disable debug features.
+	 */
+	public static final boolean DEBUG_MODE = true;
+
+	/**
 	 * Skips the entire main application code. DEBUG_MODE must be
 	 * <code>true</code> for this
 	 * to affect anything.
 	 */
-	public static final boolean SKIP_MAIN_CODE = true;
+	public static final boolean SKIP_MAIN_CODE = false;
 
 	/**
 	 * The height of the window.
@@ -192,18 +184,7 @@ public class MainWindow extends Application implements GenericView
 		prepareLogger();
 		LocalizationController.initializeBundle();
 		prepareDatabase();
-
-		if (DEBUG_MODE)
-		{
-			if (!SKIP_MAIN_CODE)
-			{
-				runApp();
-			}
-			else
-				skip();
-		}
-		else
-			runApp();
+		runApp();
 	}
 
 	/**
@@ -468,33 +449,31 @@ public class MainWindow extends Application implements GenericView
 	/**
 	 * Creates the window.
 	 */
-	@SuppressWarnings("unused")
 	@Override
 	public void start(final Stage primaryStage)
 	{
-		if (SKIP_MAIN_CODE || (!SHOW_WINDOWS && DEBUG_MODE))
+		setUserAgentStylesheet(STYLESHEET_MODENA);
+		primaryStage.setTitle(LocalizationController.getString("mainWindowTitle"));
+		final Group root = new Group();
+		scene = new Scene(root, WINDOW_WIDTH, WINDOW_HEIGHT);
+		scene.getStylesheets().add(getClass().getResource("velho.css").toExternalForm());
+		widthProperty = scene.widthProperty();
+
+		rootBorderPane = getRootBorderPane();
+
+		root.getChildren().add(rootBorderPane);
+
+		primaryStage.setOnCloseRequest(new EventHandler<WindowEvent>()
 		{
-			SYSLOG.debug("Windows are disabled.");
-			shutdown(primaryStage);
-		}
-		else
+			@Override
+			public void handle(final WindowEvent event)
+			{
+				shutdown(primaryStage);
+			}
+		});
+
+		if (!SKIP_MAIN_CODE)
 		{
-			setUserAgentStylesheet(STYLESHEET_MODENA);
-			primaryStage.setTitle(LocalizationController.getString("mainWindowTitle"));
-			final Group root = new Group();
-			scene = new Scene(root, WINDOW_WIDTH, WINDOW_HEIGHT);
-			scene.getStylesheets().add(getClass().getResource("velho.css").toExternalForm());
-			widthProperty = scene.widthProperty();
-
-			rootBorderPane = getRootBorderPane();
-
-			root.getChildren().add(rootBorderPane);
-
-			LoginController.checkLogin();
-
-			primaryStage.setScene(scene);
-			primaryStage.show();
-
 			if (DEBUG_MODE)
 			{
 				debugStage = new Stage();
@@ -510,14 +489,14 @@ public class MainWindow extends Application implements GenericView
 				});
 			}
 
-			primaryStage.setOnCloseRequest(new EventHandler<WindowEvent>()
-			{
-				@Override
-				public void handle(final WindowEvent event)
-				{
-					shutdown(primaryStage);
-				}
-			});
+			LoginController.checkLogin();
+			primaryStage.setScene(scene);
+			primaryStage.show();
+		}
+		else if (DEBUG_MODE)
+		{
+			skip();
+			shutdown(primaryStage);
 		}
 	}
 
@@ -630,10 +609,6 @@ public class MainWindow extends Application implements GenericView
 	private void skip()
 	{
 		SYSLOG.info("Main application code skipped.");
-
-		System.out.println(CSVController.readCSVFile("data/users.csv", User.class).getData());
-		System.out.println();
-		CSVController.writeCSV();
 	}
 
 	@Override
