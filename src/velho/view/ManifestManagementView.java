@@ -10,14 +10,17 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
+import velho.controller.LocalizationController;
 import velho.controller.ManifestController;
+import velho.controller.UIController;
+import velho.model.interfaces.GenericView;
 
 /**
  * View for managing manifests.
  *
  * @author Jose Uusitalo
  */
-public class ManifestManagementView
+public class ManifestManagementView implements GenericView
 {
 	/**
 	 * The root BorderPane for this view.
@@ -27,7 +30,7 @@ public class ManifestManagementView
 	/**
 	 * The {@link ManifestController}.
 	 */
-	private ManifestController manifestController;
+	private final ManifestController manifestController;
 
 	/**
 	 * The header of the view in the tab.
@@ -56,11 +59,12 @@ public class ManifestManagementView
 			managementPanel = new HBox(10);
 			managementPanel.getStyleClass().add("standard-padding");
 
-			Button browseButton = new Button("Browse Manifests");
+			Button browseButton = new Button(LocalizationController.getString("browseManifestsButton"));
 			GridPane.setConstraints(browseButton, 0, 0, 1, 1, HPos.LEFT, VPos.CENTER);
 
 			/*
-			 * After nearly an hour of trying to align the two nodes (button and state selector) on separate sides of
+			 * After nearly an hour of trying to align the two nodes (button and
+			 * state selector) on separate sides of
 			 * the HBox this was the best and only working solution.
 			 */
 			final HBox spacer = new HBox();
@@ -78,6 +82,7 @@ public class ManifestManagementView
 			});
 
 			bpane.setTop(managementPanel);
+			UIController.recordView(this);
 		}
 
 		return bpane;
@@ -115,7 +120,8 @@ public class ManifestManagementView
 		{
 			try
 			{
-				// NOTE: Assumes that the panel only has the browse button and spacer in it permanently.
+				// NOTE: Assumes that the panel only has the browse button and
+				// spacer in it permanently.
 				managementPanel.getChildren().remove(2);
 			}
 			catch (IndexOutOfBoundsException e)
@@ -127,5 +133,20 @@ public class ManifestManagementView
 		{
 			managementPanel.getChildren().add(node);
 		}
+	}
+
+	@Override
+	public void recreate()
+	{
+		bpane = null;
+		managementPanel = null;
+		getView();
+	}
+
+	@Override
+	public void destroy()
+	{
+		bpane = null;
+		managementPanel = null;
 	}
 }

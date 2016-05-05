@@ -29,6 +29,7 @@ import velho.model.Shelf;
 import velho.model.ShelfLevel;
 import velho.model.ShelfSlot;
 import velho.model.User;
+import velho.model.enums.UserRole;
 
 public class CSVController
 {
@@ -62,7 +63,8 @@ public class CSVController
 		{
 			boolean isValid = false;
 			int databaseID = 0;
-			String fname = null, lname = null, pin = null, badge = null, roleName = null;
+			String fname = null, lname = null, pin = null, badge = null;
+			UserRole role = null;
 
 			for (String[] line : csvLines)
 			{
@@ -73,9 +75,9 @@ public class CSVController
 					lname = line[2];
 					pin = line[3];
 					badge = line[4];
-					roleName = line[5];
+					role = DatabaseController.getUserRoleByName(line[5]);
 
-					isValid = UserController.validateUserData(badge, pin, fname, lname, roleName);
+					isValid = UserController.validateUserData(badge, pin, fname, lname, role);
 				}
 				catch (Exception e)
 				{
@@ -84,7 +86,7 @@ public class CSVController
 
 				if (isValid)
 				{
-					dataset.add(new User(databaseID, fname, lname, pin, badge, DatabaseController.getRoleByName(roleName)));
+					dataset.add(new User(databaseID, fname, lname, pin, badge, role));
 				}
 				else
 				{

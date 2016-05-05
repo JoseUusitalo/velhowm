@@ -1,3 +1,4 @@
+
 package velho.view;
 
 import java.text.ParseException;
@@ -21,6 +22,7 @@ import javafx.scene.Group;
 import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
+import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
@@ -35,6 +37,7 @@ import velho.controller.CSVController;
 import velho.controller.DatabaseController;
 import velho.controller.DebugController;
 import velho.controller.ExternalSystemsController;
+import velho.controller.LocalizationController;
 import velho.controller.LogController;
 import velho.controller.LogDatabaseController;
 import velho.controller.LoginController;
@@ -45,13 +48,15 @@ import velho.controller.RemovalPlatformController;
 import velho.controller.SearchController;
 import velho.controller.UIController;
 import velho.controller.UserController;
+import velho.model.enums.SupportedTranslation;
+import velho.model.interfaces.GenericView;
 
 /**
  * The main window and class for VELHO Warehouse Management.
  *
  * @author Jose Uusitalo &amp; Joona Silvennoinen
  */
-public class MainWindow extends Application
+public class MainWindow extends Application implements GenericView
 {
 	/**
 	 * Relative file path to the Apache log4j logger properties file.
@@ -78,10 +83,11 @@ public class MainWindow extends Application
 	 * Enable TRACE level logging. DEBUG_MODE must be <code>true</code> for this
 	 * to affect anything.
 	 */
-	public static final boolean SHOW_TRACE = true;
+	public static final boolean SHOW_TRACE = false;
 
 	/**
-	 * Skips the entire main application code. DEBUG_MODE must be <code>true</code> for this
+	 * Skips the entire main application code. DEBUG_MODE must be
+	 * <code>true</code> for this
 	 * to affect anything.
 	 */
 	public static final boolean SKIP_MAIN_CODE = true;
@@ -139,7 +145,7 @@ public class MainWindow extends Application
 	/**
 	 * The current width of the window.
 	 */
-	public static ReadOnlyDoubleProperty WIDTH_PROPERTY;
+	public static ReadOnlyDoubleProperty widthProperty;
 
 	/**
 	 * The root layout of the main window.
@@ -183,6 +189,7 @@ public class MainWindow extends Application
 	public MainWindow()
 	{
 		prepareLogger();
+		LocalizationController.initializeBundle();
 		prepareDatabase();
 
 		if (DEBUG_MODE)
@@ -273,8 +280,6 @@ public class MainWindow extends Application
 	{
 		SYSLOG.info("Running VELHO Warehouse Management.");
 
-		// FIXME: Database is not created correctly on first run.
-
 		try
 		{
 			DatabaseController.link();
@@ -298,6 +303,7 @@ public class MainWindow extends Application
 
 				ExternalSystemsController.setControllers(manifestController);
 				LoginController.setControllers(uiController, debugController);
+				LocalizationController.setControllers(uiController);
 
 				//@formatter:off
 				uiController.setControllers(this,
@@ -404,15 +410,33 @@ public class MainWindow extends Application
 			final GridPane statusBar = new GridPane();
 			statusBar.getStyleClass().add("status-bar");
 
+			final ComboBox<SupportedTranslation> languageBox = new ComboBox<SupportedTranslation>();
+			final Label languageChange = new Label(LocalizationController.getString("changeTranslationLabel"));
+			languageBox.getItems().addAll(SupportedTranslation.values());
+			languageBox.getSelectionModel().select(LocalizationController.getCurrentTranslation());
+			languageBox.valueProperty().addListener(new ChangeListener<SupportedTranslation>()
+			{
+				@SuppressWarnings("rawtypes")
+				@Override
+				public void changed(final ObservableValue ov, final SupportedTranslation oldValue, final SupportedTranslation newValue)
+				{
+					if (oldValue == null || !oldValue.equals(newValue))
+					{
+						LocalizationController.changeTranslation(newValue);
+					}
+				}
+			});
+
 			final HBox platformStatus = new HBox(3);
-			final Label removalPlatform = new Label("Removal Platform:");
+			final Label removalPlatform = new Label(LocalizationController.getString("removalPlatformStatusLabel"));
+			removalPlatform.setId("removalPlatformStatusLabel");
 			removalPlatformStatus = new Label();
-			platformStatus.getChildren().addAll(removalPlatform, removalPlatformStatus);
+			platformStatus.getChildren().addAll(languageChange, languageBox, removalPlatform, removalPlatformStatus);
 			platformStatus.setAlignment(Pos.CENTER_LEFT);
 
 			final HBox userStatus = new HBox(10);
-			final Label userName = new Label("Hello, " + LoginController.getCurrentUser().getRoleName() + " " + LoginController.getCurrentUser().getFullName());
-			final Button logoutButton = new Button("Log Out");
+			final Label userName = new Label(LocalizationController.getCompoundString("helloUserMessage", LoginController.getCurrentUser().getRoleName(), LoginController.getCurrentUser().getFullName()));
+			final Button logoutButton = new Button(LocalizationController.getString("logOutButton"));
 			logoutButton.setPrefHeight(5.0);
 			userStatus.getChildren().addAll(userName, logoutButton);
 			userStatus.setAlignment(Pos.CENTER_RIGHT);
@@ -430,6 +454,7 @@ public class MainWindow extends Application
 			statusBar.add(userStatus, 1, 0);
 			GridPane.setHgrow(platformStatus, Priority.ALWAYS);
 			rootBorderPane.setBottom(statusBar);
+			UIController.recordView(this);
 		}
 		rootBorderPane.setCenter(mainTabPane);
 	}
@@ -448,17 +473,13 @@ public class MainWindow extends Application
 		else
 		{
 			setUserAgentStylesheet(STYLESHEET_MODENA);
-
-			primaryStage.setTitle("VELHO Warehouse Management");
+			primaryStage.setTitle(LocalizationController.getString("mainWindowTitle"));
 			final Group root = new Group();
 			scene = new Scene(root, WINDOW_WIDTH, WINDOW_HEIGHT);
 			scene.getStylesheets().add(getClass().getResource("velho.css").toExternalForm());
-			WIDTH_PROPERTY = scene.widthProperty();
+			widthProperty = scene.widthProperty();
 
-			rootBorderPane = new BorderPane();
-			rootBorderPane.getStyleClass().add("standard-background-color");
-			rootBorderPane.prefHeightProperty().bind(scene.heightProperty());
-			rootBorderPane.prefWidthProperty().bind(scene.widthProperty());
+			rootBorderPane = getRootBorderPane();
 
 			root.getChildren().add(rootBorderPane);
 
@@ -491,6 +512,18 @@ public class MainWindow extends Application
 				}
 			});
 		}
+	}
+
+	private BorderPane getRootBorderPane()
+	{
+		if (rootBorderPane == null)
+		{
+			rootBorderPane = new BorderPane();
+			rootBorderPane.getStyleClass().add("standard-background-color");
+			rootBorderPane.prefHeightProperty().bind(scene.heightProperty());
+			rootBorderPane.prefWidthProperty().bind(scene.widthProperty());
+		}
+		return rootBorderPane;
 	}
 
 	/**
@@ -578,9 +611,13 @@ public class MainWindow extends Application
 		removalPlatformStatus.setText(percent + "%");
 	}
 
-	/**
-	 * Destroys the main tab panel.
-	 */
+	@Override
+	public void recreate()
+	{
+		mainTabPane = null;
+	}
+
+	@Override
 	public void destroy()
 	{
 		mainTabPane = null;

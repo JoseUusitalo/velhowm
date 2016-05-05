@@ -24,12 +24,6 @@ public class ProductBox extends ProductContainer
 	public ProductBox(final int databaseID, final UUID uuid, final Manifest manifest, final RemovalList removalList, final ShelfSlot shelfSlot, final Product product, final int maxSize, final int productCount, final Date expirationDate)
 	{
 		super(databaseID, uuid, manifest, removalList, shelfSlot, product, maxSize, productCount, expirationDate);
-
-		// Boxes cannot store cold products. Those may only be stored in freezers.
-		if (product.getCategory().getType().getName() == "Cold")
-		{
-			throw new IllegalArgumentException();
-		}
 	}
 
 	/**
@@ -45,12 +39,6 @@ public class ProductBox extends ProductContainer
 	public ProductBox(final int databaseID, final Manifest manifest, final RemovalList removalList, final ShelfSlot shelfSlot, final Product product, final int maxSize, final int productCount, final Date expirationDate)
 	{
 		super(databaseID, UUID.randomUUID(), manifest, removalList, shelfSlot, product, maxSize, productCount, expirationDate);
-
-		// Boxes cannot store cold products. Those may only be stored in freezers.
-		if (product.getCategory().getType().getName() == "Cold")
-		{
-			throw new IllegalArgumentException();
-		}
 	}
 
 	/**

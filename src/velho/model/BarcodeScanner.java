@@ -19,7 +19,7 @@ import velho.controller.ExternalSystemsController;
  *
  * @author Edward Puustinen
  */
-public class BarcodeScanner
+public abstract class BarcodeScanner
 {
 	/**
 	 * Apache log4j logger: System.
@@ -105,7 +105,7 @@ public class BarcodeScanner
 		}
 		while (!randomShelfSlot.hasFreeSpace());
 
-		if (ExternalSystemsController.move(list.get(0), randomShelfSlot, true))
+		if (ExternalSystemsController.move(list.get(0), randomShelfSlot.getSlotID(), true))
 		{
 			SYSLOG.debug("Move successful.");
 			return true;

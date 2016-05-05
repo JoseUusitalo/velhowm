@@ -17,7 +17,8 @@ import velho.model.Shelf;
 import velho.model.ShelfSlot;
 
 /**
- * Controller handling the communication with systems outside the VELHO Warehouse Management.
+ * Controller handling the communication with systems outside the VELHO
+ * Warehouse Management.
  *
  * @author Edward Puustinen &amp; Jose Uusitalo
  */
@@ -42,7 +43,8 @@ public class ExternalSystemsController
 	}
 
 	/**
-	 * Attempts to print the received data, if the data is empty it shows "List is empty." to the user.
+	 * Attempts to print the received data, if the data is empty it shows
+	 * "List is empty." to the user.
 	 *
 	 * @param data data to print
 	 */
@@ -69,7 +71,7 @@ public class ExternalSystemsController
 			}
 			else
 			{
-				PopupController.info("List is empty.");
+				PopupController.info(LocalizationController.getString("listIsEmptyPopUp"));
 			}
 		}
 		else
@@ -114,7 +116,7 @@ public class ExternalSystemsController
 			}
 			else
 			{
-				PopupController.info("List is empty.");
+				PopupController.info(LocalizationController.getString("listIsEmptyPopUp"));
 			}
 		}
 		else
@@ -131,61 +133,92 @@ public class ExternalSystemsController
 	 * @param showPopup show popup messages about failure/success?
 	 * @return <code>true</code> if the box was moved successfully
 	 */
-	public static boolean move(final int productBoxCode, final ShelfSlot newShelfSlot, final boolean showPopup)
+	public static boolean move(final int productBoxCode, final String newShelfSlotID, final boolean showPopup)
 	{
-		String oldShelfIDString = null;
-		int oldShelfID = -1;
-		Shelf oldShelf = null;
-		Shelf newShelf = null;
-		ProductBox boxToMove = null;
-		final boolean success = true;
-
-		newShelf = newShelfSlot.getParentShelfLevel().getParentShelf();
-		boxToMove = DatabaseController.getProductBoxByID(productBoxCode);
-
-		SYSLOG.debug("Moving box: " + boxToMove);
-		SYSLOG.debug("To shelf: " + newShelf);
+		final ProductBox boxToMove = DatabaseController.getProductBoxByID(productBoxCode);
 
 		if (boxToMove == null)
 		{
+			SYSLOG.warn("Attempted to move null product box to " + newShelfSlotID + ".");
+
+			if (showPopup)
+				PopupController.error(LocalizationController.getString("attemptToMoveNotExistingProductBoxPopUp"));
+
 			return false;
 		}
 
-		if (newShelf == null)
+		ShelfSlot newShelfSlot = null;
+		Shelf newShelf = null;
+
+		ShelfSlot oldShelfSlot = boxToMove.getShelfSlot();
+		Shelf oldShelf = null;
+
+		if (newShelfSlotID != null && !newShelfSlotID.isEmpty())
 		{
-			return false;
+			newShelfSlot = DatabaseController.getShelfSlotBySlotID(newShelfSlotID);
+			newShelf = newShelfSlot.getParentShelfLevel().getParentShelf();
 		}
 
-		oldShelfIDString = (String) Shelf.tokenizeShelfSlotID(boxToMove.getShelfSlot().getSlotID())[0];
-		oldShelfID = Integer.parseInt(oldShelfIDString.substring(1));
-		oldShelf = DatabaseController.getShelfByID(oldShelfID);
-
-		SYSLOG.debug("From shelf: " + oldShelf);
-
-		if (oldShelf == null)
+		if (oldShelfSlot != null)
 		{
+			if (oldShelfSlot.equals(newShelfSlot))
+			{
+				SYSLOG.debug("Product box " + boxToMove + " is already in the slot " + newShelfSlotID + ".");
+
+				if (showPopup)
+					PopupController.info(LocalizationController.getString("unableToMoveProductBoxToSameSlotPopUp") + newShelfSlot + "'.");
+
+				return false;
+			}
+
+			oldShelf = oldShelfSlot.getParentShelfLevel().getParentShelf();
+		}
+
+		//@formatter:off
+		SYSLOG.debug("Moving Product Box: " + boxToMove + "\n"
+					+ "\tFrom Shelf: " + oldShelf + "\n"
+					+ "\tTo Shelf: " + newShelf + "\n"
+					+ "\tTo Slot: " + newShelfSlot);
+		//@formatter:on
+
+		if (oldShelfSlot != null && !boxToMove.getShelfSlot().removeBox(boxToMove))
+		{
+			SYSLOG.error("Failed to remove product box " + boxToMove + " from shelf slot " + boxToMove.getShelfSlot());
+
+			if (showPopup)
+				PopupController.error(LocalizationController.getString("failureToRemoveProductBoxErrorPopUp"));
+
 			return false;
 		}
 
-		if (boxToMove.getShelfSlot().removeBox(boxToMove) == false)
+		if (newShelfSlot != null && !newShelfSlot.addBox(boxToMove))
 		{
+			SYSLOG.error("Failed to add product box " + boxToMove + " to shelf slot " + newShelfSlotID);
+			// Add to new slot failed, but box was removed from old slot.
+			// Add back to old slot.
+			if (oldShelfSlot != null)
+				oldShelfSlot.addBox(boxToMove);
+
+			if (showPopup)
+				PopupController.error(LocalizationController.getString("failureToAddProductBoxToNewShelfSlotErrorPopUp") + newShelfSlotID + "'.");
+
 			return false;
 		}
-		if (newShelf.addToSlot(newShelfSlot.getSlotID(), boxToMove) == false)
-		{
-			return false;
-		}
+
+		DatabaseController.saveOrUpdate(boxToMove);
+
+		if (newShelfSlot != null)
+			DatabaseController.saveOrUpdate(newShelfSlot);
+
+		if (oldShelfSlot != null)
+			DatabaseController.saveOrUpdate(oldShelfSlot);
+
+		SYSLOG.debug("Successfully moved " + boxToMove + " to " + newShelfSlot);
 
 		if (showPopup)
-		{
-			if (success)
-				PopupController.info(productBoxCode + " was moved to " + newShelfSlot + ".");
-			else
-				PopupController
-						.error(productBoxCode + " was not moved to " + newShelfSlot + ". Either the product box or the shelf does not exist in the database!");
-		}
+			PopupController.info(LocalizationController.getCompoundString("productBoxTransferSuccessMessage", productBoxCode, newShelfSlot));
 
-		return success;
+		return true;
 	}
 
 	/**

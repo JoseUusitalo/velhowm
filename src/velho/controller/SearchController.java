@@ -1,18 +1,13 @@
 package velho.controller;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.LinkedHashMap;
-import java.util.List;
 import java.util.Map;
-
-import org.apache.log4j.Logger;
 
 import javafx.scene.Node;
 import javafx.scene.layout.BorderPane;
 import velho.model.ProductBrand;
 import velho.model.ProductCategory;
-import velho.model.enums.DatabaseTable;
 import velho.view.ProductListSearch;
 import velho.view.SearchTabView;
 import velho.view.SearchView;
@@ -25,11 +20,6 @@ import velho.view.SearchView;
 public class SearchController
 {
 	/**
-	 * Apache log4j logger: System.
-	 */
-	private static final Logger SYSLOG = Logger.getLogger(SearchController.class.getName());
-
-	/**
 	 * The view in the tab itself.
 	 */
 	private SearchTabView searchTabView;
@@ -37,7 +27,7 @@ public class SearchController
 	/**
 	 * The {@link ProductController}.
 	 */
-	private ProductController productController;
+	private final ProductController productController;
 
 	/**
 	 * @param productController
@@ -61,71 +51,14 @@ public class SearchController
 	 * @param expiresEnd the expiration date range end
 	 */
 	@SuppressWarnings("static-method")
-	public void productSearch(final String limits, final String name, final Integer productCount, final Object brand, final Object category,
-			final LocalDate expiresStart, final LocalDate expiresEnd)
+
+	public void productBoxSearch(final boolean canBeInRemovalList, final String identifier, final Integer productCount, final Object brand,
+			final Object category, final LocalDate expiresStart, final LocalDate expiresEnd)
 	{
-		final List<String> where = new ArrayList<String>();
-
-		if (name != null && !name.isEmpty())
-		{
-			try
-			{
-				where.add("products.product_id = '" + Integer.parseInt(name) + "'");
-			}
-			catch (NumberFormatException e)
-			{
-				where.add("products.name LIKE '%" + name.replace('*', '%') + "%'");
-			}
-		}
-
-		if (productCount != null && productCount >= 0)
-		{
-			where.add("containers.product_count = " + productCount.intValue());
-		}
-
-		if (brand != null)
-		{
-			where.add("products.brand = " + ((ProductBrand) brand).getDatabaseID());
-		}
-
-		if (category != null)
-		{
-			where.add("products.category = " + ((ProductCategory) category).getDatabaseID());
-		}
-
-		if (expiresStart != null)
-		{
-			where.add("containers.expiration_date >= '" + expiresStart + "'");
-		}
-
-		if (expiresEnd != null)
-		{
-			where.add("containers.expiration_date <= '" + expiresEnd + "'");
-		}
-
-		final Map<DatabaseTable, String> joins = new LinkedHashMap<DatabaseTable, String>();
-
-		if (limits != null)
-		{
-			switch (limits)
-			{
-				case "removal-list":
-					// Only finds products that are not already on a removal list.
-					where.add("productboxes.removallist IS NULL");
-					break;
-				default:
-					break;
-			}
-			SYSLOG.debug(limits + " Conditions: " + DatabaseController.escape(where.toString()));
-		}
-		else
-		{
-			SYSLOG.debug("Conditions: " + DatabaseController.escape(where.toString()));
-		}
-
 		try
 		{
-			DatabaseController.searchProductBox(where, joins);
+			DatabaseController.searchProductBox(identifier, productCount.intValue(), (ProductBrand) brand, (ProductCategory) category, expiresStart, expiresEnd,
+					canBeInRemovalList);
 		}
 		catch (Exception e)
 		{
@@ -140,7 +73,7 @@ public class SearchController
 	 */
 	public Node getSearchView()
 	{
-		return new SearchView(this, DatabaseController.getAllProductBrands(), DatabaseController.getAllProductCategories()).getView();
+		return new SearchView(this, true, DatabaseController.getAllProductBrands(), DatabaseController.getAllProductCategories()).getView();
 	}
 
 	/**
@@ -149,9 +82,9 @@ public class SearchController
 	 * @param limits an internal string representing the type of search view to create
 	 * @return the search view
 	 */
-	public Node getSearchView(final String limits)
+	public Node getSearchView(final boolean canBeInRemovalList)
 	{
-		return new SearchView(this, limits, DatabaseController.getAllProductBrands(), DatabaseController.getAllProductCategories()).getView();
+		return new SearchView(this, canBeInRemovalList, DatabaseController.getAllProductBrands(), DatabaseController.getAllProductCategories()).getView();
 	}
 
 	/**

@@ -139,6 +139,41 @@ public class User extends AbstractDatabaseObject
 	}
 
 	@Override
+	public boolean equals(final Object o)
+	{
+		if (this == o)
+			return true;
+
+		if (o == null || !(o instanceof User))
+			return false;
+
+		final User u = (User) o;
+
+		// Compare all details.
+
+		//@formatter:off
+		final boolean equalNames = this.getFirstName().equalsIgnoreCase(u.getFirstName()) &&
+									this.getLastName().equalsIgnoreCase(u.getLastName());
+		//@formatter:on
+
+		boolean equalPINs = false;
+
+		if (this.getPin() != null)
+			equalPINs = this.getPin().equals(u.getPin());
+		else
+			equalPINs = u.getPin() == null;
+
+		boolean equalBadgeIDs = false;
+
+		if (this.getBadgeID() != null)
+			equalBadgeIDs = this.getBadgeID().equals(u.getBadgeID());
+		else
+			equalBadgeIDs = u.getBadgeID() == null;
+
+		return equalNames && equalPINs && equalBadgeIDs;
+	}
+
+	@Override
 	public int compareTo(final AbstractDatabaseObject user)
 	{
 		if (user instanceof User)

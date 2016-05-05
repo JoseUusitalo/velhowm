@@ -13,6 +13,7 @@ import velho.model.ManifestState;
 import velho.model.ProductBox;
 import velho.model.enums.UserRole;
 import velho.view.GenericTabView;
+import velho.view.ListView;
 import velho.view.MainWindow;
 import velho.view.ManifestManagementView;
 import velho.view.ManifestView;
@@ -37,7 +38,7 @@ public class ManifestController implements UIActionController
 	/**
 	 * The manifests tab.
 	 */
-	private GenericTabView tabView;
+	private final GenericTabView tabView;
 
 	/**
 	 * The panel in the manifest tab.
@@ -52,7 +53,7 @@ public class ManifestController implements UIActionController
 	/**
 	 * The {@link MainWindow}.
 	 */
-	private MainWindow mainWindow;
+	private final MainWindow mainWindow;
 
 	/**
 	 * @param mainWindow
@@ -60,6 +61,7 @@ public class ManifestController implements UIActionController
 	public ManifestController(final MainWindow mainWindow)
 	{
 		this.mainWindow = mainWindow;
+		tabView = new GenericTabView();
 	}
 
 	/**
@@ -93,7 +95,8 @@ public class ManifestController implements UIActionController
 		USRLOG.info("Viewing manifest: " + manifest);
 		currentManifest = manifest;
 		managementView.setContent(new ManifestView(manifest, this).getView());
-		// The method showing the combo box state selector is called in the view.
+		// The method showing the combo box state selector is called in the
+		// view.
 	}
 
 	/**
@@ -103,15 +106,12 @@ public class ManifestController implements UIActionController
 	 */
 	public Node getView()
 	{
-		if (tabView == null)
-		{
-			tabView = new GenericTabView();
-			managementView = new ManifestManagementView(this);
-			tabView.setView(managementView.getView());
+		managementView = new ManifestManagementView(this);
+		tabView.setView(managementView.getView());
 
-			// Manifest list is shown by default.
+		// Manifest list is shown by default.
+		if (managementView.getView().getCenter() == null)
 			showBrowseManifestsView();
-		}
 
 		return tabView.getView();
 	}
@@ -144,7 +144,8 @@ public class ManifestController implements UIActionController
 	}
 
 	/**
-	 * Processes the set of boxes that barcode scanner built from the barcode of the newly arrived shipment manifest.
+	 * Processes the set of boxes that barcode scanner built from the barcode of
+	 * the newly arrived shipment manifest.
 	 *
 	 * @param boxSet set of {@link ProductBox} objects on the physical manifest
 	 */
@@ -157,53 +158,78 @@ public class ManifestController implements UIActionController
 
 		if (DatabaseController.saveOrUpdate(manifest) > 0)
 		{
-			// If the user is a Manager (but not an Administrator!) show a popup.
+			// If the user is a Manager (but not an Administrator!) show a
+			// popup.
 			if (LoginController.userRoleIs(UserRole.MANAGER))
 			{
-				if (PopupController
-						.confirmation("A shipment has arrived. Please accept or refuse it in the Manifests tab. Would you like to view the manifest now?"))
+				if (PopupController.confirmation(LocalizationController.getString("manifestShipmentArrivalPopUp")))
 				{
 					showManifestView(manifest);
-					mainWindow.selectTab("Manifests");
+					mainWindow.selectTab(LocalizationController.getString("addManifestsTab"));
 				}
 			}
 		}
-
 	}
 
+	/**
+	 * creates new Object to data
+	 */
 	@Override
 	public void createAction(final Object data)
 	{
 		throw new UnsupportedOperationException();
 	}
 
+	/**
+	 * Updates the new created Object
+	 */
 	@Override
 	public void updateAction(final Object data)
 	{
 		throw new UnsupportedOperationException();
 	}
 
+	/**
+	 * Adds the new Object as an action
+	 */
 	@Override
 	public void addAction(final Object data)
 	{
 		throw new UnsupportedOperationException();
 	}
 
+	/**
+	 * Removes new Object
+	 */
 	@Override
 	public void removeAction(final Object data)
 	{
 		throw new UnsupportedOperationException();
 	}
 
+	/**
+	 * Deletes new Object
+	 */
 	@Override
 	public void deleteAction(final Object data)
 	{
 		throw new UnsupportedOperationException();
 	}
 
+	/**
+	 * Views the Object
+	 */
 	@Override
 	public void viewAction(final Object data)
 	{
 		showManifestView((Manifest) data);
+	}
+
+	@Override
+	public void recreateViews(final ListView node)
+	{
+		// TODO check for correct view
+		showBrowseManifestsView();
+
 	}
 }

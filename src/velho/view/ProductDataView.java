@@ -6,10 +6,13 @@ import javafx.geometry.Pos;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.layout.GridPane;
+import velho.controller.LocalizationController;
 import velho.controller.ProductController;
+import velho.controller.UIController;
 import velho.model.Product;
+import velho.model.interfaces.GenericView;
 
-public class ProductDataView
+public class ProductDataView implements GenericView
 {
 
 	/**
@@ -17,17 +20,35 @@ public class ProductDataView
 	 */
 	private GridPane grid;
 
+	/**
+	 * To save Product based data to ProductController
+	 */
 	private ProductController controller;
 
+	private Product currentProduct;
+
+	/**
+	 * Views the data in ProductData
+	 *
+	 * @param controller enables ProductController
+	 */
 	public ProductDataView(final ProductController controller)
 	{
 		this.controller = controller;
 	}
 
+	/**
+	 * GridPane is the viewable textfields and comboboxes
+	 *
+	 * @param product Product based grid pane
+	 * @return the grid
+	 */
 	public GridPane getView(final Product product)
 	{
 		if (grid == null)
 		{
+			currentProduct = product;
+
 			grid = new GridPane();
 
 			grid.setAlignment(Pos.CENTER);
@@ -38,13 +59,13 @@ public class ProductDataView
 			scenetitle.getStyleClass().add("centered-title");
 			grid.add(scenetitle, 0, 0, 2, 1);
 
-			Label productID = new Label("ID: ");
+			Label productID = new Label(LocalizationController.getString("productIDLabel"));
 			grid.add(productID, 0, 1);
 
-			Label productBrand = new Label("Brand: ");
+			Label productBrand = new Label(LocalizationController.getString("productBrandLabel"));
 			grid.add(productBrand, 0, 2);
 
-			Label productCategory = new Label("Category: ");
+			Label productCategory = new Label(LocalizationController.getString("productCategoryLabel"));
 			grid.add(productCategory, 0, 3);
 
 			Label productIDValue = new Label(String.valueOf(product.getDatabaseID()));
@@ -56,7 +77,7 @@ public class ProductDataView
 			Label productCategoryValue = new Label(product.getCategory().getName());
 			grid.add(productCategoryValue, 1, 3);
 
-			Button editButton = new Button("Edit");
+			Button editButton = new Button(LocalizationController.getString("editButton"));
 			editButton.setMaxWidth(Double.MAX_VALUE);
 			editButton.setAlignment(Pos.CENTER);
 			grid.add(editButton, 1, 5);
@@ -70,7 +91,7 @@ public class ProductDataView
 				}
 			});
 
-			Button backButton = new Button("Back");
+			Button backButton = new Button(LocalizationController.getString("backButton"));
 			backButton.setMaxWidth(Double.MAX_VALUE);
 			backButton.setAlignment(Pos.CENTER);
 			grid.add(backButton, 0, 5);
@@ -83,8 +104,22 @@ public class ProductDataView
 					controller.showList();
 				}
 			});
+			UIController.recordView(this);
 		}
 
 		return grid;
+	}
+
+	@Override
+	public void recreate()
+	{
+		grid = null;
+		getView(currentProduct);
+	}
+
+	@Override
+	public void destroy()
+	{
+		grid = null;
 	}
 }

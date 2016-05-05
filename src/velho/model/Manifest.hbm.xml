@@ -31,12 +31,10 @@
 					type="date" />
 
 		<!-- Many-to-one: This object can have one referenced object, the referenced object can be referenced from many objects.
-			 Cascade changes.
 			 "Select" eager fetching: load the referenced object when this object is loaded. -->
 		<many-to-one	name="state"
 						class="velho.model.ManifestState"
-						column="state"
-						cascade="all"
+						column="manifest_state_id"
 						not-null="true"
 						fetch="select"
 						lazy="false" />
@@ -44,11 +42,11 @@
 		<set	name="boxes"
 				table="PRODUCTBOXES"
 				inverse="true"
-				cascade="all"
+				cascade="save-update"
 				fetch="select"
 				lazy="false">
 
-			<key column="manifest" not-null="false"/>
+			<key column="manifest_id" not-null="false"/>
 			<one-to-many class="velho.model.ProductBox" />
 		</set>
 

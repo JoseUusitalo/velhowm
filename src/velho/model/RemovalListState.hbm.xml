@@ -7,7 +7,7 @@
 		<meta attribute="class-description">A state of a Removal List.</meta>
 
 		<id name="databaseID"
-			column="removallist_state_id"
+			column="state_id"
 			type="int">
 			<generator class="native" />
 		</id>
