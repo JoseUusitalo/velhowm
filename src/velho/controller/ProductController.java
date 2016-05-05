@@ -346,10 +346,6 @@ public class ProductController implements UIActionController
 	}
 
 	/**
-	 * Saves the category however since category is not observable system does
-	 * not update on fly
-	 * Restart required to view new set category
-	 *
 	 * @param name the name of the new category
 	 * @param type the type of the new category
 	 * @return what ever is in the product category
@@ -472,6 +468,63 @@ public class ProductController implements UIActionController
 		{
 			if (brand.getName() == null || brand.getName().isEmpty())
 				invalids.add(brand);
+		}
+
+		return invalids;
+	}
+
+	/**
+	 * Gets a set of contextually invalid {@link ProductType} objects from the specified set of product types.
+	 *
+	 * @param validDataSet a set of technically valid product types
+	 * @return a set of invalid product types
+	 */
+	public static Set<ProductType> getInvalidProductTypes(final Set<ProductType> validDataSet)
+	{
+		final Set<ProductType> invalids = new HashSet<ProductType>();
+
+		for (final ProductType type : validDataSet)
+		{
+			if (type.getName() == null || type.getName().isEmpty())
+				invalids.add(type);
+		}
+
+		return invalids;
+	}
+
+	/**
+	 * Gets a set of contextually invalid {@link ProductCategory} objects from the specified set of product categories.
+	 *
+	 * @param validDataSet a set of technically valid product categories
+	 * @return a set of invalid product categories
+	 */
+	public static Set<ProductCategory> getInvalidProductCategories(final Set<ProductCategory> validDataSet)
+	{
+		final Set<ProductCategory> invalids = new HashSet<ProductCategory>();
+
+		for (final ProductCategory category : validDataSet)
+		{
+			if (category.getName() == null || category.getName().isEmpty() || category.getType() == null)
+				invalids.add(category);
+		}
+
+		return invalids;
+	}
+
+	/**
+	 * Gets a set of contextually invalid {@link Product} objects from the specified set of products.
+	 *
+	 * @param validDataSet a set of technically valid products
+	 * @return a set of invalid products
+	 */
+	public static Set<Product> getInvalidProducts(final Set<Product> validDataSet)
+	{
+		final Set<Product> invalids = new HashSet<Product>();
+
+		for (final Product product : validDataSet)
+		{
+			if (product.getName() == null || product.getName().isEmpty() || product.getBrand() == null || product.getCategory() == null)
+				invalids.add(product);
 		}
 
 		return invalids;

@@ -143,47 +143,63 @@ public abstract class SampleData
 	{
 		if (!DatabaseController.hasProductTypes())
 		{
-			DatabaseController.save(new ProductType(1, "Regular"));
-			DatabaseController.save(new ProductType(2, "Raw"));
-			DatabaseController.save(new ProductType(3, "Frozen"));
+			SYSLOG.debug("Loading sample product types.");
+
+			final CSVLoader<ProductType> csvLoader = new CSVLoader<ProductType>(ProductType.class)
+			{
+				@Override
+				protected Set<ProductType> getInvalidDataObjects(final Set<ProductType> validDataSet)
+				{
+					return ProductController.getInvalidProductTypes(validDataSet);
+				}
+			};
+
+			csvLoader.load("data/sample_product_types.csv");
+			csvLoader.save();
 		}
 		else
-			SYSLOG.trace("Database already has types.");
+			SYSLOG.trace("Database already has product types.");
 	}
 
 	private static void createSampleProductCategories()
 	{
 		if (!DatabaseController.hasProductCategories())
 		{
-			DatabaseController.save(new ProductCategory(1, "Regular Stuff", DatabaseController.getProductTypeByID(1)));
-			DatabaseController.save(new ProductCategory(2, "Raw Food", DatabaseController.getProductTypeByID(2)));
-			DatabaseController.save(new ProductCategory(3, "Frozen Things", DatabaseController.getProductTypeByID(3)));
-			DatabaseController.save(new ProductCategory(4, "Weird Stuff", DatabaseController.getProductTypeByID(1)));
+			SYSLOG.debug("Loading sample product categories.");
+
+			final CSVLoader<ProductCategory> csvLoader = new CSVLoader<ProductCategory>(ProductCategory.class)
+			{
+				@Override
+				protected Set<ProductCategory> getInvalidDataObjects(final Set<ProductCategory> validDataSet)
+				{
+					return ProductController.getInvalidProductCategories(validDataSet);
+				}
+			};
+
+			csvLoader.load("data/sample_product_categories.csv");
+			csvLoader.save();
 		}
 		else
-			SYSLOG.trace("Database already has categories.");
+			SYSLOG.trace("Database already has product categories.");
 	}
 
 	private static void createSampleProducts()
 	{
 		if (!DatabaseController.hasProducts())
 		{
-			DatabaseController.save(new Product(1, "Test Product #1", DatabaseController.getProductBrandByID(1), DatabaseController.getProductCategoryByID(1)));
-			DatabaseController
-					.save(new Product(2, "Lonely Product #2", DatabaseController.getProductBrandByID(1), DatabaseController.getProductCategoryByID(1)));
-			DatabaseController.save(new Product(3, "Test Product #3", DatabaseController.getProductBrandByID(1), DatabaseController.getProductCategoryByID(2)));
-			DatabaseController.save(new Product(4, "Test Product #4", DatabaseController.getProductBrandByID(1), DatabaseController.getProductCategoryByID(2)));
-			DatabaseController.save(new Product(5, "Test Product #5", DatabaseController.getProductBrandByID(1), DatabaseController.getProductCategoryByID(2)));
-			DatabaseController.save(new Product(6, "Test Product #6", DatabaseController.getProductBrandByID(2), DatabaseController.getProductCategoryByID(1)));
-			DatabaseController.save(new Product(7, "Test Product #7", DatabaseController.getProductBrandByID(2), DatabaseController.getProductCategoryByID(1)));
-			DatabaseController.save(new Product(8, "Test Product #8", DatabaseController.getProductBrandByID(2), DatabaseController.getProductCategoryByID(1)));
-			DatabaseController.save(new Product(9, "Test Product #9", DatabaseController.getProductBrandByID(3), DatabaseController.getProductCategoryByID(1)));
-			DatabaseController
-					.save(new Product(10, "Test Product #10", DatabaseController.getProductBrandByID(3), DatabaseController.getProductCategoryByID(1)));
-			DatabaseController
-					.save(new Product(11, "Lonely Product #11", DatabaseController.getProductBrandByID(2), DatabaseController.getProductCategoryByID(4)));
-			DatabaseController
-					.save(new Product(12, "Lonely Product #12", DatabaseController.getProductBrandByID(2), DatabaseController.getProductCategoryByID(4)));
+			SYSLOG.debug("Loading sample products.");
+
+			final CSVLoader<Product> csvLoader = new CSVLoader<Product>(Product.class)
+			{
+				@Override
+				protected Set<Product> getInvalidDataObjects(final Set<Product> validDataSet)
+				{
+					return ProductController.getInvalidProducts(validDataSet);
+				}
+			};
+
+			csvLoader.load("data/sample_products.csv");
+			csvLoader.save();
 		}
 		else
 			SYSLOG.trace("Database already has products.");

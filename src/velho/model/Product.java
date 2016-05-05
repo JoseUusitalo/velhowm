@@ -2,6 +2,8 @@ package velho.model;
 
 import java.util.UUID;
 
+import velho.controller.DatabaseController;
+
 /**
  * A class representing a generic product of any type, shape, or size.
  *
@@ -142,5 +144,35 @@ public class Product extends AbstractDatabaseObject
 	public void setCategory(final ProductCategory category)
 	{
 		this.category = category;
+	}
+
+	/**
+	 * Sets a new category for this product by the database ID of the category.
+	 * Intended for use with loading data from CSV files.
+	 *
+	 * @param categoryID the database ID of the new product category of this product
+	 * @see DatabaseController#getProductCategoryByID(int)
+	 */
+	public void setCategoryID(final int categoryID)
+	{
+		if (categoryID < 1)
+			throw new IllegalArgumentException("Category ID must be greater than 0, was '" + categoryID + "'.");
+
+		this.category = DatabaseController.getProductCategoryByID(categoryID);
+	}
+
+	/**
+	 * Sets a new product brand for this product by the database ID of the brand.
+	 * Intended for use with loading data from CSV files.
+	 *
+	 * @param brandID the database ID of the new product brand of this product
+	 * @see DatabaseController#getProductBrandByID(int)
+	 */
+	public void setBrandID(final int brandID)
+	{
+		if (brandID < 1)
+			throw new IllegalArgumentException("Brand ID must be greater than 0, was '" + brandID + "'.");
+
+		this.brand = DatabaseController.getProductBrandByID(brandID);
 	}
 }

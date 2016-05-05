@@ -2,6 +2,8 @@ package velho.model;
 
 import java.util.UUID;
 
+import velho.controller.DatabaseController;
+
 /**
  * A class describing the category of a {@link Product}.
  *
@@ -108,6 +110,8 @@ public class ProductCategory extends AbstractDatabaseObject
 
 	/**
 	 * Sets a new name for this product category.
+	 *
+	 * @param name the new name of this category
 	 */
 	public void setName(final String name)
 	{
@@ -116,9 +120,26 @@ public class ProductCategory extends AbstractDatabaseObject
 
 	/**
 	 * Sets a new type for this product category.
+	 *
+	 * @param type the new product type of this category
 	 */
 	public void setType(final ProductType type)
 	{
 		this.type = type;
+	}
+
+	/**
+	 * Sets a new type for this product category by the database ID of the type.
+	 * Intended for use with loading data from CSV files.
+	 *
+	 * @param typeID the database ID of the new product type of this category
+	 * @see DatabaseController#getProductTypeByID(int)
+	 */
+	public void setTypeID(final int typeID)
+	{
+		if (typeID < 1)
+			throw new IllegalArgumentException("Type ID must be greater than 0, was '" + typeID + "'.");
+
+		this.type = DatabaseController.getProductTypeByID(typeID);
 	}
 }
