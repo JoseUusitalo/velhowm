@@ -11,10 +11,10 @@ import javafx.scene.control.SpinnerValueFactory;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
-import velho.controller.DatabaseController;
 import velho.controller.LocalizationController;
 import velho.controller.ProductController;
 import velho.controller.UIController;
+import velho.controller.database.DatabaseController;
 import velho.model.Product;
 import velho.model.interfaces.GenericView;
 

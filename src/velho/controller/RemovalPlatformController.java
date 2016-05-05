@@ -2,6 +2,7 @@ package velho.controller;
 
 import org.apache.log4j.Logger;
 
+import velho.controller.database.DatabaseController;
 import velho.model.RemovalPlatform;
 import velho.view.MainWindow;
 

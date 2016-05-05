@@ -9,6 +9,7 @@ import java.util.Set;
 
 import org.apache.log4j.Logger;
 
+import velho.controller.database.DatabaseController;
 import velho.model.BarcodeScanner;
 import velho.model.Printer;
 import velho.model.ProductBox;

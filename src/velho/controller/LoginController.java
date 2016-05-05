@@ -4,6 +4,7 @@ import org.apache.log4j.Logger;
 import org.apache.log4j.MDC;
 
 import javafx.scene.layout.VBox;
+import velho.controller.database.DatabaseController;
 import velho.model.User;
 import velho.model.enums.Position;
 import velho.model.enums.UserRole;

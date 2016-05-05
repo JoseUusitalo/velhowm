@@ -9,6 +9,7 @@ import java.util.Random;
 import org.apache.log4j.Logger;
 
 import javafx.stage.Stage;
+import velho.controller.database.DatabaseController;
 import velho.model.BarcodeScanner;
 import velho.model.enums.UserRole;
 import velho.view.DebugWindow;

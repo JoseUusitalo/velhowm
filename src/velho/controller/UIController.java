@@ -6,6 +6,7 @@ import java.util.Set;
 import org.apache.log4j.Logger;
 
 import javafx.scene.Node;
+import velho.controller.database.DatabaseController;
 import velho.model.enums.Position;
 import velho.model.enums.UserRole;
 import velho.model.interfaces.GenericView;

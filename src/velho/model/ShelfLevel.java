@@ -10,7 +10,7 @@ import javax.naming.directory.InvalidAttributesException;
 
 import org.apache.log4j.Logger;
 
-import velho.controller.DatabaseController;
+import velho.controller.database.DatabaseController;
 
 /**
  * A horizontal level in a {@link Shelf} that contains one or more {@link ShelfSlot}s.

@@ -4,6 +4,7 @@ import org.apache.log4j.Logger;
 
 import javafx.scene.Node;
 import javafx.scene.layout.BorderPane;
+import velho.controller.database.DatabaseController;
 import velho.controller.interfaces.UIActionController;
 import velho.model.ProductBoxSearchResultRow;
 import velho.model.RemovalList;

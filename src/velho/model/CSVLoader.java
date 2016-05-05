@@ -9,8 +9,8 @@ import org.apache.log4j.Logger;
 import com.opencsv.bean.HeaderColumnNameMappingStrategy;
 import com.opencsv.bean.MappingStrategy;
 
-import velho.controller.DatabaseController;
 import velho.controller.VelhoCsvParser;
+import velho.controller.database.DatabaseController;
 
 /**
  * <p>

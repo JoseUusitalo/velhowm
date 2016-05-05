@@ -2,7 +2,7 @@ package velho.model;
 
 import java.util.UUID;
 
-import velho.controller.DatabaseController;
+import velho.controller.database.DatabaseController;
 
 /**
  * A class describing the category of a {@link Product}.

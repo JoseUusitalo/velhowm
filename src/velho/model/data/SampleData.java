@@ -8,10 +8,10 @@ import java.util.Set;
 import org.apache.log4j.Logger;
 import org.hibernate.HibernateException;
 
-import velho.controller.DatabaseController;
 import velho.controller.ProductController;
 import velho.controller.ShelfController;
 import velho.controller.UserController;
+import velho.controller.database.DatabaseController;
 import velho.model.CSVLoader;
 import velho.model.Manifest;
 import velho.model.ManifestState;

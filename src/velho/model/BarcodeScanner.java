@@ -11,8 +11,8 @@ import java.util.Set;
 
 import org.apache.log4j.Logger;
 
-import velho.controller.DatabaseController;
 import velho.controller.ExternalSystemsController;
+import velho.controller.database.DatabaseController;
 
 /**
  * Created to scan newly arrived product boxes. This class creates product boxes into the system.

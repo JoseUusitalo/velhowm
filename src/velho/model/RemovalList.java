@@ -8,7 +8,7 @@ import org.apache.log4j.Logger;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import velho.controller.DatabaseController;
+import velho.controller.database.DatabaseController;
 
 /**
  * A list of product boxes to be thrown away.

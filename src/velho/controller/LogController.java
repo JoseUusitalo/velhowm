@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import org.apache.log4j.Logger;
 
 import javafx.scene.Node;
+import velho.controller.database.LogDatabaseController;
 import velho.view.LogView;
 import velho.view.MainWindow;
 

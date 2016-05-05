@@ -1,4 +1,4 @@
-package velho.controller;
+package velho.controller.database;
 
 import java.io.File;
 import java.sql.Connection;
@@ -30,8 +30,10 @@ import org.hibernate.exception.ConstraintViolationException;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import velho.controller.LocalizationController;
+import velho.controller.LoginController;
+import velho.controller.PopupController;
 import velho.model.AbstractDatabaseObject;
-import velho.model.HibernateSessionFactory;
 import velho.model.Manifest;
 import velho.model.ManifestState;
 import velho.model.Product;
