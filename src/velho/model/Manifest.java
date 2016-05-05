@@ -100,11 +100,6 @@ public class Manifest extends AbstractDatabaseObject
 		this.observableBoxes = FXCollections.observableArrayList();
 	}
 
-	public Manifest(final Integer valueOf, final Integer valueOf2, final Integer valueOf3, final String string, final String string2)
-	{
-		// TODO Here goodluck btw its for the CSV Manifest related items
-	}
-
 	@Override
 	public String toString()
 	{
@@ -112,7 +107,8 @@ public class Manifest extends AbstractDatabaseObject
 		 * Note: Using getter on purpose because of Hibernate. Without it apparently there may be issues where the ID is
 		 * 0 when it should not be.
 		 */
-		return "[" + getDatabaseID() + "] State: " + state + " Driver: " + driverID + " Ordered/Received: " + orderedDate.toString() + "/" + receivedDate.toString() + " (" + boxes.size() + ")";
+		return "[" + getDatabaseID() + "] State: " + state + " Driver: " + driverID + " Ordered/Received: " + orderedDate.toString() + "/"
+				+ receivedDate.toString() + " (" + boxes.size() + ")";
 	}
 
 	/**
