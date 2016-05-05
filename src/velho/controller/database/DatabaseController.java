@@ -315,7 +315,7 @@ public abstract class DatabaseController
 	 *
 	 * @return a database connection
 	 */
-	private static Connection getConnection()
+	protected static Connection getConnection()
 	{
 		Connection connection = null;
 		try
@@ -386,7 +386,7 @@ public abstract class DatabaseController
 	 * @return an SQL query string
 	 */
 	@Deprecated
-	public static String sqlBuilder(final DatabaseQueryType type, final String tableName, final Map<DatabaseTable, String> joinOnCondition,
+	protected static String sqlBuilder(final DatabaseQueryType type, final String tableName, final Map<DatabaseTable, String> joinOnCondition,
 			final String[] columns, final Map<String, Object> columnValues, final List<String> where)
 	{
 		final StringBuilder sb = new StringBuilder();
