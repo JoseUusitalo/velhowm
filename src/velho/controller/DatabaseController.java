@@ -2041,7 +2041,7 @@ public abstract class DatabaseController
 
 			if (count % HIBERNATE_BATCH_SIZE == 0)
 			{
-				// Flush a batch of inserts and release memory, improving batch insert speed.
+				// Flush a batch of inserts and release memory, improving batch update speed.
 				SESSION_FACTORY.getCurrentSession().flush();
 				SESSION_FACTORY.getCurrentSession().clear();
 			}
