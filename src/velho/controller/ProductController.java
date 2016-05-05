@@ -1,5 +1,8 @@
 package velho.controller;
 
+import java.util.HashSet;
+import java.util.Set;
+
 import org.apache.log4j.Logger;
 
 import javafx.scene.Node;
@@ -16,8 +19,8 @@ import velho.view.GenericTabView;
 import velho.view.ListView;
 import velho.view.ProductBoxesTabView;
 import velho.view.ProductDataView;
-import velho.view.VerticalViewGroup;
 import velho.view.ProductTypesTabView;
+import velho.view.VerticalViewGroup;
 
 /**
  * Controller for handling {@link Product} objects
@@ -120,7 +123,7 @@ public class ProductController implements UIActionController
 	 * object.
 	 *
 	 * @param databaseID database ID of the product (<code>-1</code> for a new
-	 * one)
+	 *            one)
 	 * @param name name of the of product
 	 * @param brand brand of the product
 	 * @param category category of the product
@@ -291,7 +294,8 @@ public class ProductController implements UIActionController
 		else if (data instanceof ProductType)
 		{
 			if (!DatabaseController.deleteProductType((ProductType) data))
-				PopupController.error(LocalizationController.getCompoundString("unableToDeleteProductTypePopUp", new Object[] { ((ProductType) data).getName() }));
+				PopupController
+						.error(LocalizationController.getCompoundString("unableToDeleteProductTypePopUp", new Object[] { ((ProductType) data).getName() }));
 		}
 		else
 		{
@@ -452,5 +456,24 @@ public class ProductController implements UIActionController
 	{
 		// TODO Need validation
 		DatabaseController.saveOrUpdate(productBox);
+	}
+
+	/**
+	 * Gets a set of contextually invalid {@link ProductBrand} objects from the specified set of product brands.
+	 *
+	 * @param validDataSet a set of technically valid product brands
+	 * @return a set of invalid product brands
+	 */
+	public static Set<ProductBrand> getInvalidProductBrands(final Set<ProductBrand> validDataSet)
+	{
+		final Set<ProductBrand> invalids = new HashSet<ProductBrand>();
+
+		for (final ProductBrand brand : validDataSet)
+		{
+			if (brand.getName() == null || brand.getName().isEmpty())
+				invalids.add(brand);
+		}
+
+		return invalids;
 	}
 }

@@ -9,6 +9,7 @@ import org.apache.log4j.Logger;
 import org.hibernate.HibernateException;
 
 import velho.controller.DatabaseController;
+import velho.controller.ProductController;
 import velho.controller.UserController;
 import velho.model.CSVLoader;
 import velho.model.Manifest;
@@ -120,13 +121,22 @@ public abstract class SampleData
 	{
 		if (!DatabaseController.hasProductBrands())
 		{
-			DatabaseController.save(new ProductBrand(1, "Test Brand #1"));
-			DatabaseController.save(new ProductBrand(2, "Test Brand #2"));
-			DatabaseController.save(new ProductBrand(3, "Test Brand #3"));
-			DatabaseController.save(new ProductBrand(4, "Empty Brand"));
+			SYSLOG.debug("Loading sample product brands.");
+
+			final CSVLoader<ProductBrand> csvLoader = new CSVLoader<ProductBrand>(ProductBrand.class)
+			{
+				@Override
+				protected Set<ProductBrand> getInvalidDataObjects(final Set<ProductBrand> validDataSet)
+				{
+					return ProductController.getInvalidProductBrands(validDataSet);
+				}
+			};
+
+			csvLoader.load("data/sample_product_brands.csv");
+			csvLoader.save();
 		}
 		else
-			SYSLOG.trace("Database already has brands.");
+			SYSLOG.trace("Database already has product brands.");
 	}
 
 	private static void createSampleProductTypes()
