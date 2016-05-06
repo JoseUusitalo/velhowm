@@ -1,5 +1,8 @@
 package velho.controller;
 
+import java.util.HashSet;
+import java.util.Set;
+
 import org.apache.log4j.Logger;
 
 import velho.controller.database.DatabaseController;
@@ -106,5 +109,24 @@ public class RemovalPlatformController
 		SYSLOG.info(LocalizationController.getString("removalPlatformEmptiedNotice"));
 		getPlatform().empty();
 		checkWarning();
+	}
+
+	/**
+	 * Gets a set of contextually invalid {@link RemovalPlatform} objects from the specified set of removal platforms.
+	 *
+	 * @param validDataSet a set of technically valid removal platforms
+	 * @return a set of invalid removal platforms
+	 */
+	public static Set<RemovalPlatform> getInvalidRemovalPlatforms(final Set<RemovalPlatform> validDataSet)
+	{
+		final Set<RemovalPlatform> invalids = new HashSet<RemovalPlatform>();
+
+		for (final RemovalPlatform list : validDataSet)
+		{
+			if (Double.compare(list.getFreeSpacePercent(), 0.0) < 0)
+				invalids.add(list);
+		}
+
+		return invalids;
 	}
 }

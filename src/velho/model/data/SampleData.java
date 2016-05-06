@@ -1,6 +1,5 @@
 package velho.model.data;
 
-import java.text.ParseException;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
@@ -9,6 +8,7 @@ import org.hibernate.HibernateException;
 import velho.controller.ManifestController;
 import velho.controller.ProductController;
 import velho.controller.RemovalListController;
+import velho.controller.RemovalPlatformController;
 import velho.controller.ShelfController;
 import velho.controller.UserController;
 import velho.controller.database.DatabaseController;
@@ -52,7 +52,7 @@ public abstract class SampleData
 	 * @throws HibernateException
 	 * @throws ParseException
 	 */
-	public static boolean createAll() throws HibernateException, ParseException
+	public static boolean createAll() throws HibernateException
 	{
 		if (!dataLoaded)
 		{
@@ -72,7 +72,7 @@ public abstract class SampleData
 
 			createSampleShelves();
 			createSampleShelfLevels();
-			// createSampleShelfSlots();
+			createSampleShelfSlots();
 
 			createSampleManifestStates();
 			createSampleManifests();
@@ -391,7 +391,19 @@ public abstract class SampleData
 	{
 		if (!DatabaseController.hasRemovalPlatforms())
 		{
-			DatabaseController.save(new RemovalPlatform(1, 1.0, 0.1));
+			SYSLOG.debug("Loading sample removal platforms.");
+
+			final CSVLoader<RemovalPlatform> csvLoader = new CSVLoader<RemovalPlatform>(RemovalPlatform.class)
+			{
+				@Override
+				protected Set<RemovalPlatform> getInvalidDataObjects(final Set<RemovalPlatform> validDataSet)
+				{
+					return RemovalPlatformController.getInvalidRemovalPlatforms(validDataSet);
+				}
+			};
+
+			csvLoader.load("data/sample_removal_platforms.csv");
+			csvLoader.save();
 		}
 		else
 			SYSLOG.trace("Database already has removal platforms.");

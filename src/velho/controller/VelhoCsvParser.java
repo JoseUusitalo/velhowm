@@ -92,7 +92,7 @@ public class VelhoCsvParser<T> extends CsvToBean<T>
 		datalist.clear();
 		invalidData.clear();
 
-		SYSLOG.debug("Parsing: " + new File(filePath).getAbsolutePath());
+		SYSLOG.trace("Parsing: " + new File(filePath).getAbsolutePath());
 
 		final CSVReader reader = new CSVReader(new FileReader(filePath));
 

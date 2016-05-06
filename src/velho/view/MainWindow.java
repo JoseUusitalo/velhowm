@@ -1,7 +1,6 @@
 
 package velho.view;
 
-import java.text.ParseException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -196,7 +195,7 @@ public class MainWindow extends Application implements GenericView
 		{
 			DatabaseController.loadSampleData();
 		}
-		catch (HibernateException | ParseException e)
+		catch (final HibernateException e)
 		{
 			e.printStackTrace();
 		}
