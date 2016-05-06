@@ -36,9 +36,10 @@ public class LocalizationController
 	{
 		if (locale.equals(localeEnglish))
 		{
-			return ResourceBundle.getBundle("res.en-US", locale);
+			return ResourceBundle.getBundle("translations.en-US", locale);
 		}
-		return ResourceBundle.getBundle("res.de-DE", locale);
+
+		return ResourceBundle.getBundle("translations.de-DE", locale);
 	}
 
 	public static void setLocale(final Locale locale)
