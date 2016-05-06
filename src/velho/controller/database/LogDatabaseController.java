@@ -1,4 +1,4 @@
-package velho.controller;
+package velho.controller.database;
 
 import java.io.File;
 import java.sql.Connection;
@@ -12,6 +12,8 @@ import java.util.Map;
 import org.apache.log4j.Logger;
 import org.h2.jdbcx.JdbcConnectionPool;
 
+import velho.controller.LocalizationController;
+import velho.controller.PopupController;
 import velho.model.enums.DatabaseFileState;
 import velho.model.enums.DatabaseQueryType;
 import velho.model.enums.DatabaseTable;

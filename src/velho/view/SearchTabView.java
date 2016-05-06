@@ -9,11 +9,11 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
-import velho.controller.DatabaseController;
 import velho.controller.ExternalSystemsController;
 import velho.controller.LocalizationController;
 import velho.controller.SearchController;
 import velho.controller.UIController;
+import velho.controller.database.DatabaseController;
 import velho.model.interfaces.GenericView;
 
 /**

@@ -1,7 +1,6 @@
 
 package velho.view;
 
-import java.text.ParseException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -33,12 +32,10 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
-import velho.controller.DatabaseController;
 import velho.controller.DebugController;
 import velho.controller.ExternalSystemsController;
 import velho.controller.LocalizationController;
 import velho.controller.LogController;
-import velho.controller.LogDatabaseController;
 import velho.controller.LoginController;
 import velho.controller.ManifestController;
 import velho.controller.ProductController;
@@ -47,6 +44,8 @@ import velho.controller.RemovalPlatformController;
 import velho.controller.SearchController;
 import velho.controller.UIController;
 import velho.controller.UserController;
+import velho.controller.database.DatabaseController;
+import velho.controller.database.LogDatabaseController;
 import velho.model.enums.SupportedTranslation;
 import velho.model.interfaces.GenericView;
 
@@ -68,21 +67,15 @@ public class MainWindow extends Application implements GenericView
 	private static final Logger SYSLOG = Logger.getLogger(MainWindow.class.getName());
 
 	/**
-	 * Enable or disable debug features.
-	 */
-	public static final boolean DEBUG_MODE = true;
-
-	/**
-	 * Enable or disable showing windows. DEBUG_MODE must be <code>true</code>
-	 * for this to affect anything.
-	 */
-	public static final boolean SHOW_WINDOWS = true;
-
-	/**
 	 * Enable TRACE level logging. DEBUG_MODE must be <code>true</code> for this
 	 * to affect anything.
 	 */
 	public static final boolean SHOW_TRACE = false;
+
+	/**
+	 * Enable or disable debug features.
+	 */
+	public static final boolean DEBUG_MODE = true;
 
 	/**
 	 * Skips the entire main application code. DEBUG_MODE must be
@@ -190,33 +183,27 @@ public class MainWindow extends Application implements GenericView
 		prepareLogger();
 		LocalizationController.initializeBundle();
 		prepareDatabase();
-
-		if (DEBUG_MODE)
-		{
-			if (!SKIP_MAIN_CODE)
-			{
-				runApp();
-			}
-			else
-				SYSLOG.info("Skipping main application code.");
-		}
-		else
-			runApp();
+		runApp();
 	}
 
+	/**
+	 * Prepares the main database by loading the sample data if needed.
+	 */
 	private static void prepareDatabase()
 	{
 		try
 		{
-			DatabaseController.link();
 			DatabaseController.loadSampleData();
 		}
-		catch (ClassNotFoundException | HibernateException | ParseException e)
+		catch (final HibernateException e)
 		{
 			e.printStackTrace();
 		}
 	}
 
+	/**
+	 * Prepares the logger by configuring it and connecting to the database.
+	 */
 	private static void prepareLogger()
 	{
 		// Load the logger properties.
@@ -271,6 +258,9 @@ public class MainWindow extends Application implements GenericView
 		}
 	}
 
+	/**
+	 * The main method for running the application.
+	 */
 	private void runApp()
 	{
 		SYSLOG.info("Running VELHO Warehouse Management.");
@@ -430,7 +420,8 @@ public class MainWindow extends Application implements GenericView
 			platformStatus.setAlignment(Pos.CENTER_LEFT);
 
 			final HBox userStatus = new HBox(10);
-			final Label userName = new Label(LocalizationController.getCompoundString("helloUserMessage", LoginController.getCurrentUser().getRoleName(), LoginController.getCurrentUser().getFullName()));
+			final Label userName = new Label(LocalizationController.getCompoundString("helloUserMessage", LoginController.getCurrentUser().getRoleName(),
+					LoginController.getCurrentUser().getFullName()));
 			final Button logoutButton = new Button(LocalizationController.getString("logOutButton"));
 			logoutButton.setPrefHeight(5.0);
 			userStatus.getChildren().addAll(userName, logoutButton);
@@ -457,29 +448,32 @@ public class MainWindow extends Application implements GenericView
 	/**
 	 * Creates the window.
 	 */
-	@SuppressWarnings("unused")
 	@Override
 	public void start(final Stage primaryStage)
 	{
-		if (SKIP_MAIN_CODE || (!SHOW_WINDOWS && DEBUG_MODE))
+		setUserAgentStylesheet(STYLESHEET_MODENA);
+		primaryStage.setTitle(LocalizationController.getString("mainWindowTitle"));
+		final Group root = new Group();
+		scene = new Scene(root, WINDOW_WIDTH, WINDOW_HEIGHT);
+		scene.getStylesheets().add(getClass().getResource("velho.css").toExternalForm());
+		widthProperty = scene.widthProperty();
+
+		rootBorderPane = getRootBorderPane();
+
+		root.getChildren().add(rootBorderPane);
+
+		primaryStage.setOnCloseRequest(new EventHandler<WindowEvent>()
 		{
-			SYSLOG.debug("Windows are disabled.");
-		}
-		else
+			@Override
+			public void handle(final WindowEvent event)
+			{
+				shutdown(primaryStage);
+			}
+		});
+
+		if (!SKIP_MAIN_CODE)
 		{
-			setUserAgentStylesheet(STYLESHEET_MODENA);
-			primaryStage.setTitle(LocalizationController.getString("mainWindowTitle"));
-			final Group root = new Group();
-			scene = new Scene(root, WINDOW_WIDTH, WINDOW_HEIGHT);
-			scene.getStylesheets().add(getClass().getResource("velho.css").toExternalForm());
-			widthProperty = scene.widthProperty();
-
-			rootBorderPane = getRootBorderPane();
-
-			root.getChildren().add(rootBorderPane);
-
 			LoginController.checkLogin();
-
 			primaryStage.setScene(scene);
 			primaryStage.show();
 
@@ -497,18 +491,19 @@ public class MainWindow extends Application implements GenericView
 					}
 				});
 			}
-
-			primaryStage.setOnCloseRequest(new EventHandler<WindowEvent>()
-			{
-				@Override
-				public void handle(final WindowEvent event)
-				{
-					shutdown(primaryStage);
-				}
-			});
+		}
+		else if (DEBUG_MODE)
+		{
+			skip();
+			shutdown(primaryStage);
 		}
 	}
 
+	/**
+	 * Gets the root {@link BorderPane} of the main window.
+	 *
+	 * @return the root node
+	 */
 	private BorderPane getRootBorderPane()
 	{
 		if (rootBorderPane == null)
@@ -604,6 +599,19 @@ public class MainWindow extends Application implements GenericView
 	public void setRemovalPlatformFullPercent(final String percent)
 	{
 		removalPlatformStatus.setText(percent + "%");
+	}
+
+	/**
+	 * Called when the main application code is skipped.
+	 */
+	@SuppressWarnings("static-method")
+	private void skip()
+	{
+		SYSLOG.info("Main application code skipped.");
+
+		// It works.
+		// System.out.println("id:" + new AssignedIdentifierGenerator().generate((SessionImplementor) HibernateSessionFactory.getInstance().getCurrentSession(),
+		// new User(120, "new", "thing", "111111", null, UserRole.ADMINISTRATOR)));
 	}
 
 	@Override

@@ -1,8 +1,13 @@
 package velho.controller;
 
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Set;
+
 import org.apache.log4j.Logger;
 
 import javafx.scene.Node;
+import velho.controller.database.DatabaseController;
 import velho.controller.interfaces.UIActionController;
 import velho.model.User;
 import velho.model.enums.UserRole;
@@ -38,6 +43,72 @@ public class UserController implements UIActionController
 	}
 
 	/**
+	 * Converts the given string to an object.
+	 *
+	 * @param userRoleName name of the user role to convert to an object
+	 * @return a {@link UserRole} object
+	 */
+	@Deprecated
+	public static UserRole stringToRole(final String userRoleName)
+	{
+		switch (userRoleName)
+		{
+			case "Administrator":
+				return UserRole.ADMINISTRATOR;
+			case "Manager":
+				return UserRole.MANAGER;
+			case "Logistician":
+				return UserRole.LOGISTICIAN;
+			default:
+				SYSLOG.error("Unknown user role '" + userRoleName + "'.");
+				return null;
+		}
+	}
+
+	@Override
+	public void updateAction(final Object data)
+	{
+		throw new UnsupportedOperationException();
+	}
+
+	@Override
+	public void removeAction(final Object data)
+	{
+		throw new UnsupportedOperationException();
+	}
+
+	@Override
+	public void deleteAction(final Object data)
+	{
+		USRLOG.debug("Delete user: " + data);
+		deleteUser((User) data);
+	}
+
+	@Override
+	public void addAction(final Object data)
+	{
+		throw new UnsupportedOperationException();
+	}
+
+	@Override
+	public void viewAction(final Object data)
+	{
+		throw new UnsupportedOperationException();
+	}
+
+	@Override
+	public void createAction(final Object data)
+	{
+		throw new UnsupportedOperationException();
+	}
+
+	@Override
+	public void recreateViews(final ListView listView)
+	{
+		// TODO refactor userlist into tabview
+	}
+
+	/**
 	 * Attempts to add a new user to the database.
 	 *
 	 * @param badgeID user's badge id number
@@ -48,7 +119,8 @@ public class UserController implements UIActionController
 	 * @return the created user or <code>null</code> if data was invalid or user
 	 *         already existed in the database
 	 */
-	public User createUser(final String badgeID, final String userPIN, final String userFirstName, final String userLastName, final UserRole userRole, final boolean showPopup)
+	public User createUser(final String badgeID, final String userPIN, final String userFirstName, final String userLastName, final UserRole userRole,
+			final boolean showPopup)
 	{
 		if (validateUserData(badgeID, userPIN, userFirstName, userLastName, userRole))
 		{
@@ -178,7 +250,7 @@ public class UserController implements UIActionController
 	 *
 	 * @param role the role to create the user as
 	 * @return a {@link User} object or <code>null</code> if
-	 * {@link MainWindow#DEBUG_MODE} is <code>false</code>
+	 *         {@link MainWindow#DEBUG_MODE} is <code>false</code>
 	 */
 	public static User getDebugUser(final UserRole role)
 	{
@@ -189,63 +261,23 @@ public class UserController implements UIActionController
 	}
 
 	/**
-	 * Converts the given string to an object.
+	 * Gets a set of invalid {@link User} objects in the specified list of users.
 	 *
-	 * @param userRoleName name of the user role to convert to an object
-	 * @return a {@link UserRole} object
+	 * @param users a list of users to be validated
+	 * @return a set of invalid users
+	 * @see #validateUserData(String, String, String, String, UserRole)
 	 */
-	@Deprecated
-	public static UserRole stringToRole(final String userRoleName)
+	public static Set<User> getInvalidUsers(final Collection<User> users)
 	{
-		switch (userRoleName)
+		final Set<User> invalids = new HashSet<User>();
+
+		for (final User user : users)
 		{
-			case "Administrator":
-				return UserRole.ADMINISTRATOR;
-			case "Manager":
-				return UserRole.MANAGER;
-			case "Logistician":
-				return UserRole.LOGISTICIAN;
-			default:
-				SYSLOG.error("Unknown user role '" + userRoleName + "'.");
-				return null;
+			if (!validateUserData(user.getBadgeID(), user.getPin(), user.getFirstName(), user.getLastName(), user.getRole()))
+				invalids.add(user);
 		}
-	}
 
-	@Override
-	public void updateAction(final Object data)
-	{
-		throw new UnsupportedOperationException();
-	}
-
-	@Override
-	public void removeAction(final Object data)
-	{
-		throw new UnsupportedOperationException();
-	}
-
-	@Override
-	public void deleteAction(final Object data)
-	{
-		USRLOG.debug("Delete user: " + data);
-		deleteUser((User) data);
-	}
-
-	@Override
-	public void addAction(final Object data)
-	{
-		throw new UnsupportedOperationException();
-	}
-
-	@Override
-	public void viewAction(final Object data)
-	{
-		throw new UnsupportedOperationException();
-	}
-
-	@Override
-	public void createAction(final Object data)
-	{
-		throw new UnsupportedOperationException();
+		return invalids;
 	}
 
 	/**
@@ -256,7 +288,7 @@ public class UserController implements UIActionController
 	 *
 	 * @param badgeID RFID identification string of the user's RFID badge
 	 * @param pin the pin string used to log in to the system if no RFID badge
-	 * ID is provided
+	 *            ID is provided
 	 * @param firstName the first name of the user
 	 * @param lastName the last name of the user
 	 * @param roleName the name of the role of the user
@@ -354,12 +386,5 @@ public class UserController implements UIActionController
 		}
 
 		return null;
-	}
-
-	@Override
-	public void recreateViews(final ListView listView)
-	{
-		// TODO refactor userlist into tabview
-
 	}
 }

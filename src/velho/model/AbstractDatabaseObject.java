@@ -60,9 +60,10 @@ public abstract class AbstractDatabaseObject implements DatabaseObject, Comparab
 	}
 
 	/**
-	 * Assign a new database ID for this {@link DatabaseObject}.
+	 * For Hibernate only.
+	 * Do not use, does not work as intended and probably breaks things.
 	 *
-	 * @param databaseID the new database ID
+	 * @param databaseID database ID
 	 */
 	final public void setDatabaseID(final int databaseID)
 	{

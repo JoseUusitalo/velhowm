@@ -16,8 +16,8 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 import javafx.collections.ObservableList;
-import velho.controller.DatabaseController;
-import velho.controller.LogDatabaseController;
+import velho.controller.database.DatabaseController;
+import velho.controller.database.LogDatabaseController;
 import velho.model.ProductBox;
 import velho.model.RemovalList;
 import velho.model.RemovalListState;

@@ -82,6 +82,8 @@ public class User extends AbstractDatabaseObject
 		this.pin = pin;
 		this.role = role;
 
+		System.out.println("new user " + firstName + " " + pin + " " + role);
+
 		if (!UserController.validateUserData(this.badgeID, this.pin, firstName, lastName, role))
 			throw new IllegalArgumentException("Invalid user data");
 	}
@@ -262,6 +264,9 @@ public class User extends AbstractDatabaseObject
 	 */
 	public void setRole(final UserRole role)
 	{
+		if (role == null)
+			throw new IllegalArgumentException("User role can not be null.");
+
 		this.role = role;
 	}
 
@@ -282,7 +287,10 @@ public class User extends AbstractDatabaseObject
 	 */
 	public void setBadgeID(final String badgeID)
 	{
-		this.badgeID = badgeID;
+		if (badgeID != null && badgeID.trim().isEmpty())
+			this.badgeID = null;
+		else
+			this.badgeID = badgeID;
 	}
 
 	/**
@@ -302,6 +310,9 @@ public class User extends AbstractDatabaseObject
 	 */
 	public void setPin(final String pin)
 	{
-		this.pin = pin;
+		if (pin != null && pin.trim().isEmpty())
+			this.pin = null;
+		else
+			this.pin = pin;
 	}
 }

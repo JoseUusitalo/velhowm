@@ -8,8 +8,8 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import velho.controller.DatabaseController;
-import velho.controller.LogDatabaseController;
+import velho.controller.database.DatabaseController;
+import velho.controller.database.LogDatabaseController;
 import velho.model.Product;
 import velho.model.ProductBrand;
 import velho.model.ProductCategory;

@@ -6,6 +6,7 @@ import java.util.Map;
 
 import javafx.scene.Node;
 import javafx.scene.layout.BorderPane;
+import velho.controller.database.DatabaseController;
 import velho.model.ProductBrand;
 import velho.model.ProductCategory;
 import velho.view.ProductListSearch;

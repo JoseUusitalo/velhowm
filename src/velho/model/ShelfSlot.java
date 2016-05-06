@@ -7,6 +7,8 @@ import java.util.UUID;
 
 import org.apache.log4j.Logger;
 
+import velho.controller.database.DatabaseController;
+
 /**
  * A Shelf Slot represents an indexed area with {@link ProductBox} objects on a {@link ShelfLevel}.
  *
@@ -300,5 +302,20 @@ public class ShelfSlot extends AbstractDatabaseObject
 			this.parentShelfLevel.removeSlot(this);
 
 		this.parentShelfLevel = parentShelfLevel;
+	}
+
+	/**
+	 * Sets the new parent shelf level for this shelf slot by the database ID of the shelf level.
+	 * Intended for use with loading data from CSV files.
+	 *
+	 * @param parentShelfLevelID the database ID of the new parent shelf level of this shelf slot
+	 * @see DatabaseController#getShelfLevelByID(int)
+	 */
+	public void setParentShelfLevelID(final int parentShelfLevelID)
+	{
+		if (parentShelfLevelID < 1)
+			throw new IllegalArgumentException("Parent shelf level ID must be greater than 0, was '" + parentShelfLevelID + "'.");
+
+		this.parentShelfLevel = DatabaseController.getShelfLevelByID(parentShelfLevelID);
 	}
 }

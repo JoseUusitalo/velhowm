@@ -14,8 +14,8 @@ import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import velho.controller.DatabaseController;
-import velho.controller.LogDatabaseController;
+import velho.controller.database.DatabaseController;
+import velho.controller.database.LogDatabaseController;
 import velho.model.Manifest;
 import velho.model.ManifestState;
 import velho.model.ProductBox;

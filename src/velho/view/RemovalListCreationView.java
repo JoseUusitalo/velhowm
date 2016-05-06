@@ -14,11 +14,11 @@ import javafx.scene.control.Label;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Priority;
-import velho.controller.DatabaseController;
 import velho.controller.LocalizationController;
 import velho.controller.RemovalListController;
 import velho.controller.SearchController;
 import velho.controller.UIController;
+import velho.controller.database.DatabaseController;
 import velho.model.RemovalListState;
 import velho.model.interfaces.GenericView;
 
