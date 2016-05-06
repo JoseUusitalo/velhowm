@@ -12,6 +12,7 @@ import velho.controller.RemovalPlatformController;
 import velho.controller.ShelfController;
 import velho.controller.UserController;
 import velho.controller.database.DatabaseController;
+import velho.model.AbstractDatabaseObject;
 import velho.model.CSVLoader;
 import velho.model.Manifest;
 import velho.model.ManifestState;
@@ -71,7 +72,13 @@ public abstract class SampleData
 			createSampleProducts();
 
 			createSampleShelves();
+
+			for (Object obj : DatabaseController.getAllShelves())
+				System.out.println(((AbstractDatabaseObject) obj).getDatabaseID() + " " + obj);
 			createSampleShelfLevels();
+
+			for (Object obj : DatabaseController.getAllShelves())
+				System.out.println(((AbstractDatabaseObject) obj).getDatabaseID() + " " + obj);
 			createSampleShelfSlots();
 
 			createSampleManifestStates();
@@ -228,6 +235,9 @@ public abstract class SampleData
 
 			csvLoader.load("data/sample_shelves.csv");
 			csvLoader.save();
+
+			for (Object obj : DatabaseController.getAllShelves())
+				System.out.println(((AbstractDatabaseObject) obj).getDatabaseID() + " " + obj);
 		}
 		else
 			SYSLOG.trace("Database already has shelves.");
@@ -250,6 +260,9 @@ public abstract class SampleData
 
 			csvLoader.load("data/sample_shelf_levels.csv");
 			csvLoader.save();
+
+			for (Object obj : DatabaseController.getAllShelfLevels())
+				System.out.println(((AbstractDatabaseObject) obj).getDatabaseID() + " " + obj);
 		}
 		else
 			SYSLOG.trace("Database already has shelf levels.");
@@ -272,6 +285,9 @@ public abstract class SampleData
 
 			csvLoader.load("data/sample_shelf_slots.csv");
 			csvLoader.save();
+
+			for (Object obj : DatabaseController.getAllShelfSlots())
+				System.out.println(((AbstractDatabaseObject) obj).getDatabaseID() + " " + obj);
 		}
 		else
 			SYSLOG.trace("Database already has shelf slots.");

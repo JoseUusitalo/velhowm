@@ -2006,6 +2006,7 @@ public abstract class DatabaseController
 		SESSION_FACTORY.getCurrentSession().beginTransaction();
 
 		int count = 0;
+		int saved = 0;
 
 		for (final Object obj : objects)
 		{
@@ -2046,7 +2047,9 @@ public abstract class DatabaseController
 			 * (using a custom sequence generator) as long as the generated ID hits an ID that is already in use (because it was manually assigned, generated
 			 * IDs do not collide) and finally return an unused ID. But that is just silly and slow.
 			 */
-			SESSION_FACTORY.getCurrentSession().save(object);
+			if (0 < (int) SESSION_FACTORY.getCurrentSession().save(object))
+				saved++;
+
 			count++;
 
 			if (count % HIBERNATE_BATCH_SIZE == 0)
@@ -2061,7 +2064,7 @@ public abstract class DatabaseController
 
 		// The log message will be wrong if the set contains objects of different types but whatever.
 		if (!objects.isEmpty())
-			DBLOG.debug("Batch saved " + objects.size() + " " + objects.iterator().next().getClass().getSimpleName() + " objects.");
+			DBLOG.debug("Batch saved " + saved + "/" + objects.size() + " " + objects.iterator().next().getClass().getSimpleName() + " objects.");
 	}
 
 	/**
