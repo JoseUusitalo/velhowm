@@ -474,6 +474,10 @@ public class MainWindow extends Application implements GenericView
 
 		if (!SKIP_MAIN_CODE)
 		{
+			LoginController.checkLogin();
+			primaryStage.setScene(scene);
+			primaryStage.show();
+
 			if (DEBUG_MODE)
 			{
 				debugStage = new Stage();
@@ -488,10 +492,6 @@ public class MainWindow extends Application implements GenericView
 					}
 				});
 			}
-
-			LoginController.checkLogin();
-			primaryStage.setScene(scene);
-			primaryStage.show();
 		}
 		else if (DEBUG_MODE)
 		{
