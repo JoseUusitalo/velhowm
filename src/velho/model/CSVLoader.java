@@ -1,7 +1,7 @@
 package velho.model;
 
 import java.io.IOException;
-import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
@@ -109,7 +109,12 @@ public class CSVLoader<T extends AbstractDatabaseObject>
 	public void load(final String csvFilePath)
 	{
 		final VelhoCsvParser<T> parser = readCSVFile(csvFilePath);
-		dataset = new HashSet<T>(parser.getData());
+
+		/*
+		 * It may be tempting to use a HashSet but that will cause the order of items to be lost.
+		 * It is crucial that the dataset contains the items read from the CSV in the same order as they were defined.
+		 */
+		dataset = new LinkedHashSet<T>(parser.getData());
 
 		SYSLOG.trace("Loaded " + dataset.size() + " " + objectClass.getSimpleName() + " objects from the CSV file.");
 

@@ -2025,17 +2025,30 @@ public abstract class DatabaseController
 			 * The Type1 product type refers to the same object in the database but is a different instance in Java for both objects.
 			 * Apparently merging returns the first instance of referenced objects, which in the case of the example would change the type of CategoryB to point
 			 * to the object Type1 (Java object ID 600, database ID 3).
+			 *
+			 * The more you know.
+			 * Merging persists the specified object and gives it an identifier according to generator specified in the mapping.
+			 * So far I have been using HashSets to store my example data.
+			 * HashSets are not ordered.
+			 * The example data in the CSV files is ordered and it is crucial that the objects are assigned database IDs in that very particular order.
+			 * I cannot manually define the database ID of an object so Hibernate simply does so in a sequence starting at 1.
+			 * So when the data is read from the CSV file into a HashSet the order of the elements is lost.
+			 * This loop reads the objects from the unordered HashSet according to the hash of the object.
+			 * In other words, the object that was defined on the first row in a CSV file is probably not the first element in the HashSet, thus its database ID
+			 * is not going to be 1.
+			 * The only reason the example data works at all is because I am assuming that the data gets inserted into the database in that order.
+			 * The kind of problems where you spend an hour questioning reality only for it to be solved by writing a single word on a single line in a single
+			 * file are the best kind of problems.
+			 * Solution: use LinkedHashSet which preserves the insertion order.
 			 */
 			final Object object = SESSION_FACTORY.getCurrentSession().merge(obj);
 
 			/*
-			 * HIBERNATE NOTE 2016-05-05
+			 * HIBERNATE NOTE
 			 *
 			 * This would have been nice to know a few weeks ago. In hindsight it is quite obvious.
-			 *
 			 * Saving an object to the database with SESSION_FACTORY.getCurrentSession().save(obj) causes the databaseID of the object to be recalculated
 			 * because all mappings have the databaseID column set to <generator class="native" /> instead of <generator class="assigned" />.
-			 *
 			 * In short. This cannot be used to save sample data where the database ID is set manually.
 			 *
 			 * Additionally after hours of research I have not found a way to use assigned positive integers as IDs.
