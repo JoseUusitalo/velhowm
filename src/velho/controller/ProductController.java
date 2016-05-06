@@ -124,7 +124,7 @@ public class ProductController implements UIActionController
 	 * object.
 	 *
 	 * @param databaseID database ID of the product (<code>-1</code> for a new
-	 *            one)
+	 * one)
 	 * @param name name of the of product
 	 * @param brand brand of the product
 	 * @param category category of the product
@@ -415,7 +415,7 @@ public class ProductController implements UIActionController
 	 * action is performed
 	 *
 	 * @param saveProductType saves the new Product Type written in the
-	 *            TextField
+	 * TextField
 	 */
 	@SuppressWarnings("static-method")
 	public void saveProductType(final ProductType saveProductType)
@@ -526,6 +526,25 @@ public class ProductController implements UIActionController
 		{
 			if (product.getName() == null || product.getName().isEmpty() || product.getBrand() == null || product.getCategory() == null)
 				invalids.add(product);
+		}
+
+		return invalids;
+	}
+
+	/**
+	 * Gets a set of contextually invalid {@link ProductBox} objects from the specified set of product boxes.
+	 *
+	 * @param validDataSet a set of technically valid product boxes
+	 * @return a set of invalid product boxes
+	 */
+	public static Set<ProductBox> getInvalidProductBoxes(final Set<ProductBox> validDataSet)
+	{
+		final Set<ProductBox> invalids = new HashSet<ProductBox>();
+
+		for (final ProductBox box : validDataSet)
+		{
+			if (box.getProduct() == null || box.getMaxSize() < 1 || box.getProductCount() < 0)
+				invalids.add(box);
 		}
 
 		return invalids;

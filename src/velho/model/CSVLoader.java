@@ -114,7 +114,8 @@ public class CSVLoader<T extends AbstractDatabaseObject>
 		SYSLOG.trace("Loaded " + dataset.size() + " " + objectClass.getSimpleName() + " objects from the CSV file.");
 
 		if (parser.hasInvalidData())
-			SYSLOG.warn("Sample " + objectClass.getSimpleName() + " CSV data has malformed data, skipped: " + parser.getInvalidData());
+			SYSLOG.warn("Sample " + objectClass.getSimpleName() + " CSV data has malformed data, skipped " + parser.getInvalidData().size() + " lines: "
+					+ parser.getInvalidData());
 
 		final Set<T> invalidDataSet = getInvalidDataObjects(dataset);
 

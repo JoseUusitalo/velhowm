@@ -365,82 +365,23 @@ public abstract class SampleData
 			SYSLOG.trace("Database already has removal lists.");
 	}
 
-	private static void createSampleProductBoxes() throws HibernateException, ParseException
+	private static void createSampleProductBoxes()
 	{
 		if (!DatabaseController.hasProductBoxes())
 		{
-			DatabaseController.save(new ProductBox(1, null, null, DatabaseController.getShelfSlotByID(1), DatabaseController.getProductByID(9), 10, 10,
-					DatabaseController.parseDateString("2016-02-18")));
+			SYSLOG.debug("Loading sample product boxes.");
 
-			DatabaseController.save(new ProductBox(2, null, null, DatabaseController.getShelfSlotByID(2), DatabaseController.getProductByID(1), 10, 10,
-					DatabaseController.parseDateString("2016-10-30")));
-			DatabaseController.save(new ProductBox(3, null, null, DatabaseController.getShelfSlotByID(3), DatabaseController.getProductByID(1), 10, 10));
-			DatabaseController.save(new ProductBox(4, null, null, DatabaseController.getShelfSlotByID(4), DatabaseController.getProductByID(3), 10, 10));
+			final CSVLoader<ProductBox> csvLoader = new CSVLoader<ProductBox>(ProductBox.class)
+			{
+				@Override
+				protected Set<ProductBox> getInvalidDataObjects(final Set<ProductBox> validDataSet)
+				{
+					return ProductController.getInvalidProductBoxes(validDataSet);
+				}
+			};
 
-			DatabaseController.save(new ProductBox(5, null, null, DatabaseController.getShelfSlotByID(5), DatabaseController.getProductByID(1), 50, 0));
-			DatabaseController.save(new ProductBox(6, null, null, DatabaseController.getShelfSlotByID(5), DatabaseController.getProductByID(3), 50, 5,
-					DatabaseController.parseDateString("2005-12-12")));
-			DatabaseController.save(new ProductBox(7, null, null, DatabaseController.getShelfSlotByID(5), DatabaseController.getProductByID(6), 50, 10,
-					DatabaseController.parseDateString("2008-01-10")));
-			DatabaseController.save(new ProductBox(8, null, null, DatabaseController.getShelfSlotByID(5), DatabaseController.getProductByID(6), 50, 25));
-			DatabaseController.save(new ProductBox(9, null, null, DatabaseController.getShelfSlotByID(44), DatabaseController.getProductByID(1), 50, 50,
-					DatabaseController.parseDateString("2020-05-26")));
-
-			DatabaseController.save(new ProductBox(10, null, null, DatabaseController.getShelfSlotByID(46), DatabaseController.getProductByID(1), 20, 20));
-			DatabaseController.save(new ProductBox(11, null, null, DatabaseController.getShelfSlotByID(46), DatabaseController.getProductByID(10), 20, 20,
-					DatabaseController.parseDateString("2015-03-20")));
-			DatabaseController.save(new ProductBox(12, null, null, DatabaseController.getShelfSlotByID(46), DatabaseController.getProductByID(10), 30, 20));
-			DatabaseController.save(new ProductBox(13, null, null, DatabaseController.getShelfSlotByID(46), DatabaseController.getProductByID(8), 30, 20));
-
-			DatabaseController.save(new ProductBox(14, null, null, DatabaseController.getShelfSlotByID(48), DatabaseController.getProductByID(1), 10, 5,
-					DatabaseController.parseDateString("2030-01-02")));
-			DatabaseController.save(new ProductBox(15, null, null, DatabaseController.getShelfSlotByID(50), DatabaseController.getProductByID(9), 10, 5));
-			DatabaseController.save(new ProductBox(16, null, null, DatabaseController.getShelfSlotByID(55), DatabaseController.getProductByID(3), 10, 5,
-					DatabaseController.parseDateString("2012-04-18")));
-			DatabaseController.save(new ProductBox(17, null, null, DatabaseController.getShelfSlotByID(67), DatabaseController.getProductByID(4), 10, 5));
-			DatabaseController.save(new ProductBox(18, null, null, DatabaseController.getShelfSlotByID(90), DatabaseController.getProductByID(5), 10, 5));
-			DatabaseController.save(new ProductBox(19, null, null, DatabaseController.getShelfSlotByID(91), DatabaseController.getProductByID(6), 10, 5,
-					DatabaseController.parseDateString("2016-05-16")));
-			DatabaseController.save(new ProductBox(20, null, null, DatabaseController.getShelfSlotByID(86), DatabaseController.getProductByID(7), 10, 5));
-
-			/* Lonely Containers 21-23 */
-			DatabaseController.save(new ProductBox(21, DatabaseController.getProductByID(11), 2, 2));
-			DatabaseController.save(new ProductBox(22, DatabaseController.getProductByID(12), 2, 2));
-			DatabaseController.save(new ProductBox(23, DatabaseController.getProductByID(1), 1, 0, DatabaseController.parseDateString("2003-11-30")));
-
-			// Removal list containers.
-			DatabaseController.save(new ProductBox(24, null, DatabaseController.getRemovalListByID(1), null, DatabaseController.getProductByID(10), 15, 10,
-					DatabaseController.parseDateString("2017-06-17")));
-			DatabaseController.save(new ProductBox(25, null, DatabaseController.getRemovalListByID(1), null, DatabaseController.getProductByID(5), 25, 0,
-					DatabaseController.parseDateString("2018-06-20")));
-			DatabaseController.save(new ProductBox(26, null, DatabaseController.getRemovalListByID(1), null, DatabaseController.getProductByID(3), 200, 120));
-			DatabaseController.save(new ProductBox(27, null, DatabaseController.getRemovalListByID(2), null, DatabaseController.getProductByID(12), 200, 96));
-			DatabaseController.save(new ProductBox(28, null, DatabaseController.getRemovalListByID(2), null, DatabaseController.getProductByID(1), 200, 2,
-					DatabaseController.parseDateString("2016-08-30")));
-			DatabaseController.save(new ProductBox(29, null, DatabaseController.getRemovalListByID(3), null, DatabaseController.getProductByID(1), 200, 10,
-					DatabaseController.parseDateString("2016-08-11")));
-			DatabaseController.save(new ProductBox(30, null, DatabaseController.getRemovalListByID(4), null, DatabaseController.getProductByID(4), 5, 0));
-
-			// Manifest containers.
-			DatabaseController.save(new ProductBox(31, DatabaseController.getManifestByID(1), null, null, DatabaseController.getProductByID(4), 1, 1,
-					DatabaseController.parseDateString("2016-06-17")));
-			DatabaseController.save(new ProductBox(32, DatabaseController.getManifestByID(1), null, null, DatabaseController.getProductByID(4), 20, 20,
-					DatabaseController.parseDateString("2020-06-01")));
-			DatabaseController.save(new ProductBox(33, DatabaseController.getManifestByID(1), null, null, DatabaseController.getProductByID(5), 200, 200,
-					DatabaseController.parseDateString("2015-12-30")));
-			DatabaseController.save(new ProductBox(34, DatabaseController.getManifestByID(1), null, null, DatabaseController.getProductByID(10), 340, 340,
-					DatabaseController.parseDateString("2016-03-22")));
-			DatabaseController.save(new ProductBox(35, DatabaseController.getManifestByID(2), null, null, DatabaseController.getProductByID(8), 60, 60,
-					DatabaseController.parseDateString("2018-10-29")));
-			DatabaseController.save(new ProductBox(36, DatabaseController.getManifestByID(2), null, null, DatabaseController.getProductByID(2), 87, 87,
-					DatabaseController.parseDateString("2019-03-15")));
-			DatabaseController.save(new ProductBox(37, DatabaseController.getManifestByID(2), null, null, DatabaseController.getProductByID(2), 99, 99,
-					DatabaseController.parseDateString("2021-01-01")));
-			DatabaseController.save(new ProductBox(38, DatabaseController.getManifestByID(4), null, null, DatabaseController.getProductByID(9), 110, 110));
-			DatabaseController.save(new ProductBox(39, DatabaseController.getManifestByID(4), null, null, DatabaseController.getProductByID(1), 205, 205));
-
-			// Something.
-			DatabaseController.save(new ProductBox(40, DatabaseController.getProductByID(8), 55, 55));
+			csvLoader.load("data/sample_product_boxes.csv");
+			csvLoader.save();
 		}
 		else
 			SYSLOG.trace("Database already has product boxes.");
