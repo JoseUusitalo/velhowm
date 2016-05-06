@@ -39,7 +39,7 @@ public class LoginView implements GenericView
 		{
 			vbox = new VBox(40);
 
-			final ImageView logoView = new ImageView(new Image("/res/velhowm_logo.png"));
+			final ImageView logoView = new ImageView(new Image("file:res/velhowm_logo.png"));
 			logoView.setFitWidth(MainWindow.WINDOW_WIDTH / 2.0);
 			logoView.setPreserveRatio(true);
 			logoView.setSmooth(true);

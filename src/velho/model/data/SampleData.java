@@ -111,7 +111,7 @@ public abstract class SampleData
 				}
 			};
 
-			csvLoader.load("data/sample_users.csv");
+			csvLoader.load("res/sample_users.csv");
 			csvLoader.save();
 		}
 		else
@@ -133,7 +133,7 @@ public abstract class SampleData
 				}
 			};
 
-			csvLoader.load("data/sample_product_brands.csv");
+			csvLoader.load("res/sample_product_brands.csv");
 			csvLoader.save();
 		}
 		else
@@ -155,7 +155,7 @@ public abstract class SampleData
 				}
 			};
 
-			csvLoader.load("data/sample_product_types.csv");
+			csvLoader.load("res/sample_product_types.csv");
 			csvLoader.save();
 		}
 		else
@@ -177,7 +177,7 @@ public abstract class SampleData
 				}
 			};
 
-			csvLoader.load("data/sample_product_categories.csv");
+			csvLoader.load("res/sample_product_categories.csv");
 			csvLoader.save();
 		}
 		else
@@ -199,7 +199,7 @@ public abstract class SampleData
 				}
 			};
 
-			csvLoader.load("data/sample_products.csv");
+			csvLoader.load("res/sample_products.csv");
 			csvLoader.save();
 		}
 		else
@@ -226,7 +226,7 @@ public abstract class SampleData
 				}
 			};
 
-			csvLoader.load("data/sample_shelves.csv");
+			csvLoader.load("res/sample_shelves.csv");
 			csvLoader.save();
 		}
 		else
@@ -248,7 +248,7 @@ public abstract class SampleData
 				}
 			};
 
-			csvLoader.load("data/sample_shelf_levels.csv");
+			csvLoader.load("res/sample_shelf_levels.csv");
 			csvLoader.save();
 		}
 		else
@@ -270,7 +270,7 @@ public abstract class SampleData
 				}
 			};
 
-			csvLoader.load("data/sample_shelf_slots.csv");
+			csvLoader.load("res/sample_shelf_slots.csv");
 			csvLoader.save();
 		}
 		else
@@ -292,7 +292,7 @@ public abstract class SampleData
 				}
 			};
 
-			csvLoader.load("data/sample_manifest_states.csv");
+			csvLoader.load("res/sample_manifest_states.csv");
 			csvLoader.save();
 		}
 		else
@@ -314,7 +314,7 @@ public abstract class SampleData
 				}
 			};
 
-			csvLoader.load("data/sample_manifests.csv");
+			csvLoader.load("res/sample_manifests.csv");
 			csvLoader.save();
 		}
 		else
@@ -336,7 +336,7 @@ public abstract class SampleData
 				}
 			};
 
-			csvLoader.load("data/sample_removal_list_states.csv");
+			csvLoader.load("res/sample_removal_list_states.csv");
 			csvLoader.save();
 		}
 		else
@@ -358,7 +358,7 @@ public abstract class SampleData
 				}
 			};
 
-			csvLoader.load("data/sample_removal_lists.csv");
+			csvLoader.load("res/sample_removal_lists.csv");
 			csvLoader.save();
 		}
 		else
@@ -380,7 +380,7 @@ public abstract class SampleData
 				}
 			};
 
-			csvLoader.load("data/sample_product_boxes.csv");
+			csvLoader.load("res/sample_product_boxes.csv");
 			csvLoader.save();
 		}
 		else
@@ -402,7 +402,7 @@ public abstract class SampleData
 				}
 			};
 
-			csvLoader.load("data/sample_removal_platforms.csv");
+			csvLoader.load("res/sample_removal_platforms.csv");
 			csvLoader.save();
 		}
 		else

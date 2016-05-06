@@ -8,6 +8,7 @@
 
 	<property name="test.dir" location="test" />
 	<property name="javadoc.dir" location="javadoc" />
+	<property name="res.dir" location="res" />
 	<property name="src.dir" location="src" />
 	<property name="src.res.dir" location="src/res" />
 	<property name="report.dir" location="report" />
@@ -29,6 +30,7 @@
 		<fileset dir="${lib.dir}" includes="hibernate/java8/*.jar" />
 		<fileset dir="${lib.dir}" includes="hibernate/jpa/*.jar" />
 		<fileset dir="${lib.dir}" includes="hibernate/required/*.jar" />
+		<fileset dir="${lib.dir}" includes="opencsv/*.jar" />
 		<pathelement location="${build.dist.test.dir}" />
 		<pathelement location="${build.dist.src.dir}" />
 	</path>
@@ -60,6 +62,7 @@
 		<mkdir dir="${build.dist.test.dir}" />
 		<mkdir dir="${build.dist.report.dir}" />
 		<mkdir dir="${dist.dir}" />
+		<mkdir dir="${dist.res.dir}" />
 		<mkdir dir="${report.dir}" />
 		<mkdir dir="${report.xml.dir}" />
 		<mkdir dir="${javadoc.dir}" />
@@ -157,9 +160,12 @@
 		</javac>
 	</target>
 
-	<target name="resources" description="Copies all configuration files, Hibernate mappings, and resources into the distribution.">
+	<target name="resources" description="Copies all configuration files, Hibernate mappings, and resources into the build and distribution.">
 		<copy todir="${build.dist.src.dir}">
-			<fileset dir="${src.dir}" includes="**/*.xml,**/*.properties,**/*.css,**/*.png" />
+			<fileset dir="${src.dir}" includes="**/*.xml,**/*.properties,**/*.css" />
+		</copy>
+		<copy todir="${dist.res.dir}">
+			<fileset dir="${res.dir}" includes="**/*" />
 		</copy>
 	</target>
 

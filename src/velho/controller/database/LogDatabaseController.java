@@ -60,7 +60,7 @@ public abstract class LogDatabaseController
 	 * @param columns columns to select (can be <code>null</code>)
 	 * @param where conditions (can be <code>null</code>)
 	 * @return
-	 * 		<ul>
+	 *         <ul>
 	 *         <li>if type is {@link DatabaseQueryType#UPDATE} or
 	 *         {@link DatabaseQueryType#DELETE}: the number of rows that were
 	 *         changed as a result of the query as an {@link Integer}</li>
@@ -69,7 +69,8 @@ public abstract class LogDatabaseController
 	 *         </ul>
 	 * @throws NoDatabaseLinkException
 	 */
-	private static List<Object> runQuery(final DatabaseQueryType type, final LogDatabaseTable tableName, final Map<DatabaseTable, String> joinOnValues, final String[] columns, final Map<String, Object> columnValues, final List<String> where) throws Exception
+	private static List<Object> runQuery(final DatabaseQueryType type, final LogDatabaseTable tableName, final Map<DatabaseTable, String> joinOnValues,
+			final String[] columns, final Map<String, Object> columnValues, final List<String> where) throws Exception
 	{
 		final Connection connection = getConnection();
 		Statement statement = null;
@@ -84,7 +85,8 @@ public abstract class LogDatabaseController
 			// Initialize a statement.
 			statement = connection.createStatement();
 
-			statement.execute(DatabaseController.sqlBuilder(type, tableName.toString(), joinOnValues, columns, columnValues, where), Statement.RETURN_GENERATED_KEYS);
+			statement.execute(DatabaseController.sqlBuilder(type, tableName.toString(), joinOnValues, columns, columnValues, where),
+					Statement.RETURN_GENERATED_KEYS);
 
 			switch (type)
 			{
@@ -108,7 +110,8 @@ public abstract class LogDatabaseController
 
 							case USRLOGS:
 								while (result.next())
-									datalist.add(result.getTimestamp("time") + " [" + result.getString("level") + "] " + DatabaseController.getUserByID(result.getInt("user_id")).getFullDetails() + ": " + result.getString("message"));
+									datalist.add(result.getTimestamp("time") + " [" + result.getString("level") + "] "
+											+ DatabaseController.getUserByID(result.getInt("user_id")).getFullDetails() + ": " + result.getString("message"));
 								break;
 							default:
 								// Close all resources.
@@ -442,66 +445,28 @@ public abstract class LogDatabaseController
 		if (MainWindow.DEBUG_MODE)
 			System.out.println("Initializing log database...");
 
-		final Connection connection = getConnection();
-		Statement statement = null;
-
 		boolean changed = false;
 
-		try
+		try (final Connection connection = getConnection())
 		{
-			// Initialize a statement.
-			statement = connection.createStatement();
-			statement.execute("RUNSCRIPT FROM './data/loginit.sql';");
-			changed = statement.getUpdateCount() > 0;
-		}
-		catch (final IllegalStateException e)
-		{
-			// Close all resources.
-
-			try
+			// Initialize a statement using a try-with-resource.
+			try (final Statement statement = connection.createStatement())
 			{
-				if (statement != null)
-					statement.close();
+				statement.execute("RUNSCRIPT FROM './res/loginit.sql';");
+				changed = statement.getUpdateCount() > 0;
 			}
-			catch (final SQLException e1)
+			catch (final IllegalStateException e1)
 			{
-				e.printStackTrace();
-			}
-
-			try
-			{
-				connection.close();
+				throw new RuntimeException("Connection pool has been disposed, no database connection.");
 			}
 			catch (final SQLException e2)
 			{
-				e.printStackTrace();
+				e2.printStackTrace();
 			}
-
-			throw new RuntimeException("Connection pool has been disposed, no database connection.");
 		}
-		catch (final SQLException e)
+		catch (final SQLException e3)
 		{
-			e.printStackTrace();
-		}
-
-		// Close all resources.
-		try
-		{
-			if (statement != null)
-				statement.close();
-		}
-		catch (final SQLException e)
-		{
-			e.printStackTrace();
-		}
-
-		try
-		{
-			connection.close();
-		}
-		catch (final SQLException e)
-		{
-			e.printStackTrace();
+			e3.printStackTrace();
 		}
 
 		if (changed)
