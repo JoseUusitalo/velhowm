@@ -455,38 +455,13 @@ public abstract class LogDatabaseController
 				statement.execute("RUNSCRIPT FROM './res/loginit.sql';");
 				changed = statement.getUpdateCount() > 0;
 			}
-			catch (final IllegalStateException e)
+			catch (final IllegalStateException e1)
 			{
-				// Close all resources.
-				try
-				{
-					connection.close();
-				}
-				catch (final SQLException e2)
-				{
-					e.printStackTrace();
-				}
-
 				throw new RuntimeException("Connection pool has been disposed, no database connection.");
 			}
-			catch (final SQLException e)
+			catch (final SQLException e2)
 			{
-				if (e.getMessage().contains("java.io.FileNotFoundException"))
-				{
-					try (final Statement statement = connection.createStatement())
-					{
-						statement.execute("RUNSCRIPT FROM './src/res/loginit.sql';");
-						changed = statement.getUpdateCount() > 0;
-					}
-					catch (final SQLException e1)
-					{
-						e1.printStackTrace();
-					}
-				}
-				else
-				{
-					e.printStackTrace();
-				}
+				e2.printStackTrace();
 			}
 		}
 		catch (final SQLException e3)
