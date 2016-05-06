@@ -5,6 +5,7 @@ import java.util.Set;
 
 import velho.model.Shelf;
 import velho.model.ShelfLevel;
+import velho.model.ShelfSlot;
 
 /**
  * A controller for handling {@link Shelf}, {@link velho.model.ShelfLevel} and {@link velho.model.ShelfSlot} objects.
@@ -46,6 +47,25 @@ public abstract class ShelfController
 		{
 			if (level.getMaxShelfSlots() < 1 || level.getParentShelf() == null || level.getShelfPosition() < 1)
 				invalids.add(level);
+		}
+
+		return invalids;
+	}
+
+	/**
+	 * Gets a set of contextually invalid {@link ShelfSlot} objects from the specified set of shelf slots.
+	 *
+	 * @param validDataSet a set of technically valid shelf slots
+	 * @return a set of invalid shelf slots
+	 */
+	public static Set<ShelfSlot> getInvalidShelfSlots(final Set<ShelfSlot> validDataSet)
+	{
+		final Set<ShelfSlot> invalids = new HashSet<ShelfSlot>();
+
+		for (final ShelfSlot slot : validDataSet)
+		{
+			if (slot.getLevelPosition() < 1 || slot.getMaxProductBoxes() < 1)
+				invalids.add(slot);
 		}
 
 		return invalids;

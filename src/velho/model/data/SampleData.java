@@ -1,8 +1,6 @@
 package velho.model.data;
 
 import java.text.ParseException;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
@@ -275,177 +273,19 @@ public abstract class SampleData
 	{
 		if (!DatabaseController.hasShelfSlots())
 		{
-			final List<Object> objs = DatabaseController.getAllShelfLevels();
-			final List<ShelfLevel> levels = new ArrayList<ShelfLevel>();
+			SYSLOG.debug("Loading sample shelf slots.");
 
-			// Padding.
-			levels.add(null);
+			final CSVLoader<ShelfSlot> csvLoader = new CSVLoader<ShelfSlot>(ShelfSlot.class)
+			{
+				@Override
+				protected Set<ShelfSlot> getInvalidDataObjects(final Set<ShelfSlot> validDataSet)
+				{
+					return ShelfController.getInvalidShelfSlots(validDataSet);
+				}
+			};
 
-			for (Object o : objs)
-				levels.add((ShelfLevel) o);
-
-			DatabaseController.save(new ShelfSlot(1, levels.get(1), 1, 1));
-			DatabaseController.save(new ShelfSlot(2, levels.get(1), 2, 1));
-			DatabaseController.save(new ShelfSlot(3, levels.get(1), 3, 1));
-			DatabaseController.save(new ShelfSlot(4, levels.get(1), 4, 1));
-
-			DatabaseController.save(new ShelfSlot(5, levels.get(2), 1, 4));
-			DatabaseController.save(new ShelfSlot(6, levels.get(2), 2, 4));
-			DatabaseController.save(new ShelfSlot(7, levels.get(2), 3, 4));
-			DatabaseController.save(new ShelfSlot(8, levels.get(2), 4, 4));
-			DatabaseController.save(new ShelfSlot(9, levels.get(2), 5, 4));
-			DatabaseController.save(new ShelfSlot(10, levels.get(2), 6, 4));
-			DatabaseController.save(new ShelfSlot(11, levels.get(2), 7, 4));
-			DatabaseController.save(new ShelfSlot(12, levels.get(2), 8, 4));
-			DatabaseController.save(new ShelfSlot(13, levels.get(2), 9, 4));
-			DatabaseController.save(new ShelfSlot(14, levels.get(2), 10, 4));
-			DatabaseController.save(new ShelfSlot(15, levels.get(2), 11, 4));
-			DatabaseController.save(new ShelfSlot(16, levels.get(2), 12, 4));
-			DatabaseController.save(new ShelfSlot(17, levels.get(2), 13, 4));
-			DatabaseController.save(new ShelfSlot(18, levels.get(2), 14, 4));
-			DatabaseController.save(new ShelfSlot(19, levels.get(2), 15, 4));
-			DatabaseController.save(new ShelfSlot(20, levels.get(2), 16, 4));
-			DatabaseController.save(new ShelfSlot(21, levels.get(2), 17, 4));
-			DatabaseController.save(new ShelfSlot(22, levels.get(2), 18, 4));
-			DatabaseController.save(new ShelfSlot(23, levels.get(2), 19, 4));
-			DatabaseController.save(new ShelfSlot(24, levels.get(2), 20, 4));
-
-			DatabaseController.save(new ShelfSlot(25, levels.get(3), 1, 4));
-			DatabaseController.save(new ShelfSlot(26, levels.get(3), 2, 4));
-			DatabaseController.save(new ShelfSlot(27, levels.get(3), 3, 4));
-			DatabaseController.save(new ShelfSlot(28, levels.get(3), 4, 4));
-			DatabaseController.save(new ShelfSlot(29, levels.get(3), 5, 4));
-			DatabaseController.save(new ShelfSlot(30, levels.get(3), 6, 4));
-			DatabaseController.save(new ShelfSlot(31, levels.get(3), 7, 4));
-			DatabaseController.save(new ShelfSlot(32, levels.get(3), 8, 4));
-			DatabaseController.save(new ShelfSlot(33, levels.get(3), 9, 4));
-			DatabaseController.save(new ShelfSlot(34, levels.get(3), 10, 4));
-			DatabaseController.save(new ShelfSlot(35, levels.get(3), 11, 4));
-			DatabaseController.save(new ShelfSlot(36, levels.get(3), 12, 4));
-			DatabaseController.save(new ShelfSlot(37, levels.get(3), 13, 4));
-			DatabaseController.save(new ShelfSlot(38, levels.get(3), 14, 4));
-			DatabaseController.save(new ShelfSlot(39, levels.get(3), 15, 4));
-			DatabaseController.save(new ShelfSlot(40, levels.get(3), 16, 4));
-			DatabaseController.save(new ShelfSlot(41, levels.get(3), 17, 4));
-			DatabaseController.save(new ShelfSlot(42, levels.get(3), 18, 4));
-			DatabaseController.save(new ShelfSlot(43, levels.get(3), 19, 4));
-			DatabaseController.save(new ShelfSlot(44, levels.get(3), 20, 4));
-
-			DatabaseController.save(new ShelfSlot(45, levels.get(4), 1, 50));
-			DatabaseController.save(new ShelfSlot(46, levels.get(5), 1, 50));
-			DatabaseController.save(new ShelfSlot(47, levels.get(6), 1, 50));
-
-			DatabaseController.save(new ShelfSlot(48, levels.get(7), 1, 1));
-			DatabaseController.save(new ShelfSlot(49, levels.get(7), 2, 1));
-			DatabaseController.save(new ShelfSlot(50, levels.get(7), 3, 1));
-			DatabaseController.save(new ShelfSlot(51, levels.get(7), 4, 1));
-			DatabaseController.save(new ShelfSlot(52, levels.get(7), 5, 1));
-			DatabaseController.save(new ShelfSlot(53, levels.get(7), 6, 1));
-			DatabaseController.save(new ShelfSlot(54, levels.get(7), 7, 1));
-			DatabaseController.save(new ShelfSlot(55, levels.get(7), 8, 1));
-			DatabaseController.save(new ShelfSlot(56, levels.get(7), 9, 1));
-			DatabaseController.save(new ShelfSlot(57, levels.get(7), 10, 1));
-			DatabaseController.save(new ShelfSlot(58, levels.get(7), 11, 1));
-			DatabaseController.save(new ShelfSlot(59, levels.get(7), 12, 1));
-			DatabaseController.save(new ShelfSlot(60, levels.get(7), 13, 1));
-			DatabaseController.save(new ShelfSlot(61, levels.get(7), 14, 1));
-
-			DatabaseController.save(new ShelfSlot(62, levels.get(7), 15, 1));
-			DatabaseController.save(new ShelfSlot(63, levels.get(7), 16, 1));
-			DatabaseController.save(new ShelfSlot(64, levels.get(7), 17, 1));
-			DatabaseController.save(new ShelfSlot(65, levels.get(7), 18, 1));
-			DatabaseController.save(new ShelfSlot(66, levels.get(7), 19, 1));
-			DatabaseController.save(new ShelfSlot(67, levels.get(7), 20, 1));
-			DatabaseController.save(new ShelfSlot(68, levels.get(7), 21, 1));
-			DatabaseController.save(new ShelfSlot(69, levels.get(7), 22, 1));
-			DatabaseController.save(new ShelfSlot(70, levels.get(7), 23, 1));
-			DatabaseController.save(new ShelfSlot(71, levels.get(7), 24, 1));
-			DatabaseController.save(new ShelfSlot(72, levels.get(7), 25, 1));
-			DatabaseController.save(new ShelfSlot(73, levels.get(7), 26, 1));
-			DatabaseController.save(new ShelfSlot(74, levels.get(7), 27, 1));
-			DatabaseController.save(new ShelfSlot(75, levels.get(7), 28, 1));
-			DatabaseController.save(new ShelfSlot(76, levels.get(7), 29, 1));
-			DatabaseController.save(new ShelfSlot(77, levels.get(7), 30, 1));
-			DatabaseController.save(new ShelfSlot(78, levels.get(7), 31, 1));
-
-			DatabaseController.save(new ShelfSlot(79, levels.get(7), 32, 1));
-			DatabaseController.save(new ShelfSlot(80, levels.get(7), 33, 1));
-			DatabaseController.save(new ShelfSlot(81, levels.get(7), 34, 1));
-			DatabaseController.save(new ShelfSlot(82, levels.get(7), 35, 1));
-			DatabaseController.save(new ShelfSlot(83, levels.get(7), 36, 1));
-			DatabaseController.save(new ShelfSlot(84, levels.get(7), 37, 1));
-			DatabaseController.save(new ShelfSlot(85, levels.get(7), 38, 1));
-			DatabaseController.save(new ShelfSlot(86, levels.get(7), 39, 1));
-			DatabaseController.save(new ShelfSlot(87, levels.get(7), 40, 1));
-			DatabaseController.save(new ShelfSlot(88, levels.get(7), 41, 1));
-			DatabaseController.save(new ShelfSlot(89, levels.get(7), 42, 1));
-			DatabaseController.save(new ShelfSlot(90, levels.get(7), 43, 1));
-			DatabaseController.save(new ShelfSlot(91, levels.get(7), 44, 1));
-			DatabaseController.save(new ShelfSlot(92, levels.get(7), 45, 1));
-			DatabaseController.save(new ShelfSlot(93, levels.get(7), 46, 1));
-			DatabaseController.save(new ShelfSlot(94, levels.get(7), 47, 1));
-			DatabaseController.save(new ShelfSlot(95, levels.get(7), 48, 1));
-			DatabaseController.save(new ShelfSlot(96, levels.get(7), 49, 1));
-			DatabaseController.save(new ShelfSlot(97, levels.get(7), 50, 1));
-
-			DatabaseController.save(new ShelfSlot(98, levels.get(8), 1, 1));
-			DatabaseController.save(new ShelfSlot(99, levels.get(8), 2, 1));
-			DatabaseController.save(new ShelfSlot(100, levels.get(8), 3, 1));
-			DatabaseController.save(new ShelfSlot(101, levels.get(8), 4, 1));
-			DatabaseController.save(new ShelfSlot(102, levels.get(8), 5, 1));
-			DatabaseController.save(new ShelfSlot(103, levels.get(8), 6, 1));
-			DatabaseController.save(new ShelfSlot(104, levels.get(8), 7, 1));
-			DatabaseController.save(new ShelfSlot(105, levels.get(8), 8, 1));
-			DatabaseController.save(new ShelfSlot(106, levels.get(8), 9, 1));
-			DatabaseController.save(new ShelfSlot(107, levels.get(8), 10, 1));
-			DatabaseController.save(new ShelfSlot(108, levels.get(8), 11, 1));
-			DatabaseController.save(new ShelfSlot(109, levels.get(8), 12, 1));
-
-			DatabaseController.save(new ShelfSlot(110, levels.get(8), 13, 1));
-			DatabaseController.save(new ShelfSlot(111, levels.get(8), 14, 1));
-			DatabaseController.save(new ShelfSlot(112, levels.get(8), 15, 1));
-			DatabaseController.save(new ShelfSlot(113, levels.get(8), 16, 1));
-			DatabaseController.save(new ShelfSlot(114, levels.get(8), 17, 1));
-			DatabaseController.save(new ShelfSlot(115, levels.get(8), 18, 1));
-			DatabaseController.save(new ShelfSlot(116, levels.get(8), 19, 1));
-			DatabaseController.save(new ShelfSlot(117, levels.get(8), 20, 1));
-			DatabaseController.save(new ShelfSlot(118, levels.get(8), 21, 1));
-			DatabaseController.save(new ShelfSlot(119, levels.get(8), 22, 1));
-
-			DatabaseController.save(new ShelfSlot(120, levels.get(8), 23, 1));
-			DatabaseController.save(new ShelfSlot(121, levels.get(8), 24, 1));
-			DatabaseController.save(new ShelfSlot(122, levels.get(8), 25, 1));
-			DatabaseController.save(new ShelfSlot(123, levels.get(8), 26, 1));
-			DatabaseController.save(new ShelfSlot(124, levels.get(8), 27, 1));
-			DatabaseController.save(new ShelfSlot(125, levels.get(8), 28, 1));
-			DatabaseController.save(new ShelfSlot(126, levels.get(8), 29, 1));
-			DatabaseController.save(new ShelfSlot(127, levels.get(8), 30, 1));
-			DatabaseController.save(new ShelfSlot(128, levels.get(8), 31, 1));
-			DatabaseController.save(new ShelfSlot(129, levels.get(8), 32, 1));
-			DatabaseController.save(new ShelfSlot(130, levels.get(8), 33, 1));
-			DatabaseController.save(new ShelfSlot(131, levels.get(8), 34, 1));
-
-			DatabaseController.save(new ShelfSlot(132, levels.get(8), 35, 1));
-			DatabaseController.save(new ShelfSlot(133, levels.get(8), 36, 1));
-			DatabaseController.save(new ShelfSlot(134, levels.get(8), 37, 1));
-			DatabaseController.save(new ShelfSlot(135, levels.get(8), 38, 1));
-			DatabaseController.save(new ShelfSlot(136, levels.get(8), 39, 1));
-			DatabaseController.save(new ShelfSlot(137, levels.get(8), 40, 1));
-			DatabaseController.save(new ShelfSlot(138, levels.get(8), 41, 1));
-			DatabaseController.save(new ShelfSlot(139, levels.get(8), 42, 1));
-			DatabaseController.save(new ShelfSlot(140, levels.get(8), 43, 1));
-			DatabaseController.save(new ShelfSlot(141, levels.get(8), 44, 1));
-			DatabaseController.save(new ShelfSlot(142, levels.get(8), 45, 1));
-			DatabaseController.save(new ShelfSlot(143, levels.get(8), 46, 1));
-			DatabaseController.save(new ShelfSlot(144, levels.get(8), 47, 1));
-			DatabaseController.save(new ShelfSlot(145, levels.get(8), 48, 1));
-			DatabaseController.save(new ShelfSlot(146, levels.get(8), 49, 1));
-			DatabaseController.save(new ShelfSlot(147, levels.get(8), 50, 1));
-
-			DatabaseController.save(new ShelfSlot(148, levels.get(9), 1, 1));
-			DatabaseController.save(new ShelfSlot(149, levels.get(9), 2, 1));
-			DatabaseController.save(new ShelfSlot(150, levels.get(10), 1, 1));
-			DatabaseController.save(new ShelfSlot(151, levels.get(10), 2, 1));
+			csvLoader.load("data/sample_shelf_slots.csv");
+			csvLoader.save();
 		}
 		else
 			SYSLOG.trace("Database already has shelf slots.");
