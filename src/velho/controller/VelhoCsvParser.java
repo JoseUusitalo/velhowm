@@ -14,7 +14,6 @@ import org.apache.log4j.Logger;
 import com.opencsv.CSVReader;
 import com.opencsv.bean.CsvToBean;
 import com.opencsv.bean.MappingStrategy;
-import com.sun.media.sound.InvalidDataException;
 
 /**
  * A stripped down customized version of {@link CsvToBean} for use in VELHO Warehouse Management.
@@ -106,7 +105,7 @@ public class VelhoCsvParser<T> extends CsvToBean<T>
 		catch (final IOException e)
 		{
 			reader.close();
-			throw new InvalidDataException("Error capturing CSV header.");
+			throw new IOException("Error capturing CSV header.");
 		}
 
 		while (null != (line = reader.readNext()))
