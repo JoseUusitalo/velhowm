@@ -1,5 +1,8 @@
 package velho.controller;
 
+import java.util.HashSet;
+import java.util.Set;
+
 import org.apache.log4j.Logger;
 
 import javafx.scene.Node;
@@ -313,5 +316,43 @@ public class RemovalListController implements UIActionController
 		browseView = null;
 		showBrowseRemovalListsView();
 
+	}
+
+	/**
+	 * Gets a set of contextually invalid {@link RemovalListState} objects from the specified set of removal list states.
+	 *
+	 * @param validDataSet a set of technically valid removal list states
+	 * @return a set of invalid removal list states
+	 */
+	public static Set<RemovalListState> getInvalidRemovalListStates(final Set<RemovalListState> validDataSet)
+	{
+		final Set<RemovalListState> invalids = new HashSet<RemovalListState>();
+
+		for (final RemovalListState state : validDataSet)
+		{
+			if (state.getName() == null || state.getName().trim().isEmpty())
+				invalids.add(state);
+		}
+
+		return invalids;
+	}
+
+	/**
+	 * Gets a set of contextually invalid {@link RemovalList} objects from the specified set of removal lists.
+	 *
+	 * @param validDataSet a set of technically valid removal lists
+	 * @return a set of invalid removal lists
+	 */
+	public static Set<RemovalList> getInvalidRemovalLists(final Set<RemovalList> validDataSet)
+	{
+		final Set<RemovalList> invalids = new HashSet<RemovalList>();
+
+		for (final RemovalList list : validDataSet)
+		{
+			if (list.getState() == null)
+				invalids.add(list);
+		}
+
+		return invalids;
 	}
 }

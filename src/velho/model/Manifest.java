@@ -1,5 +1,7 @@
 package velho.model;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.LinkedHashSet;
 import java.util.Set;
@@ -7,6 +9,7 @@ import java.util.UUID;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import velho.controller.database.DatabaseController;
 
 /**
  * A list of {@link ProductBox} objects that have been delivered to the warehouse from somewhere else.
@@ -251,5 +254,46 @@ public class Manifest extends AbstractDatabaseObject
 		boxes.forEach((final ProductBox box) -> observableBoxes.add(new ProductBoxSearchResultRow(box)));
 
 		return observableBoxes;
+	}
+
+	/**
+	 * Sets a new manifest state for this manifest by the database ID of the manifest state.
+	 * Intended for use with loading data from CSV files.
+	 *
+	 * @param manifestStateID the database ID of the new manifest state of this manifest
+	 * @see DatabaseController#getManifestStateByID(int)
+	 */
+	public void setManifestStateID(final int manifestStateID)
+	{
+		if (manifestStateID < 1)
+			throw new IllegalArgumentException("Manifest State ID must be greater than 0, was '" + manifestStateID + "'.");
+
+		this.state = DatabaseController.getManifestStateByID(manifestStateID);
+	}
+
+	/**
+	 * Sets the date the contents of this manifest were received at the warehouse by the specified string.
+	 * <blockquote>
+	 * The string must be formatted as follows: <code>yyyy-MM-dd</code>
+	 * </blockquote>
+	 *
+	 * @param dateString the new date the shipment was received as a string
+	 */
+	public void setReceivedDateString(final String dateString) throws ParseException
+	{
+		this.receivedDate = new SimpleDateFormat("yyyy-MM-dd").parse(dateString);
+	}
+
+	/**
+	 * Sets the date the contents of this manifest were ordered by the specified string.
+	 * <blockquote>
+	 * The string must be formatted as follows: <code>yyyy-MM-dd</code>
+	 * </blockquote>
+	 *
+	 * @param dateString the new date the shipment was ordered as a string
+	 */
+	public void setOrderedDateString(final String dateString) throws ParseException
+	{
+		this.orderedDate = new SimpleDateFormat("yyyy-MM-dd").parse(dateString);
 	}
 }

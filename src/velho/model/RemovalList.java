@@ -70,16 +70,15 @@ public class RemovalList extends AbstractDatabaseObject
 
 	/**
 	 */
-	@SuppressWarnings("unused")
-	private RemovalList()
+	public RemovalList()
 	{
-		// I'm hoping Hibernate still uses this.
-
 		/*
 		 * I have to create a new object here because attempting to get one from the database causes a weird null
 		 * pointer exception.
 		 */
 		// this.state = DatabaseController.getRemovalListStateByID(1);
+
+		this.state = null;
 		setUuid(UUID.randomUUID());
 		this.boxes = new LinkedHashSet<ProductBox>();
 		this.observableBoxes = FXCollections.observableArrayList();
@@ -273,5 +272,20 @@ public class RemovalList extends AbstractDatabaseObject
 		}
 
 		boxes.clear();
+	}
+
+	/**
+	 * Sets a new removal list state for this removal list by the database ID of the removal list state.
+	 * Intended for use with loading data from CSV files.
+	 *
+	 * @param removalListStateID the database ID of the new removal list state of this removal list
+	 * @see DatabaseController#getRemovalListStateByID(int)
+	 */
+	public void setRemovalListStateID(final int removalListStateID)
+	{
+		if (removalListStateID < 1)
+			throw new IllegalArgumentException("Removal List State ID must be greater than 0, was '" + removalListStateID + "'.");
+
+		this.state = DatabaseController.getRemovalListStateByID(removalListStateID);
 	}
 }

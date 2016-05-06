@@ -6,11 +6,12 @@ import java.util.Set;
 import org.apache.log4j.Logger;
 import org.hibernate.HibernateException;
 
+import velho.controller.ManifestController;
 import velho.controller.ProductController;
+import velho.controller.RemovalListController;
 import velho.controller.ShelfController;
 import velho.controller.UserController;
 import velho.controller.database.DatabaseController;
-import velho.model.AbstractDatabaseObject;
 import velho.model.CSVLoader;
 import velho.model.Manifest;
 import velho.model.ManifestState;
@@ -71,7 +72,7 @@ public abstract class SampleData
 
 			createSampleShelves();
 			createSampleShelfLevels();
-			createSampleShelfSlots();
+			// createSampleShelfSlots();
 
 			createSampleManifestStates();
 			createSampleManifests();
@@ -112,9 +113,6 @@ public abstract class SampleData
 
 			csvLoader.load("data/sample_users.csv");
 			csvLoader.save();
-
-			for (Object obj : DatabaseController.getAllUsers())
-				System.out.println("User: " + ((AbstractDatabaseObject) obj).getDatabaseID() + " " + obj);
 		}
 		else
 			SYSLOG.trace("Database already has users.");
@@ -137,9 +135,6 @@ public abstract class SampleData
 
 			csvLoader.load("data/sample_product_brands.csv");
 			csvLoader.save();
-
-			for (Object obj : DatabaseController.getAllProductBrands())
-				System.out.println("Brand: " + ((AbstractDatabaseObject) obj).getDatabaseID() + " " + obj);
 		}
 		else
 			SYSLOG.trace("Database already has product brands.");
@@ -162,9 +157,6 @@ public abstract class SampleData
 
 			csvLoader.load("data/sample_product_types.csv");
 			csvLoader.save();
-
-			for (Object obj : DatabaseController.getAllProductTypes())
-				System.out.println("Type: " + ((AbstractDatabaseObject) obj).getDatabaseID() + " " + obj);
 		}
 		else
 			SYSLOG.trace("Database already has product types.");
@@ -187,9 +179,6 @@ public abstract class SampleData
 
 			csvLoader.load("data/sample_product_categories.csv");
 			csvLoader.save();
-
-			for (Object obj : DatabaseController.getAllProductCategories())
-				System.out.println("Category: " + ((AbstractDatabaseObject) obj).getDatabaseID() + " " + obj);
 		}
 		else
 			SYSLOG.trace("Database already has product categories.");
@@ -212,9 +201,6 @@ public abstract class SampleData
 
 			csvLoader.load("data/sample_products.csv");
 			csvLoader.save();
-
-			for (Object obj : DatabaseController.getAllProducts())
-				System.out.println("Product: " + ((AbstractDatabaseObject) obj).getDatabaseID() + " " + obj);
 		}
 		else
 			SYSLOG.trace("Database already has products.");
@@ -295,28 +281,41 @@ public abstract class SampleData
 	{
 		if (!DatabaseController.hasManifestStates())
 		{
-			DatabaseController.save(new ManifestState(1, "Stored"));
-			DatabaseController.save(new ManifestState(2, "Accepted"));
-			DatabaseController.save(new ManifestState(3, "Received"));
-			DatabaseController.save(new ManifestState(4, "Rejected"));
-			DatabaseController.save(new ManifestState(5, "Discharged"));
+			SYSLOG.debug("Loading sample manifest states.");
+
+			final CSVLoader<ManifestState> csvLoader = new CSVLoader<ManifestState>(ManifestState.class)
+			{
+				@Override
+				protected Set<ManifestState> getInvalidDataObjects(final Set<ManifestState> validDataSet)
+				{
+					return ManifestController.getInvalidManifestStates(validDataSet);
+				}
+			};
+
+			csvLoader.load("data/sample_manifest_states.csv");
+			csvLoader.save();
 		}
 		else
 			SYSLOG.trace("Database already has manifest states.");
 	}
 
-	private static void createSampleManifests() throws HibernateException, ParseException
+	private static void createSampleManifests()
 	{
 		if (!DatabaseController.hasManifests())
 		{
-			DatabaseController.save(new Manifest(1, 1, DatabaseController.getManifestStateByID(3), DatabaseController.parseDateString("2016-02-20"),
-					DatabaseController.parseDateString("2016-02-29")));
-			DatabaseController.save(new Manifest(2, 2, DatabaseController.getManifestStateByID(1), DatabaseController.parseDateString("2016-01-01"),
-					DatabaseController.parseDateString("2016-01-01")));
-			DatabaseController.save(new Manifest(3, 3, DatabaseController.getManifestStateByID(2), DatabaseController.parseDateString("2016-02-04"),
-					DatabaseController.parseDateString("2016-02-10")));
-			DatabaseController.save(new Manifest(4, 4, DatabaseController.getManifestStateByID(4), DatabaseController.parseDateString("2015-04-12"),
-					DatabaseController.parseDateString("2015-07-18")));
+			SYSLOG.debug("Loading sample manifests.");
+
+			final CSVLoader<Manifest> csvLoader = new CSVLoader<Manifest>(Manifest.class)
+			{
+				@Override
+				protected Set<Manifest> getInvalidDataObjects(final Set<Manifest> validDataSet)
+				{
+					return ManifestController.getInvalidManifests(validDataSet);
+				}
+			};
+
+			csvLoader.load("data/sample_manifests.csv");
+			csvLoader.save();
 		}
 		else
 			SYSLOG.trace("Database already has manifests.");
@@ -326,9 +325,19 @@ public abstract class SampleData
 	{
 		if (!DatabaseController.hasRemovalListStates())
 		{
-			DatabaseController.save(new RemovalListState(1, "Active"));
-			DatabaseController.save(new RemovalListState(2, "Canceled"));
-			DatabaseController.save(new RemovalListState(3, "Finished"));
+			SYSLOG.debug("Loading sample removal list states.");
+
+			final CSVLoader<RemovalListState> csvLoader = new CSVLoader<RemovalListState>(RemovalListState.class)
+			{
+				@Override
+				protected Set<RemovalListState> getInvalidDataObjects(final Set<RemovalListState> validDataSet)
+				{
+					return RemovalListController.getInvalidRemovalListStates(validDataSet);
+				}
+			};
+
+			csvLoader.load("data/sample_removal_list_states.csv");
+			csvLoader.save();
 		}
 		else
 			SYSLOG.trace("Database already has removal list states.");
@@ -338,13 +347,19 @@ public abstract class SampleData
 	{
 		if (!DatabaseController.hasRemovalLists())
 		{
-			DatabaseController.save(new RemovalList(1, DatabaseController.getRemovalListStateByID(1)));
-			DatabaseController.save(new RemovalList(2, DatabaseController.getRemovalListStateByID(2)));
-			DatabaseController.save(new RemovalList(3, DatabaseController.getRemovalListStateByID(3)));
-			DatabaseController.save(new RemovalList(4, DatabaseController.getRemovalListStateByID(3)));
+			SYSLOG.debug("Loading sample removal lists.");
 
-			// Empty.
-			DatabaseController.save(new RemovalList(5, DatabaseController.getRemovalListStateByID(2)));
+			final CSVLoader<RemovalList> csvLoader = new CSVLoader<RemovalList>(RemovalList.class)
+			{
+				@Override
+				protected Set<RemovalList> getInvalidDataObjects(final Set<RemovalList> validDataSet)
+				{
+					return RemovalListController.getInvalidRemovalLists(validDataSet);
+				}
+			};
+
+			csvLoader.load("data/sample_removal_lists.csv");
+			csvLoader.save();
 		}
 		else
 			SYSLOG.trace("Database already has removal lists.");
