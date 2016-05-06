@@ -287,7 +287,10 @@ public class User extends AbstractDatabaseObject
 	 */
 	public void setBadgeID(final String badgeID)
 	{
-		this.badgeID = badgeID;
+		if (badgeID != null && badgeID.trim().isEmpty())
+			this.badgeID = null;
+		else
+			this.badgeID = badgeID;
 	}
 
 	/**
@@ -307,6 +310,9 @@ public class User extends AbstractDatabaseObject
 	 */
 	public void setPin(final String pin)
 	{
-		this.pin = pin;
+		if (pin != null && pin.trim().isEmpty())
+			this.pin = null;
+		else
+			this.pin = pin;
 	}
 }
