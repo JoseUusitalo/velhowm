@@ -3,7 +3,6 @@ package velho.controller.database;
 import java.io.File;
 import java.sql.Connection;
 import java.sql.SQLException;
-import java.sql.Statement;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
@@ -54,8 +53,6 @@ import velho.model.enums.DatabaseFileState;
 import velho.model.enums.DatabaseQueryType;
 import velho.model.enums.DatabaseTable;
 import velho.model.enums.UserRole;
-import velho.model.exceptions.NoDatabaseException;
-import velho.model.exceptions.UniqueKeyViolationException;
 import velho.model.interfaces.DatabaseObject;
 import velho.view.MainWindow;
 
@@ -189,114 +186,8 @@ public abstract class DatabaseController
 	private static ObservableList<Object> observableRemovalPlatforms = FXCollections.observableArrayList();
 
 	/*
-	 * -------------------------------- PRIVATE DATABASE METHODS
-	 * --------------------------------
+	 * -------------------------------- PRIVATE DATABASE METHODS --------------------------------
 	 */
-
-	/**
-	 * Runs a raw SQL query on the database.
-	 *
-	 * @param sql SQL to run
-	 * @return an Object containing the appropriate data
-	 * @throws NoDatabaseLinkException
-	 */
-	private static Object runQuery(final String sql) throws UniqueKeyViolationException
-	{
-		final Connection connection = getConnection();
-		Statement statement = null;
-
-		// Update queries.
-		Integer changed = new Integer(0);
-
-		try
-		{
-			// Initialize a statement.
-			statement = connection.createStatement();
-
-			statement.execute(sql);
-
-			changed = new Integer(statement.getUpdateCount());
-		}
-		catch (final IllegalStateException e)
-		{
-			// Close all resources.
-
-			try
-			{
-				if (statement != null)
-					statement.close();
-			}
-			catch (final SQLException e1)
-			{
-				e.printStackTrace();
-			}
-
-			try
-			{
-				connection.close();
-			}
-			catch (final SQLException e2)
-			{
-				e.printStackTrace();
-			}
-
-			throw new RuntimeException("Connection pool has been disposed, no database connection.");
-		}
-		catch (final SQLException e)
-		{
-			if (!e.toString().contains("Unique index or primary key violation"))
-				e.printStackTrace();
-
-			// If it was a UNIQUE constraint violation, continue normally as
-			// those are handled separately.
-			DBLOG.error("Passing SQL UNIQUE constraint violation. Begin message:");
-			DBLOG.error(escape(e.getMessage()));
-			DBLOG.error("End of message.");
-
-			// Close all resources.
-			try
-			{
-				if (statement != null)
-					statement.close();
-			}
-			catch (final SQLException e2)
-			{
-				e.printStackTrace();
-			}
-
-			try
-			{
-				connection.close();
-			}
-			catch (final SQLException e2)
-			{
-				e.printStackTrace();
-			}
-
-			throw new UniqueKeyViolationException();
-		}
-
-		// Close all resources.
-		try
-		{
-			statement.close();
-		}
-		catch (final SQLException e)
-		{
-			e.printStackTrace();
-		}
-
-		try
-		{
-			connection.close();
-		}
-		catch (final SQLException e)
-		{
-			e.printStackTrace();
-		}
-
-		return changed;
-	}
 
 	/**
 	 * Checks if the database file exists.
@@ -1674,36 +1565,6 @@ public abstract class DatabaseController
 	 * -------------------------------- PUBLIC SETTER METHODS
 	 * --------------------------------
 	 */
-
-	/**
-	 * Loads sample data into the database.
-	 * Assumes that a database exists.
-	 *
-	 * @return <code>true</code> if database changed as a result of this call
-	 * @throws NoDatabaseLinkException
-	 */
-	public static boolean initializeDatabase() throws NoDatabaseException
-	{
-		DBLOG.debug("Loading sample data to database...");
-
-		if (!databaseExists())
-			throw new NoDatabaseException();
-
-		boolean changed = false;
-		try
-		{
-			changed = (0 != (Integer) runQuery("RUNSCRIPT FROM './data/init.sql';"));
-		}
-		catch (Exception e)
-		{
-			e.printStackTrace();
-		}
-
-		if (changed)
-			DBLOG.info("Sample data loaded.");
-
-		return changed;
-	}
 
 	/**
 	 * Loads sample data into the database if it does not yet exist there.
