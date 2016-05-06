@@ -2006,6 +2006,25 @@ public abstract class DatabaseController
 
 		for (final Object obj : objects)
 		{
+
+			/*
+			 * HIBERNATE NOTE
+			 *
+			 * This fixes: org.hibernate.NonUniqueObjectException: A different object with the same identifier value was already associated with the session
+			 *
+			 * Example problem is:
+			 * CategoryA (Java object ID 500, database ID 1) has a type of Type1 (Java object ID 600, database ID 3).
+			 * SESSION_FACTORY.getCurrentSession().save(CategoryA) is fine.
+			 * CategoryB (Java object ID 530, database ID 2) has a type of Type1 (Java object ID 710, database ID 3).
+			 * SESSION_FACTORY.getCurrentSession().save(CategoryB) throws the exception because CategoryB refers to another INSTANCE of Type1.
+			 *
+			 * Hibernate uses OBJECT EQUALITY for comparing objects, not EQUALS.
+			 * The Type1 product type refers to the same object in the database but is a different instance in Java for both objects.
+			 * Apparently merging returns the first instance of referenced objects, which in the case of the example would change the type of CategoryB to point
+			 * to the object Type1 (Java object ID 600, database ID 3).
+			 */
+			final Object object = SESSION_FACTORY.getCurrentSession().merge(obj);
+
 			/*
 			 * HIBERNATE NOTE 2016-05-05
 			 *
@@ -2016,7 +2035,7 @@ public abstract class DatabaseController
 			 *
 			 * In short. This cannot be used to save sample data where the database ID is set manually.
 			 */
-			SESSION_FACTORY.getCurrentSession().save(obj);
+			SESSION_FACTORY.getCurrentSession().save(object);
 			count++;
 
 			if (count % HIBERNATE_BATCH_SIZE == 0)
