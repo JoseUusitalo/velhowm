@@ -9,7 +9,7 @@
 		<id name="databaseID"
 			column="type_id"
 			type="int">
-			<generator class="velho.controller.database.AssignedIdentifierGenerator" />
+			<generator class="native" />
 		</id>
 		
 		<property	name="uuid"

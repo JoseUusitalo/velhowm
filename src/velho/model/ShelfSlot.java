@@ -314,7 +314,7 @@ public class ShelfSlot extends AbstractDatabaseObject
 	public void setParentShelfLevelID(final int parentShelfLevelID)
 	{
 		if (parentShelfLevelID < 1)
-			throw new IllegalArgumentException("Parent shelf ID must be greater than 0, was '" + parentShelfLevelID + "'.");
+			throw new IllegalArgumentException("Parent shelf level ID must be greater than 0, was '" + parentShelfLevelID + "'.");
 
 		this.parentShelfLevel = DatabaseController.getShelfLevelByID(parentShelfLevelID);
 	}
