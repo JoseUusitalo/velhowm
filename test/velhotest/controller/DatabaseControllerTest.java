@@ -19,6 +19,7 @@ import velho.controller.LocalizationController;
 import velho.controller.database.DatabaseController;
 import velho.controller.database.LogDatabaseController;
 import velho.model.ProductBox;
+import velho.model.ProductBrand;
 import velho.model.RemovalList;
 import velho.model.User;
 import velho.model.enums.UserRole;
@@ -43,7 +44,7 @@ public class DatabaseControllerTest
 		System.out.println("\n\n---- DatabaseControllerTest BeforeClass ----\n\n");
 		LogDatabaseController.connectAndInitialize();
 		DatabaseController.link();
-		DatabaseController.loadSampleData();
+		// DatabaseController.loadSampleData();
 		LocalizationController.initializeBundle();
 		System.out.println("\n\n---- DatabaseControllerTest Start ----\n\n");
 	}
@@ -300,5 +301,14 @@ public class DatabaseControllerTest
 		 * Rollback.
 		 */
 		DatabaseController.deleteRemovalList(list);
+	}
+
+	@Test
+	public final void testAssignedID()
+	{
+		final ProductBrand brand = new ProductBrand(987654321, "Test Product Brand with Manually Assigned Database ID");
+		DatabaseController.save(brand);
+		assertEquals("Test Product Brand with Manually Assigned Database ID", DatabaseController.getProductBrandByID(987654321).getName());
+		assertTrue(DatabaseController.deleteProductBrand(brand));
 	}
 }
