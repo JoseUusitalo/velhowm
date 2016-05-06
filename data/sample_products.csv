@@ -9,5 +9,5 @@ databaseID,name,brandID,categoryID
 8,Test Product #8,2,1
 9,Test Product #9,3,1
 10,Test Product #10,3,1
-11,Lonely Product #11,2,4
-12,Lonely Product #12,2,4
+11,Lonely Product #11,2,3
+12,Lonely Product #12,2,3
