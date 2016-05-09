@@ -67,6 +67,7 @@ public class LoginView implements GenericView
 			final PasswordField authenticationStringField = new PasswordField();
 			authenticationStringField.setPromptText(LocalizationController.getString("passWordPromptText"));
 			grid.add(authenticationStringField, 0, 2, 2, 1);
+			authenticationStringField.setId("authenticationStringField");
 
 			Button logInButton = new Button(LocalizationController.getString("logInButton"));
 			logInButton.setMaxWidth(Double.MAX_VALUE);

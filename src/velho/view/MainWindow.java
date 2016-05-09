@@ -182,6 +182,8 @@ public class MainWindow extends Application implements GenericView
 	 */
 	private Label removalPlatformStatus;
 
+	private Stage primaryStage;
+
 	/**
 	 * The main window constructor.
 	 */
@@ -466,8 +468,10 @@ public class MainWindow extends Application implements GenericView
 		}
 		else
 		{
+			this.primaryStage = primaryStage;
+
 			setUserAgentStylesheet(STYLESHEET_MODENA);
-			primaryStage.setTitle(LocalizationController.getString("mainWindowTitle"));
+			this.primaryStage.setTitle(LocalizationController.getString("mainWindowTitle"));
 			final Group root = new Group();
 			scene = new Scene(root, WINDOW_WIDTH, WINDOW_HEIGHT);
 			scene.getStylesheets().add(getClass().getResource("velho.css").toExternalForm());
@@ -479,8 +483,8 @@ public class MainWindow extends Application implements GenericView
 
 			LoginController.checkLogin();
 
-			primaryStage.setScene(scene);
-			primaryStage.show();
+			this.primaryStage.setScene(scene);
+			this.primaryStage.show();
 
 			if (DEBUG_MODE)
 			{
@@ -492,17 +496,17 @@ public class MainWindow extends Application implements GenericView
 					@Override
 					public void handle(final WindowEvent event)
 					{
-						shutdown(primaryStage);
+						shutdown(MainWindow.this.primaryStage);
 					}
 				});
 			}
 
-			primaryStage.setOnCloseRequest(new EventHandler<WindowEvent>()
+			this.primaryStage.setOnCloseRequest(new EventHandler<WindowEvent>()
 			{
 				@Override
 				public void handle(final WindowEvent event)
 				{
-					shutdown(primaryStage);
+					shutdown(MainWindow.this.primaryStage);
 				}
 			});
 		}
@@ -615,5 +619,10 @@ public class MainWindow extends Application implements GenericView
 	public void destroy()
 	{
 		mainTabPane = null;
+	}
+
+	public Stage getStage()
+	{
+		return primaryStage;
 	}
 }
