@@ -16,8 +16,6 @@ import velho.model.enums.DatabaseFileState;
 import velho.model.enums.DatabaseQueryType;
 import velho.model.enums.DatabaseTable;
 import velho.model.enums.LogDatabaseTable;
-import velho.model.exceptions.ExistingDatabaseLinkException;
-import velho.model.exceptions.NoDatabaseLinkException;
 import velho.view.MainWindow;
 
 /**
@@ -25,7 +23,7 @@ import velho.view.MainWindow;
  *
  * @author Jose Uusitalo
  */
-public class LogDatabaseController
+public abstract class LogDatabaseController
 {
 	/**
 	 * Apache log4j logger: System.
@@ -35,7 +33,7 @@ public class LogDatabaseController
 	/**
 	 * The database URI on the local machine.
 	 */
-	private final static String DB_URI = "jdbc:h2:./data/velholog;MV_STORE=FALSE;MVCC=FALSE;";
+	private final static String DB_URI = "jdbc:h2:./data/velholog;MV_STORE=FALSE;MVCC=TRUE;";
 
 	/**
 	 * User name for the system itself.
@@ -60,17 +58,17 @@ public class LogDatabaseController
 	 * @param columns columns to select (can be <code>null</code>)
 	 * @param where conditions (can be <code>null</code>)
 	 * @return
-	 *         <ul>
-	 *         <li>if type is {@link DatabaseQueryType#UPDATE} or
-	 *         {@link DatabaseQueryType#DELETE}: the number of rows that were
-	 *         changed as a result of the query as an {@link Integer}</li>
-	 *         <li>if type is {@link DatabaseQueryType#SELECT}: a Set containing
-	 *         the selected data</li>
-	 *         </ul>
+	 * <ul>
+	 * <li>if type is {@link DatabaseQueryType#UPDATE} or
+	 * {@link DatabaseQueryType#DELETE}: the number of rows that were
+	 * changed as a result of the query as an {@link Integer}</li>
+	 * <li>if type is {@link DatabaseQueryType#SELECT}: a Set containing
+	 * the selected data</li>
+	 * </ul>
 	 * @throws NoDatabaseLinkException
 	 */
 	private static List<Object> runQuery(final DatabaseQueryType type, final LogDatabaseTable tableName, final Map<DatabaseTable, String> joinOnValues,
-			final String[] columns, final Map<String, Object> columnValues, final List<String> where) throws NoDatabaseLinkException
+			final String[] columns, final Map<String, Object> columnValues, final List<String> where) throws Exception
 	{
 		final Connection connection = getConnection();
 		Statement statement = null;
@@ -93,7 +91,7 @@ public class LogDatabaseController
 				case SELECT:
 					result = statement.getResultSet();
 
-					if (columns.length == 1 && columns[0] != "*")
+					if (columns.length == 1 && !columns[0].equals("*"))
 					{
 						while (result.next())
 							datalist.add(result.getObject(columns[0]));
@@ -198,8 +196,7 @@ public class LogDatabaseController
 				e.printStackTrace();
 			}
 
-			// Connection pool has been disposed = no database connection.
-			throw new NoDatabaseLinkException();
+			throw new RuntimeException("Connection pool has been disposed, no database connection.");
 		}
 		catch (final SQLException e)
 		{
@@ -234,38 +231,6 @@ public class LogDatabaseController
 	 */
 
 	/**
-	 * Attempts to re-link the database.
-	 */
-	private static void relink()
-	{
-		if (MainWindow.DEBUG_MODE)
-			System.out.println("Attempting to relink log database.");
-
-		try
-		{
-			// Just in case.
-			unlink();
-		}
-		catch (final NoDatabaseLinkException e)
-		{
-			// Do nothing. This is expected.
-		}
-
-		try
-		{
-			link();
-		}
-		catch (final ClassNotFoundException e)
-		{
-			e.printStackTrace();
-		}
-		catch (final ExistingDatabaseLinkException e)
-		{
-			e.printStackTrace();
-		}
-	}
-
-	/**
 	 * Checks if the database file exists.
 	 *
 	 * @return <code>true</code> if the database file exists
@@ -273,7 +238,7 @@ public class LogDatabaseController
 	private static boolean databaseExists()
 	{
 		final File db = new File(DB_FILEPATH);
-		return (db.exists() && !db.isDirectory());
+		return db.exists() && !db.isDirectory();
 	}
 
 	/**
@@ -282,10 +247,8 @@ public class LogDatabaseController
 	 *
 	 * @return a database connection
 	 */
-	private static Connection getConnection() throws NoDatabaseLinkException
+	private static Connection getConnection()
 	{
-		checkLink();
-
 		Connection connection = null;
 		try
 		{
@@ -301,9 +264,10 @@ public class LogDatabaseController
 			}
 			else
 			{
-				relink();
+				e.printStackTrace();
 			}
 		}
+
 		return connection;
 	}
 
@@ -322,39 +286,18 @@ public class LogDatabaseController
 	}
 
 	/**
-	 * Checks if a database link exists and throws a {@link NoDatabaseLinkException} exception if it doesn't.
-	 * To be used when a database link must exist.
-	 */
-	public static void checkLink() throws NoDatabaseLinkException
-	{
-		if (connectionPool == null)
-			throw new NoDatabaseLinkException();
-	}
-
-	/**
 	 * Attempts to re-link the database.
 	 */
 	public static void tryReLink()
 	{
-		try
-		{
-			// Just in case.
-			unlink();
-		}
-		catch (final NoDatabaseLinkException e)
-		{
-			// Do nothing. This is expected.
-		}
+		// Just in case.
+		unlink();
 
 		try
 		{
 			link();
 		}
 		catch (final ClassNotFoundException e)
-		{
-			e.printStackTrace();
-		}
-		catch (final ExistingDatabaseLinkException e)
 		{
 			e.printStackTrace();
 		}
@@ -368,15 +311,12 @@ public class LogDatabaseController
 	 *
 	 * @return <code>true</code> if the link was created successfully
 	 * @throws ClassNotFoundException
-	 *             when the H2 driver was unable to load
+	 * when the H2 driver was unable to load
 	 * @throws ExistingDatabaseLinkException
-	 *             when a database link already exists
+	 * when a database link already exists
 	 */
-	public static DatabaseFileState link() throws ClassNotFoundException, ExistingDatabaseLinkException
+	public static DatabaseFileState link() throws ClassNotFoundException
 	{
-		if (connectionPool != null)
-			throw new ExistingDatabaseLinkException();
-
 		// Load the driver.
 		Class.forName("org.h2.Driver");
 
@@ -406,14 +346,10 @@ public class LogDatabaseController
 		// Try getting a connection. If the database does not exist, it is created.
 		try
 		{
-			final Connection c = getConnection();
+			final Connection connection = getConnection();
 
-			if (c != null)
-				c.close();
-		}
-		catch (final NoDatabaseLinkException e)
-		{
-			e.printStackTrace();
+			if (connection != null)
+				connection.close();
 		}
 		catch (final SQLException e)
 		{
@@ -450,23 +386,25 @@ public class LogDatabaseController
 	 * to the database again.
 	 *
 	 * @throws NoDatabaseLinkException
-	 *             when attempting unlink a database when no database link
-	 *             exists
+	 * when attempting unlink a database when no database link
+	 * exists
 	 */
-	public static void unlink() throws NoDatabaseLinkException
+	public static void unlink()
 	{
-		if (connectionPool == null)
-			throw new NoDatabaseLinkException();
-
-		SYSLOG.debug("Unlinking log database.");
-		connectionPool.dispose();
-		connectionPool = null;
+		if (connectionPool != null)
+		{
+			SYSLOG.debug("Unlinking log database.");
+			connectionPool.dispose();
+			connectionPool = null;
+		}
+		else
+			SYSLOG.debug("Log database already unlinked.");
 	}
 
 	/**
-	 * Links and initializes the database.
+	 * Links to the log database and initializes if it does not exist.
 	 */
-	public static boolean connectAndInitialize() throws ClassNotFoundException, ExistingDatabaseLinkException, NoDatabaseLinkException
+	public static boolean connectAndInitialize() throws ClassNotFoundException
 	{
 		if (isLinked())
 			return true;
@@ -474,7 +412,6 @@ public class LogDatabaseController
 		final DatabaseFileState state = link();
 		boolean initialized = true;
 
-		System.out.println("state is " + state);
 		switch (state)
 		{
 			case DOES_NOT_EXIST:
@@ -497,7 +434,7 @@ public class LogDatabaseController
 	 * @return <code>true</code> if database changed as a result of this call
 	 * @throws NoDatabaseLinkException
 	 */
-	public static boolean initializeDatabase() throws NoDatabaseLinkException
+	public static boolean initializeDatabase()
 	{
 		if (MainWindow.DEBUG_MODE)
 			System.out.println("Initializing log database...");
@@ -512,7 +449,7 @@ public class LogDatabaseController
 			// Initialize a statement.
 			statement = connection.createStatement();
 			statement.execute("RUNSCRIPT FROM './data/loginit.sql';");
-			changed = (statement.getUpdateCount() > 0);
+			changed = statement.getUpdateCount() > 0;
 		}
 		catch (final IllegalStateException e)
 		{
@@ -537,8 +474,7 @@ public class LogDatabaseController
 				e.printStackTrace();
 			}
 
-			// Connection pool has been disposed = no database connection.
-			throw new NoDatabaseLinkException();
+			throw new RuntimeException("Connection pool has been disposed, no database connection.");
 		}
 		catch (final SQLException e)
 		{
@@ -573,13 +509,14 @@ public class LogDatabaseController
 
 	/**
 	 * Closes the database permanently.
-	 *
-	 * @throws NoDatabaseLinkException
+	 * Additionally disposes the old connection pool.
 	 */
-	public static void shutdown() throws NoDatabaseLinkException
+	public static void shutdown() throws Exception
 	{
 		if (MainWindow.DEBUG_MODE)
 			System.out.println("Shutting down log database..");
+
+		unlink();
 
 		if (!isLinked())
 		{
@@ -587,30 +524,17 @@ public class LogDatabaseController
 			{
 				link();
 			}
-			catch (ClassNotFoundException e1)
+			catch (final ClassNotFoundException e)
 			{
-				e1.printStackTrace();
-			}
-			catch (ExistingDatabaseLinkException e1)
-			{
-				e1.printStackTrace();
+				e.printStackTrace();
 			}
 		}
 
-		Connection connection = null;
-		try
-		{
-			connection = getConnection();
-		}
-		catch (NoDatabaseLinkException e1)
-		{
-			// Ignore.
-		}
+		final Connection connection = getConnection();
 
 		try
 		{
-			if (connection != null)
-				connection.createStatement().execute("SHUTDOWN;");
+			connection.createStatement().execute("SHUTDOWN;");
 		}
 		catch (final IllegalStateException e)
 		{
@@ -626,8 +550,7 @@ public class LogDatabaseController
 				e.printStackTrace();
 			}
 
-			// Connection pool has been disposed = no database connection.
-			throw new NoDatabaseLinkException();
+			throw new Exception("Connection pool has been disposed, no database connection.");
 		}
 		catch (final SQLException e)
 		{
@@ -637,13 +560,17 @@ public class LogDatabaseController
 		// Close all resources.
 		try
 		{
-			if (connection != null)
-				connection.close();
+			connection.close();
 		}
 		catch (final SQLException e)
 		{
 			e.printStackTrace();
 		}
+
+		connectionPool.dispose();
+		connectionPool = null;
+
+		System.out.println("Log database shut down.");
 	}
 
 	/*
@@ -656,7 +583,7 @@ public class LogDatabaseController
 	 * @return the system log
 	 * @throws NoDatabaseLinkException
 	 */
-	public static ArrayList<Object> getSystemLog() throws NoDatabaseLinkException
+	public static ArrayList<Object> getSystemLog() throws Exception
 	{
 		final String[] columns = { "time", "level", "message" };
 		final List<String> where = new ArrayList<String>();
@@ -677,9 +604,8 @@ public class LogDatabaseController
 	 * Gets the full user log with user names.
 	 *
 	 * @return the user log
-	 * @throws NoDatabaseLinkException
 	 */
-	public static ArrayList<Object> getUserLog() throws NoDatabaseLinkException
+	public static ArrayList<Object> getUserLog() throws Exception
 	{
 		final String[] columns = { "user_id", "time", "level", "message" };
 		final List<String> where = new ArrayList<String>();

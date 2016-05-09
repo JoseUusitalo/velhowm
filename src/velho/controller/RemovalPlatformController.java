@@ -59,7 +59,8 @@ public class RemovalPlatformController
 	}
 
 	/**
-	 * Changes the amount of free space on the platform by adding or removing the specified percentage points depending
+	 * Changes the amount of free space on the platform by adding or removing
+	 * the specified percentage points depending
 	 * on its sign.
 	 *
 	 * @param percentagePoints percentage points to modify by [0.0, 1.0]
@@ -74,7 +75,8 @@ public class RemovalPlatformController
 	}
 
 	/**
-	 * Checks if the removal platform free space is equal to or below the set warning limit and displays a warning
+	 * Checks if the removal platform free space is equal to or below the set
+	 * warning limit and displays a warning
 	 * message.
 	 */
 	public void checkWarning()
@@ -91,7 +93,7 @@ public class RemovalPlatformController
 
 			// Warning is only showed when logged in.
 			if (LoginController.isLoggedIn())
-				PopupController.warning("The removal platform is " + percentFull + "% full. Please contact the waste disposal services.");
+				PopupController.warning(LocalizationController.getCompoundString("removalPlatformFullnessPopUpNotice", percentFull));
 		}
 	}
 
@@ -100,7 +102,7 @@ public class RemovalPlatformController
 	 */
 	public void emptyPlatform()
 	{
-		SYSLOG.info("Removal platform emptied.");
+		SYSLOG.info(LocalizationController.getString("removalPlatformEmptiedNotice"));
 		getPlatform().empty();
 		checkWarning();
 	}

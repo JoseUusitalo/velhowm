@@ -1,12 +1,11 @@
 package velhotest.controller;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
-
-import java.text.ParseException;
 
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
@@ -18,8 +17,6 @@ import velho.controller.LogDatabaseController;
 import velho.controller.UserController;
 import velho.model.User;
 import velho.model.enums.UserRole;
-import velho.model.exceptions.ExistingDatabaseLinkException;
-import velho.model.exceptions.NoDatabaseLinkException;
 
 /**
  * Test for the {@link velho.controller.UserController} class.
@@ -38,44 +35,31 @@ public class UserControllerTest
 	private final UserRole NULL_ROLE = null;
 
 	/**
-	 * Connects to the log database.
+	 * Creates the log database if needed and connects to it.
 	 * Loads the sample data into the database if it does not yet exist.
 	 *
-	 * @throws ParseException
+	 * @throws Exception
 	 */
 	@BeforeClass
-	public static final void loadSampleData() throws ParseException, ClassNotFoundException, NoDatabaseLinkException
+	public static final void init() throws Exception
 	{
+		System.out.println("\n\n---- UserControllerTest BeforeClass ----\n\n");
+		LogDatabaseController.connectAndInitialize();
 		DatabaseController.link();
-
-		try
-		{
-			assertTrue(LogDatabaseController.connectAndInitialize());
-		}
-		catch (ExistingDatabaseLinkException e)
-		{
-			// Ignore.
-		}
-
 		DatabaseController.loadSampleData();
+		System.out.println("\n\n---- UserControllerTest Start ----\n\n");
 	}
 
 	/**
 	 * Unlinks from both databases.
 	 */
 	@AfterClass
-	public static final void unlinkDatabases()
+	public static final void unlinkDatabases() throws Exception
 	{
+		System.out.println("\n\n---- UserControllerTest AfterClass ----\n\n");
 		DatabaseController.unlink();
-		try
-		{
-			// This test uses the log database so we need to shut it down after using it.
-			LogDatabaseController.shutdown();
-		}
-		catch (NoDatabaseLinkException e)
-		{
-			// Ignore.
-		}
+		LogDatabaseController.unlink();
+		System.out.println("\n\n---- UserControllerTest Done ----\n\n");
 	}
 
 	@Test
@@ -100,7 +84,7 @@ public class UserControllerTest
 		if (!exists)
 			fail("User was not added to the database.");
 
-		DatabaseController.deleteUser(newUser);
+		assertTrue(DatabaseController.deleteUser(newUser));
 	}
 
 	@Test
@@ -112,10 +96,9 @@ public class UserControllerTest
 
 		final User newUser2 = controller.createUser(VALID_BADGE_ID, null, VALID_NAME, VALID_NAME, VALID_ROLE, false);
 
-		// TODO: Test fails because the database has no unique constraints.
 		assertNull(newUser2);
 
-		DatabaseController.deleteUser(newUser);
+		assertTrue(DatabaseController.deleteUser(newUser));
 	}
 
 	@Test
@@ -138,10 +121,7 @@ public class UserControllerTest
 		}
 
 		if (exists)
-		{
-			DatabaseController.deleteUser(newUser);
-			fail("Invalid user added to the database.");
-		}
+			assertFalse(DatabaseController.deleteUser(newUser));
 	}
 
 	@Test
@@ -152,7 +132,7 @@ public class UserControllerTest
 
 		assertTrue(dbUser.getFirstName().equals("A very UNIQUE! n4m3"));
 
-		DatabaseController.deleteUser(dbUser);
+		assertTrue(DatabaseController.deleteUser(dbUser));
 		assertEquals(null, DatabaseController.getUserByID(newUserID));
 	}
 

@@ -6,13 +6,15 @@ import javafx.scene.control.ScrollPane;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.text.Text;
 import velho.controller.LogController;
+import velho.controller.UIController;
+import velho.model.interfaces.GenericView;
 
 /**
  * View for reading logs.
  *
  * @author Jose Uusitalo
  */
-public class LogView
+public class LogView implements GenericView
 {
 	/**
 	 * Apache log4j logger: System.
@@ -37,8 +39,11 @@ public class LogView
 	/**
 	 * The {@link LogController}
 	 */
-	private LogController logController;
+	private final LogController logController;
 
+	/**
+	 * @param logController
+	 */
 	public LogView(final LogController logController)
 	{
 		this.logController = logController;
@@ -56,7 +61,7 @@ public class LogView
 			bpane = new BorderPane();
 			ScrollPane leftlog = new ScrollPane();
 			leftlog.setFitToHeight(true);
-			leftlog.prefWidthProperty().bind(MainWindow.WIDTH_PROPERTY.divide(2.0));
+			leftlog.prefWidthProperty().bind(MainWindow.widthProperty.divide(2.0));
 			syslog = new Text(logController.getSystemLog());
 			leftlog.setFitToWidth(true);
 			leftlog.setContent(syslog);
@@ -69,17 +74,17 @@ public class LogView
 
 			bpane.setLeft(leftlog);
 			bpane.setCenter(rightlog);
+			UIController.recordView(this);
 		}
 
 		return bpane;
 	}
 
-	/**
-	 * Destroys the view.
-	 */
-	public void destroy()
+	@Override
+	public void recreate()
 	{
 		bpane = null;
+		getView();
 	}
 
 	/**
@@ -90,5 +95,11 @@ public class LogView
 		SYSLOG.trace("Refreshing logs view.");
 		syslog = new Text(logController.getSystemLog());
 		usrlog = new Text(logController.getUserLog());
+	}
+
+	@Override
+	public void destroy()
+	{
+		bpane = null;
 	}
 }

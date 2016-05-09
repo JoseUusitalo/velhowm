@@ -11,10 +11,15 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import velho.controller.DatabaseController;
 import velho.controller.ExternalSystemsController;
+import velho.controller.LocalizationController;
 import velho.controller.SearchController;
+import velho.controller.UIController;
+import velho.model.interfaces.GenericView;
 
-public class SearchTabView
-
+/**
+ * @author Edward Puustinen
+ */
+public class SearchTabView implements GenericView
 {
 	/**
 	 * The root BorderPane for this view.
@@ -46,8 +51,8 @@ public class SearchTabView
 			final HBox buttonsBox = new HBox(10);
 			buttonsBox.setPadding(new Insets(0, 10, 10, 10));
 
-			final Button printButton = new Button("Print");
-			final Button sendToScannerButton = new Button("Send to BarcodeScanner ");
+			final Button printButton = new Button(LocalizationController.getString("printButton"));
+			final Button sendToScannerButton = new Button(LocalizationController.getString("sendToBarcodeScannerButton"));
 
 			printButton.setMaxWidth(Double.MAX_VALUE);
 			printButton.setAlignment(Pos.CENTER);
@@ -79,6 +84,7 @@ public class SearchTabView
 			bPane.setTop(top);
 			bPane.setCenter(searchController.getResultsView());
 
+			UIController.recordView(this);
 		}
 		return bPane;
 	}
@@ -87,6 +93,14 @@ public class SearchTabView
 	 * Destroys the view.
 	 */
 
+	@Override
+	public void recreate()
+	{
+		bPane = null;
+		getView();
+	}
+
+	@Override
 	public void destroy()
 	{
 		bPane = null;

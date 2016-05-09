@@ -8,7 +8,6 @@ import org.junit.runners.Suite.SuiteClasses;
 
 import velho.controller.DatabaseController;
 import velho.controller.LogDatabaseController;
-import velho.model.exceptions.NoDatabaseLinkException;
 import velhotest.controller.AllControllerTests;
 import velhotest.model.AllModelTests;
 
@@ -32,12 +31,15 @@ public class AllTests
 	}
 
 	@AfterClass
-	public final static void after() throws NoDatabaseLinkException
+	public final static void after() throws Exception
 	{
-		DatabaseController.closeSessionFactory();
-		LogDatabaseController.shutdown();
-
 		System.out.println("---------------");
 		System.out.println("All Tests Done.\n");
+
+		System.out.println("Close session factory");
+		DatabaseController.closeSessionFactory();
+
+		System.out.println("\n\nClose log database.");
+		LogDatabaseController.shutdown();
 	}
 }

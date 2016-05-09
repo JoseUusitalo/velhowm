@@ -5,18 +5,19 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertTrue;
 
-import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
 import javafx.collections.ObservableList;
 import velho.controller.DatabaseController;
+import velho.controller.LogDatabaseController;
 import velho.model.ProductBox;
 import velho.model.RemovalList;
 import velho.model.RemovalListState;
@@ -34,17 +35,31 @@ public class RemovalListTest
 	private static ProductBox box1;
 
 	/**
+	 * Creates the log database if needed and connects to it.
 	 * Loads the sample data into the database if it does not yet exist.
 	 *
-	 * @throws ParseException
+	 * @throws Exception
 	 */
 	@BeforeClass
-	public static final void loadSampleData() throws ParseException
+	public static final void init() throws Exception
 	{
+		LogDatabaseController.connectAndInitialize();
+		DatabaseController.link();
 		DatabaseController.loadSampleData();
+
 		box1 = DatabaseController.getProductBoxByID(1);
 		existingRemovalList = DatabaseController.getRemovalListByID(1);
-		newlist = new RemovalList();
+		newlist = new RemovalList(DatabaseController.getRemovalListStateByID(1));
+	}
+
+	/**
+	 * Unlinks from both databases.
+	 */
+	@AfterClass
+	public static final void unlinkDatabases() throws Exception
+	{
+		DatabaseController.unlink();
+		LogDatabaseController.unlink();
 	}
 
 	@Test
@@ -74,14 +89,14 @@ public class RemovalListTest
 	@Test
 	public final void testGetState()
 	{
-		assertEquals(DatabaseController.getRemovalListStateByID(1).getDatabaseID(), newlist.getState().getDatabaseID());
+		assertEquals(DatabaseController.getRemovalListStateByID(1), newlist.getState());
 	}
 
 	@Test
 	public final void testSetState()
 	{
 		final int oldID = existingRemovalList.getDatabaseID();
-		final RemovalListState oldState = existingRemovalList.getState();
+		final RemovalListState oldState = new RemovalListState(existingRemovalList.getState());
 		final RemovalListState newState = DatabaseController.getRemovalListStateByID(3);
 
 		assertNotEquals(oldState, newState);
@@ -101,7 +116,7 @@ public class RemovalListTest
 		// Database was updated.
 		assertEquals(newState, DatabaseController.getRemovalListByID(saveID).getState());
 
-		// TODO: Figure out a better way to roll back changes.
+		// Rollback.
 		existingRemovalList.setState(oldState);
 		DatabaseController.saveOrUpdate(existingRemovalList);
 	}
@@ -109,10 +124,8 @@ public class RemovalListTest
 	@Test
 	public final void testGetObservableBoxes()
 	{
-		final Set<ProductBox> boxes = new HashSet<ProductBox>(existingRemovalList.getBoxes());
-
-		ObservableList<Object> obsboxes = existingRemovalList.getObservableBoxes();
-		ProductBox first = existingRemovalList.getBoxes().iterator().next();
+		final ObservableList<Object> obsboxes = existingRemovalList.getObservableBoxes();
+		final ProductBox first = existingRemovalList.getBoxes().iterator().next();
 
 		assertEquals(3, obsboxes.size());
 		assertTrue(existingRemovalList.removeProductBox(first));
@@ -121,8 +134,9 @@ public class RemovalListTest
 		assertEquals(2, obsboxes.size());
 
 		// Rollback.
-		assertTrue(existingRemovalList.setBoxes(boxes));
+		assertTrue(existingRemovalList.addProductBox(first));
 		DatabaseController.saveOrUpdate(existingRemovalList);
+		assertEquals(3, DatabaseController.getRemovalListByID(1).getSize());
 	}
 
 	@Test
@@ -193,7 +207,8 @@ public class RemovalListTest
 		assertTrue(newlist.addProductBox(box1));
 		assertTrue(newlist.getBoxes().contains(box1));
 
-		newlist.removeProductBox(box1);
+		// Rollback.
+		assertTrue(newlist.removeProductBox(box1));
 	}
 
 	@Test
@@ -203,6 +218,7 @@ public class RemovalListTest
 		assertTrue(newlist.addProductBox(box1));
 		assertTrue(newlist.getBoxes().contains(box1));
 
+		// Rollback.
 		assertTrue(newlist.removeProductBox(box1));
 		assertFalse(newlist.getBoxes().contains(box1));
 	}
@@ -218,25 +234,54 @@ public class RemovalListTest
 	public final void testReset()
 	{
 		// Remember to make a copy, otherwise this variable will also change on reset!
-		final Set<ProductBox> boxes = new HashSet<ProductBox>(existingRemovalList.getBoxes());
-		final RemovalListState oldState = existingRemovalList.getState();
+		final Set<ProductBox> boxes = new HashSet<ProductBox>();
+		boxes.addAll(existingRemovalList.getBoxes());
+
+		final RemovalListState oldState = new RemovalListState(existingRemovalList.getState());
+
+		System.out.println("\nRemoval list initial state: " + existingRemovalList);
+		System.out.println(boxes);
+		System.out.println(oldState);
 
 		final RemovalListState activeState = DatabaseController.getRemovalListStateByID(1);
 		final RemovalListState finishedState = DatabaseController.getRemovalListStateByID(3);
 
 		existingRemovalList.setState(finishedState);
 
+		System.out.println("\nChanged state: " + existingRemovalList);
+		System.out.println(boxes);
+		System.out.println(oldState);
+
 		assertEquals(finishedState, existingRemovalList.getState());
 		assertEquals(3, existingRemovalList.getSize());
 
 		existingRemovalList.reset();
 
+		DatabaseController.saveOrUpdate(existingRemovalList);
+		existingRemovalList = DatabaseController.getRemovalListByID(1);
+
+		System.out.println("\nReset: " + existingRemovalList);
+		System.out.println(boxes);
+		System.out.println(oldState);
+
 		assertEquals(0, existingRemovalList.getSize());
 		assertEquals(activeState.getDatabaseID(), existingRemovalList.getState().getDatabaseID());
 
-		// Roll back.
+		// Rollback.
 		existingRemovalList.setState(oldState);
-		assertTrue(existingRemovalList.setBoxes(boxes));
+		assertTrue(existingRemovalList.addAllBoxes(boxes));
+
+		System.out.println("\nRollback: " + existingRemovalList);
+		System.out.println(boxes);
+		System.out.println(oldState);
+
 		DatabaseController.saveOrUpdate(existingRemovalList);
+
+		assertEquals(oldState, DatabaseController.getRemovalListByID(1).getState());
+		assertEquals(3, DatabaseController.getRemovalListByID(1).getSize());
+
+		System.out.println("\nFresh: " + DatabaseController.getRemovalListByID(1));
+		System.out.println(boxes);
+		System.out.println(oldState);
 	}
 }
