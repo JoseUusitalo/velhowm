@@ -11,20 +11,46 @@ import org.apache.log4j.Logger;
 
 import com.opencsv.CSVWriter;
 
+import javafx.scene.Node;
+import velho.controller.database.DatabaseController;
+import velho.controller.interfaces.UIActionController;
+import velho.model.AbstractDatabaseObject;
+import velho.model.CSVLoader;
 import velho.model.User;
 import velho.model.interfaces.DatabaseObject;
+import velho.view.CSVView;
+import velho.view.ListView;
+import velho.view.MainWindow;
 
 /**
  * A controller for writing CSV files.
  *
  * @author Jose Uusitalo
  */
-public abstract class CSVController
+public class CSVController implements UIActionController
 {
 	/**
 	 * Apache log4j logger: System.
 	 */
 	private static final Logger SYSLOG = Logger.getLogger(CSVController.class.getName());
+
+	/**
+	 * A view for loading CSV files to the database.
+	 */
+	private CSVView loadCSVView;
+
+	/**
+	 * The main window view.
+	 */
+	private MainWindow mainWindow;
+
+	/**
+	 */
+	public CSVController(final MainWindow mainWindow)
+	{
+		this.mainWindow = mainWindow;
+		loadCSVView = new CSVView(this, DatabaseController.getValidDatabaseTypes());
+	}
 
 	/**
 	 * Writes the given arrays of strings into the specified CSV file.
@@ -129,5 +155,73 @@ public abstract class CSVController
 							  user.getBadgeID(),
 							  user.getRole().toString() };
 		//@formatter:on
+	}
+
+	@SuppressWarnings({ "static-method", "rawtypes" })
+	public void loadCSVFileToDatabase(final String filePath, final Class csvType)
+	{
+		@SuppressWarnings("unchecked")
+		final CSVLoader<AbstractDatabaseObject> loader = new CSVLoader<AbstractDatabaseObject>(csvType);
+		loader.load(filePath);
+		loader.save();
+	}
+
+	/**
+	 * Gets a view for loading CSV files to database.
+	 *
+	 * @return view for loading CSV files
+	 */
+	public Node getLoadCSVView()
+	{
+		return loadCSVView.getView(mainWindow.getStage());
+	}
+
+	@Override
+	public void createAction(final Object data)
+	{
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public void updateAction(final Object data)
+	{
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public void addAction(final Object data)
+	{
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public void removeAction(final Object data)
+	{
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public void deleteAction(final Object data)
+	{
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public void viewAction(final Object data)
+	{
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public void recreateViews(final ListView listView)
+	{
+		// TODO Auto-generated method stub
+
 	}
 }
