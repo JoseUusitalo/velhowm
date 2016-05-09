@@ -232,7 +232,7 @@ public class SearchController
 			}
 
 			// Rebuild the product string.
-			final StringBuffer sb = new StringBuffer();
+			final StringBuilder strbuilder = new StringBuilder();
 			final int length = possibleProductAndCount.length;
 
 			for (int i = start; i < length; i++)
@@ -242,15 +242,15 @@ public class SearchController
 					// Left trim spaces from the first element.
 					// This assumes that no product name can begin with a space
 					// character.
-					sb.append(possibleProductAndCount[i].replaceAll("^\\s+", ""));
+					strbuilder.append(possibleProductAndCount[i].replaceAll("^\\s+", ""));
 				}
 				else
-					sb.append(possibleProductAndCount[i]);
+					strbuilder.append(possibleProductAndCount[i]);
 
 				if (i < length - 1)
-					sb.append(":");
+					strbuilder.append(":");
 			}
-			countName[1] = sb.toString();
+			countName[1] = strbuilder.toString();
 		}
 
 		return countName;

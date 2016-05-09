@@ -55,17 +55,17 @@ public class ExternalSystemsController
 		if (data instanceof Collection)
 		{
 			final Collection<Object> dataList = (Collection<Object>) data;
-			Iterator<Object> it = dataList.iterator();
-			if (it.hasNext())
+			Iterator<Object> iterator = dataList.iterator();
+			if (iterator.hasNext())
 			{
 
 				if (dataList.iterator().next() instanceof ProductBoxSearchResultRow)
 				{
-					it = dataList.iterator();
+					iterator = dataList.iterator();
 					final List<ProductBox> boxProduct = new ArrayList<ProductBox>();
-					while (it.hasNext())
+					while (iterator.hasNext())
 					{
-						boxProduct.add(((ProductBoxSearchResultRow) it.next()).getBox());
+						boxProduct.add(((ProductBoxSearchResultRow) iterator.next()).getBox());
 					}
 					Printer.print(boxProduct);
 				}
@@ -100,17 +100,17 @@ public class ExternalSystemsController
 		if (data instanceof Collection)
 		{
 			final Collection<Object> dataList = (Collection<Object>) data;
-			Iterator<Object> it = dataList.iterator();
-			if (it.hasNext())
+			Iterator<Object> iterator = dataList.iterator();
+			if (iterator.hasNext())
 			{
 
 				if (dataList.iterator().next() instanceof ProductBoxSearchResultRow)
 				{
-					it = dataList.iterator();
+					iterator = dataList.iterator();
 					final List<ProductBox> boxProduct = new ArrayList<ProductBox>();
-					while (it.hasNext())
+					while (iterator.hasNext())
 					{
-						boxProduct.add(((ProductBoxSearchResultRow) it.next()).getBox());
+						boxProduct.add(((ProductBoxSearchResultRow) iterator.next()).getBox());
 					}
 					BarcodeScanner.deviceBarcode(boxProduct);
 				}

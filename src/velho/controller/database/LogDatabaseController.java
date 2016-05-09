@@ -240,8 +240,8 @@ public abstract class LogDatabaseController
 	 */
 	private static boolean databaseExists()
 	{
-		final File db = new File(DB_FILEPATH);
-		return db.exists() && !db.isDirectory();
+		final File dbFile = new File(DB_FILEPATH);
+		return dbFile.exists() && !dbFile.isDirectory();
 	}
 
 	/**

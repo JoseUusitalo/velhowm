@@ -121,33 +121,33 @@ public abstract class BarcodeScanner
 	public static void sendRandomShipment()
 	{
 		final Set<ProductBox> boxSet = new HashSet<ProductBox>();
-		final Random r = new Random();
+		final Random rand = new Random();
 		List<Integer> productIDs;
-		int driverID = r.nextInt(10000);
+		int driverID = rand.nextInt(10000);
 		long now = Instant.now().toEpochMilli();
 
 		// 1 day is about 86400000 milliseconds.
 		// 1 month is about 2628000000 milliseconds.
 		// Range: [1 month ago, yesterday]
-		Date orderDate = new Date((now - 2628000000L) + (long) (r.nextDouble() * ((now - 86400000L) - (now - 2628000000L))));
+		Date orderDate = new Date((now - 2628000000L) + (long) (rand.nextDouble() * ((now - 86400000L) - (now - 2628000000L))));
 
 		productIDs = DatabaseController.getProductCodeList();
 		Collections.shuffle(productIDs);
 
 		int uniqueProducts = productIDs.size();
-		int randomBoxes = r.nextInt(29) + 1; // Range: [1, 30]
+		int randomBoxes = rand.nextInt(29) + 1; // Range: [1, 30]
 		int maxSize;
 		int productCount;
 		Date randomDate;
 
 		for (int i = 0; i < randomBoxes; i++)
 		{
-			maxSize = r.nextInt(499) + 1; // Range: [1, 500]
-			productCount = r.nextInt(maxSize) + 1; // Range: [1, maxSize]
+			maxSize = rand.nextInt(499) + 1; // Range: [1, 500]
+			productCount = rand.nextInt(maxSize) + 1; // Range: [1, maxSize]
 
 			// 10 years is about 315400000000 milliseconds.
 			// Exact rounding is irrelevant so cast is fine.
-			randomDate = new Date(now + (long) (r.nextDouble() * 315400000000L));
+			randomDate = new Date(now + (long) (rand.nextDouble() * 315400000000L));
 
 			// @formatter:off
 				boxSet.add(new ProductBox(	DatabaseController.getProductByID(productIDs.get(i % uniqueProducts)), // Make sure that the index doesn't go over the number of unique products in the database.

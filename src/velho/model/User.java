@@ -133,36 +133,36 @@ public class User extends AbstractDatabaseObject
 	}
 
 	@Override
-	public boolean equals(final Object o)
+	public boolean equals(final Object obj)
 	{
-		if (this == o)
+		if (this == obj)
 			return true;
 
-		if (o == null || !(o instanceof User))
+		if (obj == null || !(obj instanceof User))
 			return false;
 
-		final User u = (User) o;
+		final User user = (User) obj;
 
 		// Compare all details.
 
 		//@formatter:off
-		final boolean equalNames = this.getFirstName().equalsIgnoreCase(u.getFirstName()) &&
-									this.getLastName().equalsIgnoreCase(u.getLastName());
+		final boolean equalNames = this.getFirstName().equalsIgnoreCase(user.getFirstName()) &&
+									this.getLastName().equalsIgnoreCase(user.getLastName());
 		//@formatter:on
 
 		boolean equalPINs = false;
 
 		if (this.getPin() != null)
-			equalPINs = this.getPin().equals(u.getPin());
+			equalPINs = this.getPin().equals(user.getPin());
 		else
-			equalPINs = u.getPin() == null;
+			equalPINs = user.getPin() == null;
 
 		boolean equalBadgeIDs = false;
 
 		if (this.getBadgeID() != null)
-			equalBadgeIDs = this.getBadgeID().equals(u.getBadgeID());
+			equalBadgeIDs = this.getBadgeID().equals(user.getBadgeID());
 		else
-			equalBadgeIDs = u.getBadgeID() == null;
+			equalBadgeIDs = user.getBadgeID() == null;
 
 		return equalNames && equalPINs && equalBadgeIDs;
 	}
