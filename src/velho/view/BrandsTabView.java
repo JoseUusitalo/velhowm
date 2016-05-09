@@ -47,7 +47,7 @@ public class BrandsTabView implements GenericView
 	/**
 	 * Makes the Brands and ObservableList
 	 */
-	private ObservableList<Object> data;
+	private final ObservableList<Object> data;
 
 	/**
 	 * Adds info to Product Controller about brands

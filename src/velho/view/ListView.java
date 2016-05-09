@@ -207,7 +207,7 @@ public class ListView implements GenericView
 		/**
 		 * The button itself.
 		 */
-		private Button button;
+		private final Button button;
 
 		/**
 		 * The controller to send information to when this button is pressed.
@@ -257,7 +257,7 @@ public class ListView implements GenericView
 		/**
 		 * The button itself.
 		 */
-		private Button button;
+		private final Button button;
 
 		/**
 		 * The controller to send information to when this button is pressed.
@@ -308,7 +308,7 @@ public class ListView implements GenericView
 		/**
 		 * The button itself.
 		 */
-		private Button button;
+		private final Button button;
 
 		/**
 		 * The controller to send information to when this button is pressed.

@@ -25,7 +25,8 @@ public class SearchTabView implements GenericView
 	 * The root BorderPane for this view.
 	 */
 	private BorderPane bPane;
-	private SearchController searchController;
+
+	private final SearchController searchController;
 
 	public SearchTabView(final SearchController searchController)
 	{

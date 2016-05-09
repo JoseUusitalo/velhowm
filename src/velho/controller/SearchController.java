@@ -23,7 +23,7 @@ public class SearchController
 	/**
 	 * The view in the tab itself.
 	 */
-	private SearchTabView searchTabView;
+	private final SearchTabView searchTabView;
 
 	/**
 	 * The {@link ProductController}.

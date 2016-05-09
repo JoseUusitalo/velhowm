@@ -28,10 +28,14 @@ public class SearchView implements GenericView
 	 * The root GridPane for this view.
 	 */
 	private GridPane grid;
+
 	private final SearchController searchController;
+
 	private final ObservableList<Object> productCategories;
+
 	private final ObservableList<Object> productBrands;
-	private boolean canBeInRemovalList;
+
+	private final boolean canBeInRemovalList;
 
 	/**
 	 * @param searchController
