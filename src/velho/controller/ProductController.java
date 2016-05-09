@@ -300,7 +300,7 @@ public class ProductController implements UIActionController
 	public ProductBrand saveBrand(final String name)
 	{
 		ProductBrand productBrand = new ProductBrand(name);
-		DatabaseController.save(productBrand);
+		DatabaseController.saveOrUpdate(productBrand);
 		return productBrand;
 
 	}
@@ -317,7 +317,7 @@ public class ProductController implements UIActionController
 	public ProductCategory saveCategory(final String name, final ProductType type)
 	{
 		ProductCategory productCategory = new ProductCategory(name, type);
-		DatabaseController.save(productCategory);
+		DatabaseController.saveOrUpdate(productCategory);
 		return productCategory;
 
 	}
@@ -333,7 +333,7 @@ public class ProductController implements UIActionController
 	public ProductType saveProductType(final String name)
 	{
 		ProductType productType = new ProductType(name);
-		DatabaseController.save(productType);
+		DatabaseController.saveOrUpdate(productType);
 		return productType;
 
 	}
@@ -366,9 +366,8 @@ public class ProductController implements UIActionController
 	@SuppressWarnings("static-method")
 	public void saveBrand(final ProductBrand editBrand)
 	{
-		DatabaseController.save(editBrand);
+		DatabaseController.saveOrUpdate(editBrand);
 		// TODO Validate data
-
 	}
 
 	/**
@@ -380,7 +379,7 @@ public class ProductController implements UIActionController
 	public void saveProductType(final ProductType saveProductType)
 	{
 		// TODO Validate data
-		DatabaseController.save(saveProductType);
+		DatabaseController.saveOrUpdate(saveProductType);
 	}
 
 	/**
@@ -392,7 +391,7 @@ public class ProductController implements UIActionController
 	public void saveProductCategory(final ProductCategory saveProductCategory)
 	{
 		// TODO Need validation
-		DatabaseController.save(saveProductCategory);
+		DatabaseController.saveOrUpdate(saveProductCategory);
 	}
 
 	public Node getCategoryTab()
