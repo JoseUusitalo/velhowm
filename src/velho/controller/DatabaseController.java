@@ -39,6 +39,7 @@ import velho.model.ProductBox;
 import velho.model.ProductBoxSearchResultRow;
 import velho.model.ProductBrand;
 import velho.model.ProductCategory;
+import velho.model.ProductContainer;
 import velho.model.ProductType;
 import velho.model.RemovalList;
 import velho.model.RemovalListState;
@@ -190,8 +191,8 @@ public abstract class DatabaseController
 	 * Runs a raw SQL query on the database.
 	 *
 	 * @param sql SQL to run
-	 * @return an Object containing the appropriate data
-	 * @throws NoDatabaseLinkException
+	 * @return changed an Object containing the changed data
+	 * @throws RuntimeException
 	 */
 	private static Object runQuery(final String sql) throws UniqueKeyViolationException
 	{
@@ -380,8 +381,7 @@ public abstract class DatabaseController
 	 * @return an SQL query string
 	 */
 	@Deprecated
-	public static String sqlBuilder(final DatabaseQueryType type, final String tableName, final Map<DatabaseTable, String> joinOnCondition,
-			final String[] columns, final Map<String, Object> columnValues, final List<String> where)
+	public static String sqlBuilder(final DatabaseQueryType type, final String tableName, final Map<DatabaseTable, String> joinOnCondition, final String[] columns, final Map<String, Object> columnValues, final List<String> where)
 	{
 		final StringBuilder sb = new StringBuilder();
 
@@ -619,11 +619,11 @@ public abstract class DatabaseController
 	 * Gets an object from the database with the given database ID.
 	 *
 	 * @param objectClass the name class of the {@link AbstractDatabaseObject}
-	 * to get
+	 *            to get
 	 * @param databaseID the database ID of the object
 	 * @return the corresponding object or <code>null</code> for invalid ID
 	 * @throws HibernateException when the query failed to commit and has been
-	 * rolled back
+	 *             rolled back
 	 */
 	private static Object getByID(final Class<? extends AbstractDatabaseObject> objectClass, final int databaseID) throws HibernateException
 	{
@@ -654,7 +654,7 @@ public abstract class DatabaseController
 	 *
 	 * @param id the ordinal of the role
 	 * @return the corresponding user role object or <code>null</code> if role
-	 * was not found
+	 *         was not found
 	 */
 	public static UserRole getRoleByID(final int id)
 	{
@@ -684,10 +684,10 @@ public abstract class DatabaseController
 	 *
 	 * @param boxes list of product box objects to search from
 	 * @param wantedProductCount number of products wanted from the given
-	 * product boxes
+	 *            product boxes
 	 * @return a list of product boxes that either contains at least the wanted
-	 * number of products, or if there were not
-	 * enough products, the same list that was given
+	 *         number of products, or if there were not
+	 *         enough products, the same list that was given
 	 */
 	private static List<ProductBox> getBoxesContainingAtLeastProducts(final List<ProductBox> boxes, final Integer wantedProductCount)
 	{
@@ -750,8 +750,7 @@ public abstract class DatabaseController
 		// product count.
 		while (productCountSum < wantedProductCount)
 		{
-			DBLOG.trace("Search status | Count: " + productCountSum + " / " + wantedProductCount + " | Would Be Index: " + wantedWouldBeIndex + " | Add Index: "
-					+ addCountIndex + " / " + boxProductCount.size());
+			DBLOG.trace("Search status | Count: " + productCountSum + " / " + wantedProductCount + " | Would Be Index: " + wantedWouldBeIndex + " | Add Index: " + addCountIndex + " / " + boxProductCount.size());
 
 			// Looking for too few products, show the smallest box of that
 			// product instead.
@@ -839,8 +838,7 @@ public abstract class DatabaseController
 				else
 				{
 					DBLOG.error("Spooky untested code.");
-					DBLOG.error("Search status | Count: " + productCountSum + " / " + wantedProductCount + " | Would Be Index: " + wantedWouldBeIndex
-							+ " | Add Index: " + addCountIndex + " / " + boxProductCount.size());
+					DBLOG.error("Search status | Count: " + productCountSum + " / " + wantedProductCount + " | Would Be Index: " + wantedWouldBeIndex + " | Add Index: " + addCountIndex + " / " + boxProductCount.size());
 				}
 			}
 		}
@@ -860,7 +858,7 @@ public abstract class DatabaseController
 	 * @param withDeleteColumn get the delete button column?
 	 *
 	 * @return a map where the key is the column value and value is the column
-	 * name
+	 *         name
 	 */
 	public static Map<String, String> getPublicUserDataColumns(final boolean withDeleteColumn)
 	{
@@ -883,7 +881,7 @@ public abstract class DatabaseController
 	 * @param withDeleteColumn get the delete button column?
 	 *
 	 * @return a map where the key is the column value and value is the column
-	 * name
+	 *         name
 	 */
 	public static Map<String, String> getProductDataColumns(final boolean withAddColumn, final boolean withDeleteColumn)
 	{
@@ -909,7 +907,7 @@ public abstract class DatabaseController
 	 * objects in table views.
 	 *
 	 * @return a map where the key is the column value and value is the column
-	 * name
+	 *         name
 	 */
 	public static Map<String, String> getRemovalListDataColumns()
 	{
@@ -934,7 +932,7 @@ public abstract class DatabaseController
 	 * @param withRemoveColumn get the remove button column?
 	 *
 	 * @return a map where the key is the column value and value is the column
-	 * name
+	 *         name
 	 */
 	public static Map<String, String> getProductSearchDataColumns(final boolean withAddColumn, final boolean withRemoveColumn)
 	{
@@ -963,7 +961,7 @@ public abstract class DatabaseController
 	 * objects in table views.
 	 *
 	 * @return a map where the key is the column value and value is the column
-	 * name
+	 *         name
 	 */
 	public static Map<String, String> getManifestDataColumns()
 	{
@@ -984,9 +982,9 @@ public abstract class DatabaseController
 	 *
 	 * @param id the product type database ID
 	 * @return the corresponding product type object or <code>null</code> for
-	 * invalid ID
+	 *         invalid ID
 	 * @throws HibernateException when the query failed to commit and has been
-	 * rolled back
+	 *             rolled back
 	 */
 	public static ProductType getProductTypeByID(final int id) throws HibernateException
 	{
@@ -999,9 +997,9 @@ public abstract class DatabaseController
 	 *
 	 * @param id the product category database ID
 	 * @return the corresponding product category object or <code>null</code>
-	 * for invalid ID
+	 *         for invalid ID
 	 * @throws HibernateException when the query failed to commit and has been
-	 * rolled back
+	 *             rolled back
 	 */
 	public static ProductCategory getProductCategoryByID(final int id) throws HibernateException
 	{
@@ -1013,9 +1011,9 @@ public abstract class DatabaseController
 	 *
 	 * @param id the product brand database ID
 	 * @return the corresponding product brand object or <code>null</code> for
-	 * invalid ID
+	 *         invalid ID
 	 * @throws HibernateException when the query failed to commit and has been
-	 * rolled back
+	 *             rolled back
 	 */
 	public static ProductBrand getProductBrandByID(final int id) throws HibernateException
 	{
@@ -1047,7 +1045,7 @@ public abstract class DatabaseController
 	 *
 	 * @param badgeID a badge ID string
 	 * @return a {@link User} object representing the authenticated user or
-	 * <code>null</code> for invalid credentials
+	 *         <code>null</code> for invalid credentials
 	 * @see User#isValidBadgeID(String)
 	 */
 	public static User authenticateBadgeID(final String badgeID)
@@ -1084,7 +1082,7 @@ public abstract class DatabaseController
 	 *
 	 * @param pin is a PIN string
 	 * @return a {@link User} object representing the authenticated user or
-	 * <code>null</code> for invalid credentials
+	 *         <code>null</code> for invalid credentials
 	 * @see User#isValidPIN(String)
 	 */
 	public static User authenticatePIN(final String firstName, final String lastName, final String pin)
@@ -1126,9 +1124,9 @@ public abstract class DatabaseController
 	 *
 	 * @param id the product database ID
 	 * @return the corresponding product object or <code>null</code> for invalid
-	 * ID
+	 *         ID
 	 * @throws HibernateException when the query failed to commit and has been
-	 * rolled back
+	 *             rolled back
 	 */
 	public static Product getProductByID(final int id) throws HibernateException
 	{
@@ -1140,9 +1138,9 @@ public abstract class DatabaseController
 	 *
 	 * @param id the product box database ID
 	 * @return the corresponding product box object or <code>null</code> for
-	 * invalid ID
+	 *         invalid ID
 	 * @throws HibernateException when the query failed to commit and has been
-	 * rolled back
+	 *             rolled back
 	 */
 	public static ProductBox getProductBoxByID(final int id) throws HibernateException
 	{
@@ -1154,7 +1152,7 @@ public abstract class DatabaseController
 	 *
 	 * @param id the user database ID (use a negative number to denote a debug account)
 	 * @return the corresponding user object, <code>null</code> if a user with that ID does not exist, or the currently
-	 * logged in user (i.e. debug user) if the ID was negative
+	 *         logged in user (i.e. debug user) if the ID was negative
 	 * @throws HibernateException when the query failed to commit and has been rolled back
 	 */
 	public static User getUserByID(final int id) throws HibernateException
@@ -1177,7 +1175,7 @@ public abstract class DatabaseController
 	 *
 	 * @param name unique name of the product
 	 * @return the wanted product or <code>null</code> if the product is not
-	 * present in the database
+	 *         present in the database
 	 */
 	public static Product getProductByName(final String name)
 	{
@@ -1211,9 +1209,9 @@ public abstract class DatabaseController
 	 *
 	 * @param id the shelf database ID
 	 * @return the corresponding shelf object or <code>null</code> for invalid
-	 * ID
+	 *         ID
 	 * @throws HibernateException when the query failed to commit and has been
-	 * rolled back
+	 *             rolled back
 	 */
 	public static Shelf getShelfByID(final int id) throws HibernateException
 	{
@@ -1225,9 +1223,9 @@ public abstract class DatabaseController
 	 *
 	 * @param id the shelf level database ID
 	 * @return the corresponding shelf object or <code>null</code> for invalid
-	 * ID
+	 *         ID
 	 * @throws HibernateException when the query failed to commit and has been
-	 * rolled back
+	 *             rolled back
 	 */
 	public static ShelfLevel getShelfLevelByID(final int id) throws HibernateException
 	{
@@ -1239,9 +1237,9 @@ public abstract class DatabaseController
 	 *
 	 * @param id the shelf slot database ID
 	 * @return the corresponding shelf object or <code>null</code> for invalid
-	 * ID
+	 *         ID
 	 * @throws HibernateException when the query failed to commit and has been
-	 * rolled back
+	 *             rolled back
 	 */
 	public static ShelfSlot getShelfSlotByID(final int id) throws HibernateException
 	{
@@ -1253,9 +1251,9 @@ public abstract class DatabaseController
 	 *
 	 * @param id the removal list database ID
 	 * @return the corresponding removal list object or <code>null</code> for
-	 * invalid ID
+	 *         invalid ID
 	 * @throws HibernateException when the query failed to commit and has been
-	 * rolled back
+	 *             rolled back
 	 */
 	public static RemovalList getRemovalListByID(final int id) throws HibernateException
 	{
@@ -1267,9 +1265,9 @@ public abstract class DatabaseController
 	 *
 	 * @param id the manifest database ID
 	 * @return the corresponding manifest object or <code>null</code> for
-	 * invalid ID
+	 *         invalid ID
 	 * @throws HibernateException when the query failed to commit and has been
-	 * rolled back
+	 *             rolled back
 	 */
 	public static Manifest getManifestByID(final int id) throws HibernateException
 	{
@@ -1306,8 +1304,8 @@ public abstract class DatabaseController
 	 * Searches the database for product boxes of the specified size.
 	 *
 	 * @param productData a map of data to search for where the key is the
-	 * product box
-	 * database ID and the value is the number of products
+	 *            product box
+	 *            database ID and the value is the number of products
 	 * @throws NoDatabaseLinkException
 	 */
 	@SuppressWarnings("unchecked")
@@ -1410,11 +1408,10 @@ public abstract class DatabaseController
 	 * @param where conditions in SQL format
 	 * @param joins SQL join statements
 	 * @return a list of found product boxes as
-	 * {@link ProductBoxSearchResultRow} objects
+	 *         {@link ProductBoxSearchResultRow} objects
 	 * @throws NoDatabaseLinkException
 	 */
-	public static List<ProductBoxSearchResultRow> searchProductBox(final String identifier, final int productCount, final ProductBrand brand,
-			final ProductCategory category, final LocalDate expiresStart, final LocalDate expiresEnd, final boolean canBeInRemovalList)
+	public static List<ProductBoxSearchResultRow> searchProductBox(final String identifier, final int productCount, final ProductBrand brand, final ProductCategory category, final LocalDate expiresStart, final LocalDate expiresEnd, final boolean canBeInRemovalList)
 	{
 		final List<ProductBoxSearchResultRow> foundProducts = FXCollections.observableArrayList();
 
@@ -1576,8 +1573,7 @@ public abstract class DatabaseController
 		if (DBLOG.isDebugEnabled())
 			DBLOG.debug(logsb.toString());
 
-		@SuppressWarnings("unchecked")
-		List<ProductBox> result = query.list();
+		@SuppressWarnings("unchecked") List<ProductBox> result = query.list();
 
 		try
 		{
@@ -1606,9 +1602,9 @@ public abstract class DatabaseController
 	 *
 	 * @param id the removal list state database ID
 	 * @return the corresponding removal list state object or <code>null</code>
-	 * for invalid ID
+	 *         for invalid ID
 	 * @throws HibernateException when the query failed to commit and has been
-	 * rolled back
+	 *             rolled back
 	 */
 	public static RemovalListState getRemovalListStateByID(final int id) throws HibernateException
 	{
@@ -1621,9 +1617,9 @@ public abstract class DatabaseController
 	 *
 	 * @param id the manifest state database ID
 	 * @return the corresponding manifest state object or <code>null</code> for
-	 * invalid ID
+	 *         invalid ID
 	 * @throws HibernateException when the query failed to commit and has been
-	 * rolled back
+	 *             rolled back
 	 */
 	public static ManifestState getManifestStateByID(final int id) throws HibernateException
 	{
@@ -1636,9 +1632,9 @@ public abstract class DatabaseController
 	 *
 	 * @param id the removal platform database ID
 	 * @return the corresponding removal platform object or <code>null</code>
-	 * for invalid ID
+	 *         for invalid ID
 	 * @throws HibernateException when the query failed to commit and has been
-	 * rolled back
+	 *             rolled back
 	 */
 	public static RemovalPlatform getRemovalPlatformByID(final int id)
 	{
@@ -1698,7 +1694,8 @@ public abstract class DatabaseController
 	 *
 	 * @param object object to delete
 	 * @throws HibernateException when the object was not deleted
-	 * @throws ConstraintViolationException when the object could not be deleted because it is referenced by a <code>not-null</code> property
+	 * @throws ConstraintViolationException when the object could not be deleted because it is referenced by a
+	 *             <code>not-null</code> property
 	 */
 	private static void delete(final Object object) throws HibernateException, ConstraintViolationException
 	{
@@ -1728,8 +1725,9 @@ public abstract class DatabaseController
 	 * Deletes a user from the database.
 	 *
 	 * @param user user to be deleted
-	 * @return <code>true</code> if the specified user was deleted, <code>false</code> if the object is being referenced by another object that cannot have a
-	 * null value in that property
+	 * @return <code>true</code> if the specified user was deleted, <code>false</code> if the object is being referenced
+	 *         by another object that cannot have a
+	 *         null value in that property
 	 */
 	public static boolean deleteUser(final User user)
 	{
@@ -1750,8 +1748,9 @@ public abstract class DatabaseController
 	 * Deletes a removal list from the database.
 	 *
 	 * @param list removal list to be deleted
-	 * @return <code>true</code> if the specified removal list was deleted, <code>false</code> if the object is being referenced by another object that cannot
-	 * have a null value in that property
+	 * @return <code>true</code> if the specified removal list was deleted, <code>false</code> if the object is being
+	 *         referenced by another object that cannot
+	 *         have a null value in that property
 	 */
 	public static boolean deleteRemovalList(final RemovalList list) throws HibernateException, ConstraintViolationException
 	{
@@ -1781,8 +1780,9 @@ public abstract class DatabaseController
 	 * Deletes a product from the database.
 	 *
 	 * @param product product to be deleted
-	 * @return <code>true</code> if the specified product was deleted, <code>false</code> if the object is being referenced by another object that cannot have a
-	 * null value in that property
+	 * @return <code>true</code> if the specified product was deleted, <code>false</code> if the object is being
+	 *         referenced by another object that cannot have a
+	 *         null value in that property
 	 */
 	public static boolean deleteProduct(final Product product)
 	{
@@ -1803,8 +1803,9 @@ public abstract class DatabaseController
 	 * Deletes a product brand from the database.
 	 *
 	 * @param brand brand to be deleted
-	 * @return <code>true</code> if the specified brand was deleted, <code>false</code> if the object is being referenced by another object that cannot have a
-	 * null value in that property
+	 * @return <code>true</code> if the specified brand was deleted, <code>false</code> if the object is being
+	 *         referenced by another object that cannot have a
+	 *         null value in that property
 	 */
 	public static boolean deleteProductBrand(final ProductBrand brand)
 	{
@@ -1825,8 +1826,9 @@ public abstract class DatabaseController
 	 * Deletes a product category from the database.
 	 *
 	 * @param category category to be deleted
-	 * @return <code>true</code> if the specified category was deleted, <code>false</code> if the object is being referenced by another object that cannot have
-	 * a null value in that property
+	 * @return <code>true</code> if the specified category was deleted, <code>false</code> if the object is being
+	 *         referenced by another object that cannot have
+	 *         a null value in that property
 	 */
 	public static boolean deleteProductCategory(final ProductCategory category)
 	{
@@ -1847,8 +1849,9 @@ public abstract class DatabaseController
 	 * Deletes a product box from the database.
 	 *
 	 * @param box box to be deleted
-	 * @return <code>true</code> if the specified box was deleted, <code>false</code> if the object is being referenced by another object that cannot have a
-	 * null value in that property
+	 * @return <code>true</code> if the specified box was deleted, <code>false</code> if the object is being referenced
+	 *         by another object that cannot have a
+	 *         null value in that property
 	 */
 	public static boolean deleteProductBox(final ProductBox box)
 	{
@@ -1869,8 +1872,9 @@ public abstract class DatabaseController
 	 * Deletes a product type from the database.
 	 *
 	 * @param type type to be deleted
-	 * @return <code>true</code> if the specified type was deleted, <code>false</code> if the object is being referenced by another object that cannot have a
-	 * null value in that property
+	 * @return <code>true</code> if the specified type was deleted, <code>false</code> if the object is being referenced
+	 *         by another object that cannot have a
+	 *         null value in that property
 	 */
 	public static boolean deleteProductType(final ProductType type)
 	{
@@ -1977,15 +1981,14 @@ public abstract class DatabaseController
 	 * @param className the name of the Java class of the objects to get
 	 * @return a list of objects
 	 * @throws HibernateException when the query failed to commit and has been
-	 * rolled back
+	 *             rolled back
 	 */
 	private static List<Object> getAll(final String className) throws HibernateException
 	{
 
 		SESSION_FACTORY.getCurrentSession().beginTransaction();
 
-		@SuppressWarnings("unchecked")
-		final List<Object> result = SESSION_FACTORY.getCurrentSession().createQuery("from " + className).list();
+		@SuppressWarnings("unchecked") final List<Object> result = SESSION_FACTORY.getCurrentSession().createQuery("from " + className).list();
 
 		try
 		{
@@ -2015,7 +2018,7 @@ public abstract class DatabaseController
 	 *
 	 * @return a list of products in the database currently on shelves
 	 * @throws HibernateException when the query failed to commit and has been
-	 * rolled back
+	 *             rolled back
 	 */
 	public static ObservableList<Object> getAllProductBoxes() throws HibernateException
 	{
@@ -2036,8 +2039,7 @@ public abstract class DatabaseController
 		// Transaction is created and closed automatically with the session.
 		session.beginTransaction();
 
-		@SuppressWarnings("unchecked")
-		final List<String> result = session.createQuery("select badgeID from User where badgeID is not null").list();
+		@SuppressWarnings("unchecked") final List<String> result = session.createQuery("select badgeID from User where badgeID is not null").list();
 
 		session.close();
 
@@ -2049,7 +2051,7 @@ public abstract class DatabaseController
 	 *
 	 * @return a list of removal platforms in the database
 	 * @throws HibernateException when the query failed to commit and has been
-	 * rolled back
+	 *             rolled back
 	 */
 	public static ObservableList<Object> getAllRemovalPlatforms() throws HibernateException
 	{
@@ -2063,7 +2065,7 @@ public abstract class DatabaseController
 	 *
 	 * @return a list of shelves in the database
 	 * @throws HibernateException when the query failed to commit and has been
-	 * rolled back
+	 *             rolled back
 	 */
 	public static ObservableList<Object> getAllShelves() throws HibernateException
 	{
@@ -2078,7 +2080,7 @@ public abstract class DatabaseController
 	 *
 	 * @return a list of shelf levels in the database
 	 * @throws HibernateException when the query failed to commit and has been
-	 * rolled back
+	 *             rolled back
 	 */
 	public static List<Object> getAllShelfLevels()
 	{
@@ -2090,7 +2092,7 @@ public abstract class DatabaseController
 	 *
 	 * @return a list of shelf slots in the database
 	 * @throws HibernateException when the query failed to commit and has been
-	 * rolled back
+	 *             rolled back
 	 */
 	public static List<Object> getAllShelfSlots()
 	{
@@ -2102,7 +2104,7 @@ public abstract class DatabaseController
 	 *
 	 * @return a list of removal lists in the database
 	 * @throws HibernateException when the query failed to commit and has been
-	 * rolled back
+	 *             rolled back
 	 */
 	public static ObservableList<Object> getAllRemovalLists() throws HibernateException
 	{
@@ -2117,7 +2119,7 @@ public abstract class DatabaseController
 	 *
 	 * @return a list of users in the database
 	 * @throws HibernateException when the query failed to commit and has been
-	 * rolled back
+	 *             rolled back
 	 */
 	public static ObservableList<Object> getAllUsers() throws HibernateException
 	{
@@ -2138,7 +2140,7 @@ public abstract class DatabaseController
 	 *
 	 * @return a list of products in the database currently on shelves
 	 * @throws HibernateException when the query failed to commit and has been
-	 * rolled back
+	 *             rolled back
 	 */
 	public static ObservableList<Object> getAllProducts() throws HibernateException
 	{
@@ -2153,7 +2155,7 @@ public abstract class DatabaseController
 	 *
 	 * @return an {@link ObservableList} of all product categories
 	 * @throws HibernateException when the query failed to commit and has been
-	 * rolled back
+	 *             rolled back
 	 */
 	public static ObservableList<Object> getAllProductCategories() throws HibernateException
 	{
@@ -2168,7 +2170,7 @@ public abstract class DatabaseController
 	 *
 	 * @return an {@link ObservableList} of all product brands
 	 * @throws HibernateException when the query failed to commit and has been
-	 * rolled back
+	 *             rolled back
 	 */
 	public static ObservableList<Object> getAllProductBrands() throws HibernateException
 	{
