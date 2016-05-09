@@ -17,7 +17,7 @@ import velho.controller.database.DatabaseController;
 import velho.model.interfaces.GenericView;
 
 /**
- * @author Edward Puustinen
+ * @author Joona Silvennoinen
  */
 public class SearchTabView implements GenericView
 {
@@ -26,8 +26,16 @@ public class SearchTabView implements GenericView
 	 */
 	private BorderPane bPane;
 
-	private final SearchController searchController;
+	/**
+	 * Calls SearchControllers
+	 */
+	private SearchController searchController;
 
+	/**
+	 * Gets the information to SearchTabView form SearchController
+	 *
+	 * @param searchController
+	 */
 	public SearchTabView(final SearchController searchController)
 	{
 		this.searchController = searchController;

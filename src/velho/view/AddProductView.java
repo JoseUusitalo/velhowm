@@ -145,7 +145,7 @@ public class AddProductView implements GenericView
 				@Override
 				public void handle(final ActionEvent event)
 				{
-					productController.showList();
+					// productController.showList();
 					uiController.selectTab(LocalizationController.getString("productListTabName"));
 				}
 			});

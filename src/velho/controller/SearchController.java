@@ -53,13 +53,11 @@ public class SearchController
 	 */
 	@SuppressWarnings("static-method")
 
-	public void productBoxSearch(final boolean canBeInRemovalList, final String identifier, final Integer productCount, final Object brand,
-			final Object category, final LocalDate expiresStart, final LocalDate expiresEnd)
+	public void productBoxSearch(final boolean canBeInRemovalList, final String identifier, final Integer productCount, final Object brand, final Object category, final LocalDate expiresStart, final LocalDate expiresEnd)
 	{
 		try
 		{
-			DatabaseController.searchProductBox(identifier, productCount.intValue(), (ProductBrand) brand, (ProductCategory) category, expiresStart, expiresEnd,
-					canBeInRemovalList);
+			DatabaseController.searchProductBox(identifier, productCount.intValue(), (ProductBrand) brand, (ProductCategory) category, expiresStart, expiresEnd, canBeInRemovalList);
 		}
 		catch (Exception e)
 		{

@@ -42,8 +42,9 @@ public class DebugController
 	private final Random random;
 
 	/**
-	 * @param removalPlatformController
-	 * @throws NoDatabaseLinkException
+	 * DebugController should call the RemovalPlatform
+	 *
+	 * @param removalPlatformController removalPlatformController so that it can be called on the DebugController
 	 */
 	public DebugController(final RemovalPlatformController removalPlatformController)
 	{
@@ -74,7 +75,7 @@ public class DebugController
 	/**
 	 * Forcibly logs the user in with the specified role.
 	 *
-	 * @param userRoleName role to log in as
+	 * @param role role to log in as
 	 */
 	public void login(final UserRole role)
 	{
@@ -85,7 +86,7 @@ public class DebugController
 	/**
 	 * Forcibly logs the user in with a badge number.
 	 *
-	 * @param userRoleName role to log in as
+	 * @param badgeString badgeString is an alternative way to log in as
 	 */
 	public void login(final String badgeString)
 	{

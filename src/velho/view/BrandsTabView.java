@@ -7,6 +7,7 @@ import javafx.event.ActionEvent;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
+import javafx.scene.control.Label;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableColumn.CellEditEvent;
@@ -118,6 +119,7 @@ public class BrandsTabView implements GenericView
 			});
 			table.getColumns().add(deleteColumn);
 
+			final Label brandLabel = new Label("Brand Name: ");
 			final TextField brandName = new TextField();
 			brandName.setPromptText(LocalizationController.getString("brandNamePromtText"));
 			brandName.setMaxWidth(nameColumn.getPrefWidth());
@@ -130,8 +132,9 @@ public class BrandsTabView implements GenericView
 				productController.saveBrand(saveBrand);
 			});
 
-			hbox.getChildren().addAll(brandName, addButton);
-			hbox.setSpacing(3);
+			hbox.getChildren().addAll(brandLabel, brandName, addButton);
+			hbox.setSpacing(10);
+			hbox.setAlignment(Pos.CENTER_LEFT);
 
 			vbox = new VBox();
 			vbox.setSpacing(5);
@@ -146,7 +149,7 @@ public class BrandsTabView implements GenericView
 	/**
 	 *
 	 * @author Edward
-	 * Enables editing a cell, nameley the textField
+	 *         Enables editing a cell, nameley the textField
 	 */
 	class EditingCell extends TableCell<Object, String>
 	{

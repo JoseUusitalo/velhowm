@@ -7,6 +7,7 @@ import javafx.event.ActionEvent;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
+import javafx.scene.control.Label;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableColumn.CellEditEvent;
@@ -97,6 +98,7 @@ public class ProductTypesTabView implements GenericView
 			});
 			table.getColumns().add(deleteColumn);
 
+			final Label typeLabel = new Label("Type Name: ");
 			final TextField productTypeName = new TextField();
 			productTypeName.setPromptText(LocalizationController.getString("productTypeNamePromtText"));
 			productTypeName.setMaxWidth(nameColumn.getPrefWidth());
@@ -109,8 +111,9 @@ public class ProductTypesTabView implements GenericView
 				productController.saveProductType(saveProductType);
 			});
 
-			hbox.getChildren().addAll(productTypeName, addButton);
-			hbox.setSpacing(3);
+			hbox.getChildren().addAll(typeLabel, productTypeName, addButton);
+			hbox.setSpacing(10);
+			hbox.setAlignment(Pos.CENTER_LEFT);
 
 			vbox = new VBox();
 			vbox.setSpacing(5);

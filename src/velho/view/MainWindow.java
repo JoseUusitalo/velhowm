@@ -67,15 +67,21 @@ public class MainWindow extends Application implements GenericView
 	private static final Logger SYSLOG = Logger.getLogger(MainWindow.class.getName());
 
 	/**
+	 * Enable or disable debug features.
+	 */
+	public static final boolean DEBUG_MODE = true;
+
+	/**
+	 * Enable or disable showing windows. DEBUG_MODE must be <code>true</code>
+	 * for this to affect anything.
+	 */
+	public static final boolean SHOW_WINDOWS = true;
+
+	/**
 	 * Enable TRACE level logging. DEBUG_MODE must be <code>true</code> for this
 	 * to affect anything.
 	 */
 	public static final boolean SHOW_TRACE = false;
-
-	/**
-	 * Enable or disable debug features.
-	 */
-	public static final boolean DEBUG_MODE = true;
 
 	/**
 	 * Skips the entire main application code. DEBUG_MODE must be
@@ -420,8 +426,7 @@ public class MainWindow extends Application implements GenericView
 			platformStatus.setAlignment(Pos.CENTER_LEFT);
 
 			final HBox userStatus = new HBox(10);
-			final Label userName = new Label(LocalizationController.getCompoundString("helloUserMessage", LoginController.getCurrentUser().getRoleName(),
-					LoginController.getCurrentUser().getFullName()));
+			final Label userName = new Label(LocalizationController.getCompoundString("helloUserMessage", LoginController.getCurrentUser().getRoleName(), LoginController.getCurrentUser().getFullName()));
 			final Button logoutButton = new Button(LocalizationController.getString("logOutButton"));
 			logoutButton.setPrefHeight(5.0);
 			userStatus.getChildren().addAll(userName, logoutButton);
@@ -607,7 +612,8 @@ public class MainWindow extends Application implements GenericView
 		SYSLOG.info("Main application code skipped.");
 
 		// It works.
-		// System.out.println("id:" + new AssignedIdentifierGenerator().generate((SessionImplementor) HibernateSessionFactory.getInstance().getCurrentSession(),
+		// System.out.println("id:" + new AssignedIdentifierGenerator().generate((SessionImplementor)
+		// HibernateSessionFactory.getInstance().getCurrentSession(),
 		// new User(120, "new", "thing", "111111", null, UserRole.ADMINISTRATOR)));
 	}
 

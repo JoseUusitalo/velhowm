@@ -7,6 +7,8 @@ import javafx.event.ActionEvent;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
+import javafx.scene.control.ComboBox;
+import javafx.scene.control.Label;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableColumn.CellEditEvent;
@@ -66,6 +68,8 @@ public class CategoriesTabView implements GenericView
 
 	/**
 	 * VBox grid view make it visible
+	 *
+	 * @param productList
 	 *
 	 * @return the VBox
 	 */
@@ -134,20 +138,28 @@ public class CategoriesTabView implements GenericView
 			});
 			table.getColumns().add(deleteColumn);
 
+			final Label categoryLabel = new Label("Category Name: ");
 			final TextField categoryName = new TextField();
 			categoryName.setPromptText(LocalizationController.getString("categoryNamePromtText"));
 			categoryName.setMaxWidth(nameColumn.getPrefWidth());
 			final Button addButton = new Button(LocalizationController.getString("buttonCreate"));
+
+			final Label typeLabel = new Label("Type: ");
+			final ComboBox<Object> categoryType = new ComboBox<Object>();
+			categoryType.getItems().addAll(cbValues);
+			categoryType.getSelectionModel().selectFirst();
+
+			hbox.getChildren().addAll(categoryLabel, categoryName, typeLabel, categoryType, addButton);
+			hbox.setSpacing(10);
+			hbox.setAlignment(Pos.CENTER_LEFT);
+
 			addButton.setOnAction((final ActionEvent e) ->
 			{
-				final ProductCategory saveCategory = new ProductCategory(categoryName.getText());
+				final ProductCategory saveCategory = new ProductCategory(categoryName.getText(), (ProductType) categoryType.getValue());
 				data.add(saveCategory);
 				categoryName.clear();
 				productController.saveProductCategory(saveCategory);
 			});
-
-			hbox.getChildren().addAll(categoryName, addButton);
-			hbox.setSpacing(3);
 
 			vbox = new VBox();
 			vbox.setSpacing(5);
@@ -162,7 +174,7 @@ public class CategoriesTabView implements GenericView
 	/**
 	 *
 	 * @author Edward
-	 * Enables editing a cell, nameley the textField
+	 *         Enables editing a cell, nameley the textField
 	 */
 	class EditingCell extends TableCell<Object, Object>
 	{
