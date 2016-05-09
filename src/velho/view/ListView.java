@@ -102,7 +102,8 @@ public class ListView implements GenericView
 						@Override
 						public TableCell<Object, String> call(final TableColumn<Object, String> celldata)
 						{
-							final TableCellDeleteButton button = new TableCellDeleteButton(parentController, (LocalizationController.getString("buttonDelete")));
+							final TableCellDeleteButton button = new TableCellDeleteButton(parentController,
+									(LocalizationController.getString("buttonDelete")));
 							button.setAlignment(Pos.CENTER);
 							return button;
 						}
@@ -240,10 +241,10 @@ public class ListView implements GenericView
 			super.updateItem(string, empty);
 
 			// Display button only if the row is not empty.
-			if (!empty)
-				setGraphic(button);
-			else
+			if (empty)
 				setGraphic(null);
+			else
+				setGraphic(button);
 		}
 	}
 
@@ -291,10 +292,10 @@ public class ListView implements GenericView
 			super.updateItem(string, empty);
 
 			// Display button only if the row is not empty.
-			if (!empty)
-				setGraphic(button);
-			else
+			if (empty)
 				setGraphic(null);
+			else
+				setGraphic(button);
 		}
 	}
 
@@ -342,10 +343,10 @@ public class ListView implements GenericView
 			super.updateItem(string, empty);
 
 			// Display button only if the row is not empty.
-			if (!empty)
-				setGraphic(button);
-			else
+			if (empty)
 				setGraphic(null);
+			else
+				setGraphic(button);
 		}
 	}
 

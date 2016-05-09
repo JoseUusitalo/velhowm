@@ -497,19 +497,20 @@ public abstract class DatabaseController
 	 */
 	public static void unlink()
 	{
-		if (connectionPool != null)
+		if (connectionPool == null)
+		{
+			DBLOG.debug("No database link to unlink.");
+		}
+		else
 		{
 			connectionPool.dispose();
 			connectionPool = null;
 			DBLOG.info("Database unlinked.");
 		}
-		else
-			DBLOG.debug("No database link to unlink.");
 	}
 
 	/*
-	 * -------------------------------- PRIVATE GETTER METHODS
-	 * --------------------------------
+	 * -------------------------------- PRIVATE GETTER METHODS --------------------------------
 	 */
 
 	/**

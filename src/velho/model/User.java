@@ -152,17 +152,25 @@ public class User extends AbstractDatabaseObject
 
 		boolean equalPINs = false;
 
-		if (this.getPin() != null)
-			equalPINs = this.getPin().equals(user.getPin());
-		else
+		if (this.getPin() == null)
+		{
 			equalPINs = user.getPin() == null;
+		}
+		else
+		{
+			equalPINs = this.getPin().equals(user.getPin());
+		}
 
 		boolean equalBadgeIDs = false;
 
 		if (this.getBadgeID() != null)
-			equalBadgeIDs = this.getBadgeID().equals(user.getBadgeID());
-		else
+		{
 			equalBadgeIDs = user.getBadgeID() == null;
+		}
+		else
+		{
+			equalBadgeIDs = this.getBadgeID().equals(user.getBadgeID());
+		}
 
 		return equalNames && equalPINs && equalBadgeIDs;
 	}
