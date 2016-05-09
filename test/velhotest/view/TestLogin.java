@@ -1,5 +1,8 @@
 package velhotest.view;
 
+import static org.junit.Assert.assertEquals;
+
+import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -49,6 +52,16 @@ public class TestLogin extends GuiTest
 		DatabaseController.loadSampleData();
 	}
 
+	/**
+	 * Unlinks from both databases.
+	 */
+	@AfterClass
+	public static final void unlinkDatabases() throws Exception
+	{
+		DatabaseController.unlink();
+		LogDatabaseController.unlink();
+	}
+
 	@Before
 	public void initComponents()
 	{
@@ -62,5 +75,6 @@ public class TestLogin extends GuiTest
 	{
 		click(authenticationStringField);
 		type("jeejee");
+		assertEquals("jeejee", (authenticationStringField.getText()));
 	}
 }

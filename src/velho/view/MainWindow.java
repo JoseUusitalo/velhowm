@@ -82,7 +82,7 @@ public class MainWindow extends Application implements GenericView
 	 * Enable TRACE level logging. DEBUG_MODE must be <code>true</code> for this
 	 * to affect anything.
 	 */
-	public static final boolean SHOW_TRACE = false;
+	public static final boolean SHOW_TRACE = true;
 
 	/**
 	 * Skips the entire main application code. DEBUG_MODE must be
