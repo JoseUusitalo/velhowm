@@ -119,8 +119,7 @@ public class UserController implements UIActionController
 	 * @return the created user or <code>null</code> if data was invalid or user
 	 *         already existed in the database
 	 */
-	public User createUser(final String badgeID, final String userPIN, final String userFirstName, final String userLastName, final UserRole userRole,
-			final boolean showPopup)
+	public User createUser(final String badgeID, final String userPIN, final String userFirstName, final String userLastName, final UserRole userRole, final boolean showPopup)
 	{
 		if (validateUserData(badgeID, userPIN, userFirstName, userLastName, userRole))
 		{
@@ -211,16 +210,21 @@ public class UserController implements UIActionController
 			return false;
 		}
 
-		if (DatabaseController.deleteUser(user))
+		if (PopupController.confirmation(LocalizationController.getString("yourAccountDeletationConfirmationCheckPopUp")))
 		{
-			USRLOG.debug("User removed: " + user.getFullDetails());
-			PopupController.info(LocalizationController.getString("userRemovedInfoPopUp") + user.getFullDetails());
-			return true;
+			if (DatabaseController.deleteUser(user))
+			{
+				USRLOG.debug("User removed: " + user.getFullDetails());
+				PopupController.info(LocalizationController.getString("userRemovedInfoPopUp") + user.getFullDetails());
+				return true;
+			}
+
+			USRLOG.debug("Failed to delete user: " + user.getFullDetails());
+			PopupController.info("Failed to delete user: " + user.getFullDetails());
+
+			return false;
 		}
-
-		USRLOG.debug("Failed to delete user: " + user.getFullDetails());
-		PopupController.info("Failed to delete user: " + user.getFullDetails());
-
+		USRLOG.trace("Cancelled deletion confirmation.");
 		return false;
 	}
 
@@ -261,7 +265,8 @@ public class UserController implements UIActionController
 	}
 
 	/**
-	 * Gets a set of invalid {@link User} objects in the specified list of users.
+	 * Gets a set of invalid {@link User} objects in the specified list of
+	 * users.
 	 *
 	 * @param users a list of users to be validated
 	 * @return a set of invalid users

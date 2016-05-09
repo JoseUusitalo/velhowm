@@ -145,12 +145,11 @@ public class UIController
 				mainView.addTab(LocalizationController.getString("addRemovalListsTab"), removalListController.getView());
 				mainView.addTab(LocalizationController.getString("addProductTab"), productController.getAddProductView());
 				mainView.addTab(LocalizationController.getString("addProductListTab"), productController.getTabView());
-				mainView.addTab(LocalizationController.getString("addUserListTab"), userController.getUserListView(currentUserRole));
 				mainView.addTab(LocalizationController.getString("addBrandsTab"), productController.getBrandsTab());
 				mainView.addTab(LocalizationController.getString("addCategoriesTab"), productController.getCategoryTab());
 				mainView.addTab(LocalizationController.getString("addProductTypesTab"), productController.getProductTypesTab());
 				mainView.addTab(LocalizationController.getString("addProductBoxesTab"), productController.getProductBoxesTab());
-				mainView.addTab(LocalizationController.getString("addUserListTab"), getUserListView(currentUserRole));
+				mainView.addTab(LocalizationController.getString("addUserListTab"), userController.getUserListView(currentUserRole));
 				break;
 			case GUEST:
 				break;
