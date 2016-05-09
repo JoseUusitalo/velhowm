@@ -163,7 +163,7 @@ public class User extends AbstractDatabaseObject
 
 		boolean equalBadgeIDs = false;
 
-		if (this.getBadgeID() != null)
+		if (this.getBadgeID() == null)
 		{
 			equalBadgeIDs = user.getBadgeID() == null;
 		}
