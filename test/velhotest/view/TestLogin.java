@@ -1,15 +1,18 @@
 package velhotest.view;
 
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.loadui.testfx.GuiTest;
 
 import javafx.scene.Parent;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.Region;
+import velho.controller.DatabaseController;
+import velho.controller.LogDatabaseController;
 import velho.view.MainWindow;
 
-public class TestUserInput extends GuiTest
+public class TestLogin extends GuiTest
 {
 	MainWindow app;
 	private TextField authenticationStringField;
@@ -38,8 +41,16 @@ public class TestUserInput extends GuiTest
 		}
 	}
 
+	@BeforeClass
+	public static final void init() throws Exception
+	{
+		LogDatabaseController.connectAndInitialize();
+		DatabaseController.link();
+		DatabaseController.loadSampleData();
+	}
+
 	@Before
-	public void init()
+	public void initComponents()
 	{
 		authenticationStringField = find("#authenticationStringField");
 
