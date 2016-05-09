@@ -9,6 +9,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
+import javafx.scene.control.Tooltip;
 import javafx.scene.layout.GridPane;
 import velho.controller.LocalizationController;
 import velho.controller.UIController;
@@ -73,24 +74,28 @@ public class AddUserView implements GenericView
 
 			final TextField badgeIDField = new TextField();
 			grid.add(badgeIDField, 1, 1);
+			badgeIDField.setTooltip(new Tooltip(LocalizationController.getString("tooltipBadgeIDField")));
 
 			Label pinLabel = new Label(LocalizationController.getString("PINInputFieldLabel"));
 			grid.add(pinLabel, 0, 2);
 
 			final TextField pinField = new TextField();
 			grid.add(pinField, 1, 2);
+			pinField.setTooltip(new Tooltip(LocalizationController.getString("tooltipPinField")));
 
 			Label userFirstName = new Label(LocalizationController.getString("userFirstNameFieldLabel"));
 			grid.add(userFirstName, 0, 3);
 
 			final TextField userFnameField = new TextField();
 			grid.add(userFnameField, 1, 3);
+			userFnameField.setTooltip(new Tooltip(LocalizationController.getString("tooltipFirstNameField")));
 
 			Label userLastName = new Label(LocalizationController.getString("userLastNameFieldLabel"));
 			grid.add(userLastName, 0, 4);
 
 			final TextField userLNameField = new TextField();
 			grid.add(userLNameField, 1, 4);
+			userLNameField.setTooltip(new Tooltip(LocalizationController.getString("tooltipLastNameField")));
 
 			Label userInfo = new Label(LocalizationController.getString("userRoleComboboxLabel"));
 			grid.add(userInfo, 0, 5);

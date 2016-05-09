@@ -11,6 +11,7 @@ import javafx.scene.control.Label;
 import javafx.scene.control.Spinner;
 import javafx.scene.control.SpinnerValueFactory;
 import javafx.scene.control.TextField;
+import javafx.scene.control.Tooltip;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.GridPane;
 import velho.controller.LocalizationController;
@@ -43,8 +44,7 @@ public class SearchView implements GenericView
 	 * @param productBrands
 	 * @param productCategories
 	 */
-	public SearchView(final SearchController searchController, final boolean canBeInRemovalList, final ObservableList<Object> productBrands,
-			final ObservableList<Object> productCategories)
+	public SearchView(final SearchController searchController, final boolean canBeInRemovalList, final ObservableList<Object> productBrands, final ObservableList<Object> productCategories)
 	{
 		this.searchController = searchController;
 		this.canBeInRemovalList = canBeInRemovalList;
@@ -69,6 +69,7 @@ public class SearchView implements GenericView
 			final TextField nameField = new TextField();
 			nameField.setPromptText(LocalizationController.getString("productNameorIDPromptText"));
 			grid.add(nameField, 0, 1, 2, 1);
+			nameField.setTooltip(new Tooltip(LocalizationController.getString("tooltipSearchViewSearchField")));
 
 			final Label countSpinnerLabel = new Label(LocalizationController.getString("productCountSpinnerText"));
 			countSpinnerLabel.setAlignment(Pos.CENTER);
@@ -152,8 +153,7 @@ public class SearchView implements GenericView
 						// still numbers.
 					}
 
-					searchController.productBoxSearch(canBeInRemovalList, nameField.getText(), productCountField.getValue(), brandbox.getValue(),
-							categorybox.getValue(), dpStart.getValue(), dpEnd.getValue());
+					searchController.productBoxSearch(canBeInRemovalList, nameField.getText(), productCountField.getValue(), brandbox.getValue(), categorybox.getValue(), dpStart.getValue(), dpEnd.getValue());
 				}
 			});
 			UIController.recordView(this);
