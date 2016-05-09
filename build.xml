@@ -17,6 +17,7 @@
 	<property name="dist.res.dir" location="dist/res" />
 	<property name="lib.dir" location="lib" />
 	<property name="lib.checkstyle.dir" location="lib/checkstyle" />
+	<property name="lib.pmd.rulesets.dir" location="lib/pmd/rulesets" />
 	<property name="build.dir" location="bin" />
 	<property name="build.dist.src.dir" location="bin/dist/src" />
 	<property name="build.dist.lib.dir" location="bin/dist/lib" />
@@ -74,21 +75,21 @@
 
 		<taskdef name="pmd" classname="net.sourceforge.pmd.ant.PMDTask" classpathref="pmd.classpath"/>
 
-		<pmd shortFilenames="true" rulesetfiles="rulesets/java/basic.xml,
-												 rulesets/java/clone.xml,
-												 rulesets/java/codesize.xml,
-												 rulesets/java/comments.xml,
-												 rulesets/java/design.xml,
-												 rulesets/java/empty.xml,
-												 rulesets/java/imports.xml,
-												 rulesets/java/junit.xml,
-												 rulesets/java/naming.xml,
-												 rulesets/java/strictexception.xml,
-												 rulesets/java/strings.xml,
-												 rulesets/java/sunsecure.xml,
-												 rulesets/java/typeresolution.xml,
-												 rulesets/java/unnecessary.xml,
-												 rulesets/java/unusedcode.xml">
+		<pmd shortFilenames="true" rulesetfiles="${lib.pmd.rulesets.dir}/basic.xml,
+												 ${lib.pmd.rulesets.dir}/clone.xml,
+												 ${lib.pmd.rulesets.dir}/codesize.xml,
+												 ${lib.pmd.rulesets.dir}/comments.xml,
+												 ${lib.pmd.rulesets.dir}/design.xml,
+												 ${lib.pmd.rulesets.dir}/empty.xml,
+												 ${lib.pmd.rulesets.dir}/imports.xml,
+												 ${lib.pmd.rulesets.dir}/junit.xml,
+												 ${lib.pmd.rulesets.dir}/naming.xml,
+												 ${lib.pmd.rulesets.dir}/strictexception.xml,
+												 ${lib.pmd.rulesets.dir}/strings.xml,
+												 ${lib.pmd.rulesets.dir}/sunsecure.xml,
+												 ${lib.pmd.rulesets.dir}/typeresolution.xml,
+												 ${lib.pmd.rulesets.dir}/unnecessary.xml,
+												 ${lib.pmd.rulesets.dir}/unusedcode.xml">
 			<sourceLanguage name="java" version="${target}"/>
 
 			<formatter type="xml" toFile="${report.xml.dir}/pmd_report.xml">
