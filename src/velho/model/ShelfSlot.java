@@ -216,7 +216,7 @@ public class ShelfSlot extends AbstractDatabaseObject
 	 */
 	public boolean hasFreeSpace()
 	{
-		return (productBoxes.size() < maxProductBoxes);
+		return productBoxes.size() < maxProductBoxes;
 	}
 
 	/**

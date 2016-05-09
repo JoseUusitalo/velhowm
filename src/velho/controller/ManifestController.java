@@ -232,7 +232,6 @@ public class ManifestController implements UIActionController
 	{
 		// TODO check for correct view
 		showBrowseManifestsView();
-
 	}
 
 	/**

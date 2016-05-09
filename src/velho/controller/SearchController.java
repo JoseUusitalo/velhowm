@@ -9,7 +9,7 @@ import javafx.scene.layout.BorderPane;
 import velho.controller.database.DatabaseController;
 import velho.model.ProductBrand;
 import velho.model.ProductCategory;
-import velho.view.ProductListSearch;
+import velho.view.ProductListSearchView;
 import velho.view.SearchTabView;
 import velho.view.SearchView;
 
@@ -119,7 +119,7 @@ public class SearchController
 	 */
 	public Node getProductListSearchView()
 	{
-		final ProductListSearch searchView = new ProductListSearch(this);
+		final ProductListSearchView searchView = new ProductListSearchView(this);
 		//@formatter:off
 		return searchView.getView((BorderPane) ListController.getTableView(productController,
 										  								   DatabaseController.getProductSearchDataColumns(false, false),

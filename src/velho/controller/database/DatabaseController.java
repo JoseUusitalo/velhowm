@@ -197,7 +197,7 @@ public abstract class DatabaseController
 	private static boolean databaseExists()
 	{
 		final File dbFile = new File(DB_FILEPATH);
-		return (dbFile.exists() && !dbFile.isDirectory());
+		return dbFile.exists() && !dbFile.isDirectory();
 	}
 
 	/**
@@ -689,7 +689,7 @@ public abstract class DatabaseController
 					// Does adding this box to the set still keep the product
 					// counter under the wanted amount?
 					// OR does a box that small not exist?
-					if (wantedWouldBeIndex == 0 || addCountIndex == 0 || ((productCountSum + box.getProductCount() <= wantedProductCount)))
+					if (wantedWouldBeIndex == 0 || addCountIndex == 0 || productCountSum + box.getProductCount() <= wantedProductCount)
 					{
 						// Add up the product count.
 						productCountSum += box.getProductCount();

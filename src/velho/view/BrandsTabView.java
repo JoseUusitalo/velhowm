@@ -111,7 +111,7 @@ public class BrandsTabView implements GenericView
 				@Override
 				public TableCell<Object, String> call(final TableColumn<Object, String> tcolumn)
 				{
-					final TableCellDeleteButton button = new TableCellDeleteButton(productController, (LocalizationController.getString("buttonDelete")));
+					final TableCellDeleteButton button = new TableCellDeleteButton(productController, LocalizationController.getString("buttonDelete"));
 					button.setAlignment(Pos.CENTER);
 					return button;
 				}
@@ -146,7 +146,7 @@ public class BrandsTabView implements GenericView
 	/**
 	 *
 	 * @author Edward
-	 *         Enables editing a cell, nameley the textField
+	 * Enables editing a cell, nameley the textField
 	 */
 	class EditingCell extends TableCell<Object, String>
 	{

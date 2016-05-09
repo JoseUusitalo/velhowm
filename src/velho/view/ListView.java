@@ -102,8 +102,7 @@ public class ListView implements GenericView
 						@Override
 						public TableCell<Object, String> call(final TableColumn<Object, String> celldata)
 						{
-							final TableCellDeleteButton button = new TableCellDeleteButton(parentController,
-									(LocalizationController.getString("buttonDelete")));
+							final TableCellDeleteButton button = new TableCellDeleteButton(parentController, LocalizationController.getString("buttonDelete"));
 							button.setAlignment(Pos.CENTER);
 							return button;
 						}
@@ -179,7 +178,7 @@ public class ListView implements GenericView
 						@Override
 						public TableCell<Object, String> call(final TableColumn<Object, String> celldata)
 						{
-							final TableCellViewButton button = new TableCellViewButton(parentController, (LocalizationController.getString("buttonView")));
+							final TableCellViewButton button = new TableCellViewButton(parentController, LocalizationController.getString("buttonView"));
 							button.setAlignment(Pos.CENTER);
 							return button;
 						}
