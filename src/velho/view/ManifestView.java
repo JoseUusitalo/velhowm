@@ -31,12 +31,12 @@ public class ManifestView implements GenericView
 	/**
 	 * The {@link ManifestController}.
 	 */
-	private ManifestController manifestController;
+	private final ManifestController manifestController;
 
 	/**
 	 * The {@link Manifest} to display in this view.
 	 */
-	private Manifest manifest;
+	private final Manifest manifest;
 
 	/**
 	 * @param manifest

@@ -29,12 +29,12 @@ public class DebugController
 	/**
 	 * The {@link DebugWindow}.
 	 */
-	private DebugWindow view;
+	private final DebugWindow view;
 
 	/**
 	 * The {@link RemovalPlatformController}.
 	 */
-	private RemovalPlatformController removalPlatformController;
+	private final RemovalPlatformController removalPlatformController;
 
 	/**
 	 * A pseudo-random number generator.

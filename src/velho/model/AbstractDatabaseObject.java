@@ -23,15 +23,15 @@ public abstract class AbstractDatabaseObject implements DatabaseObject, Comparab
 	private UUID uuid;
 
 	@Override
-	public boolean equals(final Object o)
+	public boolean equals(final Object obj)
 	{
-		if (this == o)
+		if (this == obj)
 			return true;
 
-		if (o == null || !(o instanceof AbstractDatabaseObject))
+		if (obj == null || !(obj instanceof AbstractDatabaseObject))
 			return false;
 
-		return this.getUuid().equals(((AbstractDatabaseObject) o).getUuid());
+		return this.getUuid().equals(((AbstractDatabaseObject) obj).getUuid());
 	}
 
 	@Override

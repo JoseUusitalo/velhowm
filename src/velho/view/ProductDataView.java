@@ -12,9 +12,11 @@ import velho.controller.UIController;
 import velho.model.Product;
 import velho.model.interfaces.GenericView;
 
+/**
+ * @author Joona Silvennoinen
+ */
 public class ProductDataView implements GenericView
 {
-
 	/**
 	 * The root BorderPane for this view.
 	 */
@@ -23,8 +25,11 @@ public class ProductDataView implements GenericView
 	/**
 	 * To save Product based data to ProductController
 	 */
-	private ProductController controller;
+	private final ProductController controller;
 
+	/**
+	 * The product currently being modified.
+	 */
 	private Product currentProduct;
 
 	/**

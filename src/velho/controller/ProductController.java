@@ -43,44 +43,47 @@ public class ProductController implements UIActionController
 	/**
 	 * The {@link AddProductView}.
 	 */
-	private AddProductView addProductView;
+	private final AddProductView addProductView;
 
 	/**
 	 * The tab view for the product list view.
 	 */
-	private GenericTabView listTab;
+	private final GenericTabView listTab;
 
 	/**
 	 * The {@link UIController}.
 	 */
-	private UIController uiController;
+	private final UIController uiController;
 
 	/**
 	 * The tab view for creating new objects and saving them to the list view.
 	 */
-	private GenericTabView addTab;
+	private final GenericTabView addTab;
 
 	/**
 	 * The tab for creating product management view
 	 */
-	private VerticalViewGroup productManagementView;
+	private final VerticalViewGroup productManagementView;
 
 	/**
 	 * The tab for creating product type view
 	 */
-	private ProductTypesTabView productsTypeTabView;
+	private final ProductTypesTabView productsTypeTabView;
 
 	/**
 	 * The tab for creating brands view
 	 */
-	private BrandsTabView brandsTabView;
+	private final BrandsTabView brandsTabView;
 
 	/**
 	 * The tab for creating categories view
 	 */
-	private CategoriesTabView categoryTabView;
+	private final CategoriesTabView categoryTabView;
 
-	private ProductBoxesTabView productBoxTabView;
+	/**
+	 * Product box viewing/editing/creation tab view.
+	 */
+	private final ProductBoxesTabView productBoxTabView;
 
 	/**
 	 * @param uiController

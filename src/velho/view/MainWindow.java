@@ -403,7 +403,7 @@ public class MainWindow extends Application implements GenericView
 			{
 				@SuppressWarnings("rawtypes")
 				@Override
-				public void changed(final ObservableValue ov, final SupportedTranslation oldValue, final SupportedTranslation newValue)
+				public void changed(final ObservableValue obsValue, final SupportedTranslation oldValue, final SupportedTranslation newValue)
 				{
 					if (oldValue == null || !oldValue.equals(newValue))
 					{
@@ -526,11 +526,8 @@ public class MainWindow extends Application implements GenericView
 	{
 		primaryStage.close();
 
-		if (DEBUG_MODE)
-		{
-			if (debugStage != null)
-				debugStage.close();
-		}
+		if (DEBUG_MODE && debugStage != null)
+			debugStage.close();
 
 		DatabaseController.closeSessionFactory();
 		DatabaseController.unlink();

@@ -31,12 +31,12 @@ public class VelhoCsvParser<T> extends CsvToBean<T>
 	/**
 	 * The list of data read from the CSV file.
 	 */
-	private List<T> datalist;
+	private final List<T> datalist;
 
 	/**
 	 * A map of invalid CSV data where the key is the line number and the value contains a list of invalid values on that line.
 	 */
-	private Map<Long, List<String>> invalidData;
+	private final Map<Long, List<String>> invalidData;
 
 	/**
 	 */
