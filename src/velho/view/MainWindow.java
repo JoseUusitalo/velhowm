@@ -526,11 +526,8 @@ public class MainWindow extends Application implements GenericView
 	{
 		primaryStage.close();
 
-		if (DEBUG_MODE)
-		{
-			if (debugStage != null)
-				debugStage.close();
-		}
+		if (DEBUG_MODE && debugStage != null)
+			debugStage.close();
 
 		DatabaseController.closeSessionFactory();
 		DatabaseController.unlink();

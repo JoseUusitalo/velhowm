@@ -1484,11 +1484,8 @@ public abstract class DatabaseController
 				logsb.append("\texpDateEnd = " + date + "\n");
 		}
 
-		if (!canBeInRemovalList)
-		{
-			if (DBLOG.isDebugEnabled())
-				logsb.append("\tremovalList is null\n");
-		}
+		if (!canBeInRemovalList && DBLOG.isDebugEnabled())
+			logsb.append("\tremovalList is null\n");
 
 		if (DBLOG.isDebugEnabled())
 			DBLOG.debug(logsb.toString());

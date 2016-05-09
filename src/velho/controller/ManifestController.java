@@ -162,13 +162,10 @@ public class ManifestController implements UIActionController
 		{
 			// If the user is a Manager (but not an Administrator!) show a
 			// popup.
-			if (LoginController.userRoleIs(UserRole.MANAGER))
+			if (LoginController.userRoleIs(UserRole.MANAGER) && PopupController.confirmation(LocalizationController.getString("manifestShipmentArrivalPopUp")))
 			{
-				if (PopupController.confirmation(LocalizationController.getString("manifestShipmentArrivalPopUp")))
-				{
-					showManifestView(manifest);
-					mainWindow.selectTab(LocalizationController.getString("addManifestsTab"));
-				}
+				showManifestView(manifest);
+				mainWindow.selectTab(LocalizationController.getString("addManifestsTab"));
 			}
 		}
 	}

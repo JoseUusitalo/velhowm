@@ -23,7 +23,7 @@ import velho.model.ShelfSlot;
  *
  * @author Edward Puustinen &amp; Jose Uusitalo
  */
-public class ExternalSystemsController
+public abstract class ExternalSystemsController
 {
 	/**
 	 * Apache log4j logger: System.
