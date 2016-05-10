@@ -284,9 +284,9 @@ public class MainWindow extends Application implements GenericView
 				uiController = new UIController();
 				userController = new UserController();
 				logController = new LogController();
+				productController = new ProductController();
 
 				manifestController = new ManifestController(this);
-				productController = new ProductController(uiController);
 				removalPlatformController = new RemovalPlatformController(this);
 				debugController = new DebugController(removalPlatformController);
 				searchController = new SearchController(productController);
@@ -426,7 +426,8 @@ public class MainWindow extends Application implements GenericView
 			platformStatus.setAlignment(Pos.CENTER_LEFT);
 
 			final HBox userStatus = new HBox(10);
-			final Label userName = new Label(LocalizationController.getCompoundString("helloUserMessage", LoginController.getCurrentUser().getRoleName(), LoginController.getCurrentUser().getFullName()));
+			final Label userName = new Label(LocalizationController.getCompoundString("helloUserMessage", LoginController.getCurrentUser().getRoleName(),
+					LoginController.getCurrentUser().getFullName()));
 			final Button logoutButton = new Button(LocalizationController.getString("logOutButton"));
 			logoutButton.setPrefHeight(5.0);
 			userStatus.getChildren().addAll(userName, logoutButton);

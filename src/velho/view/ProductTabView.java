@@ -85,12 +85,12 @@ public class ProductTabView implements GenericView
 	 *
 	 * @return the VBox
 	 */
-	public VBox getView(final ObservableList<Object> brandList, final ObservableList<Object> categoryList)
+	public VBox getView(final ObservableList<Object> brandsList, final ObservableList<Object> categoriesList)
 	{
 		if (vbox == null)
 		{
-			this.brandList = brandList;
-			this.categoryList = categoryList;
+			this.brandList = brandsList;
+			this.categoryList = categoriesList;
 
 			HBox hb = new HBox();
 
@@ -169,12 +169,12 @@ public class ProductTabView implements GenericView
 
 			final Label brandLabel = new Label("Brand: ");
 			final ComboBox<Object> brandItem = new ComboBox<Object>();
-			brandItem.getItems().addAll(brandList);
+			brandItem.getItems().addAll(brandsList);
 			brandItem.getSelectionModel().selectFirst();
 
 			final Label categoryLabel = new Label("Category: ");
 			final ComboBox<Object> categoryItem = new ComboBox<Object>();
-			categoryItem.getItems().addAll(categoryList);
+			categoryItem.getItems().addAll(categoriesList);
 			categoryItem.getSelectionModel().selectFirst();
 
 			final Button addButton = new Button("Create");
