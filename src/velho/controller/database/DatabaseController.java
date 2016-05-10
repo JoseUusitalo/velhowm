@@ -2473,9 +2473,10 @@ public abstract class DatabaseController
 		return null;
 	}
 
-	public static ObservableList<Class> getValidDatabaseTypes()
+	@SuppressWarnings("unchecked")
+	public static ObservableList<Class<? extends AbstractDatabaseObject>> getValidDatabaseTypes()
 	{
-		final ObservableList<Class> classes = FXCollections.observableArrayList();
+		final ObservableList<Class<? extends AbstractDatabaseObject>> classes = FXCollections.observableArrayList();
 
 		//@formatter:off
 		classes.addAll(	Manifest.class,

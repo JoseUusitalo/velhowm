@@ -8,6 +8,7 @@ import javafx.event.EventHandler;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
+import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.GridPane;
 import javafx.stage.FileChooser;
@@ -15,6 +16,7 @@ import javafx.stage.Stage;
 import velho.controller.CSVController;
 import velho.controller.PopupController;
 import velho.controller.UIController;
+import velho.model.AbstractDatabaseObject;
 import velho.model.interfaces.GenericView;
 
 public class CSVView implements GenericView
@@ -37,15 +39,13 @@ public class CSVView implements GenericView
 	/**
 	 * A list of classes that can be saved and loaded from the database.
 	 */
-	@SuppressWarnings("rawtypes")
-	private ObservableList<Class> validDatabaseClasses;
+	private ObservableList<Class<? extends AbstractDatabaseObject>> validDatabaseClasses;
 
 	/**
 	 * @param csvController
 	 * @param validDatabaseClasses
 	 */
-	@SuppressWarnings("rawtypes")
-	public CSVView(final CSVController csvController, final ObservableList<Class> validDatabaseClasses)
+	public CSVView(final CSVController csvController, final ObservableList<Class<? extends AbstractDatabaseObject>> validDatabaseClasses)
 	{
 		this.csvController = csvController;
 		this.root = null;
@@ -63,11 +63,13 @@ public class CSVView implements GenericView
 			root.setHgap(10);
 			root.setVgap(10);
 
-			final TextField fileNameField = new TextField();
-			root.add(fileNameField, 0, 0);
+			final Label loadLabel = new Label("Load CSV File:");
+			root.add(loadLabel, 0, 0);
 
-			@SuppressWarnings("rawtypes")
-			final ComboBox<Class> typeSelector = new ComboBox<Class>();
+			final TextField fileNameField = new TextField();
+			root.add(fileNameField, 1, 0);
+
+			final ComboBox<Class<? extends AbstractDatabaseObject>> typeSelector = new ComboBox<Class<? extends AbstractDatabaseObject>>();
 			typeSelector.setItems(validDatabaseClasses);
 
 			final FileChooser fileChooser = new FileChooser();
@@ -76,7 +78,6 @@ public class CSVView implements GenericView
 
 			final Button loadButton = new Button("Load to Database");
 			loadButton.setDisable(true);
-			root.add(loadButton, 2, 0);
 
 			loadButton.setOnAction(new EventHandler<ActionEvent>()
 			{
@@ -88,7 +89,8 @@ public class CSVView implements GenericView
 			});
 
 			final Button selectButton = new Button("Select CSV File...");
-			root.add(selectButton, 1, 0);
+			root.add(selectButton, 2, 0);
+			root.add(loadButton, 3, 0);
 
 			selectButton.setOnAction(new EventHandler<ActionEvent>()
 			{
@@ -97,16 +99,16 @@ public class CSVView implements GenericView
 				{
 					final File csvFile = fileChooser.showOpenDialog(primaryStage);
 
-					if (csvFile == null)
-					{
-						loadButton.setDisable(true);
-						fileNameField.setText("");
-						PopupController.warning("Failed to find file: " + fileNameField.getText());
-					}
-					else
+					if (CSVController.isValidCSVFile(csvFile))
 					{
 						loadButton.setDisable(false);
 						fileNameField.setText(csvFile.getAbsolutePath());
+					}
+					else
+					{
+						loadButton.setDisable(true);
+						fileNameField.setText("");
+						PopupController.warning("Not a CSV file: " + csvFile.getAbsolutePath());
 					}
 				}
 			});

@@ -224,4 +224,9 @@ public class CSVController implements UIActionController
 		// TODO Auto-generated method stub
 
 	}
+
+	public static boolean isValidCSVFile(final File file)
+	{
+		return file != null && file.exists() && file.isFile() && file.getName().toLowerCase().endsWith(".csv");
+	}
 }
