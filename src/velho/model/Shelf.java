@@ -42,12 +42,13 @@ public class Shelf extends AbstractDatabaseObject
 	 * @param uuid
 	 * @param levelCount
 	 */
+	@SuppressWarnings("unused")
 	public Shelf(final int databaseID, final UUID uuid, final int levelCount)
 	{
 		if (levelCount < 1)
 			throw new IllegalArgumentException("Number of levels on a shelf must be greater than 0.");
 
-		setDatabaseID(databaseID);
+		// Database ID left unused on purpose.
 		setUuid(uuid);
 		this.levelCount = levelCount;
 		this.shelfLevels = new TreeSet<ShelfLevel>();

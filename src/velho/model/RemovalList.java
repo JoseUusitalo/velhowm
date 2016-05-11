@@ -42,9 +42,10 @@ public class RemovalList extends AbstractDatabaseObject
 	 * @param uuid
 	 * @param state
 	 */
+	@SuppressWarnings("unused")
 	public RemovalList(final int databaseID, final UUID uuid, final RemovalListState state)
 	{
-		setDatabaseID(databaseID);
+		// Database ID left unused on purpose.
 		setUuid(uuid);
 		this.state = state;
 		this.boxes = new LinkedHashSet<ProductBox>();

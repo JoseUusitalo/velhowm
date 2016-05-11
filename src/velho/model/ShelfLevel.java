@@ -51,9 +51,10 @@ public class ShelfLevel extends AbstractDatabaseObject
 	 * @param shelfPosition
 	 * @param maxShelfSlots
 	 */
+	@SuppressWarnings("unused")
 	public ShelfLevel(final int databaseID, final UUID uuid, final Shelf parentShelf, final int shelfPosition, final int maxShelfSlots)
 	{
-		setDatabaseID(databaseID);
+		// Database ID left unused on purpose.
 		setUuid(uuid);
 		this.parentShelf = parentShelf;
 		this.shelfPosition = shelfPosition;

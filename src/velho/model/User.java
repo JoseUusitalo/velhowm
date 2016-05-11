@@ -71,10 +71,12 @@ public class User extends AbstractDatabaseObject
 	 * @param pin
 	 * @param role
 	 */
+	@SuppressWarnings("unused")
 	public User(final int databaseID, final UUID uuid, final String firstName, final String lastName, final String pin, final String badgeID,
 			final UserRole role)
 	{
-		setDatabaseID(databaseID);
+		// Database ID left unused on purpose.
+		// TODO: Remove ID from constructor and fiddle with the CSV parser to allow for defining an ID and then ignoring it.
 		setUuid(uuid);
 		this.firstName = firstName;
 		this.lastName = lastName;

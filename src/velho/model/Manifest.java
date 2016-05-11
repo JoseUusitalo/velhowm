@@ -58,9 +58,10 @@ public class Manifest extends AbstractDatabaseObject
 	 * @param ordered
 	 * @param received
 	 */
+	@SuppressWarnings("unused")
 	public Manifest(final int databaseID, final UUID uuid, final int driverID, final ManifestState state, final Date ordered, final Date received)
 	{
-		setDatabaseID(databaseID);
+		// Database ID left unused on purpose.
 		setUuid(uuid);
 		this.state = state;
 		this.driverID = driverID;

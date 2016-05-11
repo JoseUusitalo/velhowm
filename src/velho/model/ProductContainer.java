@@ -57,6 +57,7 @@ public abstract class ProductContainer extends AbstractDatabaseObject
 	 * @param productCount
 	 * @param expirationDate
 	 */
+	@SuppressWarnings("unused")
 	public ProductContainer(final int databaseID, final UUID uuid, final Manifest manifest, final RemovalList removalList, final ShelfSlot shelfSlot,
 			final Product product, final int maxSize, final int productCount, final Date expirationDate)
 	{
@@ -65,7 +66,7 @@ public abstract class ProductContainer extends AbstractDatabaseObject
 			throw new IllegalArgumentException();
 		}
 
-		setDatabaseID(databaseID);
+		// Database ID left unused on purpose.
 		setUuid(uuid);
 		this.manifest = manifest;
 		this.removalList = removalList;

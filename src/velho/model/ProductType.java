@@ -18,9 +18,10 @@ public class ProductType extends AbstractDatabaseObject
 	 * @param databaseID
 	 * @param name
 	 */
+	@SuppressWarnings("unused")
 	public ProductType(final int databaseID, final UUID uuid, final String name)
 	{
-		setDatabaseID(databaseID);
+		// Database ID left unused on purpose.
 		setUuid(uuid);
 		this.name = name;
 	}
