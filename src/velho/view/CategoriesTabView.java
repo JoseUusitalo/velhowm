@@ -156,7 +156,6 @@ public class CategoriesTabView implements GenericView
 			addButton.setOnAction((final ActionEvent e) ->
 			{
 				final ProductCategory saveCategory = new ProductCategory(categoryName.getText(), (ProductType) categoryType.getValue());
-				data.add(saveCategory);
 				categoryName.clear();
 				productController.saveProductCategory(saveCategory);
 			});
@@ -174,7 +173,7 @@ public class CategoriesTabView implements GenericView
 	/**
 	 *
 	 * @author Edward
-	 *         Enables editing a cell, nameley the textField
+	 * Enables editing a cell, nameley the textField
 	 */
 	class EditingCell extends TableCell<Object, Object>
 	{
