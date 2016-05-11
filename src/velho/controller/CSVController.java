@@ -10,6 +10,8 @@ import java.util.List;
 import org.apache.log4j.Logger;
 
 import com.opencsv.CSVWriter;
+import com.opencsv.bean.BeanToCsv;
+import com.opencsv.bean.ColumnPositionMappingStrategy;
 
 import javafx.scene.Node;
 import velho.controller.database.DatabaseController;
@@ -18,9 +20,11 @@ import velho.model.AbstractDatabaseObject;
 import velho.model.CSVLoader;
 import velho.model.User;
 import velho.model.interfaces.DatabaseObject;
-import velho.view.CSVView;
+import velho.view.CSVLoadView;
+import velho.view.CSVWriteView;
 import velho.view.ListView;
 import velho.view.MainWindow;
+import velho.view.VerticalViewGroup;
 
 /**
  * A controller for writing CSV files.
@@ -37,7 +41,12 @@ public class CSVController implements UIActionController
 	/**
 	 * A view for loading CSV files to the database.
 	 */
-	private CSVView loadCSVView;
+	private CSVLoadView loadCSVView;
+
+	/**
+	 * A view for writing CSV files to a file.
+	 */
+	private CSVWriteView writeCSVView;
 
 	/**
 	 * The main window view.
@@ -49,7 +58,8 @@ public class CSVController implements UIActionController
 	public CSVController(final MainWindow mainWindow)
 	{
 		this.mainWindow = mainWindow;
-		loadCSVView = new CSVView(this, DatabaseController.getValidDatabaseTypes());
+		loadCSVView = new CSVLoadView(this, DatabaseController.getValidDatabaseTypes());
+		writeCSVView = new CSVWriteView(this, DatabaseController.getValidDatabaseTypes());
 	}
 
 	/**
@@ -117,7 +127,8 @@ public class CSVController implements UIActionController
 			case "Manifest":
 				return new String[] { "databaseID", "driverID", "manifestStateID", "orderedDateString", "receivedDateString" };
 			case "ProductBox":
-				return new String[] { "databaseID", "manifestID", "removalListID", "shelfSlotID", "productID", "maxSize", "productCount", "expirationDateString" };
+				return new String[] { "databaseID", "manifestID", "removalListID", "shelfSlotID", "productID", "maxSize", "productCount",
+						"expirationDateString" };
 			case "ProductCategory":
 				return new String[] { "databaseID", "name", "typeID" };
 			case "Product":
@@ -140,26 +151,11 @@ public class CSVController implements UIActionController
 	}
 
 	/**
-	 * Writes the specified object into a string array of data that can be
-	 * written to a CSV file with {@link #writeArraysToCSV(String, List)}.
+	 * Loads data from the specified CSV to database.
 	 *
-	 * @param user database object whose data to convert into a string array
-	 * @return an array of strings representing the specified object in a CSV
-	 *         file
+	 * @param filePath file path to the CSV file
+	 * @param csvType the type of data to load from the CSV file
 	 */
-	public static String[] objectToCSVDataArray(final User user)
-	{
-		// databaseID,firstName,lastName,pin,badgeID,role
-		//@formatter:off
-		return new String[] { String.valueOf(user.getDatabaseID()),
-							  user.getFirstName(),
-							  user.getLastName(),
-							  user.getPin(),
-							  user.getBadgeID(),
-							  user.getRole().toString() };
-		//@formatter:on
-	}
-
 	@SuppressWarnings({ "static-method", "rawtypes" })
 	public void loadCSVFileToDatabase(final String filePath, final Class csvType)
 	{
@@ -179,9 +175,12 @@ public class CSVController implements UIActionController
 	 *
 	 * @return view for loading CSV files
 	 */
-	public Node getLoadCSVView()
+	public Node geCSVView()
 	{
-		return loadCSVView.getView(mainWindow.getStage());
+		final VerticalViewGroup vvg = new VerticalViewGroup();
+		vvg.setContents(loadCSVView.getView(mainWindow.getStage()), writeCSVView.getView(mainWindow.getStage()));
+
+		return vvg.getView();
 	}
 
 	@Override
@@ -230,11 +229,56 @@ public class CSVController implements UIActionController
 	public void recreateViews(final ListView listView)
 	{
 		// TODO Auto-generated method stub
-
 	}
 
 	public static boolean isValidCSVFile(final File file)
 	{
 		return file != null && file.exists() && file.isFile() && file.getName().toLowerCase().endsWith(".csv");
+	}
+
+	@SuppressWarnings({ "unchecked", "static-method" })
+	public void writeDatabaseTableToCSVFile(final String filePath, final Class<? extends AbstractDatabaseObject> classToWrite)
+	{
+		@SuppressWarnings("rawtypes")
+		ColumnPositionMappingStrategy strategy = new ColumnPositionMappingStrategy();
+		strategy.setType(classToWrite);
+		strategy.setColumnMapping(getCSVDataHeader(classToWrite));
+
+		String path = filePath;
+
+		if (!filePath.endsWith(".csv"))
+			path += ".csv";
+
+		SYSLOG.debug("Writing CSV file: " + new File(path).getAbsolutePath());
+
+		try (final FileWriter fw = new FileWriter(path); CSVWriter writer = new CSVWriter(fw, ',', '\0'))
+		{
+			@SuppressWarnings("rawtypes")
+			BeanToCsv bean = new BeanToCsv();
+			bean.write(strategy, writer, DatabaseController.getAll(classToWrite.getSimpleName()));
+		}
+		catch (IOException e)
+		{
+			e.printStackTrace();
+		}
+	}
+
+	/**
+	 * Writes the specified object into a string array of data that can be written to a CSV file with {@link #writeArraysToCSV(String, List)}.
+	 *
+	 * @param user database object whose data to convert into a string array
+	 * @return an array of strings representing the specified object in a CSV file
+	 */
+	public static String[] objectToCSVDataArray(final User user)
+	{
+		// databaseID,firstName,lastName,pin,badgeID,role
+		//@formatter:off
+		return new String[] { String.valueOf(user.getDatabaseID()),
+							  user.getFirstName(),
+							  user.getLastName(),
+							  user.getPin(),
+							  user.getBadgeID(),
+							  user.getRole().toString() };
+		//@formatter:on
 	}
 }

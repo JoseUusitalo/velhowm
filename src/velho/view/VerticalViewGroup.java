@@ -20,7 +20,7 @@ public class VerticalViewGroup implements GenericView
 	 */
 	public VerticalViewGroup()
 	{
-		// Silencing PMD.
+		vbox = new VBox(10);
 	}
 
 	/**
@@ -30,9 +30,6 @@ public class VerticalViewGroup implements GenericView
 	 */
 	public VBox getView()
 	{
-		if (vbox == null)
-			vbox = new VBox(10);
-
 		return vbox;
 	}
 
