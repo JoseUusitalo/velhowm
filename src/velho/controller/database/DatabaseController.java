@@ -1638,6 +1638,8 @@ public abstract class DatabaseController
 	 */
 	private static void delete(final Object object) throws HibernateException, ConstraintViolationException
 	{
+		DBLOG.trace("Deleting: [" + (((DatabaseObject) object).getDatabaseID() + "] " + object));
+
 		SESSION_FACTORY.getCurrentSession().beginTransaction();
 
 		SESSION_FACTORY.getCurrentSession().delete(object);
@@ -1646,13 +1648,13 @@ public abstract class DatabaseController
 		{
 			SESSION_FACTORY.getCurrentSession().getTransaction().commit();
 
-			DBLOG.debug("Deleted :" + object);
+			DBLOG.debug("Deleted: [" + (((DatabaseObject) object).getDatabaseID() + "] " + object));
 		}
 		catch (final HibernateException e)
 		{
 			SESSION_FACTORY.getCurrentSession().getTransaction().rollback();
 
-			DBLOG.debug("Failed to delete: " + object);
+			DBLOG.debug("Failed to delete: [" + (((DatabaseObject) object).getDatabaseID() + "] " + object));
 
 			throw e;
 		}
@@ -1912,7 +1914,7 @@ public abstract class DatabaseController
 	 * Batch saves the given set of {@link AbstractDatabaseObject}s.
 	 * Batch saving is noticeable faster than saving each object in a collection individually.
 	 * Updates the observable lists seen in the user interface automatically.
-	 * 
+	 *
 	 * @param objects a set of objects to be saved to the database
 	 */
 	public static <T extends AbstractDatabaseObject> void batchSave(final Set<T> objects)
