@@ -85,7 +85,7 @@ public class ProductController implements UIActionController
 	 * object.
 	 *
 	 * @param databaseID database ID of the product (<code>-1</code> for a new
-	 * one)
+	 *            one)
 	 * @param name name of the of product
 	 * @param brand brand of the product
 	 * @param category category of the product
@@ -204,13 +204,12 @@ public class ProductController implements UIActionController
 		else if (data instanceof Product)
 		{
 			if (!DatabaseController.deleteProduct((Product) data))
-				PopupController.error("Unable to delete product " + ((Product) data).getName() + ", it is being used by one or more product boxes.");
+				PopupController.error(LocalizationController.getCompoundString("unableToDeleteProductError", ((Product) data).getName()));
 		}
 		else if (data instanceof ProductType)
 		{
 			if (!DatabaseController.deleteProductType((ProductType) data))
-				PopupController
-						.error(LocalizationController.getCompoundString("unableToDeleteProductTypePopUp", new Object[] { ((ProductType) data).getName() }));
+				PopupController.error(LocalizationController.getCompoundString("unableToDeleteProductTypePopUp", new Object[] { ((ProductType) data).getName() }));
 		}
 		else
 		{
@@ -328,7 +327,7 @@ public class ProductController implements UIActionController
 	 * action is performed
 	 *
 	 * @param saveProductType saves the new Product Type written in the
-	 * TextField
+	 *            TextField
 	 */
 	@SuppressWarnings("static-method")
 	public void saveProductType(final ProductType saveProductType)

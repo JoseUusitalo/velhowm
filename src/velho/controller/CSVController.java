@@ -80,7 +80,9 @@ public class CSVController implements UIActionController
 
 	/**
 	 * Writes the list of strings into the specified CSV file.
-	 * This method is slightly slower than using {@link CSVController#writeArraysToCSV(String, List)} directly as the specified collections must be converted to
+	 * This method is slightly slower than using
+	 * {@link CSVController#writeArraysToCSV(String, List)} directly as the
+	 * specified collections must be converted to
 	 * arrays first.
 	 *
 	 * @param filePath path to the CSV to be written
@@ -115,8 +117,7 @@ public class CSVController implements UIActionController
 			case "Manifest":
 				return new String[] { "databaseID", "driverID", "manifestStateID", "orderedDateString", "receivedDateString" };
 			case "ProductBox":
-				return new String[] { "databaseID", "manifestID", "removalListID", "shelfSlotID", "productID", "maxSize", "productCount",
-						"expirationDateString" };
+				return new String[] { "databaseID", "manifestID", "removalListID", "shelfSlotID", "productID", "maxSize", "productCount", "expirationDateString" };
 			case "ProductCategory":
 				return new String[] { "databaseID", "name", "typeID" };
 			case "Product":
@@ -139,10 +140,12 @@ public class CSVController implements UIActionController
 	}
 
 	/**
-	 * Writes the specified object into a string array of data that can be written to a CSV file with {@link #writeArraysToCSV(String, List)}.
+	 * Writes the specified object into a string array of data that can be
+	 * written to a CSV file with {@link #writeArraysToCSV(String, List)}.
 	 *
 	 * @param user database object whose data to convert into a string array
-	 * @return an array of strings representing the specified object in a CSV file
+	 * @return an array of strings representing the specified object in a CSV
+	 *         file
 	 */
 	public static String[] objectToCSVDataArray(final User user)
 	{
@@ -166,10 +169,9 @@ public class CSVController implements UIActionController
 		final int saved = loader.save();
 
 		if (saved == 0)
-			PopupController.warning("Failed to load any " + csvType.getSimpleName() + " objects from " + filePath
-					+ ". File probably contained data already present in the database.");
+			PopupController.warning(LocalizationController.getCompoundString("failedToLoadAnyObjectsNotice", csvType.getSimpleName(), filePath));
 		else
-			PopupController.info(saved + "/" + loaded + " " + csvType.getSimpleName() + " objects successfully loaded from: " + filePath);
+			PopupController.info(LocalizationController.getCompoundString("objectSuccesfullyLoadedNotice", saved, loaded, csvType.getSimpleName(), filePath));
 	}
 
 	/**

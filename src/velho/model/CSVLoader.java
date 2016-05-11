@@ -9,6 +9,7 @@ import org.apache.log4j.Logger;
 import com.opencsv.bean.HeaderColumnNameMappingStrategy;
 import com.opencsv.bean.MappingStrategy;
 
+import velho.controller.LocalizationController;
 import velho.controller.PopupController;
 import velho.controller.VelhoCsvParser;
 import velho.controller.database.DatabaseController;
@@ -49,7 +50,8 @@ public class CSVLoader<T extends AbstractDatabaseObject>
 	private final Class<T> objectClass;
 
 	/**
-	 * The {@link MappingStrategy} used to map the CSV values to the Java object properties.
+	 * The {@link MappingStrategy} used to map the CSV values to the Java object
+	 * properties.
 	 */
 	private final MappingStrategy<T> strategy;
 
@@ -72,9 +74,11 @@ public class CSVLoader<T extends AbstractDatabaseObject>
 	}
 
 	/**
-	 * Gets the correct {@link ObjectValidationStrategy} for validating objects of the specified type.
+	 * Gets the correct {@link ObjectValidationStrategy} for validating objects
+	 * of the specified type.
 	 *
-	 * @param className the simple name of the class of the objects to be validated
+	 * @param className the simple name of the class of the objects to be
+	 *            validated
 	 * @return the validation strategy for that class
 	 */
 	private static ObjectValidationStrategy getCorrectStrategy(final String className)
@@ -115,12 +119,14 @@ public class CSVLoader<T extends AbstractDatabaseObject>
 	}
 
 	/**
-	 * Reads the specified CSV file and parses the data into objects of the specified type.
+	 * Reads the specified CSV file and parses the data into objects of the
+	 * specified type.
 	 *
 	 * @param <T> the type of the object a single line in the file represents
 	 * @param filePath path to the csv file
 	 * @param objectClass the class the objects will instantiated as
-	 * @return a {@link VelhoCsvParser} object containing the valid and invalid data
+	 * @return a {@link VelhoCsvParser} object containing the valid and invalid
+	 *         data
 	 */
 	private VelhoCsvParser<T> readCSVFile(final String csvFilePath)
 	{
@@ -143,7 +149,8 @@ public class CSVLoader<T extends AbstractDatabaseObject>
 	 * Loads the object data from the specified CSV file.
 	 * </p>
 	 * <p>
-	 * NOTE: This method will not load anything if the {@link #getInvalidDataObjects(Set)} has not been overridden!
+	 * NOTE: This method will not load anything if the
+	 * {@link #getInvalidDataObjects(Set)} has not been overridden!
 	 * </p>
 	 *
 	 * @param csvFilePath path to the CSV file to be read
@@ -154,16 +161,17 @@ public class CSVLoader<T extends AbstractDatabaseObject>
 		final VelhoCsvParser<T> parser = readCSVFile(csvFilePath);
 
 		/*
-		 * It may be tempting to use a HashSet but that will cause the order of items to be lost.
-		 * It is crucial that the dataset contains the items read from the CSV in the same order as they were defined.
+		 * It may be tempting to use a HashSet but that will cause the order of
+		 * items to be lost.
+		 * It is crucial that the dataset contains the items read from the CSV
+		 * in the same order as they were defined.
 		 */
 		dataset = new LinkedHashSet<T>(parser.getData());
 
 		SYSLOG.trace("Loaded " + dataset.size() + " " + objectClass.getSimpleName() + " objects from the CSV file.");
 
 		if (parser.hasInvalidData())
-			SYSLOG.warn("Sample " + objectClass.getSimpleName() + " CSV data has malformed data, skipped " + parser.getInvalidData().size() + " lines: "
-					+ parser.getInvalidData());
+			SYSLOG.warn("Sample " + objectClass.getSimpleName() + " CSV data has malformed data, skipped " + parser.getInvalidData().size() + " lines: " + parser.getInvalidData());
 
 		@SuppressWarnings("unchecked")
 		final Set<AbstractDatabaseObject> invalidDataSet = validationStrategy.getInvalidObjects((Set<AbstractDatabaseObject>) dataset);
@@ -171,8 +179,7 @@ public class CSVLoader<T extends AbstractDatabaseObject>
 		if (!invalidDataSet.isEmpty())
 		{
 			SYSLOG.warn("Sample " + objectClass.getSimpleName() + " objects has " + invalidDataSet.size() + "/" + dataset.size() + " invalid objects.");
-			PopupController.warning(objectClass.getSimpleName() + " objects read from the CSV file at " + csvFilePath + " has " + invalidDataSet.size()
-					+ " (out of " + dataset.size() + ") invalid objects.");
+			PopupController.warning(LocalizationController.getCompoundString("CSVContainsInvalidObjectsNotice", objectClass.getSimpleName(), csvFilePath, invalidDataSet.size(), dataset.size()));
 			dataset.removeAll(invalidDataSet);
 		}
 
@@ -180,7 +187,8 @@ public class CSVLoader<T extends AbstractDatabaseObject>
 	}
 
 	/**
-	 * Saves the valid {@link AbstractDatabaseObject}s loaded from the CSV file into the database using {@link DatabaseController#batchSave(Set)}.
+	 * Saves the valid {@link AbstractDatabaseObject}s loaded from the CSV file
+	 * into the database using {@link DatabaseController#batchSave(Set)}.
 	 *
 	 * @return the number of objects saved to the database
 	 */
