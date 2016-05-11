@@ -2066,9 +2066,8 @@ public abstract class DatabaseController
 	 * @throws HibernateException when the query failed to commit and has been
 	 * rolled back
 	 */
-	private static List<Object> getAll(final String className) throws HibernateException
+	public static List<Object> getAll(final String className) throws HibernateException
 	{
-
 		SESSION_FACTORY.getCurrentSession().beginTransaction();
 
 		@SuppressWarnings("unchecked")

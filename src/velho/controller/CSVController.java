@@ -10,6 +10,8 @@ import java.util.List;
 import org.apache.log4j.Logger;
 
 import com.opencsv.CSVWriter;
+import com.opencsv.bean.BeanToCsv;
+import com.opencsv.bean.ColumnPositionMappingStrategy;
 
 import javafx.scene.Node;
 import velho.controller.database.DatabaseController;
@@ -147,24 +149,11 @@ public class CSVController implements UIActionController
 	}
 
 	/**
-	 * Writes the specified object into a string array of data that can be written to a CSV file with {@link #writeArraysToCSV(String, List)}.
+	 * Loads data from the specified CSV to database.
 	 *
-	 * @param user database object whose data to convert into a string array
-	 * @return an array of strings representing the specified object in a CSV file
+	 * @param filePath file path to the CSV file
+	 * @param csvType the type of data to load from the CSV file
 	 */
-	public static String[] objectToCSVDataArray(final User user)
-	{
-		// databaseID,firstName,lastName,pin,badgeID,role
-		//@formatter:off
-		return new String[] { String.valueOf(user.getDatabaseID()),
-							  user.getFirstName(),
-							  user.getLastName(),
-							  user.getPin(),
-							  user.getBadgeID(),
-							  user.getRole().toString() };
-		//@formatter:on
-	}
-
 	@SuppressWarnings({ "static-method", "rawtypes" })
 	public void loadCSVFileToDatabase(final String filePath, final Class csvType)
 	{
@@ -246,9 +235,49 @@ public class CSVController implements UIActionController
 		return file != null && file.exists() && file.isFile() && file.getName().toLowerCase().endsWith(".csv");
 	}
 
-	public void writeDatabaseTableToCSVFile(final String filePath, final Class<? extends AbstractDatabaseObject> value)
+	@SuppressWarnings({ "unchecked", "static-method" })
+	public void writeDatabaseTableToCSVFile(final String filePath, final Class<? extends AbstractDatabaseObject> classToWrite)
 	{
-		// TODO Auto-generated method stub
+		@SuppressWarnings("rawtypes")
+		ColumnPositionMappingStrategy strategy = new ColumnPositionMappingStrategy();
+		strategy.setType(classToWrite);
+		strategy.setColumnMapping(getCSVDataHeader(classToWrite));
 
+		String path = filePath;
+
+		if (!filePath.endsWith(".csv"))
+			path += ".csv";
+
+		SYSLOG.debug("Writing CSV file: " + new File(path).getAbsolutePath());
+
+		try (final FileWriter fw = new FileWriter(path); CSVWriter writer = new CSVWriter(fw, ',', '\0'))
+		{
+			@SuppressWarnings("rawtypes")
+			BeanToCsv bean = new BeanToCsv();
+			bean.write(strategy, writer, DatabaseController.getAll(classToWrite.getSimpleName()));
+		}
+		catch (IOException e)
+		{
+			e.printStackTrace();
+		}
+	}
+
+	/**
+	 * Writes the specified object into a string array of data that can be written to a CSV file with {@link #writeArraysToCSV(String, List)}.
+	 *
+	 * @param user database object whose data to convert into a string array
+	 * @return an array of strings representing the specified object in a CSV file
+	 */
+	public static String[] objectToCSVDataArray(final User user)
+	{
+		// databaseID,firstName,lastName,pin,badgeID,role
+		//@formatter:off
+		return new String[] { String.valueOf(user.getDatabaseID()),
+							  user.getFirstName(),
+							  user.getLastName(),
+							  user.getPin(),
+							  user.getBadgeID(),
+							  user.getRole().toString() };
+		//@formatter:on
 	}
 }
