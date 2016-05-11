@@ -147,8 +147,9 @@ public class CSVLoader<T extends AbstractDatabaseObject>
 	 * </p>
 	 *
 	 * @param csvFilePath path to the CSV file to be read
+	 * @param the number of objects loaded from the CSV file
 	 */
-	public void load(final String csvFilePath)
+	public int load(final String csvFilePath)
 	{
 		final VelhoCsvParser<T> parser = readCSVFile(csvFilePath);
 
@@ -174,13 +175,24 @@ public class CSVLoader<T extends AbstractDatabaseObject>
 					+ " (out of " + dataset.size() + ") invalid objects.");
 			dataset.removeAll(invalidDataSet);
 		}
+
+		return dataset.size();
 	}
 
 	/**
 	 * Saves the valid {@link AbstractDatabaseObject}s loaded from the CSV file into the database using {@link DatabaseController#batchSave(Set)}.
+	 *
+	 * @return the number of objects saved to the database
 	 */
-	public void save()
+	public int save()
 	{
-		DatabaseController.batchSave(dataset);
+		if (dataset.isEmpty())
+		{
+			SYSLOG.trace("Nothing to save.");
+
+			return 0;
+		}
+
+		return DatabaseController.batchSave(dataset);
 	}
 }

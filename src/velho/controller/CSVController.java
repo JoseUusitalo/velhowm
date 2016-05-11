@@ -162,10 +162,14 @@ public class CSVController implements UIActionController
 	{
 		@SuppressWarnings("unchecked")
 		final CSVLoader<AbstractDatabaseObject> loader = new CSVLoader<AbstractDatabaseObject>(csvType);
-		loader.load(filePath);
-		loader.save();
+		final int loaded = loader.load(filePath);
+		final int saved = loader.save();
 
-		PopupController.info(csvType.getSimpleName() + " objects successfully loaded from " + filePath);
+		if (saved == 0)
+			PopupController.warning("Failed to load any " + csvType.getSimpleName() + " objects from " + filePath
+					+ ". File probably contained data already present in the database.");
+		else
+			PopupController.info(saved + "/" + loaded + " " + csvType.getSimpleName() + " objects successfully loaded from: " + filePath);
 	}
 
 	/**
