@@ -246,7 +246,7 @@ public class UserTest
 	@Test
 	public final void testToString()
 	{
-		assertEquals("f l [Manager | -1]", user.toString());
+		assertEquals("f l [Manager | 0]", user.toString());
 	}
 
 	@Test
@@ -264,6 +264,6 @@ public class UserTest
 	@Test
 	public final void testGetDatabaseID()
 	{
-		assertEquals(-1, user.getDatabaseID());
+		assertEquals(0, user.getDatabaseID());
 	}
 }

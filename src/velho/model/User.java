@@ -131,7 +131,7 @@ public class User extends AbstractDatabaseObject
 	@Override
 	public String toString()
 	{
-		return firstName + " " + lastName + " [" + role.toString() + " | " + getDatabaseID() + "]";
+		return firstName + " " + lastName + " [" + role.getName() + " | " + getDatabaseID() + "]";
 	}
 
 	@Override
@@ -204,7 +204,7 @@ public class User extends AbstractDatabaseObject
 	 */
 	public String getFullDetails()
 	{
-		return firstName + " " + lastName + " (" + role.toString() + ")";
+		return firstName + " " + lastName + " (" + role.getName() + ")";
 	}
 
 	/**

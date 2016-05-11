@@ -25,7 +25,6 @@ public class ProductTest
 	private ProductCategory category = DatabaseController.getProductCategoryByID(3);
 	private Product product;
 	private String name = "porkkana";
-	private int id = 20;
 
 	/**
 	 * Creates the log database if needed and connects to it.
@@ -54,7 +53,7 @@ public class ProductTest
 	@Before
 	public void createProduct()
 	{
-		product = new Product(id, name, brand, category);
+		product = new Product(0, name, brand, category);
 	}
 
 	@After
@@ -72,7 +71,7 @@ public class ProductTest
 	@Test
 	public void testGetProductID()
 	{
-		assertEquals(id, product.getDatabaseID());
+		assertEquals(0, product.getDatabaseID());
 	}
 
 	@Test
@@ -114,6 +113,6 @@ public class ProductTest
 	@Test
 	public final void testToString()
 	{
-		assertEquals("[20] porkkana (Test Brand #1 / Frozen Things (Frozen))", product.toString());
+		assertEquals("[0] porkkana (Test Brand #1 / Frozen Things (Frozen))", product.toString());
 	}
 }

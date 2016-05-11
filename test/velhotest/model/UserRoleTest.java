@@ -83,10 +83,10 @@ public class UserRoleTest
 	@Test
 	public final void testToString()
 	{
-		assertEquals(administrator.getName(), administrator.toString());
-		assertEquals(manager.getName(), manager.toString());
-		assertEquals(logistician.getName(), logistician.toString());
-		assertEquals(guest.getName(), guest.toString());
+		assertEquals(administrator.getName().toUpperCase(), administrator.toString());
+		assertEquals(manager.getName().toUpperCase(), manager.toString());
+		assertEquals(logistician.getName().toUpperCase(), logistician.toString());
+		assertEquals(guest.getName().toUpperCase(), guest.toString());
 	}
 
 }

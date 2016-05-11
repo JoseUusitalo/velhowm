@@ -1637,30 +1637,35 @@ public abstract class DatabaseController
 	 * @throws HibernateException when the object was not deleted
 	 * @throws ConstraintViolationException when the object could not be deleted because it is referenced by a <code>not-null</code> property
 	 */
-	private static void delete(final Object object) throws HibernateException, ConstraintViolationException
+	private static boolean delete(final Object object) throws HibernateException, ConstraintViolationException
 	{
-		DBLOG.trace("Deleting: [" + (((DatabaseObject) object).getDatabaseID() + "] " + object));
-
-		SESSION_FACTORY.getCurrentSession().beginTransaction();
-
-		SESSION_FACTORY.getCurrentSession().delete(object);
-
-		try
+		if (object != null && ((AbstractDatabaseObject) object).getDatabaseID() > 0)
 		{
-			SESSION_FACTORY.getCurrentSession().getTransaction().commit();
+			DBLOG.trace("Deleting: [" + (((DatabaseObject) object).getDatabaseID() + "] " + object));
 
-			DBLOG.debug("Deleted: [" + (((DatabaseObject) object).getDatabaseID() + "] " + object));
+			SESSION_FACTORY.getCurrentSession().beginTransaction();
+
+			SESSION_FACTORY.getCurrentSession().delete(object);
+
+			try
+			{
+				SESSION_FACTORY.getCurrentSession().getTransaction().commit();
+
+				DBLOG.debug("Deleted: [" + (((DatabaseObject) object).getDatabaseID() + "] " + object));
+			}
+			catch (final HibernateException e)
+			{
+				SESSION_FACTORY.getCurrentSession().getTransaction().rollback();
+
+				DBLOG.debug("Failed to delete: [" + (((DatabaseObject) object).getDatabaseID() + "] " + object));
+
+				throw e;
+			}
+
+			return true;
 		}
-		catch (final HibernateException e)
-		{
-			SESSION_FACTORY.getCurrentSession().getTransaction().rollback();
 
-			DBLOG.debug("Failed to delete: [" + (((DatabaseObject) object).getDatabaseID() + "] " + object));
-
-			throw e;
-		}
-
-		// TODO: Figure out some way to return a boolean.
+		return false;
 	}
 
 	/**
@@ -1674,10 +1679,10 @@ public abstract class DatabaseController
 	{
 		try
 		{
-			delete(user);
-			observableUsers.remove(user);
+			if (delete(user))
+				return observableUsers.remove(user);
 
-			return true;
+			return false;
 		}
 		catch (final HibernateException e)
 		{

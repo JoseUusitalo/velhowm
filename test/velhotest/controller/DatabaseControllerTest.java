@@ -153,10 +153,9 @@ public class DatabaseControllerTest
 		assertFalse(DatabaseController.deleteUser(new User(-123, "A", "B", "000000", null, UserRole.ADMINISTRATOR)));
 	}
 
-	@Test(expected = IllegalArgumentException.class)
 	public final void testDelete_Null()
 	{
-		DatabaseController.deleteRemovalList(null);
+		assertFalse(DatabaseController.deleteRemovalList(null));
 	}
 
 	@Test
