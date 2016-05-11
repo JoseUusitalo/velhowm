@@ -251,7 +251,7 @@ public class RemovalListController implements UIActionController
 	{
 		removalList.setState(state);
 
-		if (DatabaseController.saveOrUpdate(removalList) < 0)
+		if (DatabaseController.saveOrUpdate(removalList) < 1)
 			PopupController.error(LocalizationController.getString("unableToSaveRemovalListStateNotice"));
 	}
 
