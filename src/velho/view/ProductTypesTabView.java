@@ -106,7 +106,6 @@ public class ProductTypesTabView implements GenericView
 			addButton.setOnAction((final ActionEvent event) ->
 			{
 				final ProductType saveProductType = new ProductType(productTypeName.getText());
-				data.add(saveProductType);
 				productTypeName.clear();
 				productController.saveProductType(saveProductType);
 			});

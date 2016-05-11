@@ -33,9 +33,10 @@ public class Product extends AbstractDatabaseObject
 	 * @param brand
 	 * @param category
 	 */
+	@SuppressWarnings("unused")
 	public Product(final int databaseID, final UUID uuid, final String name, final ProductBrand brand, final ProductCategory category)
 	{
-		setDatabaseID(databaseID);
+		// Database ID left unused on purpose.
 		setUuid(uuid);
 		this.name = name;
 		this.brand = brand;

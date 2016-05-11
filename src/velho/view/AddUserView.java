@@ -26,7 +26,7 @@ public class AddUserView implements GenericView
 	/**
 	 * The add user controller.
 	 */
-	private final UserController controller;
+	private final UserController userController;
 
 	/**
 	 * The grid panel.
@@ -42,11 +42,11 @@ public class AddUserView implements GenericView
 	 * @param mcontroller
 	 * @param rolelist
 	 */
-	public AddUserView(final UserController mcontroller, final Set<UserRole> rolelist)
+	public AddUserView(final UserController userController, final Set<UserRole> rolelist)
 	{
-		roleSet = rolelist;
-		controller = mcontroller;
-		grid = null;
+		this.roleSet = rolelist;
+		this.userController = userController;
+		this.grid = null;
 	}
 
 	/**
@@ -111,7 +111,8 @@ public class AddUserView implements GenericView
 				@Override
 				public void handle(final ActionEvent event)
 				{
-					controller.createUser(badgeIDField.getText(), pinField.getText(), userFnameField.getText(), userLNameField.getText(), listbox.getValue());
+					userController.createUser(badgeIDField.getText(), pinField.getText(), userFnameField.getText(), userLNameField.getText(),
+							listbox.getValue());
 				}
 			});
 			UIController.recordView(this);

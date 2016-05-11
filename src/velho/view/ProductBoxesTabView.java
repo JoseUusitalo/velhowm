@@ -216,13 +216,14 @@ public class ProductBoxesTabView implements GenericView
 				Date date = null;
 				if (expirationDate.getValue() != null)
 					date = Date.from(expirationDate.getValue().atTime(0, 0).toInstant(ZoneOffset.of("Z")));
-				final ProductBox saveProductBox = new ProductBox((Product) productItem.getValue(), productBoxMaxSize.getValue(), productBoxSize.getValue(), date);
+				final ProductBox saveProductBox = new ProductBox((Product) productItem.getValue(), productBoxMaxSize.getValue(), productBoxSize.getValue(),
+						date);
 				System.out.println("New product box: " + saveProductBox);
-				data.add(saveProductBox);
 				productController.saveProductBox(saveProductBox);
 			});
 
-			hb.getChildren().addAll(sizeLabel, productBoxSize, maxSizeLabel, productBoxMaxSize, productLabel, productItem, calendarLabel, expirationDate, addButton);
+			hb.getChildren().addAll(sizeLabel, productBoxSize, maxSizeLabel, productBoxMaxSize, productLabel, productItem, calendarLabel, expirationDate,
+					addButton);
 			hb.setSpacing(3);
 			hb.setSpacing(10);
 			hb.setAlignment(Pos.CENTER_LEFT);

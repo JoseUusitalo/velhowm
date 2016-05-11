@@ -183,9 +183,9 @@ public class ProductTabView implements GenericView
 			final Button addButton = new Button(LocalizationController.getString("buttonCreate"));
 			addButton.setOnAction((final ActionEvent e) ->
 			{
-				final Product saveProduct = new Product(productTextField.getText(), (ProductBrand) brandItem.getValue(), (ProductCategory) categoryItem.getValue());
+				final Product saveProduct = new Product(productTextField.getText(), (ProductBrand) brandItem.getValue(),
+						(ProductCategory) categoryItem.getValue());
 				System.out.println("New product: " + saveProduct);
-				data.add(saveProduct);
 				DatabaseController.saveOrUpdate(saveProduct);
 			});
 

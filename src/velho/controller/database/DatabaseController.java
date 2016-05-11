@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
@@ -226,6 +227,58 @@ public abstract class DatabaseController
 		return connection;
 	}
 
+	/**
+	 * Adds the given object to the correct observable list to be displayed in the user interface.
+	 *
+	 * @param object object to be added to the list
+	 */
+	private static void addToObservableList(final DatabaseObject object)
+	{
+		if (object instanceof Manifest)
+			observableManifests.add(object);
+
+		else if (object instanceof ManifestState)
+			observableManifestStates.add(object);
+
+		else if (object instanceof ProductBox)
+			observableProductBoxes.add(object);
+
+		else if (object instanceof ProductBrand)
+			observableProductBrands.add(object);
+
+		else if (object instanceof ProductCategory)
+			observableProductCategories.add(object);
+
+		else if (object instanceof ProductType)
+			observableProductTypes.add(object);
+
+		else if (object instanceof Product)
+			observableProducts.add(object);
+
+		else if (object instanceof RemovalListState)
+			observableRemovalListStates.add(object);
+
+		else if (object instanceof RemovalList)
+			observableRemovalLists.add(object);
+
+		else if (object instanceof RemovalPlatform)
+			observableRemovalPlatforms.add(object);
+
+		else if (object instanceof ShelfLevel)
+			; // Do nothing, no observable list exists.
+
+		else if (object instanceof ShelfSlot)
+			; // Do nothing, no observable list exists.
+
+		else if (object instanceof Shelf)
+			observableShelves.add(object);
+
+		else if (object instanceof User)
+			observableUsers.add(object);
+
+		else
+			throw new IllegalArgumentException("Unknown data type: " + object);
+	}
 	/*
 	 * -------------------------------- PUBLIC DATABASE METHODS --------------------------------
 	 */
@@ -1077,7 +1130,7 @@ public abstract class DatabaseController
 	public static User getUserByID(final int databaseID) throws HibernateException
 	{
 		// Debug account ID?
-		if (databaseID < 0)
+		if (databaseID < 1)
 			return LoginController.getCurrentUser();
 
 		SESSION_FACTORY.getCurrentSession().beginTransaction();
@@ -1586,6 +1639,8 @@ public abstract class DatabaseController
 	 */
 	private static void delete(final Object object) throws HibernateException, ConstraintViolationException
 	{
+		DBLOG.trace("Deleting: [" + (((DatabaseObject) object).getDatabaseID() + "] " + object));
+
 		SESSION_FACTORY.getCurrentSession().beginTransaction();
 
 		SESSION_FACTORY.getCurrentSession().delete(object);
@@ -1594,13 +1649,13 @@ public abstract class DatabaseController
 		{
 			SESSION_FACTORY.getCurrentSession().getTransaction().commit();
 
-			DBLOG.debug("Deleted :" + object);
+			DBLOG.debug("Deleted: [" + (((DatabaseObject) object).getDatabaseID() + "] " + object));
 		}
 		catch (final HibernateException e)
 		{
 			SESSION_FACTORY.getCurrentSession().getTransaction().rollback();
 
-			DBLOG.debug("Failed to delete: " + object);
+			DBLOG.debug("Failed to delete: [" + (((DatabaseObject) object).getDatabaseID() + "] " + object));
 
 			throw e;
 		}
@@ -1779,6 +1834,7 @@ public abstract class DatabaseController
 	/**
 	 * Creates a new or updates an existing object depending on whether the
 	 * given object exists in the database.
+	 * Updates the observable lists seen in the user interface automatically.
 	 *
 	 * @param object new or existing {@link DatabaseObject} in the database
 	 * @return the database ID of the inserted or updated object
@@ -1816,13 +1872,14 @@ public abstract class DatabaseController
 			throw e;
 		}
 
-		// TODO: Update observable lists.
+		addToObservableList(object);
 
 		return generatedID;
 	}
 
 	/**
 	 * Inserts a new object into the database.
+	 * Updates the observable lists seen in the user interface automatically.
 	 *
 	 * @param object new database object
 	 * @return the database ID of the inserted object
@@ -1849,7 +1906,7 @@ public abstract class DatabaseController
 
 		DBLOG.debug("Saved: " + generatedID + " " + object);
 
-		// TODO: Update observable lists.
+		addToObservableList(object);
 
 		return generatedID;
 	}
@@ -1857,70 +1914,84 @@ public abstract class DatabaseController
 	/**
 	 * Batch saves the given set of {@link AbstractDatabaseObject}s.
 	 * Batch saving is noticeable faster than saving each object in a collection individually.
+	 * Updates the observable lists seen in the user interface automatically.
 	 *
 	 * @param objects a set of objects to be saved to the database
+	 * @return the number of objects saved to the database
 	 */
-	public static <T extends AbstractDatabaseObject> void batchSave(final Set<T> objects)
+	public static <T extends AbstractDatabaseObject> int batchSave(final Set<T> objects)
 	{
-		SESSION_FACTORY.getCurrentSession().beginTransaction();
-
+		final Set<Object> savedObjects = new HashSet<Object>();
 		int count = 0;
-		int saved = 0;
+
+		SESSION_FACTORY.getCurrentSession().beginTransaction();
 
 		for (final Object obj : objects)
 		{
-			/*
-			 * HIBERNATE NOTE
-			 *
-			 * This fixes: org.hibernate.NonUniqueObjectException: A different object with the same identifier value was already associated with the session
-			 *
-			 * Example problem is:
-			 * CategoryA (Java object ID 500, database ID 1) has a product type of Type1 (Java object ID 600, database ID 3).
-			 * SESSION_FACTORY.getCurrentSession().save(CategoryA) is fine.
-			 * CategoryB (Java object ID 530, database ID 2) has a product type of Type1 (Java object ID 710, database ID 3).
-			 * SESSION_FACTORY.getCurrentSession().save(CategoryB) throws the exception because CategoryB refers to another INSTANCE of Type1.
-			 *
-			 * Hibernate uses OBJECT EQUALITY for comparing objects, not EQUALS.
-			 * The Type1 product type refers to the same object in the database but is a different instance in Java for both objects.
-			 * Apparently merging returns the first instance of referenced objects, which in the case of the example would change the type of CategoryB to point
-			 * to the object Type1 (Java object ID 600, database ID 3).
-			 *
-			 * The more you know.
-			 * Merging persists the specified object and gives it an identifier according to generator specified in the mapping.
-			 * So far I have been using HashSets to store my example data.
-			 * HashSets are not ordered.
-			 * The example data in the CSV files is ordered and it is crucial that the objects are assigned database IDs in that very particular order.
-			 * I cannot manually define the database ID of an object so Hibernate simply does so in a sequence starting at 1.
-			 * So when the data is read from the CSV file into a HashSet the order of the elements is lost.
-			 * This loop reads the objects from the unordered HashSet according to the hash of the object.
-			 * In other words, the object that was defined on the first row in a CSV file is probably not the first element in the HashSet, thus its database ID
-			 * is not going to be 1.
-			 * The only reason the example data works at all is because I am assuming that the data gets inserted into the database in that order.
-			 * The kind of problems where you spend an hour questioning reality only for it to be solved by writing a single word on a single line in a single
-			 * file are the best kind of problems.
-			 * Solution: use LinkedHashSet which preserves the insertion order.
-			 */
-			final Object object = SESSION_FACTORY.getCurrentSession().merge(obj);
+			try
+			{
+				/*
+				 * HIBERNATE NOTE
+				 *
+				 * This fixes: org.hibernate.NonUniqueObjectException: A different object with the same identifier value was already associated with the session
+				 *
+				 * Example problem is:
+				 * CategoryA (Java object ID 500, database ID 1) has a product type of Type1 (Java object ID 600, database ID 3).
+				 * SESSION_FACTORY.getCurrentSession().save(CategoryA) is fine.
+				 * CategoryB (Java object ID 530, database ID 2) has a product type of Type1 (Java object ID 710, database ID 3).
+				 * SESSION_FACTORY.getCurrentSession().save(CategoryB) throws the exception because CategoryB refers to another INSTANCE of Type1.
+				 *
+				 * Hibernate uses OBJECT EQUALITY for comparing objects, not EQUALS.
+				 * The Type1 product type refers to the same object in the database but is a different instance in Java for both objects.
+				 * Apparently merging returns the first instance of referenced objects, which in the case of the example would change the type of CategoryB to
+				 * point
+				 * to the object Type1 (Java object ID 600, database ID 3).
+				 *
+				 * The more you know.
+				 * Merging persists the specified object and gives it an identifier according to generator specified in the mapping.
+				 * So far I have been using HashSets to store my example data.
+				 * HashSets are not ordered.
+				 * The example data in the CSV files is ordered and it is crucial that the objects are assigned database IDs in that very particular order.
+				 * I cannot manually define the database ID of an object so Hibernate simply does so in a sequence starting at 1.
+				 * So when the data is read from the CSV file into a HashSet the order of the elements is lost.
+				 * This loop reads the objects from the unordered HashSet according to the hash of the object.
+				 * In other words, the object that was defined on the first row in a CSV file is probably not the first element in the HashSet, thus its
+				 * database ID
+				 * is not going to be 1.
+				 * The only reason the example data works at all is because I am assuming that the data gets inserted into the database in that order.
+				 * The kind of problems where you spend an hour questioning reality only for it to be solved by writing a single word on a single line in a
+				 * single
+				 * file are the best kind of problems.
+				 * Solution: use LinkedHashSet which preserves the insertion order.
+				 */
+				final Object object = SESSION_FACTORY.getCurrentSession().merge(obj);
 
-			/*
-			 * HIBERNATE NOTE
-			 *
-			 * This would have been nice to know a few weeks ago. In hindsight it is quite obvious.
-			 * Saving an object to the database with SESSION_FACTORY.getCurrentSession().save(obj) causes the databaseID of the object to be recalculated
-			 * because all mappings have the databaseID column set to <generator class="native" /> instead of <generator class="assigned" />.
-			 * In short. This cannot be used to save sample data where the database ID is set manually.
-			 *
-			 * Additionally after hours of research I have not found a way to use assigned positive integers as IDs.
-			 * You can either have fully assigned IDs, or generated IDs, but not both if we are only using positive integers.
-			 * However, it is possible to have positive integers be generated values and negative integers be assigned IDs but I want to use positive integers
-			 * for both which is not possible to implement in a reasonable fashion.
-			 *
-			 * I have a feeling you could just use a separate database table to keep track of used IDs for each database table and keep generating new IDs
-			 * (using a custom sequence generator) as long as the generated ID hits an ID that is already in use (because it was manually assigned, generated
-			 * IDs do not collide) and finally return an unused ID. But that is just silly and slow.
-			 */
-			if (0 < (int) SESSION_FACTORY.getCurrentSession().save(object))
-				saved++;
+				/*
+				 * HIBERNATE NOTE
+				 *
+				 * This would have been nice to know a few weeks ago. In hindsight it is quite obvious.
+				 * Saving an object to the database with SESSION_FACTORY.getCurrentSession().save(obj) causes the databaseID of the object to be recalculated
+				 * because all mappings have the databaseID column set to <generator class="native" /> instead of <generator class="assigned" />.
+				 * In short. This cannot be used to save sample data where the database ID is set manually.
+				 *
+				 * Additionally after hours of research I have not found a way to use assigned positive integers as IDs.
+				 * You can either have fully assigned IDs, or generated IDs, but not both if we are only using positive integers.
+				 * However, it is possible to have positive integers be generated values and negative integers be assigned IDs but I want to use positive
+				 * integers
+				 * for both which is not possible to implement in a reasonable fashion.
+				 *
+				 * I have a feeling you could just use a separate database table to keep track of used IDs for each database table and keep generating new IDs
+				 * (using a custom sequence generator) as long as the generated ID hits an ID that is already in use (because it was manually assigned,
+				 * generated
+				 * IDs do not collide) and finally return an unused ID. But that is just silly and slow.
+				 */
+				if (0 < (int) SESSION_FACTORY.getCurrentSession().save(object))
+					savedObjects.add(object);
+			}
+			catch (final ConstraintViolationException e)
+			{
+				DBLOG.info("Failed to save object, already exists: " + obj);
+			}
 
 			count++;
 
@@ -1932,11 +2003,23 @@ public abstract class DatabaseController
 			}
 		}
 
-		SESSION_FACTORY.getCurrentSession().getTransaction().commit();
+		final int saved = savedObjects.size();
+
+		if (saved != 0)
+		{
+			SESSION_FACTORY.getCurrentSession().getTransaction().commit();
+
+			for (final Object obj : savedObjects)
+				addToObservableList((DatabaseObject) obj);
+		}
 
 		// The log message will be wrong if the set contains objects of different types but whatever.
-		if (!objects.isEmpty())
+		if (savedObjects.isEmpty())
+			DBLOG.warn("Failed to save any of the " + objects.size() + " " + objects.iterator().next().getClass().getSimpleName() + " objects.");
+		else
 			DBLOG.debug("Batch saved " + saved + "/" + objects.size() + " " + objects.iterator().next().getClass().getSimpleName() + " objects.");
+
+		return saved;
 	}
 
 	/**
@@ -2460,14 +2543,33 @@ public abstract class DatabaseController
 		return tableHasEntries("RemovalPlatform");
 	}
 
-	public static UserRole getUserByName(final String roleName)
+	/**
+	 * Gets an observable list of classes that extends {@link AbstractDatabaseObject}.
+	 *
+	 * @return a list of classes that can be saved to the database
+	 */
+	@SuppressWarnings("unchecked")
+	public static ObservableList<Class<? extends AbstractDatabaseObject>> getValidDatabaseTypes()
 	{
-		for (final UserRole role : UserRole.values())
-		{
-			if (role.name().equals(roleName))
-				return role;
-		}
+		final ObservableList<Class<? extends AbstractDatabaseObject>> classes = FXCollections.observableArrayList();
 
-		return null;
+		//@formatter:off
+		classes.addAll(	Manifest.class,
+						ManifestState.class,
+						Product.class,
+						ProductBox.class,
+						ProductBrand.class,
+						ProductCategory.class,
+						ProductType.class,
+						RemovalList.class,
+						RemovalListState.class,
+						RemovalPlatform.class,
+						Shelf.class,
+						ShelfLevel.class,
+						ShelfSlot.class,
+						User.class);
+		//@formatter:on
+
+		return classes;
 	}
 }

@@ -1,9 +1,5 @@
 package velho.controller;
 
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Set;
-
 import org.apache.log4j.Logger;
 
 import javafx.scene.Node;
@@ -117,7 +113,7 @@ public class UserController implements UIActionController
 	 * @param userRole user's role in the company
 	 * @param showPopup show popups?
 	 * @return the created user or <code>null</code> if data was invalid or user
-	 *         already existed in the database
+	 * already existed in the database
 	 */
 	public User createUser(final String badgeID, final String userPIN, final String userFirstName, final String userLastName, final UserRole userRole,
 			final boolean showPopup)
@@ -250,7 +246,7 @@ public class UserController implements UIActionController
 	 *
 	 * @param role the role to create the user as
 	 * @return a {@link User} object or <code>null</code> if
-	 *         {@link MainWindow#DEBUG_MODE} is <code>false</code>
+	 * {@link MainWindow#DEBUG_MODE} is <code>false</code>
 	 */
 	public static User getDebugUser(final UserRole role)
 	{
@@ -261,26 +257,6 @@ public class UserController implements UIActionController
 	}
 
 	/**
-	 * Gets a set of invalid {@link User} objects in the specified list of users.
-	 *
-	 * @param users a list of users to be validated
-	 * @return a set of invalid users
-	 * @see #validateUserData(String, String, String, String, UserRole)
-	 */
-	public static Set<User> getInvalidUsers(final Collection<User> users)
-	{
-		final Set<User> invalids = new HashSet<User>();
-
-		for (final User user : users)
-		{
-			if (!validateUserData(user.getBadgeID(), user.getPin(), user.getFirstName(), user.getLastName(), user.getRole()))
-				invalids.add(user);
-		}
-
-		return invalids;
-	}
-
-	/**
 	 * Validates the user data against the database requirements.
 	 * Either a badge ID or a PIN must be defined.
 	 * Both cannot be null.
@@ -288,7 +264,7 @@ public class UserController implements UIActionController
 	 *
 	 * @param badgeID RFID identification string of the user's RFID badge
 	 * @param pin the pin string used to log in to the system if no RFID badge
-	 *            ID is provided
+	 * ID is provided
 	 * @param firstName the first name of the user
 	 * @param lastName the last name of the user
 	 * @param roleName the name of the role of the user
@@ -298,6 +274,7 @@ public class UserController implements UIActionController
 	 */
 	public static boolean validateUserData(final String badgeID, final String pin, final String firstName, final String lastName, final UserRole role)
 	{
+		// TODO: Use the strategy.
 		final boolean hasBadgeID = isValidBadgeID(badgeID);
 		final boolean hasPIN = isValidPIN(pin);
 

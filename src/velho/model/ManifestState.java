@@ -19,9 +19,10 @@ public class ManifestState extends AbstractDatabaseObject
 	 * @param uuid
 	 * @param name
 	 */
+	@SuppressWarnings("unused")
 	public ManifestState(final int databaseID, final UUID uuid, final String name)
 	{
-		setDatabaseID(databaseID);
+		// Database ID left unused on purpose.
 		setUuid(uuid);
 		this.name = name;
 	}

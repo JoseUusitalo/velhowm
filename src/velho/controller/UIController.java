@@ -64,6 +64,14 @@ public class UIController
 	 */
 	private RemovalPlatformController removalPlatformController;
 
+	/**
+	 * The {@link CSVController}.
+	 */
+	private CSVController csvController;
+
+	/**
+	 * The main set of views in this application.
+	 */
 	private static Set<GenericView> viewSet = new HashSet<GenericView>();
 
 	/**
@@ -78,7 +86,7 @@ public class UIController
 	 */
 	public void setControllers(final MainWindow mainWindow, final UserController userController, final RemovalListController removalListController,
 			final SearchController searchController, final LogController logController, final ManifestController manifestController,
-			final ProductController productController, final RemovalPlatformController removalPlatformController)
+			final ProductController productController, final RemovalPlatformController removalPlatformController, final CSVController csvController)
 	{
 		this.mainView = mainWindow;
 		this.userController = userController;
@@ -88,6 +96,7 @@ public class UIController
 		this.logController = logController;
 		this.manifestController = manifestController;
 		this.removalPlatformController = removalPlatformController;
+		this.csvController = csvController;
 	}
 
 	/**
@@ -152,6 +161,7 @@ public class UIController
 				mainView.addTab(LocalizationController.getString("addProductBoxesTab"), productController.getProductBoxesTab());
 				mainView.addTab(LocalizationController.getString("addProductListTab"), productController.getProductTabView());
 				mainView.addTab(LocalizationController.getString("addUserListTab"), getUserListView(currentUserRole));
+				mainView.addTab("CSV", csvController.getLoadCSVView());
 				break;
 			case GUEST:
 				break;

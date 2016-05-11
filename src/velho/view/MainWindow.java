@@ -32,6 +32,7 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
+import velho.controller.CSVController;
 import velho.controller.DebugController;
 import velho.controller.ExternalSystemsController;
 import velho.controller.LocalizationController;
@@ -81,7 +82,7 @@ public class MainWindow extends Application implements GenericView
 	 * Enable TRACE level logging. DEBUG_MODE must be <code>true</code> for this
 	 * to affect anything.
 	 */
-	public static final boolean SHOW_TRACE = false;
+	public static final boolean SHOW_TRACE = true;
 
 	/**
 	 * Skips the entire main application code. DEBUG_MODE must be
@@ -180,6 +181,16 @@ public class MainWindow extends Application implements GenericView
 	 * A label showing the status of the removal platform.
 	 */
 	private Label removalPlatformStatus;
+
+	/**
+	 * The {@link CSVController}.
+	 */
+	private CSVController csvController;
+
+	/**
+	 * The primary stage where the window is.
+	 */
+	private Stage primaryStage;
 
 	/**
 	 * The main window constructor.
@@ -286,6 +297,7 @@ public class MainWindow extends Application implements GenericView
 				logController = new LogController();
 				productController = new ProductController();
 
+				csvController = new CSVController(this);
 				manifestController = new ManifestController(this);
 				removalPlatformController = new RemovalPlatformController(this);
 				debugController = new DebugController(removalPlatformController);
@@ -304,7 +316,8 @@ public class MainWindow extends Application implements GenericView
 											logController,
 											manifestController,
 											productController,
-											removalPlatformController);
+											removalPlatformController,
+											csvController);
 				//@formatter:on
 
 				SYSLOG.debug("All controllers created.");
@@ -455,10 +468,12 @@ public class MainWindow extends Application implements GenericView
 	 * Creates the window.
 	 */
 	@Override
-	public void start(final Stage primaryStage)
+	public void start(final Stage mainStage)
 	{
+		this.primaryStage = mainStage;
+
 		setUserAgentStylesheet(STYLESHEET_MODENA);
-		primaryStage.setTitle(LocalizationController.getString("mainWindowTitle"));
+		this.primaryStage.setTitle(LocalizationController.getString("mainWindowTitle"));
 		final Group root = new Group();
 		scene = new Scene(root, WINDOW_WIDTH, WINDOW_HEIGHT);
 		scene.getStylesheets().add(getClass().getResource("velho.css").toExternalForm());
@@ -468,20 +483,20 @@ public class MainWindow extends Application implements GenericView
 
 		root.getChildren().add(rootBorderPane);
 
-		primaryStage.setOnCloseRequest(new EventHandler<WindowEvent>()
+		this.primaryStage.setOnCloseRequest(new EventHandler<WindowEvent>()
 		{
 			@Override
 			public void handle(final WindowEvent event)
 			{
-				shutdown(primaryStage);
+				shutdown(MainWindow.this.primaryStage);
 			}
 		});
 
 		if (!SKIP_MAIN_CODE)
 		{
 			LoginController.checkLogin();
-			primaryStage.setScene(scene);
-			primaryStage.show();
+			this.primaryStage.setScene(scene);
+			this.primaryStage.show();
 
 			if (DEBUG_MODE)
 			{
@@ -493,7 +508,7 @@ public class MainWindow extends Application implements GenericView
 					@Override
 					public void handle(final WindowEvent event)
 					{
-						shutdown(primaryStage);
+						shutdown(MainWindow.this.primaryStage);
 					}
 				});
 			}
@@ -501,7 +516,7 @@ public class MainWindow extends Application implements GenericView
 		else if (DEBUG_MODE)
 		{
 			skip();
-			shutdown(primaryStage);
+			shutdown(this.primaryStage);
 		}
 	}
 
@@ -528,9 +543,9 @@ public class MainWindow extends Application implements GenericView
 	 *
 	 * @param primaryStage the stage the main window is open in
 	 */
-	protected void shutdown(final Stage primaryStage)
+	protected void shutdown(final Stage mainstage)
 	{
-		primaryStage.close();
+		mainstage.close();
 
 		if (DEBUG_MODE && debugStage != null)
 			debugStage.close();
@@ -628,5 +643,15 @@ public class MainWindow extends Application implements GenericView
 	public void destroy()
 	{
 		mainTabPane = null;
+	}
+
+	/**
+	 * Gets the primary stage of the main window.
+	 *
+	 * @return the primary stage
+	 */
+	public Stage getStage()
+	{
+		return primaryStage;
 	}
 }

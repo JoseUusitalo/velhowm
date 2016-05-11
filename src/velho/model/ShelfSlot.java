@@ -53,19 +53,20 @@ public class ShelfSlot extends AbstractDatabaseObject
 	 * @param levelPosition
 	 * @param maxBoxesInSlot
 	 */
+	@SuppressWarnings("unused")
 	public ShelfSlot(final int databaseID, final UUID uuid, final ShelfLevel parentShelfLevel, final int levelPosition, final int maxBoxesInSlot)
 	{
-		setDatabaseID(databaseID);
+		// Database ID left unused on purpose.
 		setUuid(uuid);
 		this.parentShelfLevel = parentShelfLevel;
 
 		if (maxBoxesInSlot < 1)
-			throw new IllegalArgumentException("[" + databaseID + "] Maxmimum ProductBox count must be greater than 0, was " + maxBoxesInSlot + ".");
+			throw new IllegalArgumentException("Maxmimum ProductBox count must be greater than 0, was " + maxBoxesInSlot + ".");
 
 		this.maxProductBoxes = maxBoxesInSlot;
 
 		if (levelPosition < 1)
-			throw new IllegalArgumentException("[" + databaseID + "] Level position must be greater than 0, was " + levelPosition + ".");
+			throw new IllegalArgumentException("Level position must be greater than 0, was " + levelPosition + ".");
 
 		this.levelPosition = levelPosition;
 

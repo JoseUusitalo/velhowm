@@ -25,9 +25,10 @@ public class RemovalPlatform extends AbstractDatabaseObject
 	 * @param freeSpacePercent
 	 * @param freeSpaceLeftWarningPercent
 	 */
+	@SuppressWarnings("unused")
 	public RemovalPlatform(final int databaseID, final UUID uuid, final double freeSpacePercent, final double freeSpaceLeftWarningPercent)
 	{
-		setDatabaseID(databaseID);
+		// Database ID left unused on purpose.
 		setUuid(uuid);
 		this.freeSpacePercent = freeSpacePercent;
 		this.freeSpaceLeftWarningPercent = freeSpaceLeftWarningPercent;

@@ -127,7 +127,6 @@ public class BrandsTabView implements GenericView
 			addButton.setOnAction((final ActionEvent event) ->
 			{
 				final ProductBrand saveBrand = new ProductBrand(brandName.getText());
-				data.add(saveBrand);
 				brandName.clear();
 				productController.saveBrand(saveBrand);
 			});
@@ -149,7 +148,7 @@ public class BrandsTabView implements GenericView
 	/**
 	 *
 	 * @author Edward
-	 *         Enables editing a cell, nameley the textField
+	 * Enables editing a cell, nameley the textField
 	 */
 	class EditingCell extends TableCell<Object, String>
 	{
