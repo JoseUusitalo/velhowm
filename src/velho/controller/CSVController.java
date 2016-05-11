@@ -18,9 +18,11 @@ import velho.model.AbstractDatabaseObject;
 import velho.model.CSVLoader;
 import velho.model.User;
 import velho.model.interfaces.DatabaseObject;
-import velho.view.CSVView;
+import velho.view.CSVLoadView;
+import velho.view.CSVWriteView;
 import velho.view.ListView;
 import velho.view.MainWindow;
+import velho.view.VerticalViewGroup;
 
 /**
  * A controller for writing CSV files.
@@ -37,7 +39,12 @@ public class CSVController implements UIActionController
 	/**
 	 * A view for loading CSV files to the database.
 	 */
-	private CSVView loadCSVView;
+	private CSVLoadView loadCSVView;
+
+	/**
+	 * A view for writing CSV files to a file.
+	 */
+	private CSVWriteView writeCSVView;
 
 	/**
 	 * The main window view.
@@ -49,7 +56,8 @@ public class CSVController implements UIActionController
 	public CSVController(final MainWindow mainWindow)
 	{
 		this.mainWindow = mainWindow;
-		loadCSVView = new CSVView(this, DatabaseController.getValidDatabaseTypes());
+		loadCSVView = new CSVLoadView(this, DatabaseController.getValidDatabaseTypes());
+		writeCSVView = new CSVWriteView(this, DatabaseController.getValidDatabaseTypes());
 	}
 
 	/**
@@ -177,9 +185,12 @@ public class CSVController implements UIActionController
 	 *
 	 * @return view for loading CSV files
 	 */
-	public Node getLoadCSVView()
+	public Node geCSVView()
 	{
-		return loadCSVView.getView(mainWindow.getStage());
+		final VerticalViewGroup vvg = new VerticalViewGroup();
+		vvg.setContents(loadCSVView.getView(mainWindow.getStage()), writeCSVView.getView(mainWindow.getStage()));
+
+		return vvg.getView();
 	}
 
 	@Override
@@ -228,11 +239,16 @@ public class CSVController implements UIActionController
 	public void recreateViews(final ListView listView)
 	{
 		// TODO Auto-generated method stub
-
 	}
 
 	public static boolean isValidCSVFile(final File file)
 	{
 		return file != null && file.exists() && file.isFile() && file.getName().toLowerCase().endsWith(".csv");
+	}
+
+	public void writeDatabaseTableToCSVFile(final String filePath, final Class<? extends AbstractDatabaseObject> value)
+	{
+		// TODO Auto-generated method stub
+
 	}
 }

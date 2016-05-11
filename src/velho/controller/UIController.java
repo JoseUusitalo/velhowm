@@ -161,7 +161,7 @@ public class UIController
 				mainView.addTab(LocalizationController.getString("addProductBoxesTab"), productController.getProductBoxesTab());
 				mainView.addTab(LocalizationController.getString("addProductListTab"), productController.getProductTabView());
 				mainView.addTab(LocalizationController.getString("addUserListTab"), getUserListView(currentUserRole));
-				mainView.addTab("CSV", csvController.getLoadCSVView());
+				mainView.addTab("CSV", csvController.geCSVView());
 				break;
 			case GUEST:
 				break;

@@ -16,12 +16,11 @@ import javafx.scene.layout.GridPane;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import velho.controller.CSVController;
-import velho.controller.PopupController;
 import velho.controller.UIController;
 import velho.model.AbstractDatabaseObject;
 import velho.model.interfaces.GenericView;
 
-public class CSVView implements GenericView
+public class CSVWriteView implements GenericView
 {
 	/**
 	 * The root node.
@@ -47,7 +46,7 @@ public class CSVView implements GenericView
 	 * @param csvController
 	 * @param validDatabaseClasses
 	 */
-	public CSVView(final CSVController csvController, final ObservableList<Class<? extends AbstractDatabaseObject>> validDatabaseClasses)
+	public CSVWriteView(final CSVController csvController, final ObservableList<Class<? extends AbstractDatabaseObject>> validDatabaseClasses)
 	{
 		this.csvController = csvController;
 		this.root = null;
@@ -65,58 +64,46 @@ public class CSVView implements GenericView
 			root.setHgap(10);
 			root.setVgap(10);
 
-			final Label loadLabel = new Label("Load CSV File:");
-			root.add(loadLabel, 0, 0);
+			final Label saveLabel = new Label("Write Database Contents to File:");
 
 			final TextField fileNameField = new TextField();
-			root.add(fileNameField, 1, 0);
 
 			final FileChooser fileChooser = new FileChooser();
-			fileChooser.setTitle("Load CSV File");
+			fileChooser.setTitle("Write CSV File");
 			fileChooser.setInitialDirectory(new File("./"));
+			fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("CSV File (*.csv)", "*.csv"));
+
+			final Label typeLabel = new Label("Database Contents:");
 
 			final ComboBox<Class<? extends AbstractDatabaseObject>> typeSelector = new ComboBox<Class<? extends AbstractDatabaseObject>>();
 			typeSelector.setItems(validDatabaseClasses);
-			root.add(typeSelector, 3, 0);
 
-			final Button loadButton = new Button("Load to Database");
-			loadButton.setDisable(true);
+			final Button writeButton = new Button("Write");
+			writeButton.setDisable(true);
 
-			loadButton.setOnAction(new EventHandler<ActionEvent>()
+			writeButton.setOnAction(new EventHandler<ActionEvent>()
 			{
 				@Override
 				public void handle(final ActionEvent e)
 				{
-					csvController.loadCSVFileToDatabase(fileNameField.getText(), typeSelector.getValue());
+					csvController.writeDatabaseTableToCSVFile(fileNameField.getText(), typeSelector.getValue());
 					fileNameField.clear();
-					loadButton.setDisable(true);
+					writeButton.setDisable(true);
 				}
 			});
 
 			final Button selectButton = new Button("Select CSV File...");
-			root.add(selectButton, 2, 0);
-			root.add(loadButton, 4, 0);
 
 			selectButton.setOnAction(new EventHandler<ActionEvent>()
 			{
 				@Override
 				public void handle(final ActionEvent e)
 				{
-					final File csvFile = fileChooser.showOpenDialog(primaryStage);
+					final File csvFile = fileChooser.showSaveDialog(primaryStage);
+					fileNameField.setText(csvFile.getAbsolutePath());
 
-					if (CSVController.isValidCSVFile(csvFile))
-					{
-						fileNameField.setText(csvFile.getAbsolutePath());
-
-						if (typeSelector.getValue() != null)
-							loadButton.setDisable(false);
-					}
-					else
-					{
-						loadButton.setDisable(true);
-						fileNameField.clear();
-						PopupController.warning("Not a CSV file: " + csvFile.getAbsolutePath());
-					}
+					if (typeSelector.getValue() != null)
+						writeButton.setDisable(false);
 				}
 			});
 
@@ -127,11 +114,18 @@ public class CSVView implements GenericView
 						final Class<? extends AbstractDatabaseObject> oldValue, final Class<? extends AbstractDatabaseObject> newValue)
 				{
 					if (newValue == null || fileNameField.getText().isEmpty())
-						loadButton.setDisable(true);
+						writeButton.setDisable(true);
 					else if (!fileNameField.getText().isEmpty())
-						loadButton.setDisable(false);
+						writeButton.setDisable(false);
 				}
 			});
+
+			root.add(saveLabel, 0, 0);
+			root.add(fileNameField, 1, 0);
+			root.add(selectButton, 2, 0);
+			root.add(typeLabel, 0, 1);
+			root.add(typeSelector, 1, 1);
+			root.add(writeButton, 2, 1);
 
 			UIController.recordView(this);
 		}
