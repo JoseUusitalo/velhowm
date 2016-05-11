@@ -98,7 +98,7 @@ public class ProductTypesTabView implements GenericView
 			});
 			table.getColumns().add(deleteColumn);
 
-			final Label typeLabel = new Label("Type Name: ");
+			final Label typeLabel = new Label(LocalizationController.getString("productTypeNameLabel"));
 			final TextField productTypeName = new TextField();
 			productTypeName.setPromptText(LocalizationController.getString("productTypeNamePromtText"));
 			productTypeName.setMaxWidth(nameColumn.getPrefWidth());

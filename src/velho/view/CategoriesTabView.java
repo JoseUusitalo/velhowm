@@ -138,13 +138,13 @@ public class CategoriesTabView implements GenericView
 			});
 			table.getColumns().add(deleteColumn);
 
-			final Label categoryLabel = new Label("Category Name: ");
+			final Label categoryLabel = new Label(LocalizationController.getString("categoryNameLabel"));
 			final TextField categoryName = new TextField();
 			categoryName.setPromptText(LocalizationController.getString("categoryNamePromtText"));
 			categoryName.setMaxWidth(nameColumn.getPrefWidth());
 			final Button addButton = new Button(LocalizationController.getString("buttonCreate"));
 
-			final Label typeLabel = new Label("Type: ");
+			final Label typeLabel = new Label(LocalizationController.getString("categoryTypeLabel"));
 			final ComboBox<Object> categoryType = new ComboBox<Object>();
 			categoryType.getItems().addAll(cbValues);
 			categoryType.getSelectionModel().selectFirst();

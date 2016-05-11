@@ -119,7 +119,7 @@ public class BrandsTabView implements GenericView
 			});
 			table.getColumns().add(deleteColumn);
 
-			final Label brandLabel = new Label("Brand Name: ");
+			final Label brandLabel = new Label(LocalizationController.getString("brandNameLabel"));
 			final TextField brandName = new TextField();
 			brandName.setPromptText(LocalizationController.getString("brandNamePromtText"));
 			brandName.setMaxWidth(nameColumn.getPrefWidth());
