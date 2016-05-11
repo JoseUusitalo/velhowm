@@ -2,6 +2,8 @@ package velho.view;
 
 import java.io.File;
 
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
@@ -86,6 +88,8 @@ public class CSVView implements GenericView
 				public void handle(final ActionEvent e)
 				{
 					csvController.loadCSVFileToDatabase(fileNameField.getText(), typeSelector.getValue());
+					fileNameField.clear();
+					loadButton.setDisable(true);
 				}
 			});
 
@@ -102,15 +106,30 @@ public class CSVView implements GenericView
 
 					if (CSVController.isValidCSVFile(csvFile))
 					{
-						loadButton.setDisable(false);
 						fileNameField.setText(csvFile.getAbsolutePath());
+
+						if (typeSelector.getValue() != null)
+							loadButton.setDisable(false);
 					}
 					else
 					{
 						loadButton.setDisable(true);
-						fileNameField.setText("");
+						fileNameField.clear();
 						PopupController.warning("Not a CSV file: " + csvFile.getAbsolutePath());
 					}
+				}
+			});
+
+			typeSelector.valueProperty().addListener(new ChangeListener<Class<? extends AbstractDatabaseObject>>()
+			{
+				@Override
+				public void changed(final ObservableValue<? extends Class<? extends AbstractDatabaseObject>> observable,
+						final Class<? extends AbstractDatabaseObject> oldValue, final Class<? extends AbstractDatabaseObject> newValue)
+				{
+					if (newValue == null)
+						loadButton.setDisable(true);
+					else
+						loadButton.setDisable(false);
 				}
 			});
 
@@ -118,6 +137,7 @@ public class CSVView implements GenericView
 		}
 
 		return root;
+
 	}
 
 	@Override

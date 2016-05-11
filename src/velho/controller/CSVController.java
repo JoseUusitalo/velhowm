@@ -164,6 +164,8 @@ public class CSVController implements UIActionController
 		final CSVLoader<AbstractDatabaseObject> loader = new CSVLoader<AbstractDatabaseObject>(csvType);
 		loader.load(filePath);
 		loader.save();
+
+		PopupController.info(csvType.getSimpleName() + " objects successfully loaded from " + filePath);
 	}
 
 	/**
