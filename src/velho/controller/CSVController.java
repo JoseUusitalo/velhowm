@@ -13,6 +13,7 @@ import com.opencsv.CSVWriter;
 import com.opencsv.bean.BeanToCsv;
 import com.opencsv.bean.ColumnPositionMappingStrategy;
 
+import javafx.geometry.Insets;
 import javafx.scene.Node;
 import velho.controller.database.DatabaseController;
 import velho.controller.interfaces.UIActionController;
@@ -127,8 +128,7 @@ public class CSVController implements UIActionController
 			case "Manifest":
 				return new String[] { "databaseID", "driverID", "manifestStateID", "orderedDateString", "receivedDateString" };
 			case "ProductBox":
-				return new String[] { "databaseID", "manifestID", "removalListID", "shelfSlotID", "productID", "maxSize", "productCount",
-						"expirationDateString" };
+				return new String[] { "databaseID", "manifestID", "removalListID", "shelfSlotID", "productID", "maxSize", "productCount", "expirationDateString" };
 			case "ProductCategory":
 				return new String[] { "databaseID", "name", "typeID" };
 			case "Product":
@@ -175,11 +175,12 @@ public class CSVController implements UIActionController
 	 *
 	 * @return view for loading CSV files
 	 */
-	public Node geCSVView()
+	public Node getCSVView()
 	{
 		final VerticalViewGroup vvg = new VerticalViewGroup();
 		vvg.setContents(loadCSVView.getView(mainWindow.getStage()), writeCSVView.getView(mainWindow.getStage()));
 
+		vvg.getView().setPadding(new Insets(10));
 		return vvg.getView();
 	}
 
@@ -264,10 +265,12 @@ public class CSVController implements UIActionController
 	}
 
 	/**
-	 * Writes the specified object into a string array of data that can be written to a CSV file with {@link #writeArraysToCSV(String, List)}.
+	 * Writes the specified object into a string array of data that can be
+	 * written to a CSV file with {@link #writeArraysToCSV(String, List)}.
 	 *
 	 * @param user database object whose data to convert into a string array
-	 * @return an array of strings representing the specified object in a CSV file
+	 * @return an array of strings representing the specified object in a CSV
+	 *         file
 	 */
 	public static String[] objectToCSVDataArray(final User user)
 	{
