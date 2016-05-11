@@ -59,10 +59,12 @@ public class LoginView implements GenericView
 			final TextField firstNameField = new TextField();
 			firstNameField.setPromptText(LocalizationController.getString("promptTextFirstName"));
 			grid.add(firstNameField, 0, 1, 1, 1);
+			firstNameField.setId("firstNameField");
 
 			final TextField lastNameField = new TextField();
 			lastNameField.setPromptText(LocalizationController.getString("promptTextLastName"));
 			grid.add(lastNameField, 1, 1, 1, 1);
+			lastNameField.setId("lastNameField");
 
 			final PasswordField authenticationStringField = new PasswordField();
 			authenticationStringField.setPromptText(LocalizationController.getString("passWordPromptText"));
@@ -73,6 +75,7 @@ public class LoginView implements GenericView
 			logInButton.setMaxWidth(Double.MAX_VALUE);
 			logInButton.setPrefHeight(50.0);
 			grid.add(logInButton, 0, 3, 2, 1);
+			logInButton.setId("logInButton");
 
 			vbox.getChildren().add(grid);
 			vbox.setAlignment(Pos.CENTER);

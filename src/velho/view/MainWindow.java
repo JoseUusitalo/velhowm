@@ -432,6 +432,7 @@ public class MainWindow extends Application implements GenericView
 
 			final HBox userStatus = new HBox(10);
 			final Label userName = new Label("Hello, " + LoginController.getCurrentUser().getRoleName() + " " + LoginController.getCurrentUser().getFullName());
+			userName.setId("userName");
 			final Button logoutButton = new Button(LocalizationController.getString("logOutButton"));
 			logoutButton.setPrefHeight(5.0);
 			userStatus.getChildren().addAll(userName, logoutButton);

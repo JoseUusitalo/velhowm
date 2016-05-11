@@ -1,6 +1,7 @@
 package velhotest.view;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -9,6 +10,8 @@ import org.junit.Test;
 import org.loadui.testfx.GuiTest;
 
 import javafx.scene.Parent;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.Region;
 import velho.controller.DatabaseController;
@@ -18,7 +21,16 @@ import velho.view.MainWindow;
 public class TestLogin extends GuiTest
 {
 	MainWindow app;
+	private TextField firstNameField;
+	private TextField lastNameField;
 	private TextField authenticationStringField;
+	private Button logInButton;
+	private Label userName;
+	private TextField badgeIDField;
+	private TextField pinField;
+	private TextField userFnameField;
+	private TextField userLNameField;
+	private Button createButton;
 
 	@Override
 	protected Parent getRootNode()
@@ -63,18 +75,98 @@ public class TestLogin extends GuiTest
 	}
 
 	@Before
-	public void initComponents()
+	public void waitForUI()
 	{
-		authenticationStringField = find("#authenticationStringField");
-
-		authenticationStringField.setText("");
+		try
+		{
+			Thread.sleep(3000L);
+		}
+		catch (InterruptedException e)
+		{
+			e.printStackTrace();
+		}
 	}
 
-	@Test(timeout = 10000)
-	public void should_increment_countValue()
+	private boolean isLoggedIn()
 	{
+		return userName != null && userName.getText().contains("Admin Test");
+	}
+
+	private void loginAsAdmin()
+	{
+		firstNameField = find("#firstNameField");
+		lastNameField = find("#lastNameField");
+		authenticationStringField = find("#authenticationStringField");
+		logInButton = find("#logInButton");
+
+		click(firstNameField);
+		type("Admin");
+		assertEquals("Admin", (firstNameField.getText()));
+
+		click(lastNameField);
+		type("Test");
+		assertEquals("Test", (lastNameField.getText()));
+
 		click(authenticationStringField);
-		type("jeejee");
-		assertEquals("jeejee", (authenticationStringField.getText()));
+		type("111111");
+		assertEquals("111111", (authenticationStringField.getText()));
+
+		click(logInButton);
+	}
+
+	@Test(timeout = 30000)
+	public void loginAdmin()
+	{
+		firstNameField = find("#firstNameField");
+		lastNameField = find("#lastNameField");
+		authenticationStringField = find("#authenticationStringField");
+		logInButton = find("#logInButton");
+
+		click(firstNameField);
+		type("Admin");
+		assertEquals("Admin", (firstNameField.getText()));
+
+		click(lastNameField);
+		type("Test");
+		assertEquals("Test", (lastNameField.getText()));
+
+		click(authenticationStringField);
+		type("111111");
+		assertEquals("111111", (authenticationStringField.getText()));
+
+		click(logInButton);
+
+		assertTrue(((Label) find("#userName")).getText().contains("Admin Test"));
+	}
+
+	@Test(timeout = 30000)
+	public void createUser()
+	{
+		pinField = find("#pinField");
+		userFnameField = find("#userFnameField");
+		userLNameField = find("#userLNameField");
+		createButton = find("#createButton");
+		/*
+		 * click(badgeIDField);
+		 * type("1234");
+		 * assertEquals("Admin", (firstNameField.getText()));
+		 */
+
+		click(pinField);
+		type("8888");
+		assertEquals("8888", (pinField.getText()));
+
+		click(userFnameField);
+		type("Victor");
+		assertEquals("Victor", (userFnameField.getText()));
+
+		click(userLNameField);
+		type("MidPlzOrFeed");
+		assertEquals("MidPlzOrFeed", (userLNameField.getText()));
+
+		click(createButton);
+
+		assertTrue(((Label) find("#userName")).getText().contains("Admin Test"));
+
 	}
 }
