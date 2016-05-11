@@ -226,6 +226,58 @@ public abstract class DatabaseController
 		return connection;
 	}
 
+	/**
+	 * Adds the given object to the correct observable list to be displayed in the user interface.
+	 *
+	 * @param object object to be added to the list
+	 */
+	private static void addToObservableList(final DatabaseObject object)
+	{
+		if (object instanceof Manifest)
+			observableManifests.add(object);
+
+		else if (object instanceof ManifestState)
+			observableManifestStates.add(object);
+
+		else if (object instanceof ProductBox)
+			observableProductBoxes.add(object);
+
+		else if (object instanceof ProductBrand)
+			observableProductBrands.add(object);
+
+		else if (object instanceof ProductCategory)
+			observableProductCategories.add(object);
+
+		else if (object instanceof ProductType)
+			observableProductTypes.add(object);
+
+		else if (object instanceof Product)
+			observableProducts.add(object);
+
+		else if (object instanceof RemovalListState)
+			observableRemovalListStates.add(object);
+
+		else if (object instanceof RemovalList)
+			observableRemovalLists.add(object);
+
+		else if (object instanceof RemovalPlatform)
+			observableRemovalPlatforms.add(object);
+
+		else if (object instanceof ShelfLevel)
+			; // Do nothing, no observable list exists.
+
+		else if (object instanceof ShelfSlot)
+			; // Do nothing, no observable list exists.
+
+		else if (object instanceof Shelf)
+			observableShelves.add(object);
+
+		else if (object instanceof User)
+			observableUsers.add(object);
+
+		else
+			throw new IllegalArgumentException("Unknown data type: " + object);
+	}
 	/*
 	 * -------------------------------- PUBLIC DATABASE METHODS --------------------------------
 	 */
@@ -1781,6 +1833,7 @@ public abstract class DatabaseController
 	/**
 	 * Creates a new or updates an existing object depending on whether the
 	 * given object exists in the database.
+	 * Updates the observable lists seen in the user interface automatically.
 	 *
 	 * @param object new or existing {@link DatabaseObject} in the database
 	 * @return the database ID of the inserted or updated object
@@ -1818,13 +1871,14 @@ public abstract class DatabaseController
 			throw e;
 		}
 
-		// TODO: Update observable lists.
+		addToObservableList(object);
 
 		return generatedID;
 	}
 
 	/**
 	 * Inserts a new object into the database.
+	 * Updates the observable lists seen in the user interface automatically.
 	 *
 	 * @param object new database object
 	 * @return the database ID of the inserted object
@@ -1851,7 +1905,7 @@ public abstract class DatabaseController
 
 		DBLOG.debug("Saved: " + generatedID + " " + object);
 
-		// TODO: Update observable lists.
+		addToObservableList(object);
 
 		return generatedID;
 	}
@@ -1859,7 +1913,8 @@ public abstract class DatabaseController
 	/**
 	 * Batch saves the given set of {@link AbstractDatabaseObject}s.
 	 * Batch saving is noticeable faster than saving each object in a collection individually.
-	 *
+	 * Updates the observable lists seen in the user interface automatically.
+	 * 
 	 * @param objects a set of objects to be saved to the database
 	 */
 	public static <T extends AbstractDatabaseObject> void batchSave(final Set<T> objects)
@@ -1935,6 +1990,9 @@ public abstract class DatabaseController
 		}
 
 		SESSION_FACTORY.getCurrentSession().getTransaction().commit();
+
+		for (final DatabaseObject obj : objects)
+			addToObservableList(obj);
 
 		// The log message will be wrong if the set contains objects of different types but whatever.
 		if (!objects.isEmpty())
@@ -2462,17 +2520,11 @@ public abstract class DatabaseController
 		return tableHasEntries("RemovalPlatform");
 	}
 
-	public static UserRole getUserByName(final String roleName)
-	{
-		for (final UserRole role : UserRole.values())
-		{
-			if (role.name().equals(roleName))
-				return role;
-		}
-
-		return null;
-	}
-
+	/**
+	 * Gets an observable list of classes that extends {@link AbstractDatabaseObject}.
+	 *
+	 * @return a list of classes that can be saved to the database
+	 */
 	@SuppressWarnings("unchecked")
 	public static ObservableList<Class<? extends AbstractDatabaseObject>> getValidDatabaseTypes()
 	{
