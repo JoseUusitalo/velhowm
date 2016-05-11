@@ -126,9 +126,9 @@ public class CSVView implements GenericView
 				public void changed(final ObservableValue<? extends Class<? extends AbstractDatabaseObject>> observable,
 						final Class<? extends AbstractDatabaseObject> oldValue, final Class<? extends AbstractDatabaseObject> newValue)
 				{
-					if (newValue == null)
+					if (newValue == null || fileNameField.getText().isEmpty())
 						loadButton.setDisable(true);
-					else
+					else if (!fileNameField.getText().isEmpty())
 						loadButton.setDisable(false);
 				}
 			});
@@ -137,7 +137,6 @@ public class CSVView implements GenericView
 		}
 
 		return root;
-
 	}
 
 	@Override
