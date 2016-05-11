@@ -26,7 +26,7 @@ public class RemovalPlatformController
 	/**
 	 * The {@link MainWindow}.
 	 */
-	private MainWindow mainWindow;
+	private final MainWindow mainWindow;
 
 	/**
 	 * @param mainWindow

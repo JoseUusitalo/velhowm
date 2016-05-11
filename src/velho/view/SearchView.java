@@ -28,10 +28,14 @@ public class SearchView implements GenericView
 	 * The root GridPane for this view.
 	 */
 	private GridPane grid;
+
 	private final SearchController searchController;
+
 	private final ObservableList<Object> productCategories;
+
 	private final ObservableList<Object> productBrands;
-	private boolean canBeInRemovalList;
+
+	private final boolean canBeInRemovalList;
 
 	/**
 	 * @param searchController
@@ -39,8 +43,7 @@ public class SearchView implements GenericView
 	 * @param productBrands
 	 * @param productCategories
 	 */
-	public SearchView(final SearchController searchController, final boolean canBeInRemovalList, final ObservableList<Object> productBrands,
-			final ObservableList<Object> productCategories)
+	public SearchView(final SearchController searchController, final boolean canBeInRemovalList, final ObservableList<Object> productBrands, final ObservableList<Object> productCategories)
 	{
 		this.searchController = searchController;
 		this.canBeInRemovalList = canBeInRemovalList;
@@ -148,8 +151,7 @@ public class SearchView implements GenericView
 						// still numbers.
 					}
 
-					searchController.productBoxSearch(canBeInRemovalList, nameField.getText(), productCountField.getValue(), brandbox.getValue(),
-							categorybox.getValue(), dpStart.getValue(), dpEnd.getValue());
+					searchController.productBoxSearch(canBeInRemovalList, nameField.getText(), productCountField.getValue(), brandbox.getValue(), categorybox.getValue(), dpStart.getValue(), dpEnd.getValue());
 				}
 			});
 			UIController.recordView(this);

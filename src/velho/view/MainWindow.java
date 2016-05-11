@@ -68,15 +68,21 @@ public class MainWindow extends Application implements GenericView
 	private static final Logger SYSLOG = Logger.getLogger(MainWindow.class.getName());
 
 	/**
+	 * Enable or disable debug features.
+	 */
+	public static final boolean DEBUG_MODE = true;
+
+	/**
+	 * Enable or disable showing windows. DEBUG_MODE must be <code>true</code>
+	 * for this to affect anything.
+	 */
+	public static final boolean SHOW_WINDOWS = true;
+
+	/**
 	 * Enable TRACE level logging. DEBUG_MODE must be <code>true</code> for this
 	 * to affect anything.
 	 */
 	public static final boolean SHOW_TRACE = false;
-
-	/**
-	 * Enable or disable debug features.
-	 */
-	public static final boolean DEBUG_MODE = true;
 
 	/**
 	 * Skips the entire main application code. DEBUG_MODE must be
@@ -289,10 +295,10 @@ public class MainWindow extends Application implements GenericView
 				uiController = new UIController();
 				userController = new UserController();
 				logController = new LogController();
+				productController = new ProductController();
 
 				csvController = new CSVController(this);
 				manifestController = new ManifestController(this);
-				productController = new ProductController(uiController);
 				removalPlatformController = new RemovalPlatformController(this);
 				debugController = new DebugController(removalPlatformController);
 				searchController = new SearchController(productController);
@@ -416,7 +422,7 @@ public class MainWindow extends Application implements GenericView
 			{
 				@SuppressWarnings("rawtypes")
 				@Override
-				public void changed(final ObservableValue ov, final SupportedTranslation oldValue, final SupportedTranslation newValue)
+				public void changed(final ObservableValue obsValue, final SupportedTranslation oldValue, final SupportedTranslation newValue)
 				{
 					if (oldValue == null || !oldValue.equals(newValue))
 					{
@@ -541,11 +547,8 @@ public class MainWindow extends Application implements GenericView
 	{
 		mainstage.close();
 
-		if (DEBUG_MODE)
-		{
-			if (debugStage != null)
-				debugStage.close();
-		}
+		if (DEBUG_MODE && debugStage != null)
+			debugStage.close();
 
 		DatabaseController.closeSessionFactory();
 		DatabaseController.unlink();
@@ -625,7 +628,8 @@ public class MainWindow extends Application implements GenericView
 		SYSLOG.info("Main application code skipped.");
 
 		// It works.
-		// System.out.println("id:" + new AssignedIdentifierGenerator().generate((SessionImplementor) HibernateSessionFactory.getInstance().getCurrentSession(),
+		// System.out.println("id:" + new AssignedIdentifierGenerator().generate((SessionImplementor)
+		// HibernateSessionFactory.getInstance().getCurrentSession(),
 		// new User(120, "new", "thing", "111111", null, UserRole.ADMINISTRATOR)));
 	}
 

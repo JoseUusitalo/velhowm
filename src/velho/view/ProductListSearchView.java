@@ -22,7 +22,7 @@ import velho.model.interfaces.GenericView;
  *
  * @author Jose Uusitalo
  */
-public class ProductListSearch implements GenericView
+public class ProductListSearchView implements GenericView
 {
 	/**
 	 * The root border pane.
@@ -39,7 +39,7 @@ public class ProductListSearch implements GenericView
 	 *
 	 * @param searchController embodies SearchController
 	 */
-	public ProductListSearch(final SearchController searchController)
+	public ProductListSearchView(final SearchController searchController)
 	{
 		this.searchController = searchController;
 	}
@@ -60,7 +60,7 @@ public class ProductListSearch implements GenericView
 			Button sendToScannerButton = new Button(LocalizationController.getString("sendToScannerButton"));
 
 			final TextArea textArea = new TextArea();
-			textArea.setPromptText((LocalizationController.getString("productListSearchPromptText")));
+			textArea.setPromptText(LocalizationController.getString("productListSearchPromptText"));
 			textArea.setPrefWidth(MainWindow.WINDOW_WIDTH / 5);
 			printButton.setMaxWidth(Double.MAX_VALUE);
 			printButton.setAlignment(Pos.CENTER);

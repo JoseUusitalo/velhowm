@@ -7,6 +7,7 @@ import javafx.event.ActionEvent;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
+import javafx.scene.control.Label;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableColumn.CellEditEvent;
@@ -47,7 +48,7 @@ public class BrandsTabView implements GenericView
 	/**
 	 * Makes the Brands and ObservableList
 	 */
-	private ObservableList<Object> data;
+	private final ObservableList<Object> data;
 
 	/**
 	 * Adds info to Product Controller about brands
@@ -111,13 +112,14 @@ public class BrandsTabView implements GenericView
 				@Override
 				public TableCell<Object, String> call(final TableColumn<Object, String> tcolumn)
 				{
-					final TableCellDeleteButton button = new TableCellDeleteButton(productController, (LocalizationController.getString("buttonDelete")));
+					final TableCellDeleteButton button = new TableCellDeleteButton(productController, LocalizationController.getString("buttonDelete"));
 					button.setAlignment(Pos.CENTER);
 					return button;
 				}
 			});
 			table.getColumns().add(deleteColumn);
 
+			final Label brandLabel = new Label("Brand Name: ");
 			final TextField brandName = new TextField();
 			brandName.setPromptText(LocalizationController.getString("brandNamePromtText"));
 			brandName.setMaxWidth(nameColumn.getPrefWidth());
@@ -130,8 +132,9 @@ public class BrandsTabView implements GenericView
 				productController.saveBrand(saveBrand);
 			});
 
-			hbox.getChildren().addAll(brandName, addButton);
-			hbox.setSpacing(3);
+			hbox.getChildren().addAll(brandLabel, brandName, addButton);
+			hbox.setSpacing(10);
+			hbox.setAlignment(Pos.CENTER_LEFT);
 
 			vbox = new VBox();
 			vbox.setSpacing(5);

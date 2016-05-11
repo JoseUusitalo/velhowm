@@ -52,7 +52,7 @@ public class RemovalListView implements GenericView
 	/**
 	 * The {@link RemovalList} to display.
 	 */
-	private RemovalList removalList;
+	private final RemovalList removalList;
 
 	/**
 	 * @param removalList

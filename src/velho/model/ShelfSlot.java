@@ -199,12 +199,12 @@ public class ShelfSlot extends AbstractDatabaseObject
 	 */
 	public int getProductCountInBoxes()
 	{
-		final Iterator<ProductBox> it = productBoxes.iterator();
+		final Iterator<ProductBox> iter = productBoxes.iterator();
 
 		int sum = 0;
 
-		while (it.hasNext())
-			sum += it.next().getProductCount();
+		while (iter.hasNext())
+			sum += iter.next().getProductCount();
 
 		return sum;
 	}
@@ -216,7 +216,7 @@ public class ShelfSlot extends AbstractDatabaseObject
 	 */
 	public boolean hasFreeSpace()
 	{
-		return (productBoxes.size() < maxProductBoxes);
+		return productBoxes.size() < maxProductBoxes;
 	}
 
 	/**

@@ -2,7 +2,6 @@ package velho.view;
 
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
-import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
 import java.util.Date;
 
@@ -18,7 +17,6 @@ import javafx.scene.control.DatePicker;
 import javafx.scene.control.Label;
 import javafx.scene.control.Spinner;
 import javafx.scene.control.SpinnerValueFactory;
-import javafx.scene.control.SpinnerValueFactory.IntegerSpinnerValueFactory;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableColumn.CellEditEvent;
@@ -29,19 +27,18 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.util.Callback;
-import velho.controller.LocalizationController;
+import velho.controller.DatabaseController;
 import velho.controller.ProductController;
-import velho.controller.UIController;
-import velho.controller.database.DatabaseController;
 import velho.model.Product;
-import velho.model.ProductBox;
+import velho.model.ProductBrand;
+import velho.model.ProductCategory;
 import velho.model.interfaces.GenericView;
 import velho.view.components.TableCellDeleteButton;
 
 /**
  * @author Edward Puustinen
  */
-public class ProductBoxesTabView implements GenericView
+public class ProductTabView implements GenericView
 {
 	/**
 	 * ProductCntroller neeeded when saving to database
@@ -61,9 +58,11 @@ public class ProductBoxesTabView implements GenericView
 	/**
 	 * Makes the Categories and ObservableList
 	 */
-	private ObservableList<Object> data = DatabaseController.getAllProductBoxes();
+	private ObservableList<Object> data = DatabaseController.getAllProducts();
 
-	private ObservableList<Object> pList;
+	private ObservableList<Object> brandList;
+
+	private ObservableList<Object> categoryList;
 
 	/**
 	 * Adds info to Product Controller about brands
@@ -71,7 +70,7 @@ public class ProductBoxesTabView implements GenericView
 	 * @param productController Product Controller handles the database work
 	 * @param uiController links UIController to the productController
 	 */
-	public ProductBoxesTabView(final ProductController productController)
+	public ProductTabView(final ProductController productController)
 	{
 		this.productController = productController;
 		this.table = new TableView<Object>();
@@ -80,88 +79,65 @@ public class ProductBoxesTabView implements GenericView
 	/**
 	 * VBox grid view make it visible
 	 *
-	 * @param productList
+	 * @param observableList
+	 *
+	 * @param categoryLiset
 	 *
 	 * @return the VBox
 	 */
-	public VBox getView(final ObservableList<Object> productList)
+	public VBox getView(final ObservableList<Object> brandsList, final ObservableList<Object> categoriesList)
 	{
 		if (vbox == null)
 		{
-			table.getColumns().clear();
+			this.brandList = brandsList;
+			this.categoryList = categoriesList;
 
-			pList = productList;
 			HBox hb = new HBox();
 
 			table.setEditable(true);
 
 			table.setItems(data);
 
-			Callback<TableColumn<Object, Object>, TableCell<Object, Object>> cellFactory = (final TableColumn<Object, Object> p) -> new SpinnerCell();
+			final Callback<TableColumn<Object, Object>, TableCell<Object, Object>> cellFactory = (final TableColumn<Object, Object> p) -> new EditingCell();
+			final TableColumn<Object, Object> nameColumn = new TableColumn<Object, Object>("Name");
 
-			TableColumn<Object, Object> sizeColumn = new TableColumn<Object, Object>(LocalizationController.getString("publicRemovalTableHeaderSize"));
+			nameColumn.setMinWidth(100);
+			nameColumn.setCellValueFactory(new PropertyValueFactory<>("name"));
+			nameColumn.setCellFactory(cellFactory);
 
-			sizeColumn.setMinWidth(100);
-			sizeColumn.setCellValueFactory(new PropertyValueFactory<>("productCount"));
-			sizeColumn.setCellFactory(cellFactory);
-
-			sizeColumn.setOnEditCommit((final CellEditEvent<Object, Object> t) ->
+			nameColumn.setOnEditCommit((final CellEditEvent<Object, Object> event) ->
 			{
-				final ProductBox productBox = ((ProductBox) t.getTableView().getItems().get(t.getTablePosition().getRow()));
-				productBox.setProductCount((int) t.getNewValue());
-				productController.saveProductBox(productBox);
+				final Product editProduct = ((Product) event.getTableView().getItems().get(event.getTablePosition().getRow()));
+				editProduct.setName(event.getNewValue().toString());
+				DatabaseController.saveOrUpdate(editProduct);
 			});
-			table.getColumns().add(sizeColumn);
+			table.getColumns().add(nameColumn);
 
-			Callback<TableColumn<Object, Object>, TableCell<Object, Object>> cellFactory2 = (final TableColumn<Object, Object> p) -> new SpinnerCell();
+			ObservableList<Object> cbValues = DatabaseController.getAllProductBrands();
+			TableColumn<Object, Object> brand = new TableColumn<Object, Object>("Brand");
 
-			TableColumn<Object, Object> maxSizeColumn = new TableColumn<Object, Object>(LocalizationController.getString("maxSizeTabName"));
-
-			maxSizeColumn.setMinWidth(100);
-			maxSizeColumn.setCellValueFactory(new PropertyValueFactory<>("maxSize"));
-			maxSizeColumn.setCellFactory(cellFactory2);
-
-			maxSizeColumn.setOnEditCommit((final CellEditEvent<Object, Object> t) ->
+			brand.setCellValueFactory(new PropertyValueFactory<>("brand"));
+			brand.setCellFactory(ComboBoxTableCell.forTableColumn(cbValues));
+			brand.setOnEditCommit((final CellEditEvent<Object, Object> t) ->
 			{
-				final ProductBox productBox = ((ProductBox) t.getTableView().getItems().get(t.getTablePosition().getRow()));
-				productBox.setMaxSize((int) t.getNewValue());
-				productController.saveProductBox(productBox);
+				final Product editProduct = ((Product) t.getTableView().getItems().get(t.getTablePosition().getRow()));
+				editProduct.setBrand((ProductBrand) t.getNewValue());
+				DatabaseController.saveOrUpdate(editProduct);
 			});
-			table.getColumns().add(maxSizeColumn);
+			table.getColumns().add(brand);
 
-			ObservableList<Object> cbValues = DatabaseController.getAllProducts();
-			TableColumn<Object, Object> product = new TableColumn<Object, Object>(LocalizationController.getString("productProduct"));
+			ObservableList<Object> cbCategoryValues = DatabaseController.getAllProductCategories();
+			TableColumn<Object, Object> category = new TableColumn<Object, Object>("Category");
 
-			product.setCellValueFactory(new PropertyValueFactory<>("product"));
-			product.setCellFactory(ComboBoxTableCell.forTableColumn(cbValues));
-			product.setOnEditCommit((final CellEditEvent<Object, Object> t) ->
+			category.setCellValueFactory(new PropertyValueFactory<>("category"));
+			category.setCellFactory(ComboBoxTableCell.forTableColumn(cbCategoryValues));
+			category.setOnEditCommit((final CellEditEvent<Object, Object> t) ->
 			{
-				final ProductBox editProductBox = ((ProductBox) t.getTableView().getItems().get(t.getTablePosition().getRow()));
-				editProductBox.setProduct((Product) t.getNewValue());
-				productController.saveProductBox(editProductBox);
+				final Product editProduct = ((Product) t.getTableView().getItems().get(t.getTablePosition().getRow()));
+				editProduct.setCategory((ProductCategory) t.getNewValue());
+				DatabaseController.saveOrUpdate(editProduct);
 			});
-			table.getColumns().add(product);
-
-			Callback<TableColumn<Object, Object>, TableCell<Object, Object>> pickerFactory = (final TableColumn<Object, Object> p) -> new DatePickerCell();
-			TableColumn<Object, Object> datePickerColumn = new TableColumn<>(LocalizationController.getString("expirationDateExpirationDate"));
-			datePickerColumn.setMinWidth(150);
-			datePickerColumn.setCellValueFactory(new PropertyValueFactory<>("expirationDate"));
-			datePickerColumn.setCellFactory(pickerFactory);
-			datePickerColumn.setOnEditCommit((final CellEditEvent<Object, Object> t) ->
-			{
-				final ProductBox productBox = ((ProductBox) t.getTableView().getItems().get(t.getTablePosition().getRow()));
-
-				LocalDate saveDate = ((LocalDate) t.getNewValue());
-
-				Date date = null;
-				if (saveDate != null)
-				{
-					date = Date.from(saveDate.atTime(0, 0).toInstant(ZoneOffset.of("Z")));
-				}
-				productBox.setExpirationDate(date);
-				productController.saveProductBox(productBox);
-			});
-			table.getColumns().add(datePickerColumn);
+			table.getColumns().add(category);
 
 			final TableColumn<Object, String> deleteColumn = new TableColumn<Object, String>("");
 			deleteColumn.setCellValueFactory(new PropertyValueFactory<Object, String>(""));
@@ -181,49 +157,36 @@ public class ProductBoxesTabView implements GenericView
 				@Override
 				public TableCell<Object, String> call(final TableColumn<Object, String> p)
 				{
-					final TableCellDeleteButton button = new TableCellDeleteButton(productController, (LocalizationController.getString("buttonDelete")));
+					final TableCellDeleteButton button = new TableCellDeleteButton(productController, "Delete");
 					button.setAlignment(Pos.CENTER);
 					return button;
 				}
 			});
 			table.getColumns().add(deleteColumn);
 
-			final Label maxSizeLabel = new Label(LocalizationController.getString("maxProductsLabel"));
-			final Spinner<Integer> productBoxMaxSize = new Spinner<Integer>();
-			productBoxMaxSize.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(1, Integer.MAX_VALUE));
-			productBoxMaxSize.setMaxWidth(maxSizeColumn.getPrefWidth());
+			final Label productLabel = new Label("Product Name: ");
+			final TextField productTextField = new TextField();
 
-			final Label sizeLabel = new Label(LocalizationController.getString("productCountLabel"));
-			final Spinner<Integer> productBoxSize = new Spinner<Integer>();
-			final IntegerSpinnerValueFactory sizeFactory = new SpinnerValueFactory.IntegerSpinnerValueFactory(1, productBoxMaxSize.getValue());
-			sizeFactory.maxProperty().bind(productBoxMaxSize.getValueFactory().valueProperty());
-			productBoxSize.setValueFactory(sizeFactory);
-			productBoxSize.setMaxWidth(sizeColumn.getPrefWidth());
+			final Label brandLabel = new Label("Brand: ");
+			final ComboBox<Object> brandItem = new ComboBox<Object>();
+			brandItem.getItems().addAll(brandsList);
+			brandItem.getSelectionModel().selectFirst();
 
-			final Label productLabel = new Label(LocalizationController.getString("productPromtTextAddProductView"));
-			final ComboBox<Object> productItem = new ComboBox<Object>();
-			productItem.getItems().clear();
-			productItem.getItems().addAll(pList);
-			productItem.getSelectionModel().selectFirst();
-			productItem.setMaxWidth(product.getPrefWidth());
+			final Label categoryLabel = new Label("Category: ");
+			final ComboBox<Object> categoryItem = new ComboBox<Object>();
+			categoryItem.getItems().addAll(categoriesList);
+			categoryItem.getSelectionModel().selectFirst();
 
-			final Label calendarLabel = new Label(LocalizationController.getString("expirationDateLabel"));
-			final DatePicker expirationDate = new DatePicker();
-
-			final Button addButton = new Button(LocalizationController.getString("buttonCreate"));
+			final Button addButton = new Button("Create");
 			addButton.setOnAction((final ActionEvent e) ->
 			{
-				Date date = null;
-				if (expirationDate.getValue() != null)
-					date = Date.from(expirationDate.getValue().atTime(0, 0).toInstant(ZoneOffset.of("Z")));
-				final ProductBox saveProductBox = new ProductBox((Product) productItem.getValue(), productBoxMaxSize.getValue(), productBoxSize.getValue(), date);
-				System.out.println("New product box: " + saveProductBox);
-				data.add(saveProductBox);
-				productController.saveProductBox(saveProductBox);
+				final Product saveProduct = new Product(productTextField.getText(), (ProductBrand) brandItem.getValue(), (ProductCategory) categoryItem.getValue());
+				System.out.println("New product: " + saveProduct);
+				data.add(saveProduct);
+				DatabaseController.saveOrUpdate(saveProduct);
 			});
 
-			hb.getChildren().addAll(sizeLabel, productBoxSize, maxSizeLabel, productBoxMaxSize, productLabel, productItem, calendarLabel, expirationDate, addButton);
-			hb.setSpacing(3);
+			hb.getChildren().addAll(productLabel, productTextField, brandLabel, brandItem, categoryLabel, categoryItem, addButton);
 			hb.setSpacing(10);
 			hb.setAlignment(Pos.CENTER_LEFT);
 
@@ -232,7 +195,6 @@ public class ProductBoxesTabView implements GenericView
 			vbox.setPadding(new Insets(10, 0, 0, 10));
 			vbox.getChildren().addAll(table, hb);
 
-			UIController.recordView(this);
 		}
 		return vbox;
 	}
@@ -511,7 +473,8 @@ public class ProductBoxesTabView implements GenericView
 	public void recreate()
 	{
 		vbox = null;
-		getView(pList);
+		// TODO: Use old data.
+		getView(brandList, categoryList);
 	}
 
 	@Override

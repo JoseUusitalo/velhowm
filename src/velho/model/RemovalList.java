@@ -192,15 +192,12 @@ public class RemovalList extends AbstractDatabaseObject
 	 */
 	public boolean addProductBox(final ProductBox productBox)
 	{
-		if (productBox != null)
+		if (productBox != null && boxes.add(productBox))
 		{
-			if (boxes.add(productBox))
-			{
-				productBox.setRemovalList(this);
-				SYSLOG.trace(productBox + " added to removal list " + this);
+			productBox.setRemovalList(this);
+			SYSLOG.trace(productBox + " added to removal list " + this);
 
-				return observableBoxes.add(new ProductBoxSearchResultRow(productBox));
-			}
+			return observableBoxes.add(new ProductBoxSearchResultRow(productBox));
 		}
 
 		SYSLOG.error("Failed to add " + productBox + " to removal list " + this);

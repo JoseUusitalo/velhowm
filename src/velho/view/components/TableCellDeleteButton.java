@@ -59,7 +59,11 @@ public class TableCellDeleteButton extends TableCell<Object, String>
 		super.updateItem(string, empty);
 
 		// Display button only if the row is not empty.
-		if (!empty)
+		if (empty)
+		{
+			setGraphic(null);
+		}
+		else
 		{
 			final Object rowObject = getTableView().getItems().get(getIndex());
 
@@ -77,7 +81,5 @@ public class TableCellDeleteButton extends TableCell<Object, String>
 				setGraphic(button);
 			}
 		}
-		else
-			setGraphic(null);
 	}
 }

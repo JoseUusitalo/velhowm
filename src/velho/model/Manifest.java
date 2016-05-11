@@ -235,7 +235,7 @@ public class Manifest extends AbstractDatabaseObject
 			if (box != null)
 			{
 				box.setManifest(this);
-				bswitch = bswitch && (observableBoxes.add(new ProductBoxSearchResultRow(box)));
+				bswitch = bswitch && observableBoxes.add(new ProductBoxSearchResultRow(box));
 			}
 		}
 

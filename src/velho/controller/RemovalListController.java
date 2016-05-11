@@ -46,7 +46,7 @@ public class RemovalListController implements UIActionController
 	/**
 	 * The {@link SearchController}.
 	 */
-	private SearchController searchController;
+	private final SearchController searchController;
 
 	/**
 	 * The creation view for removal lists.
@@ -61,7 +61,7 @@ public class RemovalListController implements UIActionController
 	/**
 	 * The view in the tab itself.
 	 */
-	private GenericTabView tabView;
+	private final GenericTabView tabView;
 
 	/**
 	 * @param searchController

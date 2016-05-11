@@ -9,7 +9,7 @@ import velho.model.enums.SupportedTranslation;
 /**
  * @author Joona Silvennoinen
  */
-public class LocalizationController
+public abstract class LocalizationController
 {
 	private static ResourceBundle msgBundle;
 	private static Locale localeEnglish;

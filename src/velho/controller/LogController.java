@@ -51,7 +51,7 @@ public class LogController
 	@SuppressWarnings("static-method")
 	public String getSystemLog()
 	{
-		StringBuilder sb = new StringBuilder();
+		final StringBuilder strbuilder = new StringBuilder();
 		ArrayList<Object> log = new ArrayList<Object>();
 
 		SYSLOG.info("Loading the full system log.");
@@ -67,11 +67,11 @@ public class LogController
 
 		for (Object line : log)
 		{
-			sb.append(line.toString());
-			sb.append("\n");
+			strbuilder.append(line.toString());
+			strbuilder.append("\n");
 		}
 
-		return sb.toString();
+		return strbuilder.toString();
 	}
 
 	/**

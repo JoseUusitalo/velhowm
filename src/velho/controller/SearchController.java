@@ -9,7 +9,7 @@ import javafx.scene.layout.BorderPane;
 import velho.controller.database.DatabaseController;
 import velho.model.ProductBrand;
 import velho.model.ProductCategory;
-import velho.view.ProductListSearch;
+import velho.view.ProductListSearchView;
 import velho.view.SearchTabView;
 import velho.view.SearchView;
 
@@ -23,7 +23,7 @@ public class SearchController
 	/**
 	 * The view in the tab itself.
 	 */
-	private SearchTabView searchTabView;
+	private final SearchTabView searchTabView;
 
 	/**
 	 * The {@link ProductController}.
@@ -53,13 +53,11 @@ public class SearchController
 	 */
 	@SuppressWarnings("static-method")
 
-	public void productBoxSearch(final boolean canBeInRemovalList, final String identifier, final Integer productCount, final Object brand,
-			final Object category, final LocalDate expiresStart, final LocalDate expiresEnd)
+	public void productBoxSearch(final boolean canBeInRemovalList, final String identifier, final Integer productCount, final Object brand, final Object category, final LocalDate expiresStart, final LocalDate expiresEnd)
 	{
 		try
 		{
-			DatabaseController.searchProductBox(identifier, productCount.intValue(), (ProductBrand) brand, (ProductCategory) category, expiresStart, expiresEnd,
-					canBeInRemovalList);
+			DatabaseController.searchProductBox(identifier, productCount.intValue(), (ProductBrand) brand, (ProductCategory) category, expiresStart, expiresEnd, canBeInRemovalList);
 		}
 		catch (Exception e)
 		{
@@ -119,7 +117,7 @@ public class SearchController
 	 */
 	public Node getProductListSearchView()
 	{
-		final ProductListSearch searchView = new ProductListSearch(this);
+		final ProductListSearchView searchView = new ProductListSearchView(this);
 		//@formatter:off
 		return searchView.getView((BorderPane) ListController.getTableView(productController,
 										  								   DatabaseController.getProductSearchDataColumns(false, false),
@@ -232,7 +230,7 @@ public class SearchController
 			}
 
 			// Rebuild the product string.
-			final StringBuffer sb = new StringBuffer();
+			final StringBuilder strbuilder = new StringBuilder();
 			final int length = possibleProductAndCount.length;
 
 			for (int i = start; i < length; i++)
@@ -242,15 +240,15 @@ public class SearchController
 					// Left trim spaces from the first element.
 					// This assumes that no product name can begin with a space
 					// character.
-					sb.append(possibleProductAndCount[i].replaceAll("^\\s+", ""));
+					strbuilder.append(possibleProductAndCount[i].replaceAll("^\\s+", ""));
 				}
 				else
-					sb.append(possibleProductAndCount[i]);
+					strbuilder.append(possibleProductAndCount[i]);
 
 				if (i < length - 1)
-					sb.append(":");
+					strbuilder.append(":");
 			}
-			countName[1] = sb.toString();
+			countName[1] = strbuilder.toString();
 		}
 
 		return countName;

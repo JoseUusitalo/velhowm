@@ -46,7 +46,11 @@ public abstract class SampleData
 	 */
 	public static boolean createAll() throws HibernateException
 	{
-		if (!dataLoaded)
+		if (dataLoaded)
+		{
+			SYSLOG.info("Sample data already exists.");
+		}
+		else
 		{
 			SYSLOG.debug("Loading sample data to database...");
 
@@ -79,8 +83,6 @@ public abstract class SampleData
 			dataLoaded = true;
 			SYSLOG.info("Sample data loaded.");
 		}
-		else
-			SYSLOG.info("Sample data already exists.");
 
 		return dataLoaded;
 	}
@@ -90,7 +92,11 @@ public abstract class SampleData
 	 */
 	private static void createSampleUsers()
 	{
-		if (!DatabaseController.hasUsers())
+		if (DatabaseController.hasUsers())
+		{
+			SYSLOG.trace("Database already has users.");
+		}
+		else
 		{
 			SYSLOG.debug("Loading sample users.");
 
@@ -98,13 +104,18 @@ public abstract class SampleData
 			csvLoader.load("res/sample_users.csv");
 			csvLoader.save();
 		}
-		else
-			SYSLOG.trace("Database already has users.");
 	}
 
+	/**
+	 * Loads the sample product brands from the CSV file and saves them into the database.
+	 */
 	private static void createSampleBrands()
 	{
-		if (!DatabaseController.hasProductBrands())
+		if (DatabaseController.hasProductBrands())
+		{
+			SYSLOG.trace("Database already has product brands.");
+		}
+		else
 		{
 			SYSLOG.debug("Loading sample product brands.");
 
@@ -112,13 +123,18 @@ public abstract class SampleData
 			csvLoader.load("res/sample_product_brands.csv");
 			csvLoader.save();
 		}
-		else
-			SYSLOG.trace("Database already has product brands.");
 	}
 
+	/**
+	 * Loads the sample product types from the CSV file and saves them into the database.
+	 */
 	private static void createSampleProductTypes()
 	{
-		if (!DatabaseController.hasProductTypes())
+		if (DatabaseController.hasProductTypes())
+		{
+			SYSLOG.trace("Database already has product types.");
+		}
+		else
 		{
 			SYSLOG.debug("Loading sample product types.");
 
@@ -126,13 +142,18 @@ public abstract class SampleData
 			csvLoader.load("res/sample_product_types.csv");
 			csvLoader.save();
 		}
-		else
-			SYSLOG.trace("Database already has product types.");
 	}
 
+	/**
+	 * Loads the sample product categories from the CSV file and saves them into the database.
+	 */
 	private static void createSampleProductCategories()
 	{
-		if (!DatabaseController.hasProductCategories())
+		if (DatabaseController.hasProductCategories())
+		{
+			SYSLOG.trace("Database already has product categories.");
+		}
+		else
 		{
 			SYSLOG.debug("Loading sample product categories.");
 
@@ -140,13 +161,18 @@ public abstract class SampleData
 			csvLoader.load("res/sample_product_categories.csv");
 			csvLoader.save();
 		}
-		else
-			SYSLOG.trace("Database already has product categories.");
 	}
 
+	/**
+	 * Loads the sample products from the CSV file and saves them into the database.
+	 */
 	private static void createSampleProducts()
 	{
-		if (!DatabaseController.hasProducts())
+		if (DatabaseController.hasProducts())
+		{
+			SYSLOG.trace("Database already has products.");
+		}
+		else
 		{
 			SYSLOG.debug("Loading sample products.");
 
@@ -154,13 +180,18 @@ public abstract class SampleData
 			csvLoader.load("res/sample_products.csv");
 			csvLoader.save();
 		}
-		else
-			SYSLOG.trace("Database already has products.");
 	}
 
+	/**
+	 * Loads the sample shelves from the CSV file and saves them into the database.
+	 */
 	private static void createSampleShelves()
 	{
-		if (!DatabaseController.hasShelves())
+		if (DatabaseController.hasShelves())
+		{
+			SYSLOG.trace("Database already has shelves.");
+		}
+		else
 		{
 			/* 1 - Tiny Full Shelf: 1-4 */
 			/* 2 - Slot Full Shelf: 5-9 */
@@ -173,13 +204,18 @@ public abstract class SampleData
 			csvLoader.load("res/sample_shelves.csv");
 			csvLoader.save();
 		}
-		else
-			SYSLOG.trace("Database already has shelves.");
 	}
 
+	/**
+	 * Loads the sample shelf levels from the CSV file and saves them into the database.
+	 */
 	private static void createSampleShelfLevels()
 	{
-		if (!DatabaseController.hasShelfLevels())
+		if (DatabaseController.hasShelfLevels())
+		{
+			SYSLOG.trace("Database already has shelf levels.");
+		}
+		else
 		{
 			SYSLOG.debug("Loading sample shelf levels.");
 
@@ -187,13 +223,18 @@ public abstract class SampleData
 			csvLoader.load("res/sample_shelf_levels.csv");
 			csvLoader.save();
 		}
-		else
-			SYSLOG.trace("Database already has shelf levels.");
 	}
 
+	/**
+	 * Loads the sample shelf slots from the CSV file and saves them into the database.
+	 */
 	private static void createSampleShelfSlots()
 	{
-		if (!DatabaseController.hasShelfSlots())
+		if (DatabaseController.hasShelfSlots())
+		{
+			SYSLOG.trace("Database already has shelf slots.");
+		}
+		else
 		{
 			SYSLOG.debug("Loading sample shelf slots.");
 
@@ -201,13 +242,18 @@ public abstract class SampleData
 			csvLoader.load("res/sample_shelf_slots.csv");
 			csvLoader.save();
 		}
-		else
-			SYSLOG.trace("Database already has shelf slots.");
 	}
 
+	/**
+	 * Loads the sample manifest states from the CSV file and saves them into the database.
+	 */
 	private static void createSampleManifestStates()
 	{
-		if (!DatabaseController.hasManifestStates())
+		if (DatabaseController.hasManifestStates())
+		{
+			SYSLOG.trace("Database already has manifest states.");
+		}
+		else
 		{
 			SYSLOG.debug("Loading sample manifest states.");
 
@@ -215,13 +261,18 @@ public abstract class SampleData
 			csvLoader.load("res/sample_manifest_states.csv");
 			csvLoader.save();
 		}
-		else
-			SYSLOG.trace("Database already has manifest states.");
 	}
 
+	/**
+	 * Loads the sample manifests from the CSV file and saves them into the database.
+	 */
 	private static void createSampleManifests()
 	{
-		if (!DatabaseController.hasManifests())
+		if (DatabaseController.hasManifests())
+		{
+			SYSLOG.trace("Database already has manifests.");
+		}
+		else
 		{
 			SYSLOG.debug("Loading sample manifests.");
 
@@ -229,13 +280,18 @@ public abstract class SampleData
 			csvLoader.load("res/sample_manifests.csv");
 			csvLoader.save();
 		}
-		else
-			SYSLOG.trace("Database already has manifests.");
 	}
 
+	/**
+	 * Loads the sample removal list states from the CSV file and saves them into the database.
+	 */
 	private static void createSampleRemovalListStates()
 	{
-		if (!DatabaseController.hasRemovalListStates())
+		if (DatabaseController.hasRemovalListStates())
+		{
+			SYSLOG.trace("Database already has removal list states.");
+		}
+		else
 		{
 			SYSLOG.debug("Loading sample removal list states.");
 
@@ -243,13 +299,18 @@ public abstract class SampleData
 			csvLoader.load("res/sample_removal_list_states.csv");
 			csvLoader.save();
 		}
-		else
-			SYSLOG.trace("Database already has removal list states.");
 	}
 
+	/**
+	 * Loads the sample removal lists from the CSV file and saves them into the database.
+	 */
 	private static void createSampleRemovalLists()
 	{
-		if (!DatabaseController.hasRemovalLists())
+		if (DatabaseController.hasRemovalLists())
+		{
+			SYSLOG.trace("Database already has removal lists.");
+		}
+		else
 		{
 			SYSLOG.debug("Loading sample removal lists.");
 
@@ -257,13 +318,18 @@ public abstract class SampleData
 			csvLoader.load("res/sample_removal_lists.csv");
 			csvLoader.save();
 		}
-		else
-			SYSLOG.trace("Database already has removal lists.");
 	}
 
+	/**
+	 * Loads the sample product boxes from the CSV file and saves them into the database.
+	 */
 	private static void createSampleProductBoxes()
 	{
-		if (!DatabaseController.hasProductBoxes())
+		if (DatabaseController.hasProductBoxes())
+		{
+			SYSLOG.trace("Database already has product boxes.");
+		}
+		else
 		{
 			SYSLOG.debug("Loading sample product boxes.");
 
@@ -271,13 +337,18 @@ public abstract class SampleData
 			csvLoader.load("res/sample_product_boxes.csv");
 			csvLoader.save();
 		}
-		else
-			SYSLOG.trace("Database already has product boxes.");
 	}
 
+	/**
+	 * Loads the sample removal platforms from the CSV file and saves them into the database.
+	 */
 	private static void createSampleRemovalPlatforms()
 	{
-		if (!DatabaseController.hasRemovalPlatforms())
+		if (DatabaseController.hasRemovalPlatforms())
+		{
+			SYSLOG.trace("Database already has removal platforms.");
+		}
+		else
 		{
 			SYSLOG.debug("Loading sample removal platforms.");
 
@@ -285,7 +356,5 @@ public abstract class SampleData
 			csvLoader.load("res/sample_removal_platforms.csv");
 			csvLoader.save();
 		}
-		else
-			SYSLOG.trace("Database already has removal platforms.");
 	}
 }

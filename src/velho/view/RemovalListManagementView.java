@@ -29,7 +29,7 @@ public class RemovalListManagementView implements GenericView
 	/**
 	 * The {@link RemovalListController}.
 	 */
-	private RemovalListController removalListController;
+	private final RemovalListController removalListController;
 
 	/**
 	 * Button for showing the removal list creation view.

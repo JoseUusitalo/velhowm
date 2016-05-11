@@ -15,7 +15,7 @@ public interface UIActionController
 	 *
 	 * @param data data to create
 	 */
-	public void createAction(final Object data);
+	void createAction(final Object data);
 
 	/**
 	 * An action performed in the UI in the context of updating an existing
@@ -23,7 +23,7 @@ public interface UIActionController
 	 *
 	 * @param data data to update to
 	 */
-	public void updateAction(final Object data);
+	void updateAction(final Object data);
 
 	/**
 	 * An action performed in the UI in the context of adding data to existing
@@ -31,7 +31,7 @@ public interface UIActionController
 	 *
 	 * @param data data to add
 	 */
-	public void addAction(final Object data);
+	void addAction(final Object data);
 
 	/**
 	 * An action performed in the UI in the context of remove data from an
@@ -39,7 +39,7 @@ public interface UIActionController
 	 *
 	 * @param data data to remove
 	 */
-	public void removeAction(final Object data);
+	void removeAction(final Object data);
 
 	/**
 	 * An action performed in the UI in the context of deleting an existing
@@ -47,7 +47,7 @@ public interface UIActionController
 	 *
 	 * @param data data to delete
 	 */
-	public void deleteAction(final Object data);
+	void deleteAction(final Object data);
 
 	/**
 	 * An action performed in the UI in the context of viewing an existing
@@ -55,7 +55,12 @@ public interface UIActionController
 	 *
 	 * @param data data to delete
 	 */
-	public void viewAction(final Object data);
+	void viewAction(final Object data);
 
-	public void recreateViews(ListView listView);
+	/**
+	 * Receates the views created by this UI action controller.
+	 *
+	 * @param listView the {@link ListView} that called for recreation (optional)
+	 */
+	void recreateViews(final ListView listView);
 }

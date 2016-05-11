@@ -10,13 +10,11 @@ import velho.model.ProductBox;
 import velho.model.ProductBrand;
 import velho.model.ProductCategory;
 import velho.model.ProductType;
-import velho.view.AddProductView;
 import velho.view.BrandsTabView;
 import velho.view.CategoriesTabView;
-import velho.view.GenericTabView;
 import velho.view.ListView;
 import velho.view.ProductBoxesTabView;
-import velho.view.ProductDataView;
+import velho.view.ProductTabView;
 import velho.view.ProductTypesTabView;
 import velho.view.VerticalViewGroup;
 
@@ -33,67 +31,43 @@ public class ProductController implements UIActionController
 	private static final Logger SYSLOG = Logger.getLogger(ProductController.class.getName());
 
 	/**
-	 * Apache log4j logger: User.
-	 */
-	private static final Logger USRLOG = Logger.getLogger("userLogger");
-
-	/**
-	 * The {@link AddProductView}.
-	 */
-	private AddProductView addProductView;
-
-	/**
-	 * The tab view for the product list view.
-	 */
-	private GenericTabView listTab;
-
-	/**
-	 * The {@link UIController}.
-	 */
-	private UIController uiController;
-
-	/**
-	 * The tab view for creating new objects and saving them to the list view.
-	 */
-	private GenericTabView addTab;
-
-	/**
 	 * The tab for creating product management view
 	 */
-	private VerticalViewGroup productManagementView;
+	private final VerticalViewGroup productManagementView;
 
 	/**
 	 * The tab for creating product type view
 	 */
-	private ProductTypesTabView productsTypeTabView;
+	private final ProductTypesTabView productsTypeTabView;
 
 	/**
 	 * The tab for creating brands view
 	 */
-	private BrandsTabView brandsTabView;
+	private final BrandsTabView brandsTabView;
 
 	/**
 	 * The tab for creating categories view
 	 */
-	private CategoriesTabView categoryTabView;
+	private final CategoriesTabView categoryTabView;
 
-	private ProductBoxesTabView productBoxTabView;
+	/**
+	 * Product box viewing/editing/creation tab view.
+	 */
+	private final ProductBoxesTabView productBoxTabView;
+
+	private ProductTabView productTabView;
 
 	/**
 	 * @param uiController
 	 */
-	public ProductController(final UIController uiController)
+	public ProductController()
 	{
-		this.uiController = uiController;
 		this.productManagementView = new VerticalViewGroup();
 		this.productsTypeTabView = new ProductTypesTabView(this);
-		this.addProductView = new AddProductView(this, uiController);
 		this.brandsTabView = new BrandsTabView(this);
 		this.categoryTabView = new CategoriesTabView(this);
 		this.productBoxTabView = new ProductBoxesTabView(this);
-		listTab = new GenericTabView();
-		addTab = new GenericTabView();
-		showList();
+		this.productTabView = new ProductTabView(this);
 	}
 
 	/**
@@ -101,19 +75,9 @@ public class ProductController implements UIActionController
 	 *
 	 * @return the product list tab view
 	 */
-	public Node getTabView()
+	public Node getProductTabView()
 	{
-		return listTab.getView();
-	}
-
-	/**
-	 * Gets the product editing view.
-	 *
-	 * @return the product editing view
-	 */
-	public Node getProductEditView()
-	{
-		return addProductView.getView(true);
+		return productTabView.getView(DatabaseController.getAllProductBrands(), DatabaseController.getAllProductCategories());
 	}
 
 	/**
@@ -167,58 +131,6 @@ public class ProductController implements UIActionController
 		}
 
 		return DatabaseController.getProductByID(dbID);
-	}
-
-	/**
-	 * Changes the view in the product list tab to the edit view.
-	 *
-	 * @param product {@link Product} to edit
-	 */
-	public void editProduct(final Product product)
-	{
-		AddProductView editView = new AddProductView(this, uiController);
-		listTab.setView(editView.getView(true));
-		editView.setViewData(product);
-	}
-
-	/**
-	 * Gets the view for creating new products.
-	 *
-	 * @return the product creation view
-	 */
-	public Node getAddProductView()
-	{
-		return new AddProductView(this, uiController).getView(false);
-	}
-
-	/**
-	 * Changes the view in the product list tab to the list.
-	 */
-	public void showList()
-	{
-		// TODO ei päivity oikein
-		listTab.setView(ListController.getTableView(this, DatabaseController.getProductDataColumns(false, false), DatabaseController.getAllProducts()));
-	}
-
-	/**
-	 * Changes the view in the product add/edit list tab to the list.
-	 */
-	public void showCreatingListView()
-	{
-
-		addTab.setView(ListController.getTableView(this, DatabaseController.getProductDataColumns(false, false), DatabaseController.getAllProducts()));
-
-	}
-
-	/**
-	 * Changes the view in the product list tab to display the data from the
-	 * given product.
-	 *
-	 * @param product product to display
-	 */
-	public void showProductView(final Product product)
-	{
-		listTab.setView(new ProductDataView(this).getView(product));
 	}
 
 	/**
@@ -289,6 +201,11 @@ public class ProductController implements UIActionController
 			if (!DatabaseController.deleteProductBox((ProductBox) data))
 				PopupController.error(LocalizationController.getString("unableToDeleteProductBoxPopUp"));
 		}
+		else if (data instanceof Product)
+		{
+			if (!DatabaseController.deleteProduct((Product) data))
+				PopupController.error("Unable to delete product " + ((Product) data).getName() + ", it is being used by one or more product boxes.");
+		}
 		else if (data instanceof ProductType)
 		{
 			if (!DatabaseController.deleteProductType((ProductType) data))
@@ -307,15 +224,18 @@ public class ProductController implements UIActionController
 	@Override
 	public void viewAction(final Object data)
 	{
-		USRLOG.info("Viewing: " + ((Product) data).toString());
-		listTab.setView(new ProductDataView(this).getView(((Product) data)));
+		throw new UnsupportedOperationException();
 	}
 
 	@Override
 	public void recreateViews(final ListView node)
 	{
-		// TODO check for correct view
-		showList();
+		getBrandsTab();
+		getCategoryTab();
+		getProductBoxesTab();
+		getProductManagementView();
+		getProductTabView();
+		getProductTypesTab();
 	}
 
 	/**
@@ -323,7 +243,6 @@ public class ProductController implements UIActionController
 	 */
 	public Node getProductManagementView()
 	{
-		productManagementView.setContents(getProductEditView());
 		return productManagementView.getView();
 	}
 
@@ -338,7 +257,7 @@ public class ProductController implements UIActionController
 	public ProductBrand saveBrand(final String name)
 	{
 		ProductBrand productBrand = new ProductBrand(name);
-		DatabaseController.save(productBrand);
+		DatabaseController.saveOrUpdate(productBrand);
 		return productBrand;
 
 	}
@@ -352,7 +271,7 @@ public class ProductController implements UIActionController
 	public ProductCategory saveCategory(final String name, final ProductType type)
 	{
 		ProductCategory productCategory = new ProductCategory(name, type);
-		DatabaseController.save(productCategory);
+		DatabaseController.saveOrUpdate(productCategory);
 		return productCategory;
 
 	}
@@ -369,7 +288,7 @@ public class ProductController implements UIActionController
 	public ProductType saveProductType(final String name)
 	{
 		ProductType productType = new ProductType(name);
-		DatabaseController.save(productType);
+		DatabaseController.saveOrUpdate(productType);
 		return productType;
 	}
 
@@ -401,8 +320,7 @@ public class ProductController implements UIActionController
 	@SuppressWarnings("static-method")
 	public void saveBrand(final ProductBrand editBrand)
 	{
-		DatabaseController.save(editBrand);
-
+		DatabaseController.saveOrUpdate(editBrand);
 	}
 
 	/**
@@ -415,7 +333,7 @@ public class ProductController implements UIActionController
 	@SuppressWarnings("static-method")
 	public void saveProductType(final ProductType saveProductType)
 	{
-		DatabaseController.save(saveProductType);
+		DatabaseController.saveOrUpdate(saveProductType);
 	}
 
 	/**
@@ -427,7 +345,7 @@ public class ProductController implements UIActionController
 	@SuppressWarnings("static-method")
 	public void saveProductCategory(final ProductCategory saveProductCategory)
 	{
-		DatabaseController.save(saveProductCategory);
+		DatabaseController.saveOrUpdate(saveProductCategory);
 	}
 
 	public Node getCategoryTab()

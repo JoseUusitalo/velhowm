@@ -45,7 +45,7 @@ public class DebugWindow
 	/**
 	 * The DebugController has been tagged as controller.
 	 */
-	private DebugController debugController;
+	private final DebugController debugController;
 
 	/**
 	 * A list of for the unique roles in the database.
