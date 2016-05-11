@@ -1,8 +1,5 @@
 package velho.controller;
 
-import java.util.HashSet;
-import java.util.Set;
-
 import org.apache.log4j.Logger;
 
 import javafx.scene.Node;
@@ -374,7 +371,6 @@ public class ProductController implements UIActionController
 		ProductType productType = new ProductType(name);
 		DatabaseController.save(productType);
 		return productType;
-
 	}
 
 	/**
@@ -406,7 +402,6 @@ public class ProductController implements UIActionController
 	public void saveBrand(final ProductBrand editBrand)
 	{
 		DatabaseController.save(editBrand);
-		// TODO Validate data
 
 	}
 
@@ -420,7 +415,6 @@ public class ProductController implements UIActionController
 	@SuppressWarnings("static-method")
 	public void saveProductType(final ProductType saveProductType)
 	{
-		// TODO Validate data
 		DatabaseController.save(saveProductType);
 	}
 
@@ -433,13 +427,11 @@ public class ProductController implements UIActionController
 	@SuppressWarnings("static-method")
 	public void saveProductCategory(final ProductCategory saveProductCategory)
 	{
-		// TODO Need validation
 		DatabaseController.save(saveProductCategory);
 	}
 
 	public Node getCategoryTab()
 	{
-		// TODO Auto-generated method stub
 		return categoryTabView.getView();
 	}
 
@@ -451,102 +443,6 @@ public class ProductController implements UIActionController
 	@SuppressWarnings("static-method")
 	public void saveProductBox(final ProductBox productBox)
 	{
-		// TODO Need validation
 		DatabaseController.saveOrUpdate(productBox);
-	}
-
-	/**
-	 * Gets a set of contextually invalid {@link ProductBrand} objects from the specified set of product brands.
-	 *
-	 * @param validDataSet a set of technically valid product brands
-	 * @return a set of invalid product brands
-	 */
-	public static Set<ProductBrand> getInvalidProductBrands(final Set<ProductBrand> validDataSet)
-	{
-		final Set<ProductBrand> invalids = new HashSet<ProductBrand>();
-
-		for (final ProductBrand brand : validDataSet)
-		{
-			if (brand.getName() == null || brand.getName().isEmpty())
-				invalids.add(brand);
-		}
-
-		return invalids;
-	}
-
-	/**
-	 * Gets a set of contextually invalid {@link ProductType} objects from the specified set of product types.
-	 *
-	 * @param validDataSet a set of technically valid product types
-	 * @return a set of invalid product types
-	 */
-	public static Set<ProductType> getInvalidProductTypes(final Set<ProductType> validDataSet)
-	{
-		final Set<ProductType> invalids = new HashSet<ProductType>();
-
-		for (final ProductType type : validDataSet)
-		{
-			if (type.getName() == null || type.getName().isEmpty())
-				invalids.add(type);
-		}
-
-		return invalids;
-	}
-
-	/**
-	 * Gets a set of contextually invalid {@link ProductCategory} objects from the specified set of product categories.
-	 *
-	 * @param validDataSet a set of technically valid product categories
-	 * @return a set of invalid product categories
-	 */
-	public static Set<ProductCategory> getInvalidProductCategories(final Set<ProductCategory> validDataSet)
-	{
-		final Set<ProductCategory> invalids = new HashSet<ProductCategory>();
-
-		for (final ProductCategory category : validDataSet)
-		{
-			if (category.getName() == null || category.getName().isEmpty() || category.getType() == null)
-				invalids.add(category);
-		}
-
-		return invalids;
-	}
-
-	/**
-	 * Gets a set of contextually invalid {@link Product} objects from the specified set of products.
-	 *
-	 * @param validDataSet a set of technically valid products
-	 * @return a set of invalid products
-	 */
-	public static Set<Product> getInvalidProducts(final Set<Product> validDataSet)
-	{
-		final Set<Product> invalids = new HashSet<Product>();
-
-		for (final Product product : validDataSet)
-		{
-			if (product.getName() == null || product.getName().isEmpty() || product.getBrand() == null || product.getCategory() == null)
-				invalids.add(product);
-		}
-
-		return invalids;
-	}
-
-	/**
-	 * Gets a set of contextually invalid {@link ProductBox} objects from the specified set of product boxes.
-	 *
-	 * @param validDataSet a set of technically valid product boxes
-	 * @return a set of invalid product boxes
-	 */
-	public static Set<ProductBox> getInvalidProductBoxes(final Set<ProductBox> validDataSet)
-	{
-		final Set<ProductBox> invalids = new HashSet<ProductBox>();
-
-		for (final ProductBox box : validDataSet)
-		{
-			if (box.getProduct() == null || box.getMaxSize() < 1 || box.getProductCount() < 0)
-				invalids.add(box);
-		}
-
-		return invalids;
 	}
 }

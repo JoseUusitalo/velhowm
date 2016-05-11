@@ -2,7 +2,6 @@ package velho.controller;
 
 import java.time.Instant;
 import java.util.Date;
-import java.util.HashSet;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
@@ -233,44 +232,5 @@ public class ManifestController implements UIActionController
 		// TODO check for correct view
 		showBrowseManifestsView();
 
-	}
-
-	/**
-	 * Gets a set of contextually invalid {@link ManifestState} objects from the specified set of manifest states.
-	 *
-	 * @param validDataSet a set of technically valid manifest states
-	 * @return a set of invalid manifest states
-	 */
-	public static Set<ManifestState> getInvalidManifestStates(final Set<ManifestState> validDataSet)
-	{
-		final Set<ManifestState> invalids = new HashSet<ManifestState>();
-
-		for (final ManifestState state : validDataSet)
-		{
-			if (state.getName() == null || state.getName().trim().isEmpty())
-				invalids.add(state);
-		}
-
-		return invalids;
-	}
-
-	/**
-	 * Gets a set of contextually invalid {@link Manifest} objects from the specified set of manifests.
-	 *
-	 * @param validDataSet a set of technically valid manifests
-	 * @return a set of invalid manifests
-	 */
-	public static Set<Manifest> getInvalidManifests(final Set<Manifest> validDataSet)
-	{
-		final Set<Manifest> invalids = new HashSet<Manifest>();
-
-		for (final Manifest manifest : validDataSet)
-		{
-			if (manifest.getState() == null || manifest.getOrderedDate() == null || manifest.getReceivedDate() == null
-					|| manifest.getOrderedDate().after(manifest.getReceivedDate()))
-				invalids.add(manifest);
-		}
-
-		return invalids;
 	}
 }

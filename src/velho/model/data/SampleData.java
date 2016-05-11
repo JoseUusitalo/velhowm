@@ -1,16 +1,8 @@
 package velho.model.data;
 
-import java.util.Set;
-
 import org.apache.log4j.Logger;
 import org.hibernate.HibernateException;
 
-import velho.controller.ManifestController;
-import velho.controller.ProductController;
-import velho.controller.RemovalListController;
-import velho.controller.RemovalPlatformController;
-import velho.controller.ShelfController;
-import velho.controller.UserController;
 import velho.controller.database.DatabaseController;
 import velho.model.CSVLoader;
 import velho.model.Manifest;
@@ -102,15 +94,7 @@ public abstract class SampleData
 		{
 			SYSLOG.debug("Loading sample users.");
 
-			final CSVLoader<User> csvLoader = new CSVLoader<User>(User.class)
-			{
-				@Override
-				protected Set<User> getInvalidDataObjects(final Set<User> validDataSet)
-				{
-					return UserController.getInvalidUsers(validDataSet);
-				}
-			};
-
+			final CSVLoader<User> csvLoader = new CSVLoader<User>(User.class);
 			csvLoader.load("res/sample_users.csv");
 			csvLoader.save();
 		}
@@ -124,15 +108,7 @@ public abstract class SampleData
 		{
 			SYSLOG.debug("Loading sample product brands.");
 
-			final CSVLoader<ProductBrand> csvLoader = new CSVLoader<ProductBrand>(ProductBrand.class)
-			{
-				@Override
-				protected Set<ProductBrand> getInvalidDataObjects(final Set<ProductBrand> validDataSet)
-				{
-					return ProductController.getInvalidProductBrands(validDataSet);
-				}
-			};
-
+			final CSVLoader<ProductBrand> csvLoader = new CSVLoader<ProductBrand>(ProductBrand.class);
 			csvLoader.load("res/sample_product_brands.csv");
 			csvLoader.save();
 		}
@@ -146,15 +122,7 @@ public abstract class SampleData
 		{
 			SYSLOG.debug("Loading sample product types.");
 
-			final CSVLoader<ProductType> csvLoader = new CSVLoader<ProductType>(ProductType.class)
-			{
-				@Override
-				protected Set<ProductType> getInvalidDataObjects(final Set<ProductType> validDataSet)
-				{
-					return ProductController.getInvalidProductTypes(validDataSet);
-				}
-			};
-
+			final CSVLoader<ProductType> csvLoader = new CSVLoader<ProductType>(ProductType.class);
 			csvLoader.load("res/sample_product_types.csv");
 			csvLoader.save();
 		}
@@ -168,15 +136,7 @@ public abstract class SampleData
 		{
 			SYSLOG.debug("Loading sample product categories.");
 
-			final CSVLoader<ProductCategory> csvLoader = new CSVLoader<ProductCategory>(ProductCategory.class)
-			{
-				@Override
-				protected Set<ProductCategory> getInvalidDataObjects(final Set<ProductCategory> validDataSet)
-				{
-					return ProductController.getInvalidProductCategories(validDataSet);
-				}
-			};
-
+			final CSVLoader<ProductCategory> csvLoader = new CSVLoader<ProductCategory>(ProductCategory.class);
 			csvLoader.load("res/sample_product_categories.csv");
 			csvLoader.save();
 		}
@@ -190,15 +150,7 @@ public abstract class SampleData
 		{
 			SYSLOG.debug("Loading sample products.");
 
-			final CSVLoader<Product> csvLoader = new CSVLoader<Product>(Product.class)
-			{
-				@Override
-				protected Set<Product> getInvalidDataObjects(final Set<Product> validDataSet)
-				{
-					return ProductController.getInvalidProducts(validDataSet);
-				}
-			};
-
+			final CSVLoader<Product> csvLoader = new CSVLoader<Product>(Product.class);
 			csvLoader.load("res/sample_products.csv");
 			csvLoader.save();
 		}
@@ -217,15 +169,7 @@ public abstract class SampleData
 			/* 5 - Empty Shelf 2-slot */
 			SYSLOG.debug("Loading sample shelves.");
 
-			final CSVLoader<Shelf> csvLoader = new CSVLoader<Shelf>(Shelf.class)
-			{
-				@Override
-				protected Set<Shelf> getInvalidDataObjects(final Set<Shelf> validDataSet)
-				{
-					return ShelfController.getInvalidShelves(validDataSet);
-				}
-			};
-
+			final CSVLoader<Shelf> csvLoader = new CSVLoader<Shelf>(Shelf.class);
 			csvLoader.load("res/sample_shelves.csv");
 			csvLoader.save();
 		}
@@ -239,15 +183,7 @@ public abstract class SampleData
 		{
 			SYSLOG.debug("Loading sample shelf levels.");
 
-			final CSVLoader<ShelfLevel> csvLoader = new CSVLoader<ShelfLevel>(ShelfLevel.class)
-			{
-				@Override
-				protected Set<ShelfLevel> getInvalidDataObjects(final Set<ShelfLevel> validDataSet)
-				{
-					return ShelfController.getInvalidShelfLevels(validDataSet);
-				}
-			};
-
+			final CSVLoader<ShelfLevel> csvLoader = new CSVLoader<ShelfLevel>(ShelfLevel.class);
 			csvLoader.load("res/sample_shelf_levels.csv");
 			csvLoader.save();
 		}
@@ -261,15 +197,7 @@ public abstract class SampleData
 		{
 			SYSLOG.debug("Loading sample shelf slots.");
 
-			final CSVLoader<ShelfSlot> csvLoader = new CSVLoader<ShelfSlot>(ShelfSlot.class)
-			{
-				@Override
-				protected Set<ShelfSlot> getInvalidDataObjects(final Set<ShelfSlot> validDataSet)
-				{
-					return ShelfController.getInvalidShelfSlots(validDataSet);
-				}
-			};
-
+			final CSVLoader<ShelfSlot> csvLoader = new CSVLoader<ShelfSlot>(ShelfSlot.class);
 			csvLoader.load("res/sample_shelf_slots.csv");
 			csvLoader.save();
 		}
@@ -283,15 +211,7 @@ public abstract class SampleData
 		{
 			SYSLOG.debug("Loading sample manifest states.");
 
-			final CSVLoader<ManifestState> csvLoader = new CSVLoader<ManifestState>(ManifestState.class)
-			{
-				@Override
-				protected Set<ManifestState> getInvalidDataObjects(final Set<ManifestState> validDataSet)
-				{
-					return ManifestController.getInvalidManifestStates(validDataSet);
-				}
-			};
-
+			final CSVLoader<ManifestState> csvLoader = new CSVLoader<ManifestState>(ManifestState.class);
 			csvLoader.load("res/sample_manifest_states.csv");
 			csvLoader.save();
 		}
@@ -305,15 +225,7 @@ public abstract class SampleData
 		{
 			SYSLOG.debug("Loading sample manifests.");
 
-			final CSVLoader<Manifest> csvLoader = new CSVLoader<Manifest>(Manifest.class)
-			{
-				@Override
-				protected Set<Manifest> getInvalidDataObjects(final Set<Manifest> validDataSet)
-				{
-					return ManifestController.getInvalidManifests(validDataSet);
-				}
-			};
-
+			final CSVLoader<Manifest> csvLoader = new CSVLoader<Manifest>(Manifest.class);
 			csvLoader.load("res/sample_manifests.csv");
 			csvLoader.save();
 		}
@@ -327,15 +239,7 @@ public abstract class SampleData
 		{
 			SYSLOG.debug("Loading sample removal list states.");
 
-			final CSVLoader<RemovalListState> csvLoader = new CSVLoader<RemovalListState>(RemovalListState.class)
-			{
-				@Override
-				protected Set<RemovalListState> getInvalidDataObjects(final Set<RemovalListState> validDataSet)
-				{
-					return RemovalListController.getInvalidRemovalListStates(validDataSet);
-				}
-			};
-
+			final CSVLoader<RemovalListState> csvLoader = new CSVLoader<RemovalListState>(RemovalListState.class);
 			csvLoader.load("res/sample_removal_list_states.csv");
 			csvLoader.save();
 		}
@@ -349,15 +253,7 @@ public abstract class SampleData
 		{
 			SYSLOG.debug("Loading sample removal lists.");
 
-			final CSVLoader<RemovalList> csvLoader = new CSVLoader<RemovalList>(RemovalList.class)
-			{
-				@Override
-				protected Set<RemovalList> getInvalidDataObjects(final Set<RemovalList> validDataSet)
-				{
-					return RemovalListController.getInvalidRemovalLists(validDataSet);
-				}
-			};
-
+			final CSVLoader<RemovalList> csvLoader = new CSVLoader<RemovalList>(RemovalList.class);
 			csvLoader.load("res/sample_removal_lists.csv");
 			csvLoader.save();
 		}
@@ -371,15 +267,7 @@ public abstract class SampleData
 		{
 			SYSLOG.debug("Loading sample product boxes.");
 
-			final CSVLoader<ProductBox> csvLoader = new CSVLoader<ProductBox>(ProductBox.class)
-			{
-				@Override
-				protected Set<ProductBox> getInvalidDataObjects(final Set<ProductBox> validDataSet)
-				{
-					return ProductController.getInvalidProductBoxes(validDataSet);
-				}
-			};
-
+			final CSVLoader<ProductBox> csvLoader = new CSVLoader<ProductBox>(ProductBox.class);
 			csvLoader.load("res/sample_product_boxes.csv");
 			csvLoader.save();
 		}
@@ -393,15 +281,7 @@ public abstract class SampleData
 		{
 			SYSLOG.debug("Loading sample removal platforms.");
 
-			final CSVLoader<RemovalPlatform> csvLoader = new CSVLoader<RemovalPlatform>(RemovalPlatform.class)
-			{
-				@Override
-				protected Set<RemovalPlatform> getInvalidDataObjects(final Set<RemovalPlatform> validDataSet)
-				{
-					return RemovalPlatformController.getInvalidRemovalPlatforms(validDataSet);
-				}
-			};
-
+			final CSVLoader<RemovalPlatform> csvLoader = new CSVLoader<RemovalPlatform>(RemovalPlatform.class);
 			csvLoader.load("res/sample_removal_platforms.csv");
 			csvLoader.save();
 		}

@@ -69,12 +69,13 @@ public class CSVView implements GenericView
 			final TextField fileNameField = new TextField();
 			root.add(fileNameField, 1, 0);
 
-			final ComboBox<Class<? extends AbstractDatabaseObject>> typeSelector = new ComboBox<Class<? extends AbstractDatabaseObject>>();
-			typeSelector.setItems(validDatabaseClasses);
-
 			final FileChooser fileChooser = new FileChooser();
 			fileChooser.setTitle("Load CSV File");
 			fileChooser.setInitialDirectory(new File("./"));
+
+			final ComboBox<Class<? extends AbstractDatabaseObject>> typeSelector = new ComboBox<Class<? extends AbstractDatabaseObject>>();
+			typeSelector.setItems(validDatabaseClasses);
+			root.add(typeSelector, 3, 0);
 
 			final Button loadButton = new Button("Load to Database");
 			loadButton.setDisable(true);
@@ -90,7 +91,7 @@ public class CSVView implements GenericView
 
 			final Button selectButton = new Button("Select CSV File...");
 			root.add(selectButton, 2, 0);
-			root.add(loadButton, 3, 0);
+			root.add(loadButton, 4, 0);
 
 			selectButton.setOnAction(new EventHandler<ActionEvent>()
 			{

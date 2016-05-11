@@ -537,9 +537,9 @@ public class MainWindow extends Application implements GenericView
 	 *
 	 * @param primaryStage the stage the main window is open in
 	 */
-	protected void shutdown(final Stage primaryStage)
+	protected void shutdown(final Stage mainstage)
 	{
-		primaryStage.close();
+		mainstage.close();
 
 		if (DEBUG_MODE)
 		{

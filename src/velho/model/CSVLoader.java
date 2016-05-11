@@ -9,15 +9,28 @@ import org.apache.log4j.Logger;
 import com.opencsv.bean.HeaderColumnNameMappingStrategy;
 import com.opencsv.bean.MappingStrategy;
 
+import velho.controller.PopupController;
 import velho.controller.VelhoCsvParser;
 import velho.controller.database.DatabaseController;
+import velho.model.interfaces.ObjectValidationStrategy;
+import velho.model.strategies.ManifestStateValidationStrategy;
+import velho.model.strategies.ManifestValidationStrategy;
+import velho.model.strategies.ProductBoxValidationStrategy;
+import velho.model.strategies.ProductBrandValidationStrategy;
+import velho.model.strategies.ProductCategoryValidationStrategy;
+import velho.model.strategies.ProductTypeValidationStrategy;
+import velho.model.strategies.ProductValidationStrategy;
+import velho.model.strategies.RemovalListStateValidationStrategy;
+import velho.model.strategies.RemovalListValidationStrategy;
+import velho.model.strategies.RemovalPlatformValidationStrategy;
+import velho.model.strategies.ShelfLevelValidationStrategy;
+import velho.model.strategies.ShelfSlotValidationStrategy;
+import velho.model.strategies.ShelfValidationStrategy;
+import velho.model.strategies.UserValidationStrategy;
 
 /**
  * <p>
  * A loader for reading CSV file data into the database.
- * </p>
- * <p>
- * NOTE: The method {@link #getInvalidDataObjects(Set)} must be overridden for the loader to work.
  * </p>
  *
  * @author Jose Uusitalo
@@ -45,6 +58,8 @@ public class CSVLoader<T extends AbstractDatabaseObject>
 	 */
 	private Set<T> dataset;
 
+	private ObjectValidationStrategy validationStrategy;
+
 	/**
 	 * @param objectClass
 	 */
@@ -53,6 +68,50 @@ public class CSVLoader<T extends AbstractDatabaseObject>
 		this.objectClass = objectClass;
 		strategy = new HeaderColumnNameMappingStrategy<T>();
 		((HeaderColumnNameMappingStrategy<T>) strategy).setType(objectClass);
+		validationStrategy = getCorrectStrategy(objectClass.getSimpleName());
+	}
+
+	/**
+	 * Gets the correct {@link ObjectValidationStrategy} for validating objects of the specified type.
+	 *
+	 * @param className the simple name of the class of the objects to be validated
+	 * @return the validation strategy for that class
+	 */
+	private static ObjectValidationStrategy getCorrectStrategy(final String className)
+	{
+		switch (className)
+		{
+			case "ManifestState":
+				return new ManifestStateValidationStrategy();
+			case "Manifest":
+				return new ManifestValidationStrategy();
+			case "ProductBox":
+				return new ProductBoxValidationStrategy();
+			case "ProductBrand":
+				return new ProductBrandValidationStrategy();
+			case "ProductCategory":
+				return new ProductCategoryValidationStrategy();
+			case "ProductType":
+				return new ProductTypeValidationStrategy();
+			case "Product":
+				return new ProductValidationStrategy();
+			case "RemovalListState":
+				return new RemovalListStateValidationStrategy();
+			case "RemovalList":
+				return new RemovalListValidationStrategy();
+			case "RemovalPlatform":
+				return new RemovalPlatformValidationStrategy();
+			case "ShelfLevel":
+				return new ShelfLevelValidationStrategy();
+			case "ShelfSlot":
+				return new ShelfSlotValidationStrategy();
+			case "Shelf":
+				return new ShelfValidationStrategy();
+			case "User":
+				return new UserValidationStrategy();
+			default:
+				return null;
+		}
 	}
 
 	/**
@@ -81,23 +140,6 @@ public class CSVLoader<T extends AbstractDatabaseObject>
 
 	/**
 	 * <p>
-	 * Gets the contextually invalid objects from the specified set of technically valid objects.
-	 * </p>
-	 * <p>
-	 * For example it is possible to create a {@link User} object that has both a PIN and a badge number, but the application assumes that all users have either
-	 * a PIN or a badge number but not both.
-	 * </p>
-	 *
-	 * @param validDataSet a set of valid objects
-	 * @return a set of contextually invalid objects in the valid data set
-	 */
-	protected Set<T> getInvalidDataObjects(final Set<T> validDataSet)
-	{
-		return validDataSet;
-	}
-
-	/**
-	 * <p>
 	 * Loads the object data from the specified CSV file.
 	 * </p>
 	 * <p>
@@ -122,11 +164,14 @@ public class CSVLoader<T extends AbstractDatabaseObject>
 			SYSLOG.warn("Sample " + objectClass.getSimpleName() + " CSV data has malformed data, skipped " + parser.getInvalidData().size() + " lines: "
 					+ parser.getInvalidData());
 
-		final Set<T> invalidDataSet = getInvalidDataObjects(dataset);
+		@SuppressWarnings("unchecked")
+		final Set<AbstractDatabaseObject> invalidDataSet = validationStrategy.getInvalidObjects((Set<AbstractDatabaseObject>) dataset);
 
 		if (!invalidDataSet.isEmpty())
 		{
 			SYSLOG.warn("Sample " + objectClass.getSimpleName() + " objects has " + invalidDataSet.size() + "/" + dataset.size() + " invalid objects.");
+			PopupController.warning(objectClass.getSimpleName() + " objects read from the CSV file at " + csvFilePath + " has " + invalidDataSet.size()
+					+ " (out of " + dataset.size() + ") invalid objects.");
 			dataset.removeAll(invalidDataSet);
 		}
 	}
