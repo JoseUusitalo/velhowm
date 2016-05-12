@@ -44,11 +44,6 @@ public class RemovalListController implements UIActionController
 	private RemovalList newRemovalList;
 
 	/**
-	 * The {@link SearchController}.
-	 */
-	private final SearchController searchController;
-
-	/**
 	 * The creation view for removal lists.
 	 */
 	private RemovalListCreationView creationView;
@@ -66,9 +61,8 @@ public class RemovalListController implements UIActionController
 	/**
 	 * @param searchController
 	 */
-	public RemovalListController(final SearchController searchController)
+	public RemovalListController()
 	{
-		this.searchController = searchController;
 		tabView = new GenericTabView();
 	}
 
@@ -83,7 +77,7 @@ public class RemovalListController implements UIActionController
 		if (LoginController.getInstance().userRoleIsGreaterOrEqualTo(UserRole.MANAGER))
 		{
 			managementView = new RemovalListManagementView(this);
-			creationView = new RemovalListCreationView(this, this.searchController);
+			creationView = new RemovalListCreationView(this, SearchController.getInstance());
 
 			// Initially the browsing view is shown.
 			if (managementView.getView().getCenter() == null)
@@ -95,7 +89,8 @@ public class RemovalListController implements UIActionController
 		{
 			// Others see just the browsing view.
 			if (browseView == null)
-				browseView = ListController.getTableView(this, DatabaseController.getInstance().getRemovalListDataColumns(), DatabaseController.getInstance().getAllRemovalLists());
+				browseView = ListController.getTableView(this, DatabaseController.getInstance().getRemovalListDataColumns(),
+						DatabaseController.getInstance().getAllRemovalLists());
 			tabView.setView(browseView);
 		}
 
@@ -148,7 +143,8 @@ public class RemovalListController implements UIActionController
 		if (browseView == null)
 		{
 			SYSLOG.trace("Creating removal list browsing view.");
-			browseView = ListController.getTableView(this, DatabaseController.getInstance().getRemovalListDataColumns(), DatabaseController.getInstance().getAllRemovalLists());
+			browseView = ListController.getTableView(this, DatabaseController.getInstance().getRemovalListDataColumns(),
+					DatabaseController.getInstance().getAllRemovalLists());
 		}
 
 		SYSLOG.trace("Removal list browsing: " + DatabaseController.getInstance().getAllRemovalLists());
@@ -188,7 +184,8 @@ public class RemovalListController implements UIActionController
 	{
 		SYSLOG.trace("Getting new removal list: " + newRemovalList.getObservableBoxes());
 
-		return (BorderPane) ListController.getTableView(this, DatabaseController.getInstance().getProductSearchDataColumns(false, true), newRemovalList.getObservableBoxes());
+		return (BorderPane) ListController.getTableView(this, DatabaseController.getInstance().getProductSearchDataColumns(false, true),
+				newRemovalList.getObservableBoxes());
 	}
 
 	/**

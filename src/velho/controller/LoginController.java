@@ -44,11 +44,6 @@ public class LoginController
 	private UIController uiController;
 
 	/**
-	 * The {@link DebugController}.
-	 */
-	private DebugController debugController;
-
-	/**
 	 * A private inner class holding the class instance.
 	 *
 	 * @author Jose Uusitalo
@@ -92,11 +87,10 @@ public class LoginController
 	 * @param uiController the {@link UIController}
 	 * @param debugController the {@link DebugController}
 	 */
-	public void setControllers(final UIController uiController, final DebugController debugController)
+	public void setControllers(final UIController uiController)
 	{
 		// TODO: remove
 		LoginController.getInstance().uiController = uiController;
-		LoginController.getInstance().debugController = debugController;
 	}
 
 	/**
@@ -125,7 +119,7 @@ public class LoginController
 				destroyView();
 
 				if (MainWindow.DEBUG_MODE)
-					debugController.setLogInButtonVisiblity(false);
+					DebugController.getInstance().setLogInButtonVisiblity(false);
 
 				return true;
 			}
@@ -172,7 +166,7 @@ public class LoginController
 				destroyView();
 
 				if (MainWindow.DEBUG_MODE)
-					debugController.setLogInButtonVisiblity(false);
+					DebugController.getInstance().setLogInButtonVisiblity(false);
 
 				return true;
 			}
@@ -195,7 +189,7 @@ public class LoginController
 	public void logout()
 	{
 		if (MainWindow.DEBUG_MODE)
-			debugController.setLogInButtonVisiblity(true);
+			DebugController.getInstance().setLogInButtonVisiblity(true);
 
 		USRLOG.info(currentUser.toString() + " logged out.");
 

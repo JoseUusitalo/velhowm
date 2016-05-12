@@ -29,11 +29,6 @@ public class UIController
 	private MainWindow mainView;
 
 	/**
-	 * The {@link SearchController}.
-	 */
-	private SearchController searchController;
-
-	/**
 	 * The {@link RemovalListController}.
 	 */
 	private RemovalListController removalListController;
@@ -63,13 +58,12 @@ public class UIController
 	 */
 	private static Set<GenericView> viewSet = new HashSet<GenericView>();
 
-	public void setControllers(final MainWindow mainWindow, final RemovalListController removalListController, final SearchController searchController,
-			final ManifestController manifestController, final RemovalPlatformController removalPlatformController, final CSVController csvController)
+	public void setControllers(final MainWindow mainWindow, final RemovalListController removalListController, final ManifestController manifestController,
+			final RemovalPlatformController removalPlatformController, final CSVController csvController)
 	{
 		// TODO: remove
 		this.mainView = mainWindow;
 		this.removalListController = removalListController;
-		this.searchController = searchController;
 		this.manifestController = manifestController;
 		this.removalPlatformController = removalPlatformController;
 		this.csvController = csvController;
@@ -138,8 +132,9 @@ public class UIController
 				mainView.addTab(LocalizationController.getInstance().getString("addRemovalListsTab"), removalListController.getView());
 				//$FALL-THROUGH$
 			case GUEST:
-				mainView.addTab(LocalizationController.getInstance().getString("addSearchTab"), searchController.getSearchTabView());
-				mainView.addTab(LocalizationController.getInstance().getString("addProductListSearchTab"), searchController.getProductListSearchView());
+				mainView.addTab(LocalizationController.getInstance().getString("addSearchTab"), SearchController.getInstance().getSearchTabView());
+				mainView.addTab(LocalizationController.getInstance().getString("addProductListSearchTab"),
+						SearchController.getInstance().getProductListSearchView());
 				break;
 			default:
 				SYSLOG.error("Unknown user role '" + currentUserRole.getName() + "'.");

@@ -26,10 +26,33 @@ public class SearchController
 	private final SearchTabView searchTabView;
 
 	/**
+	 * A private inner class holding the class instance.
+	 *
+	 * @author Jose Uusitalo
 	 */
-	public SearchController()
+	private static class Holder
+	{
+		/**
+		 * The only instance of {@link SearchController}.
+		 */
+		private static final SearchController INSTANCE = new SearchController();
+	}
+
+	/**
+	 */
+	private SearchController()
 	{
 		this.searchTabView = new SearchTabView(this);
+	}
+
+	/**
+	 * Gets the instance of the {@link SearchController}.
+	 *
+	 * @return the search controller
+	 */
+	public static synchronized SearchController getInstance()
+	{
+		return Holder.INSTANCE;
 	}
 
 	/**
