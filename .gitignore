@@ -11,3 +11,5 @@
 /testreport/
 /javadoc/
 /report/
+/screenshot*.png
+/*.csv
