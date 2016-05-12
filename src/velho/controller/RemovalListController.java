@@ -175,8 +175,7 @@ public class RemovalListController implements UIActionController
 	public BorderPane getSearchResultsListView()
 	{
 		SYSLOG.trace("Getting search result list: " + DatabaseController.getObservableProductSearchResults());
-		return (BorderPane) ListController.getTableView(this, DatabaseController.getProductSearchDataColumns(true, false),
-				DatabaseController.getObservableProductSearchResults());
+		return (BorderPane) ListController.getTableView(this, DatabaseController.getProductSearchDataColumns(true, false), DatabaseController.getObservableProductSearchResults());
 	}
 
 	/**
@@ -281,8 +280,11 @@ public class RemovalListController implements UIActionController
 	@Override
 	public void deleteAction(final Object data)
 	{
-		DatabaseController.deleteRemovalList((RemovalList) data);
-		USRLOG.info("Deleted removal list: " + ((RemovalList) data).toString());
+		if (PopupController.confirmation(LocalizationController.getString("removalListDeletationConfirmation")))
+		{
+			DatabaseController.deleteRemovalList((RemovalList) data);
+			USRLOG.info("Deleted removal list: " + ((RemovalList) data).toString());
+		}
 	}
 
 	@Override
@@ -312,6 +314,5 @@ public class RemovalListController implements UIActionController
 	{
 		browseView = null;
 		showBrowseRemovalListsView();
-
 	}
 }

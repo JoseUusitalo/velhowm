@@ -206,16 +206,22 @@ public class UserController implements UIActionController
 			return false;
 		}
 
-		if (DatabaseController.deleteUser(user))
+		if (PopupController.confirmation(LocalizationController.getString("yourAccountDeletationConfirmationCheckPopUp")))
 		{
-			USRLOG.debug("User removed: " + user.getFullDetails());
-			PopupController.info(LocalizationController.getString("userRemovedInfoPopUp") + user.getFullDetails());
-			return true;
+			if (DatabaseController.deleteUser(user))
+			{
+				USRLOG.debug("User removed: " + user.getFullDetails());
+				PopupController.info(LocalizationController.getString("userRemovedInfoPopUp") + user.getFullDetails());
+				return true;
+			}
+
+			USRLOG.debug("Failed to delete user: " + user.getFullDetails());
+			PopupController.info("Failed to delete user: " + user.getFullDetails());
+
+			return false;
 		}
 
-		USRLOG.debug("Failed to delete user: " + user.getFullDetails());
-		PopupController.info(LocalizationController.getCompoundString("failedToDeleteUserNotice", user.getFullDetails()));
-
+		USRLOG.trace("Cancelled deletion confirmation.");
 		return false;
 	}
 

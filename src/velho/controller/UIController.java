@@ -83,9 +83,7 @@ public class UIController
 	 * @param productController
 	 * @param removalPlatformController
 	 */
-	public void setControllers(final MainWindow mainWindow, final UserController userController, final RemovalListController removalListController,
-			final SearchController searchController, final LogController logController, final ManifestController manifestController,
-			final ProductController productController, final RemovalPlatformController removalPlatformController, final CSVController csvController)
+	public void setControllers(final MainWindow mainWindow, final UserController userController, final RemovalListController removalListController, final SearchController searchController, final LogController logController, final ManifestController manifestController, final ProductController productController, final RemovalPlatformController removalPlatformController, final CSVController csvController)
 	{
 		this.mainView = mainWindow;
 		this.userController = userController;

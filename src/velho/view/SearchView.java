@@ -11,6 +11,7 @@ import javafx.scene.control.Label;
 import javafx.scene.control.Spinner;
 import javafx.scene.control.SpinnerValueFactory;
 import javafx.scene.control.TextField;
+import javafx.scene.control.Tooltip;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.GridPane;
 import velho.controller.LocalizationController;
@@ -68,6 +69,7 @@ public class SearchView implements GenericView
 			final TextField nameField = new TextField();
 			nameField.setPromptText(LocalizationController.getString("productNameorIDPromptText"));
 			grid.add(nameField, 0, 1, 2, 1);
+			nameField.setTooltip(new Tooltip(LocalizationController.getString("tooltipSearchViewSearchField")));
 
 			final Label countSpinnerLabel = new Label(LocalizationController.getString("productCountSpinnerText"));
 			countSpinnerLabel.setAlignment(Pos.CENTER);

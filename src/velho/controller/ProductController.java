@@ -188,18 +188,27 @@ public class ProductController implements UIActionController
 	{
 		if (data instanceof ProductBrand)
 		{
-			if (!DatabaseController.deleteProductBrand((ProductBrand) data))
-				PopupController.error(LocalizationController.getCompoundString("unableToDeleteBrandPopUp", new Object[] { ((ProductBrand) data).getName() }));
+			if (PopupController.confirmation(LocalizationController.getString("productBrandDeletationConfirmation")))
+			{
+				if (!DatabaseController.deleteProductBrand((ProductBrand) data))
+					PopupController.error(LocalizationController.getCompoundString("unableToDeleteBrandPopUp", new Object[] { ((ProductBrand) data).getName() }));
+			}
 		}
 		else if (data instanceof ProductCategory)
 		{
-			if (!DatabaseController.deleteProductCategory((ProductCategory) data))
-				PopupController.error(LocalizationController.getCompoundString("unableToDeleteCategory", new Object[] { ((ProductCategory) data).getName() }));
+			if (PopupController.confirmation(LocalizationController.getString("productCategoryDeletationConfirmation")))
+			{
+				if (!DatabaseController.deleteProductCategory((ProductCategory) data))
+					PopupController.error(LocalizationController.getCompoundString("unableToDeleteCategory", new Object[] { ((ProductCategory) data).getName() }));
+			}
 		}
 		else if (data instanceof ProductBox)
 		{
-			if (!DatabaseController.deleteProductBox((ProductBox) data))
-				PopupController.error(LocalizationController.getString("unableToDeleteProductBoxPopUp"));
+			if (PopupController.confirmation(LocalizationController.getString("productBoxDeletationConfirmation")))
+			{
+				if (!DatabaseController.deleteProductBox((ProductBox) data))
+					PopupController.error(LocalizationController.getString("unableToDeleteProductBoxPopUp"));
+			}
 		}
 		else if (data instanceof Product)
 		{
@@ -208,8 +217,11 @@ public class ProductController implements UIActionController
 		}
 		else if (data instanceof ProductType)
 		{
-			if (!DatabaseController.deleteProductType((ProductType) data))
-				PopupController.error(LocalizationController.getCompoundString("unableToDeleteProductTypePopUp", new Object[] { ((ProductType) data).getName() }));
+			if (PopupController.confirmation(LocalizationController.getString("productTypeDeletationConfirmation")))
+			{
+				if (!DatabaseController.deleteProductType((ProductType) data))
+					PopupController.error(LocalizationController.getCompoundString("unableToDeleteProductTypePopUp", new Object[] { ((ProductType) data).getName() }));
+			}
 		}
 		else
 		{
@@ -362,4 +374,5 @@ public class ProductController implements UIActionController
 	{
 		DatabaseController.saveOrUpdate(productBox);
 	}
+
 }
