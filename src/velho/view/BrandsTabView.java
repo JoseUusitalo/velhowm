@@ -58,7 +58,7 @@ public class BrandsTabView implements GenericView
 	 */
 	public BrandsTabView(final ProductController productController)
 	{
-		data = DatabaseController.getAllProductBrands();
+		data = DatabaseController.getInstance().getAllProductBrands();
 		this.productController = productController;
 		this.table = new TableView<Object>();
 	}

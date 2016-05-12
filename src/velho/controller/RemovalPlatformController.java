@@ -44,7 +44,7 @@ public class RemovalPlatformController
 	private RemovalPlatform getPlatform()
 	{
 		if (platform == null)
-			platform = DatabaseController.getRemovalPlatformByID(1);
+			platform = DatabaseController.getInstance().getRemovalPlatformByID(1);
 
 		return platform;
 	}
@@ -71,7 +71,7 @@ public class RemovalPlatformController
 		SYSLOG.debug(getPlatform() + " free space decreased by " + percentagePoints);
 		getPlatform().modifyFreeSpace(percentagePoints);
 
-		DatabaseController.saveOrUpdate(getPlatform());
+		DatabaseController.getInstance().saveOrUpdate(getPlatform());
 		checkWarning();
 	}
 

@@ -72,7 +72,7 @@ public class ProductListSearchView implements GenericView
 				@Override
 				public void handle(final ActionEvent event)
 				{
-					ExternalSystemsController.sendDataToPrinter(DatabaseController.getObservableProductSearchResults());
+					ExternalSystemsController.sendDataToPrinter(DatabaseController.getInstance().getObservableProductSearchResults());
 				}
 			});
 
@@ -81,7 +81,7 @@ public class ProductListSearchView implements GenericView
 				@Override
 				public void handle(final ActionEvent event)
 				{
-					ExternalSystemsController.sendDataToBarcodeScanner(DatabaseController.getObservableProductSearchResults());
+					ExternalSystemsController.sendDataToBarcodeScanner(DatabaseController.getInstance().getObservableProductSearchResults());
 				}
 			});
 

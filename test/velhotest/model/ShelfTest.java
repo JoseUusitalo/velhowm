@@ -56,16 +56,16 @@ public class ShelfTest
 	@BeforeClass
 	public static final void init() throws Exception
 	{
-		LogDatabaseController.connectAndInitialize();
-		DatabaseController.link();
-		DatabaseController.loadSampleData();
+		LogDatabaseController.getInstance().connectAndInitialize();
+		DatabaseController.getInstance().link();
+		DatabaseController.getInstance().loadSampleData();
 
-		fullShelf_LVL_1_SLTPOS_1 = DatabaseController.getShelfByID(FULLSHELF_LVL_1_SLTPOS_1_ID);
-		shelf_FREE_LVL_2 = DatabaseController.getShelfByID(SHELF_FREE_LVL_2_ID);
-		emptyShelf_1_1_to_1_2 = DatabaseController.getShelfByID(EMPTYSHELF_1_1_to_1_2_ID);
-		EMPTY_BOX = DatabaseController.getProductBoxByID(23);
-		BOX_ID_21 = DatabaseController.getProductBoxByID(21);
-		BOX_ID_22 = DatabaseController.getProductBoxByID(22);
+		fullShelf_LVL_1_SLTPOS_1 = DatabaseController.getInstance().getShelfByID(FULLSHELF_LVL_1_SLTPOS_1_ID);
+		shelf_FREE_LVL_2 = DatabaseController.getInstance().getShelfByID(SHELF_FREE_LVL_2_ID);
+		emptyShelf_1_1_to_1_2 = DatabaseController.getInstance().getShelfByID(EMPTYSHELF_1_1_to_1_2_ID);
+		EMPTY_BOX = DatabaseController.getInstance().getProductBoxByID(23);
+		BOX_ID_21 = DatabaseController.getInstance().getProductBoxByID(21);
+		BOX_ID_22 = DatabaseController.getInstance().getProductBoxByID(22);
 
 		System.out.println("--Start--");
 		System.out.println("Initial state");
@@ -81,8 +81,8 @@ public class ShelfTest
 	@AfterClass
 	public static final void unlinkDatabases() throws Exception
 	{
-		DatabaseController.unlink();
-		LogDatabaseController.unlink();
+		DatabaseController.getInstance().unlink();
+		LogDatabaseController.getInstance().unlink();
 	}
 
 	/**
@@ -330,10 +330,10 @@ public class ShelfTest
 		assertEquals(oldProductCount + BOX_ID_21_PRODUCT_COUNT, shelf_FREE_LVL_2.getProductCountInBoxes());
 
 		// -- Save to database --
-		DatabaseController.saveOrUpdate(shelf_FREE_LVL_2);
+		DatabaseController.getInstance().saveOrUpdate(shelf_FREE_LVL_2);
 
 		// Check that database has been updated.
-		shelf_FREE_LVL_2 = DatabaseController.getShelfByID(SHELF_FREE_LVL_2_ID);
+		shelf_FREE_LVL_2 = DatabaseController.getInstance().getShelfByID(SHELF_FREE_LVL_2_ID);
 
 		System.out.println("From database");
 		System.out.println(shelf_FREE_LVL_2);
@@ -361,16 +361,16 @@ public class ShelfTest
 		assertTrue(BOX_ID_21.getShelfSlot().removeBox(BOX_ID_21));
 
 		// Update database.
-		DatabaseController.saveOrUpdate(BOX_ID_21);
+		DatabaseController.getInstance().saveOrUpdate(BOX_ID_21);
 
 		// Fetch the updated shelf.
-		shelf_FREE_LVL_2 = DatabaseController.getShelfByID(SHELF_FREE_LVL_2_ID);
+		shelf_FREE_LVL_2 = DatabaseController.getInstance().getShelfByID(SHELF_FREE_LVL_2_ID);
 
 		// Check.
 		assertFalse(shelf_FREE_LVL_2.getShelfSlot(slotid).contains(BOX_ID_21));
 
 		// Save.
-		DatabaseController.saveOrUpdate(shelf_FREE_LVL_2);
+		DatabaseController.getInstance().saveOrUpdate(shelf_FREE_LVL_2);
 		System.out.println(shelf_FREE_LVL_2);
 		System.out.println(shelf_FREE_LVL_2.getShelfSlot(slotid).getProductBoxes());
 	}
@@ -397,7 +397,7 @@ public class ShelfTest
 		assertEquals(BOX_ID_21.getShelfSlot(), shelf_FREE_LVL_2.getShelfSlot(slotid));
 
 		// Save shelf to database.
-		DatabaseController.saveOrUpdate(shelf_FREE_LVL_2);
+		DatabaseController.getInstance().saveOrUpdate(shelf_FREE_LVL_2);
 
 		// Product box is in the shelf.
 		assertTrue(shelf_FREE_LVL_2.getProductBoxes().contains(BOX_ID_21));
@@ -447,11 +447,11 @@ public class ShelfTest
 		 */
 
 		// I.e. save the box, not the shelf(slot/level).
-		DatabaseController.saveOrUpdate(BOX_ID_21);
+		DatabaseController.getInstance().saveOrUpdate(BOX_ID_21);
 
 		// Check that database has been updated.
-		shelf_FREE_LVL_2 = DatabaseController.getShelfByID(SHELF_FREE_LVL_2_ID);
-		BOX_ID_21 = DatabaseController.getProductBoxByID(21);
+		shelf_FREE_LVL_2 = DatabaseController.getInstance().getShelfByID(SHELF_FREE_LVL_2_ID);
+		BOX_ID_21 = DatabaseController.getInstance().getProductBoxByID(21);
 
 		// Product box is not in the shelf.
 		assertNull(BOX_ID_21.getShelfSlot());

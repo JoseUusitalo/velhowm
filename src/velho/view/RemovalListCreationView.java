@@ -119,7 +119,7 @@ public class RemovalListCreationView implements GenericView
 
 			final ComboBox<Object> removalListState = new ComboBox<Object>();
 
-			removalListState.getItems().addAll(DatabaseController.getAllRemovalListStates());
+			removalListState.getItems().addAll(DatabaseController.getInstance().getAllRemovalListStates());
 
 			center.add(removalListState, 0, 0);
 

@@ -271,7 +271,7 @@ public abstract class ProductContainer extends AbstractDatabaseObject
 	public void setRemovalListID(final int removalListID)
 	{
 		if (removalListID > 0)
-			this.removalList = DatabaseController.getRemovalListByID(removalListID);
+			this.removalList = DatabaseController.getInstance().getRemovalListByID(removalListID);
 	}
 
 	/**
@@ -284,7 +284,7 @@ public abstract class ProductContainer extends AbstractDatabaseObject
 	public void setManifestID(final int manifestID)
 	{
 		if (manifestID > 0)
-			this.manifest = DatabaseController.getManifestByID(manifestID);
+			this.manifest = DatabaseController.getInstance().getManifestByID(manifestID);
 	}
 
 	/**
@@ -297,7 +297,7 @@ public abstract class ProductContainer extends AbstractDatabaseObject
 	public void setShelfSlotID(final int shelfSlotID)
 	{
 		if (shelfSlotID > 0)
-			this.shelfSlot = DatabaseController.getShelfSlotByID(shelfSlotID);
+			this.shelfSlot = DatabaseController.getInstance().getShelfSlotByID(shelfSlotID);
 	}
 
 	/**
@@ -310,7 +310,7 @@ public abstract class ProductContainer extends AbstractDatabaseObject
 	public void setProductID(final int productID)
 	{
 		if (productID > 0)
-			this.product = DatabaseController.getProductByID(productID);
+			this.product = DatabaseController.getInstance().getProductByID(productID);
 	}
 
 	/**

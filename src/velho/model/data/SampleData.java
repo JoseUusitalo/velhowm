@@ -92,7 +92,7 @@ public abstract class SampleData
 	 */
 	private static void createSampleUsers()
 	{
-		if (DatabaseController.hasUsers())
+		if (DatabaseController.getInstance().hasUsers())
 		{
 			SYSLOG.trace("Database already has users.");
 		}
@@ -111,7 +111,7 @@ public abstract class SampleData
 	 */
 	private static void createSampleBrands()
 	{
-		if (DatabaseController.hasProductBrands())
+		if (DatabaseController.getInstance().hasProductBrands())
 		{
 			SYSLOG.trace("Database already has product brands.");
 		}
@@ -130,7 +130,7 @@ public abstract class SampleData
 	 */
 	private static void createSampleProductTypes()
 	{
-		if (DatabaseController.hasProductTypes())
+		if (DatabaseController.getInstance().hasProductTypes())
 		{
 			SYSLOG.trace("Database already has product types.");
 		}
@@ -149,7 +149,7 @@ public abstract class SampleData
 	 */
 	private static void createSampleProductCategories()
 	{
-		if (DatabaseController.hasProductCategories())
+		if (DatabaseController.getInstance().hasProductCategories())
 		{
 			SYSLOG.trace("Database already has product categories.");
 		}
@@ -168,7 +168,7 @@ public abstract class SampleData
 	 */
 	private static void createSampleProducts()
 	{
-		if (DatabaseController.hasProducts())
+		if (DatabaseController.getInstance().hasProducts())
 		{
 			SYSLOG.trace("Database already has products.");
 		}
@@ -187,7 +187,7 @@ public abstract class SampleData
 	 */
 	private static void createSampleShelves()
 	{
-		if (DatabaseController.hasShelves())
+		if (DatabaseController.getInstance().hasShelves())
 		{
 			SYSLOG.trace("Database already has shelves.");
 		}
@@ -211,7 +211,7 @@ public abstract class SampleData
 	 */
 	private static void createSampleShelfLevels()
 	{
-		if (DatabaseController.hasShelfLevels())
+		if (DatabaseController.getInstance().hasShelfLevels())
 		{
 			SYSLOG.trace("Database already has shelf levels.");
 		}
@@ -230,7 +230,7 @@ public abstract class SampleData
 	 */
 	private static void createSampleShelfSlots()
 	{
-		if (DatabaseController.hasShelfSlots())
+		if (DatabaseController.getInstance().hasShelfSlots())
 		{
 			SYSLOG.trace("Database already has shelf slots.");
 		}
@@ -249,7 +249,7 @@ public abstract class SampleData
 	 */
 	private static void createSampleManifestStates()
 	{
-		if (DatabaseController.hasManifestStates())
+		if (DatabaseController.getInstance().hasManifestStates())
 		{
 			SYSLOG.trace("Database already has manifest states.");
 		}
@@ -268,7 +268,7 @@ public abstract class SampleData
 	 */
 	private static void createSampleManifests()
 	{
-		if (DatabaseController.hasManifests())
+		if (DatabaseController.getInstance().hasManifests())
 		{
 			SYSLOG.trace("Database already has manifests.");
 		}
@@ -287,7 +287,7 @@ public abstract class SampleData
 	 */
 	private static void createSampleRemovalListStates()
 	{
-		if (DatabaseController.hasRemovalListStates())
+		if (DatabaseController.getInstance().hasRemovalListStates())
 		{
 			SYSLOG.trace("Database already has removal list states.");
 		}
@@ -306,7 +306,7 @@ public abstract class SampleData
 	 */
 	private static void createSampleRemovalLists()
 	{
-		if (DatabaseController.hasRemovalLists())
+		if (DatabaseController.getInstance().hasRemovalLists())
 		{
 			SYSLOG.trace("Database already has removal lists.");
 		}
@@ -325,7 +325,7 @@ public abstract class SampleData
 	 */
 	private static void createSampleProductBoxes()
 	{
-		if (DatabaseController.hasProductBoxes())
+		if (DatabaseController.getInstance().hasProductBoxes())
 		{
 			SYSLOG.trace("Database already has product boxes.");
 		}
@@ -344,7 +344,7 @@ public abstract class SampleData
 	 */
 	private static void createSampleRemovalPlatforms()
 	{
-		if (DatabaseController.hasRemovalPlatforms())
+		if (DatabaseController.getInstance().hasRemovalPlatforms())
 		{
 			SYSLOG.trace("Database already has removal platforms.");
 		}

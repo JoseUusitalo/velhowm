@@ -95,7 +95,7 @@ public class RemovalListController implements UIActionController
 		{
 			// Others see just the browsing view.
 			if (browseView == null)
-				browseView = ListController.getTableView(this, DatabaseController.getRemovalListDataColumns(), DatabaseController.getAllRemovalLists());
+				browseView = ListController.getTableView(this, DatabaseController.getInstance().getRemovalListDataColumns(), DatabaseController.getInstance().getAllRemovalLists());
 			tabView.setView(browseView);
 		}
 
@@ -122,7 +122,7 @@ public class RemovalListController implements UIActionController
 	{
 		// Create a new removal list if it does not exist.
 		if (newRemovalList == null)
-			newRemovalList = new RemovalList(DatabaseController.getRemovalListStateByID(1));
+			newRemovalList = new RemovalList(DatabaseController.getInstance().getRemovalListStateByID(1));
 
 		if (managementView.getContent().equals(getRemovalListCreationView()))
 		{
@@ -148,10 +148,10 @@ public class RemovalListController implements UIActionController
 		if (browseView == null)
 		{
 			SYSLOG.trace("Creating removal list browsing view.");
-			browseView = ListController.getTableView(this, DatabaseController.getRemovalListDataColumns(), DatabaseController.getAllRemovalLists());
+			browseView = ListController.getTableView(this, DatabaseController.getInstance().getRemovalListDataColumns(), DatabaseController.getInstance().getAllRemovalLists());
 		}
 
-		SYSLOG.trace("Removal list browsing: " + DatabaseController.getAllRemovalLists());
+		SYSLOG.trace("Removal list browsing: " + DatabaseController.getInstance().getAllRemovalLists());
 
 		// Managers and greater see the management view.
 		if (LoginController.userRoleIsGreaterOrEqualTo(UserRole.MANAGER))
@@ -174,9 +174,9 @@ public class RemovalListController implements UIActionController
 	 */
 	public BorderPane getSearchResultsListView()
 	{
-		SYSLOG.trace("Getting search result list: " + DatabaseController.getObservableProductSearchResults());
-		return (BorderPane) ListController.getTableView(this, DatabaseController.getProductSearchDataColumns(true, false),
-				DatabaseController.getObservableProductSearchResults());
+		SYSLOG.trace("Getting search result list: " + DatabaseController.getInstance().getObservableProductSearchResults());
+		return (BorderPane) ListController.getTableView(this, DatabaseController.getInstance().getProductSearchDataColumns(true, false),
+				DatabaseController.getInstance().getObservableProductSearchResults());
 	}
 
 	/**
@@ -188,7 +188,7 @@ public class RemovalListController implements UIActionController
 	{
 		SYSLOG.trace("Getting new removal list: " + newRemovalList.getObservableBoxes());
 
-		return (BorderPane) ListController.getTableView(this, DatabaseController.getProductSearchDataColumns(false, true), newRemovalList.getObservableBoxes());
+		return (BorderPane) ListController.getTableView(this, DatabaseController.getInstance().getProductSearchDataColumns(false, true), newRemovalList.getObservableBoxes());
 	}
 
 	/**
@@ -200,9 +200,9 @@ public class RemovalListController implements UIActionController
 		{
 			SYSLOG.info("Saving Removal List: " + newRemovalList.getBoxes());
 
-			if (DatabaseController.saveOrUpdate(newRemovalList) > 0)
+			if (DatabaseController.getInstance().saveOrUpdate(newRemovalList) > 0)
 			{
-				DatabaseController.clearSearchResults();
+				DatabaseController.getInstance().clearSearchResults();
 
 				USRLOG.info("Created a new Removal List: " + newRemovalList.getBoxes());
 
@@ -251,7 +251,7 @@ public class RemovalListController implements UIActionController
 	{
 		removalList.setState(state);
 
-		if (DatabaseController.saveOrUpdate(removalList) < 1)
+		if (DatabaseController.getInstance().saveOrUpdate(removalList) < 1)
 			PopupController.error(LocalizationController.getString("unableToSaveRemovalListStateNotice"));
 	}
 
@@ -281,7 +281,7 @@ public class RemovalListController implements UIActionController
 	@Override
 	public void deleteAction(final Object data)
 	{
-		DatabaseController.deleteRemovalList((RemovalList) data);
+		DatabaseController.getInstance().deleteRemovalList((RemovalList) data);
 		USRLOG.info("Deleted removal list: " + ((RemovalList) data).toString());
 	}
 

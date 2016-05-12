@@ -98,7 +98,7 @@ public class RemovalListView implements GenericView
 			GridPane.setHgrow(removalListLabel, Priority.ALWAYS);
 
 			final ComboBox<Object> removalListState = new ComboBox<Object>();
-			removalListState.getItems().addAll(DatabaseController.getAllRemovalListStates());
+			removalListState.getItems().addAll(DatabaseController.getInstance().getAllRemovalListStates());
 			removalListState.getSelectionModel().select(removalList.getState());
 
 			removalListState.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<Object>()
@@ -110,7 +110,7 @@ public class RemovalListView implements GenericView
 				}
 			});
 
-			thisList = (BorderPane) ListController.getTableView(removalListController, DatabaseController.getProductSearchDataColumns(false, false),
+			thisList = (BorderPane) ListController.getTableView(removalListController, DatabaseController.getInstance().getProductSearchDataColumns(false, false),
 					removalList.getObservableBoxes());
 
 			// Make the list always take up the full vertical space.

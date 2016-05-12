@@ -127,7 +127,7 @@ public class UserController implements UIActionController
 			else
 				newUser = new User(userFirstName, userLastName, userPIN, null, userRole);
 
-			if (DatabaseController.getAllUsers().contains(newUser))
+			if (DatabaseController.getInstance().getAllUsers().contains(newUser))
 			{
 
 				SYSLOG.debug("User already exists.");
@@ -141,7 +141,7 @@ public class UserController implements UIActionController
 
 			}
 
-			DatabaseController.saveOrUpdate(newUser);
+			DatabaseController.getInstance().saveOrUpdate(newUser);
 
 			if (LoginController.getCurrentUser() != null)
 				USRLOG.debug("Created a user.");
@@ -190,7 +190,7 @@ public class UserController implements UIActionController
 			if (PopupController.confirmation(LocalizationController.getString("yourAccountDeletationConfirmationPopUp")))
 			{
 
-				if (DatabaseController.deleteUser(user))
+				if (DatabaseController.getInstance().deleteUser(user))
 				{
 					LoginController.logout();
 					USRLOG.debug("User deleted themselves: " + user.getFullDetails());
@@ -206,7 +206,7 @@ public class UserController implements UIActionController
 			return false;
 		}
 
-		if (DatabaseController.deleteUser(user))
+		if (DatabaseController.getInstance().deleteUser(user))
 		{
 			USRLOG.debug("User removed: " + user.getFullDetails());
 			PopupController.info(LocalizationController.getString("userRemovedInfoPopUp") + user.getFullDetails());
@@ -227,7 +227,7 @@ public class UserController implements UIActionController
 	public Node getView()
 	{
 		if (view == null)
-			view = new AddUserView(this, DatabaseController.getAllUserRoles());
+			view = new AddUserView(this, DatabaseController.getInstance().getAllUserRoles());
 		return view.getView();
 	}
 
@@ -352,9 +352,9 @@ public class UserController implements UIActionController
 		{
 			case ADMINISTRATOR:
 			case MANAGER:
-				return ListController.getTableView(this, DatabaseController.getPublicUserDataColumns(true), DatabaseController.getAllUsers());
+				return ListController.getTableView(this, DatabaseController.getInstance().getPublicUserDataColumns(true), DatabaseController.getInstance().getAllUsers());
 			case LOGISTICIAN:
-				return ListController.getTableView(this, DatabaseController.getPublicUserDataColumns(false), DatabaseController.getAllUsers());
+				return ListController.getTableView(this, DatabaseController.getInstance().getPublicUserDataColumns(false), DatabaseController.getInstance().getAllUsers());
 			case GUEST:
 				break;
 			default:

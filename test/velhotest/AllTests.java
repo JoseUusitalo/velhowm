@@ -37,9 +37,9 @@ public class AllTests
 		System.out.println("All Tests Done.\n");
 
 		System.out.println("Close session factory");
-		DatabaseController.closeSessionFactory();
+		DatabaseController.getInstance().closeSessionFactory();
 
 		System.out.println("\n\nClose log database.");
-		LogDatabaseController.shutdown();
+		LogDatabaseController.getInstance().shutdown();
 	}
 }

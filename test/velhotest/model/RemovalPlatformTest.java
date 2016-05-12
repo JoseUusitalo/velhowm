@@ -19,7 +19,7 @@ import velho.model.RemovalPlatform;
 @SuppressWarnings("static-method")
 public class RemovalPlatformTest
 {
-	private static RemovalPlatform existingPlatform = DatabaseController.getRemovalPlatformByID(1);
+	private static RemovalPlatform existingPlatform = DatabaseController.getInstance().getRemovalPlatformByID(1);
 
 	/**
 	 * Creates the log database if needed and connects to it.
@@ -30,9 +30,9 @@ public class RemovalPlatformTest
 	@BeforeClass
 	public static final void init() throws Exception
 	{
-		LogDatabaseController.connectAndInitialize();
-		DatabaseController.link();
-		DatabaseController.loadSampleData();
+		LogDatabaseController.getInstance().connectAndInitialize();
+		DatabaseController.getInstance().link();
+		DatabaseController.getInstance().loadSampleData();
 
 		// Testing in production environment is fun.
 		existingPlatform.setFreeSpacePercent(1.0);
@@ -44,8 +44,8 @@ public class RemovalPlatformTest
 	@AfterClass
 	public static final void unlinkDatabases() throws Exception
 	{
-		DatabaseController.unlink();
-		LogDatabaseController.unlink();
+		DatabaseController.getInstance().unlink();
+		LogDatabaseController.getInstance().unlink();
 	}
 
 	@Test
@@ -124,13 +124,13 @@ public class RemovalPlatformTest
 
 		// Check that the method worked.
 		assertEquals(0, Double.compare(newPercent, existingPlatform.getFreeSpacePercent()));
-		DatabaseController.saveOrUpdate(existingPlatform);
+		DatabaseController.getInstance().saveOrUpdate(existingPlatform);
 
 		// Database was updated.
-		assertTrue(Double.compare(newPercent, DatabaseController.getRemovalPlatformByID(existingPlatform.getDatabaseID()).getFreeSpacePercent()) == 0);
+		assertTrue(Double.compare(newPercent, DatabaseController.getInstance().getRemovalPlatformByID(existingPlatform.getDatabaseID()).getFreeSpacePercent()) == 0);
 
 		// Rollback.
 		existingPlatform.setFreeSpacePercent(oldPercent);
-		DatabaseController.saveOrUpdate(existingPlatform);
+		DatabaseController.getInstance().saveOrUpdate(existingPlatform);
 	}
 }

@@ -36,7 +36,7 @@ public class ProductTypesTabView implements GenericView
 
 	private VBox vbox;
 
-	private ObservableList<Object> data = DatabaseController.getAllProductTypes();
+	private ObservableList<Object> data = DatabaseController.getInstance().getAllProductTypes();
 	// TODO: Set in constructor.
 
 	public ProductTypesTabView(final ProductController productController)

@@ -61,7 +61,7 @@ public class ProductBoxesTabView implements GenericView
 	/**
 	 * Makes the Categories and ObservableList
 	 */
-	private ObservableList<Object> data = DatabaseController.getAllProductBoxes();
+	private ObservableList<Object> data = DatabaseController.getInstance().getAllProductBoxes();
 
 	private ObservableList<Object> pList;
 
@@ -129,7 +129,7 @@ public class ProductBoxesTabView implements GenericView
 			});
 			table.getColumns().add(maxSizeColumn);
 
-			ObservableList<Object> cbValues = DatabaseController.getAllProducts();
+			ObservableList<Object> cbValues = DatabaseController.getInstance().getAllProducts();
 			TableColumn<Object, Object> product = new TableColumn<Object, Object>(LocalizationController.getString("productProduct"));
 
 			product.setCellValueFactory(new PropertyValueFactory<>("product"));

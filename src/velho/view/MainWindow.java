@@ -210,7 +210,7 @@ public class MainWindow extends Application implements GenericView
 	{
 		try
 		{
-			DatabaseController.loadSampleData();
+			DatabaseController.getInstance().loadSampleData();
 		}
 		catch (final HibernateException e)
 		{
@@ -228,7 +228,7 @@ public class MainWindow extends Application implements GenericView
 
 		try
 		{
-			if (LogDatabaseController.connectAndInitialize())
+			if (LogDatabaseController.getInstance().connectAndInitialize())
 			{
 				if (!DEBUG_MODE)
 				{
@@ -284,9 +284,9 @@ public class MainWindow extends Application implements GenericView
 
 		try
 		{
-			DatabaseController.link();
+			DatabaseController.getInstance().link();
 
-			if (DatabaseController.isLinked())
+			if (DatabaseController.getInstance().isLinked())
 			{
 				SYSLOG.debug("Creating all controllers...");
 
@@ -552,12 +552,12 @@ public class MainWindow extends Application implements GenericView
 		if (DEBUG_MODE && debugStage != null)
 			debugStage.close();
 
-		DatabaseController.closeSessionFactory();
-		DatabaseController.unlink();
+		DatabaseController.getInstance().closeSessionFactory();
+		DatabaseController.getInstance().unlink();
 
 		SYSLOG.info("Exit.");
 
-		LogDatabaseController.unlink();
+		LogDatabaseController.getInstance().unlink();
 	}
 
 	/**

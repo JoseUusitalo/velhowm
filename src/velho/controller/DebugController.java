@@ -59,7 +59,7 @@ public class DebugController
 		 */
 		Collections.reverse(roles);
 
-		view = new DebugWindow(this, roles, DatabaseController.getAllBadgeIDS());
+		view = new DebugWindow(this, roles, DatabaseController.getInstance().getAllBadgeIDS());
 	}
 
 	/**

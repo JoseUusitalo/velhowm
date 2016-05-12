@@ -51,7 +51,7 @@ public class CategoriesTabView implements GenericView
 	/**
 	 * Makes the Categories and ObservableList
 	 */
-	private final ObservableList<Object> data = DatabaseController.getAllProductCategories();
+	private final ObservableList<Object> data = DatabaseController.getInstance().getAllProductCategories();
 	// TODO: Set in constructor;
 
 	/**
@@ -100,7 +100,7 @@ public class CategoriesTabView implements GenericView
 			});
 			table.getColumns().add(nameColumn);
 
-			final ObservableList<Object> cbValues = DatabaseController.getAllProductTypes();
+			final ObservableList<Object> cbValues = DatabaseController.getInstance().getAllProductTypes();
 			final TableColumn<Object, Object> comboBoxColumn = new TableColumn<>(LocalizationController.getString("typesComboboxTabName"));
 			comboBoxColumn.setMinWidth(150);
 			comboBoxColumn.setCellValueFactory(new PropertyValueFactory<>("type"));

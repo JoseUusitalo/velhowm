@@ -300,6 +300,6 @@ public class ShelfLevel extends AbstractDatabaseObject
 		if (parentShelfID < 1)
 			throw new IllegalArgumentException("Parent shelf ID must be greater than 0, was '" + parentShelfID + "'.");
 
-		this.parentShelf = DatabaseController.getShelfByID(parentShelfID);
+		this.parentShelf = DatabaseController.getInstance().getShelfByID(parentShelfID);
 	}
 }

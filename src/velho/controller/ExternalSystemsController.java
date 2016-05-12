@@ -136,7 +136,7 @@ public abstract class ExternalSystemsController
 	 */
 	public static boolean move(final int productBoxCode, final String newShelfSlotID, final boolean showPopup)
 	{
-		final ProductBox boxToMove = DatabaseController.getProductBoxByID(productBoxCode);
+		final ProductBox boxToMove = DatabaseController.getInstance().getProductBoxByID(productBoxCode);
 
 		if (boxToMove == null)
 		{
@@ -156,7 +156,7 @@ public abstract class ExternalSystemsController
 
 		if (newShelfSlotID != null && !newShelfSlotID.isEmpty())
 		{
-			newShelfSlot = DatabaseController.getShelfSlotBySlotID(newShelfSlotID);
+			newShelfSlot = DatabaseController.getInstance().getShelfSlotBySlotID(newShelfSlotID);
 			newShelf = newShelfSlot.getParentShelfLevel().getParentShelf();
 		}
 
@@ -206,13 +206,13 @@ public abstract class ExternalSystemsController
 			return false;
 		}
 
-		DatabaseController.saveOrUpdate(boxToMove);
+		DatabaseController.getInstance().saveOrUpdate(boxToMove);
 
 		if (newShelfSlot != null)
-			DatabaseController.saveOrUpdate(newShelfSlot);
+			DatabaseController.getInstance().saveOrUpdate(newShelfSlot);
 
 		if (oldShelfSlot != null)
-			DatabaseController.saveOrUpdate(oldShelfSlot);
+			DatabaseController.getInstance().saveOrUpdate(oldShelfSlot);
 
 		SYSLOG.debug("Successfully moved " + boxToMove + " to " + newShelfSlot);
 

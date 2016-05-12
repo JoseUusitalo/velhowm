@@ -60,14 +60,14 @@ public class ManifestView implements GenericView
 		{
 			bpane = new BorderPane();
 
-			BorderPane boxlist = (BorderPane) ListController.getTableView(manifestController, DatabaseController.getProductSearchDataColumns(false, false),
+			BorderPane boxlist = (BorderPane) ListController.getTableView(manifestController, DatabaseController.getInstance().getProductSearchDataColumns(false, false),
 					manifest.getObservableBoxes());
 
 			HBox stateBox = new HBox(10);
 			Label stateLabel = new Label(LocalizationController.getString("manifestStateLabel"));
 			ComboBox<Object> manifestState = new ComboBox<Object>();
 
-			manifestState.getItems().addAll(DatabaseController.getManifestStateChangeList(manifest.getState()));
+			manifestState.getItems().addAll(DatabaseController.getInstance().getManifestStateChangeList(manifest.getState()));
 			manifestState.getSelectionModel().select(manifest.getState());
 
 			stateBox.getChildren().addAll(stateLabel, manifestState);

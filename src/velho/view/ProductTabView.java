@@ -60,7 +60,7 @@ public class ProductTabView implements GenericView
 	/**
 	 * An observable list of database products.
 	 */
-	private ObservableList<Object> productList = DatabaseController.getAllProducts();
+	private ObservableList<Object> productList = DatabaseController.getInstance().getAllProducts();
 
 	/**
 	 * An observable list of database brands.
@@ -118,11 +118,11 @@ public class ProductTabView implements GenericView
 			{
 				final Product editProduct = ((Product) event.getTableView().getItems().get(event.getTablePosition().getRow()));
 				editProduct.setName(event.getNewValue().toString());
-				DatabaseController.saveOrUpdate(editProduct);
+				DatabaseController.getInstance().saveOrUpdate(editProduct);
 			});
 			table.getColumns().add(nameColumn);
 
-			ObservableList<Object> cbValues = DatabaseController.getAllProductBrands();
+			ObservableList<Object> cbValues = DatabaseController.getInstance().getAllProductBrands();
 			TableColumn<Object, Object> brand = new TableColumn<Object, Object>(LocalizationController.getString("publicProductSearchTableHeaderBrand"));
 
 			brand.setCellValueFactory(new PropertyValueFactory<>("brand"));
@@ -131,11 +131,11 @@ public class ProductTabView implements GenericView
 			{
 				final Product editProduct = ((Product) t.getTableView().getItems().get(t.getTablePosition().getRow()));
 				editProduct.setBrand((ProductBrand) t.getNewValue());
-				DatabaseController.saveOrUpdate(editProduct);
+				DatabaseController.getInstance().saveOrUpdate(editProduct);
 			});
 			table.getColumns().add(brand);
 
-			ObservableList<Object> cbCategoryValues = DatabaseController.getAllProductCategories();
+			ObservableList<Object> cbCategoryValues = DatabaseController.getInstance().getAllProductCategories();
 			TableColumn<Object, Object> category = new TableColumn<Object, Object>(LocalizationController.getString("publicProductSearchTableHeaderCategory"));
 
 			category.setCellValueFactory(new PropertyValueFactory<>("category"));
@@ -144,7 +144,7 @@ public class ProductTabView implements GenericView
 			{
 				final Product editProduct = ((Product) t.getTableView().getItems().get(t.getTablePosition().getRow()));
 				editProduct.setCategory((ProductCategory) t.getNewValue());
-				DatabaseController.saveOrUpdate(editProduct);
+				DatabaseController.getInstance().saveOrUpdate(editProduct);
 			});
 			table.getColumns().add(category);
 
@@ -193,7 +193,7 @@ public class ProductTabView implements GenericView
 				final Product saveProduct = new Product(productTextField.getText(), (ProductBrand) brandItem.getValue(),
 						(ProductCategory) categoryItem.getValue());
 				System.out.println("New product: " + saveProduct);
-				DatabaseController.saveOrUpdate(saveProduct);
+				DatabaseController.getInstance().saveOrUpdate(saveProduct);
 			});
 
 			hb.getChildren().addAll(productLabel, productTextField, brandLabel, brandItem, categoryLabel, categoryItem, addButton);

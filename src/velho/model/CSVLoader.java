@@ -201,6 +201,6 @@ public class CSVLoader<T extends AbstractDatabaseObject>
 			return 0;
 		}
 
-		return DatabaseController.batchSave(dataset);
+		return DatabaseController.getInstance().batchSave(dataset);
 	}
 }

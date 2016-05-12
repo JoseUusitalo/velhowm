@@ -57,7 +57,7 @@ public class SearchController
 	{
 		try
 		{
-			DatabaseController.searchProductBox(identifier, productCount.intValue(), (ProductBrand) brand, (ProductCategory) category, expiresStart, expiresEnd, canBeInRemovalList);
+			DatabaseController.getInstance().searchProductBox(identifier, productCount.intValue(), (ProductBrand) brand, (ProductCategory) category, expiresStart, expiresEnd, canBeInRemovalList);
 		}
 		catch (Exception e)
 		{
@@ -72,7 +72,7 @@ public class SearchController
 	 */
 	public Node getSearchView()
 	{
-		return new SearchView(this, true, DatabaseController.getAllProductBrands(), DatabaseController.getAllProductCategories()).getView();
+		return new SearchView(this, true, DatabaseController.getInstance().getAllProductBrands(), DatabaseController.getInstance().getAllProductCategories()).getView();
 	}
 
 	/**
@@ -83,7 +83,7 @@ public class SearchController
 	 */
 	public Node getSearchView(final boolean canBeInRemovalList)
 	{
-		return new SearchView(this, canBeInRemovalList, DatabaseController.getAllProductBrands(), DatabaseController.getAllProductCategories()).getView();
+		return new SearchView(this, canBeInRemovalList, DatabaseController.getInstance().getAllProductBrands(), DatabaseController.getInstance().getAllProductCategories()).getView();
 	}
 
 	/**
@@ -105,8 +105,8 @@ public class SearchController
 	{
 		//@formatter:off
 		return ListController.getTableView(productController,
-										   DatabaseController.getProductSearchDataColumns(false, false),
-										   DatabaseController.getObservableProductSearchResults());
+										   DatabaseController.getInstance().getProductSearchDataColumns(false, false),
+										   DatabaseController.getInstance().getObservableProductSearchResults());
 		//@formatter:on
 	}
 
@@ -120,8 +120,8 @@ public class SearchController
 		final ProductListSearchView searchView = new ProductListSearchView(this);
 		//@formatter:off
 		return searchView.getView((BorderPane) ListController.getTableView(productController,
-										  								   DatabaseController.getProductSearchDataColumns(false, false),
-										  								   DatabaseController.getObservableProductSearchResults()));
+										  								   DatabaseController.getInstance().getProductSearchDataColumns(false, false),
+										  								   DatabaseController.getInstance().getObservableProductSearchResults()));
 		//@formatter:on
 	}
 
@@ -153,7 +153,7 @@ public class SearchController
 				}
 				catch (final NumberFormatException e)
 				{
-					productID = DatabaseController.getProductByName((String) countName[1]).getDatabaseID();
+					productID = DatabaseController.getInstance().getProductByName((String) countName[1]).getDatabaseID();
 				}
 
 				// If the product already exists, add the new count to the
@@ -170,7 +170,7 @@ public class SearchController
 		}
 
 		// Search the database for the products.
-		DatabaseController.searchProductBoxByDataList(productID_BoxSize);
+		DatabaseController.getInstance().searchProductBoxByDataList(productID_BoxSize);
 
 		// Return the data for unit testing.
 		return productID_BoxSize;

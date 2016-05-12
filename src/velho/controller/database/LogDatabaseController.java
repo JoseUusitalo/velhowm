@@ -21,12 +21,26 @@ import velho.model.enums.LogDatabaseTable;
 import velho.view.MainWindow;
 
 /**
- * The H2 logs database controller.
+ * The singleton database controller for handling the H2 logs database.
  *
  * @author Jose Uusitalo
  */
-public abstract class LogDatabaseController
+@SuppressWarnings("static-method")
+public class LogDatabaseController
 {
+	/**
+	 * A private inner class holding the class instance.
+	 *
+	 * @author Jose Uusitalo
+	 */
+	private static class Holder
+	{
+		/**
+		 * The only instance of {@link LogDatabaseController}.
+		 */
+		private static final LogDatabaseController INSTANCE = new LogDatabaseController();
+	}
+
 	/**
 	 * Apache log4j logger: System.
 	 */
@@ -53,6 +67,23 @@ public abstract class LogDatabaseController
 	private static JdbcConnectionPool connectionPool;
 
 	/**
+	 */
+	private LogDatabaseController()
+	{
+		// No need to instantiate this class.
+	}
+
+	/**
+	 * Gets the instance of the {@link LogDatabaseController}.
+	 *
+	 * @return the log database controller
+	 */
+	public static synchronized LogDatabaseController getInstance()
+	{
+		return Holder.INSTANCE;
+	}
+
+	/**
 	 * Runs a database query with the given data.
 	 *
 	 * @param type query command
@@ -69,7 +100,7 @@ public abstract class LogDatabaseController
 	 * </ul>
 	 * @throws NoDatabaseLinkException
 	 */
-	private static List<Object> runQuery(final DatabaseQueryType type, final LogDatabaseTable tableName, final Map<DatabaseTable, String> joinOnValues,
+	private List<Object> runQuery(final DatabaseQueryType type, final LogDatabaseTable tableName, final Map<DatabaseTable, String> joinOnValues,
 			final String[] columns, final Map<String, Object> columnValues, final List<String> where) throws Exception
 	{
 		final Connection connection = getConnection();
@@ -85,7 +116,7 @@ public abstract class LogDatabaseController
 			// Initialize a statement.
 			statement = connection.createStatement();
 
-			statement.execute(DatabaseController.sqlBuilder(type, tableName.toString(), joinOnValues, columns, columnValues, where),
+			statement.execute(DatabaseController.getInstance().sqlBuilder(type, tableName.toString(), joinOnValues, columns, columnValues, where),
 					Statement.RETURN_GENERATED_KEYS);
 
 			switch (type)
@@ -111,7 +142,8 @@ public abstract class LogDatabaseController
 							case USRLOGS:
 								while (result.next())
 									datalist.add(result.getTimestamp("time") + " [" + result.getString("level") + "] "
-											+ DatabaseController.getUserByID(result.getInt("user_id")).getFullDetails() + ": " + result.getString("message"));
+											+ DatabaseController.getInstance().getUserByID(result.getInt("user_id")).getFullDetails() + ": "
+											+ result.getString("message"));
 								break;
 							default:
 								// Close all resources.
@@ -238,7 +270,7 @@ public abstract class LogDatabaseController
 	 *
 	 * @return <code>true</code> if the database file exists
 	 */
-	private static boolean databaseExists()
+	private boolean databaseExists()
 	{
 		final File dbFile = new File(DB_FILEPATH);
 		return dbFile.exists() && !dbFile.isDirectory();
@@ -250,7 +282,7 @@ public abstract class LogDatabaseController
 	 *
 	 * @return a database connection
 	 */
-	private static Connection getConnection()
+	private Connection getConnection()
 	{
 		Connection connection = null;
 		try
@@ -284,7 +316,7 @@ public abstract class LogDatabaseController
 	 *
 	 * @return <code>true</code> if a database link exists
 	 */
-	public static boolean isLinked()
+	public boolean isLinked()
 	{
 		return connectionPool != null;
 	}
@@ -292,7 +324,7 @@ public abstract class LogDatabaseController
 	/**
 	 * Attempts to re-link the database.
 	 */
-	public static void tryReLink()
+	public void tryReLink()
 	{
 		// Just in case.
 		unlink();
@@ -319,7 +351,7 @@ public abstract class LogDatabaseController
 	 * @throws ExistingDatabaseLinkException
 	 * when a database link already exists
 	 */
-	public static DatabaseFileState link() throws ClassNotFoundException
+	public DatabaseFileState link() throws ClassNotFoundException
 	{
 		// Load the driver.
 		Class.forName("org.h2.Driver");
@@ -395,7 +427,7 @@ public abstract class LogDatabaseController
 	 * when attempting unlink a database when no database link
 	 * exists
 	 */
-	public static void unlink()
+	public void unlink()
 	{
 		if (connectionPool == null)
 		{
@@ -412,7 +444,7 @@ public abstract class LogDatabaseController
 	/**
 	 * Links to the log database and initializes if it does not exist.
 	 */
-	public static boolean connectAndInitialize() throws ClassNotFoundException
+	public boolean connectAndInitialize() throws ClassNotFoundException
 	{
 		if (isLinked())
 			return true;
@@ -442,7 +474,7 @@ public abstract class LogDatabaseController
 	 * @return <code>true</code> if database changed as a result of this call
 	 * @throws NoDatabaseLinkException
 	 */
-	public static boolean initializeDatabase()
+	public boolean initializeDatabase()
 	{
 		if (MainWindow.DEBUG_MODE)
 			System.out.println("Initializing log database...");
@@ -479,9 +511,9 @@ public abstract class LogDatabaseController
 
 	/**
 	 * Closes the database permanently.
-	 * Additionally disposes the old connection pool.
+	 * nally disposes the old connection pool.
 	 */
-	public static void shutdown() throws Exception
+	public void shutdown() throws Exception
 	{
 		if (MainWindow.DEBUG_MODE)
 			System.out.println("Shutting down log database..");
@@ -554,7 +586,7 @@ public abstract class LogDatabaseController
 	 * @return the system log
 	 * @throws NoDatabaseLinkException
 	 */
-	public static ArrayList<Object> getSystemLog() throws Exception
+	public ArrayList<Object> getSystemLog() throws Exception
 	{
 		final String[] columns = { "time", "level", "message" };
 		final List<String> where = new ArrayList<String>();
@@ -576,7 +608,7 @@ public abstract class LogDatabaseController
 	 *
 	 * @return the user log
 	 */
-	public static ArrayList<Object> getUserLog() throws Exception
+	public ArrayList<Object> getUserLog() throws Exception
 	{
 		final String[] columns = { "user_id", "time", "level", "message" };
 		final List<String> where = new ArrayList<String>();

@@ -59,8 +59,8 @@ public class CSVController implements UIActionController
 	public CSVController(final MainWindow mainWindow)
 	{
 		this.mainWindow = mainWindow;
-		loadCSVView = new CSVLoadView(this, DatabaseController.getValidDatabaseTypes());
-		writeCSVView = new CSVWriteView(this, DatabaseController.getValidDatabaseTypes());
+		loadCSVView = new CSVLoadView(this, DatabaseController.getInstance().getValidDatabaseTypes());
+		writeCSVView = new CSVWriteView(this, DatabaseController.getInstance().getValidDatabaseTypes());
 	}
 
 	/**
@@ -256,7 +256,7 @@ public class CSVController implements UIActionController
 		{
 			@SuppressWarnings("rawtypes")
 			BeanToCsv bean = new BeanToCsv();
-			bean.write(strategy, writer, DatabaseController.getAll(classToWrite.getSimpleName()));
+			bean.write(strategy, writer, DatabaseController.getInstance().getAll(classToWrite.getSimpleName()));
 		}
 		catch (IOException e)
 		{

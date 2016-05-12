@@ -58,7 +58,7 @@ public class LogController
 
 		try
 		{
-			log = LogDatabaseController.getSystemLog();
+			log = LogDatabaseController.getInstance().getSystemLog();
 		}
 		catch (Exception e)
 		{
@@ -89,7 +89,7 @@ public class LogController
 
 		try
 		{
-			log = LogDatabaseController.getUserLog();
+			log = LogDatabaseController.getInstance().getUserLog();
 		}
 		catch (Exception e)
 		{

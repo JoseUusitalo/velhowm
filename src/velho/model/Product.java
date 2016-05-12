@@ -159,7 +159,7 @@ public class Product extends AbstractDatabaseObject
 		if (categoryID < 1)
 			throw new IllegalArgumentException("Category ID must be greater than 0, was '" + categoryID + "'.");
 
-		this.category = DatabaseController.getProductCategoryByID(categoryID);
+		this.category = DatabaseController.getInstance().getProductCategoryByID(categoryID);
 	}
 
 	/**
@@ -174,6 +174,6 @@ public class Product extends AbstractDatabaseObject
 		if (brandID < 1)
 			throw new IllegalArgumentException("Brand ID must be greater than 0, was '" + brandID + "'.");
 
-		this.brand = DatabaseController.getProductBrandByID(brandID);
+		this.brand = DatabaseController.getInstance().getProductBrandByID(brandID);
 	}
 }
