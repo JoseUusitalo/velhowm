@@ -23,7 +23,6 @@ import velho.model.interfaces.GenericView;
  */
 public class SearchView implements GenericView
 {
-	// TODO search button doesnt work right
 	/**
 	 * The root GridPane for this view.
 	 */
@@ -43,7 +42,8 @@ public class SearchView implements GenericView
 	 * @param productBrands
 	 * @param productCategories
 	 */
-	public SearchView(final SearchController searchController, final boolean canBeInRemovalList, final ObservableList<Object> productBrands, final ObservableList<Object> productCategories)
+	public SearchView(final SearchController searchController, final boolean canBeInRemovalList, final ObservableList<Object> productBrands,
+			final ObservableList<Object> productCategories)
 	{
 		this.searchController = searchController;
 		this.canBeInRemovalList = canBeInRemovalList;
@@ -151,7 +151,8 @@ public class SearchView implements GenericView
 						// still numbers.
 					}
 
-					searchController.productBoxSearch(canBeInRemovalList, nameField.getText(), productCountField.getValue(), brandbox.getValue(), categorybox.getValue(), dpStart.getValue(), dpEnd.getValue());
+					searchController.productBoxSearch(canBeInRemovalList, nameField.getText(), productCountField.getValue(), brandbox.getValue(),
+							categorybox.getValue(), dpStart.getValue(), dpEnd.getValue());
 				}
 			});
 			UIController.getInstance().recordView(this);

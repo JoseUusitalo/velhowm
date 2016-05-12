@@ -34,11 +34,6 @@ import velho.view.components.TableCellDeleteButton;
 public class CategoriesTabView implements GenericView
 {
 	/**
-	 * ProductCntroller neeeded when saving to database
-	 */
-	private final ProductController productController;
-
-	/**
 	 * Makes the Categories tab call for table and make it viewable
 	 */
 	private final TableView<Object> table;
@@ -51,8 +46,7 @@ public class CategoriesTabView implements GenericView
 	/**
 	 * Makes the Categories and ObservableList
 	 */
-	private final ObservableList<Object> data = DatabaseController.getInstance().getAllProductCategories();
-	// TODO: Set in constructor;
+	private final ObservableList<Object> categories;
 
 	/**
 	 * Adds info to Product Controller about brands
@@ -60,10 +54,10 @@ public class CategoriesTabView implements GenericView
 	 * @param productController Product Controller handles the database work
 	 * @param uiController links UIController to the productController
 	 */
-	public CategoriesTabView(final ProductController productController)
+	public CategoriesTabView(final ObservableList<Object> categories)
 	{
-		this.productController = productController;
 		this.table = new TableView<Object>();
+		this.categories = categories;
 	}
 
 	/**
@@ -83,7 +77,7 @@ public class CategoriesTabView implements GenericView
 
 			table.setEditable(true);
 			table.getItems().clear();
-			table.setItems(data);
+			table.setItems(categories);
 
 			final Callback<TableColumn<Object, Object>, TableCell<Object, Object>> cellFactory = (final TableColumn<Object, Object> p) -> new EditingCell();
 			final TableColumn<Object, Object> nameColumn = new TableColumn<Object, Object>("Name");
@@ -96,7 +90,7 @@ public class CategoriesTabView implements GenericView
 			{
 				final ProductCategory editCategory = ((ProductCategory) event.getTableView().getItems().get(event.getTablePosition().getRow()));
 				editCategory.setName(event.getNewValue().toString());
-				productController.saveProductCategory(editCategory);
+				ProductController.getInstance().saveProductCategory(editCategory);
 			});
 			table.getColumns().add(nameColumn);
 
@@ -109,7 +103,7 @@ public class CategoriesTabView implements GenericView
 			{
 				final ProductCategory editCategory = ((ProductCategory) event.getTableView().getItems().get(event.getTablePosition().getRow()));
 				editCategory.setType((ProductType) event.getNewValue());
-				productController.saveProductCategory(editCategory);
+				ProductController.getInstance().saveProductCategory(editCategory);
 			});
 			table.getColumns().add(comboBoxColumn);
 
@@ -131,7 +125,8 @@ public class CategoriesTabView implements GenericView
 				@Override
 				public TableCell<Object, String> call(final TableColumn<Object, String> tcolumn)
 				{
-					final TableCellDeleteButton button = new TableCellDeleteButton(productController, LocalizationController.getInstance().getString("buttonDelete"));
+					final TableCellDeleteButton button = new TableCellDeleteButton(ProductController.getInstance(),
+							LocalizationController.getInstance().getString("buttonDelete"));
 					button.setAlignment(Pos.CENTER);
 					return button;
 				}
@@ -157,7 +152,7 @@ public class CategoriesTabView implements GenericView
 			{
 				final ProductCategory saveCategory = new ProductCategory(categoryName.getText(), (ProductType) categoryType.getValue());
 				categoryName.clear();
-				productController.saveProductCategory(saveCategory);
+				ProductController.getInstance().saveProductCategory(saveCategory);
 			});
 
 			vbox = new VBox();

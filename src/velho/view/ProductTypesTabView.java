@@ -20,7 +20,6 @@ import javafx.util.Callback;
 import velho.controller.LocalizationController;
 import velho.controller.ProductController;
 import velho.controller.UIController;
-import velho.controller.database.DatabaseController;
 import velho.model.ProductType;
 import velho.model.interfaces.GenericView;
 import velho.view.components.TableCellDeleteButton;
@@ -30,18 +29,15 @@ import velho.view.components.TableCellDeleteButton;
  */
 public class ProductTypesTabView implements GenericView
 {
-	private final ProductController productController;
-
 	private final TableView<Object> table;
 
 	private VBox vbox;
 
-	private ObservableList<Object> data = DatabaseController.getInstance().getAllProductTypes();
-	// TODO: Set in constructor.
+	private ObservableList<Object> productTypes;
 
-	public ProductTypesTabView(final ProductController productController)
+	public ProductTypesTabView(final ObservableList<Object> productTypes)
 	{
-		this.productController = productController;
+		this.productTypes = productTypes;
 		this.table = new TableView<Object>();
 	}
 
@@ -55,7 +51,7 @@ public class ProductTypesTabView implements GenericView
 
 			table.setEditable(true);
 			table.getItems().clear();
-			table.setItems(data);
+			table.setItems(productTypes);
 
 			final Callback<TableColumn<Object, String>, TableCell<Object, String>> cellFactory = (final TableColumn<Object, String> p) -> new EditingCell();
 			final TableColumn<Object, String> nameColumn = new TableColumn<Object, String>("Name");
@@ -68,7 +64,7 @@ public class ProductTypesTabView implements GenericView
 			{
 				final ProductType editProductType = ((ProductType) event.getTableView().getItems().get(event.getTablePosition().getRow()));
 				editProductType.setName(event.getNewValue());
-				productController.saveProductType(editProductType);
+				ProductController.getInstance().saveProductType(editProductType);
 			});
 			table.getColumns().add(nameColumn);
 
@@ -91,7 +87,8 @@ public class ProductTypesTabView implements GenericView
 				@Override
 				public TableCell<Object, String> call(final TableColumn<Object, String> tcolumn)
 				{
-					final TableCellDeleteButton button = new TableCellDeleteButton(productController, LocalizationController.getInstance().getString("buttonDelete"));
+					final TableCellDeleteButton button = new TableCellDeleteButton(ProductController.getInstance(),
+							LocalizationController.getInstance().getString("buttonDelete"));
 					button.setAlignment(Pos.CENTER);
 					return button;
 				}
@@ -107,7 +104,7 @@ public class ProductTypesTabView implements GenericView
 			{
 				final ProductType saveProductType = new ProductType(productTypeName.getText());
 				productTypeName.clear();
-				productController.saveProductType(saveProductType);
+				ProductController.getInstance().saveProductType(saveProductType);
 			});
 
 			hbox.getChildren().addAll(typeLabel, productTypeName, addButton);

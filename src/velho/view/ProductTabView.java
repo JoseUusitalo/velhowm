@@ -43,11 +43,6 @@ import velho.view.components.TableCellDeleteButton;
 public class ProductTabView implements GenericView
 {
 	/**
-	 * ProductCntroller neeeded when saving to database
-	 */
-	private final ProductController productController;
-
-	/**
 	 * Makes the Categories tab call for table and make it viewable
 	 */
 	private final TableView<Object> table;
@@ -60,7 +55,7 @@ public class ProductTabView implements GenericView
 	/**
 	 * An observable list of database products.
 	 */
-	private ObservableList<Object> productList = DatabaseController.getInstance().getAllProducts();
+	private ObservableList<Object> productList;
 
 	/**
 	 * An observable list of database brands.
@@ -73,14 +68,11 @@ public class ProductTabView implements GenericView
 	private ObservableList<Object> categoryList;
 
 	/**
-	 * Adds info to Product Controller about brands
-	 *
-	 * @param productController Product Controller handles the database work
-	 * @param uiController links UIController to the productController
+	 * @param products
 	 */
-	public ProductTabView(final ProductController productController)
+	public ProductTabView(final ObservableList<Object> products)
 	{
-		this.productController = productController;
+		this.productList = products;
 		this.table = new TableView<Object>();
 	}
 
@@ -168,7 +160,7 @@ public class ProductTabView implements GenericView
 				@Override
 				public TableCell<Object, String> call(final TableColumn<Object, String> p)
 				{
-					final TableCellDeleteButton button = new TableCellDeleteButton(productController,
+					final TableCellDeleteButton button = new TableCellDeleteButton(ProductController.getInstance(),
 							(LocalizationController.getInstance().getString("publicProductTableDeleteButton")));
 					button.setAlignment(Pos.CENTER);
 					return button;

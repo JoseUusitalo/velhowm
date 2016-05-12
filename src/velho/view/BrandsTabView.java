@@ -20,7 +20,6 @@ import javafx.util.Callback;
 import velho.controller.LocalizationController;
 import velho.controller.ProductController;
 import velho.controller.UIController;
-import velho.controller.database.DatabaseController;
 import velho.model.ProductBrand;
 import velho.model.interfaces.GenericView;
 import velho.view.components.TableCellDeleteButton;
@@ -30,11 +29,6 @@ import velho.view.components.TableCellDeleteButton;
  */
 public class BrandsTabView implements GenericView
 {
-	/**
-	 * ProductCntroller neeeded when saving to database
-	 */
-	private final ProductController productController;
-
 	/**
 	 * Makes the Brands tab call for table and make it viewable
 	 */
@@ -48,18 +42,14 @@ public class BrandsTabView implements GenericView
 	/**
 	 * Makes the Brands and ObservableList
 	 */
-	private final ObservableList<Object> data;
+	private final ObservableList<Object> brands;
 
 	/**
-	 * Adds info to Product Controller about brands
-	 *
-	 * @param productController Product Controller handles the database work
-	 * @param uiController links UIController to the productController
+	 * @param brands
 	 */
-	public BrandsTabView(final ProductController productController)
+	public BrandsTabView(final ObservableList<Object> brands)
 	{
-		data = DatabaseController.getInstance().getAllProductBrands();
-		this.productController = productController;
+		this.brands = brands;
 		this.table = new TableView<Object>();
 	}
 
@@ -75,7 +65,7 @@ public class BrandsTabView implements GenericView
 			HBox hbox = new HBox();
 
 			table.setEditable(true);
-			table.setItems(data);
+			table.setItems(brands);
 
 			final Callback<TableColumn<Object, String>, TableCell<Object, String>> cellFactory = (final TableColumn<Object, String> p) -> new EditingCell();
 			final TableColumn<Object, String> nameColumn = new TableColumn<Object, String>("Name");
@@ -89,7 +79,7 @@ public class BrandsTabView implements GenericView
 			{
 				final ProductBrand editBrand = ((ProductBrand) event.getTableView().getItems().get(event.getTablePosition().getRow()));
 				editBrand.setName(event.getNewValue());
-				productController.saveBrand(editBrand);
+				ProductController.getInstance().saveBrand(editBrand);
 			});
 			table.getColumns().add(nameColumn);
 
@@ -112,7 +102,8 @@ public class BrandsTabView implements GenericView
 				@Override
 				public TableCell<Object, String> call(final TableColumn<Object, String> tcolumn)
 				{
-					final TableCellDeleteButton button = new TableCellDeleteButton(productController, LocalizationController.getInstance().getString("buttonDelete"));
+					final TableCellDeleteButton button = new TableCellDeleteButton(ProductController.getInstance(),
+							LocalizationController.getInstance().getString("buttonDelete"));
 					button.setAlignment(Pos.CENTER);
 					return button;
 				}
@@ -128,7 +119,7 @@ public class BrandsTabView implements GenericView
 			{
 				final ProductBrand saveBrand = new ProductBrand(brandName.getText());
 				brandName.clear();
-				productController.saveBrand(saveBrand);
+				ProductController.getInstance().saveBrand(saveBrand);
 			});
 
 			hbox.getChildren().addAll(brandLabel, brandName, addButton);

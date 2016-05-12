@@ -81,7 +81,6 @@ public class UIController
 	public void setControllers(final MainWindow mainWindow, final ManifestController manifestController,
 			final RemovalPlatformController removalPlatformController, final CSVController csvController)
 	{
-		// TODO: remove
 		this.mainView = mainWindow;
 		this.manifestController = manifestController;
 		this.removalPlatformController = removalPlatformController;

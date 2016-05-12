@@ -78,11 +78,11 @@ public class ProductController implements UIActionController
 	private ProductController()
 	{
 		this.productManagementView = new VerticalViewGroup();
-		this.productsTypeTabView = new ProductTypesTabView(this);
-		this.brandsTabView = new BrandsTabView(this);
-		this.categoryTabView = new CategoriesTabView(this);
-		this.productBoxTabView = new ProductBoxesTabView(this);
-		this.productTabView = new ProductTabView(this);
+		this.productsTypeTabView = new ProductTypesTabView(DatabaseController.getInstance().getAllProductTypes());
+		this.brandsTabView = new BrandsTabView(DatabaseController.getInstance().getAllProductBrands());
+		this.categoryTabView = new CategoriesTabView(DatabaseController.getInstance().getAllProductCategories());
+		this.productBoxTabView = new ProductBoxesTabView(DatabaseController.getInstance().getAllProductBoxes());
+		this.productTabView = new ProductTabView(DatabaseController.getInstance().getAllProducts());
 	}
 
 	/**

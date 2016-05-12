@@ -71,7 +71,6 @@ public class ExternalSystemsController
 	 */
 	public void setControllers(final ManifestController manifestController)
 	{
-		// TODO: remove
 		this.manifestController = manifestController;
 	}
 

@@ -44,11 +44,6 @@ import velho.view.components.TableCellDeleteButton;
 public class ProductBoxesTabView implements GenericView
 {
 	/**
-	 * ProductCntroller neeeded when saving to database
-	 */
-	private final ProductController productController;
-
-	/**
 	 * Makes the Categories tab call for table and make it viewable
 	 */
 	private final TableView<Object> table;
@@ -61,19 +56,14 @@ public class ProductBoxesTabView implements GenericView
 	/**
 	 * Makes the Categories and ObservableList
 	 */
-	private ObservableList<Object> data = DatabaseController.getInstance().getAllProductBoxes();
-
-	private ObservableList<Object> pList;
+	private ObservableList<Object> products;
 
 	/**
-	 * Adds info to Product Controller about brands
-	 *
-	 * @param productController Product Controller handles the database work
-	 * @param uiController links UIController to the productController
+	 * @param products
 	 */
-	public ProductBoxesTabView(final ProductController productController)
+	public ProductBoxesTabView(final ObservableList<Object> products)
 	{
-		this.productController = productController;
+		this.products = products;
 		this.table = new TableView<Object>();
 	}
 
@@ -90,12 +80,12 @@ public class ProductBoxesTabView implements GenericView
 		{
 			table.getColumns().clear();
 
-			pList = productList;
+			products = productList;
 			HBox hb = new HBox();
 
 			table.setEditable(true);
 
-			table.setItems(data);
+			table.setItems(products);
 
 			Callback<TableColumn<Object, Object>, TableCell<Object, Object>> cellFactory = (final TableColumn<Object, Object> p) -> new SpinnerCell();
 
@@ -110,7 +100,7 @@ public class ProductBoxesTabView implements GenericView
 			{
 				final ProductBox productBox = ((ProductBox) t.getTableView().getItems().get(t.getTablePosition().getRow()));
 				productBox.setProductCount((int) t.getNewValue());
-				productController.saveProductBox(productBox);
+				ProductController.getInstance().saveProductBox(productBox);
 			});
 			table.getColumns().add(sizeColumn);
 
@@ -126,7 +116,7 @@ public class ProductBoxesTabView implements GenericView
 			{
 				final ProductBox productBox = ((ProductBox) t.getTableView().getItems().get(t.getTablePosition().getRow()));
 				productBox.setMaxSize((int) t.getNewValue());
-				productController.saveProductBox(productBox);
+				ProductController.getInstance().saveProductBox(productBox);
 			});
 			table.getColumns().add(maxSizeColumn);
 
@@ -139,7 +129,7 @@ public class ProductBoxesTabView implements GenericView
 			{
 				final ProductBox editProductBox = ((ProductBox) t.getTableView().getItems().get(t.getTablePosition().getRow()));
 				editProductBox.setProduct((Product) t.getNewValue());
-				productController.saveProductBox(editProductBox);
+				ProductController.getInstance().saveProductBox(editProductBox);
 			});
 			table.getColumns().add(product);
 
@@ -160,7 +150,7 @@ public class ProductBoxesTabView implements GenericView
 					date = Date.from(saveDate.atTime(0, 0).toInstant(ZoneOffset.of("Z")));
 				}
 				productBox.setExpirationDate(date);
-				productController.saveProductBox(productBox);
+				ProductController.getInstance().saveProductBox(productBox);
 			});
 			table.getColumns().add(datePickerColumn);
 
@@ -182,7 +172,7 @@ public class ProductBoxesTabView implements GenericView
 				@Override
 				public TableCell<Object, String> call(final TableColumn<Object, String> p)
 				{
-					final TableCellDeleteButton button = new TableCellDeleteButton(productController,
+					final TableCellDeleteButton button = new TableCellDeleteButton(ProductController.getInstance(),
 							(LocalizationController.getInstance().getString("buttonDelete")));
 					button.setAlignment(Pos.CENTER);
 					return button;
@@ -205,7 +195,7 @@ public class ProductBoxesTabView implements GenericView
 			final Label productLabel = new Label(LocalizationController.getInstance().getString("productPromtTextAddProductView"));
 			final ComboBox<Object> productItem = new ComboBox<Object>();
 			productItem.getItems().clear();
-			productItem.getItems().addAll(pList);
+			productItem.getItems().addAll(products);
 			productItem.getSelectionModel().selectFirst();
 			productItem.setMaxWidth(product.getPrefWidth());
 
@@ -220,7 +210,7 @@ public class ProductBoxesTabView implements GenericView
 					date = Date.from(expirationDate.getValue().atTime(0, 0).toInstant(ZoneOffset.of("Z")));
 				final ProductBox saveProductBox = new ProductBox((Product) productItem.getValue(), productBoxMaxSize.getValue(), productBoxSize.getValue(),
 						date);
-				productController.saveProductBox(saveProductBox);
+				ProductController.getInstance().saveProductBox(saveProductBox);
 			});
 
 			hb.getChildren().addAll(sizeLabel, productBoxSize, maxSizeLabel, productBoxMaxSize, productLabel, productItem, calendarLabel, expirationDate,
@@ -513,7 +503,7 @@ public class ProductBoxesTabView implements GenericView
 	public void recreate()
 	{
 		vbox = null;
-		getView(pList);
+		getView(products);
 	}
 
 	@Override

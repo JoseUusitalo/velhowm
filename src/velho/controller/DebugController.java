@@ -86,7 +86,6 @@ public class DebugController
 	 */
 	public void setControllers(final RemovalPlatformController removalPlatformController)
 	{
-		// TODO: remove
 		this.removalPlatformController = removalPlatformController;
 	}
 
