@@ -154,7 +154,7 @@ public class SearchView implements GenericView
 					searchController.productBoxSearch(canBeInRemovalList, nameField.getText(), productCountField.getValue(), brandbox.getValue(), categorybox.getValue(), dpStart.getValue(), dpEnd.getValue());
 				}
 			});
-			UIController.recordView(this);
+			UIController.getInstance().recordView(this);
 		}
 
 		return grid;

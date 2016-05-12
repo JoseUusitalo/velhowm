@@ -7,7 +7,7 @@ import java.util.ResourceBundle;
 import velho.model.enums.SupportedTranslation;
 
 /**
- * A singleton controller for handling localization.
+ * The singleton controller for handling localization.
  *
  * @author Joona Silvennoinen
  */
@@ -22,7 +22,6 @@ public class LocalizationController
 
 	private final static String LANGUAGE_GERMAN = "de";
 	private final static String COUNTRY_GERMANY = "DE";
-	private UIController uiController;
 	private SupportedTranslation currentTranslation;
 
 	/**
@@ -109,17 +108,11 @@ public class LocalizationController
 
 		}
 		currentTranslation = newTranslation;
-		uiController.recreateAllViews();
+		UIController.getInstance().recreateAllViews();
 	}
 
 	public SupportedTranslation getCurrentTranslation()
 	{
 		return currentTranslation;
-	}
-
-	public void setControllers(final UIController uiController)
-	{
-		// TODO: remove
-		this.uiController = uiController;
 	}
 }

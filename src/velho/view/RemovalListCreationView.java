@@ -151,7 +151,7 @@ public class RemovalListCreationView implements GenericView
 
 			bpane.setLeft(left);
 			bpane.setCenter(center);
-			UIController.recordView(this);
+			UIController.getInstance().recordView(this);
 		}
 
 		return bpane;

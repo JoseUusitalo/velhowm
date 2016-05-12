@@ -18,7 +18,7 @@ import velho.model.Shelf;
 import velho.model.ShelfSlot;
 
 /**
- * A singleton controller handling the communication with systems outside the VELHO
+ * The singleton controller handling the communication with systems outside the VELHO
  * Warehouse Management.
  *
  * @author Edward Puustinen &amp; Jose Uusitalo

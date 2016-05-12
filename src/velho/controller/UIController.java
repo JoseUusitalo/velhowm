@@ -12,7 +12,7 @@ import velho.model.interfaces.GenericView;
 import velho.view.MainWindow;
 
 /**
- * The controller for the {@link MainWindow}.
+ * The singleton controller for the {@link MainWindow}.
  *
  * @author Jose Uusitalo
  */
@@ -52,6 +52,36 @@ public class UIController
 	 * The main set of views in this application.
 	 */
 	private static Set<GenericView> viewSet = new HashSet<GenericView>();
+
+	/**
+	 * A private inner class holding the class instance.
+	 *
+	 * @author Jose Uusitalo
+	 */
+	private static class Holder
+	{
+		/**
+		 * The only instance of {@link UIController}.
+		 */
+		private static final UIController INSTANCE = new UIController();
+	}
+
+	/**
+	 */
+	private UIController()
+	{
+		// No need to instantiate this class.
+	}
+
+	/**
+	 * Gets the instance of the {@link UIController}.
+	 *
+	 * @return the UI controller
+	 */
+	public static synchronized UIController getInstance()
+	{
+		return Holder.INSTANCE;
+	}
 
 	public void setControllers(final MainWindow mainWindow, final ManifestController manifestController,
 			final RemovalPlatformController removalPlatformController, final CSVController csvController)
@@ -160,9 +190,10 @@ public class UIController
 		showMainMenu(LoginController.getInstance().getCurrentUser().getRole());
 	}
 
-	public static void destroyAllViews()
+	@SuppressWarnings("static-method")
+	public void destroyAllViews()
 	{
-		SYSLOG.debug("destroying all views");
+		SYSLOG.debug("Destroying all views.");
 		Set<GenericView> temp = new HashSet<GenericView>(viewSet);
 		for (GenericView view : temp)
 		{
@@ -181,9 +212,9 @@ public class UIController
 		mainView.selectTab(tabName);
 	}
 
-	public static void recordView(final GenericView view)
+	@SuppressWarnings("static-method")
+	public void recordView(final GenericView view)
 	{
 		viewSet.add(view);
 	}
-
 }

@@ -17,7 +17,7 @@ import velho.view.RemovalListManagementView;
 import velho.view.RemovalListView;
 
 /**
- * A singleton controller for managing {@link RemovalList} objects.
+ * The singleton controller for managing {@link RemovalList} objects.
  *
  * @author Jose Uusitalo
  */

@@ -205,7 +205,7 @@ public class ProductTabView implements GenericView
 			vbox.setPadding(new Insets(10, 0, 0, 10));
 			vbox.getChildren().addAll(table, hb);
 
-			UIController.recordView(this);
+			UIController.getInstance().recordView(this);
 		}
 		return vbox;
 	}

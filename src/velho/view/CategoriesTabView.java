@@ -165,7 +165,7 @@ public class CategoriesTabView implements GenericView
 			vbox.setPadding(new Insets(10, 0, 0, 10));
 			vbox.getChildren().addAll(table, hbox);
 
-			UIController.recordView(this);
+			UIController.getInstance().recordView(this);
 		}
 		return vbox;
 	}

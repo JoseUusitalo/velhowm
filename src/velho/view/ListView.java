@@ -192,7 +192,7 @@ public class ListView implements GenericView
 			tableView.getColumns().addAll(cols);
 			pane.setCenter(tableView);
 
-			UIController.recordView(this);
+			UIController.getInstance().recordView(this);
 		}
 		return pane;
 	}

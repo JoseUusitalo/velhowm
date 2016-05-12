@@ -127,7 +127,7 @@ public class CSVWriteView implements GenericView
 			root.add(typeSelector, 1, 1);
 			root.add(writeButton, 2, 1);
 
-			UIController.recordView(this);
+			UIController.getInstance().recordView(this);
 		}
 
 		return root;

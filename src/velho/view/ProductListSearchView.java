@@ -103,7 +103,7 @@ public class ProductListSearchView implements GenericView
 
 			pane.setLeft(left);
 			pane.setCenter(list);
-			UIController.recordView(this);
+			UIController.getInstance().recordView(this);
 		}
 		return pane;
 	}

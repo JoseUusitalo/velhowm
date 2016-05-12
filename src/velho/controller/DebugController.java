@@ -15,7 +15,7 @@ import velho.model.enums.UserRole;
 import velho.view.DebugWindow;
 
 /**
- * A singleton controller assisting developers in using and testing the application.
+ * The singleton controller assisting developers in using and testing the application.
  *
  * @author Jose Uusitalo
  */

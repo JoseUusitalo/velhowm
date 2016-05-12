@@ -120,7 +120,7 @@ public class AddUserView implements GenericView
 							listbox.getValue());
 				}
 			});
-			UIController.recordView(this);
+			UIController.getInstance().recordView(this);
 		}
 		return grid;
 	}

@@ -97,7 +97,7 @@ public class RemovalListManagementView implements GenericView
 			});
 
 			bpane.setTop(managementPanel);
-			UIController.recordView(this);
+			UIController.getInstance().recordView(this);
 		}
 
 		return bpane;

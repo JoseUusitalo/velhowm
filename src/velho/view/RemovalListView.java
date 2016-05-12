@@ -122,7 +122,7 @@ public class RemovalListView implements GenericView
 
 			bpane.setTop(top);
 			bpane.setCenter(thisList);
-			UIController.recordView(this);
+			UIController.getInstance().recordView(this);
 		}
 
 		return bpane;

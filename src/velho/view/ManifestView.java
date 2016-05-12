@@ -84,7 +84,7 @@ public class ManifestView implements GenericView
 
 			manifestController.showStateSelector(stateBox);
 			bpane.setCenter(boxlist);
-			UIController.recordView(this);
+			UIController.getInstance().recordView(this);
 		}
 
 		return bpane;

@@ -12,7 +12,7 @@ import velho.view.ListView;
 import velho.view.MainWindow;
 
 /**
- * A singleton controller for managing users.
+ * The singleton controller for managing users.
  *
  * @author Jose Uusitalo &amp; Joona Silvennoinen
  */

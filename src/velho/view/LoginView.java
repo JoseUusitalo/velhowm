@@ -88,7 +88,7 @@ public class LoginView implements GenericView
 					LoginController.getInstance().login(firstNameField.getText(), lastNameField.getText(), authenticationStringField.getText());
 				}
 			});
-			UIController.recordView(this);
+			UIController.getInstance().recordView(this);
 		}
 
 		return vbox;

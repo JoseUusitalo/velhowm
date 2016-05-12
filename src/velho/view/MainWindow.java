@@ -103,11 +103,6 @@ public class MainWindow extends Application implements GenericView
 	private static DebugController debugController;
 
 	/**
-	 * The {@link UIController}.
-	 */
-	private static UIController uiController;
-
-	/**
 	 * The {@link ManifestController}.
 	 */
 	private ManifestController manifestController;
@@ -263,10 +258,6 @@ public class MainWindow extends Application implements GenericView
 
 				// FIXME: Convert most controllers to use the singleton pattern.
 
-				uiController = new UIController();
-				LoginController.getInstance().setControllers(uiController);
-				LocalizationController.getInstance().setControllers(uiController);
-
 				csvController = new CSVController(this);
 				manifestController = new ManifestController(this);
 				removalPlatformController = new RemovalPlatformController(this);
@@ -275,7 +266,7 @@ public class MainWindow extends Application implements GenericView
 				ExternalSystemsController.getInstance().setControllers(manifestController);
 
 				//@formatter:off
-				uiController.setControllers(this,
+				UIController.getInstance().setControllers(this,
 											manifestController,
 											removalPlatformController,
 											csvController);
@@ -422,7 +413,7 @@ public class MainWindow extends Application implements GenericView
 			statusBar.add(userStatus, 1, 0);
 			GridPane.setHgrow(platformStatus, Priority.ALWAYS);
 			rootBorderPane.setBottom(statusBar);
-			UIController.recordView(this);
+			UIController.getInstance().recordView(this);
 		}
 		rootBorderPane.setCenter(mainTabPane);
 	}

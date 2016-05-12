@@ -74,7 +74,7 @@ public class LogView implements GenericView
 
 			bpane.setLeft(leftlog);
 			bpane.setCenter(rightlog);
-			UIController.recordView(this);
+			UIController.getInstance().recordView(this);
 		}
 
 		return bpane;

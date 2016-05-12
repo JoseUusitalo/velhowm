@@ -133,7 +133,7 @@ public class CSVLoadView implements GenericView
 				}
 			});
 
-			UIController.recordView(this);
+			UIController.getInstance().recordView(this);
 		}
 
 		return root;

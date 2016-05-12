@@ -19,7 +19,7 @@ import velho.view.ProductTypesTabView;
 import velho.view.VerticalViewGroup;
 
 /**
- * A singleton controller for handling {@link Product} objects
+ * The singleton controller for handling {@link Product} objects
  *
  * @author Jose Uusitalo &amp; Edward Puustinen
  */

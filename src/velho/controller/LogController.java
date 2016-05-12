@@ -9,7 +9,7 @@ import velho.controller.database.LogDatabaseController;
 import velho.view.LogView;
 
 /**
- * A singleton controller for handling the viewing of logs.
+ * The singleton controller for handling the viewing of logs.
  *
  * @author Jose Uusitalo
  */

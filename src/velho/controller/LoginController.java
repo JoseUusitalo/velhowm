@@ -39,11 +39,6 @@ public class LoginController
 	private LoginView view;
 
 	/**
-	 * The {@link UIController}.
-	 */
-	private UIController uiController;
-
-	/**
 	 * A private inner class holding the class instance.
 	 *
 	 * @author Jose Uusitalo
@@ -82,18 +77,6 @@ public class LoginController
 	}
 
 	/**
-	 * Attaches the controllers that the login controller uses.
-	 *
-	 * @param uiController the {@link UIController}
-	 * @param debugController the {@link DebugController}
-	 */
-	public void setControllers(final UIController uiController)
-	{
-		// TODO: remove
-		LoginController.getInstance().uiController = uiController;
-	}
-
-	/**
 	 * Validates the badge ID and logs the user into the system.
 	 *
 	 * @param badgeString use RFID badge identification number
@@ -115,7 +98,7 @@ public class LoginController
 				MDC.put("user_id", currentUser.getDatabaseID());
 
 				USRLOG.info(currentUser.toString() + " logged in with a badge.");
-				uiController.showMainMenu(currentUser.getRole());
+				UIController.getInstance().showMainMenu(currentUser.getRole());
 				destroyView();
 
 				if (MainWindow.DEBUG_MODE)
@@ -162,7 +145,7 @@ public class LoginController
 				MDC.put("user_id", currentUser.getDatabaseID());
 
 				USRLOG.info(currentUser.toString() + " logged in with PIN.");
-				uiController.showMainMenu(currentUser.getRole());
+				UIController.getInstance().showMainMenu(currentUser.getRole());
 				destroyView();
 
 				if (MainWindow.DEBUG_MODE)
@@ -219,7 +202,7 @@ public class LoginController
 
 			USRLOG.info(currentUser.toString() + " logged in via Debug Window.");
 
-			uiController.showMainMenu(currentUser.getRole());
+			UIController.getInstance().showMainMenu(currentUser.getRole());
 
 			return true;
 		}
@@ -259,9 +242,9 @@ public class LoginController
 	{
 		if (!isLoggedIn())
 		{
-			uiController.setView(Position.CENTER, getView());
-			uiController.setView(Position.BOTTOM, null);
-			UIController.destroyAllViews();
+			UIController.getInstance().setView(Position.CENTER, getView());
+			UIController.getInstance().setView(Position.BOTTOM, null);
+			UIController.getInstance().destroyAllViews();
 			SYSLOG.debug("Login check failed.");
 
 			return false;

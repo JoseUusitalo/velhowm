@@ -93,7 +93,7 @@ public class SearchTabView implements GenericView
 			bPane.setTop(top);
 			bPane.setCenter(searchController.getResultsView());
 
-			UIController.recordView(this);
+			UIController.getInstance().recordView(this);
 		}
 		return bPane;
 	}

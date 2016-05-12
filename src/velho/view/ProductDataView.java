@@ -99,7 +99,7 @@ public class ProductDataView implements GenericView
 					// controller.showList();
 				}
 			});
-			UIController.recordView(this);
+			UIController.getInstance().recordView(this);
 		}
 
 		return grid;

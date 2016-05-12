@@ -82,7 +82,7 @@ public class ManifestManagementView implements GenericView
 			});
 
 			bpane.setTop(managementPanel);
-			UIController.recordView(this);
+			UIController.getInstance().recordView(this);
 		}
 
 		return bpane;
