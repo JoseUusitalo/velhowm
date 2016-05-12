@@ -10,7 +10,7 @@ import velho.view.LogView;
 import velho.view.MainWindow;
 
 /**
- * A class for controlling viwing logs.
+ * A class for controlling the viewing of logs.
  *
  * @author Jose Uusitalo
  */
@@ -27,10 +27,33 @@ public class LogController
 	private final LogView logView;
 
 	/**
+	 * A private inner class holding the class instance.
+	 *
+	 * @author Jose Uusitalo
 	 */
-	public LogController()
+	private static class Holder
+	{
+		/**
+		 * The only instance of {@link LogController}.
+		 */
+		private static final LogController INSTANCE = new LogController();
+	}
+
+	/**
+	 */
+	private LogController()
 	{
 		logView = new LogView(this);
+	}
+
+	/**
+	 * Gets the instance of the {@link LogController}.
+	 *
+	 * @return the log controller
+	 */
+	public static synchronized LogController getInstance()
+	{
+		return Holder.INSTANCE;
 	}
 
 	/**

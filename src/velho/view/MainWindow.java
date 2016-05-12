@@ -127,11 +127,6 @@ public class MainWindow extends Application implements GenericView
 	private RemovalListController removalListController;
 
 	/**
-	 * The {@link LogController}.
-	 */
-	private LogController logController;
-
-	/**
 	 * The {@link ManifestController}.
 	 */
 	private ManifestController manifestController;
@@ -294,7 +289,6 @@ public class MainWindow extends Application implements GenericView
 
 				uiController = new UIController();
 				userController = new UserController();
-				logController = new LogController();
 				productController = new ProductController();
 
 				csvController = new CSVController(this);
@@ -313,7 +307,6 @@ public class MainWindow extends Application implements GenericView
 											userController,
 											removalListController,
 											searchController,
-											logController,
 											manifestController,
 											productController,
 											removalPlatformController,
@@ -398,7 +391,7 @@ public class MainWindow extends Application implements GenericView
 					switch (newTab.getText())
 					{
 						case "Logs":
-							logController.refresh();
+							LogController.getInstance().refresh();
 							break;
 						default:
 							// Do nothing.
@@ -439,8 +432,8 @@ public class MainWindow extends Application implements GenericView
 			platformStatus.setAlignment(Pos.CENTER_LEFT);
 
 			final HBox userStatus = new HBox(10);
-			final Label userName = new Label(LocalizationController.getInstance().getCompoundString("helloUserMessage", LoginController.getCurrentUser().getRoleName(),
-					LoginController.getCurrentUser().getFullName()));
+			final Label userName = new Label(LocalizationController.getInstance().getCompoundString("helloUserMessage",
+					LoginController.getCurrentUser().getRoleName(), LoginController.getCurrentUser().getFullName()));
 			userName.setId("userName");
 
 			final Button logoutButton = new Button(LocalizationController.getInstance().getString("logOutButton"));
