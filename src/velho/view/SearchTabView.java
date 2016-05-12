@@ -73,7 +73,7 @@ public class SearchTabView implements GenericView
 				@Override
 				public void handle(final ActionEvent event)
 				{
-					ExternalSystemsController.sendDataToPrinter(DatabaseController.getInstance().getObservableProductSearchResults());
+					ExternalSystemsController.getInstance().sendDataToPrinter(DatabaseController.getInstance().getObservableProductSearchResults());
 				}
 			});
 
@@ -82,7 +82,7 @@ public class SearchTabView implements GenericView
 				@Override
 				public void handle(final ActionEvent event)
 				{
-					ExternalSystemsController.sendDataToBarcodeScanner(DatabaseController.getInstance().getObservableProductSearchResults());
+					ExternalSystemsController.getInstance().sendDataToBarcodeScanner(DatabaseController.getInstance().getObservableProductSearchResults());
 				}
 			});
 

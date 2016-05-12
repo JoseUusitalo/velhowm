@@ -123,7 +123,7 @@ public class DebugController
 	@SuppressWarnings("static-method")
 	public void scannerMoveValid()
 	{
-		ExternalSystemsController.scannerMoveValid();
+		ExternalSystemsController.getInstance().scannerMoveValid();
 	}
 
 	/**
@@ -158,6 +158,6 @@ public class DebugController
 	public static void scanBadge(final String badgeID)
 	{
 		SYSLOG.info("Badge scanned: " + badgeID);
-		ExternalSystemsController.receiveBadgeID(badgeID);
+		ExternalSystemsController.getInstance().receiveBadgeID(badgeID);
 	}
 }

@@ -105,7 +105,7 @@ public abstract class BarcodeScanner
 		}
 		while (!randomShelfSlot.hasFreeSpace());
 
-		if (ExternalSystemsController.move(list.get(0), randomShelfSlot.getSlotID(), true))
+		if (ExternalSystemsController.getInstance().move(list.get(0), randomShelfSlot.getSlotID(), true))
 		{
 			SYSLOG.debug("Move successful.");
 			return true;
@@ -159,6 +159,6 @@ public abstract class BarcodeScanner
 
 		SYSLOG.debug("Generated " + boxSet.size() + " random product boxes.");
 
-		ExternalSystemsController.receiveManifestBarcode(boxSet, orderDate, driverID);
+		ExternalSystemsController.getInstance().receiveManifestBarcode(boxSet, orderDate, driverID);
 	}
 }

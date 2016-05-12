@@ -70,7 +70,7 @@ public class ExternalSystemsControllerTest
 		assertFalse(newShelf.getProductBoxes().contains(box));
 
 		// Move is a success.
-		assertTrue(ExternalSystemsController.move(box.getDatabaseID(), NEW_SHELFSLOT_ID, false));
+		assertTrue(ExternalSystemsController.getInstance().move(box.getDatabaseID(), NEW_SHELFSLOT_ID, false));
 
 		// TODO: Refresh private method
 		oldShelf = DatabaseController.getInstance().getShelfByID(oldShelf.getDatabaseID());
@@ -90,7 +90,7 @@ public class ExternalSystemsControllerTest
 		 * Rollback.
 		 */
 
-		assertTrue(ExternalSystemsController.move(box.getDatabaseID(), oldShelfSlot, false));
+		assertTrue(ExternalSystemsController.getInstance().move(box.getDatabaseID(), oldShelfSlot, false));
 
 		// TODO: Refresh private method
 		oldShelf = DatabaseController.getInstance().getShelfByID(oldShelf.getDatabaseID());
@@ -107,19 +107,19 @@ public class ExternalSystemsControllerTest
 	@Test
 	public final void testMoveToFullSlot()
 	{
-		assertFalse(ExternalSystemsController.move(BOX_NOT_IN_SLOT, "S1-1-1", false));
+		assertFalse(ExternalSystemsController.getInstance().move(BOX_NOT_IN_SLOT, "S1-1-1", false));
 	}
 
 	@Test
 	public final void testMoveBackToSameSlot()
 	{
-		assertFalse(ExternalSystemsController.move(BOX_DBID_1, "S1-1-1", false));
+		assertFalse(ExternalSystemsController.getInstance().move(BOX_DBID_1, "S1-1-1", false));
 	}
 
 	@Test
 	public final void testMoveInvalidBox()
 	{
-		assertFalse(ExternalSystemsController.move(99999, "S4-1-1", false));
+		assertFalse(ExternalSystemsController.getInstance().move(99999, "S4-1-1", false));
 	}
 
 	@Test
@@ -133,7 +133,7 @@ public class ExternalSystemsControllerTest
 		assertFalse(newShelf.getProductBoxes().contains(box));
 
 		// Move is a success.
-		assertTrue(ExternalSystemsController.move(box.getDatabaseID(), NEW_SHELFSLOT_ID, false));
+		assertTrue(ExternalSystemsController.getInstance().move(box.getDatabaseID(), NEW_SHELFSLOT_ID, false));
 
 		// TODO: Refresh private method
 		newShelf = DatabaseController.getInstance().getShelfByID(newShelf.getDatabaseID());
@@ -149,7 +149,7 @@ public class ExternalSystemsControllerTest
 		 * Rollback.
 		 */
 
-		assertTrue(ExternalSystemsController.move(box.getDatabaseID(), null, false));
+		assertTrue(ExternalSystemsController.getInstance().move(box.getDatabaseID(), null, false));
 
 		// TODO: Refresh private method
 		newShelf = DatabaseController.getInstance().getShelfByID(newShelf.getDatabaseID());

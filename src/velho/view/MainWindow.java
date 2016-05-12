@@ -304,7 +304,7 @@ public class MainWindow extends Application implements GenericView
 				searchController = new SearchController(productController);
 				removalListController = new RemovalListController(searchController);
 
-				ExternalSystemsController.setControllers(manifestController);
+				ExternalSystemsController.getInstance().setControllers(manifestController);
 				LoginController.setControllers(uiController, debugController);
 				LocalizationController.setControllers(uiController);
 

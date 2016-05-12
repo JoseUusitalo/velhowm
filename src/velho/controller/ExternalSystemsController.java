@@ -23,8 +23,22 @@ import velho.model.ShelfSlot;
  *
  * @author Edward Puustinen &amp; Jose Uusitalo
  */
-public abstract class ExternalSystemsController
+@SuppressWarnings("static-method")
+public class ExternalSystemsController
 {
+	/**
+	 * A private inner class holding the class instance.
+	 *
+	 * @author Jose Uusitalo
+	 */
+	private static class Holder
+	{
+		/**
+		 * The only instance of {@link ExternalSystemsController}.
+		 */
+		private static final ExternalSystemsController INSTANCE = new ExternalSystemsController();
+	}
+
 	/**
 	 * Apache log4j logger: System.
 	 */
@@ -33,14 +47,31 @@ public abstract class ExternalSystemsController
 	/**
 	 * The {@link ManifestController}.
 	 */
-	private static ManifestController manifestController;
+	private ManifestController manifestController;
+
+	/**
+	 */
+	private ExternalSystemsController()
+	{
+		// No need to instantiate this class.
+	}
+
+	/**
+	 * Gets the instance of the {@link ExternalSystemsController}.
+	 *
+	 * @return the external systems controller
+	 */
+	public static synchronized ExternalSystemsController getInstance()
+	{
+		return Holder.INSTANCE;
+	}
 
 	/**
 	 * @param manifestController
 	 */
-	public static void setControllers(final ManifestController manifestController)
+	public void setControllers(final ManifestController manifestController)
 	{
-		ExternalSystemsController.manifestController = manifestController;
+		this.manifestController = manifestController;
 	}
 
 	/**
@@ -50,7 +81,7 @@ public abstract class ExternalSystemsController
 	 * @param data data to print
 	 */
 	@SuppressWarnings("unchecked")
-	public static void sendDataToPrinter(final Object data)
+	public void sendDataToPrinter(final Object data)
 	{
 		if (data instanceof Collection)
 		{
@@ -84,7 +115,7 @@ public abstract class ExternalSystemsController
 	/**
 	 * Carries out initial order from DebugController to BarcodeScanner
 	 */
-	public static void scannerMoveValid()
+	public void scannerMoveValid()
 	{
 		BarcodeScanner.scannerMoveValid();
 	}
@@ -95,7 +126,7 @@ public abstract class ExternalSystemsController
 	 * @param data data to send
 	 */
 	@SuppressWarnings("unchecked")
-	public static void sendDataToBarcodeScanner(final Object data)
+	public void sendDataToBarcodeScanner(final Object data)
 	{
 		if (data instanceof Collection)
 		{
@@ -134,7 +165,7 @@ public abstract class ExternalSystemsController
 	 * @param showPopup show popup messages about failure/success?
 	 * @return <code>true</code> if the box was moved successfully
 	 */
-	public static boolean move(final int productBoxCode, final String newShelfSlotID, final boolean showPopup)
+	public boolean move(final int productBoxCode, final String newShelfSlotID, final boolean showPopup)
 	{
 		final ProductBox boxToMove = DatabaseController.getInstance().getProductBoxByID(productBoxCode);
 
@@ -229,7 +260,7 @@ public abstract class ExternalSystemsController
 	 * @param orderDate the date the manifest was ordered
 	 * @param driverID the ID of the driver who delivered the boxes
 	 */
-	public static void receiveManifestBarcode(final Set<ProductBox> boxSet, final Date orderDate, final int driverID)
+	public void receiveManifestBarcode(final Set<ProductBox> boxSet, final Date orderDate, final int driverID)
 	{
 		SYSLOG.info("VELHOWM has received a manifest by driver " + driverID + " with " + boxSet.size() + " product boxes.");
 		manifestController.receiveShipment(boxSet, orderDate, driverID);
@@ -239,9 +270,8 @@ public abstract class ExternalSystemsController
 	 * Receives a badge ID from the badge scanner.
 	 *
 	 * @param badgeID badge identification string
-	 * @return
 	 */
-	public static void receiveBadgeID(final String badgeID)
+	public void receiveBadgeID(final String badgeID)
 	{
 		// TODO: Observer model.
 
