@@ -99,7 +99,8 @@ public class ProductBoxesTabView implements GenericView
 
 			Callback<TableColumn<Object, Object>, TableCell<Object, Object>> cellFactory = (final TableColumn<Object, Object> p) -> new SpinnerCell();
 
-			TableColumn<Object, Object> sizeColumn = new TableColumn<Object, Object>(LocalizationController.getInstance().getString("publicRemovalTableHeaderSize"));
+			TableColumn<Object, Object> sizeColumn = new TableColumn<Object, Object>(
+					LocalizationController.getInstance().getString("publicRemovalTableHeaderSize"));
 
 			sizeColumn.setMinWidth(100);
 			sizeColumn.setCellValueFactory(new PropertyValueFactory<>("productCount"));
@@ -181,7 +182,8 @@ public class ProductBoxesTabView implements GenericView
 				@Override
 				public TableCell<Object, String> call(final TableColumn<Object, String> p)
 				{
-					final TableCellDeleteButton button = new TableCellDeleteButton(productController, (LocalizationController.getInstance().getString("buttonDelete")));
+					final TableCellDeleteButton button = new TableCellDeleteButton(productController,
+							(LocalizationController.getInstance().getString("buttonDelete")));
 					button.setAlignment(Pos.CENTER);
 					return button;
 				}
@@ -218,7 +220,6 @@ public class ProductBoxesTabView implements GenericView
 					date = Date.from(expirationDate.getValue().atTime(0, 0).toInstant(ZoneOffset.of("Z")));
 				final ProductBox saveProductBox = new ProductBox((Product) productItem.getValue(), productBoxMaxSize.getValue(), productBoxSize.getValue(),
 						date);
-				System.out.println("New product box: " + saveProductBox);
 				productController.saveProductBox(saveProductBox);
 			});
 

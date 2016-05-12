@@ -575,11 +575,6 @@ public class MainWindow extends Application implements GenericView
 	private void skip()
 	{
 		SYSLOG.info("Main application code skipped.");
-
-		// It works.
-		// System.out.println("id:" + new AssignedIdentifierGenerator().generate((SessionImplementor)
-		// HibernateSessionFactory.getInstance().getCurrentSession(),
-		// new User(120, "new", "thing", "111111", null, UserRole.ADMINISTRATOR)));
 	}
 
 	@Override

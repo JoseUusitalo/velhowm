@@ -194,7 +194,6 @@ public class ProductTabView implements GenericView
 			{
 				final Product saveProduct = new Product(productTextField.getText(), (ProductBrand) brandItem.getValue(),
 						(ProductCategory) categoryItem.getValue());
-				System.out.println("New product: " + saveProduct);
 				DatabaseController.getInstance().saveOrUpdate(saveProduct);
 			});
 

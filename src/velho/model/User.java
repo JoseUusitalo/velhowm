@@ -84,7 +84,6 @@ public class User extends AbstractDatabaseObject
 		this.pin = pin;
 		this.role = role;
 
-		System.out.println("new user " + firstName + " " + pin + " " + role);
 		if (!UserController.getInstance().validateUser(this))
 			throw new IllegalArgumentException("Invalid user data");
 	}

@@ -253,7 +253,7 @@ public class DatabaseController
 				PopupController.getInstance().error(LocalizationController.getInstance().getString("popUpDatabaseInUse"));
 			}
 
-			System.out.println(e);
+			e.printStackTrace();
 		}
 		return connection;
 	}
