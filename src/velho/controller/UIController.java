@@ -163,7 +163,7 @@ public class UIController
 		 * Check the state the of the removal platform when the main menu is
 		 * shown after user has logged in.
 		 */
-		removalPlatformController.checkWarning();
+		removalPlatformController.update();
 	}
 
 	/**

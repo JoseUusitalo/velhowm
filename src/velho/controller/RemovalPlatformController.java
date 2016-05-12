@@ -1,5 +1,8 @@
 package velho.controller;
 
+import java.util.Observable;
+import java.util.Observer;
+
 import org.apache.log4j.Logger;
 
 import velho.controller.database.DatabaseController;
@@ -11,7 +14,7 @@ import velho.view.MainWindow;
  *
  * @author Jose Uusitalo
  */
-public class RemovalPlatformController
+public class RemovalPlatformController implements Observer
 {
 	/**
 	 * Apache log4j logger: System.
@@ -34,6 +37,7 @@ public class RemovalPlatformController
 	public RemovalPlatformController(final MainWindow mainWindow)
 	{
 		this.mainWindow = mainWindow;
+		getPlatform().addObserver(this);
 	}
 
 	/**
@@ -50,19 +54,7 @@ public class RemovalPlatformController
 	}
 
 	/**
-	 * Gets the amount of free space left on the removal platform.
-	 *
-	 * @return the percent of free space left
-	 */
-	public double getFreeSpace()
-	{
-		return getPlatform().getFreeSpacePercent();
-	}
-
-	/**
-	 * Changes the amount of free space on the platform by adding or removing
-	 * the specified percentage points depending
-	 * on its sign.
+	 * Changes the amount of free space on the platform by adding or removing the specified percentage points depending on its sign.
 	 *
 	 * @param percentagePoints percentage points to modify by [0.0, 1.0]
 	 */
@@ -72,31 +64,22 @@ public class RemovalPlatformController
 		getPlatform().modifyFreeSpace(percentagePoints);
 
 		DatabaseController.getInstance().saveOrUpdate(getPlatform());
-		checkWarning();
 	}
 
 	/**
-	 * Checks if the removal platform free space is equal to or below the set
-	 * warning limit and displays a warning
-	 * message.
+	 * Checks if the removal platform free space is equal to or below the set warning limit and displays a warning message.
 	 */
-	public void checkWarning()
+	@SuppressWarnings("static-method")
+	private void checkWarning(final RemovalPlatform rplatform)
 	{
 		SYSLOG.trace("Checking for removal platform fullness.");
 
-		final int percentFull = (int) (100.0 - getFreeSpace() * 100.0);
-
-		// TODO: Observer
-		mainWindow.setRemovalPlatformFullPercent(String.valueOf(percentFull));
-
-		if (Double.compare(getFreeSpace(), getPlatform().getFreeSpaceLeftWarningPercent()) <= 0)
+		if (Double.compare(rplatform.getFreeSpacePercent(), rplatform.getFreeSpaceLeftWarningPercent()) <= 0)
 		{
-			SYSLOG.info("The removal platform is " + percentFull + " / " + (int) (100.0 - getPlatform().getFreeSpaceLeftWarningPercent() * 100.0) + "% full!");
-
 			// Warning is only showed when logged in.
 			if (LoginController.getInstance().isLoggedIn())
-				PopupController.getInstance()
-						.warning(LocalizationController.getInstance().getCompoundString("removalPlatformFullnessPopUpNotice", percentFull));
+				PopupController.getInstance().warning(
+						LocalizationController.getInstance().getCompoundString("removalPlatformFullnessPopUpNotice", (int) rplatform.getPercentFull()));
 		}
 	}
 
@@ -105,8 +88,38 @@ public class RemovalPlatformController
 	 */
 	public void emptyPlatform()
 	{
-		SYSLOG.info(LocalizationController.getInstance().getString("removalPlatformEmptiedNotice"));
+		SYSLOG.info("Removal platform emptied.");
 		getPlatform().empty();
-		checkWarning();
+	}
+
+	@Override
+	public void update(final Observable observable, final Object arg)
+	{
+		if (observable instanceof RemovalPlatform)
+		{
+			final RemovalPlatform rplatform = (RemovalPlatform) observable;
+			updateMainWindow(rplatform);
+			checkWarning(rplatform);
+		}
+	}
+
+	/**
+	 * Updates the label in the main window showing the removal platform fullness.
+	 *
+	 * @param rplatform platform to get data from
+	 */
+	private void updateMainWindow(final RemovalPlatform rplatform)
+	{
+		final int full = (int) rplatform.getPercentFull();
+		mainWindow.setRemovalPlatformFullPercent(String.valueOf(full));
+		SYSLOG.info("The removal platform is " + full + " / " + (int) (100.0 - rplatform.getFreeSpaceLeftWarningPercent() * 100.0) + "% full!");
+	}
+
+	/**
+	 * Checks the fullness of the removal platform.
+	 */
+	public void update()
+	{
+		update(getPlatform(), null);
 	}
 }

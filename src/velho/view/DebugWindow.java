@@ -107,7 +107,7 @@ public class DebugWindow
 	{
 		primaryStage.setTitle("VELHO WM DEBUG");
 		final Group root = new Group();
-		final Scene scene = new Scene(root, 300, 150);
+		final Scene scene = new Scene(root, 300, 200);
 		scene.getStylesheets().add(getClass().getResource("velho.css").toExternalForm());
 
 		final BorderPane rootBorderPane = new BorderPane();
