@@ -128,7 +128,8 @@ public class CSVController implements UIActionController
 			case "Manifest":
 				return new String[] { "databaseID", "driverID", "manifestStateID", "orderedDateString", "receivedDateString" };
 			case "ProductBox":
-				return new String[] { "databaseID", "manifestID", "removalListID", "shelfSlotID", "productID", "maxSize", "productCount", "expirationDateString" };
+				return new String[] { "databaseID", "manifestID", "removalListID", "shelfSlotID", "productID", "maxSize", "productCount",
+						"expirationDateString" };
 			case "ProductCategory":
 				return new String[] { "databaseID", "name", "typeID" };
 			case "Product":
@@ -165,9 +166,11 @@ public class CSVController implements UIActionController
 		final int saved = loader.save();
 
 		if (saved == 0)
-			PopupController.getInstance().warning(LocalizationController.getInstance().getCompoundString("failedToLoadAnyObjectsNotice", csvType.getSimpleName(), filePath));
+			PopupController.getInstance()
+					.warning(LocalizationController.getInstance().getCompoundString("failedToLoadAnyObjectsNotice", csvType.getSimpleName(), filePath));
 		else
-			PopupController.getInstance().info(LocalizationController.getInstance().getCompoundString("objectSuccesfullyLoadedNotice", saved, loaded, csvType.getSimpleName(), filePath));
+			PopupController.getInstance().info(
+					LocalizationController.getInstance().getCompoundString("objectSuccesfullyLoadedNotice", saved, loaded, csvType.getSimpleName(), filePath));
 	}
 
 	/**
@@ -187,49 +190,43 @@ public class CSVController implements UIActionController
 	@Override
 	public void createAction(final Object data)
 	{
-		// TODO Auto-generated method stub
-
+		throw new UnsupportedOperationException();
 	}
 
 	@Override
 	public void updateAction(final Object data)
 	{
-		// TODO Auto-generated method stub
-
+		throw new UnsupportedOperationException();
 	}
 
 	@Override
 	public void addAction(final Object data)
 	{
-		// TODO Auto-generated method stub
-
+		throw new UnsupportedOperationException();
 	}
 
 	@Override
 	public void removeAction(final Object data)
 	{
-		// TODO Auto-generated method stub
-
+		throw new UnsupportedOperationException();
 	}
 
 	@Override
 	public void deleteAction(final Object data)
 	{
-		// TODO Auto-generated method stub
-
+		throw new UnsupportedOperationException();
 	}
 
 	@Override
 	public void viewAction(final Object data)
 	{
-		// TODO Auto-generated method stub
-
+		throw new UnsupportedOperationException();
 	}
 
 	@Override
 	public void recreateViews(final ListView listView)
 	{
-		// TODO Auto-generated method stub
+		throw new UnsupportedOperationException();
 	}
 
 	public static boolean isValidCSVFile(final File file)
@@ -270,7 +267,7 @@ public class CSVController implements UIActionController
 	 *
 	 * @param user database object whose data to convert into a string array
 	 * @return an array of strings representing the specified object in a CSV
-	 *         file
+	 * file
 	 */
 	public static String[] objectToCSVDataArray(final User user)
 	{
