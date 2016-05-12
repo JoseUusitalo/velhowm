@@ -7,7 +7,6 @@ import org.apache.log4j.Logger;
 import javafx.scene.Node;
 import velho.controller.database.LogDatabaseController;
 import velho.view.LogView;
-import velho.view.MainWindow;
 
 /**
  * A class for controlling the viewing of logs.
@@ -19,7 +18,7 @@ public class LogController
 	/**
 	 * Apache log4j logger: System.
 	 */
-	private static final Logger SYSLOG = Logger.getLogger(MainWindow.class.getName());
+	private static final Logger SYSLOG = Logger.getLogger(LogController.class.getName());
 
 	/**
 	 * The {@link LogView}.
