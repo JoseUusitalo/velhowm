@@ -145,23 +145,23 @@ public class UIController
 		{
 			case ADMINISTRATOR:
 			case MANAGER:
-				mainView.addTab(LocalizationController.getString("addUserTab"), userController.getView());
-				mainView.addTab(LocalizationController.getString("addLogsTab"), logController.getView());
+				mainView.addTab(LocalizationController.getInstance().getString("addUserTab"), userController.getView());
+				mainView.addTab(LocalizationController.getInstance().getString("addLogsTab"), logController.getView());
 				//$FALL-THROUGH$
 			case LOGISTICIAN:
-				mainView.addTab(LocalizationController.getString("addUserListTab"), userController.getUserListView(currentUserRole));
-				mainView.addTab(LocalizationController.getString("csvTab"), csvController.getCSVView());
-				mainView.addTab(LocalizationController.getString("addBrandsTab"), productController.getBrandsTab());
-				mainView.addTab(LocalizationController.getString("addProductTypesTab"), productController.getProductTypesTab());
-				mainView.addTab(LocalizationController.getString("addCategoriesTab"), productController.getCategoryTab());
-				mainView.addTab(LocalizationController.getString("addProductListTab"), productController.getProductTabView());
-				mainView.addTab(LocalizationController.getString("addProductBoxesTab"), productController.getProductBoxesTab());
-				mainView.addTab(LocalizationController.getString("addManifestsTab"), manifestController.getView());
-				mainView.addTab(LocalizationController.getString("addRemovalListsTab"), removalListController.getView());
+				mainView.addTab(LocalizationController.getInstance().getString("addUserListTab"), userController.getUserListView(currentUserRole));
+				mainView.addTab(LocalizationController.getInstance().getString("csvTab"), csvController.getCSVView());
+				mainView.addTab(LocalizationController.getInstance().getString("addBrandsTab"), productController.getBrandsTab());
+				mainView.addTab(LocalizationController.getInstance().getString("addProductTypesTab"), productController.getProductTypesTab());
+				mainView.addTab(LocalizationController.getInstance().getString("addCategoriesTab"), productController.getCategoryTab());
+				mainView.addTab(LocalizationController.getInstance().getString("addProductListTab"), productController.getProductTabView());
+				mainView.addTab(LocalizationController.getInstance().getString("addProductBoxesTab"), productController.getProductBoxesTab());
+				mainView.addTab(LocalizationController.getInstance().getString("addManifestsTab"), manifestController.getView());
+				mainView.addTab(LocalizationController.getInstance().getString("addRemovalListsTab"), removalListController.getView());
 				//$FALL-THROUGH$
 			case GUEST:
-				mainView.addTab(LocalizationController.getString("addSearchTab"), searchController.getSearchTabView());
-				mainView.addTab(LocalizationController.getString("addProductListSearchTab"), searchController.getProductListSearchView());
+				mainView.addTab(LocalizationController.getInstance().getString("addSearchTab"), searchController.getSearchTabView());
+				mainView.addTab(LocalizationController.getInstance().getString("addProductListSearchTab"), searchController.getProductListSearchView());
 				break;
 			default:
 				SYSLOG.error("Unknown user role '" + currentUserRole.getName() + "'.");

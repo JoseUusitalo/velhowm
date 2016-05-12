@@ -250,7 +250,7 @@ public class DatabaseController
 			if (e.getMessage().contains("Database may be already in use"))
 			{
 				DBLOG.info("Database is already in use.");
-				PopupController.error(LocalizationController.getString("popUpDatabaseInUse"));
+				PopupController.error(LocalizationController.getInstance().getString("popUpDatabaseInUse"));
 			}
 
 			System.out.println(e);
@@ -500,7 +500,7 @@ public class DatabaseController
 			e.printStackTrace();
 		}
 
-		PopupController.warning(LocalizationController.getString("popUpDatabaseConnectionLost"));
+		PopupController.warning(LocalizationController.getInstance().getString("popUpDatabaseConnectionLost"));
 	}
 
 	/**
@@ -866,12 +866,12 @@ public class DatabaseController
 	public Map<String, String> getPublicUserDataColumns(final boolean withDeleteColumn)
 	{
 		final LinkedHashMap<String, String> cols = new LinkedHashMap<String, String>();
-		cols.put("firstName", LocalizationController.getString("publicUserTableHeaderFirstName"));
-		cols.put("lastName", LocalizationController.getString("publicUserTableHeaderLastName"));
-		cols.put("roleName", LocalizationController.getString("publicUserTableHeaderRole"));
+		cols.put("firstName", LocalizationController.getInstance().getString("publicUserTableHeaderFirstName"));
+		cols.put("lastName", LocalizationController.getInstance().getString("publicUserTableHeaderLastName"));
+		cols.put("roleName", LocalizationController.getInstance().getString("publicUserTableHeaderRole"));
 
 		if (withDeleteColumn)
-			cols.put("deleteButton", LocalizationController.getString("publicProductTableDeleteButton"));
+			cols.put("deleteButton", LocalizationController.getInstance().getString("publicProductTableDeleteButton"));
 
 		return cols;
 	}
@@ -891,10 +891,10 @@ public class DatabaseController
 		final LinkedHashMap<String, String> cols = new LinkedHashMap<String, String>();
 
 		if (withAddColumn)
-			cols.put("addButton", LocalizationController.getString("buttonAdd"));
+			cols.put("addButton", LocalizationController.getInstance().getString("buttonAdd"));
 
 		if (withDeleteColumn)
-			cols.put("deleteButton", LocalizationController.getString("buttonDelete"));
+			cols.put("deleteButton", LocalizationController.getInstance().getString("buttonDelete"));
 
 		cols.put("databaseID", "ID");
 		cols.put("name", "Name");
@@ -915,14 +915,14 @@ public class DatabaseController
 	public Map<String, String> getRemovalListDataColumns()
 	{
 		final LinkedHashMap<String, String> cols = new LinkedHashMap<String, String>();
-		cols.put("databaseID", LocalizationController.getString("publicRemovalTableHeaderID"));
-		cols.put("state", LocalizationController.getString("publicRemovalTableHeaderState"));
-		cols.put("size", LocalizationController.getString("publicRemovalTableHeaderSize"));
-		cols.put("viewButton", LocalizationController.getString("publicRemovalTableViewButton"));
+		cols.put("databaseID", LocalizationController.getInstance().getString("publicRemovalTableHeaderID"));
+		cols.put("state", LocalizationController.getInstance().getString("publicRemovalTableHeaderState"));
+		cols.put("size", LocalizationController.getInstance().getString("publicRemovalTableHeaderSize"));
+		cols.put("viewButton", LocalizationController.getInstance().getString("publicRemovalTableViewButton"));
 
 		// Only managers and administrators can delete lists.
 		if (LoginController.getCurrentUser().getRole().compareTo(UserRole.MANAGER) >= 0)
-			cols.put("deleteButton", LocalizationController.getString("publicRemovalTableDeleteButton"));
+			cols.put("deleteButton", LocalizationController.getInstance().getString("publicRemovalTableDeleteButton"));
 
 		return cols;
 	}
@@ -942,19 +942,19 @@ public class DatabaseController
 		final LinkedHashMap<String, String> cols = new LinkedHashMap<String, String>();
 
 		if (withAddColumn)
-			cols.put("addButton", LocalizationController.getString("buttonAdd"));
+			cols.put("addButton", LocalizationController.getInstance().getString("buttonAdd"));
 
 		if (withRemoveColumn)
-			cols.put("removeButton", LocalizationController.getString("buttonRemove"));
+			cols.put("removeButton", LocalizationController.getInstance().getString("buttonRemove"));
 
-		cols.put("databaseID", LocalizationController.getString("publicProductSearchTableHeaderID"));
-		cols.put("productName", LocalizationController.getString("publicProductSearchTableHeaderName"));
-		cols.put("productBrand", LocalizationController.getString("publicProductSearchTableHeaderBrand"));
-		cols.put("productCategory", LocalizationController.getString("publicProductSearchTableHeaderCategory"));
-		cols.put("expirationDate", LocalizationController.getString("publicProductSearchTableHeaderExpires"));
-		cols.put("boxID", LocalizationController.getString("publicProductSearchTableHeaderBoxID"));
-		cols.put("boxShelfSlot", LocalizationController.getString("publicProductSearchTableHeaderShelfSlot"));
-		cols.put("boxProductCount", LocalizationController.getString("publicProductSearchTableHeaderProductCount"));
+		cols.put("databaseID", LocalizationController.getInstance().getString("publicProductSearchTableHeaderID"));
+		cols.put("productName", LocalizationController.getInstance().getString("publicProductSearchTableHeaderName"));
+		cols.put("productBrand", LocalizationController.getInstance().getString("publicProductSearchTableHeaderBrand"));
+		cols.put("productCategory", LocalizationController.getInstance().getString("publicProductSearchTableHeaderCategory"));
+		cols.put("expirationDate", LocalizationController.getInstance().getString("publicProductSearchTableHeaderExpires"));
+		cols.put("boxID", LocalizationController.getInstance().getString("publicProductSearchTableHeaderBoxID"));
+		cols.put("boxShelfSlot", LocalizationController.getInstance().getString("publicProductSearchTableHeaderShelfSlot"));
+		cols.put("boxProductCount", LocalizationController.getInstance().getString("publicProductSearchTableHeaderProductCount"));
 
 		return cols;
 	}
@@ -969,13 +969,13 @@ public class DatabaseController
 	public Map<String, String> getManifestDataColumns()
 	{
 		final LinkedHashMap<String, String> cols = new LinkedHashMap<String, String>();
-		cols.put("databaseID", LocalizationController.getString("publicManifestTableHeaderID"));
-		cols.put("state", LocalizationController.getString("publicManifestTableHeaderState"));
-		cols.put("size", LocalizationController.getString("publicManifestTableHeaderSize"));
-		cols.put("driverID", LocalizationController.getString("publicManifestTableDriverID"));
-		cols.put("orderedDate", LocalizationController.getString("publicManifestTableOrderedDate"));
-		cols.put("receivedDate", LocalizationController.getString("publicManifestTableReceivedDate"));
-		cols.put("viewButton", LocalizationController.getString("buttonView"));
+		cols.put("databaseID", LocalizationController.getInstance().getString("publicManifestTableHeaderID"));
+		cols.put("state", LocalizationController.getInstance().getString("publicManifestTableHeaderState"));
+		cols.put("size", LocalizationController.getInstance().getString("publicManifestTableHeaderSize"));
+		cols.put("driverID", LocalizationController.getInstance().getString("publicManifestTableDriverID"));
+		cols.put("orderedDate", LocalizationController.getInstance().getString("publicManifestTableOrderedDate"));
+		cols.put("receivedDate", LocalizationController.getInstance().getString("publicManifestTableReceivedDate"));
+		cols.put("viewButton", LocalizationController.getInstance().getString("buttonView"));
 
 		return cols;
 	}

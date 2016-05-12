@@ -63,18 +63,18 @@ public class RemovalListManagementView implements GenericView
 			final GridPane managementPanel = new GridPane();
 			managementPanel.getStyleClass().add("standard-padding");
 
-			browseListsButton = new Button(LocalizationController.getString("browseRemovalListsButton"));
+			browseListsButton = new Button(LocalizationController.getInstance().getString("browseRemovalListsButton"));
 			browseListsButton.setAlignment(Pos.CENTER_LEFT);
 			managementPanel.add(browseListsButton, 0, 0);
 
-			final Label removalListManagementLabel = new Label(LocalizationController.getString("removalListManagementLabel"));
+			final Label removalListManagementLabel = new Label(LocalizationController.getInstance().getString("removalListManagementLabel"));
 			removalListManagementLabel.getStyleClass().add("standard-padding");
 			removalListManagementLabel.getStyleClass().add("centered-title");
 			removalListManagementLabel.setMaxWidth(Double.MAX_VALUE);
 			managementPanel.add(removalListManagementLabel, 1, 0);
 			GridPane.setHgrow(removalListManagementLabel, Priority.ALWAYS);
 
-			newListButton = new Button(LocalizationController.getString("createRemovalListButton"));
+			newListButton = new Button(LocalizationController.getInstance().getString("createRemovalListButton"));
 			newListButton.setAlignment(Pos.CENTER_RIGHT);
 			managementPanel.add(newListButton, 2, 0);
 

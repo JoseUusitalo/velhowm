@@ -101,7 +101,7 @@ public class CategoriesTabView implements GenericView
 			table.getColumns().add(nameColumn);
 
 			final ObservableList<Object> cbValues = DatabaseController.getInstance().getAllProductTypes();
-			final TableColumn<Object, Object> comboBoxColumn = new TableColumn<>(LocalizationController.getString("typesComboboxTabName"));
+			final TableColumn<Object, Object> comboBoxColumn = new TableColumn<>(LocalizationController.getInstance().getString("typesComboboxTabName"));
 			comboBoxColumn.setMinWidth(150);
 			comboBoxColumn.setCellValueFactory(new PropertyValueFactory<>("type"));
 			comboBoxColumn.setCellFactory(ComboBoxTableCell.forTableColumn(cbValues));
@@ -131,20 +131,20 @@ public class CategoriesTabView implements GenericView
 				@Override
 				public TableCell<Object, String> call(final TableColumn<Object, String> tcolumn)
 				{
-					final TableCellDeleteButton button = new TableCellDeleteButton(productController, LocalizationController.getString("buttonDelete"));
+					final TableCellDeleteButton button = new TableCellDeleteButton(productController, LocalizationController.getInstance().getString("buttonDelete"));
 					button.setAlignment(Pos.CENTER);
 					return button;
 				}
 			});
 			table.getColumns().add(deleteColumn);
 
-			final Label categoryLabel = new Label(LocalizationController.getString("categoryNameLabel"));
+			final Label categoryLabel = new Label(LocalizationController.getInstance().getString("categoryNameLabel"));
 			final TextField categoryName = new TextField();
-			categoryName.setPromptText(LocalizationController.getString("categoryNamePromtText"));
+			categoryName.setPromptText(LocalizationController.getInstance().getString("categoryNamePromtText"));
 			categoryName.setMaxWidth(nameColumn.getPrefWidth());
-			final Button addButton = new Button(LocalizationController.getString("buttonCreate"));
+			final Button addButton = new Button(LocalizationController.getInstance().getString("buttonCreate"));
 
-			final Label typeLabel = new Label(LocalizationController.getString("categoryTypeLabel"));
+			final Label typeLabel = new Label(LocalizationController.getInstance().getString("categoryTypeLabel"));
 			final ComboBox<Object> categoryType = new ComboBox<Object>();
 			categoryType.getItems().addAll(cbValues);
 			categoryType.getSelectionModel().selectFirst();

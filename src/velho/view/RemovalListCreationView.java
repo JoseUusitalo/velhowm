@@ -87,7 +87,7 @@ public class RemovalListCreationView implements GenericView
 
 			final GridPane left = new GridPane();
 
-			final Label resultsLabel = new Label(LocalizationController.getString("searchResultsLabel"));
+			final Label resultsLabel = new Label(LocalizationController.getInstance().getString("searchResultsLabel"));
 			resultsLabel.getStyleClass().add("centered-title-medium");
 			resultsLabel.setPadding(new Insets(7, 0, 0, 0));
 			resultsLabel.setAlignment(Pos.CENTER);
@@ -104,7 +104,7 @@ public class RemovalListCreationView implements GenericView
 
 			final GridPane center = new GridPane();
 
-			final Label removalListLabel = new Label(LocalizationController.getString("newRemovalListLabel"));
+			final Label removalListLabel = new Label(LocalizationController.getInstance().getString("newRemovalListLabel"));
 			removalListLabel.getStyleClass().add("centered-title-medium");
 			removalListLabel.setAlignment(Pos.CENTER);
 			removalListLabel.setMaxWidth(Double.MAX_VALUE);
@@ -132,7 +132,7 @@ public class RemovalListCreationView implements GenericView
 				}
 			});
 
-			final Button saveButton = new Button(LocalizationController.getString("saveButton"));
+			final Button saveButton = new Button(LocalizationController.getInstance().getString("saveButton"));
 			center.add(saveButton, 2, 0);
 
 			saveButton.setOnAction(new EventHandler<ActionEvent>()
@@ -175,7 +175,7 @@ public class RemovalListCreationView implements GenericView
 	 */
 	public void refresh()
 	{
-		SYSLOG.trace(LocalizationController.getString("refreshRemovalListNotice"));
+		SYSLOG.trace(LocalizationController.getInstance().getString("refreshRemovalListNotice"));
 		resultList = removalListController.getSearchResultsListView();
 		newList = removalListController.getNewRemovalListView();
 	}

@@ -94,7 +94,7 @@ public class RemovalPlatformController
 
 			// Warning is only showed when logged in.
 			if (LoginController.isLoggedIn())
-				PopupController.warning(LocalizationController.getCompoundString("removalPlatformFullnessPopUpNotice", percentFull));
+				PopupController.warning(LocalizationController.getInstance().getCompoundString("removalPlatformFullnessPopUpNotice", percentFull));
 		}
 	}
 
@@ -103,7 +103,7 @@ public class RemovalPlatformController
 	 */
 	public void emptyPlatform()
 	{
-		SYSLOG.info(LocalizationController.getString("removalPlatformEmptiedNotice"));
+		SYSLOG.info(LocalizationController.getInstance().getString("removalPlatformEmptiedNotice"));
 		getPlatform().empty();
 		checkWarning();
 	}

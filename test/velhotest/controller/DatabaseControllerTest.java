@@ -44,7 +44,7 @@ public class DatabaseControllerTest
 		LogDatabaseController.getInstance().connectAndInitialize();
 		DatabaseController.getInstance().link();
 		DatabaseController.getInstance().loadSampleData();
-		LocalizationController.initializeBundle();
+		LocalizationController.getInstance().initializeBundle();
 		System.out.println("\n\n---- DatabaseControllerTest Start ----\n\n");
 	}
 

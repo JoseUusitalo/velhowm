@@ -165,9 +165,9 @@ public class CSVController implements UIActionController
 		final int saved = loader.save();
 
 		if (saved == 0)
-			PopupController.warning(LocalizationController.getCompoundString("failedToLoadAnyObjectsNotice", csvType.getSimpleName(), filePath));
+			PopupController.warning(LocalizationController.getInstance().getCompoundString("failedToLoadAnyObjectsNotice", csvType.getSimpleName(), filePath));
 		else
-			PopupController.info(LocalizationController.getCompoundString("objectSuccesfullyLoadedNotice", saved, loaded, csvType.getSimpleName(), filePath));
+			PopupController.info(LocalizationController.getInstance().getCompoundString("objectSuccesfullyLoadedNotice", saved, loaded, csvType.getSimpleName(), filePath));
 	}
 
 	/**

@@ -198,7 +198,7 @@ public class MainWindow extends Application implements GenericView
 	public MainWindow()
 	{
 		prepareLogger();
-		LocalizationController.initializeBundle();
+		LocalizationController.getInstance().initializeBundle();
 		prepareDatabase();
 		runApp();
 	}
@@ -306,7 +306,7 @@ public class MainWindow extends Application implements GenericView
 
 				ExternalSystemsController.getInstance().setControllers(manifestController);
 				LoginController.setControllers(uiController, debugController);
-				LocalizationController.setControllers(uiController);
+				LocalizationController.getInstance().setControllers(uiController);
 
 				//@formatter:off
 				uiController.setControllers(this,
@@ -415,9 +415,9 @@ public class MainWindow extends Application implements GenericView
 			statusBar.getStyleClass().add("status-bar");
 
 			final ComboBox<SupportedTranslation> languageBox = new ComboBox<SupportedTranslation>();
-			final Label languageChange = new Label(LocalizationController.getString("changeTranslationLabel"));
+			final Label languageChange = new Label(LocalizationController.getInstance().getString("changeTranslationLabel"));
 			languageBox.getItems().addAll(SupportedTranslation.values());
-			languageBox.getSelectionModel().select(LocalizationController.getCurrentTranslation());
+			languageBox.getSelectionModel().select(LocalizationController.getInstance().getCurrentTranslation());
 			languageBox.valueProperty().addListener(new ChangeListener<SupportedTranslation>()
 			{
 				@SuppressWarnings("rawtypes")
@@ -426,24 +426,24 @@ public class MainWindow extends Application implements GenericView
 				{
 					if (oldValue == null || !oldValue.equals(newValue))
 					{
-						LocalizationController.changeTranslation(newValue);
+						LocalizationController.getInstance().changeTranslation(newValue);
 					}
 				}
 			});
 
 			final HBox platformStatus = new HBox(3);
-			final Label removalPlatform = new Label(LocalizationController.getString("removalPlatformStatusLabel"));
+			final Label removalPlatform = new Label(LocalizationController.getInstance().getString("removalPlatformStatusLabel"));
 			removalPlatform.setId("removalPlatformStatusLabel");
 			removalPlatformStatus = new Label();
 			platformStatus.getChildren().addAll(languageChange, languageBox, removalPlatform, removalPlatformStatus);
 			platformStatus.setAlignment(Pos.CENTER_LEFT);
 
 			final HBox userStatus = new HBox(10);
-			final Label userName = new Label(LocalizationController.getCompoundString("helloUserMessage", LoginController.getCurrentUser().getRoleName(),
+			final Label userName = new Label(LocalizationController.getInstance().getCompoundString("helloUserMessage", LoginController.getCurrentUser().getRoleName(),
 					LoginController.getCurrentUser().getFullName()));
 			userName.setId("userName");
 
-			final Button logoutButton = new Button(LocalizationController.getString("logOutButton"));
+			final Button logoutButton = new Button(LocalizationController.getInstance().getString("logOutButton"));
 			logoutButton.setPrefHeight(5.0);
 			userStatus.getChildren().addAll(userName, logoutButton);
 			userStatus.setAlignment(Pos.CENTER_RIGHT);
@@ -475,7 +475,7 @@ public class MainWindow extends Application implements GenericView
 		this.primaryStage = mainStage;
 
 		setUserAgentStylesheet(STYLESHEET_MODENA);
-		this.primaryStage.setTitle(LocalizationController.getString("mainWindowTitle"));
+		this.primaryStage.setTitle(LocalizationController.getInstance().getString("mainWindowTitle"));
 		final Group root = new Group();
 		scene = new Scene(root, WINDOW_WIDTH, WINDOW_HEIGHT);
 		scene.getStylesheets().add(getClass().getResource("velho.css").toExternalForm());

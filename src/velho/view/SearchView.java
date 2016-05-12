@@ -66,10 +66,10 @@ public class SearchView implements GenericView
 			grid.setAlignment(Pos.CENTER);
 
 			final TextField nameField = new TextField();
-			nameField.setPromptText(LocalizationController.getString("productNameorIDPromptText"));
+			nameField.setPromptText(LocalizationController.getInstance().getString("productNameorIDPromptText"));
 			grid.add(nameField, 0, 1, 2, 1);
 
-			final Label countSpinnerLabel = new Label(LocalizationController.getString("productCountSpinnerText"));
+			final Label countSpinnerLabel = new Label(LocalizationController.getInstance().getString("productCountSpinnerText"));
 			countSpinnerLabel.setAlignment(Pos.CENTER);
 			grid.add(countSpinnerLabel, 2, 1, 1, 1);
 
@@ -108,7 +108,7 @@ public class SearchView implements GenericView
 
 			final ComboBox<Object> brandbox = new ComboBox<Object>();
 			brandbox.getItems().add(null);
-			brandbox.setPromptText(LocalizationController.getString("productBrandComboboxPrompt"));
+			brandbox.setPromptText(LocalizationController.getInstance().getString("productBrandComboboxPrompt"));
 			brandbox.getItems().addAll(productBrands);
 			brandbox.setMaxWidth(Double.MAX_VALUE);
 			brandbox.getSelectionModel().selectFirst();
@@ -116,20 +116,20 @@ public class SearchView implements GenericView
 
 			final ComboBox<Object> categorybox = new ComboBox<Object>();
 			categorybox.getItems().add(null);
-			categorybox.setPromptText(LocalizationController.getString("productCategoryComboboxPrompt"));
+			categorybox.setPromptText(LocalizationController.getInstance().getString("productCategoryComboboxPrompt"));
 			categorybox.getItems().addAll(productCategories);
 			categorybox.getSelectionModel().selectFirst();
 			grid.add(categorybox, 4, 2, 1, 1);
 
 			final DatePicker dpStart = new DatePicker();
-			dpStart.setPromptText(LocalizationController.getString("expirationDateStartDTPrompt"));
+			dpStart.setPromptText(LocalizationController.getInstance().getString("expirationDateStartDTPrompt"));
 			grid.add(dpStart, 0, 2, 1, 1);
 
 			final DatePicker dpEnd = new DatePicker();
-			dpEnd.setPromptText(LocalizationController.getString("expirationDateEndDTPrompt"));
+			dpEnd.setPromptText(LocalizationController.getInstance().getString("expirationDateEndDTPrompt"));
 			grid.add(dpEnd, 1, 2, 1, 1);
 
-			Button searchButton = new Button(LocalizationController.getString("searchButton"));
+			Button searchButton = new Button(LocalizationController.getInstance().getString("searchButton"));
 			searchButton.setMaxWidth(Double.MAX_VALUE);
 			searchButton.setPrefHeight(60.0);
 			searchButton.setPrefWidth(120.0);

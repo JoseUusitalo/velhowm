@@ -60,8 +60,8 @@ public class SearchTabView implements GenericView
 			final HBox buttonsBox = new HBox(10);
 			buttonsBox.setPadding(new Insets(0, 10, 10, 10));
 
-			final Button printButton = new Button(LocalizationController.getString("printButton"));
-			final Button sendToScannerButton = new Button(LocalizationController.getString("sendToBarcodeScannerButton"));
+			final Button printButton = new Button(LocalizationController.getInstance().getString("printButton"));
+			final Button sendToScannerButton = new Button(LocalizationController.getInstance().getString("sendToBarcodeScannerButton"));
 
 			printButton.setMaxWidth(Double.MAX_VALUE);
 			printButton.setAlignment(Pos.CENTER);

@@ -27,6 +27,16 @@ import velho.model.ShelfSlot;
 public class ExternalSystemsController
 {
 	/**
+	 * Apache log4j logger: System.
+	 */
+	private static final Logger SYSLOG = Logger.getLogger(ExternalSystemsController.class.getName());
+
+	/**
+	 * The {@link ManifestController}.
+	 */
+	private ManifestController manifestController;
+
+	/**
 	 * A private inner class holding the class instance.
 	 *
 	 * @author Jose Uusitalo
@@ -38,16 +48,6 @@ public class ExternalSystemsController
 		 */
 		private static final ExternalSystemsController INSTANCE = new ExternalSystemsController();
 	}
-
-	/**
-	 * Apache log4j logger: System.
-	 */
-	private static final Logger SYSLOG = Logger.getLogger(ExternalSystemsController.class.getName());
-
-	/**
-	 * The {@link ManifestController}.
-	 */
-	private ManifestController manifestController;
 
 	/**
 	 */
@@ -103,7 +103,7 @@ public class ExternalSystemsController
 			}
 			else
 			{
-				PopupController.info(LocalizationController.getString("listIsEmptyPopUp"));
+				PopupController.info(LocalizationController.getInstance().getString("listIsEmptyPopUp"));
 			}
 		}
 		else
@@ -148,7 +148,7 @@ public class ExternalSystemsController
 			}
 			else
 			{
-				PopupController.info(LocalizationController.getString("listIsEmptyPopUp"));
+				PopupController.info(LocalizationController.getInstance().getString("listIsEmptyPopUp"));
 			}
 		}
 		else
@@ -174,7 +174,7 @@ public class ExternalSystemsController
 			SYSLOG.warn("Attempted to move null product box to " + newShelfSlotID + ".");
 
 			if (showPopup)
-				PopupController.error(LocalizationController.getString("attemptToMoveNotExistingProductBoxPopUp"));
+				PopupController.error(LocalizationController.getInstance().getString("attemptToMoveNotExistingProductBoxPopUp"));
 
 			return false;
 		}
@@ -198,7 +198,7 @@ public class ExternalSystemsController
 				SYSLOG.debug("Product box " + boxToMove + " is already in the slot " + newShelfSlotID + ".");
 
 				if (showPopup)
-					PopupController.info(LocalizationController.getString("unableToMoveProductBoxToSameSlotPopUp") + newShelfSlot + "'.");
+					PopupController.info(LocalizationController.getInstance().getString("unableToMoveProductBoxToSameSlotPopUp") + newShelfSlot + "'.");
 
 				return false;
 			}
@@ -218,7 +218,7 @@ public class ExternalSystemsController
 			SYSLOG.error("Failed to remove product box " + boxToMove + " from shelf slot " + boxToMove.getShelfSlot());
 
 			if (showPopup)
-				PopupController.error(LocalizationController.getString("failureToRemoveProductBoxErrorPopUp"));
+				PopupController.error(LocalizationController.getInstance().getString("failureToRemoveProductBoxErrorPopUp"));
 
 			return false;
 		}
@@ -232,7 +232,7 @@ public class ExternalSystemsController
 				oldShelfSlot.addBox(boxToMove);
 
 			if (showPopup)
-				PopupController.error(LocalizationController.getString("failureToAddProductBoxToNewShelfSlotErrorPopUp") + newShelfSlotID + "'.");
+				PopupController.error(LocalizationController.getInstance().getString("failureToAddProductBoxToNewShelfSlotErrorPopUp") + newShelfSlotID + "'.");
 
 			return false;
 		}
@@ -248,7 +248,7 @@ public class ExternalSystemsController
 		SYSLOG.debug("Successfully moved " + boxToMove + " to " + newShelfSlot);
 
 		if (showPopup)
-			PopupController.info(LocalizationController.getCompoundString("productBoxTransferSuccessMessage", productBoxCode, newShelfSlot));
+			PopupController.info(LocalizationController.getInstance().getCompoundString("productBoxTransferSuccessMessage", productBoxCode, newShelfSlot));
 
 		return true;
 	}

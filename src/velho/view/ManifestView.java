@@ -64,7 +64,7 @@ public class ManifestView implements GenericView
 					manifest.getObservableBoxes());
 
 			HBox stateBox = new HBox(10);
-			Label stateLabel = new Label(LocalizationController.getString("manifestStateLabel"));
+			Label stateLabel = new Label(LocalizationController.getInstance().getString("manifestStateLabel"));
 			ComboBox<Object> manifestState = new ComboBox<Object>();
 
 			manifestState.getItems().addAll(DatabaseController.getInstance().getManifestStateChangeList(manifest.getState()));

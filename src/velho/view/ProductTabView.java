@@ -123,7 +123,7 @@ public class ProductTabView implements GenericView
 			table.getColumns().add(nameColumn);
 
 			ObservableList<Object> cbValues = DatabaseController.getInstance().getAllProductBrands();
-			TableColumn<Object, Object> brand = new TableColumn<Object, Object>(LocalizationController.getString("publicProductSearchTableHeaderBrand"));
+			TableColumn<Object, Object> brand = new TableColumn<Object, Object>(LocalizationController.getInstance().getString("publicProductSearchTableHeaderBrand"));
 
 			brand.setCellValueFactory(new PropertyValueFactory<>("brand"));
 			brand.setCellFactory(ComboBoxTableCell.forTableColumn(cbValues));
@@ -136,7 +136,7 @@ public class ProductTabView implements GenericView
 			table.getColumns().add(brand);
 
 			ObservableList<Object> cbCategoryValues = DatabaseController.getInstance().getAllProductCategories();
-			TableColumn<Object, Object> category = new TableColumn<Object, Object>(LocalizationController.getString("publicProductSearchTableHeaderCategory"));
+			TableColumn<Object, Object> category = new TableColumn<Object, Object>(LocalizationController.getInstance().getString("publicProductSearchTableHeaderCategory"));
 
 			category.setCellValueFactory(new PropertyValueFactory<>("category"));
 			category.setCellFactory(ComboBoxTableCell.forTableColumn(cbCategoryValues));
@@ -167,27 +167,27 @@ public class ProductTabView implements GenericView
 				public TableCell<Object, String> call(final TableColumn<Object, String> p)
 				{
 					final TableCellDeleteButton button = new TableCellDeleteButton(productController,
-							(LocalizationController.getString("publicProductTableDeleteButton")));
+							(LocalizationController.getInstance().getString("publicProductTableDeleteButton")));
 					button.setAlignment(Pos.CENTER);
 					return button;
 				}
 			});
 			table.getColumns().add(deleteColumn);
 
-			final Label productLabel = new Label(LocalizationController.getString("productNameLabel"));
+			final Label productLabel = new Label(LocalizationController.getInstance().getString("productNameLabel"));
 			final TextField productTextField = new TextField();
 
-			final Label brandLabel = new Label(LocalizationController.getString("productBrandLabel"));
+			final Label brandLabel = new Label(LocalizationController.getInstance().getString("productBrandLabel"));
 			final ComboBox<Object> brandItem = new ComboBox<Object>();
 			brandItem.getItems().addAll(brandsList);
 			brandItem.getSelectionModel().selectFirst();
 
-			final Label categoryLabel = new Label(LocalizationController.getString("productCategoryLabel"));
+			final Label categoryLabel = new Label(LocalizationController.getInstance().getString("productCategoryLabel"));
 			final ComboBox<Object> categoryItem = new ComboBox<Object>();
 			categoryItem.getItems().addAll(categoriesList);
 			categoryItem.getSelectionModel().selectFirst();
 
-			final Button addButton = new Button(LocalizationController.getString("buttonCreate"));
+			final Button addButton = new Button(LocalizationController.getInstance().getString("buttonCreate"));
 			addButton.setOnAction((final ActionEvent e) ->
 			{
 				final Product saveProduct = new Product(productTextField.getText(), (ProductBrand) brandItem.getValue(),

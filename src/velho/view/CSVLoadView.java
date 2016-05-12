@@ -66,21 +66,21 @@ public class CSVLoadView implements GenericView
 			root.setHgap(10);
 			root.setVgap(10);
 
-			final Label loadLabel = new Label(LocalizationController.getString("loadCSVFileLabel"));
+			final Label loadLabel = new Label(LocalizationController.getInstance().getString("loadCSVFileLabel"));
 			root.add(loadLabel, 0, 0);
 
 			final TextField fileNameField = new TextField();
 			root.add(fileNameField, 1, 0);
 
 			final FileChooser fileChooser = new FileChooser();
-			fileChooser.setTitle(LocalizationController.getString("loadCSVFileTitle"));
+			fileChooser.setTitle(LocalizationController.getInstance().getString("loadCSVFileTitle"));
 			fileChooser.setInitialDirectory(new File("./"));
 
 			final ComboBox<Class<? extends AbstractDatabaseObject>> typeSelector = new ComboBox<Class<? extends AbstractDatabaseObject>>();
 			typeSelector.setItems(validDatabaseClasses);
 			root.add(typeSelector, 3, 0);
 
-			final Button loadButton = new Button(LocalizationController.getString("loadToDatabaseButton"));
+			final Button loadButton = new Button(LocalizationController.getInstance().getString("loadToDatabaseButton"));
 			loadButton.setDisable(true);
 
 			loadButton.setOnAction(new EventHandler<ActionEvent>()
@@ -94,7 +94,7 @@ public class CSVLoadView implements GenericView
 				}
 			});
 
-			final Button selectButton = new Button(LocalizationController.getString("selectCSVFileButton"));
+			final Button selectButton = new Button(LocalizationController.getInstance().getString("selectCSVFileButton"));
 			root.add(selectButton, 2, 0);
 			root.add(loadButton, 4, 0);
 
@@ -116,7 +116,7 @@ public class CSVLoadView implements GenericView
 					{
 						loadButton.setDisable(true);
 						fileNameField.clear();
-						PopupController.warning(LocalizationController.getCompoundString("notACSVFileNotice", csvFile.getAbsolutePath()));
+						PopupController.warning(LocalizationController.getInstance().getCompoundString("notACSVFileNotice", csvFile.getAbsolutePath()));
 					}
 				}
 			});

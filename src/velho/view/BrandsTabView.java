@@ -112,18 +112,18 @@ public class BrandsTabView implements GenericView
 				@Override
 				public TableCell<Object, String> call(final TableColumn<Object, String> tcolumn)
 				{
-					final TableCellDeleteButton button = new TableCellDeleteButton(productController, LocalizationController.getString("buttonDelete"));
+					final TableCellDeleteButton button = new TableCellDeleteButton(productController, LocalizationController.getInstance().getString("buttonDelete"));
 					button.setAlignment(Pos.CENTER);
 					return button;
 				}
 			});
 			table.getColumns().add(deleteColumn);
 
-			final Label brandLabel = new Label(LocalizationController.getString("brandNameLabel"));
+			final Label brandLabel = new Label(LocalizationController.getInstance().getString("brandNameLabel"));
 			final TextField brandName = new TextField();
-			brandName.setPromptText(LocalizationController.getString("brandNamePromtText"));
+			brandName.setPromptText(LocalizationController.getInstance().getString("brandNamePromtText"));
 			brandName.setMaxWidth(nameColumn.getPrefWidth());
-			final Button addButton = new Button(LocalizationController.getString("buttonCreate"));
+			final Button addButton = new Button(LocalizationController.getInstance().getString("buttonCreate"));
 			addButton.setOnAction((final ActionEvent event) ->
 			{
 				final ProductBrand saveBrand = new ProductBrand(brandName.getText());

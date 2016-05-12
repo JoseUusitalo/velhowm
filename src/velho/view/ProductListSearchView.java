@@ -56,11 +56,11 @@ public class ProductListSearchView implements GenericView
 		{
 			pane = new BorderPane();
 			VBox left = new VBox();
-			Button printButton = new Button(LocalizationController.getString("printButton"));
-			Button sendToScannerButton = new Button(LocalizationController.getString("sendToScannerButton"));
+			Button printButton = new Button(LocalizationController.getInstance().getString("printButton"));
+			Button sendToScannerButton = new Button(LocalizationController.getInstance().getString("sendToScannerButton"));
 
 			final TextArea textArea = new TextArea();
-			textArea.setPromptText(LocalizationController.getString("productListSearchPromptText"));
+			textArea.setPromptText(LocalizationController.getInstance().getString("productListSearchPromptText"));
 			textArea.setPrefWidth(MainWindow.WINDOW_WIDTH / 5);
 			printButton.setMaxWidth(Double.MAX_VALUE);
 			printButton.setAlignment(Pos.CENTER);

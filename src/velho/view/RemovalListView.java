@@ -79,7 +79,7 @@ public class RemovalListView implements GenericView
 			final GridPane top = new GridPane();
 			top.getStyleClass().add("standard-padding");
 
-			final Button browseListsButton = new Button(LocalizationController.getString("browseRemovalListsButton"));
+			final Button browseListsButton = new Button(LocalizationController.getInstance().getString("browseRemovalListsButton"));
 			browseListsButton.setAlignment(Pos.CENTER_LEFT);
 
 			browseListsButton.setOnAction(new EventHandler<ActionEvent>()
@@ -91,7 +91,7 @@ public class RemovalListView implements GenericView
 				}
 			});
 
-			final Label removalListLabel = new Label(LocalizationController.getString("removalListLabel") + removalList.getDatabaseID());
+			final Label removalListLabel = new Label(LocalizationController.getInstance().getString("removalListLabel") + removalList.getDatabaseID());
 			removalListLabel.getStyleClass().add("centered-title-small");
 			removalListLabel.setAlignment(Pos.CENTER);
 			removalListLabel.setMaxWidth(Double.MAX_VALUE);

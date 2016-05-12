@@ -100,12 +100,12 @@ public abstract class LoginController
 			}
 
 			SYSLOG.debug("Incorrect Badge ID.");
-			PopupController.warning(LocalizationController.getString("logInFailurePopUp"));
+			PopupController.warning(LocalizationController.getInstance().getString("logInFailurePopUp"));
 		}
 		else
 		{
 			SYSLOG.debug("Invalid Badge ID.");
-			PopupController.warning(LocalizationController.getString("logInFailurePopUp"));
+			PopupController.warning(LocalizationController.getInstance().getString("logInFailurePopUp"));
 		}
 
 		return false;
@@ -147,12 +147,12 @@ public abstract class LoginController
 			}
 
 			SYSLOG.info("Incorrect PIN or Names.");
-			PopupController.warning(LocalizationController.getString("logInPinOrNamesIncorrect"));
+			PopupController.warning(LocalizationController.getInstance().getString("logInPinOrNamesIncorrect"));
 		}
 		else
 		{
 			SYSLOG.info("Invalid PIN.");
-			PopupController.warning(LocalizationController.getString("logInInvalidPin"));
+			PopupController.warning(LocalizationController.getInstance().getString("logInInvalidPin"));
 		}
 
 		return false;

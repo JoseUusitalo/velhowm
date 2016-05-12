@@ -22,7 +22,7 @@ public abstract class PopupController
 	public static boolean confirmation(final String msg)
 	{
 		Alert alert = new Alert(AlertType.CONFIRMATION);
-		alert.setTitle(LocalizationController.getString("popUpConfirmTitle"));
+		alert.setTitle(LocalizationController.getInstance().getString("popUpConfirmTitle"));
 		alert.setHeaderText(null);
 		alert.setContentText(msg);
 
@@ -38,7 +38,7 @@ public abstract class PopupController
 	public static void info(final String msg)
 	{
 		Alert alert = new Alert(AlertType.INFORMATION);
-		alert.setTitle(LocalizationController.getString("popUpInfoTitle"));
+		alert.setTitle(LocalizationController.getInstance().getString("popUpInfoTitle"));
 		alert.setHeaderText(null);
 		alert.setContentText(msg);
 
@@ -53,7 +53,7 @@ public abstract class PopupController
 	public static void warning(final String msg)
 	{
 		Alert alert = new Alert(AlertType.WARNING);
-		alert.setTitle(LocalizationController.getString("popUpWarningTitle"));
+		alert.setTitle(LocalizationController.getInstance().getString("popUpWarningTitle"));
 		alert.setHeaderText(null);
 		alert.setContentText(msg);
 
@@ -68,7 +68,7 @@ public abstract class PopupController
 	public static void error(final String msg)
 	{
 		Alert alert = new Alert(AlertType.ERROR);
-		alert.setTitle(LocalizationController.getString("popUpDatabaseInUse"));
+		alert.setTitle(LocalizationController.getInstance().getString("popUpDatabaseInUse"));
 		alert.setHeaderText(null);
 		alert.setContentText(msg);
 

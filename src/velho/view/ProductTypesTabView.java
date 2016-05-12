@@ -91,18 +91,18 @@ public class ProductTypesTabView implements GenericView
 				@Override
 				public TableCell<Object, String> call(final TableColumn<Object, String> tcolumn)
 				{
-					final TableCellDeleteButton button = new TableCellDeleteButton(productController, LocalizationController.getString("buttonDelete"));
+					final TableCellDeleteButton button = new TableCellDeleteButton(productController, LocalizationController.getInstance().getString("buttonDelete"));
 					button.setAlignment(Pos.CENTER);
 					return button;
 				}
 			});
 			table.getColumns().add(deleteColumn);
 
-			final Label typeLabel = new Label(LocalizationController.getString("productTypeNameLabel"));
+			final Label typeLabel = new Label(LocalizationController.getInstance().getString("productTypeNameLabel"));
 			final TextField productTypeName = new TextField();
-			productTypeName.setPromptText(LocalizationController.getString("productTypeNamePromtText"));
+			productTypeName.setPromptText(LocalizationController.getInstance().getString("productTypeNamePromtText"));
 			productTypeName.setMaxWidth(nameColumn.getPrefWidth());
-			final Button addButton = new Button(LocalizationController.getString("buttonCreate"));
+			final Button addButton = new Button(LocalizationController.getInstance().getString("buttonCreate"));
 			addButton.setOnAction((final ActionEvent event) ->
 			{
 				final ProductType saveProductType = new ProductType(productTypeName.getText());

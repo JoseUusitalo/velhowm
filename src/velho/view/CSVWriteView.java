@@ -65,21 +65,21 @@ public class CSVWriteView implements GenericView
 			root.setHgap(10);
 			root.setVgap(10);
 
-			final Label saveLabel = new Label(LocalizationController.getString("writeDatabaseContentsLabel"));
+			final Label saveLabel = new Label(LocalizationController.getInstance().getString("writeDatabaseContentsLabel"));
 
 			final TextField fileNameField = new TextField();
 
 			final FileChooser fileChooser = new FileChooser();
-			fileChooser.setTitle(LocalizationController.getString("writeCSVFileTitle"));
+			fileChooser.setTitle(LocalizationController.getInstance().getString("writeCSVFileTitle"));
 			fileChooser.setInitialDirectory(new File("./"));
 			fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("CSV File (*.csv)", "*.csv"));
 
-			final Label typeLabel = new Label(LocalizationController.getString("dataBaseContentsLabel"));
+			final Label typeLabel = new Label(LocalizationController.getInstance().getString("dataBaseContentsLabel"));
 
 			final ComboBox<Class<? extends AbstractDatabaseObject>> typeSelector = new ComboBox<Class<? extends AbstractDatabaseObject>>();
 			typeSelector.setItems(validDatabaseClasses);
 
-			final Button writeButton = new Button(LocalizationController.getString("writeButton"));
+			final Button writeButton = new Button(LocalizationController.getInstance().getString("writeButton"));
 			writeButton.setDisable(true);
 
 			writeButton.setOnAction(new EventHandler<ActionEvent>()
@@ -93,7 +93,7 @@ public class CSVWriteView implements GenericView
 				}
 			});
 
-			final Button selectButton = new Button(LocalizationController.getString("selectCSVFileButton"));
+			final Button selectButton = new Button(LocalizationController.getInstance().getString("selectCSVFileButton"));
 
 			selectButton.setOnAction(new EventHandler<ActionEvent>()
 			{

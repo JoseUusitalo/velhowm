@@ -22,8 +22,8 @@ public enum SupportedTranslation
 	{
 		if (this.equals(ENGLISH))
 		{
-			return LocalizationController.getString("languageNameEnglish") + " (English)";
+			return LocalizationController.getInstance().getString("languageNameEnglish") + " (English)";
 		}
-		return LocalizationController.getString("languageNameGerman") + " (German)";
+		return LocalizationController.getInstance().getString("languageNameGerman") + " (German)";
 	}
 }
