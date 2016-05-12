@@ -3,8 +3,8 @@ package velho.model.strategies;
 import java.util.HashSet;
 import java.util.Set;
 
-import velho.model.AbstractDatabaseObject;
 import velho.model.ProductBox;
+import velho.model.interfaces.DatabaseObject;
 import velho.model.interfaces.ObjectValidationStrategy;
 
 /**
@@ -15,12 +15,12 @@ import velho.model.interfaces.ObjectValidationStrategy;
 public class ProductBoxValidationStrategy implements ObjectValidationStrategy
 {
 	@Override
-	public Set<AbstractDatabaseObject> getInvalidObjects(final Set<AbstractDatabaseObject> validDataSet)
+	public Set<DatabaseObject> getInvalidObjects(final Set<DatabaseObject> validDataSet)
 	{
-		final Set<AbstractDatabaseObject> invalids = new HashSet<AbstractDatabaseObject>();
+		final Set<DatabaseObject> invalids = new HashSet<DatabaseObject>();
 		ProductBox box = null;
 
-		for (final AbstractDatabaseObject object : validDataSet)
+		for (final DatabaseObject object : validDataSet)
 		{
 			if (!(object instanceof ProductBox))
 				invalids.add(object);

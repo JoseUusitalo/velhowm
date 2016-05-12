@@ -607,7 +607,7 @@ public class DatabaseController
 	 * @throws HibernateException when the query failed to commit and has been
 	 * rolled back
 	 */
-	private Object getByID(final Class<? extends AbstractDatabaseObject> objectClass, final int databaseID) throws HibernateException
+	private Object getByID(final Class<? extends DatabaseObject> objectClass, final int databaseID) throws HibernateException
 	{
 		if (databaseID < 1)
 			return null;
@@ -1955,7 +1955,7 @@ public class DatabaseController
 	 * @param objects a set of objects to be saved to the database
 	 * @return the number of objects saved to the database
 	 */
-	public <T extends AbstractDatabaseObject> int batchSave(final Set<T> objects)
+	public <T extends DatabaseObject> int batchSave(final Set<T> objects)
 	{
 		final Set<Object> savedObjects = new HashSet<Object>();
 		int count = 0;
@@ -2064,7 +2064,7 @@ public class DatabaseController
 	 *
 	 * @param objects a set of objects to be updated in the database
 	 */
-	public <T extends AbstractDatabaseObject> void batchUpdate(final Set<T> objects)
+	public <T extends DatabaseObject> void batchUpdate(final Set<T> objects)
 	{
 		SESSION_FACTORY.getCurrentSession().beginTransaction();
 
@@ -2584,9 +2584,9 @@ public class DatabaseController
 	 * @return a list of classes that can be saved to the database
 	 */
 	@SuppressWarnings("unchecked")
-	public ObservableList<Class<? extends AbstractDatabaseObject>> getValidDatabaseTypes()
+	public ObservableList<Class<? extends DatabaseObject>> getValidDatabaseTypes()
 	{
-		final ObservableList<Class<? extends AbstractDatabaseObject>> classes = FXCollections.observableArrayList();
+		final ObservableList<Class<? extends DatabaseObject>> classes = FXCollections.observableArrayList();
 
 		//@formatter:off
 		classes.addAll(	Manifest.class,

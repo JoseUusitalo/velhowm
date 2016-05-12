@@ -2,8 +2,6 @@ package velho.model.interfaces;
 
 import java.util.Set;
 
-import velho.model.AbstractDatabaseObject;
-
 /**
  * A validation strategy for validating an {@link AbstractDatabaseObject}.
  *
@@ -23,5 +21,5 @@ public interface ObjectValidationStrategy
 	 * @param validDataSet a set of valid objects
 	 * @return a set of contextually invalid objects in the valid data set
 	 */
-	Set<AbstractDatabaseObject> getInvalidObjects(final Set<AbstractDatabaseObject> validDataSet);
+	Set<DatabaseObject> getInvalidObjects(final Set<DatabaseObject> validDataSet);
 }

@@ -18,7 +18,7 @@ import javafx.stage.Stage;
 import velho.controller.CSVController;
 import velho.controller.LocalizationController;
 import velho.controller.UIController;
-import velho.model.AbstractDatabaseObject;
+import velho.model.interfaces.DatabaseObject;
 import velho.model.interfaces.GenericView;
 
 public class CSVWriteView implements GenericView
@@ -41,13 +41,13 @@ public class CSVWriteView implements GenericView
 	/**
 	 * A list of classes that can be saved and loaded from the database.
 	 */
-	private ObservableList<Class<? extends AbstractDatabaseObject>> validDatabaseClasses;
+	private ObservableList<Class<? extends DatabaseObject>> validDatabaseClasses;
 
 	/**
 	 * @param csvController
 	 * @param validDatabaseClasses
 	 */
-	public CSVWriteView(final CSVController csvController, final ObservableList<Class<? extends AbstractDatabaseObject>> validDatabaseClasses)
+	public CSVWriteView(final CSVController csvController, final ObservableList<Class<? extends DatabaseObject>> validDatabaseClasses)
 	{
 		this.csvController = csvController;
 		this.root = null;
@@ -76,7 +76,7 @@ public class CSVWriteView implements GenericView
 
 			final Label typeLabel = new Label(LocalizationController.getInstance().getString("dataBaseContentsLabel"));
 
-			final ComboBox<Class<? extends AbstractDatabaseObject>> typeSelector = new ComboBox<Class<? extends AbstractDatabaseObject>>();
+			final ComboBox<Class<? extends DatabaseObject>> typeSelector = new ComboBox<Class<? extends DatabaseObject>>();
 			typeSelector.setItems(validDatabaseClasses);
 
 			final Button writeButton = new Button(LocalizationController.getInstance().getString("writeButton"));
@@ -108,10 +108,11 @@ public class CSVWriteView implements GenericView
 				}
 			});
 
-			typeSelector.valueProperty().addListener(new ChangeListener<Class<? extends AbstractDatabaseObject>>()
+			typeSelector.valueProperty().addListener(new ChangeListener<Class<? extends DatabaseObject>>()
 			{
 				@Override
-				public void changed(final ObservableValue<? extends Class<? extends AbstractDatabaseObject>> observable, final Class<? extends AbstractDatabaseObject> oldValue, final Class<? extends AbstractDatabaseObject> newValue)
+				public void changed(final ObservableValue<? extends Class<? extends DatabaseObject>> observable, final Class<? extends DatabaseObject> oldValue,
+						final Class<? extends DatabaseObject> newValue)
 				{
 					if (newValue == null || fileNameField.getText().isEmpty())
 						writeButton.setDisable(true);

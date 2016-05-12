@@ -3,8 +3,8 @@ package velho.model.strategies;
 import java.util.HashSet;
 import java.util.Set;
 
-import velho.model.AbstractDatabaseObject;
 import velho.model.RemovalList;
+import velho.model.interfaces.DatabaseObject;
 import velho.model.interfaces.ObjectValidationStrategy;
 
 /**
@@ -15,12 +15,12 @@ import velho.model.interfaces.ObjectValidationStrategy;
 public class RemovalListValidationStrategy implements ObjectValidationStrategy
 {
 	@Override
-	public Set<AbstractDatabaseObject> getInvalidObjects(final Set<AbstractDatabaseObject> validDataSet)
+	public Set<DatabaseObject> getInvalidObjects(final Set<DatabaseObject> validDataSet)
 	{
-		final Set<AbstractDatabaseObject> invalids = new HashSet<AbstractDatabaseObject>();
+		final Set<DatabaseObject> invalids = new HashSet<DatabaseObject>();
 		RemovalList list = null;
 
-		for (final AbstractDatabaseObject object : validDataSet)
+		for (final DatabaseObject object : validDataSet)
 		{
 			if (!(object instanceof RemovalList))
 				invalids.add(object);

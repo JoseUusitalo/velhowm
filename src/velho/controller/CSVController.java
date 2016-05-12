@@ -17,7 +17,6 @@ import javafx.geometry.Insets;
 import javafx.scene.Node;
 import velho.controller.database.DatabaseController;
 import velho.controller.interfaces.UIActionController;
-import velho.model.AbstractDatabaseObject;
 import velho.model.CSVLoader;
 import velho.model.User;
 import velho.model.interfaces.DatabaseObject;
@@ -161,7 +160,7 @@ public class CSVController implements UIActionController
 	public void loadCSVFileToDatabase(final String filePath, final Class csvType)
 	{
 		@SuppressWarnings("unchecked")
-		final CSVLoader<AbstractDatabaseObject> loader = new CSVLoader<AbstractDatabaseObject>(csvType);
+		final CSVLoader<DatabaseObject> loader = new CSVLoader<DatabaseObject>(csvType);
 		final int loaded = loader.load(filePath);
 		final int saved = loader.save();
 
@@ -235,7 +234,7 @@ public class CSVController implements UIActionController
 	}
 
 	@SuppressWarnings({ "unchecked", "static-method" })
-	public void writeDatabaseTableToCSVFile(final String filePath, final Class<? extends AbstractDatabaseObject> classToWrite)
+	public void writeDatabaseTableToCSVFile(final String filePath, final Class<? extends DatabaseObject> classToWrite)
 	{
 		@SuppressWarnings("rawtypes")
 		ColumnPositionMappingStrategy strategy = new ColumnPositionMappingStrategy();
