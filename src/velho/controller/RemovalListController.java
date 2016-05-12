@@ -178,8 +178,7 @@ public class RemovalListController implements UIActionController
 	public BorderPane getSearchResultsListView()
 	{
 		SYSLOG.trace("Getting search result list: " + DatabaseController.getObservableProductSearchResults());
-		return (BorderPane) ListController.getTableView(this, DatabaseController.getProductSearchDataColumns(true, false),
-				DatabaseController.getObservableProductSearchResults());
+		return (BorderPane) ListController.getTableView(this, DatabaseController.getProductSearchDataColumns(true, false), DatabaseController.getObservableProductSearchResults());
 	}
 
 	/**
@@ -284,8 +283,11 @@ public class RemovalListController implements UIActionController
 	@Override
 	public void deleteAction(final Object data)
 	{
-		DatabaseController.deleteRemovalList((RemovalList) data);
-		USRLOG.info("Deleted removal list: " + ((RemovalList) data).toString());
+		if (PopupController.confirmation(LocalizationController.getString("removalListDeletationConfirmation")))
+		{
+			DatabaseController.deleteRemovalList((RemovalList) data);
+			USRLOG.info("Deleted removal list: " + ((RemovalList) data).toString());
+		}
 	}
 
 	@Override
@@ -319,7 +321,8 @@ public class RemovalListController implements UIActionController
 	}
 
 	/**
-	 * Gets a set of contextually invalid {@link RemovalListState} objects from the specified set of removal list states.
+	 * Gets a set of contextually invalid {@link RemovalListState} objects from
+	 * the specified set of removal list states.
 	 *
 	 * @param validDataSet a set of technically valid removal list states
 	 * @return a set of invalid removal list states
@@ -338,7 +341,8 @@ public class RemovalListController implements UIActionController
 	}
 
 	/**
-	 * Gets a set of contextually invalid {@link RemovalList} objects from the specified set of removal lists.
+	 * Gets a set of contextually invalid {@link RemovalList} objects from the
+	 * specified set of removal lists.
 	 *
 	 * @param validDataSet a set of technically valid removal lists
 	 * @return a set of invalid removal lists

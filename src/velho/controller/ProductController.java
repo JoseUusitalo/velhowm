@@ -127,7 +127,7 @@ public class ProductController implements UIActionController
 	 * object.
 	 *
 	 * @param databaseID database ID of the product (<code>-1</code> for a new
-	 * one)
+	 *            one)
 	 * @param name name of the of product
 	 * @param brand brand of the product
 	 * @param category category of the product
@@ -282,24 +282,35 @@ public class ProductController implements UIActionController
 	{
 		if (data instanceof ProductBrand)
 		{
-			if (!DatabaseController.deleteProductBrand((ProductBrand) data))
-				PopupController.error(LocalizationController.getCompoundString("unableToDeleteBrandPopUp", new Object[] { ((ProductBrand) data).getName() }));
+			if (PopupController.confirmation(LocalizationController.getString("productBrandDeletationConfirmation")))
+			{
+				if (!DatabaseController.deleteProductBrand((ProductBrand) data))
+					PopupController.error(LocalizationController.getCompoundString("unableToDeleteBrandPopUp", new Object[] { ((ProductBrand) data).getName() }));
+			}
 		}
 		else if (data instanceof ProductCategory)
 		{
-			if (!DatabaseController.deleteProductCategory((ProductCategory) data))
-				PopupController.error(LocalizationController.getCompoundString("unableToDeleteCategory", new Object[] { ((ProductCategory) data).getName() }));
+			if (PopupController.confirmation(LocalizationController.getString("productCategoryDeletationConfirmation")))
+			{
+				if (!DatabaseController.deleteProductCategory((ProductCategory) data))
+					PopupController.error(LocalizationController.getCompoundString("unableToDeleteCategory", new Object[] { ((ProductCategory) data).getName() }));
+			}
 		}
 		else if (data instanceof ProductBox)
 		{
-			if (!DatabaseController.deleteProductBox((ProductBox) data))
-				PopupController.error(LocalizationController.getString("unableToDeleteProductBoxPopUp"));
+			if (PopupController.confirmation(LocalizationController.getString("productBoxDeletationConfirmation")))
+			{
+				if (!DatabaseController.deleteProductBox((ProductBox) data))
+					PopupController.error(LocalizationController.getString("unableToDeleteProductBoxPopUp"));
+			}
 		}
 		else if (data instanceof ProductType)
 		{
-			if (!DatabaseController.deleteProductType((ProductType) data))
-				PopupController
-						.error(LocalizationController.getCompoundString("unableToDeleteProductTypePopUp", new Object[] { ((ProductType) data).getName() }));
+			if (PopupController.confirmation(LocalizationController.getString("productTypeDeletationConfirmation")))
+			{
+				if (!DatabaseController.deleteProductType((ProductType) data))
+					PopupController.error(LocalizationController.getCompoundString("unableToDeleteProductTypePopUp", new Object[] { ((ProductType) data).getName() }));
+			}
 		}
 		else
 		{
@@ -418,7 +429,7 @@ public class ProductController implements UIActionController
 	 * action is performed
 	 *
 	 * @param saveProductType saves the new Product Type written in the
-	 * TextField
+	 *            TextField
 	 */
 	@SuppressWarnings("static-method")
 	public void saveProductType(final ProductType saveProductType)
@@ -459,7 +470,8 @@ public class ProductController implements UIActionController
 	}
 
 	/**
-	 * Gets a set of contextually invalid {@link ProductBrand} objects from the specified set of product brands.
+	 * Gets a set of contextually invalid {@link ProductBrand} objects from the
+	 * specified set of product brands.
 	 *
 	 * @param validDataSet a set of technically valid product brands
 	 * @return a set of invalid product brands
@@ -478,7 +490,8 @@ public class ProductController implements UIActionController
 	}
 
 	/**
-	 * Gets a set of contextually invalid {@link ProductType} objects from the specified set of product types.
+	 * Gets a set of contextually invalid {@link ProductType} objects from the
+	 * specified set of product types.
 	 *
 	 * @param validDataSet a set of technically valid product types
 	 * @return a set of invalid product types
@@ -497,7 +510,8 @@ public class ProductController implements UIActionController
 	}
 
 	/**
-	 * Gets a set of contextually invalid {@link ProductCategory} objects from the specified set of product categories.
+	 * Gets a set of contextually invalid {@link ProductCategory} objects from
+	 * the specified set of product categories.
 	 *
 	 * @param validDataSet a set of technically valid product categories
 	 * @return a set of invalid product categories
@@ -516,7 +530,8 @@ public class ProductController implements UIActionController
 	}
 
 	/**
-	 * Gets a set of contextually invalid {@link Product} objects from the specified set of products.
+	 * Gets a set of contextually invalid {@link Product} objects from the
+	 * specified set of products.
 	 *
 	 * @param validDataSet a set of technically valid products
 	 * @return a set of invalid products
@@ -535,7 +550,8 @@ public class ProductController implements UIActionController
 	}
 
 	/**
-	 * Gets a set of contextually invalid {@link ProductBox} objects from the specified set of product boxes.
+	 * Gets a set of contextually invalid {@link ProductBox} objects from the
+	 * specified set of product boxes.
 	 *
 	 * @param validDataSet a set of technically valid product boxes
 	 * @return a set of invalid product boxes
