@@ -29,11 +29,6 @@ public class UIController
 	private MainWindow mainView;
 
 	/**
-	 * The {@link LogController}.
-	 */
-	private LogController logController;
-
-	/**
 	 * The {@link ManifestController}.
 	 */
 	private ManifestController manifestController;
@@ -141,7 +136,7 @@ public class UIController
 			case ADMINISTRATOR:
 			case MANAGER:
 				mainView.addTab(LocalizationController.getInstance().getString("addUserTab"), UserController.getInstance().getView());
-				mainView.addTab(LocalizationController.getInstance().getString("addLogsTab"), logController.getView());
+				mainView.addTab(LocalizationController.getInstance().getString("addLogsTab"), LogController.getInstance().getView());
 				//$FALL-THROUGH$
 			case LOGISTICIAN:
 				mainView.addTab(LocalizationController.getInstance().getString("addUserListTab"),

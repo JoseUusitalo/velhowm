@@ -86,6 +86,7 @@ public class RemovalPlatformController
 
 		final int percentFull = (int) (100.0 - getFreeSpace() * 100.0);
 
+		// TODO: Observer
 		mainWindow.setRemovalPlatformFullPercent(String.valueOf(percentFull));
 
 		if (Double.compare(getFreeSpace(), getPlatform().getFreeSpaceLeftWarningPercent()) <= 0)
@@ -94,7 +95,8 @@ public class RemovalPlatformController
 
 			// Warning is only showed when logged in.
 			if (LoginController.getInstance().isLoggedIn())
-				PopupController.getInstance().warning(LocalizationController.getInstance().getCompoundString("removalPlatformFullnessPopUpNotice", percentFull));
+				PopupController.getInstance()
+						.warning(LocalizationController.getInstance().getCompoundString("removalPlatformFullnessPopUpNotice", percentFull));
 		}
 	}
 

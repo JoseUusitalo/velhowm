@@ -98,11 +98,6 @@ public class MainWindow extends Application implements GenericView
 	public static final double WINDOW_WIDTH = 1024;
 
 	/**
-	 * The {@link DebugController}.
-	 */
-	private static DebugController debugController;
-
-	/**
 	 * The {@link ManifestController}.
 	 */
 	private ManifestController manifestController;
@@ -455,7 +450,7 @@ public class MainWindow extends Application implements GenericView
 			if (DEBUG_MODE)
 			{
 				debugStage = new Stage();
-				debugController.createDebugWindow(debugStage);
+				DebugController.getInstance().createDebugWindow(debugStage);
 
 				debugStage.setOnCloseRequest(new EventHandler<WindowEvent>()
 				{
