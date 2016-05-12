@@ -143,7 +143,7 @@ public class UserController implements UIActionController
 
 			DatabaseController.getInstance().saveOrUpdate(newUser);
 
-			if (LoginController.getCurrentUser() != null)
+			if (LoginController.getInstance().getCurrentUser() != null)
 				USRLOG.debug("Created a user.");
 			// Else: running a JUnit test -> above line causes a null pointer
 			// error.
@@ -185,14 +185,14 @@ public class UserController implements UIActionController
 	{
 		USRLOG.debug("Attempting to delete: " + user.getFullDetails());
 
-		if (LoginController.getCurrentUser().getDatabaseID() == user.getDatabaseID())
+		if (LoginController.getInstance().getCurrentUser().getDatabaseID() == user.getDatabaseID())
 		{
 			if (PopupController.confirmation(LocalizationController.getInstance().getString("yourAccountDeletationConfirmationPopUp")))
 			{
 
 				if (DatabaseController.getInstance().deleteUser(user))
 				{
-					LoginController.logout();
+					LoginController.getInstance().logout();
 					USRLOG.debug("User deleted themselves: " + user.getFullDetails());
 					PopupController.info(LocalizationController.getInstance().getString("deletedUserInfoPopUp") + user.getFullDetails());
 					return true;

@@ -93,7 +93,7 @@ public class RemovalPlatformController
 			SYSLOG.info("The removal platform is " + percentFull + " / " + (int) (100.0 - getPlatform().getFreeSpaceLeftWarningPercent() * 100.0) + "% full!");
 
 			// Warning is only showed when logged in.
-			if (LoginController.isLoggedIn())
+			if (LoginController.getInstance().isLoggedIn())
 				PopupController.warning(LocalizationController.getInstance().getCompoundString("removalPlatformFullnessPopUpNotice", percentFull));
 		}
 	}

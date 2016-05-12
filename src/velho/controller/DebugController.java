@@ -79,7 +79,7 @@ public class DebugController
 	 */
 	public void login(final UserRole role)
 	{
-		if (LoginController.debugLogin(role))
+		if (LoginController.getInstance().debugLogin(role))
 			setLogInButtonVisiblity(false);
 	}
 
@@ -90,7 +90,7 @@ public class DebugController
 	 */
 	public void login(final String badgeString)
 	{
-		if (LoginController.login(badgeString))
+		if (LoginController.getInstance().login(badgeString))
 			setLogInButtonVisiblity(false);
 	}
 
@@ -100,8 +100,8 @@ public class DebugController
 	public void logout()
 	{
 		// Only log out if a user is logged in, otherwise just visually toggle the buttons.
-		if (LoginController.isLoggedIn())
-			LoginController.logout();
+		if (LoginController.getInstance().isLoggedIn())
+			LoginController.getInstance().logout();
 		setLogInButtonVisiblity(true);
 	}
 

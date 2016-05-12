@@ -16,7 +16,7 @@ import velho.view.MainWindow;
  *
  * @author Jose Uusitalo &amp; Edward Puustinen
  */
-public abstract class LoginController
+public class LoginController
 {
 	/**
 	 * Apache log4j logger: System.
@@ -31,27 +31,57 @@ public abstract class LoginController
 	/**
 	 * User currently logged in.
 	 */
-	private static User currentUser;
+	private User currentUser;
 
 	/**
 	 * The {@link LoginView}.
 	 */
-	private static LoginView view;
+	private LoginView view;
 
 	/**
 	 * The {@link UIController}.
 	 */
-	private static UIController uiController;
+	private UIController uiController;
 
 	/**
 	 * The {@link DebugController}.
 	 */
-	private static DebugController debugController;
+	private DebugController debugController;
+
+	/**
+	 * A private inner class holding the class instance.
+	 *
+	 * @author Jose Uusitalo
+	 */
+	private static class Holder
+	{
+		/**
+		 * The only instance of {@link LoginController}.
+		 */
+		private static final LoginController INSTANCE = new LoginController();
+	}
+
+	/**
+	 */
+	private LoginController()
+	{
+		// No need to instantiate this class.
+	}
+
+	/**
+	 * Gets the instance of the {@link LoginController}.
+	 *
+	 * @return the login controller
+	 */
+	public static synchronized LoginController getInstance()
+	{
+		return Holder.INSTANCE;
+	}
 
 	/**
 	 * Destroys the login view.
 	 */
-	private static void destroyView()
+	private void destroyView()
 	{
 		view.recreate();
 	}
@@ -62,10 +92,11 @@ public abstract class LoginController
 	 * @param uiController the {@link UIController}
 	 * @param debugController the {@link DebugController}
 	 */
-	public static void setControllers(final UIController uiController, final DebugController debugController)
+	public void setControllers(final UIController uiController, final DebugController debugController)
 	{
-		LoginController.uiController = uiController;
-		LoginController.debugController = debugController;
+		// TODO: remove
+		LoginController.getInstance().uiController = uiController;
+		LoginController.getInstance().debugController = debugController;
 	}
 
 	/**
@@ -75,7 +106,7 @@ public abstract class LoginController
 	 * @return <code>true</code> if login was successful, or <code>false</code>
 	 * if debug mode was disabled
 	 */
-	public static boolean login(final String badgeString)
+	public boolean login(final String badgeString)
 	{
 		SYSLOG.info("Attempting to log in with: " + badgeString);
 
@@ -119,7 +150,7 @@ public abstract class LoginController
 	 * @param lastName the last name of the user
 	 * @param pin login PIN string
 	 */
-	public static boolean login(final String firstName, final String lastName, final String authenticationString)
+	public boolean login(final String firstName, final String lastName, final String authenticationString)
 	{
 		if (firstName.isEmpty() || lastName.isEmpty())
 			return login(authenticationString);
@@ -161,7 +192,7 @@ public abstract class LoginController
 	/**
 	 * Logs out the current user.
 	 */
-	public static void logout()
+	public void logout()
 	{
 		if (MainWindow.DEBUG_MODE)
 			debugController.setLogInButtonVisiblity(true);
@@ -183,7 +214,7 @@ public abstract class LoginController
 	 * @return <code>true</code> if login was successful, or <code>false</code>
 	 * if debug mode was disabled
 	 */
-	public static boolean debugLogin(final UserRole role)
+	public boolean debugLogin(final UserRole role)
 	{
 		if (MainWindow.DEBUG_MODE)
 		{
@@ -207,7 +238,7 @@ public abstract class LoginController
 	 *
 	 * @return <code>true</code> if a user is logged in
 	 */
-	public static boolean isLoggedIn()
+	public boolean isLoggedIn()
 	{
 		return currentUser != null;
 	}
@@ -217,7 +248,7 @@ public abstract class LoginController
 	 *
 	 * @return the login view
 	 */
-	public static VBox getView()
+	public VBox getView()
 	{
 		if (view == null)
 			view = new LoginView();
@@ -230,7 +261,7 @@ public abstract class LoginController
 	 *
 	 * @return <code>true</code> if the user is logged in
 	 */
-	public static boolean checkLogin()
+	public boolean checkLogin()
 	{
 		if (!isLoggedIn())
 		{
@@ -252,7 +283,7 @@ public abstract class LoginController
 	 *
 	 * @return the user currently logged in
 	 */
-	public static User getCurrentUser()
+	public User getCurrentUser()
 	{
 		return currentUser;
 	}
@@ -266,7 +297,7 @@ public abstract class LoginController
 	 * equal to the given role, <code>false</code>
 	 * if user is not logged in
 	 */
-	public static boolean userRoleIsGreaterOrEqualTo(final UserRole role)
+	public boolean userRoleIsGreaterOrEqualTo(final UserRole role)
 	{
 		if (isLoggedIn())
 			return currentUser.getRole().compareTo(role) >= 0;
@@ -280,7 +311,7 @@ public abstract class LoginController
 	 * @return <code>true</code> if logged in user's role is the given role,
 	 * <code>false</code> if user is not logged in
 	 */
-	public static boolean userRoleIs(final UserRole role)
+	public boolean userRoleIs(final UserRole role)
 	{
 		if (isLoggedIn())
 			return currentUser.getRole().compareTo(role) == 0;

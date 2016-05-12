@@ -299,7 +299,7 @@ public class MainWindow extends Application implements GenericView
 				removalListController = new RemovalListController(searchController);
 
 				ExternalSystemsController.getInstance().setControllers(manifestController);
-				LoginController.setControllers(uiController, debugController);
+				LoginController.getInstance().setControllers(uiController, debugController);
 				LocalizationController.getInstance().setControllers(uiController);
 
 				//@formatter:off
@@ -402,7 +402,7 @@ public class MainWindow extends Application implements GenericView
 		}
 
 		// Force log in to see main menu.
-		if (LoginController.checkLogin())
+		if (LoginController.getInstance().checkLogin())
 		{
 			final GridPane statusBar = new GridPane();
 			statusBar.getStyleClass().add("status-bar");
@@ -433,7 +433,7 @@ public class MainWindow extends Application implements GenericView
 
 			final HBox userStatus = new HBox(10);
 			final Label userName = new Label(LocalizationController.getInstance().getCompoundString("helloUserMessage",
-					LoginController.getCurrentUser().getRoleName(), LoginController.getCurrentUser().getFullName()));
+					LoginController.getInstance().getCurrentUser().getRoleName(), LoginController.getInstance().getCurrentUser().getFullName()));
 			userName.setId("userName");
 
 			final Button logoutButton = new Button(LocalizationController.getInstance().getString("logOutButton"));
@@ -446,7 +446,7 @@ public class MainWindow extends Application implements GenericView
 				@Override
 				public void handle(final ActionEvent event)
 				{
-					LoginController.logout();
+					LoginController.getInstance().logout();
 				}
 			});
 
@@ -489,7 +489,7 @@ public class MainWindow extends Application implements GenericView
 
 		if (!SKIP_MAIN_CODE)
 		{
-			LoginController.checkLogin();
+			LoginController.getInstance().checkLogin();
 			this.primaryStage.setScene(scene);
 			this.primaryStage.show();
 

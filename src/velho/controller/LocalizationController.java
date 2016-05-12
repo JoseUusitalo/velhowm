@@ -117,6 +117,7 @@ public class LocalizationController
 
 	public void setControllers(final UIController uiController)
 	{
+		// TODO: remove
 		this.uiController = uiController;
 	}
 }

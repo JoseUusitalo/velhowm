@@ -71,6 +71,7 @@ public class ExternalSystemsController
 	 */
 	public void setControllers(final ManifestController manifestController)
 	{
+		// TODO: remove
 		this.manifestController = manifestController;
 	}
 
@@ -276,6 +277,6 @@ public class ExternalSystemsController
 		// TODO: Observer model.
 
 		SYSLOG.info("VELHOWM has received an RFID badge ID: " + badgeID);
-		LoginController.login(badgeID);
+		LoginController.getInstance().login(badgeID);
 	}
 }

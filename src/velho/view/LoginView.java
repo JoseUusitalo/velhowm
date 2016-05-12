@@ -85,7 +85,7 @@ public class LoginView implements GenericView
 				@Override
 				public void handle(final ActionEvent event)
 				{
-					LoginController.login(firstNameField.getText(), lastNameField.getText(), authenticationStringField.getText());
+					LoginController.getInstance().login(firstNameField.getText(), lastNameField.getText(), authenticationStringField.getText());
 				}
 			});
 			UIController.recordView(this);

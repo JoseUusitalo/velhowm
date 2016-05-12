@@ -87,6 +87,7 @@ public class UIController
 			final SearchController searchController, final ManifestController manifestController, final ProductController productController,
 			final RemovalPlatformController removalPlatformController, final CSVController csvController)
 	{
+		// TODO: remove
 		this.mainView = mainWindow;
 		this.userController = userController;
 		this.removalListController = removalListController;
@@ -189,7 +190,7 @@ public class UIController
 		{
 			view.recreate();
 		}
-		showMainMenu(LoginController.getCurrentUser().getRole());
+		showMainMenu(LoginController.getInstance().getCurrentUser().getRole());
 	}
 
 	public static void destroyAllViews()

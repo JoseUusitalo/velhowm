@@ -921,7 +921,7 @@ public class DatabaseController
 		cols.put("viewButton", LocalizationController.getInstance().getString("publicRemovalTableViewButton"));
 
 		// Only managers and administrators can delete lists.
-		if (LoginController.getCurrentUser().getRole().compareTo(UserRole.MANAGER) >= 0)
+		if (LoginController.getInstance().getCurrentUser().getRole().compareTo(UserRole.MANAGER) >= 0)
 			cols.put("deleteButton", LocalizationController.getInstance().getString("publicRemovalTableDeleteButton"));
 
 		return cols;
@@ -1162,7 +1162,7 @@ public class DatabaseController
 	{
 		// Debug account ID?
 		if (databaseID < 1)
-			return LoginController.getCurrentUser();
+			return LoginController.getInstance().getCurrentUser();
 
 		SESSION_FACTORY.getCurrentSession().beginTransaction();
 
@@ -2352,7 +2352,7 @@ public class DatabaseController
 		{
 			if (((ManifestState) state).getName().equals("Accepted") || ((ManifestState) state).getName().equals("Rejected"))
 			{
-				if (LoginController.userRoleIsGreaterOrEqualTo(UserRole.MANAGER) || ((ManifestState) state).compareTo(currentState) == 0)
+				if (LoginController.getInstance().userRoleIsGreaterOrEqualTo(UserRole.MANAGER) || ((ManifestState) state).compareTo(currentState) == 0)
 					observableManifestStates.add(state);
 			}
 			else
