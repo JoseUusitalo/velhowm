@@ -19,7 +19,7 @@ import velho.view.ProductTypesTabView;
 import velho.view.VerticalViewGroup;
 
 /**
- * Controller for handling {@link Product} objects
+ * A singleton controller for handling {@link Product} objects
  *
  * @author Jose Uusitalo &amp; Edward Puustinen
  */
@@ -61,8 +61,21 @@ public class ProductController implements UIActionController
 	private ProductTabView productTabView;
 
 	/**
+	 * A private inner class holding the class instance.
+	 *
+	 * @author Jose Uusitalo
 	 */
-	public ProductController()
+	private static class Holder
+	{
+		/**
+		 * The only instance of {@link ProductController}.
+		 */
+		private static final ProductController INSTANCE = new ProductController();
+	}
+
+	/**
+	 */
+	private ProductController()
 	{
 		this.productManagementView = new VerticalViewGroup();
 		this.productsTypeTabView = new ProductTypesTabView(this);
@@ -70,6 +83,16 @@ public class ProductController implements UIActionController
 		this.categoryTabView = new CategoriesTabView(this);
 		this.productBoxTabView = new ProductBoxesTabView(this);
 		this.productTabView = new ProductTabView(this);
+	}
+
+	/**
+	 * Gets the instance of the {@link ProductController}.
+	 *
+	 * @return the product controller
+	 */
+	public static synchronized ProductController getInstance()
+	{
+		return Holder.INSTANCE;
 	}
 
 	/**
@@ -266,7 +289,6 @@ public class ProductController implements UIActionController
 		ProductBrand productBrand = new ProductBrand(name);
 		DatabaseController.getInstance().saveOrUpdate(productBrand);
 		return productBrand;
-
 	}
 
 	/**

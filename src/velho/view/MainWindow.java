@@ -39,7 +39,6 @@ import velho.controller.LocalizationController;
 import velho.controller.LogController;
 import velho.controller.LoginController;
 import velho.controller.ManifestController;
-import velho.controller.ProductController;
 import velho.controller.RemovalListController;
 import velho.controller.RemovalPlatformController;
 import velho.controller.SearchController;
@@ -162,11 +161,6 @@ public class MainWindow extends Application implements GenericView
 	private Stage debugStage;
 
 	/**
-	 * The {@link ProductController}.
-	 */
-	private ProductController productController;
-
-	/**
 	 * A label showing the status of the removal platform.
 	 */
 	private Label removalPlatformStatus;
@@ -279,16 +273,15 @@ public class MainWindow extends Application implements GenericView
 			{
 				SYSLOG.debug("Creating all controllers...");
 
-				// FIXME: Convert all controllers to use the singleton pattern.
+				// FIXME: Convert most controllers to use the singleton pattern.
 
 				uiController = new UIController();
-				productController = new ProductController();
+				searchController = new SearchController();
+				removalListController = new RemovalListController(searchController);
 
 				csvController = new CSVController(this);
 				manifestController = new ManifestController(this);
 				removalPlatformController = new RemovalPlatformController(this);
-				searchController = new SearchController(productController);
-				removalListController = new RemovalListController(searchController);
 
 				DebugController.getInstance().setControllers(removalPlatformController);
 				ExternalSystemsController.getInstance().setControllers(manifestController);
@@ -300,7 +293,6 @@ public class MainWindow extends Application implements GenericView
 											removalListController,
 											searchController,
 											manifestController,
-											productController,
 											removalPlatformController,
 											csvController);
 				//@formatter:on

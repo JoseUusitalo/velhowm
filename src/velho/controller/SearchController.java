@@ -26,16 +26,9 @@ public class SearchController
 	private final SearchTabView searchTabView;
 
 	/**
-	 * The {@link ProductController}.
 	 */
-	private final ProductController productController;
-
-	/**
-	 * @param productController
-	 */
-	public SearchController(final ProductController productController)
+	public SearchController()
 	{
-		this.productController = productController;
 		this.searchTabView = new SearchTabView(this);
 	}
 
@@ -53,11 +46,13 @@ public class SearchController
 	 */
 	@SuppressWarnings("static-method")
 
-	public void productBoxSearch(final boolean canBeInRemovalList, final String identifier, final Integer productCount, final Object brand, final Object category, final LocalDate expiresStart, final LocalDate expiresEnd)
+	public void productBoxSearch(final boolean canBeInRemovalList, final String identifier, final Integer productCount, final Object brand,
+			final Object category, final LocalDate expiresStart, final LocalDate expiresEnd)
 	{
 		try
 		{
-			DatabaseController.getInstance().searchProductBox(identifier, productCount.intValue(), (ProductBrand) brand, (ProductCategory) category, expiresStart, expiresEnd, canBeInRemovalList);
+			DatabaseController.getInstance().searchProductBox(identifier, productCount.intValue(), (ProductBrand) brand, (ProductCategory) category,
+					expiresStart, expiresEnd, canBeInRemovalList);
 		}
 		catch (Exception e)
 		{
@@ -72,7 +67,8 @@ public class SearchController
 	 */
 	public Node getSearchView()
 	{
-		return new SearchView(this, true, DatabaseController.getInstance().getAllProductBrands(), DatabaseController.getInstance().getAllProductCategories()).getView();
+		return new SearchView(this, true, DatabaseController.getInstance().getAllProductBrands(), DatabaseController.getInstance().getAllProductCategories())
+				.getView();
 	}
 
 	/**
@@ -83,7 +79,8 @@ public class SearchController
 	 */
 	public Node getSearchView(final boolean canBeInRemovalList)
 	{
-		return new SearchView(this, canBeInRemovalList, DatabaseController.getInstance().getAllProductBrands(), DatabaseController.getInstance().getAllProductCategories()).getView();
+		return new SearchView(this, canBeInRemovalList, DatabaseController.getInstance().getAllProductBrands(),
+				DatabaseController.getInstance().getAllProductCategories()).getView();
 	}
 
 	/**
@@ -101,10 +98,11 @@ public class SearchController
 	 *
 	 * @return the search results view
 	 */
+	@SuppressWarnings("static-method")
 	public Node getResultsView()
 	{
 		//@formatter:off
-		return ListController.getTableView(productController,
+		return ListController.getTableView(ProductController.getInstance(),
 										   DatabaseController.getInstance().getProductSearchDataColumns(false, false),
 										   DatabaseController.getInstance().getObservableProductSearchResults());
 		//@formatter:on
@@ -119,7 +117,7 @@ public class SearchController
 	{
 		final ProductListSearchView searchView = new ProductListSearchView(this);
 		//@formatter:off
-		return searchView.getView((BorderPane) ListController.getTableView(productController,
+		return searchView.getView((BorderPane) ListController.getTableView(ProductController.getInstance(),
 										  								   DatabaseController.getInstance().getProductSearchDataColumns(false, false),
 										  								   DatabaseController.getInstance().getObservableProductSearchResults()));
 		//@formatter:on

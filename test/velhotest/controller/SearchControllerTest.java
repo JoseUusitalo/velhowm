@@ -30,7 +30,7 @@ public class SearchControllerTest
 	private static final String PRODUCT_TWO_COLONS = "A Very Long Product Name: With Two: Colons";
 	private static final String PRODUCT_WITH_COLON = "Product Name: With a Single Colon";
 
-	private SearchController searchController = new SearchController(null);
+	private SearchController searchController = new SearchController();
 
 	/**
 	 * Creates the log database if needed and connects to it.

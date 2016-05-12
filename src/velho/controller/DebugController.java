@@ -15,9 +15,9 @@ import velho.model.enums.UserRole;
 import velho.view.DebugWindow;
 
 /**
- * Various debugging features.
+ * A singleton controller assisting developers in using and testing the application.
  *
- * @author Edward Puustinen &amp; Jose Uusitalo
+ * @author Jose Uusitalo
  */
 public class DebugController
 {

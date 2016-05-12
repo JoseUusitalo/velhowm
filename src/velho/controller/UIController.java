@@ -39,11 +39,6 @@ public class UIController
 	private RemovalListController removalListController;
 
 	/**
-	 * The {@link ProductController}.
-	 */
-	private ProductController productController;
-
-	/**
 	 * The {@link LogController}.
 	 */
 	private LogController logController;
@@ -68,25 +63,13 @@ public class UIController
 	 */
 	private static Set<GenericView> viewSet = new HashSet<GenericView>();
 
-	/**
-	 * @param mainWindow
-	 * @param userController
-	 * @param removalListController
-	 * @param searchController
-	 * @param logController
-	 * @param manifestController
-	 * @param productController
-	 * @param removalPlatformController
-	 */
 	public void setControllers(final MainWindow mainWindow, final RemovalListController removalListController, final SearchController searchController,
-			final ManifestController manifestController, final ProductController productController, final RemovalPlatformController removalPlatformController,
-			final CSVController csvController)
+			final ManifestController manifestController, final RemovalPlatformController removalPlatformController, final CSVController csvController)
 	{
 		// TODO: remove
 		this.mainView = mainWindow;
 		this.removalListController = removalListController;
 		this.searchController = searchController;
-		this.productController = productController;
 		this.manifestController = manifestController;
 		this.removalPlatformController = removalPlatformController;
 		this.csvController = csvController;
@@ -146,11 +129,11 @@ public class UIController
 				mainView.addTab(LocalizationController.getInstance().getString("addUserListTab"),
 						UserController.getInstance().getUserListView(currentUserRole));
 				mainView.addTab(LocalizationController.getInstance().getString("csvTab"), csvController.getCSVView());
-				mainView.addTab(LocalizationController.getInstance().getString("addBrandsTab"), productController.getBrandsTab());
-				mainView.addTab(LocalizationController.getInstance().getString("addProductTypesTab"), productController.getProductTypesTab());
-				mainView.addTab(LocalizationController.getInstance().getString("addCategoriesTab"), productController.getCategoryTab());
-				mainView.addTab(LocalizationController.getInstance().getString("addProductListTab"), productController.getProductTabView());
-				mainView.addTab(LocalizationController.getInstance().getString("addProductBoxesTab"), productController.getProductBoxesTab());
+				mainView.addTab(LocalizationController.getInstance().getString("addBrandsTab"), ProductController.getInstance().getBrandsTab());
+				mainView.addTab(LocalizationController.getInstance().getString("addProductTypesTab"), ProductController.getInstance().getProductTypesTab());
+				mainView.addTab(LocalizationController.getInstance().getString("addCategoriesTab"), ProductController.getInstance().getCategoryTab());
+				mainView.addTab(LocalizationController.getInstance().getString("addProductListTab"), ProductController.getInstance().getProductTabView());
+				mainView.addTab(LocalizationController.getInstance().getString("addProductBoxesTab"), ProductController.getInstance().getProductBoxesTab());
 				mainView.addTab(LocalizationController.getInstance().getString("addManifestsTab"), manifestController.getView());
 				mainView.addTab(LocalizationController.getInstance().getString("addRemovalListsTab"), removalListController.getView());
 				//$FALL-THROUGH$
