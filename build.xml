@@ -32,6 +32,7 @@
 		<fileset dir="${lib.dir}" includes="hibernate/jpa/*.jar" />
 		<fileset dir="${lib.dir}" includes="hibernate/required/*.jar" />
 		<fileset dir="${lib.dir}" includes="opencsv/*.jar" />
+		<fileset dir="${lib.dir}" includes="testfx/*.jar" />
 		<pathelement location="${build.dist.test.dir}" />
 		<pathelement location="${build.dist.src.dir}" />
 	</path>
