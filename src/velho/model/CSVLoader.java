@@ -11,7 +11,6 @@ import com.opencsv.bean.MappingStrategy;
 
 import velho.controller.LocalizationController;
 import velho.controller.PopupController;
-import velho.controller.VelhoCsvParser;
 import velho.controller.database.DatabaseController;
 import velho.model.interfaces.ObjectValidationStrategy;
 import velho.model.strategies.ManifestStateValidationStrategy;

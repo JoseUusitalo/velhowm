@@ -55,10 +55,12 @@ public class ProductController implements UIActionController
 	 */
 	private final ProductBoxesTabView productBoxTabView;
 
+	/**
+	 * A tab view for creating and editing products.
+	 */
 	private ProductTabView productTabView;
 
 	/**
-	 * @param uiController
 	 */
 	public ProductController()
 	{
@@ -85,7 +87,7 @@ public class ProductController implements UIActionController
 	 * object.
 	 *
 	 * @param databaseID database ID of the product (<code>-1</code> for a new
-	 *            one)
+	 * one)
 	 * @param name name of the of product
 	 * @param brand brand of the product
 	 * @param category category of the product
@@ -105,7 +107,8 @@ public class ProductController implements UIActionController
 		if (category instanceof String)
 		{
 			SYSLOG.trace("creating new category from " + category.toString());
-			cat = DatabaseController.getInstance().getProductCategoryByID(DatabaseController.getInstance().saveOrUpdate(new ProductCategory((String) category)));
+			cat = DatabaseController.getInstance()
+					.getProductCategoryByID(DatabaseController.getInstance().saveOrUpdate(new ProductCategory((String) category)));
 		}
 
 		if (brand instanceof ProductBrand)
@@ -141,7 +144,8 @@ public class ProductController implements UIActionController
 	public Node getProductSearchResultsView()
 	{
 		SYSLOG.trace("Getting search results for product list.");
-		return ListController.getTableView(this, DatabaseController.getInstance().getProductDataColumns(true, false), DatabaseController.getInstance().getObservableProductSearchResults());
+		return ListController.getTableView(this, DatabaseController.getInstance().getProductDataColumns(true, false),
+				DatabaseController.getInstance().getObservableProductSearchResults());
 	}
 
 	/**
@@ -189,12 +193,14 @@ public class ProductController implements UIActionController
 		if (data instanceof ProductBrand)
 		{
 			if (!DatabaseController.getInstance().deleteProductBrand((ProductBrand) data))
-				PopupController.getInstance().error(LocalizationController.getInstance().getCompoundString("unableToDeleteBrandPopUp", new Object[] { ((ProductBrand) data).getName() }));
+				PopupController.getInstance().error(
+						LocalizationController.getInstance().getCompoundString("unableToDeleteBrandPopUp", new Object[] { ((ProductBrand) data).getName() }));
 		}
 		else if (data instanceof ProductCategory)
 		{
 			if (!DatabaseController.getInstance().deleteProductCategory((ProductCategory) data))
-				PopupController.getInstance().error(LocalizationController.getInstance().getCompoundString("unableToDeleteCategory", new Object[] { ((ProductCategory) data).getName() }));
+				PopupController.getInstance().error(
+						LocalizationController.getInstance().getCompoundString("unableToDeleteCategory", new Object[] { ((ProductCategory) data).getName() }));
 		}
 		else if (data instanceof ProductBox)
 		{
@@ -204,12 +210,14 @@ public class ProductController implements UIActionController
 		else if (data instanceof Product)
 		{
 			if (!DatabaseController.getInstance().deleteProduct((Product) data))
-				PopupController.getInstance().error(LocalizationController.getInstance().getCompoundString("unableToDeleteProductError", ((Product) data).getName()));
+				PopupController.getInstance()
+						.error(LocalizationController.getInstance().getCompoundString("unableToDeleteProductError", ((Product) data).getName()));
 		}
 		else if (data instanceof ProductType)
 		{
 			if (!DatabaseController.getInstance().deleteProductType((ProductType) data))
-				PopupController.getInstance().error(LocalizationController.getInstance().getCompoundString("unableToDeleteProductTypePopUp", new Object[] { ((ProductType) data).getName() }));
+				PopupController.getInstance().error(LocalizationController.getInstance().getCompoundString("unableToDeleteProductTypePopUp",
+						new Object[] { ((ProductType) data).getName() }));
 		}
 		else
 		{
@@ -327,7 +335,7 @@ public class ProductController implements UIActionController
 	 * action is performed
 	 *
 	 * @param saveProductType saves the new Product Type written in the
-	 *            TextField
+	 * TextField
 	 */
 	@SuppressWarnings("static-method")
 	public void saveProductType(final ProductType saveProductType)
