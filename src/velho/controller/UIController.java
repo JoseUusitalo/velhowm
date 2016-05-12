@@ -6,7 +6,6 @@ import java.util.Set;
 import org.apache.log4j.Logger;
 
 import javafx.scene.Node;
-import velho.controller.database.DatabaseController;
 import velho.model.enums.Position;
 import velho.model.enums.UserRole;
 import velho.model.interfaces.GenericView;
@@ -150,20 +149,19 @@ public class UIController
 				mainView.addTab(LocalizationController.getString("addLogsTab"), logController.getView());
 				//$FALL-THROUGH$
 			case LOGISTICIAN:
-				mainView.addTab(LocalizationController.getString("addSearchTab"), searchController.getSearchTabView());
-				mainView.addTab(LocalizationController.getString("addProductListSearchTab"), searchController.getProductListSearchView());
+				mainView.addTab(LocalizationController.getString("addUserListTab"), userController.getUserListView(currentUserRole));
+				mainView.addTab(LocalizationController.getString("csvTab"), csvController.getCSVView());
+				mainView.addTab(LocalizationController.getString("addBrandsTab"), productController.getBrandsTab());
+				mainView.addTab(LocalizationController.getString("addProductTypesTab"), productController.getProductTypesTab());
+				mainView.addTab(LocalizationController.getString("addCategoriesTab"), productController.getCategoryTab());
+				mainView.addTab(LocalizationController.getString("addProductListTab"), productController.getProductTabView());
+				mainView.addTab(LocalizationController.getString("addProductBoxesTab"), productController.getProductBoxesTab());
 				mainView.addTab(LocalizationController.getString("addManifestsTab"), manifestController.getView());
 				mainView.addTab(LocalizationController.getString("addRemovalListsTab"), removalListController.getView());
-				mainView.addTab(LocalizationController.getString("addUserListTab"), userController.getUserListView(currentUserRole));
-				mainView.addTab(LocalizationController.getString("addBrandsTab"), productController.getBrandsTab());
-				mainView.addTab(LocalizationController.getString("addCategoriesTab"), productController.getCategoryTab());
-				mainView.addTab(LocalizationController.getString("addProductTypesTab"), productController.getProductTypesTab());
-				mainView.addTab(LocalizationController.getString("addProductBoxesTab"), productController.getProductBoxesTab());
-				mainView.addTab(LocalizationController.getString("addProductListTab"), productController.getProductTabView());
-				mainView.addTab(LocalizationController.getString("addUserListTab"), getUserListView(currentUserRole));
-				mainView.addTab("CSV", csvController.getCSVView());
-				break;
+				//$FALL-THROUGH$
 			case GUEST:
+				mainView.addTab(LocalizationController.getString("addSearchTab"), searchController.getSearchTabView());
+				mainView.addTab(LocalizationController.getString("addProductListSearchTab"), searchController.getProductListSearchView());
 				break;
 			default:
 				SYSLOG.error("Unknown user role '" + currentUserRole.getName() + "'.");
@@ -174,36 +172,6 @@ public class UIController
 		 * shown after user has logged in.
 		 */
 		removalPlatformController.checkWarning();
-	}
-
-	/**
-	 * Creates the user list view. The list contents change depending on who is
-	 * logged in.
-	 *
-	 * @param currentUserRole the role of the user who is currently logged in
-	 * @return the user list view
-	 */
-	private Node getUserListView(final UserRole currentUserRole)
-	{
-		/*
-		 * What is shown in the user list depends on your role.
-		 */
-		switch (currentUserRole)
-		{
-
-			case ADMINISTRATOR:
-			case MANAGER:
-				return ListController.getTableView(userController, DatabaseController.getPublicUserDataColumns(true), DatabaseController.getAllUsers());
-			case LOGISTICIAN:
-				return ListController.getTableView(userController, DatabaseController.getPublicUserDataColumns(false), DatabaseController.getAllUsers());
-			case GUEST:
-				break;
-			default:
-				SYSLOG.error("Unknown user role '" + currentUserRole.getName() + "'.");
-
-		}
-
-		return null;
 	}
 
 	/**
