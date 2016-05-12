@@ -55,6 +55,9 @@ public class ProductController implements UIActionController
 	 */
 	private final ProductBoxesTabView productBoxTabView;
 
+	/**
+	 * Product tab where you can view/edit/create/delete products.
+	 */
 	private ProductTabView productTabView;
 
 	/**
@@ -359,16 +362,31 @@ public class ProductController implements UIActionController
 		DatabaseController.saveOrUpdate(saveProductCategory);
 	}
 
+	/**
+	 * Gets Category tab view.
+	 * 
+	 * @return category tab view
+	 */
 	public Node getCategoryTab()
 	{
 		return categoryTabView.getView();
 	}
 
+	/**
+	 * Get product box view.
+	 * 
+	 * @return product box view
+	 */
 	public Node getProductBoxesTab()
 	{
 		return productBoxTabView.getView(DatabaseController.getAllProducts());
 	}
 
+	/**
+	 * Saves the creted product box.
+	 * 
+	 * @param productBox uses the product box parameter to refer to the model of ProductBox
+	 */
 	@SuppressWarnings("static-method")
 	public void saveProductBox(final ProductBox productBox)
 	{

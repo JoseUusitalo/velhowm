@@ -30,21 +30,43 @@ import velho.view.components.TableCellDeleteButton;
  */
 public class ProductTypesTabView implements GenericView
 {
+	/**
+	 * ProductController a gatekeeper to our data that the ProductType needs
+	 */
 	private final ProductController productController;
 
+	/**
+	 * TableView so the tab can be shown.
+	 */
 	private final TableView<Object> table;
 
+	/**
+	 * VBox is a vertical box where you can set up labels fields & buttons.
+	 */
 	private VBox vbox;
 
+	/**
+	 * data comes from the database that is conrolled by the DatabaseController.
+	 */
 	private ObservableList<Object> data = DatabaseController.getAllProductTypes();
 	// TODO: Set in constructor.
 
+	/**
+	 * ProductController holds access to the Product types.
+	 * 
+	 * @param productController named after the ProductController to fach items from there
+	 */
 	public ProductTypesTabView(final ProductController productController)
 	{
 		this.productController = productController;
 		this.table = new TableView<Object>();
 	}
 
+	/**
+	 * VBox is inside the view to set up the text fields & labels.
+	 * 
+	 * @return return the view
+	 */
 	public VBox getView()
 	{
 		if (vbox == null)
