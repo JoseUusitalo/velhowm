@@ -18,15 +18,19 @@ import velho.controller.DatabaseController;
 import velho.controller.LogDatabaseController;
 import velho.view.MainWindow;
 
-public class TestLogin extends GuiTest
+/**
+ * Attempts at testing the UI.
+ *
+ * @author Jose Uusitalo &amp; Edward Puustinen
+ */
+@SuppressWarnings("static-method")
+public class ViewTest extends GuiTest
 {
-	MainWindow app;
+	private MainWindow app;
 	private TextField firstNameField;
 	private TextField lastNameField;
 	private TextField authenticationStringField;
 	private Button logInButton;
-	private Label userName;
-	private TextField badgeIDField;
 	private TextField pinField;
 	private TextField userFnameField;
 	private TextField userLNameField;
@@ -52,6 +56,7 @@ public class TestLogin extends GuiTest
 		catch (Exception e)
 		{
 			e.printStackTrace();
+
 			return null;
 		}
 	}
@@ -87,33 +92,6 @@ public class TestLogin extends GuiTest
 		}
 	}
 
-	private boolean isLoggedIn()
-	{
-		return userName != null && userName.getText().contains("Admin Test");
-	}
-
-	private void loginAsAdmin()
-	{
-		firstNameField = find("#firstNameField");
-		lastNameField = find("#lastNameField");
-		authenticationStringField = find("#authenticationStringField");
-		logInButton = find("#logInButton");
-
-		click(firstNameField);
-		type("Admin");
-		assertEquals("Admin", (firstNameField.getText()));
-
-		click(lastNameField);
-		type("Test");
-		assertEquals("Test", (lastNameField.getText()));
-
-		click(authenticationStringField);
-		type("111111");
-		assertEquals("111111", (authenticationStringField.getText()));
-
-		click(logInButton);
-	}
-
 	@Test(timeout = 30000)
 	public void loginAdmin()
 	{
@@ -142,15 +120,10 @@ public class TestLogin extends GuiTest
 	@Test(timeout = 30000)
 	public void createUser()
 	{
-		pinField = find("#pinField");
 		userFnameField = find("#userFnameField");
 		userLNameField = find("#userLNameField");
+		pinField = find("#pinField");
 		createButton = find("#createButton");
-		/*
-		 * click(badgeIDField);
-		 * type("1234");
-		 * assertEquals("Admin", (firstNameField.getText()));
-		 */
 
 		click(pinField);
 		type("8888");
@@ -165,8 +138,5 @@ public class TestLogin extends GuiTest
 		assertEquals("MidPlzOrFeed", (userLNameField.getText()));
 
 		click(createButton);
-
-		assertTrue(((Label) find("#userName")).getText().contains("Admin Test"));
-
 	}
 }
