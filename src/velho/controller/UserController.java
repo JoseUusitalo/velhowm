@@ -7,6 +7,7 @@ import velho.controller.database.DatabaseController;
 import velho.controller.interfaces.UIActionController;
 import velho.model.User;
 import velho.model.enums.UserRole;
+import velho.model.strategies.UserValidationStrategy;
 import velho.view.AddUserView;
 import velho.view.ListView;
 import velho.view.MainWindow;
@@ -144,28 +145,18 @@ public class UserController implements UIActionController
 	public User createUser(final String badgeID, final String userPIN, final String userFirstName, final String userLastName, final UserRole userRole,
 			final boolean showPopup)
 	{
-		if (validateUserData(badgeID, userPIN, userFirstName, userLastName, userRole))
+		try
 		{
-			User newUser;
-
-			// If no pin is defined, use badge ID.
-			if (userPIN == null || userPIN.isEmpty())
-				newUser = new User(userFirstName, userLastName, null, badgeID, userRole);
-			else
-				newUser = new User(userFirstName, userLastName, userPIN, null, userRole);
+			final User newUser = new User(userFirstName, userLastName, userPIN, badgeID, userRole);
 
 			if (DatabaseController.getInstance().getAllUsers().contains(newUser))
 			{
-
 				SYSLOG.debug("User already exists.");
 
 				if (showPopup)
-				{
 					PopupController.getInstance().info(LocalizationController.getInstance().getString("userAlreadyExistInfoPopUp"));
-				}
 
 				return null;
-
 			}
 
 			DatabaseController.getInstance().saveOrUpdate(newUser);
@@ -180,13 +171,15 @@ public class UserController implements UIActionController
 
 			return newUser;
 		}
+		catch (IllegalArgumentException e)
+		{
+			SYSLOG.debug("Invalid user data.");
 
-		SYSLOG.debug("Invalid user data.");
+			if (showPopup)
+				PopupController.getInstance().warning(LocalizationController.getInstance().getString("invalidUserDataPopUp"));
 
-		if (showPopup)
-			PopupController.getInstance().warning(LocalizationController.getInstance().getString("invalidUserDataPopUp"));
-
-		return null;
+			return null;
+		}
 	}
 
 	/**
@@ -283,44 +276,15 @@ public class UserController implements UIActionController
 	}
 
 	/**
-	 * Validates the user data against the database requirements.
-	 * Either a badge ID or a PIN must be defined.
-	 * Both cannot be null.
-	 * Both cannot be defined.
+	 * Validates the user data against the contextual requirements.
 	 *
-	 * @param badgeID RFID identification string of the user's RFID badge
-	 * @param pin the pin string used to log in to the system if no RFID badge
-	 * ID is provided
-	 * @param firstName the first name of the user
-	 * @param lastName the last name of the user
-	 * @param roleName the name of the role of the user
+	 * @param user the user to be validated
 	 *
-	 * @return <code>true</code> if given information is valid
-	 * @throws NoDatabaseLinkException
+	 * @return <code>true</code> if the user properties are valid
 	 */
-	public boolean validateUserData(final String badgeID, final String pin, final String firstName, final String lastName, final UserRole role)
+	public boolean validateUser(final User user)
 	{
-		// TODO: Use the strategy.
-		final boolean hasBadgeID = isValidBadgeID(badgeID);
-		final boolean hasPIN = isValidPIN(pin);
-
-		// Must have exactly one.
-		if (hasBadgeID && hasPIN || !hasBadgeID && !hasPIN)
-			return false;
-
-		// Name cannot be null, empty, or longer than maximum and length.
-		if (firstName == null || firstName.isEmpty() || firstName.length() > User.MAX_NAME_LENGTH)
-			return false;
-
-		// Name cannot be null, empty, or longer than maximum and length.
-		if (lastName == null || lastName.isEmpty() || lastName.length() > User.MAX_NAME_LENGTH)
-			return false;
-
-		// TODO: The role is not in the database at the moment.
-		if (role == null)
-			return false;
-
-		return true;
+		return new UserValidationStrategy().isValidUser(user);
 	}
 
 	/**

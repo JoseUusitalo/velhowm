@@ -85,8 +85,7 @@ public class User extends AbstractDatabaseObject
 		this.role = role;
 
 		System.out.println("new user " + firstName + " " + pin + " " + role);
-
-		if (!UserController.getInstance().validateUserData(this.badgeID, this.pin, firstName, lastName, role))
+		if (!UserController.getInstance().validateUser(this))
 			throw new IllegalArgumentException("Invalid user data");
 	}
 
@@ -167,7 +166,7 @@ public class User extends AbstractDatabaseObject
 
 		if (this.getBadgeID() == null)
 		{
-			equalBadgeIDs = user.getBadgeID() == null;
+			equalBadgeIDs = user.getBadgeID() == null || user.getBadgeID().isEmpty();
 		}
 		else
 		{

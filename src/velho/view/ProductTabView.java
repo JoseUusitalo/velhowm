@@ -123,7 +123,8 @@ public class ProductTabView implements GenericView
 			table.getColumns().add(nameColumn);
 
 			ObservableList<Object> cbValues = DatabaseController.getInstance().getAllProductBrands();
-			TableColumn<Object, Object> brand = new TableColumn<Object, Object>(LocalizationController.getInstance().getString("publicProductSearchTableHeaderBrand"));
+			TableColumn<Object, Object> brand = new TableColumn<Object, Object>(
+					LocalizationController.getInstance().getString("publicProductSearchTableHeaderBrand"));
 
 			brand.setCellValueFactory(new PropertyValueFactory<>("brand"));
 			brand.setCellFactory(ComboBoxTableCell.forTableColumn(cbValues));
@@ -136,7 +137,8 @@ public class ProductTabView implements GenericView
 			table.getColumns().add(brand);
 
 			ObservableList<Object> cbCategoryValues = DatabaseController.getInstance().getAllProductCategories();
-			TableColumn<Object, Object> category = new TableColumn<Object, Object>(LocalizationController.getInstance().getString("publicProductSearchTableHeaderCategory"));
+			TableColumn<Object, Object> category = new TableColumn<Object, Object>(
+					LocalizationController.getInstance().getString("publicProductSearchTableHeaderCategory"));
 
 			category.setCellValueFactory(new PropertyValueFactory<>("category"));
 			category.setCellFactory(ComboBoxTableCell.forTableColumn(cbCategoryValues));
@@ -484,7 +486,6 @@ public class ProductTabView implements GenericView
 	public void recreate()
 	{
 		vbox = null;
-		// TODO: Use old data.
 		getView(brandList, categoryList);
 	}
 

@@ -67,70 +67,74 @@ public class UserTest
 	@Test
 	public final void testValidation_PIN_Valid()
 	{
-		assertTrue(UserController.getInstance().validateUserData(null, VALID_PIN_MAX, VALID_NAME, VALID_NAME, VALID_ROLE));
+		@SuppressWarnings("unused")
+		final User usr = new User(VALID_NAME, VALID_NAME, VALID_PIN_MAX, null, VALID_ROLE);
 	}
 
 	@Test
 	public final void testValidation_Badge_Valid()
 	{
-		assertTrue(UserController.getInstance().validateUserData(VALID_BADGE_ID_MAX, "", VALID_NAME, VALID_NAME, VALID_ROLE));
+		@SuppressWarnings("unused")
+		final User usr = new User(VALID_NAME, VALID_NAME, "", VALID_BADGE_ID_MAX, VALID_ROLE);
 	}
 
 	@Test
 	public final void testValidation_PIN_Valid2()
 	{
-		assertTrue(UserController.getInstance().validateUserData(null, VALID_PIN_MIN, VALID_NAME, VALID_NAME, VALID_ROLE));
+		@SuppressWarnings("unused")
+		final User usr = new User(VALID_NAME, VALID_NAME, VALID_PIN_MIN, "", VALID_ROLE);
 	}
 
 	@Test
 	public final void testValidation_Badge_Valid2()
 	{
-		assertTrue(UserController.getInstance().validateUserData(VALID_BADGE_ID_MIN, "", VALID_NAME, VALID_NAME, VALID_ROLE));
+		@SuppressWarnings("unused")
+		final User usr = new User(VALID_NAME, VALID_NAME, null, VALID_BADGE_ID_MIN, VALID_ROLE);
 	}
 
-	@Test
+	@Test(expected = IllegalArgumentException.class)
 	public final void testValidation_BadgeID_Long()
 	{
-		assertFalse(UserController.getInstance().validateUserData(INVALID_BADGE_ID_LONG, null, VALID_NAME, VALID_NAME, VALID_ROLE));
+		@SuppressWarnings("unused")
+		final User usr = new User(VALID_NAME, VALID_NAME, null, INVALID_BADGE_ID_LONG, VALID_ROLE);
 	}
 
-	@Test
+	@Test(expected = IllegalArgumentException.class)
 	public final void testValidation_BadgeID_Short()
 	{
-		assertFalse(UserController.getInstance().validateUserData(INVALID_BADGE_ID_SHORT, "", VALID_NAME, VALID_NAME, VALID_ROLE));
+		@SuppressWarnings("unused")
+		final User usr = new User(VALID_NAME, VALID_NAME, null, INVALID_BADGE_ID_SHORT, VALID_ROLE);
 	}
 
-	@Test
+	@Test(expected = IllegalArgumentException.class)
 	public final void testValidation_PIN_Long()
 	{
-		assertFalse(UserController.getInstance().validateUserData("", INVALID_PIN_LONG, VALID_NAME, VALID_NAME, VALID_ROLE));
+		@SuppressWarnings("unused")
+		final User usr = new User(VALID_NAME, VALID_NAME, INVALID_PIN_LONG, null, VALID_ROLE);
 	}
 
-	@Test
+	@Test(expected = IllegalArgumentException.class)
 	public final void testValidation_PIN_Short()
 	{
-		assertFalse(UserController.getInstance().validateUserData(null, INVALID_PIN_SHORT, VALID_NAME, VALID_NAME, VALID_ROLE));
+		@SuppressWarnings("unused")
+		final User usr = new User(VALID_NAME, VALID_NAME, INVALID_PIN_SHORT, "", VALID_ROLE);
 	}
 
-	@Test
-	public final void testValidation_PinBadge()
-	{
-		assertFalse(UserController.getInstance().validateUserData(VALID_BADGE_ID_MAX, VALID_PIN_MAX, VALID_NAME, VALID_NAME, VALID_ROLE));
-	}
-
-	@Test
+	@Test(expected = IllegalArgumentException.class)
 	public final void testValidation_PinBadge_Neither()
 	{
-		assertFalse(UserController.getInstance().validateUserData("", "", VALID_NAME, VALID_NAME, VALID_ROLE));
+		@SuppressWarnings("unused")
+		final User usr = new User(VALID_NAME, VALID_NAME, "", "", VALID_ROLE);
 	}
 
-	@Test
+	@Test(expected = IllegalArgumentException.class)
 	public final void testValidation_PinBadge_Neither2()
 	{
-		assertFalse(UserController.getInstance().validateUserData(null, null, VALID_NAME, VALID_NAME, VALID_ROLE));
+		@SuppressWarnings("unused")
+		final User usr = new User(VALID_NAME, VALID_NAME, null, null, VALID_ROLE);
 	}
 
-	@Test
+	@Test(expected = IllegalArgumentException.class)
 	public final void testValidation_PinBadge_Both()
 	{
 		System.out.println("testValidation_PinBadge_Both():");
@@ -138,49 +142,51 @@ public class UserTest
 		System.out.println(UserController.getInstance().isValidPIN(VALID_PIN_MAX));
 		System.out.println(UserController.getInstance().isValidBadgeID(VALID_BADGE_ID_MAX));
 		System.out.println(UserController.getInstance().isValidBadgeID(VALID_BADGE_ID_MIN));
-		assertFalse(UserController.getInstance().validateUserData(VALID_BADGE_ID_MIN, VALID_PIN_MAX, VALID_NAME, VALID_NAME, VALID_ROLE));
+
+		@SuppressWarnings("unused")
+		final User usr = new User(VALID_NAME, VALID_NAME, VALID_PIN_MAX, VALID_BADGE_ID_MIN, VALID_ROLE);
 	}
 
-	@Test
+	@Test(expected = IllegalArgumentException.class)
 	public final void testValidation_Name_Long()
 	{
-		assertFalse(UserController.getInstance().validateUserData(VALID_BADGE_ID_MAX, null, INVALID_NAME_LONG, VALID_NAME, VALID_ROLE));
+		@SuppressWarnings("unused")
+		final User usr = new User(VALID_NAME, INVALID_NAME_LONG, null, VALID_BADGE_ID_MAX, VALID_ROLE);
 	}
 
-	@Test
+	@Test(expected = IllegalArgumentException.class)
 	public final void testValidation_Name_Null()
 	{
-		assertFalse(UserController.getInstance().validateUserData("", VALID_PIN_MAX, null, VALID_NAME, VALID_ROLE));
+		@SuppressWarnings("unused")
+		final User usr = new User(null, VALID_NAME, VALID_PIN_MAX, null, VALID_ROLE);
 	}
 
-	@Test
+	@Test(expected = IllegalArgumentException.class)
 	public final void testValidation_Name_Empty()
 	{
-		assertFalse(UserController.getInstance().validateUserData(VALID_BADGE_ID_MAX, "", "", VALID_NAME, VALID_ROLE));
+		@SuppressWarnings("unused")
+		final User usr = new User("", "", null, VALID_BADGE_ID_MAX, VALID_ROLE);
 	}
 
-	@Test
+	@Test(expected = IllegalArgumentException.class)
 	public final void testValidation_Name_Long2()
 	{
-		assertFalse(UserController.getInstance().validateUserData(VALID_BADGE_ID_MAX, null, VALID_NAME, INVALID_NAME_LONG, VALID_ROLE));
+		@SuppressWarnings("unused")
+		final User usr = new User(INVALID_NAME_LONG, VALID_NAME, null, VALID_BADGE_ID_MAX, VALID_ROLE);
 	}
 
-	@Test
+	@Test(expected = IllegalArgumentException.class)
 	public final void testValidation_Name_Null2()
 	{
-		assertFalse(UserController.getInstance().validateUserData("", VALID_PIN_MAX, VALID_NAME, null, VALID_ROLE));
+		@SuppressWarnings("unused")
+		final User usr = new User(VALID_NAME, null, null, VALID_BADGE_ID_MAX, VALID_ROLE);
 	}
 
-	@Test
-	public final void testValidation_Name_Empty2()
-	{
-		assertFalse(UserController.getInstance().validateUserData(VALID_BADGE_ID_MAX, "", VALID_NAME, "", VALID_ROLE));
-	}
-
-	@Test
+	@Test(expected = IllegalArgumentException.class)
 	public final void testValidation_Role_Invalid()
 	{
-		assertFalse(UserController.getInstance().validateUserData("", VALID_PIN_MAX, VALID_NAME, VALID_NAME, NULL_ROLE));
+		@SuppressWarnings("unused")
+		final User usr = new User(VALID_NAME, VALID_NAME, null, VALID_BADGE_ID_MAX, NULL_ROLE);
 	}
 
 	@Test
