@@ -28,18 +28,27 @@ public class UserValidationStrategy implements ObjectValidationStrategy
 
 			user = (User) object;
 
-			final boolean hasBadgeID = UserController.getInstance().isValidBadgeID(user.getBadgeID());
-			final boolean hasPIN = UserController.getInstance().isValidPIN(user.getPin());
-
-			//@formatter:off
-			if (hasBadgeID && hasPIN || !hasBadgeID && !hasPIN ||
-				user.getFirstName() == null || user.getFirstName().trim().isEmpty() || user.getFirstName().length() > User.MAX_NAME_LENGTH ||
-				user.getLastName() == null || user.getLastName().trim().isEmpty() || user.getLastName().length() > User.MAX_NAME_LENGTH ||
-				user.getRole() == null)
-			//@formatter:on
+			if (!isValidUser(user))
 				invalids.add(user);
 		}
 
 		return invalids;
+	}
+
+	@SuppressWarnings("static-method")
+	public boolean isValidUser(final User user)
+	{
+		final boolean hasBadgeID = UserController.getInstance().isValidBadgeID(user.getBadgeID());
+		final boolean hasPIN = UserController.getInstance().isValidPIN(user.getPin());
+
+		//@formatter:off
+		if (hasBadgeID && hasPIN || !hasBadgeID && !hasPIN ||
+			user.getFirstName() == null || user.getFirstName().trim().isEmpty() || user.getFirstName().length() > User.MAX_NAME_LENGTH ||
+			user.getLastName() == null || user.getLastName().trim().isEmpty() || user.getLastName().length() > User.MAX_NAME_LENGTH ||
+			user.getRole() == null)
+		//@formatter:on
+			return false;
+
+		return true;
 	}
 }
