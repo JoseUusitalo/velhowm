@@ -17,7 +17,7 @@ import velho.view.RemovalListManagementView;
 import velho.view.RemovalListView;
 
 /**
- * A class for managing {@link RemovalList} objects.
+ * A singleton controller for managing {@link RemovalList} objects.
  *
  * @author Jose Uusitalo
  */
@@ -59,11 +59,33 @@ public class RemovalListController implements UIActionController
 	private final GenericTabView tabView;
 
 	/**
-	 * @param searchController
+	 * A private inner class holding the class instance.
+	 *
+	 * @author Jose Uusitalo
 	 */
-	public RemovalListController()
+	private static class Holder
+	{
+		/**
+		 * The only instance of {@link RemovalListController}.
+		 */
+		private static final RemovalListController INSTANCE = new RemovalListController();
+	}
+
+	/**
+	 */
+	private RemovalListController()
 	{
 		tabView = new GenericTabView();
+	}
+
+	/**
+	 * Gets the instance of the {@link RemovalListController}.
+	 *
+	 * @return the removal list controller
+	 */
+	public static synchronized RemovalListController getInstance()
+	{
+		return Holder.INSTANCE;
 	}
 
 	/**

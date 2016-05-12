@@ -29,11 +29,6 @@ public class UIController
 	private MainWindow mainView;
 
 	/**
-	 * The {@link RemovalListController}.
-	 */
-	private RemovalListController removalListController;
-
-	/**
 	 * The {@link LogController}.
 	 */
 	private LogController logController;
@@ -58,12 +53,11 @@ public class UIController
 	 */
 	private static Set<GenericView> viewSet = new HashSet<GenericView>();
 
-	public void setControllers(final MainWindow mainWindow, final RemovalListController removalListController, final ManifestController manifestController,
+	public void setControllers(final MainWindow mainWindow, final ManifestController manifestController,
 			final RemovalPlatformController removalPlatformController, final CSVController csvController)
 	{
 		// TODO: remove
 		this.mainView = mainWindow;
-		this.removalListController = removalListController;
 		this.manifestController = manifestController;
 		this.removalPlatformController = removalPlatformController;
 		this.csvController = csvController;
@@ -129,7 +123,7 @@ public class UIController
 				mainView.addTab(LocalizationController.getInstance().getString("addProductListTab"), ProductController.getInstance().getProductTabView());
 				mainView.addTab(LocalizationController.getInstance().getString("addProductBoxesTab"), ProductController.getInstance().getProductBoxesTab());
 				mainView.addTab(LocalizationController.getInstance().getString("addManifestsTab"), manifestController.getView());
-				mainView.addTab(LocalizationController.getInstance().getString("addRemovalListsTab"), removalListController.getView());
+				mainView.addTab(LocalizationController.getInstance().getString("addRemovalListsTab"), RemovalListController.getInstance().getView());
 				//$FALL-THROUGH$
 			case GUEST:
 				mainView.addTab(LocalizationController.getInstance().getString("addSearchTab"), SearchController.getInstance().getSearchTabView());

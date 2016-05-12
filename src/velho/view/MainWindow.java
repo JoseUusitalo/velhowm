@@ -39,7 +39,6 @@ import velho.controller.LocalizationController;
 import velho.controller.LogController;
 import velho.controller.LoginController;
 import velho.controller.ManifestController;
-import velho.controller.RemovalListController;
 import velho.controller.RemovalPlatformController;
 import velho.controller.UIController;
 import velho.controller.database.DatabaseController;
@@ -107,11 +106,6 @@ public class MainWindow extends Application implements GenericView
 	 * The {@link UIController}.
 	 */
 	private static UIController uiController;
-
-	/**
-	 * The {@link RemovalListController}.
-	 */
-	private RemovalListController removalListController;
 
 	/**
 	 * The {@link ManifestController}.
@@ -270,7 +264,6 @@ public class MainWindow extends Application implements GenericView
 				// FIXME: Convert most controllers to use the singleton pattern.
 
 				uiController = new UIController();
-				removalListController = new RemovalListController();
 				LoginController.getInstance().setControllers(uiController);
 				LocalizationController.getInstance().setControllers(uiController);
 
@@ -283,7 +276,6 @@ public class MainWindow extends Application implements GenericView
 
 				//@formatter:off
 				uiController.setControllers(this,
-											removalListController,
 											manifestController,
 											removalPlatformController,
 											csvController);

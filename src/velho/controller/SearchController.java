@@ -14,7 +14,7 @@ import velho.view.SearchTabView;
 import velho.view.SearchView;
 
 /**
- * A class handling searching the database for data.
+ * A singleton controller handling searching the database for data.
  *
  * @author Jose Uusitalo &amp; Joona Silvennoinen
  */
