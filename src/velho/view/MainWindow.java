@@ -287,10 +287,10 @@ public class MainWindow extends Application implements GenericView
 				csvController = new CSVController(this);
 				manifestController = new ManifestController(this);
 				removalPlatformController = new RemovalPlatformController(this);
-				debugController = new DebugController(removalPlatformController);
 				searchController = new SearchController(productController);
 				removalListController = new RemovalListController(searchController);
 
+				DebugController.getInstance().setControllers(removalPlatformController);
 				ExternalSystemsController.getInstance().setControllers(manifestController);
 				LoginController.getInstance().setControllers(uiController, debugController);
 				LocalizationController.getInstance().setControllers(uiController);
