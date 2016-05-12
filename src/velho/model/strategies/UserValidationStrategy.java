@@ -28,8 +28,8 @@ public class UserValidationStrategy implements ObjectValidationStrategy
 
 			user = (User) object;
 
-			final boolean hasBadgeID = UserController.isValidBadgeID(user.getBadgeID());
-			final boolean hasPIN = UserController.isValidPIN(user.getPin());
+			final boolean hasBadgeID = UserController.getInstance().isValidBadgeID(user.getBadgeID());
+			final boolean hasPIN = UserController.getInstance().isValidPIN(user.getPin());
 
 			//@formatter:off
 			if (hasBadgeID && hasPIN || !hasBadgeID && !hasPIN ||

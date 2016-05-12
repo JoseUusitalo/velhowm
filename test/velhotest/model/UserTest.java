@@ -67,156 +67,156 @@ public class UserTest
 	@Test
 	public final void testValidation_PIN_Valid()
 	{
-		assertTrue(UserController.validateUserData(null, VALID_PIN_MAX, VALID_NAME, VALID_NAME, VALID_ROLE));
+		assertTrue(UserController.getInstance().validateUserData(null, VALID_PIN_MAX, VALID_NAME, VALID_NAME, VALID_ROLE));
 	}
 
 	@Test
 	public final void testValidation_Badge_Valid()
 	{
-		assertTrue(UserController.validateUserData(VALID_BADGE_ID_MAX, "", VALID_NAME, VALID_NAME, VALID_ROLE));
+		assertTrue(UserController.getInstance().validateUserData(VALID_BADGE_ID_MAX, "", VALID_NAME, VALID_NAME, VALID_ROLE));
 	}
 
 	@Test
 	public final void testValidation_PIN_Valid2()
 	{
-		assertTrue(UserController.validateUserData(null, VALID_PIN_MIN, VALID_NAME, VALID_NAME, VALID_ROLE));
+		assertTrue(UserController.getInstance().validateUserData(null, VALID_PIN_MIN, VALID_NAME, VALID_NAME, VALID_ROLE));
 	}
 
 	@Test
 	public final void testValidation_Badge_Valid2()
 	{
-		assertTrue(UserController.validateUserData(VALID_BADGE_ID_MIN, "", VALID_NAME, VALID_NAME, VALID_ROLE));
+		assertTrue(UserController.getInstance().validateUserData(VALID_BADGE_ID_MIN, "", VALID_NAME, VALID_NAME, VALID_ROLE));
 	}
 
 	@Test
 	public final void testValidation_BadgeID_Long()
 	{
-		assertFalse(UserController.validateUserData(INVALID_BADGE_ID_LONG, null, VALID_NAME, VALID_NAME, VALID_ROLE));
+		assertFalse(UserController.getInstance().validateUserData(INVALID_BADGE_ID_LONG, null, VALID_NAME, VALID_NAME, VALID_ROLE));
 	}
 
 	@Test
 	public final void testValidation_BadgeID_Short()
 	{
-		assertFalse(UserController.validateUserData(INVALID_BADGE_ID_SHORT, "", VALID_NAME, VALID_NAME, VALID_ROLE));
+		assertFalse(UserController.getInstance().validateUserData(INVALID_BADGE_ID_SHORT, "", VALID_NAME, VALID_NAME, VALID_ROLE));
 	}
 
 	@Test
 	public final void testValidation_PIN_Long()
 	{
-		assertFalse(UserController.validateUserData("", INVALID_PIN_LONG, VALID_NAME, VALID_NAME, VALID_ROLE));
+		assertFalse(UserController.getInstance().validateUserData("", INVALID_PIN_LONG, VALID_NAME, VALID_NAME, VALID_ROLE));
 	}
 
 	@Test
 	public final void testValidation_PIN_Short()
 	{
-		assertFalse(UserController.validateUserData(null, INVALID_PIN_SHORT, VALID_NAME, VALID_NAME, VALID_ROLE));
+		assertFalse(UserController.getInstance().validateUserData(null, INVALID_PIN_SHORT, VALID_NAME, VALID_NAME, VALID_ROLE));
 	}
 
 	@Test
 	public final void testValidation_PinBadge()
 	{
-		assertFalse(UserController.validateUserData(VALID_BADGE_ID_MAX, VALID_PIN_MAX, VALID_NAME, VALID_NAME, VALID_ROLE));
+		assertFalse(UserController.getInstance().validateUserData(VALID_BADGE_ID_MAX, VALID_PIN_MAX, VALID_NAME, VALID_NAME, VALID_ROLE));
 	}
 
 	@Test
 	public final void testValidation_PinBadge_Neither()
 	{
-		assertFalse(UserController.validateUserData("", "", VALID_NAME, VALID_NAME, VALID_ROLE));
+		assertFalse(UserController.getInstance().validateUserData("", "", VALID_NAME, VALID_NAME, VALID_ROLE));
 	}
 
 	@Test
 	public final void testValidation_PinBadge_Neither2()
 	{
-		assertFalse(UserController.validateUserData(null, null, VALID_NAME, VALID_NAME, VALID_ROLE));
+		assertFalse(UserController.getInstance().validateUserData(null, null, VALID_NAME, VALID_NAME, VALID_ROLE));
 	}
 
 	@Test
 	public final void testValidation_PinBadge_Both()
 	{
 		System.out.println("testValidation_PinBadge_Both():");
-		System.out.println(UserController.isValidPIN(VALID_PIN_MIN));
-		System.out.println(UserController.isValidPIN(VALID_PIN_MAX));
-		System.out.println(UserController.isValidBadgeID(VALID_BADGE_ID_MAX));
-		System.out.println(UserController.isValidBadgeID(VALID_BADGE_ID_MIN));
-		assertFalse(UserController.validateUserData(VALID_BADGE_ID_MIN, VALID_PIN_MAX, VALID_NAME, VALID_NAME, VALID_ROLE));
+		System.out.println(UserController.getInstance().isValidPIN(VALID_PIN_MIN));
+		System.out.println(UserController.getInstance().isValidPIN(VALID_PIN_MAX));
+		System.out.println(UserController.getInstance().isValidBadgeID(VALID_BADGE_ID_MAX));
+		System.out.println(UserController.getInstance().isValidBadgeID(VALID_BADGE_ID_MIN));
+		assertFalse(UserController.getInstance().validateUserData(VALID_BADGE_ID_MIN, VALID_PIN_MAX, VALID_NAME, VALID_NAME, VALID_ROLE));
 	}
 
 	@Test
 	public final void testValidation_Name_Long()
 	{
-		assertFalse(UserController.validateUserData(VALID_BADGE_ID_MAX, null, INVALID_NAME_LONG, VALID_NAME, VALID_ROLE));
+		assertFalse(UserController.getInstance().validateUserData(VALID_BADGE_ID_MAX, null, INVALID_NAME_LONG, VALID_NAME, VALID_ROLE));
 	}
 
 	@Test
 	public final void testValidation_Name_Null()
 	{
-		assertFalse(UserController.validateUserData("", VALID_PIN_MAX, null, VALID_NAME, VALID_ROLE));
+		assertFalse(UserController.getInstance().validateUserData("", VALID_PIN_MAX, null, VALID_NAME, VALID_ROLE));
 	}
 
 	@Test
 	public final void testValidation_Name_Empty()
 	{
-		assertFalse(UserController.validateUserData(VALID_BADGE_ID_MAX, "", "", VALID_NAME, VALID_ROLE));
+		assertFalse(UserController.getInstance().validateUserData(VALID_BADGE_ID_MAX, "", "", VALID_NAME, VALID_ROLE));
 	}
 
 	@Test
 	public final void testValidation_Name_Long2()
 	{
-		assertFalse(UserController.validateUserData(VALID_BADGE_ID_MAX, null, VALID_NAME, INVALID_NAME_LONG, VALID_ROLE));
+		assertFalse(UserController.getInstance().validateUserData(VALID_BADGE_ID_MAX, null, VALID_NAME, INVALID_NAME_LONG, VALID_ROLE));
 	}
 
 	@Test
 	public final void testValidation_Name_Null2()
 	{
-		assertFalse(UserController.validateUserData("", VALID_PIN_MAX, VALID_NAME, null, VALID_ROLE));
+		assertFalse(UserController.getInstance().validateUserData("", VALID_PIN_MAX, VALID_NAME, null, VALID_ROLE));
 	}
 
 	@Test
 	public final void testValidation_Name_Empty2()
 	{
-		assertFalse(UserController.validateUserData(VALID_BADGE_ID_MAX, "", VALID_NAME, "", VALID_ROLE));
+		assertFalse(UserController.getInstance().validateUserData(VALID_BADGE_ID_MAX, "", VALID_NAME, "", VALID_ROLE));
 	}
 
 	@Test
 	public final void testValidation_Role_Invalid()
 	{
-		assertFalse(UserController.validateUserData("", VALID_PIN_MAX, VALID_NAME, VALID_NAME, NULL_ROLE));
+		assertFalse(UserController.getInstance().validateUserData("", VALID_PIN_MAX, VALID_NAME, VALID_NAME, NULL_ROLE));
 	}
 
 	@Test
 	public final void testIsValidPIN_Invalid()
 	{
-		assertFalse(UserController.isValidPIN("whatev"));
+		assertFalse(UserController.getInstance().isValidPIN("whatev"));
 	}
 
 	@Test
 	public final void testIsValidPIN_Negative()
 	{
-		assertFalse(UserController.isValidPIN("-12345"));
+		assertFalse(UserController.getInstance().isValidPIN("-12345"));
 	}
 
 	@Test
 	public final void testisValidPIN_Zero()
 	{
-		assertTrue(UserController.isValidPIN("000000"));
+		assertTrue(UserController.getInstance().isValidPIN("000000"));
 	}
 
 	@Test
 	public final void testIsValidBadgeID_Invalid()
 	{
-		assertFalse(UserController.isValidBadgeID("whatever"));
+		assertFalse(UserController.getInstance().isValidBadgeID("whatever"));
 	}
 
 	@Test
 	public final void testIsValidBadgeID_Negative()
 	{
-		assertFalse(UserController.isValidBadgeID("-10000000"));
+		assertFalse(UserController.getInstance().isValidBadgeID("-10000000"));
 	}
 
 	@Test
 	public final void testIsValidBadgeID2()
 	{
-		assertTrue(UserController.isValidBadgeID("99999999"));
+		assertTrue(UserController.getInstance().isValidBadgeID("99999999"));
 	}
 
 	@Test

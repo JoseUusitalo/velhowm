@@ -12,7 +12,7 @@ import velho.view.LoginView;
 import velho.view.MainWindow;
 
 /**
- * Controls logging users in and out.
+ * A singleton control for managing users logging in and out.
  *
  * @author Jose Uusitalo &amp; Edward Puustinen
  */
@@ -110,7 +110,7 @@ public class LoginController
 	{
 		SYSLOG.info("Attempting to log in with: " + badgeString);
 
-		if (UserController.isValidBadgeID(badgeString))
+		if (UserController.getInstance().isValidBadgeID(badgeString))
 		{
 			currentUser = DatabaseController.getInstance().authenticateBadgeID(badgeString);
 
@@ -157,7 +157,7 @@ public class LoginController
 
 		SYSLOG.info("Attempting to log in with: " + firstName + " " + lastName + " : " + authenticationString);
 
-		if (UserController.isValidPIN(authenticationString))
+		if (UserController.getInstance().isValidPIN(authenticationString))
 		{
 			currentUser = DatabaseController.getInstance().authenticatePIN(firstName, lastName, authenticationString);
 
@@ -218,7 +218,7 @@ public class LoginController
 	{
 		if (MainWindow.DEBUG_MODE)
 		{
-			currentUser = UserController.getDebugUser(role);
+			currentUser = UserController.getInstance().getDebugUser(role);
 
 			// Put the user database ID into the MDC thing for log4j.
 			MDC.put("user_id", currentUser.getDatabaseID());

@@ -7,7 +7,7 @@ import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.ButtonType;
 
 /**
- * A controller for popup alerts.
+ * A singeleton controller for popup alerts.
  *
  * @author Joona Silvennoinen
  */

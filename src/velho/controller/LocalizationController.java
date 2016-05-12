@@ -7,6 +7,8 @@ import java.util.ResourceBundle;
 import velho.model.enums.SupportedTranslation;
 
 /**
+ * A singleton controller for handling localization.
+ *
  * @author Joona Silvennoinen
  */
 public class LocalizationController

@@ -26,7 +26,7 @@ import velho.model.enums.UserRole;
 @SuppressWarnings("static-method")
 public class UserControllerTest
 {
-	private static UserController controller = new UserController();
+	private static UserController controller = UserController.getInstance();
 
 	private final String VALID_BADGE_ID = "99955999";
 	private final String VALID_PIN = "003000";

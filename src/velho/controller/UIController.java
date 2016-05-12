@@ -29,11 +29,6 @@ public class UIController
 	private MainWindow mainView;
 
 	/**
-	 * The {@link UserController}.
-	 */
-	private UserController userController;
-
-	/**
 	 * The {@link SearchController}.
 	 */
 	private SearchController searchController;
@@ -83,13 +78,12 @@ public class UIController
 	 * @param productController
 	 * @param removalPlatformController
 	 */
-	public void setControllers(final MainWindow mainWindow, final UserController userController, final RemovalListController removalListController,
-			final SearchController searchController, final ManifestController manifestController, final ProductController productController,
-			final RemovalPlatformController removalPlatformController, final CSVController csvController)
+	public void setControllers(final MainWindow mainWindow, final RemovalListController removalListController, final SearchController searchController,
+			final ManifestController manifestController, final ProductController productController, final RemovalPlatformController removalPlatformController,
+			final CSVController csvController)
 	{
 		// TODO: remove
 		this.mainView = mainWindow;
-		this.userController = userController;
 		this.removalListController = removalListController;
 		this.searchController = searchController;
 		this.productController = productController;
@@ -145,11 +139,12 @@ public class UIController
 		{
 			case ADMINISTRATOR:
 			case MANAGER:
-				mainView.addTab(LocalizationController.getInstance().getString("addUserTab"), userController.getView());
+				mainView.addTab(LocalizationController.getInstance().getString("addUserTab"), UserController.getInstance().getView());
 				mainView.addTab(LocalizationController.getInstance().getString("addLogsTab"), logController.getView());
 				//$FALL-THROUGH$
 			case LOGISTICIAN:
-				mainView.addTab(LocalizationController.getInstance().getString("addUserListTab"), userController.getUserListView(currentUserRole));
+				mainView.addTab(LocalizationController.getInstance().getString("addUserListTab"),
+						UserController.getInstance().getUserListView(currentUserRole));
 				mainView.addTab(LocalizationController.getInstance().getString("csvTab"), csvController.getCSVView());
 				mainView.addTab(LocalizationController.getInstance().getString("addBrandsTab"), productController.getBrandsTab());
 				mainView.addTab(LocalizationController.getInstance().getString("addProductTypesTab"), productController.getProductTypesTab());

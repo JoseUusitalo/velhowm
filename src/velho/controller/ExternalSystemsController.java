@@ -18,7 +18,7 @@ import velho.model.Shelf;
 import velho.model.ShelfSlot;
 
 /**
- * Controller handling the communication with systems outside the VELHO
+ * A singleton controller handling the communication with systems outside the VELHO
  * Warehouse Management.
  *
  * @author Edward Puustinen &amp; Jose Uusitalo
@@ -199,7 +199,8 @@ public class ExternalSystemsController
 				SYSLOG.debug("Product box " + boxToMove + " is already in the slot " + newShelfSlotID + ".");
 
 				if (showPopup)
-					PopupController.getInstance().info(LocalizationController.getInstance().getString("unableToMoveProductBoxToSameSlotPopUp") + newShelfSlot + "'.");
+					PopupController.getInstance()
+							.info(LocalizationController.getInstance().getString("unableToMoveProductBoxToSameSlotPopUp") + newShelfSlot + "'.");
 
 				return false;
 			}
@@ -233,7 +234,8 @@ public class ExternalSystemsController
 				oldShelfSlot.addBox(boxToMove);
 
 			if (showPopup)
-				PopupController.getInstance().error(LocalizationController.getInstance().getString("failureToAddProductBoxToNewShelfSlotErrorPopUp") + newShelfSlotID + "'.");
+				PopupController.getInstance()
+						.error(LocalizationController.getInstance().getString("failureToAddProductBoxToNewShelfSlotErrorPopUp") + newShelfSlotID + "'.");
 
 			return false;
 		}
@@ -249,7 +251,8 @@ public class ExternalSystemsController
 		SYSLOG.debug("Successfully moved " + boxToMove + " to " + newShelfSlot);
 
 		if (showPopup)
-			PopupController.getInstance().info(LocalizationController.getInstance().getCompoundString("productBoxTransferSuccessMessage", productBoxCode, newShelfSlot));
+			PopupController.getInstance()
+					.info(LocalizationController.getInstance().getCompoundString("productBoxTransferSuccessMessage", productBoxCode, newShelfSlot));
 
 		return true;
 	}

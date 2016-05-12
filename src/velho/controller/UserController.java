@@ -12,7 +12,7 @@ import velho.view.ListView;
 import velho.view.MainWindow;
 
 /**
- * A controller for managing users.
+ * A singleton controller for managing users.
  *
  * @author Jose Uusitalo &amp; Joona Silvennoinen
  */
@@ -34,8 +34,34 @@ public class UserController implements UIActionController
 	 */
 	private AddUserView view;
 
-	public UserController()
+	/**
+	 * A private inner class holding the class instance.
+	 *
+	 * @author Jose Uusitalo
+	 */
+	private static class Holder
 	{
+		/**
+		 * The only instance of {@link UserController}.
+		 */
+		private static final UserController INSTANCE = new UserController();
+	}
+
+	/**
+	 */
+	private UserController()
+	{
+		// No need to instantiate this class.
+	}
+
+	/**
+	 * Gets the instance of the {@link UserController}.
+	 *
+	 * @return the user controller
+	 */
+	public static synchronized UserController getInstance()
+	{
+		return Holder.INSTANCE;
 	}
 
 	/**
@@ -45,7 +71,7 @@ public class UserController implements UIActionController
 	 * @return a {@link UserRole} object
 	 */
 	@Deprecated
-	public static UserRole stringToRole(final String userRoleName)
+	public UserRole stringToRole(final String userRoleName)
 	{
 		switch (userRoleName)
 		{
@@ -113,9 +139,10 @@ public class UserController implements UIActionController
 	 * @param userRole user's role in the company
 	 * @param showPopup show popups?
 	 * @return the created user or <code>null</code> if data was invalid or user
-	 *         already existed in the database
+	 * already existed in the database
 	 */
-	public User createUser(final String badgeID, final String userPIN, final String userFirstName, final String userLastName, final UserRole userRole, final boolean showPopup)
+	public User createUser(final String badgeID, final String userPIN, final String userFirstName, final String userLastName, final UserRole userRole,
+			final boolean showPopup)
 	{
 		if (validateUserData(badgeID, userPIN, userFirstName, userLastName, userRole))
 		{
@@ -245,9 +272,9 @@ public class UserController implements UIActionController
 	 *
 	 * @param role the role to create the user as
 	 * @return a {@link User} object or <code>null</code> if
-	 *         {@link MainWindow#DEBUG_MODE} is <code>false</code>
+	 * {@link MainWindow#DEBUG_MODE} is <code>false</code>
 	 */
-	public static User getDebugUser(final UserRole role)
+	public User getDebugUser(final UserRole role)
 	{
 		if (MainWindow.DEBUG_MODE)
 			return new User(-1, "Debug", "Account", "000000", null, role);
@@ -263,7 +290,7 @@ public class UserController implements UIActionController
 	 *
 	 * @param badgeID RFID identification string of the user's RFID badge
 	 * @param pin the pin string used to log in to the system if no RFID badge
-	 *            ID is provided
+	 * ID is provided
 	 * @param firstName the first name of the user
 	 * @param lastName the last name of the user
 	 * @param roleName the name of the role of the user
@@ -271,7 +298,7 @@ public class UserController implements UIActionController
 	 * @return <code>true</code> if given information is valid
 	 * @throws NoDatabaseLinkException
 	 */
-	public static boolean validateUserData(final String badgeID, final String pin, final String firstName, final String lastName, final UserRole role)
+	public boolean validateUserData(final String badgeID, final String pin, final String firstName, final String lastName, final UserRole role)
 	{
 		// TODO: Use the strategy.
 		final boolean hasBadgeID = isValidBadgeID(badgeID);
@@ -303,7 +330,7 @@ public class UserController implements UIActionController
 	 * @param pin PIN to check
 	 * @return <code>true</code> if the pin is valid
 	 */
-	public static boolean isValidPIN(final String pin)
+	public boolean isValidPIN(final String pin)
 	{
 		if (pin == null || pin.length() != User.PIN_LENGTH)
 			return false;
@@ -326,7 +353,7 @@ public class UserController implements UIActionController
 	 * @param badgeID badge ID to check
 	 * @return <code>true</code> if the badge ID is valid
 	 */
-	public static boolean isValidBadgeID(final String badgeID)
+	public boolean isValidBadgeID(final String badgeID)
 	{
 		if (badgeID == null || badgeID.length() != User.BADGE_ID_LENGTH)
 			return false;
@@ -352,9 +379,11 @@ public class UserController implements UIActionController
 		{
 			case ADMINISTRATOR:
 			case MANAGER:
-				return ListController.getTableView(this, DatabaseController.getInstance().getPublicUserDataColumns(true), DatabaseController.getInstance().getAllUsers());
+				return ListController.getTableView(this, DatabaseController.getInstance().getPublicUserDataColumns(true),
+						DatabaseController.getInstance().getAllUsers());
 			case LOGISTICIAN:
-				return ListController.getTableView(this, DatabaseController.getInstance().getPublicUserDataColumns(false), DatabaseController.getInstance().getAllUsers());
+				return ListController.getTableView(this, DatabaseController.getInstance().getPublicUserDataColumns(false),
+						DatabaseController.getInstance().getAllUsers());
 			case GUEST:
 				break;
 			default:
