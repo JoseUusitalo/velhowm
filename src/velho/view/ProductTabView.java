@@ -27,10 +27,10 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.util.Callback;
-import velho.controller.DatabaseController;
 import velho.controller.LocalizationController;
 import velho.controller.ProductController;
 import velho.controller.UIController;
+import velho.controller.database.DatabaseController;
 import velho.model.Product;
 import velho.model.ProductBrand;
 import velho.model.ProductCategory;
@@ -38,7 +38,7 @@ import velho.model.interfaces.GenericView;
 import velho.view.components.TableCellDeleteButton;
 
 /**
- * @author Edward Puustinen
+ * @author Edward Puustinen &amp; Jose Uusitalo
  */
 public class ProductTabView implements GenericView
 {
@@ -58,12 +58,18 @@ public class ProductTabView implements GenericView
 	private VBox vbox;
 
 	/**
-	 * Makes the Categories and ObservableList
+	 * An observable list of database products.
 	 */
-	private ObservableList<Object> data = DatabaseController.getAllProducts();
+	private ObservableList<Object> productList = DatabaseController.getAllProducts();
 
+	/**
+	 * An observable list of database brands.
+	 */
 	private ObservableList<Object> brandList;
 
+	/**
+	 * An observable list of database categories.
+	 */
 	private ObservableList<Object> categoryList;
 
 	/**
@@ -98,7 +104,7 @@ public class ProductTabView implements GenericView
 
 			table.setEditable(true);
 
-			table.setItems(data);
+			table.setItems(productList);
 			table.getColumns().clear();
 
 			final Callback<TableColumn<Object, Object>, TableCell<Object, Object>> cellFactory = (final TableColumn<Object, Object> p) -> new EditingCell();
@@ -160,7 +166,8 @@ public class ProductTabView implements GenericView
 				@Override
 				public TableCell<Object, String> call(final TableColumn<Object, String> p)
 				{
-					final TableCellDeleteButton button = new TableCellDeleteButton(productController, (LocalizationController.getString("publicProductTableDeleteButton")));
+					final TableCellDeleteButton button = new TableCellDeleteButton(productController,
+							(LocalizationController.getString("publicProductTableDeleteButton")));
 					button.setAlignment(Pos.CENTER);
 					return button;
 				}
