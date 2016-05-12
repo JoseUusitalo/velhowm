@@ -73,24 +73,28 @@ public class AddUserView implements GenericView
 
 			final TextField badgeIDField = new TextField();
 			grid.add(badgeIDField, 1, 1);
+			badgeIDField.setId("badgeIDField");
 
 			Label pinLabel = new Label(LocalizationController.getString("PINInputFieldLabel"));
 			grid.add(pinLabel, 0, 2);
 
 			final TextField pinField = new TextField();
 			grid.add(pinField, 1, 2);
+			pinField.setId("pinField");
 
 			Label userFirstName = new Label(LocalizationController.getString("userFirstNameFieldLabel"));
 			grid.add(userFirstName, 0, 3);
 
 			final TextField userFnameField = new TextField();
 			grid.add(userFnameField, 1, 3);
+			userFnameField.setId("userFnameField");
 
 			Label userLastName = new Label(LocalizationController.getString("userLastNameFieldLabel"));
 			grid.add(userLastName, 0, 4);
 
 			final TextField userLNameField = new TextField();
 			grid.add(userLNameField, 1, 4);
+			userLNameField.setId("userLNameField");
 
 			Label userInfo = new Label(LocalizationController.getString("userRoleComboboxLabel"));
 			grid.add(userInfo, 0, 5);
@@ -102,6 +106,7 @@ public class AddUserView implements GenericView
 
 			Button createButton = new Button(LocalizationController.getString("createUserButton"));
 			grid.add(createButton, 0, 6);
+			createButton.setId("createButton");
 
 			/**
 			 * Handles the button press event.

@@ -12,4 +12,5 @@
 /.classpath
 /VELHOWM_*.jar
 /junit*.properties
+/screenshot*.png
 /*.csv
