@@ -179,7 +179,7 @@ public class CSVLoader<T extends AbstractDatabaseObject>
 		if (!invalidDataSet.isEmpty())
 		{
 			SYSLOG.warn("Sample " + objectClass.getSimpleName() + " objects has " + invalidDataSet.size() + "/" + dataset.size() + " invalid objects.");
-			PopupController.warning(LocalizationController.getInstance().getCompoundString("CSVContainsInvalidObjectsNotice", objectClass.getSimpleName(), csvFilePath, invalidDataSet.size(), dataset.size()));
+			PopupController.getInstance().warning(LocalizationController.getInstance().getCompoundString("CSVContainsInvalidObjectsNotice", objectClass.getSimpleName(), csvFilePath, invalidDataSet.size(), dataset.size()));
 			dataset.removeAll(invalidDataSet);
 		}
 

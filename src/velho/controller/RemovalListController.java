@@ -220,12 +220,12 @@ public class RemovalListController implements UIActionController
 			}
 			else
 			{
-				PopupController.error(LocalizationController.getInstance().getString("removalListSavingFailPopUp"));
+				PopupController.getInstance().error(LocalizationController.getInstance().getString("removalListSavingFailPopUp"));
 			}
 		}
 		else
 		{
-			PopupController.info(LocalizationController.getInstance().getString("addProductBoxesFirstNotice"));
+			PopupController.getInstance().info(LocalizationController.getInstance().getString("addProductBoxesFirstNotice"));
 		}
 	}
 
@@ -252,7 +252,7 @@ public class RemovalListController implements UIActionController
 		removalList.setState(state);
 
 		if (DatabaseController.getInstance().saveOrUpdate(removalList) < 1)
-			PopupController.error(LocalizationController.getInstance().getString("unableToSaveRemovalListStateNotice"));
+			PopupController.getInstance().error(LocalizationController.getInstance().getString("unableToSaveRemovalListStateNotice"));
 	}
 
 	@Override
@@ -274,7 +274,7 @@ public class RemovalListController implements UIActionController
 		if (!newRemovalList.removeProductBox(((ProductBoxSearchResultRow) data).getBox()))
 		{
 			USRLOG.debug("Failed to remove product box from removal list.");
-			PopupController.error(LocalizationController.getInstance().getString("failedToRemoveProductBoxFromRemovalListNotice"));
+			PopupController.getInstance().error(LocalizationController.getInstance().getString("failedToRemoveProductBoxFromRemovalListNotice"));
 		}
 	}
 
@@ -292,7 +292,7 @@ public class RemovalListController implements UIActionController
 		if (!newRemovalList.addProductBox(((ProductBoxSearchResultRow) data).getBox()))
 		{
 			USRLOG.trace("Product box is already on the list.");
-			PopupController.error(LocalizationController.getInstance().getString("productBoxExistsOnRemovalList"));
+			PopupController.getInstance().error(LocalizationController.getInstance().getString("productBoxExistsOnRemovalList"));
 		}
 	}
 

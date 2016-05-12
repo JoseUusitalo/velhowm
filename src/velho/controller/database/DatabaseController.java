@@ -250,7 +250,7 @@ public class DatabaseController
 			if (e.getMessage().contains("Database may be already in use"))
 			{
 				DBLOG.info("Database is already in use.");
-				PopupController.error(LocalizationController.getInstance().getString("popUpDatabaseInUse"));
+				PopupController.getInstance().error(LocalizationController.getInstance().getString("popUpDatabaseInUse"));
 			}
 
 			System.out.println(e);
@@ -500,7 +500,7 @@ public class DatabaseController
 			e.printStackTrace();
 		}
 
-		PopupController.warning(LocalizationController.getInstance().getString("popUpDatabaseConnectionLost"));
+		PopupController.getInstance().warning(LocalizationController.getInstance().getString("popUpDatabaseConnectionLost"));
 	}
 
 	/**

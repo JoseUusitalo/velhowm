@@ -295,7 +295,7 @@ public class LogDatabaseController
 			{
 				if (MainWindow.DEBUG_MODE)
 					System.out.println("Log database is already in use.");
-				PopupController.error(LocalizationController.getInstance().getString("databaseAlreadyInUsePopUp"));
+				PopupController.getInstance().error(LocalizationController.getInstance().getString("databaseAlreadyInUsePopUp"));
 			}
 			else
 			{
@@ -338,7 +338,7 @@ public class LogDatabaseController
 			e.printStackTrace();
 		}
 
-		PopupController.warning(LocalizationController.getInstance().getString("databaseConnectionTemporarilyLostPopUp"));
+		PopupController.getInstance().warning(LocalizationController.getInstance().getString("databaseConnectionTemporarilyLostPopUp"));
 	}
 
 	/**

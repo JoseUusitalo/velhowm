@@ -11,15 +11,46 @@ import javafx.scene.control.ButtonType;
  *
  * @author Joona Silvennoinen
  */
-public abstract class PopupController
+@SuppressWarnings("static-method")
+public class PopupController
 {
+	/**
+	 * A private inner class holding the class instance.
+	 *
+	 * @author Jose Uusitalo
+	 */
+	private static class Holder
+	{
+		/**
+		 * The only instance of {@link PopupController}.
+		 */
+		private static final PopupController INSTANCE = new PopupController();
+	}
+
+	/**
+	 */
+	private PopupController()
+	{
+		// No need to instantiate this class.
+	}
+
+	/**
+	 * Gets the instance of the {@link PopupController}.
+	 *
+	 * @return the popup controller
+	 */
+	public static synchronized PopupController getInstance()
+	{
+		return Holder.INSTANCE;
+	}
+
 	/**
 	 * Displays a popup alert with the given message asking the user a yes/no
 	 * question.
 	 *
 	 * @param msg the message to show
 	 */
-	public static boolean confirmation(final String msg)
+	public boolean confirmation(final String msg)
 	{
 		Alert alert = new Alert(AlertType.CONFIRMATION);
 		alert.setTitle(LocalizationController.getInstance().getString("popUpConfirmTitle"));
@@ -35,7 +66,7 @@ public abstract class PopupController
 	 *
 	 * @param msg the message to show
 	 */
-	public static void info(final String msg)
+	public void info(final String msg)
 	{
 		Alert alert = new Alert(AlertType.INFORMATION);
 		alert.setTitle(LocalizationController.getInstance().getString("popUpInfoTitle"));
@@ -50,7 +81,7 @@ public abstract class PopupController
 	 *
 	 * @param msg the message to show
 	 */
-	public static void warning(final String msg)
+	public void warning(final String msg)
 	{
 		Alert alert = new Alert(AlertType.WARNING);
 		alert.setTitle(LocalizationController.getInstance().getString("popUpWarningTitle"));
@@ -65,7 +96,7 @@ public abstract class PopupController
 	 *
 	 * @param msg the message to show
 	 */
-	public static void error(final String msg)
+	public void error(final String msg)
 	{
 		Alert alert = new Alert(AlertType.ERROR);
 		alert.setTitle(LocalizationController.getInstance().getString("popUpDatabaseInUse"));

@@ -104,7 +104,7 @@ public class ExternalSystemsController
 			}
 			else
 			{
-				PopupController.info(LocalizationController.getInstance().getString("listIsEmptyPopUp"));
+				PopupController.getInstance().info(LocalizationController.getInstance().getString("listIsEmptyPopUp"));
 			}
 		}
 		else
@@ -149,7 +149,7 @@ public class ExternalSystemsController
 			}
 			else
 			{
-				PopupController.info(LocalizationController.getInstance().getString("listIsEmptyPopUp"));
+				PopupController.getInstance().info(LocalizationController.getInstance().getString("listIsEmptyPopUp"));
 			}
 		}
 		else
@@ -175,7 +175,7 @@ public class ExternalSystemsController
 			SYSLOG.warn("Attempted to move null product box to " + newShelfSlotID + ".");
 
 			if (showPopup)
-				PopupController.error(LocalizationController.getInstance().getString("attemptToMoveNotExistingProductBoxPopUp"));
+				PopupController.getInstance().error(LocalizationController.getInstance().getString("attemptToMoveNotExistingProductBoxPopUp"));
 
 			return false;
 		}
@@ -199,7 +199,7 @@ public class ExternalSystemsController
 				SYSLOG.debug("Product box " + boxToMove + " is already in the slot " + newShelfSlotID + ".");
 
 				if (showPopup)
-					PopupController.info(LocalizationController.getInstance().getString("unableToMoveProductBoxToSameSlotPopUp") + newShelfSlot + "'.");
+					PopupController.getInstance().info(LocalizationController.getInstance().getString("unableToMoveProductBoxToSameSlotPopUp") + newShelfSlot + "'.");
 
 				return false;
 			}
@@ -219,7 +219,7 @@ public class ExternalSystemsController
 			SYSLOG.error("Failed to remove product box " + boxToMove + " from shelf slot " + boxToMove.getShelfSlot());
 
 			if (showPopup)
-				PopupController.error(LocalizationController.getInstance().getString("failureToRemoveProductBoxErrorPopUp"));
+				PopupController.getInstance().error(LocalizationController.getInstance().getString("failureToRemoveProductBoxErrorPopUp"));
 
 			return false;
 		}
@@ -233,7 +233,7 @@ public class ExternalSystemsController
 				oldShelfSlot.addBox(boxToMove);
 
 			if (showPopup)
-				PopupController.error(LocalizationController.getInstance().getString("failureToAddProductBoxToNewShelfSlotErrorPopUp") + newShelfSlotID + "'.");
+				PopupController.getInstance().error(LocalizationController.getInstance().getString("failureToAddProductBoxToNewShelfSlotErrorPopUp") + newShelfSlotID + "'.");
 
 			return false;
 		}
@@ -249,7 +249,7 @@ public class ExternalSystemsController
 		SYSLOG.debug("Successfully moved " + boxToMove + " to " + newShelfSlot);
 
 		if (showPopup)
-			PopupController.info(LocalizationController.getInstance().getCompoundString("productBoxTransferSuccessMessage", productBoxCode, newShelfSlot));
+			PopupController.getInstance().info(LocalizationController.getInstance().getCompoundString("productBoxTransferSuccessMessage", productBoxCode, newShelfSlot));
 
 		return true;
 	}

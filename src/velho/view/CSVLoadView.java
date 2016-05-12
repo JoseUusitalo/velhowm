@@ -116,7 +116,7 @@ public class CSVLoadView implements GenericView
 					{
 						loadButton.setDisable(true);
 						fileNameField.clear();
-						PopupController.warning(LocalizationController.getInstance().getCompoundString("notACSVFileNotice", csvFile.getAbsolutePath()));
+						PopupController.getInstance().warning(LocalizationController.getInstance().getCompoundString("notACSVFileNotice", csvFile.getAbsolutePath()));
 					}
 				}
 			});

@@ -126,7 +126,7 @@ public class ProductController implements UIActionController
 
 		if (dbID < 0)
 		{
-			PopupController.error(LocalizationController.getInstance().getString("failedToSaveProductDataPopUpWarning"));
+			PopupController.getInstance().error(LocalizationController.getInstance().getString("failedToSaveProductDataPopUpWarning"));
 			return null;
 		}
 
@@ -189,27 +189,27 @@ public class ProductController implements UIActionController
 		if (data instanceof ProductBrand)
 		{
 			if (!DatabaseController.getInstance().deleteProductBrand((ProductBrand) data))
-				PopupController.error(LocalizationController.getInstance().getCompoundString("unableToDeleteBrandPopUp", new Object[] { ((ProductBrand) data).getName() }));
+				PopupController.getInstance().error(LocalizationController.getInstance().getCompoundString("unableToDeleteBrandPopUp", new Object[] { ((ProductBrand) data).getName() }));
 		}
 		else if (data instanceof ProductCategory)
 		{
 			if (!DatabaseController.getInstance().deleteProductCategory((ProductCategory) data))
-				PopupController.error(LocalizationController.getInstance().getCompoundString("unableToDeleteCategory", new Object[] { ((ProductCategory) data).getName() }));
+				PopupController.getInstance().error(LocalizationController.getInstance().getCompoundString("unableToDeleteCategory", new Object[] { ((ProductCategory) data).getName() }));
 		}
 		else if (data instanceof ProductBox)
 		{
 			if (!DatabaseController.getInstance().deleteProductBox((ProductBox) data))
-				PopupController.error(LocalizationController.getInstance().getString("unableToDeleteProductBoxPopUp"));
+				PopupController.getInstance().error(LocalizationController.getInstance().getString("unableToDeleteProductBoxPopUp"));
 		}
 		else if (data instanceof Product)
 		{
 			if (!DatabaseController.getInstance().deleteProduct((Product) data))
-				PopupController.error(LocalizationController.getInstance().getCompoundString("unableToDeleteProductError", ((Product) data).getName()));
+				PopupController.getInstance().error(LocalizationController.getInstance().getCompoundString("unableToDeleteProductError", ((Product) data).getName()));
 		}
 		else if (data instanceof ProductType)
 		{
 			if (!DatabaseController.getInstance().deleteProductType((ProductType) data))
-				PopupController.error(LocalizationController.getInstance().getCompoundString("unableToDeleteProductTypePopUp", new Object[] { ((ProductType) data).getName() }));
+				PopupController.getInstance().error(LocalizationController.getInstance().getCompoundString("unableToDeleteProductTypePopUp", new Object[] { ((ProductType) data).getName() }));
 		}
 		else
 		{
