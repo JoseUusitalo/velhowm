@@ -251,8 +251,6 @@ public class MainWindow extends Application implements GenericView
 			{
 				SYSLOG.debug("Creating all controllers...");
 
-				// FIXME: Convert most controllers to use the singleton pattern.
-
 				csvController = new CSVController(this);
 				manifestController = new ManifestController(this);
 				removalPlatformController = new RemovalPlatformController(this);

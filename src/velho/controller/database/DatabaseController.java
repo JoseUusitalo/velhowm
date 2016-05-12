@@ -659,8 +659,6 @@ public class DatabaseController
 	 */
 	public UserRole getUserRoleByName(final String roleName)
 	{
-		// TODO: Find a way to put the roles into the database.
-
 		for (final UserRole role : UserRole.values())
 		{
 			if (role.getName().equalsIgnoreCase(roleName))
@@ -2251,7 +2249,6 @@ public class DatabaseController
 
 	public Set<UserRole> getAllUserRoles()
 	{
-		// TODO: Find a way to put roles into the database.
 		return new LinkedHashSet<UserRole>(Arrays.asList(UserRole.values()));
 	}
 

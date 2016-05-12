@@ -92,7 +92,6 @@ public class ExternalSystemsControllerTest
 
 		assertTrue(ExternalSystemsController.getInstance().move(box.getDatabaseID(), oldShelfSlot, false));
 
-		// TODO: Refresh private method
 		oldShelf = DatabaseController.getInstance().getShelfByID(oldShelf.getDatabaseID());
 		newShelf = DatabaseController.getInstance().getShelfByID(newShelf.getDatabaseID());
 		box = DatabaseController.getInstance().getProductBoxByID(BOX_DBID_1);
@@ -135,7 +134,6 @@ public class ExternalSystemsControllerTest
 		// Move is a success.
 		assertTrue(ExternalSystemsController.getInstance().move(box.getDatabaseID(), NEW_SHELFSLOT_ID, false));
 
-		// TODO: Refresh private method
 		newShelf = DatabaseController.getInstance().getShelfByID(newShelf.getDatabaseID());
 		box = DatabaseController.getInstance().getProductBoxByID(BOX_NOT_IN_SLOT);
 
@@ -151,7 +149,6 @@ public class ExternalSystemsControllerTest
 
 		assertTrue(ExternalSystemsController.getInstance().move(box.getDatabaseID(), null, false));
 
-		// TODO: Refresh private method
 		newShelf = DatabaseController.getInstance().getShelfByID(newShelf.getDatabaseID());
 		box = DatabaseController.getInstance().getProductBoxByID(BOX_NOT_IN_SLOT);
 
