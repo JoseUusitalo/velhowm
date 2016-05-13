@@ -187,13 +187,14 @@ public class MainWindow extends Application implements GenericView
 					Logger.getRootLogger().removeAppender("SysConsoleAppender");
 
 					// Remove file appenders from all system loggers.
-					Logger.getRootLogger().removeAppender("SysRollingAppender");
+					Logger.getRootLogger().removeAppender("SysFileAppender");
 
 					// Do the same for user and database loggers.
 					Logger.getLogger("userLogger").removeAppender("UsrConsoleAppender");
-					Logger.getLogger("userLogger").removeAppender("UsrRollingAppender");
+					Logger.getLogger("userLogger").removeAppender("UsrFileAppender");
 					Logger.getLogger("dbLogger").removeAppender("DbConsoleAppender");
-					Logger.getLogger("dbLogger").removeAppender("DbRollingAppender");
+					Logger.getLogger("dbLogger").removeAppender("DbFileAppender");
+					// TODO: Remove Hibernate appenders without the log4j warning.
 				}
 				else
 				{
@@ -201,8 +202,11 @@ public class MainWindow extends Application implements GenericView
 					{
 						SYSLOG.debug("Enabling trace.");
 						((AppenderSkeleton) Logger.getRootLogger().getAppender("SysConsoleAppender")).setThreshold(Level.TRACE);
+						((AppenderSkeleton) Logger.getRootLogger().getAppender("SysFileAppender")).setThreshold(Level.TRACE);
 						((AppenderSkeleton) Logger.getLogger("userLogger").getAppender("UsrConsoleAppender")).setThreshold(Level.TRACE);
+						((AppenderSkeleton) Logger.getLogger("userLogger").getAppender("UsrFileAppender")).setThreshold(Level.TRACE);
 						((AppenderSkeleton) Logger.getLogger("dbLogger").getAppender("DbConsoleAppender")).setThreshold(Level.TRACE);
+						((AppenderSkeleton) Logger.getLogger("dbLogger").getAppender("DbFileAppender")).setThreshold(Level.TRACE);
 					}
 				}
 			}
