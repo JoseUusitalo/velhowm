@@ -34,11 +34,6 @@ public class UIController
 	private ManifestController manifestController;
 
 	/**
-	 * The {@link RemovalPlatformController}.
-	 */
-	private RemovalPlatformController removalPlatformController;
-
-	/**
 	 * The {@link CSVController}.
 	 */
 	private CSVController csvController;
@@ -78,12 +73,20 @@ public class UIController
 		return Holder.INSTANCE;
 	}
 
-	public void setControllers(final MainWindow mainWindow, final ManifestController manifestController,
-			final RemovalPlatformController removalPlatformController, final CSVController csvController)
+	/**
+	 * Initializes this controller.
+	 *
+	 * @param mainWindow the {@link MainWindow}
+	 */
+	public void initialize(final MainWindow mainWindow)
 	{
 		this.mainView = mainWindow;
+	}
+
+	public void setControllers(final ManifestController manifestController, final CSVController csvController)
+	{
+		// TODO: remove
 		this.manifestController = manifestController;
-		this.removalPlatformController = removalPlatformController;
 		this.csvController = csvController;
 	}
 
@@ -93,7 +96,7 @@ public class UIController
 	 * @param position {@link Position} to show the view in
 	 * @param view view to show
 	 */
-	public void setView(final Position position, final Node view)
+	public void setMainWindowView(final Position position, final Node view)
 	{
 		switch (position)
 		{
@@ -162,7 +165,7 @@ public class UIController
 		 * Check the state the of the removal platform when the main menu is
 		 * shown after user has logged in.
 		 */
-		removalPlatformController.update();
+		RemovalPlatformController.getInstance().update();
 	}
 
 	/**
@@ -173,6 +176,9 @@ public class UIController
 		mainView.recreate();
 	}
 
+	/**
+	 * Recreates all views in the application.
+	 */
 	public void recreateAllViews()
 	{
 		SYSLOG.debug("recreating all views");

@@ -242,8 +242,8 @@ public class LoginController
 	{
 		if (!isLoggedIn())
 		{
-			UIController.getInstance().setView(Position.CENTER, getView());
-			UIController.getInstance().setView(Position.BOTTOM, null);
+			UIController.getInstance().setMainWindowView(Position.CENTER, getView());
+			UIController.getInstance().setMainWindowView(Position.BOTTOM, null);
 			UIController.getInstance().destroyAllViews();
 			SYSLOG.debug("Login check failed.");
 

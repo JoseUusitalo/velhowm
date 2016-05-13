@@ -1025,8 +1025,6 @@ public class DatabaseController
 	 */
 	public Set<String> getUserRoleNames()
 	{
-		// TODO: Use database.
-
 		final UserRole[] roles = UserRole.values();
 		final Set<String> names = new LinkedHashSet<String>();
 

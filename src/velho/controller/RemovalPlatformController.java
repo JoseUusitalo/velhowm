@@ -29,15 +29,46 @@ public class RemovalPlatformController implements Observer
 	/**
 	 * The {@link MainWindow}.
 	 */
-	private final MainWindow mainWindow;
+	private MainWindow mainWindow;
 
 	/**
-	 * @param mainWindow
+	 * A private inner class holding the class instance.
+	 *
+	 * @author Jose Uusitalo
 	 */
-	public RemovalPlatformController(final MainWindow mainWindow)
+	private static class Holder
 	{
-		this.mainWindow = mainWindow;
+		/**
+		 * The only instance of {@link RemovalPlatformController}.
+		 */
+		private static final RemovalPlatformController INSTANCE = new RemovalPlatformController();
+	}
+
+	/**
+	 */
+	private RemovalPlatformController()
+	{
 		getPlatform().addObserver(this);
+	}
+
+	/**
+	 * Gets the instance of the {@link RemovalPlatformController}.
+	 *
+	 * @return the removal platform controller
+	 */
+	public static synchronized RemovalPlatformController getInstance()
+	{
+		return Holder.INSTANCE;
+	}
+
+	/**
+	 * Initializes this controller
+	 *
+	 * @param main the {@link MainWindow}
+	 */
+	public void initialize(final MainWindow main)
+	{
+		this.mainWindow = main;
 	}
 
 	/**

@@ -1,4 +1,3 @@
-
 package velho.view;
 
 import java.util.HashMap;
@@ -101,11 +100,6 @@ public class MainWindow extends Application implements GenericView
 	 * The {@link ManifestController}.
 	 */
 	private ManifestController manifestController;
-
-	/**
-	 * The {@link RemovalPlatformController}.
-	 */
-	private RemovalPlatformController removalPlatformController;
 
 	/**
 	 * The current width of the window.
@@ -237,6 +231,25 @@ public class MainWindow extends Application implements GenericView
 	}
 
 	/**
+	 * Initializes all controllers in the application.
+	 */
+	private void initializeControllers()
+	{
+		SYSLOG.debug("Initializing all controllers...");
+
+		csvController = new CSVController(this);
+		manifestController = new ManifestController(this);
+
+		RemovalPlatformController.getInstance().initialize(this);
+		UIController.getInstance().initialize(this);
+
+		ExternalSystemsController.getInstance().setControllers(manifestController);
+		UIController.getInstance().setControllers(manifestController, csvController);
+
+		SYSLOG.debug("All controllers initialized.");
+	}
+
+	/**
 	 * The main method for running the application.
 	 */
 	private void runApp()
@@ -249,23 +262,7 @@ public class MainWindow extends Application implements GenericView
 
 			if (DatabaseController.getInstance().isLinked())
 			{
-				SYSLOG.debug("Creating all controllers...");
-
-				csvController = new CSVController(this);
-				manifestController = new ManifestController(this);
-				removalPlatformController = new RemovalPlatformController(this);
-
-				DebugController.getInstance().setControllers(removalPlatformController);
-				ExternalSystemsController.getInstance().setControllers(manifestController);
-
-				//@formatter:off
-				UIController.getInstance().setControllers(this,
-											manifestController,
-											removalPlatformController,
-											csvController);
-				//@formatter:on
-
-				SYSLOG.debug("All controllers created.");
+				initializeControllers();
 			}
 			else
 			{
@@ -274,9 +271,9 @@ public class MainWindow extends Application implements GenericView
 				System.exit(0);
 			}
 		}
-		catch (ClassNotFoundException e1)
+		catch (final ClassNotFoundException e)
 		{
-			e1.printStackTrace();
+			e.printStackTrace();
 		}
 	}
 
