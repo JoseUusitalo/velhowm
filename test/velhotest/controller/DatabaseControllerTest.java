@@ -215,12 +215,11 @@ public class DatabaseControllerTest
 		// This test is worthless but it exists to improve coverage.
 
 		final LinkedHashMap<String, String> cols = new LinkedHashMap<String, String>();
-		cols.put("databaseID", "ID");
+		cols.put("databaseID", "Box ID");
 		cols.put("productName", "Name");
 		cols.put("productBrand", "Brand");
 		cols.put("productCategory", "Category");
 		cols.put("expirationDate", "Expires");
-		cols.put("boxID", "Box ID");
 		cols.put("boxShelfSlot", "Shelf Slot");
 		cols.put("boxProductCount", "Amount");
 
@@ -235,12 +234,11 @@ public class DatabaseControllerTest
 		final LinkedHashMap<String, String> cols = new LinkedHashMap<String, String>();
 		cols.put("addButton", "Add");
 		cols.put("removeButton", "Remove");
-		cols.put("databaseID", "ID");
+		cols.put("databaseID", "Box ID");
 		cols.put("productName", "Name");
 		cols.put("productBrand", "Brand");
 		cols.put("productCategory", "Category");
 		cols.put("expirationDate", "Expires");
-		cols.put("boxID", "Box ID");
 		cols.put("boxShelfSlot", "Shelf Slot");
 		cols.put("boxProductCount", "Amount");
 

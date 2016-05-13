@@ -92,6 +92,6 @@ public class ProductBoxSearchResultRowTest
 	@Test
 	public final void testGetBoxID()
 	{
-		assertEquals(box.getDatabaseID(), row.getBoxID());
+		assertEquals(box.getDatabaseID(), row.getDatabaseID());
 	}
 }

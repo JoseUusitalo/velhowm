@@ -941,12 +941,11 @@ public class DatabaseController
 		if (withRemoveColumn)
 			cols.put("removeButton", LocalizationController.getInstance().getString("buttonRemove"));
 
-		cols.put("databaseID", LocalizationController.getInstance().getString("publicProductSearchTableHeaderID"));
+		cols.put("databaseID", LocalizationController.getInstance().getString("publicProductSearchTableHeaderBoxID"));
 		cols.put("productName", LocalizationController.getInstance().getString("publicProductSearchTableHeaderName"));
 		cols.put("productBrand", LocalizationController.getInstance().getString("publicProductSearchTableHeaderBrand"));
 		cols.put("productCategory", LocalizationController.getInstance().getString("publicProductSearchTableHeaderCategory"));
 		cols.put("expirationDate", LocalizationController.getInstance().getString("publicProductSearchTableHeaderExpires"));
-		cols.put("boxID", LocalizationController.getInstance().getString("publicProductSearchTableHeaderBoxID"));
 		cols.put("boxShelfSlot", LocalizationController.getInstance().getString("publicProductSearchTableHeaderShelfSlot"));
 		cols.put("boxProductCount", LocalizationController.getInstance().getString("publicProductSearchTableHeaderProductCount"));
 

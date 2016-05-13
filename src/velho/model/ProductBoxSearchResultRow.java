@@ -98,7 +98,7 @@ public class ProductBoxSearchResultRow
 	 *
 	 * @return ID of the box
 	 */
-	public int getBoxID()
+	public int getDatabaseID()
 	{
 		return box.getDatabaseID();
 	}
