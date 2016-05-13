@@ -18,6 +18,13 @@ import velho.view.ListView;
 public abstract class ListController
 {
 	/**
+	 */
+	protected ListController()
+	{
+		// No need to instantiate this class.
+	}
+
+	/**
 	 * Gets a view for displaying tabular data with the specified columns and data.
 	 *
 	 * @param columnMap map of column names and their values

@@ -162,7 +162,7 @@ public class LogDatabaseController
 		catch (final IllegalStateException e)
 		{
 			// Connection and statement are closed automatically.
-			throw new IllegalStateException("Connection pool has been disposed, no database connection.");
+			throw (IllegalStateException) new IllegalStateException("Connection pool has been disposed, no database connection.").initCause(e);
 		}
 		catch (final SQLException e)
 		{
@@ -174,8 +174,7 @@ public class LogDatabaseController
 	}
 
 	/*
-	 * -------------------------------- PUBLIC DATABASE METHODS
-	 * --------------------------------
+	 * -------------------------------- PUBLIC DATABASE METHODS --------------------------------
 	 */
 
 	/**
@@ -399,7 +398,7 @@ public class LogDatabaseController
 		}
 		catch (final IllegalStateException e)
 		{
-			throw new IllegalStateException("Connection pool has been disposed, no database connection.");
+			throw (IllegalStateException) new IllegalStateException("Connection pool has been disposed, no database connection.").initCause(e);
 		}
 		catch (final SQLException e)
 		{
@@ -441,7 +440,7 @@ public class LogDatabaseController
 		}
 		catch (final IllegalStateException e)
 		{
-			throw new IllegalStateException("Connection pool has been disposed, no database connection.");
+			throw (IllegalStateException) new IllegalStateException("Connection pool has been disposed, no database connection.").initCause(e);
 		}
 		catch (final SQLException e)
 		{

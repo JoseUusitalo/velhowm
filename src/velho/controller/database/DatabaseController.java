@@ -622,7 +622,7 @@ public class DatabaseController
 		{
 			SESSION_FACTORY.getCurrentSession().getTransaction().rollback();
 
-			throw new HibernateException("Failed to commit.");
+			throw (HibernateException) new HibernateException("Failed to commit.").initCause(e);
 		}
 
 		return result;
@@ -1930,7 +1930,7 @@ public class DatabaseController
 		{
 			SESSION_FACTORY.getCurrentSession().getTransaction().rollback();
 
-			throw new HibernateException("Failed to commit.");
+			throw (HibernateException) new HibernateException("Failed to commit.").initCause(e);
 		}
 
 		DBLOG.debug("Saved: " + generatedID + " " + object);
