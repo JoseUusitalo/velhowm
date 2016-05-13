@@ -88,10 +88,7 @@ public class LogController
 		}
 
 		for (Object line : log)
-		{
-			strbuilder.append(line.toString());
-			strbuilder.append("\n");
-		}
+			strbuilder.append(line.toString()).append('\n');
 
 		return strbuilder.toString();
 	}
@@ -119,10 +116,7 @@ public class LogController
 		}
 
 		for (Object line : log)
-		{
-			stringBuilder.append(line.toString());
-			stringBuilder.append("\n");
-		}
+			stringBuilder.append(line.toString()).append('\n');
 
 		return stringBuilder.toString();
 	}

@@ -248,7 +248,7 @@ public class Foo {
     </rule>
 
 
-    <rule name="EmptyStatementNotInLoop"
+<!--    <rule name="EmptyStatementNotInLoop"
     		 language="java"
     		 since="1.5"
           message="An empty statement (semicolon) not part of a loop"
@@ -288,7 +288,7 @@ public void doit() {
 }
 ]]>
        </example>
-     </rule>
+     </rule>-->
 
 <rule 	name="EmptyInitializer"
 		    language="java"

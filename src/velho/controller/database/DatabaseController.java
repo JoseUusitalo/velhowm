@@ -367,8 +367,7 @@ public class DatabaseController
 		final StringBuilder strbuilder = new StringBuilder();
 
 		// Command
-		strbuilder.append(type.toString());
-		strbuilder.append(" ");
+		strbuilder.append(type.toString()).append(' ');
 
 		// Columns
 		if (columns != null)
@@ -380,7 +379,7 @@ public class DatabaseController
 				if (i < count - 1)
 					strbuilder.append(", ");
 			}
-			strbuilder.append(" ");
+			strbuilder.append(' ');
 		}
 
 		switch (type)
@@ -429,7 +428,7 @@ public class DatabaseController
 				key = iter.next();
 
 				strbuilder.append(key);
-				strbuilder.append("=");
+				strbuilder.append('=');
 
 				final Object value = columnValues.get(key);
 
@@ -440,9 +439,9 @@ public class DatabaseController
 				}
 				else
 				{
-					strbuilder.append("'");
+					strbuilder.append('\'');
 					strbuilder.append(value.toString());
-					strbuilder.append("'");
+					strbuilder.append('\'');
 
 				}
 
@@ -466,7 +465,7 @@ public class DatabaseController
 			}
 		}
 
-		strbuilder.append(";");
+		strbuilder.append(';');
 
 		DBLOG.trace("[SQLBUILDER] " + escape(strbuilder.toString()));
 

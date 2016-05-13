@@ -270,7 +270,7 @@ public class SearchController
 					strbuilder.append(possibleProductAndCount[i]);
 
 				if (i < length - 1)
-					strbuilder.append(":");
+					strbuilder.append(':');
 			}
 			countName[1] = strbuilder.toString();
 		}
