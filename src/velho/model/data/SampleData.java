@@ -3,8 +3,8 @@ package velho.model.data;
 import org.apache.log4j.Logger;
 import org.hibernate.HibernateException;
 
+import velho.controller.CSVController;
 import velho.controller.database.DatabaseController;
-import velho.model.CSVLoader;
 import velho.model.Manifest;
 import velho.model.ManifestState;
 import velho.model.Product;
@@ -99,10 +99,7 @@ public abstract class SampleData
 		else
 		{
 			SYSLOG.debug("Loading sample users.");
-
-			final CSVLoader<User> csvLoader = new CSVLoader<User>(User.class);
-			csvLoader.load("res/sample_users.csv");
-			csvLoader.save();
+			CSVController.getInstance().loadCSVFileToDatabase("res/sample_users.csv", User.class, true);
 		}
 	}
 
@@ -118,10 +115,7 @@ public abstract class SampleData
 		else
 		{
 			SYSLOG.debug("Loading sample product brands.");
-
-			final CSVLoader<ProductBrand> csvLoader = new CSVLoader<ProductBrand>(ProductBrand.class);
-			csvLoader.load("res/sample_product_brands.csv");
-			csvLoader.save();
+			CSVController.getInstance().loadCSVFileToDatabase("res/sample_product_brands.csv", ProductBrand.class, true);
 		}
 	}
 
@@ -137,10 +131,7 @@ public abstract class SampleData
 		else
 		{
 			SYSLOG.debug("Loading sample product types.");
-
-			final CSVLoader<ProductType> csvLoader = new CSVLoader<ProductType>(ProductType.class);
-			csvLoader.load("res/sample_product_types.csv");
-			csvLoader.save();
+			CSVController.getInstance().loadCSVFileToDatabase("res/sample_product_types.csv", ProductType.class, true);
 		}
 	}
 
@@ -156,10 +147,7 @@ public abstract class SampleData
 		else
 		{
 			SYSLOG.debug("Loading sample product categories.");
-
-			final CSVLoader<ProductCategory> csvLoader = new CSVLoader<ProductCategory>(ProductCategory.class);
-			csvLoader.load("res/sample_product_categories.csv");
-			csvLoader.save();
+			CSVController.getInstance().loadCSVFileToDatabase("res/sample_product_categories.csv", ProductCategory.class, true);
 		}
 	}
 
@@ -175,10 +163,7 @@ public abstract class SampleData
 		else
 		{
 			SYSLOG.debug("Loading sample products.");
-
-			final CSVLoader<Product> csvLoader = new CSVLoader<Product>(Product.class);
-			csvLoader.load("res/sample_products.csv");
-			csvLoader.save();
+			CSVController.getInstance().loadCSVFileToDatabase("res/sample_products.csv", Product.class, true);
 		}
 	}
 
@@ -199,10 +184,7 @@ public abstract class SampleData
 			/* 4 - Many Slot Level: 14-20 */
 			/* 5 - Empty Shelf 2-slot */
 			SYSLOG.debug("Loading sample shelves.");
-
-			final CSVLoader<Shelf> csvLoader = new CSVLoader<Shelf>(Shelf.class);
-			csvLoader.load("res/sample_shelves.csv");
-			csvLoader.save();
+			CSVController.getInstance().loadCSVFileToDatabase("res/sample_shelves.csv", Shelf.class, true);
 		}
 	}
 
@@ -218,10 +200,7 @@ public abstract class SampleData
 		else
 		{
 			SYSLOG.debug("Loading sample shelf levels.");
-
-			final CSVLoader<ShelfLevel> csvLoader = new CSVLoader<ShelfLevel>(ShelfLevel.class);
-			csvLoader.load("res/sample_shelf_levels.csv");
-			csvLoader.save();
+			CSVController.getInstance().loadCSVFileToDatabase("res/sample_shelf_levels.csv", ShelfLevel.class, true);
 		}
 	}
 
@@ -237,10 +216,7 @@ public abstract class SampleData
 		else
 		{
 			SYSLOG.debug("Loading sample shelf slots.");
-
-			final CSVLoader<ShelfSlot> csvLoader = new CSVLoader<ShelfSlot>(ShelfSlot.class);
-			csvLoader.load("res/sample_shelf_slots.csv");
-			csvLoader.save();
+			CSVController.getInstance().loadCSVFileToDatabase("res/sample_shelf_slots.csv", ShelfSlot.class, true);
 		}
 	}
 
@@ -256,10 +232,7 @@ public abstract class SampleData
 		else
 		{
 			SYSLOG.debug("Loading sample manifest states.");
-
-			final CSVLoader<ManifestState> csvLoader = new CSVLoader<ManifestState>(ManifestState.class);
-			csvLoader.load("res/sample_manifest_states.csv");
-			csvLoader.save();
+			CSVController.getInstance().loadCSVFileToDatabase("res/sample_manifest_states.csv", ManifestState.class, true);
 		}
 	}
 
@@ -275,10 +248,7 @@ public abstract class SampleData
 		else
 		{
 			SYSLOG.debug("Loading sample manifests.");
-
-			final CSVLoader<Manifest> csvLoader = new CSVLoader<Manifest>(Manifest.class);
-			csvLoader.load("res/sample_manifests.csv");
-			csvLoader.save();
+			CSVController.getInstance().loadCSVFileToDatabase("res/sample_manifests.csv", Manifest.class, true);
 		}
 	}
 
@@ -294,10 +264,7 @@ public abstract class SampleData
 		else
 		{
 			SYSLOG.debug("Loading sample removal list states.");
-
-			final CSVLoader<RemovalListState> csvLoader = new CSVLoader<RemovalListState>(RemovalListState.class);
-			csvLoader.load("res/sample_removal_list_states.csv");
-			csvLoader.save();
+			CSVController.getInstance().loadCSVFileToDatabase("res/sample_removal_list_states.csv", RemovalListState.class, true);
 		}
 	}
 
@@ -313,10 +280,7 @@ public abstract class SampleData
 		else
 		{
 			SYSLOG.debug("Loading sample removal lists.");
-
-			final CSVLoader<RemovalList> csvLoader = new CSVLoader<RemovalList>(RemovalList.class);
-			csvLoader.load("res/sample_removal_lists.csv");
-			csvLoader.save();
+			CSVController.getInstance().loadCSVFileToDatabase("res/sample_removal_lists.csv", RemovalList.class, true);
 		}
 	}
 
@@ -332,10 +296,7 @@ public abstract class SampleData
 		else
 		{
 			SYSLOG.debug("Loading sample product boxes.");
-
-			final CSVLoader<ProductBox> csvLoader = new CSVLoader<ProductBox>(ProductBox.class);
-			csvLoader.load("res/sample_product_boxes.csv");
-			csvLoader.save();
+			CSVController.getInstance().loadCSVFileToDatabase("res/sample_product_boxes.csv", ProductBox.class, true);
 		}
 	}
 
@@ -351,10 +312,7 @@ public abstract class SampleData
 		else
 		{
 			SYSLOG.debug("Loading sample removal platforms.");
-
-			final CSVLoader<RemovalPlatform> csvLoader = new CSVLoader<RemovalPlatform>(RemovalPlatform.class);
-			csvLoader.load("res/sample_removal_platforms.csv");
-			csvLoader.save();
+			CSVController.getInstance().loadCSVFileToDatabase("res/sample_removal_platforms.csv", RemovalPlatform.class, true);
 		}
 	}
 }

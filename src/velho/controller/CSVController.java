@@ -25,7 +25,7 @@ import velho.view.MainWindow;
 import velho.view.VerticalViewGroup;
 
 /**
- * The singleton controller for writing and reading CSV files.
+ * The singleton controller and a facade for writing and reading CSV files.
  *
  * @author Jose Uusitalo
  */
@@ -184,20 +184,35 @@ public class CSVController
 	 *
 	 * @param filePath file path to the CSV file
 	 * @param csvType the type of data to load from the CSV file
+	 * @param silent do not show popups?
 	 */
-	public void loadCSVFileToDatabase(final String filePath, final Class<? extends DatabaseObject> csvType)
+	public void loadCSVFileToDatabase(final String filePath, final Class<? extends DatabaseObject> csvType, final boolean silent)
 	{
 		@SuppressWarnings({ "rawtypes", "unchecked" })
 		final CSVLoader loader = new CSVLoader(csvType);
 		final int loaded = loader.load(filePath);
 		final int saved = loader.save();
 
-		if (saved == 0)
-			PopupController.getInstance()
-					.warning(LocalizationController.getInstance().getCompoundString("failedToLoadAnyObjectsNotice", csvType.getSimpleName(), filePath));
-		else
-			PopupController.getInstance().info(
-					LocalizationController.getInstance().getCompoundString("objectSuccesfullyLoadedNotice", saved, loaded, csvType.getSimpleName(), filePath));
+		if (!silent)
+		{
+			if (saved == 0)
+				PopupController.getInstance()
+						.warning(LocalizationController.getInstance().getCompoundString("failedToLoadAnyObjectsNotice", csvType.getSimpleName(), filePath));
+			else
+				PopupController.getInstance().info(LocalizationController.getInstance().getCompoundString("objectSuccesfullyLoadedNotice", saved, loaded,
+						csvType.getSimpleName(), filePath));
+		}
+	}
+
+	/**
+	 * Loads data from the specified CSV to database.
+	 *
+	 * @param filePath file path to the CSV file
+	 * @param csvType the type of data to load from the CSV file
+	 */
+	public void loadCSVFileToDatabase(final String filePath, final Class<? extends DatabaseObject> csvType)
+	{
+		loadCSVFileToDatabase(filePath, csvType, false);
 	}
 
 	/**
