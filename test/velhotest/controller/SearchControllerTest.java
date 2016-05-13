@@ -30,7 +30,7 @@ public class SearchControllerTest
 	private static final String PRODUCT_TWO_COLONS = "A Very Long Product Name: With Two: Colons";
 	private static final String PRODUCT_WITH_COLON = "Product Name: With a Single Colon";
 
-	private SearchController searchController = new SearchController(null);
+	private SearchController searchController = SearchController.getInstance();
 
 	/**
 	 * Creates the log database if needed and connects to it.
@@ -42,9 +42,9 @@ public class SearchControllerTest
 	public static final void init() throws Exception
 	{
 		System.out.println("\n\n---- SearchControllerTest BeforeClass ----\n\n");
-		LogDatabaseController.connectAndInitialize();
-		DatabaseController.link();
-		DatabaseController.loadSampleData();
+		LogDatabaseController.getInstance().connectAndInitialize();
+		DatabaseController.getInstance().link();
+		DatabaseController.getInstance().loadSampleData();
 		System.out.println("\n\n---- SearchControllerTest Start ----\n\n");
 	}
 
@@ -55,8 +55,8 @@ public class SearchControllerTest
 	public static final void unlinkDatabases() throws Exception
 	{
 		System.out.println("\n\n---- SearchControllerTest AfterClass ----\n\n");
-		DatabaseController.unlink();
-		LogDatabaseController.unlink();
+		DatabaseController.getInstance().unlink();
+		LogDatabaseController.getInstance().unlink();
 		System.out.println("\n\n---- SearchControllerTest Done ----\n\n");
 	}
 

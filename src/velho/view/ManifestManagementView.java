@@ -59,7 +59,7 @@ public class ManifestManagementView implements GenericView
 			managementPanel = new HBox(10);
 			managementPanel.getStyleClass().add("standard-padding");
 
-			Button browseButton = new Button(LocalizationController.getString("browseManifestsButton"));
+			Button browseButton = new Button(LocalizationController.getInstance().getString("browseManifestsButton"));
 			GridPane.setConstraints(browseButton, 0, 0, 1, 1, HPos.LEFT, VPos.CENTER);
 
 			/*
@@ -82,7 +82,7 @@ public class ManifestManagementView implements GenericView
 			});
 
 			bpane.setTop(managementPanel);
-			UIController.recordView(this);
+			UIController.getInstance().recordView(this);
 		}
 
 		return bpane;

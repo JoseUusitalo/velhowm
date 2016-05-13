@@ -43,11 +43,6 @@ import velho.view.components.TableCellDeleteButton;
 public class ProductTabView implements GenericView
 {
 	/**
-	 * ProductCntroller neeeded when saving to database
-	 */
-	private final ProductController productController;
-
-	/**
 	 * Makes the Categories tab call for table and make it viewable
 	 */
 	private final TableView<Object> table;
@@ -60,7 +55,7 @@ public class ProductTabView implements GenericView
 	/**
 	 * An observable list of database products.
 	 */
-	private ObservableList<Object> productList = DatabaseController.getAllProducts();
+	private ObservableList<Object> productList;
 
 	/**
 	 * An observable list of database brands.
@@ -73,14 +68,11 @@ public class ProductTabView implements GenericView
 	private ObservableList<Object> categoryList;
 
 	/**
-	 * Adds info to Product Controller about brands
-	 *
-	 * @param productController Product Controller handles the database work
-	 * @param uiController links UIController to the productController
+	 * @param products
 	 */
-	public ProductTabView(final ProductController productController)
+	public ProductTabView(final ObservableList<Object> products)
 	{
-		this.productController = productController;
+		this.productList = products;
 		this.table = new TableView<Object>();
 	}
 
@@ -118,12 +110,13 @@ public class ProductTabView implements GenericView
 			{
 				final Product editProduct = ((Product) event.getTableView().getItems().get(event.getTablePosition().getRow()));
 				editProduct.setName(event.getNewValue().toString());
-				DatabaseController.saveOrUpdate(editProduct);
+				DatabaseController.getInstance().saveOrUpdate(editProduct);
 			});
 			table.getColumns().add(nameColumn);
 
-			ObservableList<Object> cbValues = DatabaseController.getAllProductBrands();
-			TableColumn<Object, Object> brand = new TableColumn<Object, Object>(LocalizationController.getString("publicProductSearchTableHeaderBrand"));
+			ObservableList<Object> cbValues = DatabaseController.getInstance().getAllProductBrands();
+			TableColumn<Object, Object> brand = new TableColumn<Object, Object>(
+					LocalizationController.getInstance().getString("publicProductSearchTableHeaderBrand"));
 
 			brand.setCellValueFactory(new PropertyValueFactory<>("brand"));
 			brand.setCellFactory(ComboBoxTableCell.forTableColumn(cbValues));
@@ -131,12 +124,13 @@ public class ProductTabView implements GenericView
 			{
 				final Product editProduct = ((Product) t.getTableView().getItems().get(t.getTablePosition().getRow()));
 				editProduct.setBrand((ProductBrand) t.getNewValue());
-				DatabaseController.saveOrUpdate(editProduct);
+				DatabaseController.getInstance().saveOrUpdate(editProduct);
 			});
 			table.getColumns().add(brand);
 
-			ObservableList<Object> cbCategoryValues = DatabaseController.getAllProductCategories();
-			TableColumn<Object, Object> category = new TableColumn<Object, Object>(LocalizationController.getString("publicProductSearchTableHeaderCategory"));
+			ObservableList<Object> cbCategoryValues = DatabaseController.getInstance().getAllProductCategories();
+			TableColumn<Object, Object> category = new TableColumn<Object, Object>(
+					LocalizationController.getInstance().getString("publicProductSearchTableHeaderCategory"));
 
 			category.setCellValueFactory(new PropertyValueFactory<>("category"));
 			category.setCellFactory(ComboBoxTableCell.forTableColumn(cbCategoryValues));
@@ -144,7 +138,7 @@ public class ProductTabView implements GenericView
 			{
 				final Product editProduct = ((Product) t.getTableView().getItems().get(t.getTablePosition().getRow()));
 				editProduct.setCategory((ProductCategory) t.getNewValue());
-				DatabaseController.saveOrUpdate(editProduct);
+				DatabaseController.getInstance().saveOrUpdate(editProduct);
 			});
 			table.getColumns().add(category);
 
@@ -166,34 +160,33 @@ public class ProductTabView implements GenericView
 				@Override
 				public TableCell<Object, String> call(final TableColumn<Object, String> p)
 				{
-					final TableCellDeleteButton button = new TableCellDeleteButton(productController,
-							(LocalizationController.getString("publicProductTableDeleteButton")));
+					final TableCellDeleteButton button = new TableCellDeleteButton(ProductController.getInstance(),
+							(LocalizationController.getInstance().getString("publicProductTableDeleteButton")));
 					button.setAlignment(Pos.CENTER);
 					return button;
 				}
 			});
 			table.getColumns().add(deleteColumn);
 
-			final Label productLabel = new Label(LocalizationController.getString("productNameLabel"));
+			final Label productLabel = new Label(LocalizationController.getInstance().getString("productNameLabel"));
 			final TextField productTextField = new TextField();
 
-			final Label brandLabel = new Label(LocalizationController.getString("productBrandLabel"));
+			final Label brandLabel = new Label(LocalizationController.getInstance().getString("productBrandLabel"));
 			final ComboBox<Object> brandItem = new ComboBox<Object>();
 			brandItem.getItems().addAll(brandsList);
 			brandItem.getSelectionModel().selectFirst();
 
-			final Label categoryLabel = new Label(LocalizationController.getString("productCategoryLabel"));
+			final Label categoryLabel = new Label(LocalizationController.getInstance().getString("productCategoryLabel"));
 			final ComboBox<Object> categoryItem = new ComboBox<Object>();
 			categoryItem.getItems().addAll(categoriesList);
 			categoryItem.getSelectionModel().selectFirst();
 
-			final Button addButton = new Button(LocalizationController.getString("buttonCreate"));
+			final Button addButton = new Button(LocalizationController.getInstance().getString("buttonCreate"));
 			addButton.setOnAction((final ActionEvent e) ->
 			{
 				final Product saveProduct = new Product(productTextField.getText(), (ProductBrand) brandItem.getValue(),
 						(ProductCategory) categoryItem.getValue());
-				System.out.println("New product: " + saveProduct);
-				DatabaseController.saveOrUpdate(saveProduct);
+				DatabaseController.getInstance().saveOrUpdate(saveProduct);
 			});
 
 			hb.getChildren().addAll(productLabel, productTextField, brandLabel, brandItem, categoryLabel, categoryItem, addButton);
@@ -205,7 +198,7 @@ public class ProductTabView implements GenericView
 			vbox.setPadding(new Insets(10, 0, 0, 10));
 			vbox.getChildren().addAll(table, hb);
 
-			UIController.recordView(this);
+			UIController.getInstance().recordView(this);
 		}
 		return vbox;
 	}
@@ -484,7 +477,6 @@ public class ProductTabView implements GenericView
 	public void recreate()
 	{
 		vbox = null;
-		// TODO: Use old data.
 		getView(brandList, categoryList);
 	}
 

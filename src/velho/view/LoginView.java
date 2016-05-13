@@ -51,27 +51,27 @@ public class LoginView implements GenericView
 			grid.setHgap(10);
 			grid.setAlignment(Pos.CENTER);
 
-			final Label infoText = new Label(LocalizationController.getString("infoTextScanBadgeOrLogInWithName"));
+			final Label infoText = new Label(LocalizationController.getInstance().getString("infoTextScanBadgeOrLogInWithName"));
 			infoText.setMaxWidth(Double.MAX_VALUE);
 			infoText.setAlignment(Pos.CENTER);
 			grid.add(infoText, 0, 0, 2, 1);
 
 			final TextField firstNameField = new TextField();
-			firstNameField.setPromptText(LocalizationController.getString("promptTextFirstName"));
+			firstNameField.setPromptText(LocalizationController.getInstance().getString("promptTextFirstName"));
 			grid.add(firstNameField, 0, 1, 1, 1);
 			firstNameField.setId("firstNameField");
 
 			final TextField lastNameField = new TextField();
-			lastNameField.setPromptText(LocalizationController.getString("promptTextLastName"));
+			lastNameField.setPromptText(LocalizationController.getInstance().getString("promptTextLastName"));
 			grid.add(lastNameField, 1, 1, 1, 1);
 			lastNameField.setId("lastNameField");
 
 			final PasswordField authenticationStringField = new PasswordField();
-			authenticationStringField.setPromptText(LocalizationController.getString("passWordPromptText"));
+			authenticationStringField.setPromptText(LocalizationController.getInstance().getString("passWordPromptText"));
 			grid.add(authenticationStringField, 0, 2, 2, 1);
 			authenticationStringField.setId("authenticationStringField");
 
-			Button logInButton = new Button(LocalizationController.getString("logInButton"));
+			Button logInButton = new Button(LocalizationController.getInstance().getString("logInButton"));
 			logInButton.setMaxWidth(Double.MAX_VALUE);
 			logInButton.setPrefHeight(50.0);
 			grid.add(logInButton, 0, 3, 2, 1);
@@ -85,10 +85,10 @@ public class LoginView implements GenericView
 				@Override
 				public void handle(final ActionEvent event)
 				{
-					LoginController.login(firstNameField.getText(), lastNameField.getText(), authenticationStringField.getText());
+					LoginController.getInstance().login(firstNameField.getText(), lastNameField.getText(), authenticationStringField.getText());
 				}
 			});
-			UIController.recordView(this);
+			UIController.getInstance().recordView(this);
 		}
 
 		return vbox;

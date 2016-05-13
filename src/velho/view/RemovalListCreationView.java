@@ -40,16 +40,6 @@ public class RemovalListCreationView implements GenericView
 	private BorderPane bpane;
 
 	/**
-	 * The {@link RemovalListController}.
-	 */
-	private final RemovalListController removalListController;
-
-	/**
-	 * The {@link SearchController}.
-	 */
-	private final SearchController searchController;
-
-	/**
 	 * The new removal list view.
 	 */
 	private BorderPane newList;
@@ -58,16 +48,6 @@ public class RemovalListCreationView implements GenericView
 	 * The search results list.
 	 */
 	private BorderPane resultList;
-
-	/**
-	 * @param removalListController
-	 * @param searchController
-	 */
-	public RemovalListCreationView(final RemovalListController removalListController, final SearchController searchController)
-	{
-		this.removalListController = removalListController;
-		this.searchController = searchController;
-	}
 
 	/**
 	 * Gets the removal list management view.
@@ -81,20 +61,20 @@ public class RemovalListCreationView implements GenericView
 		if (bpane == null)
 		{
 			bpane = new BorderPane();
-			final GridPane searchView = (GridPane) searchController.getSearchView(false);
+			final GridPane searchView = (GridPane) SearchController.getInstance().getSearchView(false);
 			searchView.setPadding(new Insets(0, 10, 10, 10));
 			bpane.setTop(searchView);
 
 			final GridPane left = new GridPane();
 
-			final Label resultsLabel = new Label(LocalizationController.getString("searchResultsLabel"));
+			final Label resultsLabel = new Label(LocalizationController.getInstance().getString("searchResultsLabel"));
 			resultsLabel.getStyleClass().add("centered-title-medium");
 			resultsLabel.setPadding(new Insets(7, 0, 0, 0));
 			resultsLabel.setAlignment(Pos.CENTER);
 			resultsLabel.setMaxWidth(Double.MAX_VALUE);
 			left.add(resultsLabel, 0, 0);
 
-			resultList = removalListController.getSearchResultsListView();
+			resultList = RemovalListController.getInstance().getSearchResultsListView();
 			resultList.setPadding(new Insets(10, 0, 0, 0));
 			resultList.setPrefWidth(MainWindow.WINDOW_WIDTH / 2);
 			left.add(resultList, 0, 1);
@@ -104,14 +84,14 @@ public class RemovalListCreationView implements GenericView
 
 			final GridPane center = new GridPane();
 
-			final Label removalListLabel = new Label(LocalizationController.getString("newRemovalListLabel"));
+			final Label removalListLabel = new Label(LocalizationController.getInstance().getString("newRemovalListLabel"));
 			removalListLabel.getStyleClass().add("centered-title-medium");
 			removalListLabel.setAlignment(Pos.CENTER);
 			removalListLabel.setMaxWidth(Double.MAX_VALUE);
 
 			GridPane.setHgrow(removalListLabel, Priority.ALWAYS);
 
-			newList = removalListController.getNewRemovalListView();
+			newList = RemovalListController.getInstance().getNewRemovalListView();
 			newList.setPadding(new Insets(10, 0, 0, 0));
 			newList.setPrefWidth(MainWindow.WINDOW_WIDTH / 2);
 			center.add(removalListLabel, 1, 0);
@@ -119,7 +99,7 @@ public class RemovalListCreationView implements GenericView
 
 			final ComboBox<Object> removalListState = new ComboBox<Object>();
 
-			removalListState.getItems().addAll(DatabaseController.getAllRemovalListStates());
+			removalListState.getItems().addAll(DatabaseController.getInstance().getAllRemovalListStates());
 
 			center.add(removalListState, 0, 0);
 
@@ -128,11 +108,11 @@ public class RemovalListCreationView implements GenericView
 				@Override
 				public void changed(final ObservableValue<?> observableValue, final Object oldValue, final Object newValue)
 				{
-					removalListController.setNewRemovalListState((RemovalListState) newValue);
+					RemovalListController.getInstance().setNewRemovalListState((RemovalListState) newValue);
 				}
 			});
 
-			final Button saveButton = new Button(LocalizationController.getString("saveButton"));
+			final Button saveButton = new Button(LocalizationController.getInstance().getString("saveButton"));
 			center.add(saveButton, 2, 0);
 
 			saveButton.setOnAction(new EventHandler<ActionEvent>()
@@ -140,7 +120,7 @@ public class RemovalListCreationView implements GenericView
 				@Override
 				public void handle(final ActionEvent event)
 				{
-					removalListController.saveNewRemovalList();
+					RemovalListController.getInstance().saveNewRemovalList();
 				}
 			});
 
@@ -151,7 +131,7 @@ public class RemovalListCreationView implements GenericView
 
 			bpane.setLeft(left);
 			bpane.setCenter(center);
-			UIController.recordView(this);
+			UIController.getInstance().recordView(this);
 		}
 
 		return bpane;
@@ -175,9 +155,9 @@ public class RemovalListCreationView implements GenericView
 	 */
 	public void refresh()
 	{
-		SYSLOG.trace(LocalizationController.getString("refreshRemovalListNotice"));
-		resultList = removalListController.getSearchResultsListView();
-		newList = removalListController.getNewRemovalListView();
+		SYSLOG.trace(LocalizationController.getInstance().getString("refreshRemovalListNotice"));
+		resultList = RemovalListController.getInstance().getSearchResultsListView();
+		newList = RemovalListController.getInstance().getNewRemovalListView();
 	}
 
 	@Override

@@ -26,7 +26,7 @@ import velho.model.enums.UserRole;
 @SuppressWarnings("static-method")
 public class UserControllerTest
 {
-	private static UserController controller = new UserController();
+	private static UserController controller = UserController.getInstance();
 
 	private final String VALID_BADGE_ID = "99955999";
 	private final String VALID_PIN = "003000";
@@ -44,9 +44,9 @@ public class UserControllerTest
 	public static final void init() throws Exception
 	{
 		System.out.println("\n\n---- UserControllerTest BeforeClass ----\n\n");
-		LogDatabaseController.connectAndInitialize();
-		DatabaseController.link();
-		DatabaseController.loadSampleData();
+		LogDatabaseController.getInstance().connectAndInitialize();
+		DatabaseController.getInstance().link();
+		DatabaseController.getInstance().loadSampleData();
 		System.out.println("\n\n---- UserControllerTest Start ----\n\n");
 	}
 
@@ -57,8 +57,8 @@ public class UserControllerTest
 	public static final void unlinkDatabases() throws Exception
 	{
 		System.out.println("\n\n---- UserControllerTest AfterClass ----\n\n");
-		DatabaseController.unlink();
-		LogDatabaseController.unlink();
+		DatabaseController.getInstance().unlink();
+		LogDatabaseController.getInstance().unlink();
 		System.out.println("\n\n---- UserControllerTest Done ----\n\n");
 	}
 
@@ -70,7 +70,7 @@ public class UserControllerTest
 		assertNotNull(newUser);
 
 		boolean exists = false;
-		ObservableList<Object> users = DatabaseController.getAllUsers();
+		ObservableList<Object> users = DatabaseController.getInstance().getAllUsers();
 
 		for (final Object user : users)
 		{
@@ -84,7 +84,7 @@ public class UserControllerTest
 		if (!exists)
 			fail("User was not added to the database.");
 
-		assertTrue(DatabaseController.deleteUser(newUser));
+		assertTrue(DatabaseController.getInstance().deleteUser(newUser));
 	}
 
 	@Test
@@ -98,7 +98,7 @@ public class UserControllerTest
 
 		assertNull(newUser2);
 
-		assertTrue(DatabaseController.deleteUser(newUser));
+		assertTrue(DatabaseController.getInstance().deleteUser(newUser));
 	}
 
 	@Test
@@ -109,7 +109,7 @@ public class UserControllerTest
 		assertNull(newUser);
 
 		boolean exists = false;
-		ObservableList<Object> users = DatabaseController.getAllUsers();
+		ObservableList<Object> users = DatabaseController.getInstance().getAllUsers();
 
 		for (final Object user : users)
 		{
@@ -121,19 +121,19 @@ public class UserControllerTest
 		}
 
 		if (exists)
-			assertFalse(DatabaseController.deleteUser(newUser));
+			assertFalse(DatabaseController.getInstance().deleteUser(newUser));
 	}
 
 	@Test
 	public final void testAddUser_RemoveUser()
 	{
 		final int newUserID = controller.createUser("", "000001", "A very UNIQUE! n4m3", "Some text here!", UserRole.MANAGER, false).getDatabaseID();
-		final User dbUser = DatabaseController.getUserByID(newUserID);
+		final User dbUser = DatabaseController.getInstance().getUserByID(newUserID);
 
 		assertTrue(dbUser.getFirstName().equals("A very UNIQUE! n4m3"));
 
-		assertTrue(DatabaseController.deleteUser(dbUser));
-		assertEquals(null, DatabaseController.getUserByID(newUserID));
+		assertTrue(DatabaseController.getInstance().deleteUser(dbUser));
+		assertEquals(null, DatabaseController.getInstance().getUserByID(newUserID));
 	}
 
 }

@@ -7,7 +7,7 @@ import java.util.UUID;
  *
  * @author Jose Uusitalo
  */
-public class RemovalPlatform extends AbstractDatabaseObject
+public class RemovalPlatform extends ObservableDatabaseObject
 {
 	/**
 	 * The amount of free space left on this removal platform as a percentage.
@@ -76,6 +76,8 @@ public class RemovalPlatform extends AbstractDatabaseObject
 	public void setFreeSpacePercent(final double freeSpacePercent)
 	{
 		this.freeSpacePercent = freeSpacePercent;
+		setChanged();
+		notifyObservers();
 	}
 
 	/**
@@ -111,6 +113,8 @@ public class RemovalPlatform extends AbstractDatabaseObject
 	public void modifyFreeSpace(final double percentagePoints)
 	{
 		this.freeSpacePercent += percentagePoints;
+		setChanged();
+		notifyObservers();
 	}
 
 	/**
@@ -119,5 +123,17 @@ public class RemovalPlatform extends AbstractDatabaseObject
 	public void empty()
 	{
 		this.freeSpacePercent = 1.0;
+		setChanged();
+		notifyObservers();
+	}
+
+	/**
+	 * The inverse of {@link #getFreeSpacePercent()} as a percentage [0.0, 100.0].
+	 *
+	 * @return a percent value of how full this platform is
+	 */
+	public double getPercentFull()
+	{
+		return 100.0 - getFreeSpacePercent() * 100.0;
 	}
 }

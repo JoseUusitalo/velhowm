@@ -21,12 +21,26 @@ import velho.model.enums.LogDatabaseTable;
 import velho.view.MainWindow;
 
 /**
- * The H2 logs database controller.
+ * The singleton database controller for handling the H2 logs database.
  *
  * @author Jose Uusitalo
  */
-public abstract class LogDatabaseController
+@SuppressWarnings("static-method")
+public class LogDatabaseController
 {
+	/**
+	 * A private inner class holding the class instance.
+	 *
+	 * @author Jose Uusitalo
+	 */
+	private static class Holder
+	{
+		/**
+		 * The only instance of {@link LogDatabaseController}.
+		 */
+		private static final LogDatabaseController INSTANCE = new LogDatabaseController();
+	}
+
 	/**
 	 * Apache log4j logger: System.
 	 */
@@ -53,175 +67,106 @@ public abstract class LogDatabaseController
 	private static JdbcConnectionPool connectionPool;
 
 	/**
+	 */
+	private LogDatabaseController()
+	{
+		// No need to instantiate this class.
+	}
+
+	/**
+	 * Gets the instance of the {@link LogDatabaseController}.
+	 *
+	 * @return the log database controller
+	 */
+	public static synchronized LogDatabaseController getInstance()
+	{
+		return Holder.INSTANCE;
+	}
+
+	/**
 	 * Runs a database query with the given data.
 	 *
 	 * @param type query command
 	 * @param tableName the {@link DatabaseTable}
 	 * @param columns columns to select (can be <code>null</code>)
 	 * @param where conditions (can be <code>null</code>)
+	 * @param columnValues a map of column names and the values these columns must be equal to (can be <code>null</code>)
+	 * @param joinOnValues a map of table names and the columns to join on (can be <code>null</code>)
 	 * @return
-	 * <ul>
-	 * <li>if type is {@link DatabaseQueryType#UPDATE} or
-	 * {@link DatabaseQueryType#DELETE}: the number of rows that were
-	 * changed as a result of the query as an {@link Integer}</li>
-	 * <li>if type is {@link DatabaseQueryType#SELECT}: a Set containing
-	 * the selected data</li>
-	 * </ul>
-	 * @throws NoDatabaseLinkException
+	 *         <ul>
+	 *         <li>if type is {@link DatabaseQueryType#UPDATE} or
+	 *         {@link DatabaseQueryType#DELETE}: the number of rows that were
+	 *         changed as a result of the query as an {@link Integer}</li>
+	 *         <li>if type is {@link DatabaseQueryType#SELECT}: a Set containing
+	 *         the selected data</li>
+	 *         </ul>
 	 */
-	private static List<Object> runQuery(final DatabaseQueryType type, final LogDatabaseTable tableName, final Map<DatabaseTable, String> joinOnValues,
+	private List<Object> runQuery(final DatabaseQueryType type, final LogDatabaseTable tableName, final Map<DatabaseTable, String> joinOnValues,
 			final String[] columns, final Map<String, Object> columnValues, final List<String> where) throws Exception
 	{
-		final Connection connection = getConnection();
-		Statement statement = null;
 
-		// Most other queries.
 		final List<Object> datalist = new ArrayList<Object>();
 
-		try
+		try (final Connection connection = getConnection(); Statement statement = connection.createStatement())
 		{
-			ResultSet result = null;
-
-			// Initialize a statement.
-			statement = connection.createStatement();
-
-			statement.execute(DatabaseController.sqlBuilder(type, tableName.toString(), joinOnValues, columns, columnValues, where),
+			statement.execute(DatabaseController.getInstance().sqlBuilder(type, tableName.toString(), joinOnValues, columns, columnValues, where),
 					Statement.RETURN_GENERATED_KEYS);
 
-			switch (type)
+			try (final ResultSet result = statement.getResultSet())
 			{
-				case SELECT:
-					result = statement.getResultSet();
-
-					if (columns.length == 1 && !columns[0].equals("*"))
-					{
-						while (result.next())
-							datalist.add(result.getObject(columns[0]));
-					}
-					else
-					{
-						switch (tableName)
+				switch (type)
+				{
+					case SELECT:
+						if (columns.length == 1 && !columns[0].equals("*"))
 						{
-							case DBLOGS:
-							case SYSLOGS:
-								while (result.next())
-									datalist.add(result.getTimestamp("time") + " [" + result.getString("level") + "] " + result.getString("message"));
-								break;
-
-							case USRLOGS:
-								while (result.next())
-									datalist.add(result.getTimestamp("time") + " [" + result.getString("level") + "] "
-											+ DatabaseController.getUserByID(result.getInt("user_id")).getFullDetails() + ": " + result.getString("message"));
-								break;
-							default:
-								// Close all resources.
-								try
-								{
-									result.close();
-								}
-								catch (final SQLException e)
-								{
-									e.printStackTrace();
-								}
-
-								try
-								{
-									statement.close();
-								}
-								catch (final SQLException e)
-								{
-									e.printStackTrace();
-								}
-
-								try
-								{
-									connection.close();
-								}
-								catch (final SQLException e)
-								{
-									e.printStackTrace();
-								}
-								throw new IllegalArgumentException();
+							while (result.next())
+								datalist.add(result.getObject(columns[0]));
 						}
-					}
+						else
+						{
+							switch (tableName)
+							{
+								case DBLOGS:
+								case SYSLOGS:
+									while (result.next())
+										datalist.add(result.getTimestamp("time") + " [" + result.getString("level") + "] " + result.getString("message"));
+									break;
 
-					try
-					{
-						result.close();
-					}
-					catch (final SQLException e)
-					{
-						e.printStackTrace();
-					}
-					break;
-				default:
-					// Close all resources.
-					try
-					{
-						statement.close();
-					}
-					catch (final SQLException e)
-					{
-						e.printStackTrace();
-					}
+								case USRLOGS:
+									while (result.next())
+										datalist.add(result.getTimestamp("time") + " [" + result.getString("level") + "] "
+												+ DatabaseController.getInstance().getUserByID(result.getInt("user_id")).getFullDetails() + ": "
+												+ result.getString("message"));
+									break;
+								default:
+									// Connection, statement, and result set are closed automatically.
+									throw new IllegalArgumentException();
+							}
+						}
+						break;
+					default:
+						// Connection, statement, and result set are closed automatically.
+						throw new IllegalArgumentException();
+				}
 
-					try
-					{
-						connection.close();
-					}
-					catch (final SQLException e)
-					{
-						e.printStackTrace();
-					}
-					throw new IllegalArgumentException();
+				// Result set is closed automatically.
 			}
+			catch (SQLException e)
+			{
+				// Connection, statement, and result set are closed automatically.
+				e.printStackTrace();
+			}
+
+			// Connection and statement are closed automatically.
 		}
 		catch (final IllegalStateException e)
 		{
-			// Close all resources.
-			try
-			{
-				if (statement != null)
-					statement.close();
-			}
-			catch (final SQLException e1)
-			{
-				e.printStackTrace();
-			}
-
-			try
-			{
-				connection.close();
-			}
-			catch (final SQLException e2)
-			{
-				e.printStackTrace();
-			}
-
-			throw new RuntimeException("Connection pool has been disposed, no database connection.");
+			// Connection and statement are closed automatically.
+			throw new IllegalStateException("Connection pool has been disposed, no database connection.");
 		}
 		catch (final SQLException e)
 		{
-			e.printStackTrace();
-		}
-
-		// Close all resources.
-		try
-		{
-			if (statement != null)
-				statement.close();
-		}
-		catch (final SQLException e)
-		{
-			e.printStackTrace();
-		}
-
-		try
-		{
-			connection.close();
-		}
-		catch (final SQLException e)
-		{
+			// Connection and statement are closed automatically.
 			e.printStackTrace();
 		}
 
@@ -238,7 +183,7 @@ public abstract class LogDatabaseController
 	 *
 	 * @return <code>true</code> if the database file exists
 	 */
-	private static boolean databaseExists()
+	private boolean databaseExists()
 	{
 		final File dbFile = new File(DB_FILEPATH);
 		return dbFile.exists() && !dbFile.isDirectory();
@@ -250,7 +195,7 @@ public abstract class LogDatabaseController
 	 *
 	 * @return a database connection
 	 */
-	private static Connection getConnection()
+	private Connection getConnection()
 	{
 		Connection connection = null;
 		try
@@ -263,7 +208,8 @@ public abstract class LogDatabaseController
 			{
 				if (MainWindow.DEBUG_MODE)
 					System.out.println("Log database is already in use.");
-				PopupController.error(LocalizationController.getString("databaseAlreadyInUsePopUp"));
+
+				PopupController.getInstance().error(LocalizationController.getInstance().getString("databaseAlreadyInUsePopUp"));
 			}
 			else
 			{
@@ -275,8 +221,7 @@ public abstract class LogDatabaseController
 	}
 
 	/*
-	 * -------------------------------- PUBLIC DATABASE METHODS
-	 * --------------------------------
+	 * -------------------------------- PUBLIC DATABASE METHODS --------------------------------
 	 */
 
 	/**
@@ -284,7 +229,7 @@ public abstract class LogDatabaseController
 	 *
 	 * @return <code>true</code> if a database link exists
 	 */
-	public static boolean isLinked()
+	public boolean isLinked()
 	{
 		return connectionPool != null;
 	}
@@ -292,7 +237,7 @@ public abstract class LogDatabaseController
 	/**
 	 * Attempts to re-link the database.
 	 */
-	public static void tryReLink()
+	public void tryReLink()
 	{
 		// Just in case.
 		unlink();
@@ -306,7 +251,7 @@ public abstract class LogDatabaseController
 			e.printStackTrace();
 		}
 
-		PopupController.warning(LocalizationController.getString("databaseConnectionTemporarilyLostPopUp"));
+		PopupController.getInstance().warning(LocalizationController.getInstance().getString("databaseConnectionTemporarilyLostPopUp"));
 	}
 
 	/**
@@ -315,11 +260,11 @@ public abstract class LogDatabaseController
 	 *
 	 * @return <code>true</code> if the link was created successfully
 	 * @throws ClassNotFoundException
-	 * when the H2 driver was unable to load
+	 *             when the H2 driver was unable to load
 	 * @throws ExistingDatabaseLinkException
-	 * when a database link already exists
+	 *             when a database link already exists
 	 */
-	public static DatabaseFileState link() throws ClassNotFoundException
+	public DatabaseFileState link() throws ClassNotFoundException
 	{
 		// Load the driver.
 		Class.forName("org.h2.Driver");
@@ -348,12 +293,9 @@ public abstract class LogDatabaseController
 		// Create a connection pool.
 		connectionPool = JdbcConnectionPool.create(uri, USERNAME, "gottaKeepEmL0G5safe");
 
-		// Try getting a connection. If the database does not exist, it is
-		// created.
-		try
+		// Try getting a connection. If the database does not exist, it is created.
+		try (final Connection connection = getConnection())
 		{
-			final Connection connection = getConnection();
-
 			if (connection != null)
 				connection.close();
 		}
@@ -392,10 +334,10 @@ public abstract class LogDatabaseController
 	 * to the database again.
 	 *
 	 * @throws NoDatabaseLinkException
-	 * when attempting unlink a database when no database link
-	 * exists
+	 *             when attempting unlink a database when no database link
+	 *             exists
 	 */
-	public static void unlink()
+	public void unlink()
 	{
 		if (connectionPool == null)
 		{
@@ -412,7 +354,7 @@ public abstract class LogDatabaseController
 	/**
 	 * Links to the log database and initializes if it does not exist.
 	 */
-	public static boolean connectAndInitialize() throws ClassNotFoundException
+	public boolean connectAndInitialize() throws ClassNotFoundException
 	{
 		if (isLinked())
 			return true;
@@ -442,33 +384,26 @@ public abstract class LogDatabaseController
 	 * @return <code>true</code> if database changed as a result of this call
 	 * @throws NoDatabaseLinkException
 	 */
-	public static boolean initializeDatabase()
+	public boolean initializeDatabase()
 	{
 		if (MainWindow.DEBUG_MODE)
 			System.out.println("Initializing log database...");
 
 		boolean changed = false;
 
-		try (final Connection connection = getConnection())
+		// Initialize a statement using a try-with-resource.
+		try (final Connection connection = getConnection(); final Statement statement = connection.createStatement())
 		{
-			// Initialize a statement using a try-with-resource.
-			try (final Statement statement = connection.createStatement())
-			{
-				statement.execute("RUNSCRIPT FROM './res/loginit.sql';");
-				changed = statement.getUpdateCount() > 0;
-			}
-			catch (final IllegalStateException e1)
-			{
-				throw new RuntimeException("Connection pool has been disposed, no database connection.");
-			}
-			catch (final SQLException e2)
-			{
-				e2.printStackTrace();
-			}
+			statement.execute("RUNSCRIPT FROM './res/loginit.sql';");
+			changed = statement.getUpdateCount() > 0;
 		}
-		catch (final SQLException e3)
+		catch (final IllegalStateException e)
 		{
-			e3.printStackTrace();
+			throw new IllegalStateException("Connection pool has been disposed, no database connection.");
+		}
+		catch (final SQLException e)
+		{
+			e.printStackTrace();
 		}
 
 		if (changed)
@@ -479,9 +414,9 @@ public abstract class LogDatabaseController
 
 	/**
 	 * Closes the database permanently.
-	 * Additionally disposes the old connection pool.
+	 * nally disposes the old connection pool.
 	 */
-	public static void shutdown() throws Exception
+	public void shutdown() throws Exception
 	{
 		if (MainWindow.DEBUG_MODE)
 			System.out.println("Shutting down log database..");
@@ -500,37 +435,13 @@ public abstract class LogDatabaseController
 			}
 		}
 
-		final Connection connection = getConnection();
-
-		try
+		try (final Connection connection = getConnection())
 		{
 			connection.createStatement().execute("SHUTDOWN;");
 		}
 		catch (final IllegalStateException e)
 		{
-			// Close all resources.
-
-			try
-			{
-				if (connection != null)
-					connection.close();
-			}
-			catch (final SQLException e2)
-			{
-				e.printStackTrace();
-			}
-
-			throw new Exception("Connection pool has been disposed, no database connection.");
-		}
-		catch (final SQLException e)
-		{
-			e.printStackTrace();
-		}
-
-		// Close all resources.
-		try
-		{
-			connection.close();
+			throw new IllegalStateException("Connection pool has been disposed, no database connection.");
 		}
 		catch (final SQLException e)
 		{
@@ -544,8 +455,7 @@ public abstract class LogDatabaseController
 	}
 
 	/*
-	 * -------------------------------- PUBLIC GETTER METHODS
-	 * --------------------------------
+	 * -------------------------------- PUBLIC GETTER METHODS --------------------------------
 	 */
 
 	/**
@@ -554,7 +464,7 @@ public abstract class LogDatabaseController
 	 * @return the system log
 	 * @throws NoDatabaseLinkException
 	 */
-	public static ArrayList<Object> getSystemLog() throws Exception
+	public ArrayList<Object> getSystemLog() throws Exception
 	{
 		final String[] columns = { "time", "level", "message" };
 		final List<String> where = new ArrayList<String>();
@@ -576,7 +486,7 @@ public abstract class LogDatabaseController
 	 *
 	 * @return the user log
 	 */
-	public static ArrayList<Object> getUserLog() throws Exception
+	public ArrayList<Object> getUserLog() throws Exception
 	{
 		final String[] columns = { "user_id", "time", "level", "message" };
 		final List<String> where = new ArrayList<String>();

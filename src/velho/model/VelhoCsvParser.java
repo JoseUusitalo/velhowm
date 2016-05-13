@@ -1,4 +1,4 @@
-package velho.controller;
+package velho.model;
 
 import java.io.File;
 import java.io.FileReader;

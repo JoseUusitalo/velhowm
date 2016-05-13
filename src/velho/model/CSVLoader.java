@@ -11,8 +11,8 @@ import com.opencsv.bean.MappingStrategy;
 
 import velho.controller.LocalizationController;
 import velho.controller.PopupController;
-import velho.controller.VelhoCsvParser;
 import velho.controller.database.DatabaseController;
+import velho.model.interfaces.DatabaseObject;
 import velho.model.interfaces.ObjectValidationStrategy;
 import velho.model.strategies.ManifestStateValidationStrategy;
 import velho.model.strategies.ManifestValidationStrategy;
@@ -37,7 +37,7 @@ import velho.model.strategies.UserValidationStrategy;
  * @author Jose Uusitalo
  * @param <T> the type of the object a single line in the CSV file represents
  */
-public class CSVLoader<T extends AbstractDatabaseObject>
+public class CSVLoader<T extends DatabaseObject>
 {
 	/**
 	 * Apache log4j logger: System.
@@ -78,7 +78,7 @@ public class CSVLoader<T extends AbstractDatabaseObject>
 	 * of the specified type.
 	 *
 	 * @param className the simple name of the class of the objects to be
-	 *            validated
+	 * validated
 	 * @return the validation strategy for that class
 	 */
 	private static ObjectValidationStrategy getCorrectStrategy(final String className)
@@ -126,7 +126,7 @@ public class CSVLoader<T extends AbstractDatabaseObject>
 	 * @param filePath path to the csv file
 	 * @param objectClass the class the objects will instantiated as
 	 * @return a {@link VelhoCsvParser} object containing the valid and invalid
-	 *         data
+	 * data
 	 */
 	private VelhoCsvParser<T> readCSVFile(final String csvFilePath)
 	{
@@ -171,15 +171,17 @@ public class CSVLoader<T extends AbstractDatabaseObject>
 		SYSLOG.trace("Loaded " + dataset.size() + " " + objectClass.getSimpleName() + " objects from the CSV file.");
 
 		if (parser.hasInvalidData())
-			SYSLOG.warn("Sample " + objectClass.getSimpleName() + " CSV data has malformed data, skipped " + parser.getInvalidData().size() + " lines: " + parser.getInvalidData());
+			SYSLOG.warn("Sample " + objectClass.getSimpleName() + " CSV data has malformed data, skipped " + parser.getInvalidData().size() + " lines: "
+					+ parser.getInvalidData());
 
 		@SuppressWarnings("unchecked")
-		final Set<AbstractDatabaseObject> invalidDataSet = validationStrategy.getInvalidObjects((Set<AbstractDatabaseObject>) dataset);
+		final Set<DatabaseObject> invalidDataSet = validationStrategy.getInvalidObjects((Set<DatabaseObject>) dataset);
 
 		if (!invalidDataSet.isEmpty())
 		{
 			SYSLOG.warn("Sample " + objectClass.getSimpleName() + " objects has " + invalidDataSet.size() + "/" + dataset.size() + " invalid objects.");
-			PopupController.warning(LocalizationController.getCompoundString("CSVContainsInvalidObjectsNotice", objectClass.getSimpleName(), csvFilePath, invalidDataSet.size(), dataset.size()));
+			PopupController.getInstance().warning(LocalizationController.getInstance().getCompoundString("CSVContainsInvalidObjectsNotice",
+					objectClass.getSimpleName(), csvFilePath, invalidDataSet.size(), dataset.size()));
 			dataset.removeAll(invalidDataSet);
 		}
 
@@ -201,6 +203,6 @@ public class CSVLoader<T extends AbstractDatabaseObject>
 			return 0;
 		}
 
-		return DatabaseController.batchSave(dataset);
+		return DatabaseController.getInstance().batchSave(dataset);
 	}
 }

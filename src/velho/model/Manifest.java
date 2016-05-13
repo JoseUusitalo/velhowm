@@ -269,7 +269,7 @@ public class Manifest extends AbstractDatabaseObject
 		if (manifestStateID < 1)
 			throw new IllegalArgumentException("Manifest State ID must be greater than 0, was '" + manifestStateID + "'.");
 
-		this.state = DatabaseController.getManifestStateByID(manifestStateID);
+		this.state = DatabaseController.getInstance().getManifestStateByID(manifestStateID);
 	}
 
 	/**

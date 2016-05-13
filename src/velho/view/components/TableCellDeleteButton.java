@@ -73,7 +73,7 @@ public class TableCellDeleteButton extends TableCell<Object, String>
 
 				// Show delete button for users that have a lower or equal
 				// role than current user.
-				if (((User) rowObject).getRole().compareTo(LoginController.getCurrentUser().getRole()) <= 0)
+				if (((User) rowObject).getRole().compareTo(LoginController.getInstance().getCurrentUser().getRole()) <= 0)
 					setGraphic(button);
 			}
 			else

@@ -30,21 +30,6 @@ public class ProductListSearchView implements GenericView
 	private BorderPane pane;
 
 	/**
-	 * The {@link SearchController}.
-	 */
-	private final SearchController searchController;
-
-	/**
-	 * Searches the list of products
-	 *
-	 * @param searchController embodies SearchController
-	 */
-	public ProductListSearchView(final SearchController searchController)
-	{
-		this.searchController = searchController;
-	}
-
-	/**
 	 * Gets the product list search view.
 	 *
 	 * @param list the view of the search results
@@ -55,12 +40,12 @@ public class ProductListSearchView implements GenericView
 		if (pane == null)
 		{
 			pane = new BorderPane();
-			VBox left = new VBox();
-			Button printButton = new Button(LocalizationController.getString("printButton"));
-			Button sendToScannerButton = new Button(LocalizationController.getString("sendToScannerButton"));
+			final VBox left = new VBox();
+			final Button printButton = new Button(LocalizationController.getInstance().getString("printButton"));
+			final Button sendToScannerButton = new Button(LocalizationController.getInstance().getString("sendToScannerButton"));
 
 			final TextArea textArea = new TextArea();
-			textArea.setPromptText(LocalizationController.getString("productListSearchPromptText"));
+			textArea.setPromptText(LocalizationController.getInstance().getString("productListSearchPromptText"));
 			textArea.setPrefWidth(MainWindow.WINDOW_WIDTH / 5);
 			printButton.setMaxWidth(Double.MAX_VALUE);
 			printButton.setAlignment(Pos.CENTER);
@@ -72,7 +57,7 @@ public class ProductListSearchView implements GenericView
 				@Override
 				public void handle(final ActionEvent event)
 				{
-					ExternalSystemsController.sendDataToPrinter(DatabaseController.getObservableProductSearchResults());
+					ExternalSystemsController.getInstance().sendDataToPrinter(DatabaseController.getInstance().getObservableProductSearchResults());
 				}
 			});
 
@@ -81,7 +66,7 @@ public class ProductListSearchView implements GenericView
 				@Override
 				public void handle(final ActionEvent event)
 				{
-					ExternalSystemsController.sendDataToBarcodeScanner(DatabaseController.getObservableProductSearchResults());
+					ExternalSystemsController.getInstance().sendDataToBarcodeScanner(DatabaseController.getInstance().getObservableProductSearchResults());
 				}
 			});
 
@@ -96,14 +81,14 @@ public class ProductListSearchView implements GenericView
 				{
 					if (event.getCode() == KeyCode.ENTER)
 					{
-						searchController.searchByProductList(textArea.getText());
+						SearchController.getInstance().searchByProductList(textArea.getText());
 					}
 				}
 			});
 
 			pane.setLeft(left);
 			pane.setCenter(list);
-			UIController.recordView(this);
+			UIController.getInstance().recordView(this);
 		}
 		return pane;
 	}

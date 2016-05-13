@@ -77,7 +77,7 @@ public class RemovalList extends AbstractDatabaseObject
 		 * I have to create a new object here because attempting to get one from the database causes a weird null
 		 * pointer exception.
 		 */
-		// this.state = DatabaseController.getRemovalListStateByID(1);
+		// this.state = DatabaseController.getInstance().getRemovalListStateByID(1);
 
 		this.state = null;
 		setUuid(UUID.randomUUID());
@@ -242,7 +242,7 @@ public class RemovalList extends AbstractDatabaseObject
 	 */
 	public void reset()
 	{
-		state = DatabaseController.getRemovalListStateByID(1);
+		state = DatabaseController.getInstance().getRemovalListStateByID(1);
 		clear();
 	}
 
@@ -266,7 +266,7 @@ public class RemovalList extends AbstractDatabaseObject
 			 * Saving collections only works when saving the children and not the parents.
 			 */
 
-			DatabaseController.saveOrUpdate(box);
+			DatabaseController.getInstance().saveOrUpdate(box);
 		}
 
 		boxes.clear();
@@ -284,6 +284,6 @@ public class RemovalList extends AbstractDatabaseObject
 		if (removalListStateID < 1)
 			throw new IllegalArgumentException("Removal List State ID must be greater than 0, was '" + removalListStateID + "'.");
 
-		this.state = DatabaseController.getRemovalListStateByID(removalListStateID);
+		this.state = DatabaseController.getInstance().getRemovalListStateByID(removalListStateID);
 	}
 }

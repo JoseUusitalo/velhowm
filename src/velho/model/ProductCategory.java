@@ -141,6 +141,6 @@ public class ProductCategory extends AbstractDatabaseObject
 		if (typeID < 1)
 			throw new IllegalArgumentException("Type ID must be greater than 0, was '" + typeID + "'.");
 
-		this.type = DatabaseController.getProductTypeByID(typeID);
+		this.type = DatabaseController.getInstance().getProductTypeByID(typeID);
 	}
 }

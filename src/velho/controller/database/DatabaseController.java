@@ -58,16 +58,30 @@ import velho.model.interfaces.DatabaseObject;
 import velho.view.MainWindow;
 
 /**
- * The H2 database controller.
+ * The singleton controller for the H2 database and Hibernate.
  *
  * @author Jose Uusitalo
  */
-public abstract class DatabaseController
+@SuppressWarnings("static-method")
+public class DatabaseController
 {
+	/**
+	 * A private inner class holding the class instance.
+	 *
+	 * @author Jose Uusitalo
+	 */
+	private static class Holder
+	{
+		/**
+		 * The only instance of {@link DatabaseController}.
+		 */
+		private static final DatabaseController INSTANCE = new DatabaseController();
+	}
+
 	/**
 	 * Apache log4j logger: System.
 	 */
-	private static final Logger DBLOG = Logger.getLogger("dbLogger");
+	private final Logger DBLOG = Logger.getLogger("dbLogger");
 
 	/**
 	 * The database URI on the local machine.
@@ -87,22 +101,22 @@ public abstract class DatabaseController
 	/**
 	 * A pool where database connections are acquired from.
 	 */
-	private static JdbcConnectionPool connectionPool;
+	private JdbcConnectionPool connectionPool;
 
 	/**
 	 * The date format used by the database.
 	 */
-	private static final SimpleDateFormat H2_DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd");
+	private final SimpleDateFormat H2_DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd");
 
 	/**
 	 * The Hibernate session factory.
 	 */
-	private static final SessionFactory SESSION_FACTORY = HibernateSessionFactory.getInstance();
+	private final SessionFactory SESSION_FACTORY = HibernateSessionFactory.getInstance();
 
 	/**
 	 * The value of hibernate.jdbc.batch_size property in hibernate.cfg.xml file.
 	 */
-	private static final int HIBERNATE_BATCH_SIZE = 30;
+	private final int HIBERNATE_BATCH_SIZE = 30;
 
 	/*
 	 * ---- UI LISTS ----
@@ -112,79 +126,96 @@ public abstract class DatabaseController
 	 * An observable list of {@link User} objects for display in the user
 	 * interface.
 	 */
-	private static ObservableList<Object> observableUsers = FXCollections.observableArrayList();
+	private ObservableList<Object> observableUsers = FXCollections.observableArrayList();
 
 	/**
 	 * An observable list of {@link Product} objects for display in the user
 	 * interface.
 	 */
-	private static ObservableList<Object> observableProducts = FXCollections.observableArrayList();
+	private ObservableList<Object> observableProducts = FXCollections.observableArrayList();
 
 	/**
 	 * An observable list of {@link ProductType} objects for display in the user
 	 * interface.
 	 */
-	private static ObservableList<Object> observableProductTypes = FXCollections.observableArrayList();
+	private ObservableList<Object> observableProductTypes = FXCollections.observableArrayList();
 
 	/**
 	 * An observable list of {@link Product} search results for display in the
 	 * user interface.
 	 */
-	private static ObservableList<Object> observableProductBoxSearchResults = FXCollections.observableArrayList();
+	private ObservableList<Object> observableProductBoxSearchResults = FXCollections.observableArrayList();
 
 	/**
 	 * An observable list of {@link ProductBox} objects for display in the
 	 * user interface.
 	 */
-	private static ObservableList<Object> observableProductBoxes = FXCollections.observableArrayList();
+	private ObservableList<Object> observableProductBoxes = FXCollections.observableArrayList();
 
 	/**
 	 * An observable list of {@link RemovalList} objects for display in the user
 	 * interface.
 	 */
-	private static ObservableList<Object> observableRemovalLists = FXCollections.observableArrayList();
+	private ObservableList<Object> observableRemovalLists = FXCollections.observableArrayList();
 
 	/**
 	 * An observable list of {@link ProductCategory} objects for display in the
 	 * user interface.
 	 */
-	private static ObservableList<Object> observableProductCategories = FXCollections.observableArrayList();
+	private ObservableList<Object> observableProductCategories = FXCollections.observableArrayList();
 
 	/**
 	 * An observable list of {@link ProductBrand} objects for display in the
 	 * user interface.
 	 */
-	private static ObservableList<Object> observableProductBrands = FXCollections.observableArrayList();
+	private ObservableList<Object> observableProductBrands = FXCollections.observableArrayList();
 
 	/**
 	 * An observable list of {@link RemovalListState} objects for display in the
 	 * user interface.
 	 */
-	private static ObservableList<Object> observableRemovalListStates = FXCollections.observableArrayList();
+	private ObservableList<Object> observableRemovalListStates = FXCollections.observableArrayList();
 
 	/**
 	 * An observable list of {@link RemovalListState} objects for display in the
 	 * user interface.
 	 */
-	private static ObservableList<Object> observableManifests = FXCollections.observableArrayList();
+	private ObservableList<Object> observableManifests = FXCollections.observableArrayList();
 
 	/**
 	 * An observable list of {@link ManifestState} objects for display in the
 	 * user interface.
 	 */
-	private static ObservableList<Object> observableManifestStates = FXCollections.observableArrayList();
+	private ObservableList<Object> observableManifestStates = FXCollections.observableArrayList();
 
 	/**
 	 * An observable list of {@link Shelf} objects for display in the
 	 * user interface.
 	 */
-	private static ObservableList<Object> observableShelves = FXCollections.observableArrayList();
+	private ObservableList<Object> observableShelves = FXCollections.observableArrayList();
 
 	/**
 	 * An observable list of {@link RemovalPlatform} objects for display in the
 	 * user interface.
 	 */
-	private static ObservableList<Object> observableRemovalPlatforms = FXCollections.observableArrayList();
+	private ObservableList<Object> observableRemovalPlatforms = FXCollections.observableArrayList();
+
+	/**
+	 */
+	private DatabaseController()
+	{
+		// No need to instantiate this class.
+	}
+
+	/**
+	 * Gets the instance of the {@link DatabaseController}.
+	 *
+	 * @return the database controller
+	 */
+	public static synchronized DatabaseController getInstance()
+	{
+		return Holder.INSTANCE;
+	}
 
 	/*
 	 * -------------------------------- PRIVATE DATABASE METHODS --------------------------------
@@ -195,7 +226,7 @@ public abstract class DatabaseController
 	 *
 	 * @return <code>true</code> if the database file exists
 	 */
-	private static boolean databaseExists()
+	private boolean databaseExists()
 	{
 		final File dbFile = new File(DB_FILEPATH);
 		return dbFile.exists() && !dbFile.isDirectory();
@@ -207,7 +238,7 @@ public abstract class DatabaseController
 	 *
 	 * @return a database connection
 	 */
-	protected static Connection getConnection()
+	protected Connection getConnection()
 	{
 		Connection connection = null;
 		try
@@ -219,11 +250,12 @@ public abstract class DatabaseController
 			if (e.getMessage().contains("Database may be already in use"))
 			{
 				DBLOG.info("Database is already in use.");
-				PopupController.error(LocalizationController.getString("popUpDatabaseInUse"));
+				PopupController.getInstance().error(LocalizationController.getInstance().getString("popUpDatabaseInUse"));
 			}
 
-			System.out.println(e);
+			e.printStackTrace();
 		}
+
 		return connection;
 	}
 
@@ -232,7 +264,7 @@ public abstract class DatabaseController
 	 *
 	 * @param object object to be added to the list
 	 */
-	private static void addToObservableList(final DatabaseObject object)
+	private void addToObservableList(final DatabaseObject object)
 	{
 		if (object instanceof Manifest)
 			observableManifests.add(object);
@@ -289,7 +321,7 @@ public abstract class DatabaseController
 	 * @param date date to format
 	 * @return a string that can be inserted into the database
 	 */
-	public static String getH2DateFormat(final Date date)
+	public String getH2DateFormat(final Date date)
 	{
 		return H2_DATE_FORMAT.format(date);
 	}
@@ -300,7 +332,7 @@ public abstract class DatabaseController
 	 * @param dateString date string to parse
 	 * @return a Date object representing the string
 	 */
-	public static Date parseDateString(final String dateString) throws ParseException
+	public Date parseDateString(final String dateString) throws ParseException
 	{
 		return H2_DATE_FORMAT.parse(dateString);
 	}
@@ -312,7 +344,7 @@ public abstract class DatabaseController
 	 * @return escaped string
 	 */
 	@Deprecated
-	public static String escape(final String sql)
+	public String escape(final String sql)
 	{
 		String escaped = sql.replace("'", "''");
 		return escaped.replace("\"", "\\\"");
@@ -329,9 +361,8 @@ public abstract class DatabaseController
 	 * @param where conditions (can be <code>null</code>)
 	 * @return an SQL query string
 	 */
-	@Deprecated
-	protected static String sqlBuilder(final DatabaseQueryType type, final String tableName, final Map<DatabaseTable, String> joinOnCondition,
-			final String[] columns, final Map<String, Object> columnValues, final List<String> where)
+	protected String sqlBuilder(final DatabaseQueryType type, final String tableName, final Map<DatabaseTable, String> joinOnCondition, final String[] columns,
+			final Map<String, Object> columnValues, final List<String> where)
 	{
 		final StringBuilder strbuilder = new StringBuilder();
 
@@ -447,7 +478,7 @@ public abstract class DatabaseController
 	 *
 	 * @return <code>true</code> if a database link exists
 	 */
-	public static boolean isLinked()
+	public boolean isLinked()
 	{
 		return connectionPool != null;
 	}
@@ -455,7 +486,7 @@ public abstract class DatabaseController
 	/**
 	 * Attempts to re-link the database.
 	 */
-	public static void tryReLink()
+	public void tryReLink()
 	{
 		// Just in case.
 		unlink();
@@ -469,7 +500,7 @@ public abstract class DatabaseController
 			e.printStackTrace();
 		}
 
-		PopupController.warning(LocalizationController.getString("popUpDatabaseConnectionLost"));
+		PopupController.getInstance().warning(LocalizationController.getInstance().getString("popUpDatabaseConnectionLost"));
 	}
 
 	/**
@@ -480,7 +511,7 @@ public abstract class DatabaseController
 	 * @throws ClassNotFoundException when the H2 driver was unable to load
 	 * @throws ExistingDatabaseLinkException when a database link already exists
 	 */
-	public static DatabaseFileState link() throws ClassNotFoundException
+	public DatabaseFileState link() throws ClassNotFoundException
 	{
 		if (isLinked())
 		{
@@ -516,10 +547,8 @@ public abstract class DatabaseController
 
 		// Try getting a connection
 		// If the database does not exist, it is created.
-		try
+		try (final Connection conn = getConnection())
 		{
-			final Connection conn = getConnection();
-
 			if (conn != null)
 				conn.close();
 		}
@@ -548,7 +577,7 @@ public abstract class DatabaseController
 	 * Shuts down the connection to the database. Use {@link #link()} to connect
 	 * to the database again.
 	 */
-	public static void unlink()
+	public void unlink()
 	{
 		if (connectionPool == null)
 		{
@@ -570,13 +599,13 @@ public abstract class DatabaseController
 	 * Gets an object from the database with the given database ID.
 	 *
 	 * @param objectClass the name class of the {@link AbstractDatabaseObject}
-	 * to get
+	 *            to get
 	 * @param databaseID the database ID of the object
 	 * @return the corresponding object or <code>null</code> for invalid ID
 	 * @throws HibernateException when the query failed to commit and has been
-	 * rolled back
+	 *             rolled back
 	 */
-	private static Object getByID(final Class<? extends AbstractDatabaseObject> objectClass, final int databaseID) throws HibernateException
+	private Object getByID(final Class<? extends DatabaseObject> objectClass, final int databaseID) throws HibernateException
 	{
 		if (databaseID < 1)
 			return null;
@@ -588,7 +617,6 @@ public abstract class DatabaseController
 		try
 		{
 			SESSION_FACTORY.getCurrentSession().getTransaction().commit();
-
 		}
 		catch (final HibernateException e)
 		{
@@ -605,9 +633,9 @@ public abstract class DatabaseController
 	 *
 	 * @param databaseID the ordinal of the role
 	 * @return the corresponding user role object or <code>null</code> if role
-	 * was not found
+	 *         was not found
 	 */
-	public static UserRole getRoleByID(final int databaseID)
+	public UserRole getRoleByID(final int databaseID)
 	{
 		// TODO: Find a way to put the roles into the database.
 
@@ -626,10 +654,8 @@ public abstract class DatabaseController
 	 * @param roleName the name of the role (case insensitive)
 	 * @return the corresponding user role object or <code>null</code> if role was not found
 	 */
-	public static UserRole getUserRoleByName(final String roleName)
+	public UserRole getUserRoleByName(final String roleName)
 	{
-		// TODO: Find a way to put the roles into the database.
-
 		for (final UserRole role : UserRole.values())
 		{
 			if (role.getName().equalsIgnoreCase(roleName))
@@ -654,12 +680,12 @@ public abstract class DatabaseController
 	 *
 	 * @param boxes list of product box objects to search from
 	 * @param wantedProductCount number of products wanted from the given
-	 * product boxes
+	 *            product boxes
 	 * @return a list of product boxes that either contains at least the wanted
-	 * number of products, or if there were not
-	 * enough products, the same list that was given
+	 *         number of products, or if there were not
+	 *         enough products, the same list that was given
 	 */
-	private static List<ProductBox> getBoxesContainingAtLeastProducts(final List<ProductBox> boxes, final Integer wantedProductCount)
+	private List<ProductBox> getBoxesContainingAtLeastProducts(final List<ProductBox> boxes, final Integer wantedProductCount)
 	{
 		final Map<Integer, List<ProductBox>> boxProductCount = new TreeMap<Integer, List<ProductBox>>();
 		List<ProductBox> nextSmallestBoxes = null;
@@ -830,17 +856,17 @@ public abstract class DatabaseController
 	 * @param withDeleteColumn get the delete button column?
 	 *
 	 * @return a map where the key is the column value and value is the column
-	 * name
+	 *         name
 	 */
-	public static Map<String, String> getPublicUserDataColumns(final boolean withDeleteColumn)
+	public Map<String, String> getPublicUserDataColumns(final boolean withDeleteColumn)
 	{
 		final LinkedHashMap<String, String> cols = new LinkedHashMap<String, String>();
-		cols.put("firstName", LocalizationController.getString("publicUserTableHeaderFirstName"));
-		cols.put("lastName", LocalizationController.getString("publicUserTableHeaderLastName"));
-		cols.put("roleName", LocalizationController.getString("publicUserTableHeaderRole"));
+		cols.put("firstName", LocalizationController.getInstance().getString("publicUserTableHeaderFirstName"));
+		cols.put("lastName", LocalizationController.getInstance().getString("publicUserTableHeaderLastName"));
+		cols.put("roleName", LocalizationController.getInstance().getString("publicUserTableHeaderRole"));
 
 		if (withDeleteColumn)
-			cols.put("deleteButton", LocalizationController.getString("publicProductTableDeleteButton"));
+			cols.put("deleteButton", LocalizationController.getInstance().getString("publicProductTableDeleteButton"));
 
 		return cols;
 	}
@@ -853,17 +879,17 @@ public abstract class DatabaseController
 	 * @param withDeleteColumn get the delete button column?
 	 *
 	 * @return a map where the key is the column value and value is the column
-	 * name
+	 *         name
 	 */
-	public static Map<String, String> getProductDataColumns(final boolean withAddColumn, final boolean withDeleteColumn)
+	public Map<String, String> getProductDataColumns(final boolean withAddColumn, final boolean withDeleteColumn)
 	{
 		final LinkedHashMap<String, String> cols = new LinkedHashMap<String, String>();
 
 		if (withAddColumn)
-			cols.put("addButton", LocalizationController.getString("buttonAdd"));
+			cols.put("addButton", LocalizationController.getInstance().getString("buttonAdd"));
 
 		if (withDeleteColumn)
-			cols.put("deleteButton", LocalizationController.getString("buttonDelete"));
+			cols.put("deleteButton", LocalizationController.getInstance().getString("buttonDelete"));
 
 		cols.put("databaseID", "ID");
 		cols.put("name", "Name");
@@ -879,19 +905,19 @@ public abstract class DatabaseController
 	 * objects in table views.
 	 *
 	 * @return a map where the key is the column value and value is the column
-	 * name
+	 *         name
 	 */
-	public static Map<String, String> getRemovalListDataColumns()
+	public Map<String, String> getRemovalListDataColumns()
 	{
 		final LinkedHashMap<String, String> cols = new LinkedHashMap<String, String>();
-		cols.put("databaseID", LocalizationController.getString("publicRemovalTableHeaderID"));
-		cols.put("state", LocalizationController.getString("publicRemovalTableHeaderState"));
-		cols.put("size", LocalizationController.getString("publicRemovalTableHeaderSize"));
-		cols.put("viewButton", LocalizationController.getString("publicRemovalTableViewButton"));
+		cols.put("databaseID", LocalizationController.getInstance().getString("publicRemovalTableHeaderID"));
+		cols.put("state", LocalizationController.getInstance().getString("publicRemovalTableHeaderState"));
+		cols.put("size", LocalizationController.getInstance().getString("publicRemovalTableHeaderSize"));
+		cols.put("viewButton", LocalizationController.getInstance().getString("publicRemovalTableViewButton"));
 
 		// Only managers and administrators can delete lists.
-		if (LoginController.getCurrentUser().getRole().compareTo(UserRole.MANAGER) >= 0)
-			cols.put("deleteButton", LocalizationController.getString("publicRemovalTableDeleteButton"));
+		if (LoginController.getInstance().getCurrentUser().getRole().compareTo(UserRole.MANAGER) >= 0)
+			cols.put("deleteButton", LocalizationController.getInstance().getString("publicRemovalTableDeleteButton"));
 
 		return cols;
 	}
@@ -904,26 +930,26 @@ public abstract class DatabaseController
 	 * @param withRemoveColumn get the remove button column?
 	 *
 	 * @return a map where the key is the column value and value is the column
-	 * name
+	 *         name
 	 */
-	public static Map<String, String> getProductSearchDataColumns(final boolean withAddColumn, final boolean withRemoveColumn)
+	public Map<String, String> getProductSearchDataColumns(final boolean withAddColumn, final boolean withRemoveColumn)
 	{
 		final LinkedHashMap<String, String> cols = new LinkedHashMap<String, String>();
 
 		if (withAddColumn)
-			cols.put("addButton", LocalizationController.getString("buttonAdd"));
+			cols.put("addButton", LocalizationController.getInstance().getString("buttonAdd"));
 
 		if (withRemoveColumn)
-			cols.put("removeButton", LocalizationController.getString("buttonRemove"));
+			cols.put("removeButton", LocalizationController.getInstance().getString("buttonRemove"));
 
-		cols.put("databaseID", LocalizationController.getString("publicProductSearchTableHeaderID"));
-		cols.put("productName", LocalizationController.getString("publicProductSearchTableHeaderName"));
-		cols.put("productBrand", LocalizationController.getString("publicProductSearchTableHeaderBrand"));
-		cols.put("productCategory", LocalizationController.getString("publicProductSearchTableHeaderCategory"));
-		cols.put("expirationDate", LocalizationController.getString("publicProductSearchTableHeaderExpires"));
-		cols.put("boxID", LocalizationController.getString("publicProductSearchTableHeaderBoxID"));
-		cols.put("boxShelfSlot", LocalizationController.getString("publicProductSearchTableHeaderShelfSlot"));
-		cols.put("boxProductCount", LocalizationController.getString("publicProductSearchTableHeaderProductCount"));
+		cols.put("databaseID", LocalizationController.getInstance().getString("publicProductSearchTableHeaderID"));
+		cols.put("productName", LocalizationController.getInstance().getString("publicProductSearchTableHeaderName"));
+		cols.put("productBrand", LocalizationController.getInstance().getString("publicProductSearchTableHeaderBrand"));
+		cols.put("productCategory", LocalizationController.getInstance().getString("publicProductSearchTableHeaderCategory"));
+		cols.put("expirationDate", LocalizationController.getInstance().getString("publicProductSearchTableHeaderExpires"));
+		cols.put("boxID", LocalizationController.getInstance().getString("publicProductSearchTableHeaderBoxID"));
+		cols.put("boxShelfSlot", LocalizationController.getInstance().getString("publicProductSearchTableHeaderShelfSlot"));
+		cols.put("boxProductCount", LocalizationController.getInstance().getString("publicProductSearchTableHeaderProductCount"));
 
 		return cols;
 	}
@@ -933,18 +959,18 @@ public abstract class DatabaseController
 	 * objects in table views.
 	 *
 	 * @return a map where the key is the column value and value is the column
-	 * name
+	 *         name
 	 */
-	public static Map<String, String> getManifestDataColumns()
+	public Map<String, String> getManifestDataColumns()
 	{
 		final LinkedHashMap<String, String> cols = new LinkedHashMap<String, String>();
-		cols.put("databaseID", LocalizationController.getString("publicManifestTableHeaderID"));
-		cols.put("state", LocalizationController.getString("publicManifestTableHeaderState"));
-		cols.put("size", LocalizationController.getString("publicManifestTableHeaderSize"));
-		cols.put("driverID", LocalizationController.getString("publicManifestTableDriverID"));
-		cols.put("orderedDate", LocalizationController.getString("publicManifestTableOrderedDate"));
-		cols.put("receivedDate", LocalizationController.getString("publicManifestTableReceivedDate"));
-		cols.put("viewButton", LocalizationController.getString("buttonView"));
+		cols.put("databaseID", LocalizationController.getInstance().getString("publicManifestTableHeaderID"));
+		cols.put("state", LocalizationController.getInstance().getString("publicManifestTableHeaderState"));
+		cols.put("size", LocalizationController.getInstance().getString("publicManifestTableHeaderSize"));
+		cols.put("driverID", LocalizationController.getInstance().getString("publicManifestTableDriverID"));
+		cols.put("orderedDate", LocalizationController.getInstance().getString("publicManifestTableOrderedDate"));
+		cols.put("receivedDate", LocalizationController.getInstance().getString("publicManifestTableReceivedDate"));
+		cols.put("viewButton", LocalizationController.getInstance().getString("buttonView"));
 
 		return cols;
 	}
@@ -954,11 +980,11 @@ public abstract class DatabaseController
 	 *
 	 * @param databaseID the product type database ID
 	 * @return the corresponding product type object or <code>null</code> for
-	 * invalid ID
+	 *         invalid ID
 	 * @throws HibernateException when the query failed to commit and has been
-	 * rolled back
+	 *             rolled back
 	 */
-	public static ProductType getProductTypeByID(final int databaseID) throws HibernateException
+	public ProductType getProductTypeByID(final int databaseID) throws HibernateException
 	{
 		return (ProductType) getByID(ProductType.class, databaseID);
 	}
@@ -969,11 +995,11 @@ public abstract class DatabaseController
 	 *
 	 * @param databaseID the product category database ID
 	 * @return the corresponding product category object or <code>null</code>
-	 * for invalid ID
+	 *         for invalid ID
 	 * @throws HibernateException when the query failed to commit and has been
-	 * rolled back
+	 *             rolled back
 	 */
-	public static ProductCategory getProductCategoryByID(final int databaseID) throws HibernateException
+	public ProductCategory getProductCategoryByID(final int databaseID) throws HibernateException
 	{
 		return (ProductCategory) getByID(ProductCategory.class, databaseID);
 	}
@@ -983,11 +1009,11 @@ public abstract class DatabaseController
 	 *
 	 * @param databaseID the product brand database ID
 	 * @return the corresponding product brand object or <code>null</code> for
-	 * invalid ID
+	 *         invalid ID
 	 * @throws HibernateException when the query failed to commit and has been
-	 * rolled back
+	 *             rolled back
 	 */
-	public static ProductBrand getProductBrandByID(final int databaseID) throws HibernateException
+	public ProductBrand getProductBrandByID(final int databaseID) throws HibernateException
 	{
 		return (ProductBrand) getByID(ProductBrand.class, databaseID);
 	}
@@ -997,10 +1023,8 @@ public abstract class DatabaseController
 	 *
 	 * @return a set of user role names
 	 */
-	public static Set<String> getUserRoleNames()
+	public Set<String> getUserRoleNames()
 	{
-		// TODO: Use database.
-
 		final UserRole[] roles = UserRole.values();
 		final Set<String> names = new LinkedHashSet<String>();
 
@@ -1017,10 +1041,10 @@ public abstract class DatabaseController
 	 *
 	 * @param badgeID a badge ID string
 	 * @return a {@link User} object representing the authenticated user or
-	 * <code>null</code> for invalid credentials
+	 *         <code>null</code> for invalid credentials
 	 * @see User#isValidBadgeID(String)
 	 */
-	public static User authenticateBadgeID(final String badgeID)
+	public User authenticateBadgeID(final String badgeID)
 	{
 		SESSION_FACTORY.getCurrentSession().beginTransaction();
 
@@ -1054,10 +1078,10 @@ public abstract class DatabaseController
 	 *
 	 * @param pin is a PIN string
 	 * @return a {@link User} object representing the authenticated user or
-	 * <code>null</code> for invalid credentials
+	 *         <code>null</code> for invalid credentials
 	 * @see User#isValidPIN(String)
 	 */
-	public static User authenticatePIN(final String firstName, final String lastName, final String pin)
+	public User authenticatePIN(final String firstName, final String lastName, final String pin)
 	{
 		SESSION_FACTORY.getCurrentSession().beginTransaction();
 
@@ -1096,11 +1120,11 @@ public abstract class DatabaseController
 	 *
 	 * @param databaseID the product database ID
 	 * @return the corresponding product object or <code>null</code> for invalid
-	 * ID
+	 *         ID
 	 * @throws HibernateException when the query failed to commit and has been
-	 * rolled back
+	 *             rolled back
 	 */
-	public static Product getProductByID(final int databaseID) throws HibernateException
+	public Product getProductByID(final int databaseID) throws HibernateException
 	{
 		return (Product) getByID(Product.class, databaseID);
 	}
@@ -1110,11 +1134,11 @@ public abstract class DatabaseController
 	 *
 	 * @param databaseID the product box database ID
 	 * @return the corresponding product box object or <code>null</code> for
-	 * invalid ID
+	 *         invalid ID
 	 * @throws HibernateException when the query failed to commit and has been
-	 * rolled back
+	 *             rolled back
 	 */
-	public static ProductBox getProductBoxByID(final int databaseID) throws HibernateException
+	public ProductBox getProductBoxByID(final int databaseID) throws HibernateException
 	{
 		return (ProductBox) getByID(ProductBox.class, databaseID);
 	}
@@ -1124,14 +1148,14 @@ public abstract class DatabaseController
 	 *
 	 * @param databaseID the user database ID (use a negative number to denote a debug account)
 	 * @return the corresponding user object, <code>null</code> if a user with that ID does not exist, or the currently
-	 * logged in user (i.e. debug user) if the ID was negative
+	 *         logged in user (i.e. debug user) if the ID was negative
 	 * @throws HibernateException when the query failed to commit and has been rolled back
 	 */
-	public static User getUserByID(final int databaseID) throws HibernateException
+	public User getUserByID(final int databaseID) throws HibernateException
 	{
 		// Debug account ID?
 		if (databaseID < 1)
-			return LoginController.getCurrentUser();
+			return LoginController.getInstance().getCurrentUser();
 
 		SESSION_FACTORY.getCurrentSession().beginTransaction();
 
@@ -1147,9 +1171,9 @@ public abstract class DatabaseController
 	 *
 	 * @param name unique name of the product
 	 * @return the wanted product or <code>null</code> if the product is not
-	 * present in the database
+	 *         present in the database
 	 */
-	public static Product getProductByName(final String name)
+	public Product getProductByName(final String name)
 	{
 		SESSION_FACTORY.getCurrentSession().beginTransaction();
 
@@ -1181,11 +1205,11 @@ public abstract class DatabaseController
 	 *
 	 * @param databaseID the shelf database ID
 	 * @return the corresponding shelf object or <code>null</code> for invalid
-	 * ID
+	 *         ID
 	 * @throws HibernateException when the query failed to commit and has been
-	 * rolled back
+	 *             rolled back
 	 */
-	public static Shelf getShelfByID(final int databaseID) throws HibernateException
+	public Shelf getShelfByID(final int databaseID) throws HibernateException
 	{
 		return (Shelf) getByID(Shelf.class, databaseID);
 	}
@@ -1195,11 +1219,11 @@ public abstract class DatabaseController
 	 *
 	 * @param databaseID the shelf level database ID
 	 * @return the corresponding shelf object or <code>null</code> for invalid
-	 * ID
+	 *         ID
 	 * @throws HibernateException when the query failed to commit and has been
-	 * rolled back
+	 *             rolled back
 	 */
-	public static ShelfLevel getShelfLevelByID(final int databaseID) throws HibernateException
+	public ShelfLevel getShelfLevelByID(final int databaseID) throws HibernateException
 	{
 		return (ShelfLevel) getByID(ShelfLevel.class, databaseID);
 	}
@@ -1209,11 +1233,11 @@ public abstract class DatabaseController
 	 *
 	 * @param databaseID the shelf slot database ID
 	 * @return the corresponding shelf object or <code>null</code> for invalid
-	 * ID
+	 *         ID
 	 * @throws HibernateException when the query failed to commit and has been
-	 * rolled back
+	 *             rolled back
 	 */
-	public static ShelfSlot getShelfSlotByID(final int databaseID) throws HibernateException
+	public ShelfSlot getShelfSlotByID(final int databaseID) throws HibernateException
 	{
 		return (ShelfSlot) getByID(ShelfSlot.class, databaseID);
 	}
@@ -1223,11 +1247,11 @@ public abstract class DatabaseController
 	 *
 	 * @param databaseID the removal list database ID
 	 * @return the corresponding removal list object or <code>null</code> for
-	 * invalid ID
+	 *         invalid ID
 	 * @throws HibernateException when the query failed to commit and has been
-	 * rolled back
+	 *             rolled back
 	 */
-	public static RemovalList getRemovalListByID(final int databaseID) throws HibernateException
+	public RemovalList getRemovalListByID(final int databaseID) throws HibernateException
 	{
 		return (RemovalList) getByID(RemovalList.class, databaseID);
 	}
@@ -1237,11 +1261,11 @@ public abstract class DatabaseController
 	 *
 	 * @param databaseID the manifest database ID
 	 * @return the corresponding manifest object or <code>null</code> for
-	 * invalid ID
+	 *         invalid ID
 	 * @throws HibernateException when the query failed to commit and has been
-	 * rolled back
+	 *             rolled back
 	 */
-	public static Manifest getManifestByID(final int databaseID) throws HibernateException
+	public Manifest getManifestByID(final int databaseID) throws HibernateException
 	{
 		return (Manifest) getByID(Manifest.class, databaseID);
 	}
@@ -1251,7 +1275,7 @@ public abstract class DatabaseController
 	 *
 	 * @return a list of integer product database IDs
 	 */
-	public static List<Integer> getProductCodeList()
+	public List<Integer> getProductCodeList()
 	{
 		final List<Object> result = getAllProducts();
 		final List<Integer> ints = new ArrayList<Integer>();
@@ -1267,7 +1291,7 @@ public abstract class DatabaseController
 	 *
 	 * @return a cached list of products searched by the user
 	 */
-	public static ObservableList<Object> getObservableProductSearchResults()
+	public ObservableList<Object> getObservableProductSearchResults()
 	{
 		return observableProductBoxSearchResults;
 	}
@@ -1276,12 +1300,12 @@ public abstract class DatabaseController
 	 * Searches the database for product boxes of the specified size.
 	 *
 	 * @param productData a map of data to search for where the key is the
-	 * product box
-	 * database ID and the value is the number of products
+	 *            product box
+	 *            database ID and the value is the number of products
 	 * @throws NoDatabaseLinkException
 	 */
 	@SuppressWarnings("unchecked")
-	public static List<ProductBoxSearchResultRow> searchProductBoxByDataList(final Map<Integer, Integer> productData)
+	public List<ProductBoxSearchResultRow> searchProductBoxByDataList(final Map<Integer, Integer> productData)
 	{
 		final List<ProductBoxSearchResultRow> foundProducts = FXCollections.observableArrayList();
 		Integer wantedProductCount = null;
@@ -1380,10 +1404,10 @@ public abstract class DatabaseController
 	 * @param where conditions in SQL format
 	 * @param joins SQL join statements
 	 * @return a list of found product boxes as
-	 * {@link ProductBoxSearchResultRow} objects
+	 *         {@link ProductBoxSearchResultRow} objects
 	 * @throws NoDatabaseLinkException
 	 */
-	public static List<ProductBoxSearchResultRow> searchProductBox(final String identifier, final int productCount, final ProductBrand brand,
+	public List<ProductBoxSearchResultRow> searchProductBox(final String identifier, final int productCount, final ProductBrand brand,
 			final ProductCategory category, final LocalDate expiresStart, final LocalDate expiresEnd, final boolean canBeInRemovalList)
 	{
 		final List<ProductBoxSearchResultRow> foundProducts = FXCollections.observableArrayList();
@@ -1573,11 +1597,11 @@ public abstract class DatabaseController
 	 *
 	 * @param databaseID the removal list state database ID
 	 * @return the corresponding removal list state object or <code>null</code>
-	 * for invalid ID
+	 *         for invalid ID
 	 * @throws HibernateException when the query failed to commit and has been
-	 * rolled back
+	 *             rolled back
 	 */
-	public static RemovalListState getRemovalListStateByID(final int databaseID) throws HibernateException
+	public RemovalListState getRemovalListStateByID(final int databaseID) throws HibernateException
 	{
 		return (RemovalListState) getByID(RemovalListState.class, databaseID);
 	}
@@ -1588,11 +1612,11 @@ public abstract class DatabaseController
 	 *
 	 * @param databaseID the manifest state database ID
 	 * @return the corresponding manifest state object or <code>null</code> for
-	 * invalid ID
+	 *         invalid ID
 	 * @throws HibernateException when the query failed to commit and has been
-	 * rolled back
+	 *             rolled back
 	 */
-	public static ManifestState getManifestStateByID(final int databaseID) throws HibernateException
+	public ManifestState getManifestStateByID(final int databaseID) throws HibernateException
 	{
 		return (ManifestState) getByID(ManifestState.class, databaseID);
 	}
@@ -1603,11 +1627,11 @@ public abstract class DatabaseController
 	 *
 	 * @param databaseID the removal platform database ID
 	 * @return the corresponding removal platform object or <code>null</code>
-	 * for invalid ID
+	 *         for invalid ID
 	 * @throws HibernateException when the query failed to commit and has been
-	 * rolled back
+	 *             rolled back
 	 */
-	public static RemovalPlatform getRemovalPlatformByID(final int databaseID)
+	public RemovalPlatform getRemovalPlatformByID(final int databaseID)
 	{
 		return (RemovalPlatform) getByID(RemovalPlatform.class, databaseID);
 	}
@@ -1624,7 +1648,7 @@ public abstract class DatabaseController
 	 * @return <code>true</code> if database changed as a result of this call
 	 * @throws NoDatabaseLinkException
 	 */
-	public static boolean loadSampleData() throws HibernateException
+	public boolean loadSampleData() throws HibernateException
 	{
 		// TODO: Find a way to return a proper boolean.
 		return SampleData.createAll();
@@ -1637,7 +1661,7 @@ public abstract class DatabaseController
 	 * @throws HibernateException when the object was not deleted
 	 * @throws ConstraintViolationException when the object could not be deleted because it is referenced by a <code>not-null</code> property
 	 */
-	private static boolean delete(final Object object) throws HibernateException, ConstraintViolationException
+	private boolean delete(final Object object) throws HibernateException, ConstraintViolationException
 	{
 		if (object != null && ((AbstractDatabaseObject) object).getDatabaseID() > 0)
 		{
@@ -1673,9 +1697,9 @@ public abstract class DatabaseController
 	 *
 	 * @param user user to be deleted
 	 * @return <code>true</code> if the specified user was deleted, <code>false</code> if the object is being referenced by another object that cannot have a
-	 * null value in that property
+	 *         null value in that property
 	 */
-	public static boolean deleteUser(final User user)
+	public boolean deleteUser(final User user)
 	{
 		try
 		{
@@ -1695,9 +1719,9 @@ public abstract class DatabaseController
 	 *
 	 * @param list removal list to be deleted
 	 * @return <code>true</code> if the specified removal list was deleted, <code>false</code> if the object is being referenced by another object that cannot
-	 * have a null value in that property
+	 *         have a null value in that property
 	 */
-	public static boolean deleteRemovalList(final RemovalList list) throws HibernateException, ConstraintViolationException
+	public boolean deleteRemovalList(final RemovalList list) throws HibernateException, ConstraintViolationException
 	{
 		/*
 		 * HIBERNATE NOTICE
@@ -1726,9 +1750,9 @@ public abstract class DatabaseController
 	 *
 	 * @param product product to be deleted
 	 * @return <code>true</code> if the specified product was deleted, <code>false</code> if the object is being referenced by another object that cannot have a
-	 * null value in that property
+	 *         null value in that property
 	 */
-	public static boolean deleteProduct(final Product product)
+	public boolean deleteProduct(final Product product)
 	{
 		try
 		{
@@ -1748,9 +1772,9 @@ public abstract class DatabaseController
 	 *
 	 * @param brand brand to be deleted
 	 * @return <code>true</code> if the specified brand was deleted, <code>false</code> if the object is being referenced by another object that cannot have a
-	 * null value in that property
+	 *         null value in that property
 	 */
-	public static boolean deleteProductBrand(final ProductBrand brand)
+	public boolean deleteProductBrand(final ProductBrand brand)
 	{
 		try
 		{
@@ -1770,9 +1794,9 @@ public abstract class DatabaseController
 	 *
 	 * @param category category to be deleted
 	 * @return <code>true</code> if the specified category was deleted, <code>false</code> if the object is being referenced by another object that cannot have
-	 * a null value in that property
+	 *         a null value in that property
 	 */
-	public static boolean deleteProductCategory(final ProductCategory category)
+	public boolean deleteProductCategory(final ProductCategory category)
 	{
 		try
 		{
@@ -1792,9 +1816,9 @@ public abstract class DatabaseController
 	 *
 	 * @param box box to be deleted
 	 * @return <code>true</code> if the specified box was deleted, <code>false</code> if the object is being referenced by another object that cannot have a
-	 * null value in that property
+	 *         null value in that property
 	 */
-	public static boolean deleteProductBox(final ProductBox box)
+	public boolean deleteProductBox(final ProductBox box)
 	{
 		try
 		{
@@ -1814,9 +1838,9 @@ public abstract class DatabaseController
 	 *
 	 * @param type type to be deleted
 	 * @return <code>true</code> if the specified type was deleted, <code>false</code> if the object is being referenced by another object that cannot have a
-	 * null value in that property
+	 *         null value in that property
 	 */
-	public static boolean deleteProductType(final ProductType type)
+	public boolean deleteProductType(final ProductType type)
 	{
 		try
 		{
@@ -1845,7 +1869,7 @@ public abstract class DatabaseController
 	 * @return the database ID of the inserted or updated object
 	 * @throws HibernateException when data was not saved
 	 */
-	public static int saveOrUpdate(final DatabaseObject object)
+	public int saveOrUpdate(final DatabaseObject object)
 	{
 		int generatedID = object.getDatabaseID();
 
@@ -1890,7 +1914,7 @@ public abstract class DatabaseController
 	 * @return the database ID of the inserted object
 	 * @throws HibernateException when data was not saved
 	 */
-	public static int save(final DatabaseObject object)
+	public int save(final DatabaseObject object)
 	{
 		SESSION_FACTORY.getCurrentSession().beginTransaction();
 
@@ -1924,7 +1948,7 @@ public abstract class DatabaseController
 	 * @param objects a set of objects to be saved to the database
 	 * @return the number of objects saved to the database
 	 */
-	public static <T extends AbstractDatabaseObject> int batchSave(final Set<T> objects)
+	public <T extends DatabaseObject> int batchSave(final Set<T> objects)
 	{
 		final Set<Object> savedObjects = new HashSet<Object>();
 		int count = 0;
@@ -2033,7 +2057,7 @@ public abstract class DatabaseController
 	 *
 	 * @param objects a set of objects to be updated in the database
 	 */
-	public static <T extends AbstractDatabaseObject> void batchUpdate(final Set<T> objects)
+	public <T extends DatabaseObject> void batchUpdate(final Set<T> objects)
 	{
 		SESSION_FACTORY.getCurrentSession().beginTransaction();
 
@@ -2069,9 +2093,9 @@ public abstract class DatabaseController
 	 * @param className the name of the Java class of the objects to get
 	 * @return a list of objects
 	 * @throws HibernateException when the query failed to commit and has been
-	 * rolled back
+	 *             rolled back
 	 */
-	public static List<Object> getAll(final String className) throws HibernateException
+	public List<Object> getAll(final String className) throws HibernateException
 	{
 		SESSION_FACTORY.getCurrentSession().beginTransaction();
 
@@ -2106,9 +2130,9 @@ public abstract class DatabaseController
 	 *
 	 * @return a list of products in the database currently on shelves
 	 * @throws HibernateException when the query failed to commit and has been
-	 * rolled back
+	 *             rolled back
 	 */
-	public static ObservableList<Object> getAllProductBoxes() throws HibernateException
+	public ObservableList<Object> getAllProductBoxes() throws HibernateException
 	{
 		observableProductBoxes.clear();
 		observableProductBoxes.addAll(getAll("ProductBox"));
@@ -2120,7 +2144,7 @@ public abstract class DatabaseController
 	 *
 	 * @return a list of badge id number strings
 	 */
-	public static List<String> getAllBadgeIDS()
+	public List<String> getAllBadgeIDS()
 	{
 		final Session session = SESSION_FACTORY.openSession();
 
@@ -2140,9 +2164,9 @@ public abstract class DatabaseController
 	 *
 	 * @return a list of removal platforms in the database
 	 * @throws HibernateException when the query failed to commit and has been
-	 * rolled back
+	 *             rolled back
 	 */
-	public static ObservableList<Object> getAllRemovalPlatforms() throws HibernateException
+	public ObservableList<Object> getAllRemovalPlatforms() throws HibernateException
 	{
 		observableRemovalPlatforms.clear();
 		observableRemovalPlatforms.addAll(getAll("RemovalPlatform"));
@@ -2154,9 +2178,9 @@ public abstract class DatabaseController
 	 *
 	 * @return a list of shelves in the database
 	 * @throws HibernateException when the query failed to commit and has been
-	 * rolled back
+	 *             rolled back
 	 */
-	public static ObservableList<Object> getAllShelves() throws HibernateException
+	public ObservableList<Object> getAllShelves() throws HibernateException
 	{
 		observableShelves.clear();
 		observableShelves.addAll(getAll("Shelf"));
@@ -2169,9 +2193,9 @@ public abstract class DatabaseController
 	 *
 	 * @return a list of shelf levels in the database
 	 * @throws HibernateException when the query failed to commit and has been
-	 * rolled back
+	 *             rolled back
 	 */
-	public static List<Object> getAllShelfLevels()
+	public List<Object> getAllShelfLevels()
 	{
 		return getAll("ShelfLevel");
 	}
@@ -2181,9 +2205,9 @@ public abstract class DatabaseController
 	 *
 	 * @return a list of shelf slots in the database
 	 * @throws HibernateException when the query failed to commit and has been
-	 * rolled back
+	 *             rolled back
 	 */
-	public static List<Object> getAllShelfSlots()
+	public List<Object> getAllShelfSlots()
 	{
 		return getAll("ShelfSlot");
 	}
@@ -2193,9 +2217,9 @@ public abstract class DatabaseController
 	 *
 	 * @return a list of removal lists in the database
 	 * @throws HibernateException when the query failed to commit and has been
-	 * rolled back
+	 *             rolled back
 	 */
-	public static ObservableList<Object> getAllRemovalLists() throws HibernateException
+	public ObservableList<Object> getAllRemovalLists() throws HibernateException
 	{
 		observableRemovalLists.clear();
 		observableRemovalLists.addAll(getAll("RemovalList"));
@@ -2208,9 +2232,9 @@ public abstract class DatabaseController
 	 *
 	 * @return a list of users in the database
 	 * @throws HibernateException when the query failed to commit and has been
-	 * rolled back
+	 *             rolled back
 	 */
-	public static ObservableList<Object> getAllUsers() throws HibernateException
+	public ObservableList<Object> getAllUsers() throws HibernateException
 	{
 		observableUsers.clear();
 		observableUsers.addAll(getAll("User"));
@@ -2218,9 +2242,8 @@ public abstract class DatabaseController
 		return observableUsers;
 	}
 
-	public static Set<UserRole> getAllUserRoles()
+	public Set<UserRole> getAllUserRoles()
 	{
-		// TODO: Find a way to put roles into the database.
 		return new LinkedHashSet<UserRole>(Arrays.asList(UserRole.values()));
 	}
 
@@ -2229,9 +2252,9 @@ public abstract class DatabaseController
 	 *
 	 * @return a list of products in the database currently on shelves
 	 * @throws HibernateException when the query failed to commit and has been
-	 * rolled back
+	 *             rolled back
 	 */
-	public static ObservableList<Object> getAllProducts() throws HibernateException
+	public ObservableList<Object> getAllProducts() throws HibernateException
 	{
 		observableProducts.clear();
 		observableProducts.addAll(getAll("Product"));
@@ -2244,9 +2267,9 @@ public abstract class DatabaseController
 	 *
 	 * @return an {@link ObservableList} of all product categories
 	 * @throws HibernateException when the query failed to commit and has been
-	 * rolled back
+	 *             rolled back
 	 */
-	public static ObservableList<Object> getAllProductCategories() throws HibernateException
+	public ObservableList<Object> getAllProductCategories() throws HibernateException
 	{
 		observableProductCategories.clear();
 		observableProductCategories.addAll(getAll("ProductCategory"));
@@ -2259,9 +2282,9 @@ public abstract class DatabaseController
 	 *
 	 * @return an {@link ObservableList} of all product brands
 	 * @throws HibernateException when the query failed to commit and has been
-	 * rolled back
+	 *             rolled back
 	 */
-	public static ObservableList<Object> getAllProductBrands() throws HibernateException
+	public ObservableList<Object> getAllProductBrands() throws HibernateException
 	{
 		// TODO: Can this return a list of ProductBrand objects? Will the JavaFX
 		// lists still work?
@@ -2276,7 +2299,7 @@ public abstract class DatabaseController
 	 *
 	 * @return an {@link ObservableList} of all removal list states
 	 */
-	public static ObservableList<Object> getAllRemovalListStates()
+	public ObservableList<Object> getAllRemovalListStates()
 	{
 		observableRemovalListStates.clear();
 		observableRemovalListStates.addAll(getAll("RemovalListState"));
@@ -2288,7 +2311,7 @@ public abstract class DatabaseController
 	 *
 	 * @return an {@link ObservableList} of all manifests
 	 */
-	public static ObservableList<Object> getAllManifests()
+	public ObservableList<Object> getAllManifests()
 	{
 		observableManifests.clear();
 		observableManifests.addAll(getAll("Manifest"));
@@ -2304,7 +2327,7 @@ public abstract class DatabaseController
 	 *
 	 * @return an {@link ObservableList} of manifest states
 	 */
-	public static ObservableList<Object> getManifestStateChangeList(final ManifestState currentState)
+	public ObservableList<Object> getManifestStateChangeList(final ManifestState currentState)
 	{
 		final List<Object> states = getAll("ManifestState");
 
@@ -2321,7 +2344,7 @@ public abstract class DatabaseController
 		{
 			if (((ManifestState) state).getName().equals("Accepted") || ((ManifestState) state).getName().equals("Rejected"))
 			{
-				if (LoginController.userRoleIsGreaterOrEqualTo(UserRole.MANAGER) || ((ManifestState) state).compareTo(currentState) == 0)
+				if (LoginController.getInstance().userRoleIsGreaterOrEqualTo(UserRole.MANAGER) || ((ManifestState) state).compareTo(currentState) == 0)
 					observableManifestStates.add(state);
 			}
 			else
@@ -2334,7 +2357,7 @@ public abstract class DatabaseController
 	/**
 	 * Clears the observable list of product box search results.
 	 */
-	public static void clearSearchResults()
+	public void clearSearchResults()
 	{
 		DBLOG.info("Clearing search results.");
 		observableProductBoxSearchResults.clear();
@@ -2343,7 +2366,7 @@ public abstract class DatabaseController
 	/**
 	 * Closes the session factory.
 	 */
-	public static void closeSessionFactory()
+	public void closeSessionFactory()
 	{
 		DBLOG.info("Closing session factory.");
 		SESSION_FACTORY.close();
@@ -2355,7 +2378,7 @@ public abstract class DatabaseController
 	 * @param shelfSlotID shelf slot ID string
 	 * @return the shelf slot object
 	 */
-	public static ShelfSlot getShelfSlotBySlotID(final String shelfSlotID)
+	public ShelfSlot getShelfSlotBySlotID(final String shelfSlotID)
 	{
 		return getShelfByID(Shelf.shelfSlotIDToShelfDatabaseID(shelfSlotID)).getShelfSlot(shelfSlotID);
 	}
@@ -2366,7 +2389,7 @@ public abstract class DatabaseController
 	 * @return Observable Product Types
 	 * @throws HibernateException this should be the new database to get the information from
 	 */
-	public static ObservableList<Object> getAllProductTypes() throws HibernateException
+	public ObservableList<Object> getAllProductTypes() throws HibernateException
 	{
 		observableProductTypes.clear();
 		observableProductTypes.addAll(getAll("ProductType"));
@@ -2380,7 +2403,7 @@ public abstract class DatabaseController
 	 * @param className name of the class whose table to check
 	 * @return <code>true</code> if at least one record was found
 	 */
-	private static boolean tableHasEntries(final String className)
+	private boolean tableHasEntries(final String className)
 	{
 		SESSION_FACTORY.getCurrentSession().beginTransaction();
 
@@ -2412,7 +2435,7 @@ public abstract class DatabaseController
 	 *
 	 * @return <code>true</code> if database has users
 	 */
-	public static boolean hasUsers()
+	public boolean hasUsers()
 	{
 		return tableHasEntries("User");
 	}
@@ -2422,7 +2445,7 @@ public abstract class DatabaseController
 	 *
 	 * @return <code>true</code> if database has product brands
 	 */
-	public static boolean hasProductBrands()
+	public boolean hasProductBrands()
 	{
 		return tableHasEntries("ProductBrand");
 	}
@@ -2432,7 +2455,7 @@ public abstract class DatabaseController
 	 *
 	 * @return <code>true</code> if database has product types
 	 */
-	public static boolean hasProductTypes()
+	public boolean hasProductTypes()
 	{
 		return tableHasEntries("ProductType");
 	}
@@ -2442,7 +2465,7 @@ public abstract class DatabaseController
 	 *
 	 * @return <code>true</code> if database has product categories
 	 */
-	public static boolean hasProductCategories()
+	public boolean hasProductCategories()
 	{
 		return tableHasEntries("ProductCategory");
 	}
@@ -2452,7 +2475,7 @@ public abstract class DatabaseController
 	 *
 	 * @return <code>true</code> if database has products
 	 */
-	public static boolean hasProducts()
+	public boolean hasProducts()
 	{
 		return tableHasEntries("Product");
 	}
@@ -2462,7 +2485,7 @@ public abstract class DatabaseController
 	 *
 	 * @return <code>true</code> if database has shelves
 	 */
-	public static boolean hasShelves()
+	public boolean hasShelves()
 	{
 		return tableHasEntries("Shelf");
 	}
@@ -2472,7 +2495,7 @@ public abstract class DatabaseController
 	 *
 	 * @return <code>true</code> if database has shelf levels
 	 */
-	public static boolean hasShelfLevels()
+	public boolean hasShelfLevels()
 	{
 		return tableHasEntries("ShelfLevel");
 	}
@@ -2482,7 +2505,7 @@ public abstract class DatabaseController
 	 *
 	 * @return <code>true</code> if database has shelf slots
 	 */
-	public static boolean hasShelfSlots()
+	public boolean hasShelfSlots()
 	{
 		return tableHasEntries("ShelfSlot");
 	}
@@ -2492,7 +2515,7 @@ public abstract class DatabaseController
 	 *
 	 * @return <code>true</code> if database has manifest states
 	 */
-	public static boolean hasManifestStates()
+	public boolean hasManifestStates()
 	{
 		return tableHasEntries("ManifestState");
 	}
@@ -2502,7 +2525,7 @@ public abstract class DatabaseController
 	 *
 	 * @return <code>true</code> if database has manifests
 	 */
-	public static boolean hasManifests()
+	public boolean hasManifests()
 	{
 		return tableHasEntries("Manifest");
 	}
@@ -2512,7 +2535,7 @@ public abstract class DatabaseController
 	 *
 	 * @return <code>true</code> if database has removal list states
 	 */
-	public static boolean hasRemovalListStates()
+	public boolean hasRemovalListStates()
 	{
 		return tableHasEntries("RemovalListState");
 	}
@@ -2522,7 +2545,7 @@ public abstract class DatabaseController
 	 *
 	 * @return <code>true</code> if database has removal lists
 	 */
-	public static boolean hasRemovalLists()
+	public boolean hasRemovalLists()
 	{
 		return tableHasEntries("RemovalList");
 	}
@@ -2532,7 +2555,7 @@ public abstract class DatabaseController
 	 *
 	 * @return <code>true</code> if database has product boxes
 	 */
-	public static boolean hasProductBoxes()
+	public boolean hasProductBoxes()
 	{
 		return tableHasEntries("ProductBox");
 	}
@@ -2542,7 +2565,7 @@ public abstract class DatabaseController
 	 *
 	 * @return <code>true</code> if database has removal platforms
 	 */
-	public static boolean hasRemovalPlatforms()
+	public boolean hasRemovalPlatforms()
 	{
 		return tableHasEntries("RemovalPlatform");
 	}
@@ -2553,9 +2576,9 @@ public abstract class DatabaseController
 	 * @return a list of classes that can be saved to the database
 	 */
 	@SuppressWarnings("unchecked")
-	public static ObservableList<Class<? extends AbstractDatabaseObject>> getValidDatabaseTypes()
+	public ObservableList<Class<? extends DatabaseObject>> getValidDatabaseTypes()
 	{
-		final ObservableList<Class<? extends AbstractDatabaseObject>> classes = FXCollections.observableArrayList();
+		final ObservableList<Class<? extends DatabaseObject>> classes = FXCollections.observableArrayList();
 
 		//@formatter:off
 		classes.addAll(	Manifest.class,

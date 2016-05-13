@@ -7,10 +7,9 @@ import org.apache.log4j.Logger;
 import javafx.scene.Node;
 import velho.controller.database.LogDatabaseController;
 import velho.view.LogView;
-import velho.view.MainWindow;
 
 /**
- * A class for controlling viwing logs.
+ * The singleton controller for handling the viewing of logs.
  *
  * @author Jose Uusitalo
  */
@@ -19,7 +18,7 @@ public class LogController
 	/**
 	 * Apache log4j logger: System.
 	 */
-	private static final Logger SYSLOG = Logger.getLogger(MainWindow.class.getName());
+	private static final Logger SYSLOG = Logger.getLogger(LogController.class.getName());
 
 	/**
 	 * The {@link LogView}.
@@ -27,10 +26,33 @@ public class LogController
 	private final LogView logView;
 
 	/**
+	 * A private inner class holding the class instance.
+	 *
+	 * @author Jose Uusitalo
 	 */
-	public LogController()
+	private static class Holder
 	{
-		logView = new LogView(this);
+		/**
+		 * The only instance of {@link LogController}.
+		 */
+		private static final LogController INSTANCE = new LogController();
+	}
+
+	/**
+	 */
+	private LogController()
+	{
+		logView = new LogView();
+	}
+
+	/**
+	 * Gets the instance of the {@link LogController}.
+	 *
+	 * @return the log controller
+	 */
+	public static synchronized LogController getInstance()
+	{
+		return Holder.INSTANCE;
 	}
 
 	/**
@@ -58,7 +80,7 @@ public class LogController
 
 		try
 		{
-			log = LogDatabaseController.getSystemLog();
+			log = LogDatabaseController.getInstance().getSystemLog();
 		}
 		catch (Exception e)
 		{
@@ -89,7 +111,7 @@ public class LogController
 
 		try
 		{
-			log = LogDatabaseController.getUserLog();
+			log = LogDatabaseController.getInstance().getUserLog();
 		}
 		catch (Exception e)
 		{

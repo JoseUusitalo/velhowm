@@ -19,7 +19,7 @@ import velho.controller.CSVController;
 import velho.controller.LocalizationController;
 import velho.controller.PopupController;
 import velho.controller.UIController;
-import velho.model.AbstractDatabaseObject;
+import velho.model.interfaces.DatabaseObject;
 import velho.model.interfaces.GenericView;
 
 public class CSVLoadView implements GenericView
@@ -30,11 +30,6 @@ public class CSVLoadView implements GenericView
 	private GridPane root;
 
 	/**
-	 * This view's controller.
-	 */
-	private CSVController csvController;
-
-	/**
 	 * The primary stage of the main window.
 	 */
 	private Stage primaryStage;
@@ -42,16 +37,13 @@ public class CSVLoadView implements GenericView
 	/**
 	 * A list of classes that can be saved and loaded from the database.
 	 */
-	private ObservableList<Class<? extends AbstractDatabaseObject>> validDatabaseClasses;
+	private ObservableList<Class<? extends DatabaseObject>> validDatabaseClasses;
 
 	/**
-	 * @param csvController
 	 * @param validDatabaseClasses
 	 */
-	public CSVLoadView(final CSVController csvController, final ObservableList<Class<? extends AbstractDatabaseObject>> validDatabaseClasses)
+	public CSVLoadView(final ObservableList<Class<? extends DatabaseObject>> validDatabaseClasses)
 	{
-		this.csvController = csvController;
-		this.root = null;
 		this.validDatabaseClasses = validDatabaseClasses;
 	}
 
@@ -66,21 +58,21 @@ public class CSVLoadView implements GenericView
 			root.setHgap(10);
 			root.setVgap(10);
 
-			final Label loadLabel = new Label(LocalizationController.getString("loadCSVFileLabel"));
+			final Label loadLabel = new Label(LocalizationController.getInstance().getString("loadCSVFileLabel"));
 			root.add(loadLabel, 0, 0);
 
 			final TextField fileNameField = new TextField();
 			root.add(fileNameField, 1, 0);
 
 			final FileChooser fileChooser = new FileChooser();
-			fileChooser.setTitle(LocalizationController.getString("loadCSVFileTitle"));
+			fileChooser.setTitle(LocalizationController.getInstance().getString("loadCSVFileTitle"));
 			fileChooser.setInitialDirectory(new File("./"));
 
-			final ComboBox<Class<? extends AbstractDatabaseObject>> typeSelector = new ComboBox<Class<? extends AbstractDatabaseObject>>();
+			final ComboBox<Class<? extends DatabaseObject>> typeSelector = new ComboBox<Class<? extends DatabaseObject>>();
 			typeSelector.setItems(validDatabaseClasses);
 			root.add(typeSelector, 3, 0);
 
-			final Button loadButton = new Button(LocalizationController.getString("loadToDatabaseButton"));
+			final Button loadButton = new Button(LocalizationController.getInstance().getString("loadToDatabaseButton"));
 			loadButton.setDisable(true);
 
 			loadButton.setOnAction(new EventHandler<ActionEvent>()
@@ -88,13 +80,13 @@ public class CSVLoadView implements GenericView
 				@Override
 				public void handle(final ActionEvent e)
 				{
-					csvController.loadCSVFileToDatabase(fileNameField.getText(), typeSelector.getValue());
+					CSVController.getInstance().loadCSVFileToDatabase(fileNameField.getText(), typeSelector.getValue());
 					fileNameField.clear();
 					loadButton.setDisable(true);
 				}
 			});
 
-			final Button selectButton = new Button(LocalizationController.getString("selectCSVFileButton"));
+			final Button selectButton = new Button(LocalizationController.getInstance().getString("selectCSVFileButton"));
 			root.add(selectButton, 2, 0);
 			root.add(loadButton, 4, 0);
 
@@ -105,7 +97,7 @@ public class CSVLoadView implements GenericView
 				{
 					final File csvFile = fileChooser.showOpenDialog(primaryStage);
 
-					if (CSVController.isValidCSVFile(csvFile))
+					if (CSVController.getInstance().isValidCSVFile(csvFile))
 					{
 						fileNameField.setText(csvFile.getAbsolutePath());
 
@@ -116,15 +108,17 @@ public class CSVLoadView implements GenericView
 					{
 						loadButton.setDisable(true);
 						fileNameField.clear();
-						PopupController.warning(LocalizationController.getCompoundString("notACSVFileNotice", csvFile.getAbsolutePath()));
+						PopupController.getInstance()
+								.warning(LocalizationController.getInstance().getCompoundString("notACSVFileNotice", csvFile.getAbsolutePath()));
 					}
 				}
 			});
 
-			typeSelector.valueProperty().addListener(new ChangeListener<Class<? extends AbstractDatabaseObject>>()
+			typeSelector.valueProperty().addListener(new ChangeListener<Class<? extends DatabaseObject>>()
 			{
 				@Override
-				public void changed(final ObservableValue<? extends Class<? extends AbstractDatabaseObject>> observable, final Class<? extends AbstractDatabaseObject> oldValue, final Class<? extends AbstractDatabaseObject> newValue)
+				public void changed(final ObservableValue<? extends Class<? extends DatabaseObject>> observable, final Class<? extends DatabaseObject> oldValue,
+						final Class<? extends DatabaseObject> newValue)
 				{
 					if (newValue == null || fileNameField.getText().isEmpty())
 						loadButton.setDisable(true);
@@ -133,7 +127,7 @@ public class CSVLoadView implements GenericView
 				}
 			});
 
-			UIController.recordView(this);
+			UIController.getInstance().recordView(this);
 		}
 
 		return root;

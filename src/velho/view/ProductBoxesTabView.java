@@ -44,11 +44,6 @@ import velho.view.components.TableCellDeleteButton;
 public class ProductBoxesTabView implements GenericView
 {
 	/**
-	 * ProductCntroller neeeded when saving to database
-	 */
-	private final ProductController productController;
-
-	/**
 	 * Makes the Categories tab call for table and make it viewable
 	 */
 	private final TableView<Object> table;
@@ -61,19 +56,14 @@ public class ProductBoxesTabView implements GenericView
 	/**
 	 * Makes the Categories and ObservableList
 	 */
-	private ObservableList<Object> data = DatabaseController.getAllProductBoxes();
-
-	private ObservableList<Object> pList;
+	private ObservableList<Object> products;
 
 	/**
-	 * Adds info to Product Controller about brands
-	 *
-	 * @param productController Product Controller handles the database work
-	 * @param uiController links UIController to the productController
+	 * @param products
 	 */
-	public ProductBoxesTabView(final ProductController productController)
+	public ProductBoxesTabView(final ObservableList<Object> products)
 	{
-		this.productController = productController;
+		this.products = products;
 		this.table = new TableView<Object>();
 	}
 
@@ -90,16 +80,17 @@ public class ProductBoxesTabView implements GenericView
 		{
 			table.getColumns().clear();
 
-			pList = productList;
+			products = productList;
 			HBox hb = new HBox();
 
 			table.setEditable(true);
 
-			table.setItems(data);
+			table.setItems(products);
 
 			Callback<TableColumn<Object, Object>, TableCell<Object, Object>> cellFactory = (final TableColumn<Object, Object> p) -> new SpinnerCell();
 
-			TableColumn<Object, Object> sizeColumn = new TableColumn<Object, Object>(LocalizationController.getString("publicRemovalTableHeaderSize"));
+			TableColumn<Object, Object> sizeColumn = new TableColumn<Object, Object>(
+					LocalizationController.getInstance().getString("publicRemovalTableHeaderSize"));
 
 			sizeColumn.setMinWidth(100);
 			sizeColumn.setCellValueFactory(new PropertyValueFactory<>("productCount"));
@@ -109,13 +100,13 @@ public class ProductBoxesTabView implements GenericView
 			{
 				final ProductBox productBox = ((ProductBox) t.getTableView().getItems().get(t.getTablePosition().getRow()));
 				productBox.setProductCount((int) t.getNewValue());
-				productController.saveProductBox(productBox);
+				ProductController.getInstance().saveProductBox(productBox);
 			});
 			table.getColumns().add(sizeColumn);
 
 			Callback<TableColumn<Object, Object>, TableCell<Object, Object>> cellFactory2 = (final TableColumn<Object, Object> p) -> new SpinnerCell();
 
-			TableColumn<Object, Object> maxSizeColumn = new TableColumn<Object, Object>(LocalizationController.getString("maxSizeTabName"));
+			TableColumn<Object, Object> maxSizeColumn = new TableColumn<Object, Object>(LocalizationController.getInstance().getString("maxSizeTabName"));
 
 			maxSizeColumn.setMinWidth(100);
 			maxSizeColumn.setCellValueFactory(new PropertyValueFactory<>("maxSize"));
@@ -125,12 +116,12 @@ public class ProductBoxesTabView implements GenericView
 			{
 				final ProductBox productBox = ((ProductBox) t.getTableView().getItems().get(t.getTablePosition().getRow()));
 				productBox.setMaxSize((int) t.getNewValue());
-				productController.saveProductBox(productBox);
+				ProductController.getInstance().saveProductBox(productBox);
 			});
 			table.getColumns().add(maxSizeColumn);
 
-			ObservableList<Object> cbValues = DatabaseController.getAllProducts();
-			TableColumn<Object, Object> product = new TableColumn<Object, Object>(LocalizationController.getString("productProduct"));
+			ObservableList<Object> cbValues = DatabaseController.getInstance().getAllProducts();
+			TableColumn<Object, Object> product = new TableColumn<Object, Object>(LocalizationController.getInstance().getString("productProduct"));
 
 			product.setCellValueFactory(new PropertyValueFactory<>("product"));
 			product.setCellFactory(ComboBoxTableCell.forTableColumn(cbValues));
@@ -138,12 +129,12 @@ public class ProductBoxesTabView implements GenericView
 			{
 				final ProductBox editProductBox = ((ProductBox) t.getTableView().getItems().get(t.getTablePosition().getRow()));
 				editProductBox.setProduct((Product) t.getNewValue());
-				productController.saveProductBox(editProductBox);
+				ProductController.getInstance().saveProductBox(editProductBox);
 			});
 			table.getColumns().add(product);
 
 			Callback<TableColumn<Object, Object>, TableCell<Object, Object>> pickerFactory = (final TableColumn<Object, Object> p) -> new DatePickerCell();
-			TableColumn<Object, Object> datePickerColumn = new TableColumn<>(LocalizationController.getString("expirationDateExpirationDate"));
+			TableColumn<Object, Object> datePickerColumn = new TableColumn<>(LocalizationController.getInstance().getString("expirationDateExpirationDate"));
 			datePickerColumn.setMinWidth(150);
 			datePickerColumn.setCellValueFactory(new PropertyValueFactory<>("expirationDate"));
 			datePickerColumn.setCellFactory(pickerFactory);
@@ -159,7 +150,7 @@ public class ProductBoxesTabView implements GenericView
 					date = Date.from(saveDate.atTime(0, 0).toInstant(ZoneOffset.of("Z")));
 				}
 				productBox.setExpirationDate(date);
-				productController.saveProductBox(productBox);
+				ProductController.getInstance().saveProductBox(productBox);
 			});
 			table.getColumns().add(datePickerColumn);
 
@@ -181,36 +172,37 @@ public class ProductBoxesTabView implements GenericView
 				@Override
 				public TableCell<Object, String> call(final TableColumn<Object, String> p)
 				{
-					final TableCellDeleteButton button = new TableCellDeleteButton(productController, (LocalizationController.getString("buttonDelete")));
+					final TableCellDeleteButton button = new TableCellDeleteButton(ProductController.getInstance(),
+							(LocalizationController.getInstance().getString("buttonDelete")));
 					button.setAlignment(Pos.CENTER);
 					return button;
 				}
 			});
 			table.getColumns().add(deleteColumn);
 
-			final Label maxSizeLabel = new Label(LocalizationController.getString("maxProductsLabel"));
+			final Label maxSizeLabel = new Label(LocalizationController.getInstance().getString("maxProductsLabel"));
 			final Spinner<Integer> productBoxMaxSize = new Spinner<Integer>();
 			productBoxMaxSize.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(1, Integer.MAX_VALUE));
 			productBoxMaxSize.setMaxWidth(maxSizeColumn.getPrefWidth());
 
-			final Label sizeLabel = new Label(LocalizationController.getString("productCountLabel"));
+			final Label sizeLabel = new Label(LocalizationController.getInstance().getString("productCountLabel"));
 			final Spinner<Integer> productBoxSize = new Spinner<Integer>();
 			final IntegerSpinnerValueFactory sizeFactory = new SpinnerValueFactory.IntegerSpinnerValueFactory(1, productBoxMaxSize.getValue());
 			sizeFactory.maxProperty().bind(productBoxMaxSize.getValueFactory().valueProperty());
 			productBoxSize.setValueFactory(sizeFactory);
 			productBoxSize.setMaxWidth(sizeColumn.getPrefWidth());
 
-			final Label productLabel = new Label(LocalizationController.getString("productPromtTextAddProductView"));
+			final Label productLabel = new Label(LocalizationController.getInstance().getString("productPromtTextAddProductView"));
 			final ComboBox<Object> productItem = new ComboBox<Object>();
 			productItem.getItems().clear();
-			productItem.getItems().addAll(pList);
+			productItem.getItems().addAll(products);
 			productItem.getSelectionModel().selectFirst();
 			productItem.setMaxWidth(product.getPrefWidth());
 
-			final Label calendarLabel = new Label(LocalizationController.getString("expirationDateLabel"));
+			final Label calendarLabel = new Label(LocalizationController.getInstance().getString("expirationDateLabel"));
 			final DatePicker expirationDate = new DatePicker();
 
-			final Button addButton = new Button(LocalizationController.getString("buttonCreate"));
+			final Button addButton = new Button(LocalizationController.getInstance().getString("buttonCreate"));
 			addButton.setOnAction((final ActionEvent e) ->
 			{
 				Date date = null;
@@ -218,8 +210,7 @@ public class ProductBoxesTabView implements GenericView
 					date = Date.from(expirationDate.getValue().atTime(0, 0).toInstant(ZoneOffset.of("Z")));
 				final ProductBox saveProductBox = new ProductBox((Product) productItem.getValue(), productBoxMaxSize.getValue(), productBoxSize.getValue(),
 						date);
-				System.out.println("New product box: " + saveProductBox);
-				productController.saveProductBox(saveProductBox);
+				ProductController.getInstance().saveProductBox(saveProductBox);
 			});
 
 			hb.getChildren().addAll(sizeLabel, productBoxSize, maxSizeLabel, productBoxMaxSize, productLabel, productItem, calendarLabel, expirationDate,
@@ -233,7 +224,7 @@ public class ProductBoxesTabView implements GenericView
 			vbox.setPadding(new Insets(10, 0, 0, 10));
 			vbox.getChildren().addAll(table, hb);
 
-			UIController.recordView(this);
+			UIController.getInstance().recordView(this);
 		}
 		return vbox;
 	}
@@ -512,7 +503,7 @@ public class ProductBoxesTabView implements GenericView
 	public void recreate()
 	{
 		vbox = null;
-		getView(pList);
+		getView(products);
 	}
 
 	@Override

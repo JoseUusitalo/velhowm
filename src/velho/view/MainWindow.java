@@ -1,4 +1,3 @@
-
 package velho.view;
 
 import java.util.HashMap;
@@ -34,17 +33,12 @@ import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
 import velho.controller.CSVController;
 import velho.controller.DebugController;
-import velho.controller.ExternalSystemsController;
 import velho.controller.LocalizationController;
 import velho.controller.LogController;
 import velho.controller.LoginController;
 import velho.controller.ManifestController;
-import velho.controller.ProductController;
-import velho.controller.RemovalListController;
 import velho.controller.RemovalPlatformController;
-import velho.controller.SearchController;
 import velho.controller.UIController;
-import velho.controller.UserController;
 import velho.controller.database.DatabaseController;
 import velho.controller.database.LogDatabaseController;
 import velho.model.enums.SupportedTranslation;
@@ -102,46 +96,6 @@ public class MainWindow extends Application implements GenericView
 	public static final double WINDOW_WIDTH = 1024;
 
 	/**
-	 * The {@link DebugController}.
-	 */
-	private static DebugController debugController;
-
-	/**
-	 * The {@link SearchController}.
-	 */
-	private SearchController searchController;
-
-	/**
-	 * The {@link UserController}.
-	 */
-	private UserController userController;
-
-	/**
-	 * The {@link UIController}.
-	 */
-	private static UIController uiController;
-
-	/**
-	 * The {@link RemovalListController}.
-	 */
-	private RemovalListController removalListController;
-
-	/**
-	 * The {@link LogController}.
-	 */
-	private LogController logController;
-
-	/**
-	 * The {@link ManifestController}.
-	 */
-	private ManifestController manifestController;
-
-	/**
-	 * The {@link RemovalPlatformController}.
-	 */
-	private RemovalPlatformController removalPlatformController;
-
-	/**
 	 * The current width of the window.
 	 */
 	public static ReadOnlyDoubleProperty widthProperty;
@@ -173,19 +127,9 @@ public class MainWindow extends Application implements GenericView
 	private Stage debugStage;
 
 	/**
-	 * The {@link ProductController}.
-	 */
-	private ProductController productController;
-
-	/**
 	 * A label showing the status of the removal platform.
 	 */
 	private Label removalPlatformStatus;
-
-	/**
-	 * The {@link CSVController}.
-	 */
-	private CSVController csvController;
 
 	/**
 	 * The primary stage where the window is.
@@ -198,7 +142,7 @@ public class MainWindow extends Application implements GenericView
 	public MainWindow()
 	{
 		prepareLogger();
-		LocalizationController.initializeBundle();
+		LocalizationController.getInstance().initializeBundle();
 		prepareDatabase();
 		runApp();
 	}
@@ -210,7 +154,7 @@ public class MainWindow extends Application implements GenericView
 	{
 		try
 		{
-			DatabaseController.loadSampleData();
+			DatabaseController.getInstance().loadSampleData();
 		}
 		catch (final HibernateException e)
 		{
@@ -228,7 +172,7 @@ public class MainWindow extends Application implements GenericView
 
 		try
 		{
-			if (LogDatabaseController.connectAndInitialize())
+			if (LogDatabaseController.getInstance().connectAndInitialize())
 			{
 				if (!DEBUG_MODE)
 				{
@@ -276,6 +220,21 @@ public class MainWindow extends Application implements GenericView
 	}
 
 	/**
+	 * Initializes all controllers in the application.
+	 */
+	private void initializeControllers()
+	{
+		SYSLOG.debug("Initializing all controllers...");
+
+		ManifestController.getInstance().initialize(this);
+		RemovalPlatformController.getInstance().initialize(this);
+		CSVController.getInstance().initialize(this);
+		UIController.getInstance().initialize(this);
+
+		SYSLOG.debug("All controllers initialized.");
+	}
+
+	/**
 	 * The main method for running the application.
 	 */
 	private void runApp()
@@ -284,43 +243,11 @@ public class MainWindow extends Application implements GenericView
 
 		try
 		{
-			DatabaseController.link();
+			DatabaseController.getInstance().link();
 
-			if (DatabaseController.isLinked())
+			if (DatabaseController.getInstance().isLinked())
 			{
-				SYSLOG.debug("Creating all controllers...");
-
-				// FIXME: Convert all controllers to use the singleton pattern.
-
-				uiController = new UIController();
-				userController = new UserController();
-				logController = new LogController();
-				productController = new ProductController();
-
-				csvController = new CSVController(this);
-				manifestController = new ManifestController(this);
-				removalPlatformController = new RemovalPlatformController(this);
-				debugController = new DebugController(removalPlatformController);
-				searchController = new SearchController(productController);
-				removalListController = new RemovalListController(searchController);
-
-				ExternalSystemsController.setControllers(manifestController);
-				LoginController.setControllers(uiController, debugController);
-				LocalizationController.setControllers(uiController);
-
-				//@formatter:off
-				uiController.setControllers(this,
-											userController,
-											removalListController,
-											searchController,
-											logController,
-											manifestController,
-											productController,
-											removalPlatformController,
-											csvController);
-				//@formatter:on
-
-				SYSLOG.debug("All controllers created.");
+				initializeControllers();
 			}
 			else
 			{
@@ -329,9 +256,9 @@ public class MainWindow extends Application implements GenericView
 				System.exit(0);
 			}
 		}
-		catch (ClassNotFoundException e1)
+		catch (final ClassNotFoundException e)
 		{
-			e1.printStackTrace();
+			e.printStackTrace();
 		}
 	}
 
@@ -398,7 +325,7 @@ public class MainWindow extends Application implements GenericView
 					switch (newTab.getText())
 					{
 						case "Logs":
-							logController.refresh();
+							LogController.getInstance().refresh();
 							break;
 						default:
 							// Do nothing.
@@ -409,15 +336,15 @@ public class MainWindow extends Application implements GenericView
 		}
 
 		// Force log in to see main menu.
-		if (LoginController.checkLogin())
+		if (LoginController.getInstance().checkLogin())
 		{
 			final GridPane statusBar = new GridPane();
 			statusBar.getStyleClass().add("status-bar");
 
 			final ComboBox<SupportedTranslation> languageBox = new ComboBox<SupportedTranslation>();
-			final Label languageChange = new Label(LocalizationController.getString("changeTranslationLabel"));
+			final Label languageChange = new Label(LocalizationController.getInstance().getString("changeTranslationLabel"));
 			languageBox.getItems().addAll(SupportedTranslation.values());
-			languageBox.getSelectionModel().select(LocalizationController.getCurrentTranslation());
+			languageBox.getSelectionModel().select(LocalizationController.getInstance().getCurrentTranslation());
 			languageBox.valueProperty().addListener(new ChangeListener<SupportedTranslation>()
 			{
 				@SuppressWarnings("rawtypes")
@@ -426,24 +353,24 @@ public class MainWindow extends Application implements GenericView
 				{
 					if (oldValue == null || !oldValue.equals(newValue))
 					{
-						LocalizationController.changeTranslation(newValue);
+						LocalizationController.getInstance().changeTranslation(newValue);
 					}
 				}
 			});
 
 			final HBox platformStatus = new HBox(3);
-			final Label removalPlatform = new Label(LocalizationController.getString("removalPlatformStatusLabel"));
+			final Label removalPlatform = new Label(LocalizationController.getInstance().getString("removalPlatformStatusLabel"));
 			removalPlatform.setId("removalPlatformStatusLabel");
 			removalPlatformStatus = new Label();
 			platformStatus.getChildren().addAll(languageChange, languageBox, removalPlatform, removalPlatformStatus);
 			platformStatus.setAlignment(Pos.CENTER_LEFT);
 
 			final HBox userStatus = new HBox(10);
-			final Label userName = new Label(LocalizationController.getCompoundString("helloUserMessage", LoginController.getCurrentUser().getRoleName(),
-					LoginController.getCurrentUser().getFullName()));
+			final Label userName = new Label(LocalizationController.getInstance().getCompoundString("helloUserMessage",
+					LoginController.getInstance().getCurrentUser().getRoleName(), LoginController.getInstance().getCurrentUser().getFullName()));
 			userName.setId("userName");
 
-			final Button logoutButton = new Button(LocalizationController.getString("logOutButton"));
+			final Button logoutButton = new Button(LocalizationController.getInstance().getString("logOutButton"));
 			logoutButton.setPrefHeight(5.0);
 			userStatus.getChildren().addAll(userName, logoutButton);
 			userStatus.setAlignment(Pos.CENTER_RIGHT);
@@ -453,7 +380,7 @@ public class MainWindow extends Application implements GenericView
 				@Override
 				public void handle(final ActionEvent event)
 				{
-					LoginController.logout();
+					LoginController.getInstance().logout();
 				}
 			});
 
@@ -461,7 +388,7 @@ public class MainWindow extends Application implements GenericView
 			statusBar.add(userStatus, 1, 0);
 			GridPane.setHgrow(platformStatus, Priority.ALWAYS);
 			rootBorderPane.setBottom(statusBar);
-			UIController.recordView(this);
+			UIController.getInstance().recordView(this);
 		}
 		rootBorderPane.setCenter(mainTabPane);
 	}
@@ -475,7 +402,7 @@ public class MainWindow extends Application implements GenericView
 		this.primaryStage = mainStage;
 
 		setUserAgentStylesheet(STYLESHEET_MODENA);
-		this.primaryStage.setTitle(LocalizationController.getString("mainWindowTitle"));
+		this.primaryStage.setTitle(LocalizationController.getInstance().getString("mainWindowTitle"));
 		final Group root = new Group();
 		scene = new Scene(root, WINDOW_WIDTH, WINDOW_HEIGHT);
 		scene.getStylesheets().add(getClass().getResource("velho.css").toExternalForm());
@@ -496,14 +423,14 @@ public class MainWindow extends Application implements GenericView
 
 		if (!SKIP_MAIN_CODE)
 		{
-			LoginController.checkLogin();
+			LoginController.getInstance().checkLogin();
 			this.primaryStage.setScene(scene);
 			this.primaryStage.show();
 
 			if (DEBUG_MODE)
 			{
 				debugStage = new Stage();
-				debugController.createDebugWindow(debugStage);
+				DebugController.getInstance().createDebugWindow(debugStage);
 
 				debugStage.setOnCloseRequest(new EventHandler<WindowEvent>()
 				{
@@ -552,12 +479,12 @@ public class MainWindow extends Application implements GenericView
 		if (DEBUG_MODE && debugStage != null)
 			debugStage.close();
 
-		DatabaseController.closeSessionFactory();
-		DatabaseController.unlink();
+		DatabaseController.getInstance().closeSessionFactory();
+		DatabaseController.getInstance().unlink();
 
 		SYSLOG.info("Exit.");
 
-		LogDatabaseController.unlink();
+		LogDatabaseController.getInstance().unlink();
 	}
 
 	/**
@@ -628,11 +555,6 @@ public class MainWindow extends Application implements GenericView
 	private void skip()
 	{
 		SYSLOG.info("Main application code skipped.");
-
-		// It works.
-		// System.out.println("id:" + new AssignedIdentifierGenerator().generate((SessionImplementor)
-		// HibernateSessionFactory.getInstance().getCurrentSession(),
-		// new User(120, "new", "thing", "111111", null, UserRole.ADMINISTRATOR)));
 	}
 
 	@Override

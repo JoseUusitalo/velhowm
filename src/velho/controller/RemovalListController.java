@@ -17,7 +17,7 @@ import velho.view.RemovalListManagementView;
 import velho.view.RemovalListView;
 
 /**
- * A class for managing {@link RemovalList} objects.
+ * The singleton controller for managing {@link RemovalList} objects.
  *
  * @author Jose Uusitalo
  */
@@ -44,11 +44,6 @@ public class RemovalListController implements UIActionController
 	private RemovalList newRemovalList;
 
 	/**
-	 * The {@link SearchController}.
-	 */
-	private final SearchController searchController;
-
-	/**
 	 * The creation view for removal lists.
 	 */
 	private RemovalListCreationView creationView;
@@ -64,12 +59,33 @@ public class RemovalListController implements UIActionController
 	private final GenericTabView tabView;
 
 	/**
-	 * @param searchController
+	 * A private inner class holding the class instance.
+	 *
+	 * @author Jose Uusitalo
 	 */
-	public RemovalListController(final SearchController searchController)
+	private static class Holder
 	{
-		this.searchController = searchController;
+		/**
+		 * The only instance of {@link RemovalListController}.
+		 */
+		private static final RemovalListController INSTANCE = new RemovalListController();
+	}
+
+	/**
+	 */
+	private RemovalListController()
+	{
 		tabView = new GenericTabView();
+	}
+
+	/**
+	 * Gets the instance of the {@link RemovalListController}.
+	 *
+	 * @return the removal list controller
+	 */
+	public static synchronized RemovalListController getInstance()
+	{
+		return Holder.INSTANCE;
 	}
 
 	/**
@@ -80,10 +96,10 @@ public class RemovalListController implements UIActionController
 	public Node getView()
 	{
 		// Managers and greater see the management view.
-		if (LoginController.userRoleIsGreaterOrEqualTo(UserRole.MANAGER))
+		if (LoginController.getInstance().userRoleIsGreaterOrEqualTo(UserRole.MANAGER))
 		{
-			managementView = new RemovalListManagementView(this);
-			creationView = new RemovalListCreationView(this, this.searchController);
+			managementView = new RemovalListManagementView();
+			creationView = new RemovalListCreationView();
 
 			// Initially the browsing view is shown.
 			if (managementView.getView().getCenter() == null)
@@ -95,7 +111,8 @@ public class RemovalListController implements UIActionController
 		{
 			// Others see just the browsing view.
 			if (browseView == null)
-				browseView = ListController.getTableView(this, DatabaseController.getRemovalListDataColumns(), DatabaseController.getAllRemovalLists());
+				browseView = ListController.getTableView(this, DatabaseController.getInstance().getRemovalListDataColumns(),
+						DatabaseController.getInstance().getAllRemovalLists());
 			tabView.setView(browseView);
 		}
 
@@ -122,7 +139,7 @@ public class RemovalListController implements UIActionController
 	{
 		// Create a new removal list if it does not exist.
 		if (newRemovalList == null)
-			newRemovalList = new RemovalList(DatabaseController.getRemovalListStateByID(1));
+			newRemovalList = new RemovalList(DatabaseController.getInstance().getRemovalListStateByID(1));
 
 		if (managementView.getContent().equals(getRemovalListCreationView()))
 		{
@@ -148,13 +165,14 @@ public class RemovalListController implements UIActionController
 		if (browseView == null)
 		{
 			SYSLOG.trace("Creating removal list browsing view.");
-			browseView = ListController.getTableView(this, DatabaseController.getRemovalListDataColumns(), DatabaseController.getAllRemovalLists());
+			browseView = ListController.getTableView(this, DatabaseController.getInstance().getRemovalListDataColumns(),
+					DatabaseController.getInstance().getAllRemovalLists());
 		}
 
-		SYSLOG.trace("Removal list browsing: " + DatabaseController.getAllRemovalLists());
+		SYSLOG.trace("Removal list browsing: " + DatabaseController.getInstance().getAllRemovalLists());
 
 		// Managers and greater see the management view.
-		if (LoginController.userRoleIsGreaterOrEqualTo(UserRole.MANAGER))
+		if (LoginController.getInstance().userRoleIsGreaterOrEqualTo(UserRole.MANAGER))
 		{
 			managementView.setBrowseListsButtonVisiblity(false);
 			managementView.setContent(browseView);
@@ -174,8 +192,9 @@ public class RemovalListController implements UIActionController
 	 */
 	public BorderPane getSearchResultsListView()
 	{
-		SYSLOG.trace("Getting search result list: " + DatabaseController.getObservableProductSearchResults());
-		return (BorderPane) ListController.getTableView(this, DatabaseController.getProductSearchDataColumns(true, false), DatabaseController.getObservableProductSearchResults());
+		SYSLOG.trace("Getting search result list: " + DatabaseController.getInstance().getObservableProductSearchResults());
+		return (BorderPane) ListController.getTableView(this, DatabaseController.getInstance().getProductSearchDataColumns(true, false),
+				DatabaseController.getInstance().getObservableProductSearchResults());
 	}
 
 	/**
@@ -187,7 +206,8 @@ public class RemovalListController implements UIActionController
 	{
 		SYSLOG.trace("Getting new removal list: " + newRemovalList.getObservableBoxes());
 
-		return (BorderPane) ListController.getTableView(this, DatabaseController.getProductSearchDataColumns(false, true), newRemovalList.getObservableBoxes());
+		return (BorderPane) ListController.getTableView(this, DatabaseController.getInstance().getProductSearchDataColumns(false, true),
+				newRemovalList.getObservableBoxes());
 	}
 
 	/**
@@ -199,9 +219,9 @@ public class RemovalListController implements UIActionController
 		{
 			SYSLOG.info("Saving Removal List: " + newRemovalList.getBoxes());
 
-			if (DatabaseController.saveOrUpdate(newRemovalList) > 0)
+			if (DatabaseController.getInstance().saveOrUpdate(newRemovalList) > 0)
 			{
-				DatabaseController.clearSearchResults();
+				DatabaseController.getInstance().clearSearchResults();
 
 				USRLOG.info("Created a new Removal List: " + newRemovalList.getBoxes());
 
@@ -219,12 +239,12 @@ public class RemovalListController implements UIActionController
 			}
 			else
 			{
-				PopupController.error(LocalizationController.getString("removalListSavingFailPopUp"));
+				PopupController.getInstance().error(LocalizationController.getInstance().getString("removalListSavingFailPopUp"));
 			}
 		}
 		else
 		{
-			PopupController.info(LocalizationController.getString("addProductBoxesFirstNotice"));
+			PopupController.getInstance().info(LocalizationController.getInstance().getString("addProductBoxesFirstNotice"));
 		}
 	}
 
@@ -250,8 +270,8 @@ public class RemovalListController implements UIActionController
 	{
 		removalList.setState(state);
 
-		if (DatabaseController.saveOrUpdate(removalList) < 1)
-			PopupController.error(LocalizationController.getString("unableToSaveRemovalListStateNotice"));
+		if (DatabaseController.getInstance().saveOrUpdate(removalList) < 1)
+			PopupController.getInstance().error(LocalizationController.getInstance().getString("unableToSaveRemovalListStateNotice"));
 	}
 
 	@Override
@@ -273,16 +293,16 @@ public class RemovalListController implements UIActionController
 		if (!newRemovalList.removeProductBox(((ProductBoxSearchResultRow) data).getBox()))
 		{
 			USRLOG.debug("Failed to remove product box from removal list.");
-			PopupController.error(LocalizationController.getString("failedToRemoveProductBoxFromRemovalListNotice"));
+			PopupController.getInstance().error(LocalizationController.getInstance().getString("failedToRemoveProductBoxFromRemovalListNotice"));
 		}
 	}
 
 	@Override
 	public void deleteAction(final Object data)
 	{
-		if (PopupController.confirmation(LocalizationController.getString("removalListDeletationConfirmation")))
+		if (PopupController.getInstance().confirmation(LocalizationController.getInstance().getString("removalListDeletationConfirmation")))
 		{
-			DatabaseController.deleteRemovalList((RemovalList) data);
+			DatabaseController.getInstance().deleteRemovalList((RemovalList) data);
 			USRLOG.info("Deleted removal list: " + ((RemovalList) data).toString());
 		}
 	}
@@ -294,7 +314,7 @@ public class RemovalListController implements UIActionController
 		if (!newRemovalList.addProductBox(((ProductBoxSearchResultRow) data).getBox()))
 		{
 			USRLOG.trace("Product box is already on the list.");
-			PopupController.error(LocalizationController.getString("productBoxExistsOnRemovalList"));
+			PopupController.getInstance().error(LocalizationController.getInstance().getString("productBoxExistsOnRemovalList"));
 		}
 	}
 
@@ -303,10 +323,10 @@ public class RemovalListController implements UIActionController
 	{
 		USRLOG.info("Viewing removal list " + data);
 
-		if (LoginController.userRoleIsGreaterOrEqualTo(UserRole.MANAGER))
-			managementView.setContent(new RemovalListView((RemovalList) data, this).getView());
+		if (LoginController.getInstance().userRoleIsGreaterOrEqualTo(UserRole.MANAGER))
+			managementView.setContent(new RemovalListView((RemovalList) data).getView());
 		else
-			tabView.setView(new RemovalListView((RemovalList) data, this).getView());
+			tabView.setView(new RemovalListView((RemovalList) data).getView());
 	}
 
 	@Override

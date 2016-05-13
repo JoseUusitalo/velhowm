@@ -18,7 +18,7 @@ import javafx.stage.Stage;
 import velho.controller.CSVController;
 import velho.controller.LocalizationController;
 import velho.controller.UIController;
-import velho.model.AbstractDatabaseObject;
+import velho.model.interfaces.DatabaseObject;
 import velho.model.interfaces.GenericView;
 
 public class CSVWriteView implements GenericView
@@ -29,11 +29,6 @@ public class CSVWriteView implements GenericView
 	private GridPane root;
 
 	/**
-	 * This view's controller.
-	 */
-	private CSVController csvController;
-
-	/**
 	 * The primary stage of the main window.
 	 */
 	private Stage primaryStage;
@@ -41,16 +36,13 @@ public class CSVWriteView implements GenericView
 	/**
 	 * A list of classes that can be saved and loaded from the database.
 	 */
-	private ObservableList<Class<? extends AbstractDatabaseObject>> validDatabaseClasses;
+	private ObservableList<Class<? extends DatabaseObject>> validDatabaseClasses;
 
 	/**
-	 * @param csvController
 	 * @param validDatabaseClasses
 	 */
-	public CSVWriteView(final CSVController csvController, final ObservableList<Class<? extends AbstractDatabaseObject>> validDatabaseClasses)
+	public CSVWriteView(final ObservableList<Class<? extends DatabaseObject>> validDatabaseClasses)
 	{
-		this.csvController = csvController;
-		this.root = null;
 		this.validDatabaseClasses = validDatabaseClasses;
 	}
 
@@ -65,21 +57,21 @@ public class CSVWriteView implements GenericView
 			root.setHgap(10);
 			root.setVgap(10);
 
-			final Label saveLabel = new Label(LocalizationController.getString("writeDatabaseContentsLabel"));
+			final Label saveLabel = new Label(LocalizationController.getInstance().getString("writeDatabaseContentsLabel"));
 
 			final TextField fileNameField = new TextField();
 
 			final FileChooser fileChooser = new FileChooser();
-			fileChooser.setTitle(LocalizationController.getString("writeCSVFileTitle"));
+			fileChooser.setTitle(LocalizationController.getInstance().getString("writeCSVFileTitle"));
 			fileChooser.setInitialDirectory(new File("./"));
 			fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("CSV File (*.csv)", "*.csv"));
 
-			final Label typeLabel = new Label(LocalizationController.getString("dataBaseContentsLabel"));
+			final Label typeLabel = new Label(LocalizationController.getInstance().getString("dataBaseContentsLabel"));
 
-			final ComboBox<Class<? extends AbstractDatabaseObject>> typeSelector = new ComboBox<Class<? extends AbstractDatabaseObject>>();
+			final ComboBox<Class<? extends DatabaseObject>> typeSelector = new ComboBox<Class<? extends DatabaseObject>>();
 			typeSelector.setItems(validDatabaseClasses);
 
-			final Button writeButton = new Button(LocalizationController.getString("writeButton"));
+			final Button writeButton = new Button(LocalizationController.getInstance().getString("writeButton"));
 			writeButton.setDisable(true);
 
 			writeButton.setOnAction(new EventHandler<ActionEvent>()
@@ -87,13 +79,13 @@ public class CSVWriteView implements GenericView
 				@Override
 				public void handle(final ActionEvent e)
 				{
-					csvController.writeDatabaseTableToCSVFile(fileNameField.getText(), typeSelector.getValue());
+					CSVController.getInstance().writeDatabaseTableToCSVFile(fileNameField.getText(), typeSelector.getValue());
 					fileNameField.clear();
 					writeButton.setDisable(true);
 				}
 			});
 
-			final Button selectButton = new Button(LocalizationController.getString("selectCSVFileButton"));
+			final Button selectButton = new Button(LocalizationController.getInstance().getString("selectCSVFileButton"));
 
 			selectButton.setOnAction(new EventHandler<ActionEvent>()
 			{
@@ -108,10 +100,11 @@ public class CSVWriteView implements GenericView
 				}
 			});
 
-			typeSelector.valueProperty().addListener(new ChangeListener<Class<? extends AbstractDatabaseObject>>()
+			typeSelector.valueProperty().addListener(new ChangeListener<Class<? extends DatabaseObject>>()
 			{
 				@Override
-				public void changed(final ObservableValue<? extends Class<? extends AbstractDatabaseObject>> observable, final Class<? extends AbstractDatabaseObject> oldValue, final Class<? extends AbstractDatabaseObject> newValue)
+				public void changed(final ObservableValue<? extends Class<? extends DatabaseObject>> observable, final Class<? extends DatabaseObject> oldValue,
+						final Class<? extends DatabaseObject> newValue)
 				{
 					if (newValue == null || fileNameField.getText().isEmpty())
 						writeButton.setDisable(true);
@@ -127,7 +120,7 @@ public class CSVWriteView implements GenericView
 			root.add(typeSelector, 1, 1);
 			root.add(writeButton, 2, 1);
 
-			UIController.recordView(this);
+			UIController.getInstance().recordView(this);
 		}
 
 		return root;

@@ -21,8 +21,8 @@ import velho.model.ProductCategory;
  */
 public class ProductTest
 {
-	private ProductBrand brand = DatabaseController.getProductBrandByID(1);
-	private ProductCategory category = DatabaseController.getProductCategoryByID(3);
+	private ProductBrand brand = DatabaseController.getInstance().getProductBrandByID(1);
+	private ProductCategory category = DatabaseController.getInstance().getProductCategoryByID(3);
 	private Product product;
 	private String name = "porkkana";
 
@@ -35,9 +35,9 @@ public class ProductTest
 	@BeforeClass
 	public static final void init() throws Exception
 	{
-		LogDatabaseController.connectAndInitialize();
-		DatabaseController.link();
-		DatabaseController.loadSampleData();
+		LogDatabaseController.getInstance().connectAndInitialize();
+		DatabaseController.getInstance().link();
+		DatabaseController.getInstance().loadSampleData();
 	}
 
 	/**
@@ -46,8 +46,8 @@ public class ProductTest
 	@AfterClass
 	public static final void unlinkDatabases() throws Exception
 	{
-		DatabaseController.unlink();
-		LogDatabaseController.unlink();
+		DatabaseController.getInstance().unlink();
+		LogDatabaseController.getInstance().unlink();
 	}
 
 	@Before

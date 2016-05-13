@@ -35,7 +35,7 @@ public class GenericTabView implements GenericView
 		if (bPane == null)
 		{
 			bPane = new BorderPane();
-			UIController.recordView(this);
+			UIController.getInstance().recordView(this);
 		}
 		return bPane;
 

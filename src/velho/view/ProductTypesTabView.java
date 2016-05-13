@@ -20,7 +20,6 @@ import javafx.util.Callback;
 import velho.controller.LocalizationController;
 import velho.controller.ProductController;
 import velho.controller.UIController;
-import velho.controller.database.DatabaseController;
 import velho.model.ProductType;
 import velho.model.interfaces.GenericView;
 import velho.view.components.TableCellDeleteButton;
@@ -30,14 +29,6 @@ import velho.view.components.TableCellDeleteButton;
  */
 public class ProductTypesTabView implements GenericView
 {
-	/**
-	 * ProductController a gatekeeper to our data that the ProductType needs
-	 */
-	private final ProductController productController;
-
-	/**
-	 * TableView so the tab can be shown.
-	 */
 	private final TableView<Object> table;
 
 	/**
@@ -45,26 +36,17 @@ public class ProductTypesTabView implements GenericView
 	 */
 	private VBox vbox;
 
-	/**
-	 * data comes from the database that is conrolled by the DatabaseController.
-	 */
-	private ObservableList<Object> data = DatabaseController.getAllProductTypes();
-	// TODO: Set in constructor.
+	private ObservableList<Object> productTypes;
 
-	/**
-	 * ProductController holds access to the Product types.
-	 * 
-	 * @param productController named after the ProductController to fach items from there
-	 */
-	public ProductTypesTabView(final ProductController productController)
+	public ProductTypesTabView(final ObservableList<Object> productTypes)
 	{
-		this.productController = productController;
+		this.productTypes = productTypes;
 		this.table = new TableView<Object>();
 	}
 
 	/**
 	 * VBox is inside the view to set up the text fields & labels.
-	 * 
+	 *
 	 * @return return the view
 	 */
 	public VBox getView()
@@ -77,7 +59,7 @@ public class ProductTypesTabView implements GenericView
 
 			table.setEditable(true);
 			table.getItems().clear();
-			table.setItems(data);
+			table.setItems(productTypes);
 
 			final Callback<TableColumn<Object, String>, TableCell<Object, String>> cellFactory = (final TableColumn<Object, String> p) -> new EditingCell();
 			final TableColumn<Object, String> nameColumn = new TableColumn<Object, String>("Name");
@@ -90,7 +72,7 @@ public class ProductTypesTabView implements GenericView
 			{
 				final ProductType editProductType = ((ProductType) event.getTableView().getItems().get(event.getTablePosition().getRow()));
 				editProductType.setName(event.getNewValue());
-				productController.saveProductType(editProductType);
+				ProductController.getInstance().saveProductType(editProductType);
 			});
 			table.getColumns().add(nameColumn);
 
@@ -113,23 +95,24 @@ public class ProductTypesTabView implements GenericView
 				@Override
 				public TableCell<Object, String> call(final TableColumn<Object, String> tcolumn)
 				{
-					final TableCellDeleteButton button = new TableCellDeleteButton(productController, LocalizationController.getString("buttonDelete"));
+					final TableCellDeleteButton button = new TableCellDeleteButton(ProductController.getInstance(),
+							LocalizationController.getInstance().getString("buttonDelete"));
 					button.setAlignment(Pos.CENTER);
 					return button;
 				}
 			});
 			table.getColumns().add(deleteColumn);
 
-			final Label typeLabel = new Label(LocalizationController.getString("productTypeNameLabel"));
+			final Label typeLabel = new Label(LocalizationController.getInstance().getString("productTypeNameLabel"));
 			final TextField productTypeName = new TextField();
-			productTypeName.setPromptText(LocalizationController.getString("productTypeNamePromtText"));
+			productTypeName.setPromptText(LocalizationController.getInstance().getString("productTypeNamePromtText"));
 			productTypeName.setMaxWidth(nameColumn.getPrefWidth());
-			final Button addButton = new Button(LocalizationController.getString("buttonCreate"));
+			final Button addButton = new Button(LocalizationController.getInstance().getString("buttonCreate"));
 			addButton.setOnAction((final ActionEvent event) ->
 			{
 				final ProductType saveProductType = new ProductType(productTypeName.getText());
 				productTypeName.clear();
-				productController.saveProductType(saveProductType);
+				ProductController.getInstance().saveProductType(saveProductType);
 			});
 
 			hbox.getChildren().addAll(typeLabel, productTypeName, addButton);
@@ -141,7 +124,7 @@ public class ProductTypesTabView implements GenericView
 			vbox.setPadding(new Insets(10, 0, 0, 10));
 			vbox.getChildren().addAll(table, hbox);
 
-			UIController.recordView(this);
+			UIController.getInstance().recordView(this);
 		}
 		return vbox;
 	}

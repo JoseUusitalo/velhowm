@@ -54,13 +54,13 @@ public class ProductDataView implements GenericView
 			scenetitle.getStyleClass().add("centered-title");
 			grid.add(scenetitle, 0, 0, 2, 1);
 
-			Label productID = new Label(LocalizationController.getString("productIDLabel"));
+			Label productID = new Label(LocalizationController.getInstance().getString("productIDLabel"));
 			grid.add(productID, 0, 1);
 
-			Label productBrand = new Label(LocalizationController.getString("productBrandLabel"));
+			Label productBrand = new Label(LocalizationController.getInstance().getString("productBrandLabel"));
 			grid.add(productBrand, 0, 2);
 
-			Label productCategory = new Label(LocalizationController.getString("productCategoryLabel"));
+			Label productCategory = new Label(LocalizationController.getInstance().getString("productCategoryLabel"));
 			grid.add(productCategory, 0, 3);
 
 			Label productIDValue = new Label(String.valueOf(product.getDatabaseID()));
@@ -72,7 +72,7 @@ public class ProductDataView implements GenericView
 			Label productCategoryValue = new Label(product.getCategory().getName());
 			grid.add(productCategoryValue, 1, 3);
 
-			Button editButton = new Button(LocalizationController.getString("editButton"));
+			Button editButton = new Button(LocalizationController.getInstance().getString("editButton"));
 			editButton.setMaxWidth(Double.MAX_VALUE);
 			editButton.setAlignment(Pos.CENTER);
 			grid.add(editButton, 1, 5);
@@ -86,7 +86,7 @@ public class ProductDataView implements GenericView
 				}
 			});
 
-			Button backButton = new Button(LocalizationController.getString("backButton"));
+			Button backButton = new Button(LocalizationController.getInstance().getString("backButton"));
 			backButton.setMaxWidth(Double.MAX_VALUE);
 			backButton.setAlignment(Pos.CENTER);
 			grid.add(backButton, 0, 5);
@@ -99,7 +99,7 @@ public class ProductDataView implements GenericView
 					// controller.showList();
 				}
 			});
-			UIController.recordView(this);
+			UIController.getInstance().recordView(this);
 		}
 
 		return grid;

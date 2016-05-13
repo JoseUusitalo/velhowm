@@ -4,8 +4,8 @@ import java.util.HashSet;
 import java.util.Set;
 
 import velho.controller.UserController;
-import velho.model.AbstractDatabaseObject;
 import velho.model.User;
+import velho.model.interfaces.DatabaseObject;
 import velho.model.interfaces.ObjectValidationStrategy;
 
 /**
@@ -16,30 +16,39 @@ import velho.model.interfaces.ObjectValidationStrategy;
 public class UserValidationStrategy implements ObjectValidationStrategy
 {
 	@Override
-	public Set<AbstractDatabaseObject> getInvalidObjects(final Set<AbstractDatabaseObject> validDataSet)
+	public Set<DatabaseObject> getInvalidObjects(final Set<DatabaseObject> validDataSet)
 	{
-		final Set<AbstractDatabaseObject> invalids = new HashSet<AbstractDatabaseObject>();
+		final Set<DatabaseObject> invalids = new HashSet<DatabaseObject>();
 		User user = null;
 
-		for (final AbstractDatabaseObject object : validDataSet)
+		for (final DatabaseObject object : validDataSet)
 		{
 			if (!(object instanceof User))
 				invalids.add(object);
 
 			user = (User) object;
 
-			final boolean hasBadgeID = UserController.isValidBadgeID(user.getBadgeID());
-			final boolean hasPIN = UserController.isValidPIN(user.getPin());
-
-			//@formatter:off
-			if (hasBadgeID && hasPIN || !hasBadgeID && !hasPIN ||
-				user.getFirstName() == null || user.getFirstName().trim().isEmpty() || user.getFirstName().length() > User.MAX_NAME_LENGTH ||
-				user.getLastName() == null || user.getLastName().trim().isEmpty() || user.getLastName().length() > User.MAX_NAME_LENGTH ||
-				user.getRole() == null)
-			//@formatter:on
+			if (!isValidUser(user))
 				invalids.add(user);
 		}
 
 		return invalids;
+	}
+
+	@SuppressWarnings("static-method")
+	public boolean isValidUser(final User user)
+	{
+		final boolean hasBadgeID = UserController.getInstance().isValidBadgeID(user.getBadgeID());
+		final boolean hasPIN = UserController.getInstance().isValidPIN(user.getPin());
+
+		//@formatter:off
+		if (hasBadgeID && hasPIN || !hasBadgeID && !hasPIN ||
+			user.getFirstName() == null || user.getFirstName().trim().isEmpty() || user.getFirstName().length() > User.MAX_NAME_LENGTH ||
+			user.getLastName() == null || user.getLastName().trim().isEmpty() || user.getLastName().length() > User.MAX_NAME_LENGTH ||
+			user.getRole() == null)
+		//@formatter:on
+			return false;
+
+		return true;
 	}
 }

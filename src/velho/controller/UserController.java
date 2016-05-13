@@ -7,12 +7,13 @@ import velho.controller.database.DatabaseController;
 import velho.controller.interfaces.UIActionController;
 import velho.model.User;
 import velho.model.enums.UserRole;
+import velho.model.strategies.UserValidationStrategy;
 import velho.view.AddUserView;
 import velho.view.ListView;
 import velho.view.MainWindow;
 
 /**
- * A controller for managing users.
+ * The singleton controller for managing {@link User} objects.
  *
  * @author Jose Uusitalo &amp; Joona Silvennoinen
  */
@@ -34,8 +35,34 @@ public class UserController implements UIActionController
 	 */
 	private AddUserView view;
 
-	public UserController()
+	/**
+	 * A private inner class holding the class instance.
+	 *
+	 * @author Jose Uusitalo
+	 */
+	private static class Holder
 	{
+		/**
+		 * The only instance of {@link UserController}.
+		 */
+		private static final UserController INSTANCE = new UserController();
+	}
+
+	/**
+	 */
+	private UserController()
+	{
+		// No need to instantiate this class.
+	}
+
+	/**
+	 * Gets the instance of the {@link UserController}.
+	 *
+	 * @return the user controller
+	 */
+	public static synchronized UserController getInstance()
+	{
+		return Holder.INSTANCE;
 	}
 
 	/**
@@ -45,7 +72,7 @@ public class UserController implements UIActionController
 	 * @return a {@link UserRole} object
 	 */
 	@Deprecated
-	public static UserRole stringToRole(final String userRoleName)
+	public UserRole stringToRole(final String userRoleName)
 	{
 		switch (userRoleName)
 		{
@@ -115,51 +142,44 @@ public class UserController implements UIActionController
 	 * @return the created user or <code>null</code> if data was invalid or user
 	 *         already existed in the database
 	 */
-	public User createUser(final String badgeID, final String userPIN, final String userFirstName, final String userLastName, final UserRole userRole, final boolean showPopup)
+	public User createUser(final String badgeID, final String userPIN, final String userFirstName, final String userLastName, final UserRole userRole,
+			final boolean showPopup)
 	{
-		if (validateUserData(badgeID, userPIN, userFirstName, userLastName, userRole))
+		try
 		{
-			User newUser;
+			final User newUser = new User(userFirstName, userLastName, userPIN, badgeID, userRole);
 
-			// If no pin is defined, use badge ID.
-			if (userPIN == null || userPIN.isEmpty())
-				newUser = new User(userFirstName, userLastName, null, badgeID, userRole);
-			else
-				newUser = new User(userFirstName, userLastName, userPIN, null, userRole);
-
-			if (DatabaseController.getAllUsers().contains(newUser))
+			if (DatabaseController.getInstance().getAllUsers().contains(newUser))
 			{
-
 				SYSLOG.debug("User already exists.");
 
 				if (showPopup)
-				{
-					PopupController.info(LocalizationController.getString("userAlreadyExistInfoPopUp"));
-				}
+					PopupController.getInstance().info(LocalizationController.getInstance().getString("userAlreadyExistInfoPopUp"));
 
 				return null;
-
 			}
 
-			DatabaseController.saveOrUpdate(newUser);
+			DatabaseController.getInstance().saveOrUpdate(newUser);
 
-			if (LoginController.getCurrentUser() != null)
+			if (LoginController.getInstance().getCurrentUser() != null)
 				USRLOG.debug("Created a user.");
 			// Else: running a JUnit test -> above line causes a null pointer
 			// error.
 
 			if (showPopup)
-				PopupController.info(LocalizationController.getString("userCreatedPopUpNotice"));
+				PopupController.getInstance().info(LocalizationController.getInstance().getString("userCreatedPopUpNotice"));
 
 			return newUser;
 		}
+		catch (IllegalArgumentException e)
+		{
+			SYSLOG.debug("Invalid user data.");
 
-		SYSLOG.debug("Invalid user data.");
+			if (showPopup)
+				PopupController.getInstance().warning(LocalizationController.getInstance().getString("invalidUserDataPopUp"));
 
-		if (showPopup)
-			PopupController.warning(LocalizationController.getString("invalidUserDataPopUp"));
-
-		return null;
+			return null;
+		}
 	}
 
 	/**
@@ -185,38 +205,38 @@ public class UserController implements UIActionController
 	{
 		USRLOG.debug("Attempting to delete: " + user.getFullDetails());
 
-		if (LoginController.getCurrentUser().getDatabaseID() == user.getDatabaseID())
+		if (LoginController.getInstance().getCurrentUser().getDatabaseID() == user.getDatabaseID())
 		{
-			if (PopupController.confirmation(LocalizationController.getString("yourAccountDeletationConfirmationPopUp")))
+			if (PopupController.getInstance().confirmation(LocalizationController.getInstance().getString("yourAccountDeletationConfirmationPopUp")))
 			{
 
-				if (DatabaseController.deleteUser(user))
+				if (DatabaseController.getInstance().deleteUser(user))
 				{
-					LoginController.logout();
+					LoginController.getInstance().logout();
 					USRLOG.debug("User deleted themselves: " + user.getFullDetails());
-					PopupController.info(LocalizationController.getString("deletedUserInfoPopUp") + user.getFullDetails());
+					PopupController.getInstance().info(LocalizationController.getInstance().getString("deletedUserInfoPopUp") + user.getFullDetails());
 					return true;
 				}
 
 				USRLOG.debug("Failed to delete user: " + user.getFullDetails());
-				PopupController.info(LocalizationController.getCompoundString("failedToDeleteUserNotice", user.getFullDetails()));
+				PopupController.getInstance().info(LocalizationController.getInstance().getCompoundString("failedToDeleteUserNotice", user.getFullDetails()));
 			}
 
 			USRLOG.trace("Cancelled self-deletion confirmation.");
 			return false;
 		}
 
-		if (PopupController.confirmation(LocalizationController.getString("yourAccountDeletationConfirmationCheckPopUp")))
+		if (PopupController.getInstance().confirmation(LocalizationController.getInstance().getString("yourAccountDeletationConfirmationCheckPopUp")))
 		{
-			if (DatabaseController.deleteUser(user))
+			if (DatabaseController.getInstance().deleteUser(user))
 			{
 				USRLOG.debug("User removed: " + user.getFullDetails());
-				PopupController.info(LocalizationController.getString("userRemovedInfoPopUp") + user.getFullDetails());
+				PopupController.getInstance().info(LocalizationController.getInstance().getString("userRemovedInfoPopUp") + user.getFullDetails());
 				return true;
 			}
 
 			USRLOG.debug("Failed to delete user: " + user.getFullDetails());
-			PopupController.info("Failed to delete user: " + user.getFullDetails());
+			PopupController.getInstance().info(LocalizationController.getInstance().getCompoundString("failedToDeleteUserNotice", user.getFullDetails()));
 
 			return false;
 		}
@@ -233,7 +253,7 @@ public class UserController implements UIActionController
 	public Node getView()
 	{
 		if (view == null)
-			view = new AddUserView(this, DatabaseController.getAllUserRoles());
+			view = new AddUserView(this, DatabaseController.getInstance().getAllUserRoles());
 		return view.getView();
 	}
 
@@ -253,7 +273,7 @@ public class UserController implements UIActionController
 	 * @return a {@link User} object or <code>null</code> if
 	 *         {@link MainWindow#DEBUG_MODE} is <code>false</code>
 	 */
-	public static User getDebugUser(final UserRole role)
+	public User getDebugUser(final UserRole role)
 	{
 		if (MainWindow.DEBUG_MODE)
 			return new User(-1, "Debug", "Account", "000000", null, role);
@@ -262,44 +282,15 @@ public class UserController implements UIActionController
 	}
 
 	/**
-	 * Validates the user data against the database requirements.
-	 * Either a badge ID or a PIN must be defined.
-	 * Both cannot be null.
-	 * Both cannot be defined.
+	 * Validates the user data against the contextual requirements.
 	 *
-	 * @param badgeID RFID identification string of the user's RFID badge
-	 * @param pin the pin string used to log in to the system if no RFID badge
-	 *            ID is provided
-	 * @param firstName the first name of the user
-	 * @param lastName the last name of the user
-	 * @param roleName the name of the role of the user
+	 * @param user the user to be validated
 	 *
-	 * @return <code>true</code> if given information is valid
-	 * @throws NoDatabaseLinkException
+	 * @return <code>true</code> if the user properties are valid
 	 */
-	public static boolean validateUserData(final String badgeID, final String pin, final String firstName, final String lastName, final UserRole role)
+	public boolean validateUser(final User user)
 	{
-		// TODO: Use the strategy.
-		final boolean hasBadgeID = isValidBadgeID(badgeID);
-		final boolean hasPIN = isValidPIN(pin);
-
-		// Must have exactly one.
-		if (hasBadgeID && hasPIN || !hasBadgeID && !hasPIN)
-			return false;
-
-		// Name cannot be null, empty, or longer than maximum and length.
-		if (firstName == null || firstName.isEmpty() || firstName.length() > User.MAX_NAME_LENGTH)
-			return false;
-
-		// Name cannot be null, empty, or longer than maximum and length.
-		if (lastName == null || lastName.isEmpty() || lastName.length() > User.MAX_NAME_LENGTH)
-			return false;
-
-		// TODO: The role is not in the database at the moment.
-		if (role == null)
-			return false;
-
-		return true;
+		return new UserValidationStrategy().isValidUser(user);
 	}
 
 	/**
@@ -309,7 +300,7 @@ public class UserController implements UIActionController
 	 * @param pin PIN to check
 	 * @return <code>true</code> if the pin is valid
 	 */
-	public static boolean isValidPIN(final String pin)
+	public boolean isValidPIN(final String pin)
 	{
 		if (pin == null || pin.length() != User.PIN_LENGTH)
 			return false;
@@ -332,7 +323,7 @@ public class UserController implements UIActionController
 	 * @param badgeID badge ID to check
 	 * @return <code>true</code> if the badge ID is valid
 	 */
-	public static boolean isValidBadgeID(final String badgeID)
+	public boolean isValidBadgeID(final String badgeID)
 	{
 		if (badgeID == null || badgeID.length() != User.BADGE_ID_LENGTH)
 			return false;
@@ -358,9 +349,11 @@ public class UserController implements UIActionController
 		{
 			case ADMINISTRATOR:
 			case MANAGER:
-				return ListController.getTableView(this, DatabaseController.getPublicUserDataColumns(true), DatabaseController.getAllUsers());
+				return ListController.getTableView(this, DatabaseController.getInstance().getPublicUserDataColumns(true),
+						DatabaseController.getInstance().getAllUsers());
 			case LOGISTICIAN:
-				return ListController.getTableView(this, DatabaseController.getPublicUserDataColumns(false), DatabaseController.getAllUsers());
+				return ListController.getTableView(this, DatabaseController.getInstance().getPublicUserDataColumns(false),
+						DatabaseController.getInstance().getAllUsers());
 			case GUEST:
 				break;
 			default:

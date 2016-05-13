@@ -15,9 +15,9 @@ import velho.model.enums.UserRole;
 import velho.view.DebugWindow;
 
 /**
- * Various debugging features.
+ * The singleton controller assisting developers in using and testing the application.
  *
- * @author Edward Puustinen &amp; Jose Uusitalo
+ * @author Jose Uusitalo
  */
 public class DebugController
 {
@@ -34,7 +34,7 @@ public class DebugController
 	/**
 	 * The {@link RemovalPlatformController}.
 	 */
-	private final RemovalPlatformController removalPlatformController;
+	private RemovalPlatformController removalPlatformController;
 
 	/**
 	 * A pseudo-random number generator.
@@ -42,14 +42,23 @@ public class DebugController
 	private final Random random;
 
 	/**
-	 * DebugController should call the RemovalPlatform
+	 * A private inner class holding the class instance.
 	 *
-	 * @param removalPlatformController removalPlatformController so that it can be called on the DebugController
+	 * @author Jose Uusitalo
 	 */
-	public DebugController(final RemovalPlatformController removalPlatformController)
+	private static class Holder
+	{
+		/**
+		 * The only instance of {@link DebugController}.
+		 */
+		private static final DebugController INSTANCE = new DebugController();
+	}
+
+	/**
+	 */
+	private DebugController()
 	{
 		this.random = new Random();
-		this.removalPlatformController = removalPlatformController;
 		List<UserRole> roles = new ArrayList<UserRole>();
 		roles.addAll(Arrays.asList(UserRole.values()));
 
@@ -59,7 +68,25 @@ public class DebugController
 		 */
 		Collections.reverse(roles);
 
-		view = new DebugWindow(this, roles, DatabaseController.getAllBadgeIDS());
+		view = new DebugWindow(this, roles, DatabaseController.getInstance().getAllBadgeIDS());
+	}
+
+	/**
+	 * Gets the instance of the {@link DebugController}.
+	 *
+	 * @return the debug controller
+	 */
+	public static synchronized DebugController getInstance()
+	{
+		return Holder.INSTANCE;
+	}
+
+	/**
+	 * @param removalPlatformController removalPlatformController so that it can be called on the DebugController
+	 */
+	public void setControllers(final RemovalPlatformController removalPlatformController)
+	{
+		this.removalPlatformController = removalPlatformController;
 	}
 
 	/**
@@ -79,7 +106,7 @@ public class DebugController
 	 */
 	public void login(final UserRole role)
 	{
-		if (LoginController.debugLogin(role))
+		if (LoginController.getInstance().debugLogin(role))
 			setLogInButtonVisiblity(false);
 	}
 
@@ -90,7 +117,7 @@ public class DebugController
 	 */
 	public void login(final String badgeString)
 	{
-		if (LoginController.login(badgeString))
+		if (LoginController.getInstance().login(badgeString))
 			setLogInButtonVisiblity(false);
 	}
 
@@ -100,8 +127,8 @@ public class DebugController
 	public void logout()
 	{
 		// Only log out if a user is logged in, otherwise just visually toggle the buttons.
-		if (LoginController.isLoggedIn())
-			LoginController.logout();
+		if (LoginController.getInstance().isLoggedIn())
+			LoginController.getInstance().logout();
 		setLogInButtonVisiblity(true);
 	}
 
@@ -123,7 +150,7 @@ public class DebugController
 	@SuppressWarnings("static-method")
 	public void scannerMoveValid()
 	{
-		ExternalSystemsController.scannerMoveValid();
+		ExternalSystemsController.getInstance().scannerMoveValid();
 	}
 
 	/**
@@ -158,6 +185,6 @@ public class DebugController
 	public static void scanBadge(final String badgeID)
 	{
 		SYSLOG.info("Badge scanned: " + badgeID);
-		ExternalSystemsController.receiveBadgeID(badgeID);
+		ExternalSystemsController.getInstance().receiveBadgeID(badgeID);
 	}
 }
