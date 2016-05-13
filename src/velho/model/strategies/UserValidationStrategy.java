@@ -42,10 +42,13 @@ public class UserValidationStrategy implements ObjectValidationStrategy
 		final boolean hasPIN = UserController.getInstance().isValidPIN(user.getPin());
 
 		//@formatter:off
-		return	hasBadgeID && hasPIN || !hasBadgeID && !hasPIN ||
-				user.getFirstName() == null || user.getFirstName().trim().isEmpty() || user.getFirstName().length() > User.MAX_NAME_LENGTH ||
-				user.getLastName() == null || user.getLastName().trim().isEmpty() || user.getLastName().length() > User.MAX_NAME_LENGTH ||
-				user.getRole() == null;
+		if(	hasBadgeID && hasPIN || !hasBadgeID && !hasPIN ||
+			user.getFirstName() == null || user.getFirstName().trim().isEmpty() || user.getFirstName().length() > User.MAX_NAME_LENGTH ||
+			user.getLastName() == null || user.getLastName().trim().isEmpty() || user.getLastName().length() > User.MAX_NAME_LENGTH ||
+			user.getRole() == null)
 		//@formatter:on
+			return false;
+
+		return true;
 	}
 }
