@@ -152,7 +152,7 @@ public class ExternalSystemsController
 	 * @param showPopup show popup messages about failure/success?
 	 * @return <code>true</code> if the box was moved successfully
 	 */
-	public boolean move(final int productBoxCode, final String newShelfSlotID, final boolean showPopup)
+	public boolean receiveMoveCommand(final int productBoxCode, final String newShelfSlotID, final boolean showPopup)
 	{
 		final ProductBox boxToMove = DatabaseController.getInstance().getProductBoxByID(productBoxCode);
 
@@ -263,9 +263,20 @@ public class ExternalSystemsController
 	 */
 	public void receiveBadgeID(final String badgeID)
 	{
-		// TODO: Observer model.
+		// TODO: Observer model?
 
 		SYSLOG.info("VELHOWM has received an RFID badge ID: " + badgeID);
 		LoginController.getInstance().login(badgeID);
+	}
+
+	/**
+	 * Receive a new free space reading from a sensor of the specified {@link velho.model.RemovalPlatform}.
+	 *
+	 * @param removalPlatformID the ID of the removal platform the reading was received from
+	 * @param newFreeSpacePercent the amount of free space left on the platform as percentage
+	 */
+	public void receiveRemovalPlatformReading(final int removalPlatformID, final double newFreeSpacePercent)
+	{
+		RemovalPlatformController.getInstance().setFreeSpace(removalPlatformID, newFreeSpacePercent);
 	}
 }

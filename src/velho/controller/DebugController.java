@@ -19,6 +19,7 @@ import velho.view.DebugWindow;
  *
  * @author Jose Uusitalo
  */
+@SuppressWarnings("static-method")
 public class DebugController
 {
 	/**
@@ -30,11 +31,6 @@ public class DebugController
 	 * The {@link DebugWindow}.
 	 */
 	private final DebugWindow view;
-
-	/**
-	 * The {@link RemovalPlatformController}.
-	 */
-	private RemovalPlatformController removalPlatformController;
 
 	/**
 	 * A pseudo-random number generator.
@@ -79,14 +75,6 @@ public class DebugController
 	public static synchronized DebugController getInstance()
 	{
 		return Holder.INSTANCE;
-	}
-
-	/**
-	 * @param removalPlatformController removalPlatformController so that it can be called on the DebugController
-	 */
-	public void setControllers(final RemovalPlatformController removalPlatformController)
-	{
-		this.removalPlatformController = removalPlatformController;
 	}
 
 	/**
@@ -147,7 +135,6 @@ public class DebugController
 	/**
 	 * Sends the order from DebugWindow to the external systems controller.
 	 */
-	@SuppressWarnings("static-method")
 	public void scannerMoveValid()
 	{
 		ExternalSystemsController.getInstance().scannerMoveValid();
@@ -166,7 +153,10 @@ public class DebugController
 	 */
 	public void fillUpPlatform()
 	{
-		removalPlatformController.modifyFreeSpace(-1.0 * (random.nextDouble() * 0.15 + 0.2 - 0.1));
+		final double oldPercentage = DatabaseController.getInstance().getRemovalPlatformByID(1).getFreeSpacePercent();
+		final double modPercentage = -1.0 * (random.nextDouble() * 0.15 + 0.2 - 0.1);
+
+		ExternalSystemsController.getInstance().receiveRemovalPlatformReading(1, oldPercentage + modPercentage);
 	}
 
 	/**
@@ -174,7 +164,7 @@ public class DebugController
 	 */
 	public void emptyPlatform()
 	{
-		removalPlatformController.emptyPlatform();
+		ExternalSystemsController.getInstance().receiveRemovalPlatformReading(1, 1.0d);
 	}
 
 	/**
