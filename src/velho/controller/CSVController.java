@@ -39,12 +39,12 @@ public class CSVController
 	/**
 	 * A view for loading CSV files to the database.
 	 */
-	private CSVLoadView loadCSVView;
+	private final CSVLoadView loadCSVView;
 
 	/**
 	 * A view for writing CSV files to a file.
 	 */
-	private CSVWriteView writeCSVView;
+	private final CSVWriteView writeCSVView;
 
 	/**
 	 * The main window view.

@@ -55,7 +55,7 @@ public class ProductTabView implements GenericView
 	/**
 	 * An observable list of database products.
 	 */
-	private ObservableList<Object> productList;
+	private final ObservableList<Object> productList;
 
 	/**
 	 * An observable list of database brands.

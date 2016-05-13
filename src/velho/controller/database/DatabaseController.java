@@ -66,19 +66,6 @@ import velho.view.MainWindow;
 public class DatabaseController
 {
 	/**
-	 * A private inner class holding the class instance.
-	 *
-	 * @author Jose Uusitalo
-	 */
-	private static class Holder
-	{
-		/**
-		 * The only instance of {@link DatabaseController}.
-		 */
-		private static final DatabaseController INSTANCE = new DatabaseController();
-	}
-
-	/**
 	 * Apache log4j logger: System.
 	 */
 	private final Logger DBLOG = Logger.getLogger("dbLogger");
@@ -116,7 +103,7 @@ public class DatabaseController
 	/**
 	 * The value of hibernate.jdbc.batch_size property in hibernate.cfg.xml file.
 	 */
-	private final int HIBERNATE_BATCH_SIZE = 30;
+	private static final int HIBERNATE_BATCH_SIZE = 30;
 
 	/*
 	 * ---- UI LISTS ----
@@ -126,79 +113,92 @@ public class DatabaseController
 	 * An observable list of {@link User} objects for display in the user
 	 * interface.
 	 */
-	private ObservableList<Object> observableUsers = FXCollections.observableArrayList();
+	private final ObservableList<Object> observableUsers = FXCollections.observableArrayList();
 
 	/**
 	 * An observable list of {@link Product} objects for display in the user
 	 * interface.
 	 */
-	private ObservableList<Object> observableProducts = FXCollections.observableArrayList();
+	private final ObservableList<Object> observableProducts = FXCollections.observableArrayList();
 
 	/**
 	 * An observable list of {@link ProductType} objects for display in the user
 	 * interface.
 	 */
-	private ObservableList<Object> observableProductTypes = FXCollections.observableArrayList();
+	private final ObservableList<Object> observableProductTypes = FXCollections.observableArrayList();
 
 	/**
 	 * An observable list of {@link Product} search results for display in the
 	 * user interface.
 	 */
-	private ObservableList<Object> observableProductBoxSearchResults = FXCollections.observableArrayList();
+	private final ObservableList<Object> observableProductBoxSearchResults = FXCollections.observableArrayList();
 
 	/**
 	 * An observable list of {@link ProductBox} objects for display in the
 	 * user interface.
 	 */
-	private ObservableList<Object> observableProductBoxes = FXCollections.observableArrayList();
+	private final ObservableList<Object> observableProductBoxes = FXCollections.observableArrayList();
 
 	/**
 	 * An observable list of {@link RemovalList} objects for display in the user
 	 * interface.
 	 */
-	private ObservableList<Object> observableRemovalLists = FXCollections.observableArrayList();
+	private final ObservableList<Object> observableRemovalLists = FXCollections.observableArrayList();
 
 	/**
 	 * An observable list of {@link ProductCategory} objects for display in the
 	 * user interface.
 	 */
-	private ObservableList<Object> observableProductCategories = FXCollections.observableArrayList();
+	private final ObservableList<Object> observableProductCategories = FXCollections.observableArrayList();
 
 	/**
 	 * An observable list of {@link ProductBrand} objects for display in the
 	 * user interface.
 	 */
-	private ObservableList<Object> observableProductBrands = FXCollections.observableArrayList();
+	private final ObservableList<Object> observableProductBrands = FXCollections.observableArrayList();
 
 	/**
 	 * An observable list of {@link RemovalListState} objects for display in the
 	 * user interface.
 	 */
-	private ObservableList<Object> observableRemovalListStates = FXCollections.observableArrayList();
+	private final ObservableList<Object> observableRemovalListStates = FXCollections.observableArrayList();
 
 	/**
 	 * An observable list of {@link RemovalListState} objects for display in the
 	 * user interface.
 	 */
-	private ObservableList<Object> observableManifests = FXCollections.observableArrayList();
+	private final ObservableList<Object> observableManifests = FXCollections.observableArrayList();
 
 	/**
 	 * An observable list of {@link ManifestState} objects for display in the
 	 * user interface.
 	 */
-	private ObservableList<Object> observableManifestStates = FXCollections.observableArrayList();
+	private final ObservableList<Object> observableManifestStates = FXCollections.observableArrayList();
 
 	/**
 	 * An observable list of {@link Shelf} objects for display in the
 	 * user interface.
 	 */
-	private ObservableList<Object> observableShelves = FXCollections.observableArrayList();
+	private final ObservableList<Object> observableShelves = FXCollections.observableArrayList();
 
 	/**
 	 * An observable list of {@link RemovalPlatform} objects for display in the
 	 * user interface.
 	 */
-	private ObservableList<Object> observableRemovalPlatforms = FXCollections.observableArrayList();
+	private final ObservableList<Object> observableRemovalPlatforms = FXCollections.observableArrayList();
+
+	/**
+	 * A private inner class holding the class instance.
+	 *
+	 * @author Jose Uusitalo
+	 */
+	private static class Holder
+	{
+		/**
+		 * The only instance of {@link DatabaseController}.
+		 */
+		private static final DatabaseController INSTANCE = new DatabaseController();
+	}
 
 	/**
 	 */

@@ -10,9 +10,9 @@ import java.util.Date;
 public class ProductBoxSearchResultRow
 {
 	/**
-	 * The product.
+	 * The {@link ProductBox}.
 	 */
-	private ProductBox box;
+	private final ProductBox box;
 
 	/**
 	 * @param box

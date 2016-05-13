@@ -36,7 +36,7 @@ public class CSVWriteView implements GenericView
 	/**
 	 * A list of classes that can be saved and loaded from the database.
 	 */
-	private ObservableList<Class<? extends DatabaseObject>> validDatabaseClasses;
+	private final ObservableList<Class<? extends DatabaseObject>> validDatabaseClasses;
 
 	/**
 	 * @param validDatabaseClasses

@@ -36,8 +36,14 @@ public class ProductTypesTabView implements GenericView
 	 */
 	private VBox vbox;
 
-	private ObservableList<Object> productTypes;
+	/**
+	 * A list of {@link ProductType} objects in the database.
+	 */
+	private final ObservableList<Object> productTypes;
 
+	/**
+	 * @param productTypes
+	 */
 	public ProductTypesTabView(final ObservableList<Object> productTypes)
 	{
 		this.productTypes = productTypes;

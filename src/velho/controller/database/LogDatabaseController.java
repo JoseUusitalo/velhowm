@@ -29,19 +29,6 @@ import velho.view.MainWindow;
 public class LogDatabaseController
 {
 	/**
-	 * A private inner class holding the class instance.
-	 *
-	 * @author Jose Uusitalo
-	 */
-	private static class Holder
-	{
-		/**
-		 * The only instance of {@link LogDatabaseController}.
-		 */
-		private static final LogDatabaseController INSTANCE = new LogDatabaseController();
-	}
-
-	/**
 	 * Apache log4j logger: System.
 	 */
 	private static final Logger SYSLOG = Logger.getLogger(LogDatabaseController.class.getName());
@@ -65,6 +52,19 @@ public class LogDatabaseController
 	 * A pool where database connections are acquired from.
 	 */
 	private static JdbcConnectionPool connectionPool;
+
+	/**
+	 * A private inner class holding the class instance.
+	 *
+	 * @author Jose Uusitalo
+	 */
+	private static class Holder
+	{
+		/**
+		 * The only instance of {@link LogDatabaseController}.
+		 */
+		private static final LogDatabaseController INSTANCE = new LogDatabaseController();
+	}
 
 	/**
 	 */

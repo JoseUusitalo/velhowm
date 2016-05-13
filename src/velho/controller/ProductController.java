@@ -58,7 +58,7 @@ public class ProductController implements UIActionController
 	/**
 	 * A tab view for creating and editing products.
 	 */
-	private ProductTabView productTabView;
+	private final ProductTabView productTabView;
 
 	/**
 	 * A private inner class holding the class instance.
