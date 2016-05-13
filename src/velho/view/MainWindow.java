@@ -33,7 +33,6 @@ import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
 import velho.controller.CSVController;
 import velho.controller.DebugController;
-import velho.controller.ExternalSystemsController;
 import velho.controller.LocalizationController;
 import velho.controller.LogController;
 import velho.controller.LoginController;
@@ -95,11 +94,6 @@ public class MainWindow extends Application implements GenericView
 	 * The width of the window.
 	 */
 	public static final double WINDOW_WIDTH = 1024;
-
-	/**
-	 * The {@link ManifestController}.
-	 */
-	private ManifestController manifestController;
 
 	/**
 	 * The current width of the window.
@@ -232,14 +226,10 @@ public class MainWindow extends Application implements GenericView
 	{
 		SYSLOG.debug("Initializing all controllers...");
 
-		manifestController = new ManifestController(this);
-
-		CSVController.getInstance().initialize(this);
+		ManifestController.getInstance().initialize(this);
 		RemovalPlatformController.getInstance().initialize(this);
+		CSVController.getInstance().initialize(this);
 		UIController.getInstance().initialize(this);
-
-		ExternalSystemsController.getInstance().setControllers(manifestController);
-		UIController.getInstance().setControllers(manifestController);
 
 		SYSLOG.debug("All controllers initialized.");
 	}

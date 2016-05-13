@@ -29,11 +29,6 @@ public class UIController
 	private MainWindow mainView;
 
 	/**
-	 * The {@link ManifestController}.
-	 */
-	private ManifestController manifestController;
-
-	/**
 	 * The main set of views in this application.
 	 */
 	private static Set<GenericView> viewSet = new HashSet<GenericView>();
@@ -76,12 +71,6 @@ public class UIController
 	public void initialize(final MainWindow mainWindow)
 	{
 		this.mainView = mainWindow;
-	}
-
-	public void setControllers(final ManifestController manifestController)
-	{
-		// TODO: remove
-		this.manifestController = manifestController;
 	}
 
 	/**
@@ -143,7 +132,7 @@ public class UIController
 				mainView.addTab(LocalizationController.getInstance().getString("addCategoriesTab"), ProductController.getInstance().getCategoryTab());
 				mainView.addTab(LocalizationController.getInstance().getString("addProductListTab"), ProductController.getInstance().getProductTabView());
 				mainView.addTab(LocalizationController.getInstance().getString("addProductBoxesTab"), ProductController.getInstance().getProductBoxesTab());
-				mainView.addTab(LocalizationController.getInstance().getString("addManifestsTab"), manifestController.getView());
+				mainView.addTab(LocalizationController.getInstance().getString("addManifestsTab"), ManifestController.getInstance().getView());
 				mainView.addTab(LocalizationController.getInstance().getString("addRemovalListsTab"), RemovalListController.getInstance().getView());
 				//$FALL-THROUGH$
 			case GUEST:

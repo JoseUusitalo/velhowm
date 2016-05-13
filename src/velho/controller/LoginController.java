@@ -12,7 +12,7 @@ import velho.view.LoginView;
 import velho.view.MainWindow;
 
 /**
- * A singleton control for managing users logging in and out.
+ * The singleton controller for managing users logging in and out.
  *
  * @author Jose Uusitalo &amp; Edward Puustinen
  */
@@ -81,7 +81,7 @@ public class LoginController
 	 *
 	 * @param badgeString use RFID badge identification number
 	 * @return <code>true</code> if login was successful, or <code>false</code>
-	 * if debug mode was disabled
+	 *         if debug mode was disabled
 	 */
 	public boolean login(final String badgeString)
 	{
@@ -189,7 +189,7 @@ public class LoginController
 	 *
 	 * @param userRoleName name of the role
 	 * @return <code>true</code> if login was successful, or <code>false</code>
-	 * if debug mode was disabled
+	 *         if debug mode was disabled
 	 */
 	public boolean debugLogin(final UserRole role)
 	{
@@ -271,8 +271,8 @@ public class LoginController
 	 *
 	 * @param role role to check against
 	 * @return <code>true</code> if logged in user's role is greater than or
-	 * equal to the given role, <code>false</code>
-	 * if user is not logged in
+	 *         equal to the given role, <code>false</code>
+	 *         if user is not logged in
 	 */
 	public boolean userRoleIsGreaterOrEqualTo(final UserRole role)
 	{
@@ -286,7 +286,7 @@ public class LoginController
 	 *
 	 * @param role role to check against
 	 * @return <code>true</code> if logged in user's role is the given role,
-	 * <code>false</code> if user is not logged in
+	 *         <code>false</code> if user is not logged in
 	 */
 	public boolean userRoleIs(final UserRole role)
 	{

@@ -32,11 +32,6 @@ public class ExternalSystemsController
 	private static final Logger SYSLOG = Logger.getLogger(ExternalSystemsController.class.getName());
 
 	/**
-	 * The {@link ManifestController}.
-	 */
-	private ManifestController manifestController;
-
-	/**
 	 * A private inner class holding the class instance.
 	 *
 	 * @author Jose Uusitalo
@@ -64,14 +59,6 @@ public class ExternalSystemsController
 	public static synchronized ExternalSystemsController getInstance()
 	{
 		return Holder.INSTANCE;
-	}
-
-	/**
-	 * @param manifestController
-	 */
-	public void setControllers(final ManifestController manifestController)
-	{
-		this.manifestController = manifestController;
 	}
 
 	/**
@@ -266,7 +253,7 @@ public class ExternalSystemsController
 	public void receiveManifestBarcode(final Set<ProductBox> boxSet, final Date orderDate, final int driverID)
 	{
 		SYSLOG.info("VELHOWM has received a manifest by driver " + driverID + " with " + boxSet.size() + " product boxes.");
-		manifestController.receiveShipment(boxSet, orderDate, driverID);
+		ManifestController.getInstance().receiveShipment(boxSet, orderDate, driverID);
 	}
 
 	/**

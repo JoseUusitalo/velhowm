@@ -10,7 +10,7 @@ import velho.model.RemovalPlatform;
 import velho.view.MainWindow;
 
 /**
- * Controller handling the {@link RemovalPlatform}.
+ * The singleton controller handling {@link RemovalPlatform} objects.
  *
  * @author Jose Uusitalo
  */

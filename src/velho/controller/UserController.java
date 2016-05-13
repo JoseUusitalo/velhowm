@@ -13,7 +13,7 @@ import velho.view.ListView;
 import velho.view.MainWindow;
 
 /**
- * The singleton controller for managing users.
+ * The singleton controller for managing {@link User} objects.
  *
  * @author Jose Uusitalo &amp; Joona Silvennoinen
  */
@@ -140,7 +140,7 @@ public class UserController implements UIActionController
 	 * @param userRole user's role in the company
 	 * @param showPopup show popups?
 	 * @return the created user or <code>null</code> if data was invalid or user
-	 * already existed in the database
+	 *         already existed in the database
 	 */
 	public User createUser(final String badgeID, final String userPIN, final String userFirstName, final String userLastName, final UserRole userRole,
 			final boolean showPopup)
@@ -265,7 +265,7 @@ public class UserController implements UIActionController
 	 *
 	 * @param role the role to create the user as
 	 * @return a {@link User} object or <code>null</code> if
-	 * {@link MainWindow#DEBUG_MODE} is <code>false</code>
+	 *         {@link MainWindow#DEBUG_MODE} is <code>false</code>
 	 */
 	public User getDebugUser(final UserRole role)
 	{

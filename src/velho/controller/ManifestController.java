@@ -20,7 +20,7 @@ import velho.view.ManifestManagementView;
 import velho.view.ManifestView;
 
 /**
- * A controller for handling {@link Manifest} objects.
+ * The singleton controller for handling {@link Manifest} objects.
  *
  * @author Jose Uusitalo
  */
@@ -54,15 +54,44 @@ public class ManifestController implements UIActionController
 	/**
 	 * The {@link MainWindow}.
 	 */
-	private final MainWindow mainWindow;
+	private MainWindow mainWindow;
+
+	/**
+	 * A private inner class holding the class instance.
+	 *
+	 * @author Jose Uusitalo
+	 */
+	private static class Holder
+	{
+		/**
+		 * The only instance of {@link ManifestController}.
+		 */
+		private static final ManifestController INSTANCE = new ManifestController();
+	}
+
+	/**
+	 */
+	private ManifestController()
+	{
+		tabView = new GenericTabView();
+	}
+
+	/**
+	 * Gets the instance of the {@link ManifestController}.
+	 *
+	 * @return the manifest controller
+	 */
+	public static synchronized ManifestController getInstance()
+	{
+		return Holder.INSTANCE;
+	}
 
 	/**
 	 * @param mainWindow
 	 */
-	public ManifestController(final MainWindow mainWindow)
+	public void initialize(final MainWindow main)
 	{
-		this.mainWindow = mainWindow;
-		tabView = new GenericTabView();
+		this.mainWindow = main;
 	}
 
 	/**
@@ -161,7 +190,8 @@ public class ManifestController implements UIActionController
 		{
 			// If the user is a Manager (but not an Administrator!) show a
 			// popup.
-			if (LoginController.getInstance().userRoleIs(UserRole.MANAGER) && PopupController.getInstance().confirmation(LocalizationController.getInstance().getString("manifestShipmentArrivalPopUp")))
+			if (LoginController.getInstance().userRoleIs(UserRole.MANAGER)
+					&& PopupController.getInstance().confirmation(LocalizationController.getInstance().getString("manifestShipmentArrivalPopUp")))
 			{
 				showManifestView(manifest);
 				mainWindow.selectTab(LocalizationController.getInstance().getString("addManifestsTab"));

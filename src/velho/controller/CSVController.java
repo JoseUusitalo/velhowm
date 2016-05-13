@@ -25,7 +25,7 @@ import velho.view.MainWindow;
 import velho.view.VerticalViewGroup;
 
 /**
- * A controller for writing CSV files.
+ * The singleton controller for writing and reading CSV files.
  *
  * @author Jose Uusitalo
  */
