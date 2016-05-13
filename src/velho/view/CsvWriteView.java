@@ -15,13 +15,13 @@ import javafx.scene.control.TextField;
 import javafx.scene.layout.GridPane;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
-import velho.controller.CSVController;
+import velho.controller.CsvController;
 import velho.controller.LocalizationController;
 import velho.controller.UIController;
 import velho.model.interfaces.DatabaseObject;
 import velho.model.interfaces.GenericView;
 
-public class CSVWriteView implements GenericView
+public class CsvWriteView implements GenericView
 {
 	/**
 	 * The root node.
@@ -41,7 +41,7 @@ public class CSVWriteView implements GenericView
 	/**
 	 * @param validDatabaseClasses
 	 */
-	public CSVWriteView(final ObservableList<Class<? extends DatabaseObject>> validDatabaseClasses)
+	public CsvWriteView(final ObservableList<Class<? extends DatabaseObject>> validDatabaseClasses)
 	{
 		this.validDatabaseClasses = validDatabaseClasses;
 	}
@@ -79,7 +79,7 @@ public class CSVWriteView implements GenericView
 				@Override
 				public void handle(final ActionEvent event)
 				{
-					CSVController.getInstance().writeDatabaseTableToCSVFile(fileNameField.getText(), typeSelector.getValue());
+					CsvController.getInstance().writeDatabaseTableToCSVFile(fileNameField.getText(), typeSelector.getValue());
 					fileNameField.clear();
 					writeButton.setDisable(true);
 				}

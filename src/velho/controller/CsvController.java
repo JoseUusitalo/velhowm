@@ -16,35 +16,35 @@ import com.opencsv.bean.ColumnPositionMappingStrategy;
 import javafx.geometry.Insets;
 import javafx.scene.Node;
 import velho.controller.database.DatabaseController;
-import velho.model.CSVLoader;
+import velho.model.CsvLoader;
 import velho.model.User;
 import velho.model.interfaces.DatabaseObject;
-import velho.view.CSVLoadView;
-import velho.view.CSVWriteView;
+import velho.view.CsvLoadView;
+import velho.view.CsvWriteView;
 import velho.view.MainWindow;
 import velho.view.VerticalViewGroup;
 
 /**
- * The singleton controller for writing and reading CSV files.
+ * The singleton controller and a facade for writing and reading CSV files.
  *
  * @author Jose Uusitalo
  */
 @SuppressWarnings("static-method")
-public class CSVController
+public class CsvController
 {
 	/**
 	 */
-	private static final Logger SYSLOG = Logger.getLogger(CSVController.class.getName());
+	private static final Logger SYSLOG = Logger.getLogger(CsvController.class.getName());
 
 	/**
 	 * A view for loading CSV files to the database.
 	 */
-	private final CSVLoadView loadCSVView;
+	private final CsvLoadView loadCSVView;
 
 	/**
 	 * A view for writing CSV files to a file.
 	 */
-	private final CSVWriteView writeCSVView;
+	private final CsvWriteView writeCSVView;
 
 	/**
 	 * The main window view.
@@ -61,15 +61,15 @@ public class CSVController
 		/**
 		 * The only instance of {@link CSVController}.
 		 */
-		private static final CSVController INSTANCE = new CSVController();
+		private static final CsvController INSTANCE = new CsvController();
 	}
 
 	/**
 	 */
-	private CSVController()
+	private CsvController()
 	{
-		loadCSVView = new CSVLoadView(DatabaseController.getInstance().getValidDatabaseTypes());
-		writeCSVView = new CSVWriteView(DatabaseController.getInstance().getValidDatabaseTypes());
+		loadCSVView = new CsvLoadView(DatabaseController.getInstance().getValidDatabaseTypes());
+		writeCSVView = new CsvWriteView(DatabaseController.getInstance().getValidDatabaseTypes());
 	}
 
 	/**
@@ -77,7 +77,7 @@ public class CSVController
 	 *
 	 * @return the CSV controller
 	 */
-	public static synchronized CSVController getInstance()
+	public static synchronized CsvController getInstance()
 	{
 		return Holder.INSTANCE;
 	}
@@ -184,20 +184,34 @@ public class CSVController
 	 *
 	 * @param filePath file path to the CSV file
 	 * @param csvType the type of data to load from the CSV file
+	 * @param silent do not show popups?
 	 */
-	public void loadCSVFileToDatabase(final String filePath, final Class<? extends DatabaseObject> csvType)
+	public <T extends DatabaseObject> void loadCSVFileToDatabase(final String filePath, final Class<T> csvType, final boolean silent)
 	{
-		@SuppressWarnings({ "rawtypes", "unchecked" })
-		final CSVLoader loader = new CSVLoader(csvType);
+		final CsvLoader<T> loader = new CsvLoader<T>(csvType);
 		final int loaded = loader.load(filePath);
 		final int saved = loader.save();
 
-		if (saved == 0)
-			PopupController.getInstance()
-					.warning(LocalizationController.getInstance().getCompoundString("failedToLoadAnyObjectsNotice", csvType.getSimpleName(), filePath));
-		else
-			PopupController.getInstance().info(
-					LocalizationController.getInstance().getCompoundString("objectSuccesfullyLoadedNotice", saved, loaded, csvType.getSimpleName(), filePath));
+		if (!silent)
+		{
+			if (saved == 0)
+				PopupController.getInstance()
+						.warning(LocalizationController.getInstance().getCompoundString("failedToLoadAnyObjectsNotice", csvType.getSimpleName(), filePath));
+			else
+				PopupController.getInstance().info(LocalizationController.getInstance().getCompoundString("objectSuccesfullyLoadedNotice", saved, loaded,
+						csvType.getSimpleName(), filePath));
+		}
+	}
+
+	/**
+	 * Loads data from the specified CSV to database.
+	 *
+	 * @param filePath file path to the CSV file
+	 * @param csvType the type of data to load from the CSV file
+	 */
+	public <T extends DatabaseObject> void loadCSVFileToDatabase(final String filePath, final Class<T> csvType)
+	{
+		loadCSVFileToDatabase(filePath, csvType, false);
 	}
 
 	/**
@@ -232,10 +246,9 @@ public class CSVController
 	 * @param classToWrite the {@link velho.model} class whose database table to write to a file
 	 */
 	@SuppressWarnings("unchecked")
-	public void writeDatabaseTableToCSVFile(final String filePath, final Class<? extends DatabaseObject> classToWrite)
+	public <T extends DatabaseObject> void writeDatabaseTableToCSVFile(final String filePath, final Class<T> classToWrite)
 	{
-		@SuppressWarnings("rawtypes")
-		ColumnPositionMappingStrategy strategy = new ColumnPositionMappingStrategy();
+		final ColumnPositionMappingStrategy<T> strategy = new ColumnPositionMappingStrategy<T>();
 		strategy.setType(classToWrite);
 		strategy.setColumnMapping(getCSVDataHeader(classToWrite));
 

@@ -105,7 +105,7 @@ public abstract class BarcodeScanner
 		}
 		while (!randomShelfSlot.hasFreeSpace());
 
-		if (ExternalSystemsController.getInstance().move(list.get(0), randomShelfSlot.getSlotID(), true))
+		if (ExternalSystemsController.getInstance().receiveMoveCommand(list.get(0), randomShelfSlot.getSlotID(), true))
 		{
 			SYSLOG.debug("Move successful.");
 			return true;

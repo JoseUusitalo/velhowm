@@ -69,11 +69,11 @@ public class RemovalPlatformTest
 	@Test
 	public final void testModifyFreeSpace()
 	{
-		existingPlatform.modifyFreeSpace(-0.125);
+		existingPlatform.setFreeSpacePercent(existingPlatform.getFreeSpacePercent() - 0.125d);
 		assertTrue(Double.compare((1.0 - 0.125), existingPlatform.getFreeSpacePercent()) == 0);
 
 		// Rollback.
-		existingPlatform.modifyFreeSpace(0.125);
+		existingPlatform.setFreeSpacePercent(existingPlatform.getFreeSpacePercent() + 0.125d);
 	}
 
 	@Test
@@ -81,10 +81,10 @@ public class RemovalPlatformTest
 	{
 		final double old = existingPlatform.getFreeSpacePercent();
 
-		existingPlatform.modifyFreeSpace(-0.125);
+		existingPlatform.setFreeSpacePercent(existingPlatform.getFreeSpacePercent() - 0.125d);
 		assertTrue(Double.compare((1.0 - 0.125), existingPlatform.getFreeSpacePercent()) == 0);
 
-		existingPlatform.empty();
+		existingPlatform.setFreeSpacePercent(1.0d);
 
 		assertTrue(Double.compare((1.0), existingPlatform.getFreeSpacePercent()) == 0);
 
@@ -120,14 +120,15 @@ public class RemovalPlatformTest
 
 		assertTrue(Double.compare(1.0, oldPercent) == 0);
 
-		existingPlatform.modifyFreeSpace(modPercent);
+		existingPlatform.setFreeSpacePercent(existingPlatform.getFreeSpacePercent() + modPercent);
 
 		// Check that the method worked.
 		assertEquals(0, Double.compare(newPercent, existingPlatform.getFreeSpacePercent()));
 		DatabaseController.getInstance().saveOrUpdate(existingPlatform);
 
 		// Database was updated.
-		assertTrue(Double.compare(newPercent, DatabaseController.getInstance().getRemovalPlatformByID(existingPlatform.getDatabaseID()).getFreeSpacePercent()) == 0);
+		assertTrue(Double.compare(newPercent,
+				DatabaseController.getInstance().getRemovalPlatformByID(existingPlatform.getDatabaseID()).getFreeSpacePercent()) == 0);
 
 		// Rollback.
 		existingPlatform.setFreeSpacePercent(oldPercent);

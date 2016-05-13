@@ -31,7 +31,7 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
-import velho.controller.CSVController;
+import velho.controller.CsvController;
 import velho.controller.DebugController;
 import velho.controller.LocalizationController;
 import velho.controller.LogController;
@@ -228,7 +228,7 @@ public class MainWindow extends Application implements GenericView
 
 		ManifestController.getInstance().initialize(this);
 		RemovalPlatformController.getInstance().initialize(this);
-		CSVController.getInstance().initialize(this);
+		CsvController.getInstance().initialize(this);
 		UIController.getInstance().initialize(this);
 
 		SYSLOG.debug("All controllers initialized.");

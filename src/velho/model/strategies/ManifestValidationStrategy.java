@@ -27,12 +27,15 @@ public class ManifestValidationStrategy implements ObjectValidationStrategy
 
 			manifest = (Manifest) object;
 
-			if (manifest.getState() == null || manifest.getOrderedDate() == null || manifest.getReceivedDate() == null
-					|| manifest.getOrderedDate().after(manifest.getReceivedDate()))
+			// @formatter:off
+			if (manifest.getState() == null ||
+				manifest.getOrderedDate() == null ||
+				manifest.getReceivedDate() == null ||
+				manifest.getOrderedDate().after(manifest.getReceivedDate()))
+			// @formatter:on
 				invalids.add(object);
 		}
 
 		return invalids;
 	}
-
 }

@@ -105,29 +105,6 @@ public class RemovalPlatform extends ObservableDatabaseObject
 	}
 
 	/**
-	 * Changes the amount of free space on this platform by adding or removing the specified percentage points depending
-	 * on its sign.
-	 *
-	 * @param percentagePoints percentage points to modify the free space by [0.0, 1.0]
-	 */
-	public void modifyFreeSpace(final double percentagePoints)
-	{
-		this.freeSpacePercent += percentagePoints;
-		setChanged();
-		notifyObservers();
-	}
-
-	/**
-	 * Call this method when the removal platform has been emptied.
-	 */
-	public void empty()
-	{
-		this.freeSpacePercent = 1.0;
-		setChanged();
-		notifyObservers();
-	}
-
-	/**
 	 * The inverse of {@link #getFreeSpacePercent()} as a percentage [0.0, 100.0].
 	 *
 	 * @return a percent value of how full this platform is

@@ -7,6 +7,7 @@ import org.apache.log4j.Logger;
 
 import velho.controller.database.DatabaseController;
 import velho.model.RemovalPlatform;
+import velho.model.enums.UserRole;
 import velho.view.MainWindow;
 
 /**
@@ -85,14 +86,19 @@ public class RemovalPlatformController implements Observer
 	}
 
 	/**
+	 * <p>
 	 * Changes the amount of free space on the platform by adding or removing the specified percentage points depending on its sign.
+	 * </p>
+	 * <p>
+	 * <strong>For debug use only.</strong>
+	 * </p>
 	 *
 	 * @param percentagePoints percentage points to modify by [0.0, 1.0]
 	 */
 	public void modifyFreeSpace(final double percentagePoints)
 	{
-		SYSLOG.debug(getPlatform() + " free space decreased by " + percentagePoints);
-		getPlatform().modifyFreeSpace(percentagePoints);
+		SYSLOG.debug(getPlatform() + " free space changed by " + percentagePoints);
+		getPlatform().setFreeSpacePercent(getPlatform().getFreeSpacePercent() + percentagePoints);
 
 		DatabaseController.getInstance().saveOrUpdate(getPlatform());
 	}
@@ -107,20 +113,11 @@ public class RemovalPlatformController implements Observer
 
 		if (Double.compare(rplatform.getFreeSpacePercent(), rplatform.getFreeSpaceLeftWarningPercent()) <= 0)
 		{
-			// Warning is only showed when logged in.
-			if (LoginController.getInstance().isLoggedIn())
+			// Warning is only showed when logged in to Managers and lower.
+			if (LoginController.getInstance().userRoleIsLessOrEqualTo(UserRole.MANAGER))
 				PopupController.getInstance().warning(
 						LocalizationController.getInstance().getCompoundString("removalPlatformFullnessPopUpNotice", (int) rplatform.getPercentFull()));
 		}
-	}
-
-	/**
-	 * Empties the removal platform.
-	 */
-	public void emptyPlatform()
-	{
-		SYSLOG.info("Removal platform emptied.");
-		getPlatform().empty();
 	}
 
 	@Override
@@ -143,14 +140,26 @@ public class RemovalPlatformController implements Observer
 	{
 		final int full = (int) rplatform.getPercentFull();
 		mainWindow.setRemovalPlatformFullPercent(String.valueOf(full));
-		SYSLOG.info("The removal platform is " + full + " / " + (int) (100.0 - rplatform.getFreeSpaceLeftWarningPercent() * 100.0) + "% full!");
+		SYSLOG.info("The removal platform is " + full + " / " + (int) (100.0 - rplatform.getFreeSpaceLeftWarningPercent() * 100.0) + "% full.");
 	}
 
 	/**
-	 * Checks the fullness of the removal platform.
+	 * Manually checks the fullness of the removal platform.
 	 */
 	public void update()
 	{
 		update(getPlatform(), null);
+	}
+
+	/**
+	 * Changes the free space on the specified {@link RemovalPlatform} to the specified value.
+	 *
+	 * @param removalPlatformID the ID of the removal platform to be modified
+	 * @param newFreeSpacePercent the new percentage of free space on the specified removal platform
+	 */
+	public void setFreeSpace(@SuppressWarnings("unused") final int removalPlatformID, final double newFreeSpacePercent)
+	{
+		// removalPlatformID is unused on purpose, at the moment the system supports a single removal platform.
+		getPlatform().setFreeSpacePercent(newFreeSpacePercent);
 	}
 }
