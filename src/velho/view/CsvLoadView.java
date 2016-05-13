@@ -15,14 +15,14 @@ import javafx.scene.control.TextField;
 import javafx.scene.layout.GridPane;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
-import velho.controller.CSVController;
+import velho.controller.CsvController;
 import velho.controller.LocalizationController;
 import velho.controller.PopupController;
 import velho.controller.UIController;
 import velho.model.interfaces.DatabaseObject;
 import velho.model.interfaces.GenericView;
 
-public class CSVLoadView implements GenericView
+public class CsvLoadView implements GenericView
 {
 	/**
 	 * The root node.
@@ -42,7 +42,7 @@ public class CSVLoadView implements GenericView
 	/**
 	 * @param validDatabaseClasses
 	 */
-	public CSVLoadView(final ObservableList<Class<? extends DatabaseObject>> validDatabaseClasses)
+	public CsvLoadView(final ObservableList<Class<? extends DatabaseObject>> validDatabaseClasses)
 	{
 		this.validDatabaseClasses = validDatabaseClasses;
 	}
@@ -80,7 +80,7 @@ public class CSVLoadView implements GenericView
 				@Override
 				public void handle(final ActionEvent event)
 				{
-					CSVController.getInstance().loadCSVFileToDatabase(fileNameField.getText(), typeSelector.getValue());
+					CsvController.getInstance().loadCSVFileToDatabase(fileNameField.getText(), typeSelector.getValue());
 					fileNameField.clear();
 					loadButton.setDisable(true);
 				}
@@ -97,7 +97,7 @@ public class CSVLoadView implements GenericView
 				{
 					final File csvFile = fileChooser.showOpenDialog(primaryStage);
 
-					if (CSVController.getInstance().isValidCSVFile(csvFile))
+					if (CsvController.getInstance().isValidCSVFile(csvFile))
 					{
 						fileNameField.setText(csvFile.getAbsolutePath());
 

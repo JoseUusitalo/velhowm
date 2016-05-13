@@ -1,6 +1,5 @@
 package velho.model;
 
-import java.io.IOException;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
@@ -30,19 +29,17 @@ import velho.model.strategies.ShelfValidationStrategy;
 import velho.model.strategies.UserValidationStrategy;
 
 /**
- * <p>
  * A loader for reading CSV file data into the database.
- * </p>
  *
  * @author Jose Uusitalo
  * @param <T> the type of the object a single line in the CSV file represents
  */
-public class CSVLoader<T extends DatabaseObject>
+public class CsvLoader<T extends DatabaseObject>
 {
 	/**
 	 * Apache log4j logger: System.
 	 */
-	private static final Logger SYSLOG = Logger.getLogger(CSVLoader.class.getName());
+	private static final Logger SYSLOG = Logger.getLogger(CsvLoader.class.getName());
 
 	/**
 	 * The class the objects will instantiated as.
@@ -68,7 +65,7 @@ public class CSVLoader<T extends DatabaseObject>
 	/**
 	 * @param objectClass
 	 */
-	public CSVLoader(final Class<T> objectClass)
+	public CsvLoader(final Class<T> objectClass)
 	{
 		this.objectClass = objectClass;
 		strategy = new HeaderColumnNameMappingStrategy<T>();
@@ -122,38 +119,8 @@ public class CSVLoader<T extends DatabaseObject>
 	}
 
 	/**
-	 * Reads the specified CSV file and parses the data into objects of the
-	 * specified type.
-	 *
-	 * @param <T> the type of the object a single line in the file represents
-	 * @param filePath path to the csv file
-	 * @param objectClass the class the objects will instantiated as
-	 * @return a {@link VelhoCsvParser} object containing the valid and invalid
-	 *         data
-	 */
-	private VelhoCsvParser<T> readCSVFile(final String csvFilePath)
-	{
-		final VelhoCsvParser<T> parser = new VelhoCsvParser<T>();
-
-		try
-		{
-			parser.parseFile(strategy, csvFilePath);
-		}
-		catch (IOException e)
-		{
-			e.printStackTrace();
-		}
-
-		return parser;
-	}
-
-	/**
 	 * <p>
 	 * Loads the object data from the specified CSV file.
-	 * </p>
-	 * <p>
-	 * NOTE: This method will not load anything if the
-	 * {@link #getInvalidDataObjects(Set)} has not been overridden!
 	 * </p>
 	 *
 	 * @param csvFilePath path to the CSV file to be read
@@ -161,7 +128,8 @@ public class CSVLoader<T extends DatabaseObject>
 	 */
 	public int load(final String csvFilePath)
 	{
-		final VelhoCsvParser<T> parser = readCSVFile(csvFilePath);
+		final VelhoCsvParser<T> parser = new VelhoCsvParser<T>();
+		parser.parseFile(strategy, csvFilePath);
 
 		/*
 		 * It may be tempting to use a HashSet but that will cause the order of

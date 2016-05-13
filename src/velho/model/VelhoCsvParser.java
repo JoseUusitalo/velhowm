@@ -82,46 +82,47 @@ public class VelhoCsvParser<T> extends CsvToBean<T>
 	 * Clears previous data from memory and parses values from the specified CSV file to a list of data.
 	 *
 	 * @param mapper mapping strategy for the bean.
-	 * @param filePath path to the csv file to read
+	 * @param filePath path to the csv file to be read
 	 * @see #getData()
 	 */
-	@SuppressWarnings("resource")
-	public void parseFile(final MappingStrategy<T> mapper, final String filePath) throws IOException
+	public void parseFile(final MappingStrategy<T> mapper, final String filePath)
 	{
 		datalist.clear();
 		invalidData.clear();
 
 		SYSLOG.trace("Parsing: " + new File(filePath).getAbsolutePath());
 
-		final CSVReader reader = new CSVReader(new FileReader(filePath));
-
-		long lineProcessed = 0;
-		String[] line = null;
-
-		try
+		try (final CSVReader reader = new CSVReader(new FileReader(filePath)))
 		{
-			mapper.captureHeader(reader);
-		}
-		catch (final IOException e)
-		{
-			reader.close();
-			throw (IOException) new IOException("Error capturing CSV header.").initCause(e);
-		}
-
-		while (null != (line = reader.readNext()))
-		{
-			lineProcessed++;
+			long lineProcessed = 0;
+			String[] line = null;
 
 			try
 			{
-				datalist.add(super.processLine(mapper, line));
+				mapper.captureHeader(reader);
 			}
-			catch (Exception e)
+			catch (final IOException e)
 			{
-				invalidData.put(lineProcessed, Arrays.asList(line));
+				throw (IOException) new IOException("Error capturing CSV header.").initCause(e);
+			}
+
+			while (null != (line = reader.readNext()))
+			{
+				lineProcessed++;
+
+				try
+				{
+					datalist.add(super.processLine(mapper, line));
+				}
+				catch (Exception e)
+				{
+					invalidData.put(lineProcessed, Arrays.asList(line));
+				}
 			}
 		}
-
-		reader.close();
+		catch (IOException e)
+		{
+			e.printStackTrace();
+		}
 	}
 }

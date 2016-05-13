@@ -126,7 +126,7 @@ public class UIController
 			case LOGISTICIAN:
 				mainView.addTab(LocalizationController.getInstance().getString("addUserListTab"),
 						UserController.getInstance().getUserListView(currentUserRole));
-				mainView.addTab(LocalizationController.getInstance().getString("csvTab"), CSVController.getInstance().getCSVView());
+				mainView.addTab(LocalizationController.getInstance().getString("csvTab"), CsvController.getInstance().getCSVView());
 				mainView.addTab(LocalizationController.getInstance().getString("addBrandsTab"), ProductController.getInstance().getBrandsTab());
 				mainView.addTab(LocalizationController.getInstance().getString("addProductTypesTab"), ProductController.getInstance().getProductTypesTab());
 				mainView.addTab(LocalizationController.getInstance().getString("addCategoriesTab"), ProductController.getInstance().getCategoryTab());
