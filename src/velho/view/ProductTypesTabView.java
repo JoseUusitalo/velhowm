@@ -36,8 +36,14 @@ public class ProductTypesTabView implements GenericView
 	 */
 	private VBox vbox;
 
-	private ObservableList<Object> productTypes;
+	/**
+	 * A list of {@link ProductType} objects in the database.
+	 */
+	private final ObservableList<Object> productTypes;
 
+	/**
+	 * @param productTypes
+	 */
 	public ProductTypesTabView(final ObservableList<Object> productTypes)
 	{
 		this.productTypes = productTypes;
@@ -61,7 +67,7 @@ public class ProductTypesTabView implements GenericView
 			table.getItems().clear();
 			table.setItems(productTypes);
 
-			final Callback<TableColumn<Object, String>, TableCell<Object, String>> cellFactory = (final TableColumn<Object, String> p) -> new EditingCell();
+			final Callback<TableColumn<Object, String>, TableCell<Object, String>> cellFactory = (final TableColumn<Object, String> col) -> new EditingCell();
 			final TableColumn<Object, String> nameColumn = new TableColumn<Object, String>("Name");
 
 			nameColumn.setMinWidth(100);

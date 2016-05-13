@@ -36,7 +36,7 @@ public class CSVWriteView implements GenericView
 	/**
 	 * A list of classes that can be saved and loaded from the database.
 	 */
-	private ObservableList<Class<? extends DatabaseObject>> validDatabaseClasses;
+	private final ObservableList<Class<? extends DatabaseObject>> validDatabaseClasses;
 
 	/**
 	 * @param validDatabaseClasses
@@ -77,7 +77,7 @@ public class CSVWriteView implements GenericView
 			writeButton.setOnAction(new EventHandler<ActionEvent>()
 			{
 				@Override
-				public void handle(final ActionEvent e)
+				public void handle(final ActionEvent event)
 				{
 					CSVController.getInstance().writeDatabaseTableToCSVFile(fileNameField.getText(), typeSelector.getValue());
 					fileNameField.clear();
@@ -90,7 +90,7 @@ public class CSVWriteView implements GenericView
 			selectButton.setOnAction(new EventHandler<ActionEvent>()
 			{
 				@Override
-				public void handle(final ActionEvent e)
+				public void handle(final ActionEvent event)
 				{
 					final File csvFile = fileChooser.showSaveDialog(primaryStage);
 					fileNameField.setText(csvFile.getAbsolutePath());

@@ -60,7 +60,10 @@ public class CSVLoader<T extends DatabaseObject>
 	 */
 	private Set<T> dataset;
 
-	private ObjectValidationStrategy validationStrategy;
+	/**
+	 * The {@link ObjectValidationStrategy} used to validate the objects loaded with this loader.
+	 */
+	private final ObjectValidationStrategy validationStrategy;
 
 	/**
 	 * @param objectClass
@@ -78,7 +81,7 @@ public class CSVLoader<T extends DatabaseObject>
 	 * of the specified type.
 	 *
 	 * @param className the simple name of the class of the objects to be
-	 * validated
+	 *            validated
 	 * @return the validation strategy for that class
 	 */
 	private static ObjectValidationStrategy getCorrectStrategy(final String className)
@@ -126,7 +129,7 @@ public class CSVLoader<T extends DatabaseObject>
 	 * @param filePath path to the csv file
 	 * @param objectClass the class the objects will instantiated as
 	 * @return a {@link VelhoCsvParser} object containing the valid and invalid
-	 * data
+	 *         data
 	 */
 	private VelhoCsvParser<T> readCSVFile(final String csvFilePath)
 	{

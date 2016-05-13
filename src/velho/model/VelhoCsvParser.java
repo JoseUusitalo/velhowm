@@ -105,7 +105,7 @@ public class VelhoCsvParser<T> extends CsvToBean<T>
 		catch (final IOException e)
 		{
 			reader.close();
-			throw new IOException("Error capturing CSV header.");
+			throw (IOException) new IOException("Error capturing CSV header.").initCause(e);
 		}
 
 		while (null != (line = reader.readNext()))

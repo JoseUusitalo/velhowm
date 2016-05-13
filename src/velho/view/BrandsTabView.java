@@ -67,7 +67,7 @@ public class BrandsTabView implements GenericView
 			table.setEditable(true);
 			table.setItems(brands);
 
-			final Callback<TableColumn<Object, String>, TableCell<Object, String>> cellFactory = (final TableColumn<Object, String> p) -> new EditingCell();
+			final Callback<TableColumn<Object, String>, TableCell<Object, String>> cellFactory = (final TableColumn<Object, String> col) -> new EditingCell();
 			final TableColumn<Object, String> nameColumn = new TableColumn<Object, String>("Name");
 
 			table.getColumns().clear();

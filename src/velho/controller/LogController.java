@@ -88,10 +88,7 @@ public class LogController
 		}
 
 		for (Object line : log)
-		{
-			strbuilder.append(line.toString());
-			strbuilder.append("\n");
-		}
+			strbuilder.append(line.toString()).append('\n');
 
 		return strbuilder.toString();
 	}
@@ -104,7 +101,7 @@ public class LogController
 	@SuppressWarnings("static-method")
 	public String getUserLog()
 	{
-		StringBuilder sb = new StringBuilder();
+		final StringBuilder stringBuilder = new StringBuilder();
 		ArrayList<Object> log = new ArrayList<Object>();
 
 		SYSLOG.info("Loading the full user log.");
@@ -119,12 +116,9 @@ public class LogController
 		}
 
 		for (Object line : log)
-		{
-			sb.append(line.toString());
-			sb.append("\n");
-		}
+			stringBuilder.append(line.toString()).append('\n');
 
-		return sb.toString();
+		return stringBuilder.toString();
 	}
 
 	/**

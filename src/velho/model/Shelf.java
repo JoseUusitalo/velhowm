@@ -122,7 +122,7 @@ public class Shelf extends AbstractDatabaseObject
 		}
 		catch (final NumberFormatException e)
 		{
-			throw new IllegalArgumentException("Invalid shelf slot ID '" + shelfSlotID + "'.");
+			throw (IllegalArgumentException) new IllegalArgumentException("Invalid shelf slot ID '" + shelfSlotID + "'.").initCause(e);
 		}
 
 		try
@@ -131,7 +131,7 @@ public class Shelf extends AbstractDatabaseObject
 		}
 		catch (final NumberFormatException e)
 		{
-			throw new IllegalArgumentException("Invalid shelf slot ID '" + shelfSlotID + "'.");
+			throw (IllegalArgumentException) new IllegalArgumentException("Invalid shelf slot ID '" + shelfSlotID + "'.").initCause(e);
 		}
 
 		try
@@ -140,7 +140,7 @@ public class Shelf extends AbstractDatabaseObject
 		}
 		catch (final NumberFormatException e)
 		{
-			throw new IllegalArgumentException("Invalid shelf slot ID '" + shelfSlotID + "'.");
+			throw (IllegalArgumentException) new IllegalArgumentException("Invalid shelf slot ID '" + shelfSlotID + "'.").initCause(e);
 		}
 
 		return tokens;
@@ -181,7 +181,7 @@ public class Shelf extends AbstractDatabaseObject
 		}
 		catch (final NumberFormatException e)
 		{
-			throw new IllegalArgumentException("Invalid shelf slot ID '" + shelfSlotID + "'.");
+			throw (IllegalArgumentException) new IllegalArgumentException("Invalid shelf slot ID '" + shelfSlotID + "'.").initCause(e);
 		}
 
 		try
@@ -190,7 +190,7 @@ public class Shelf extends AbstractDatabaseObject
 		}
 		catch (final NumberFormatException e)
 		{
-			throw new IllegalArgumentException("Invalid shelf slot ID '" + shelfSlotID + "'.");
+			throw (IllegalArgumentException) new IllegalArgumentException("Invalid shelf slot ID '" + shelfSlotID + "'.").initCause(e);
 		}
 
 		try
@@ -199,7 +199,7 @@ public class Shelf extends AbstractDatabaseObject
 		}
 		catch (final NumberFormatException e)
 		{
-			throw new IllegalArgumentException("Invalid shelf slot ID '" + shelfSlotID + "'.");
+			throw (IllegalArgumentException) new IllegalArgumentException("Invalid shelf slot ID '" + shelfSlotID + "'.").initCause(e);
 		}
 
 		return tokens;
@@ -211,7 +211,7 @@ public class Shelf extends AbstractDatabaseObject
 	 *
 	 * @param shelfSlotID shelf slot ID string to tokenize and validate
 	 * @return an array of integers where the values are: the database ID of this shelf, the index of the level, and the
-	 * index of the slot on the level
+	 *         index of the slot on the level
 	 */
 	private int[] tokenizeAndValidateShelfSlotID(final String shelfSlotID)
 	{
@@ -381,7 +381,7 @@ public class Shelf extends AbstractDatabaseObject
 	 * @param shelfSlotID ID of the shelf slot
 	 * @param productBox box to add
 	 * @return <code>true</code> if box was added to the slot, <code>false</code> the slot did not have enough free
-	 * space
+	 *         space
 	 * @throws IllegalArgumentException if the slot ID is not in this shelf or the given box was <code>null</code>
 	 */
 	public boolean addToSlot(final String shelfSlotID, final ProductBox productBox) throws IllegalArgumentException

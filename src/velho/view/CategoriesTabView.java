@@ -79,7 +79,7 @@ public class CategoriesTabView implements GenericView
 			table.getItems().clear();
 			table.setItems(categories);
 
-			final Callback<TableColumn<Object, Object>, TableCell<Object, Object>> cellFactory = (final TableColumn<Object, Object> p) -> new EditingCell();
+			final Callback<TableColumn<Object, Object>, TableCell<Object, Object>> cellFactory = (final TableColumn<Object, Object> col) -> new EditingCell();
 			final TableColumn<Object, Object> nameColumn = new TableColumn<Object, Object>("Name");
 
 			nameColumn.setMinWidth(100);
@@ -148,7 +148,7 @@ public class CategoriesTabView implements GenericView
 			hbox.setSpacing(10);
 			hbox.setAlignment(Pos.CENTER_LEFT);
 
-			addButton.setOnAction((final ActionEvent e) ->
+			addButton.setOnAction((final ActionEvent event) ->
 			{
 				final ProductCategory saveCategory = new ProductCategory(categoryName.getText(), (ProductType) categoryType.getValue());
 				categoryName.clear();

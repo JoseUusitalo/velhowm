@@ -39,12 +39,12 @@ public class CSVController
 	/**
 	 * A view for loading CSV files to the database.
 	 */
-	private CSVLoadView loadCSVView;
+	private final CSVLoadView loadCSVView;
 
 	/**
 	 * A view for writing CSV files to a file.
 	 */
-	private CSVWriteView writeCSVView;
+	private final CSVWriteView writeCSVView;
 
 	/**
 	 * The main window view.
@@ -246,7 +246,7 @@ public class CSVController
 
 		SYSLOG.debug("Writing CSV file: " + new File(path).getAbsolutePath());
 
-		try (final FileWriter fw = new FileWriter(path); CSVWriter writer = new CSVWriter(fw, ',', '\0'))
+		try (final FileWriter fileWriter = new FileWriter(path); CSVWriter writer = new CSVWriter(fileWriter, ',', '\0'))
 		{
 			@SuppressWarnings("rawtypes")
 			BeanToCsv bean = new BeanToCsv();
