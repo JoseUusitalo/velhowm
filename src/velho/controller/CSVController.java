@@ -33,7 +33,6 @@ import velho.view.VerticalViewGroup;
 public class CSVController
 {
 	/**
-	 * Apache log4j logger: System.
 	 */
 	private static final Logger SYSLOG = Logger.getLogger(CSVController.class.getName());
 
@@ -109,7 +108,7 @@ public class CSVController
 
 		SYSLOG.debug("Writing CSV file: " + new File(path).getAbsolutePath());
 
-		try (final FileWriter fw = new FileWriter(path); CSVWriter writer = new CSVWriter(fw, ',', '\0'))
+		try (final FileWriter fileWriter = new FileWriter(path); CSVWriter writer = new CSVWriter(fileWriter, ',', '\0'))
 		{
 			writer.writeAll(lines);
 		}

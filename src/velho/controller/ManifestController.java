@@ -124,7 +124,7 @@ public class ManifestController implements UIActionController
 	{
 		USRLOG.info("Viewing manifest: " + manifest);
 		currentManifest = manifest;
-		managementView.setContent(new ManifestView(manifest, this).getView());
+		managementView.setContent(new ManifestView(manifest).getView());
 		// The method showing the combo box state selector is called in the
 		// view.
 	}

@@ -29,11 +29,6 @@ public class ManifestView implements GenericView
 	private BorderPane bpane;
 
 	/**
-	 * The {@link ManifestController}.
-	 */
-	private final ManifestController manifestController;
-
-	/**
 	 * The {@link Manifest} to display in this view.
 	 */
 	private final Manifest manifest;
@@ -42,9 +37,8 @@ public class ManifestView implements GenericView
 	 * @param manifest
 	 * @param manifestController
 	 */
-	public ManifestView(final Manifest manifest, final ManifestController manifestController)
+	public ManifestView(final Manifest manifest)
 	{
-		this.manifestController = manifestController;
 		this.manifest = manifest;
 	}
 
@@ -60,12 +54,12 @@ public class ManifestView implements GenericView
 		{
 			bpane = new BorderPane();
 
-			BorderPane boxlist = (BorderPane) ListController.getTableView(manifestController, DatabaseController.getInstance().getProductSearchDataColumns(false, false),
-					manifest.getObservableBoxes());
+			final BorderPane boxlist = (BorderPane) ListController.getTableView(ManifestController.getInstance(),
+					DatabaseController.getInstance().getProductSearchDataColumns(false, false), manifest.getObservableBoxes());
 
-			HBox stateBox = new HBox(10);
-			Label stateLabel = new Label(LocalizationController.getInstance().getString("manifestStateLabel"));
-			ComboBox<Object> manifestState = new ComboBox<Object>();
+			final HBox stateBox = new HBox(10);
+			final Label stateLabel = new Label(LocalizationController.getInstance().getString("manifestStateLabel"));
+			final ComboBox<Object> manifestState = new ComboBox<Object>();
 
 			manifestState.getItems().addAll(DatabaseController.getInstance().getManifestStateChangeList(manifest.getState()));
 			manifestState.getSelectionModel().select(manifest.getState());
@@ -78,11 +72,11 @@ public class ManifestView implements GenericView
 				@Override
 				public void changed(final ObservableValue<?> observableValue, final Object oldValue, final Object newValue)
 				{
-					manifestController.setCurrentManifestState((ManifestState) newValue);
+					ManifestController.getInstance().setCurrentManifestState((ManifestState) newValue);
 				}
 			});
 
-			manifestController.showStateSelector(stateBox);
+			ManifestController.getInstance().showStateSelector(stateBox);
 			bpane.setCenter(boxlist);
 			UIController.getInstance().recordView(this);
 		}

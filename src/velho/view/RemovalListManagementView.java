@@ -27,11 +27,6 @@ public class RemovalListManagementView implements GenericView
 	private BorderPane bpane;
 
 	/**
-	 * The {@link RemovalListController}.
-	 */
-	private final RemovalListController removalListController;
-
-	/**
 	 * Button for showing the removal list creation view.
 	 */
 	private Button newListButton;
@@ -40,14 +35,6 @@ public class RemovalListManagementView implements GenericView
 	 * Button for showing all removal lists.
 	 */
 	private Button browseListsButton;
-
-	/**
-	 * @param removalListController
-	 */
-	public RemovalListManagementView(final RemovalListController removalListController)
-	{
-		this.removalListController = removalListController;
-	}
 
 	/**
 	 * Gets the removal list management view.
@@ -83,7 +70,7 @@ public class RemovalListManagementView implements GenericView
 				@Override
 				public void handle(final ActionEvent event)
 				{
-					removalListController.showNewRemovalListView();
+					RemovalListController.getInstance().showNewRemovalListView();
 				}
 			});
 
@@ -92,7 +79,7 @@ public class RemovalListManagementView implements GenericView
 				@Override
 				public void handle(final ActionEvent event)
 				{
-					removalListController.showBrowseRemovalListsView();
+					RemovalListController.getInstance().showBrowseRemovalListsView();
 				}
 			});
 
@@ -115,6 +102,7 @@ public class RemovalListManagementView implements GenericView
 
 	/**
 	 * Gets the view below the management pane.
+	 *
 	 * @return the center view
 	 */
 	public Node getContent()

@@ -40,11 +40,6 @@ public class RemovalListView implements GenericView
 	private BorderPane bpane;
 
 	/**
-	 * The {@link RemovalListController}.
-	 */
-	private final RemovalListController removalListController;
-
-	/**
 	 * The new removal list view.
 	 */
 	private BorderPane thisList;
@@ -56,12 +51,10 @@ public class RemovalListView implements GenericView
 
 	/**
 	 * @param removalList
-	 * @param removalListController
 	 */
-	public RemovalListView(final RemovalList removalList, final RemovalListController removalListController)
+	public RemovalListView(final RemovalList removalList)
 	{
 		this.removalList = removalList;
-		this.removalListController = removalListController;
 	}
 
 	/**
@@ -87,7 +80,7 @@ public class RemovalListView implements GenericView
 				@Override
 				public void handle(final ActionEvent event)
 				{
-					removalListController.showBrowseRemovalListsView();
+					RemovalListController.getInstance().showBrowseRemovalListsView();
 				}
 			});
 
@@ -106,12 +99,12 @@ public class RemovalListView implements GenericView
 				@Override
 				public void changed(final ObservableValue<?> observableValue, final Object oldValue, final Object newValue)
 				{
-					removalListController.updateRemovalListState(removalList, (RemovalListState) newValue);
+					RemovalListController.getInstance().updateRemovalListState(removalList, (RemovalListState) newValue);
 				}
 			});
 
-			thisList = (BorderPane) ListController.getTableView(removalListController, DatabaseController.getInstance().getProductSearchDataColumns(false, false),
-					removalList.getObservableBoxes());
+			thisList = (BorderPane) ListController.getTableView(RemovalListController.getInstance(),
+					DatabaseController.getInstance().getProductSearchDataColumns(false, false), removalList.getObservableBoxes());
 
 			// Make the list always take up the full vertical space.
 			GridPane.setVgrow(thisList, Priority.ALWAYS);
@@ -146,7 +139,7 @@ public class RemovalListView implements GenericView
 	public void refresh()
 	{
 		SYSLOG.trace("Refreshing removal list viewing view.");
-		thisList = removalListController.getNewRemovalListView();
+		thisList = RemovalListController.getInstance().getNewRemovalListView();
 	}
 
 	@Override

@@ -248,7 +248,7 @@ public class JuniorClass extends SeniorClass {
       </example>
     </rule>
 
-    <rule name="AccessorClassGeneration"
+<!--    <rule name="AccessorClassGeneration"
     		 since="1.04"
           message="Avoid instantiation through private constructors from outside of the constructor's class."
           class="net.sourceforge.pmd.lang.java.rule.design.AccessorClassGenerationRule"
@@ -273,7 +273,7 @@ public class Outer {
 }
   ]]>
       </example>
-    </rule>
+    </rule>-->
 
     <rule name="FinalFieldCouldBeStatic"
    		language="java"
@@ -864,7 +864,7 @@ public class Foo {
     </rule>
 
 
-    <rule name="AvoidSynchronizedAtMethodLevel"
+<!--    <rule name="AvoidSynchronizedAtMethodLevel"
    		language="java"
     		 since="3.0"
           message="Use block level rather than method level synchronization"
@@ -909,7 +909,7 @@ public class Foo {
 }
 ]]>
       </example>
-    </rule>
+    </rule>-->
 
     <rule name="MissingBreakInSwitch"
           language="java"

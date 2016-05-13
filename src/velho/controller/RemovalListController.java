@@ -98,8 +98,8 @@ public class RemovalListController implements UIActionController
 		// Managers and greater see the management view.
 		if (LoginController.getInstance().userRoleIsGreaterOrEqualTo(UserRole.MANAGER))
 		{
-			managementView = new RemovalListManagementView(this);
-			creationView = new RemovalListCreationView(this, SearchController.getInstance());
+			managementView = new RemovalListManagementView();
+			creationView = new RemovalListCreationView();
 
 			// Initially the browsing view is shown.
 			if (managementView.getView().getCenter() == null)
@@ -321,9 +321,9 @@ public class RemovalListController implements UIActionController
 		USRLOG.info("Viewing removal list " + data);
 
 		if (LoginController.getInstance().userRoleIsGreaterOrEqualTo(UserRole.MANAGER))
-			managementView.setContent(new RemovalListView((RemovalList) data, this).getView());
+			managementView.setContent(new RemovalListView((RemovalList) data).getView());
 		else
-			tabView.setView(new RemovalListView((RemovalList) data, this).getView());
+			tabView.setView(new RemovalListView((RemovalList) data).getView());
 	}
 
 	@Override

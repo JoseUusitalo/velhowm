@@ -42,7 +42,7 @@ public class LogController
 	 */
 	private LogController()
 	{
-		logView = new LogView(this);
+		logView = new LogView();
 	}
 
 	/**

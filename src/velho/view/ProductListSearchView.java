@@ -30,21 +30,6 @@ public class ProductListSearchView implements GenericView
 	private BorderPane pane;
 
 	/**
-	 * The {@link SearchController}.
-	 */
-	private final SearchController searchController;
-
-	/**
-	 * Searches the list of products
-	 *
-	 * @param searchController embodies SearchController
-	 */
-	public ProductListSearchView(final SearchController searchController)
-	{
-		this.searchController = searchController;
-	}
-
-	/**
 	 * Gets the product list search view.
 	 *
 	 * @param list the view of the search results
@@ -55,9 +40,9 @@ public class ProductListSearchView implements GenericView
 		if (pane == null)
 		{
 			pane = new BorderPane();
-			VBox left = new VBox();
-			Button printButton = new Button(LocalizationController.getInstance().getString("printButton"));
-			Button sendToScannerButton = new Button(LocalizationController.getInstance().getString("sendToScannerButton"));
+			final VBox left = new VBox();
+			final Button printButton = new Button(LocalizationController.getInstance().getString("printButton"));
+			final Button sendToScannerButton = new Button(LocalizationController.getInstance().getString("sendToScannerButton"));
 
 			final TextArea textArea = new TextArea();
 			textArea.setPromptText(LocalizationController.getInstance().getString("productListSearchPromptText"));
@@ -96,7 +81,7 @@ public class ProductListSearchView implements GenericView
 				{
 					if (event.getCode() == KeyCode.ENTER)
 					{
-						searchController.searchByProductList(textArea.getText());
+						SearchController.getInstance().searchByProductList(textArea.getText());
 					}
 				}
 			});

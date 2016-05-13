@@ -27,21 +27,6 @@ public class SearchTabView implements GenericView
 	private BorderPane bPane;
 
 	/**
-	 * Calls SearchControllers
-	 */
-	private SearchController searchController;
-
-	/**
-	 * Gets the information to SearchTabView form SearchController
-	 *
-	 * @param searchController
-	 */
-	public SearchTabView(final SearchController searchController)
-	{
-		this.searchController = searchController;
-	}
-
-	/**
 	 * Gets the login view.
 	 *
 	 * @return the login view BorderPane
@@ -54,7 +39,7 @@ public class SearchTabView implements GenericView
 			top.getStyleClass().add("standard-background-color");
 
 			bPane = new BorderPane();
-			final GridPane searchPane = (GridPane) searchController.getSearchView();
+			final GridPane searchPane = (GridPane) SearchController.getInstance().getSearchView();
 			searchPane.setPadding(new Insets(0, 10, 10, 10));
 
 			final HBox buttonsBox = new HBox(10);
@@ -91,7 +76,7 @@ public class SearchTabView implements GenericView
 			top.getChildren().addAll(searchPane, buttonsBox);
 
 			bPane.setTop(top);
-			bPane.setCenter(searchController.getResultsView());
+			bPane.setCenter(SearchController.getInstance().getResultsView());
 
 			UIController.getInstance().recordView(this);
 		}

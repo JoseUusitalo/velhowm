@@ -42,7 +42,7 @@ public class SearchController
 	 */
 	private SearchController()
 	{
-		this.searchTabView = new SearchTabView(this);
+		this.searchTabView = new SearchTabView();
 	}
 
 	/**
@@ -88,9 +88,10 @@ public class SearchController
 	 *
 	 * @return the search view
 	 */
+	@SuppressWarnings("static-method")
 	public Node getSearchView()
 	{
-		return new SearchView(this, true, DatabaseController.getInstance().getAllProductBrands(), DatabaseController.getInstance().getAllProductCategories())
+		return new SearchView(true, DatabaseController.getInstance().getAllProductBrands(), DatabaseController.getInstance().getAllProductCategories())
 				.getView();
 	}
 
@@ -100,9 +101,10 @@ public class SearchController
 	 * @param limits an internal string representing the type of search view to create
 	 * @return the search view
 	 */
+	@SuppressWarnings("static-method")
 	public Node getSearchView(final boolean canBeInRemovalList)
 	{
-		return new SearchView(this, canBeInRemovalList, DatabaseController.getInstance().getAllProductBrands(),
+		return new SearchView(canBeInRemovalList, DatabaseController.getInstance().getAllProductBrands(),
 				DatabaseController.getInstance().getAllProductCategories()).getView();
 	}
 
@@ -136,9 +138,10 @@ public class SearchController
 	 *
 	 * @return product list search view
 	 */
+	@SuppressWarnings("static-method")
 	public Node getProductListSearchView()
 	{
-		final ProductListSearchView searchView = new ProductListSearchView(this);
+		final ProductListSearchView searchView = new ProductListSearchView();
 		//@formatter:off
 		return searchView.getView((BorderPane) ListController.getTableView(ProductController.getInstance(),
 										  								   DatabaseController.getInstance().getProductSearchDataColumns(false, false),
@@ -205,7 +208,7 @@ public class SearchController
 	 *
 	 * @param line String to parse
 	 * @return an object array where the first element is the integer and the
-	 * second element is the product name
+	 *         second element is the product name
 	 */
 	public static Object[] parseProductLine(final String line)
 	{

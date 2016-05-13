@@ -28,8 +28,6 @@ public class SearchView implements GenericView
 	 */
 	private GridPane grid;
 
-	private final SearchController searchController;
-
 	private final ObservableList<Object> productCategories;
 
 	private final ObservableList<Object> productBrands;
@@ -42,10 +40,8 @@ public class SearchView implements GenericView
 	 * @param productBrands
 	 * @param productCategories
 	 */
-	public SearchView(final SearchController searchController, final boolean canBeInRemovalList, final ObservableList<Object> productBrands,
-			final ObservableList<Object> productCategories)
+	public SearchView(final boolean canBeInRemovalList, final ObservableList<Object> productBrands, final ObservableList<Object> productCategories)
 	{
-		this.searchController = searchController;
 		this.canBeInRemovalList = canBeInRemovalList;
 		this.productBrands = productBrands;
 		this.productCategories = productCategories;
@@ -151,7 +147,7 @@ public class SearchView implements GenericView
 						// still numbers.
 					}
 
-					searchController.productBoxSearch(canBeInRemovalList, nameField.getText(), productCountField.getValue(), brandbox.getValue(),
+					SearchController.getInstance().productBoxSearch(canBeInRemovalList, nameField.getText(), productCountField.getValue(), brandbox.getValue(),
 							categorybox.getValue(), dpStart.getValue(), dpEnd.getValue());
 				}
 			});
