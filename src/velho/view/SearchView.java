@@ -11,6 +11,7 @@ import javafx.scene.control.Label;
 import javafx.scene.control.Spinner;
 import javafx.scene.control.SpinnerValueFactory;
 import javafx.scene.control.TextField;
+import javafx.scene.control.Tooltip;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.GridPane;
 import velho.controller.LocalizationController;
@@ -19,7 +20,6 @@ import velho.controller.UIController;
 import velho.model.interfaces.GenericView;
 
 /**
- *
  * @author Joona Silvennoinen &amp; Jose Uusitalo
  */
 public class SearchView implements GenericView
@@ -28,10 +28,12 @@ public class SearchView implements GenericView
 	 * The root GridPane for this view.
 	 */
 	private GridPane grid;
-	private SearchController searchController;
-	private ObservableList<Object> productCategories;
-	private ObservableList<Object> productBrands;
-	private boolean canBeInRemovalList;
+
+	private final ObservableList<Object> productCategories;
+
+	private final ObservableList<Object> productBrands;
+
+	private final boolean canBeInRemovalList;
 
 	/**
 	 * @param searchController
@@ -39,10 +41,8 @@ public class SearchView implements GenericView
 	 * @param productBrands
 	 * @param productCategories
 	 */
-	public SearchView(final SearchController searchController, final boolean canBeInRemovalList, final ObservableList<Object> productBrands,
-			final ObservableList<Object> productCategories)
+	public SearchView(final boolean canBeInRemovalList, final ObservableList<Object> productBrands, final ObservableList<Object> productCategories)
 	{
-		this.searchController = searchController;
 		this.canBeInRemovalList = canBeInRemovalList;
 		this.productBrands = productBrands;
 		this.productCategories = productCategories;
@@ -63,10 +63,11 @@ public class SearchView implements GenericView
 			grid.setAlignment(Pos.CENTER);
 
 			final TextField nameField = new TextField();
-			nameField.setPromptText(LocalizationController.getString("productNameorIDPromptText"));
+			nameField.setPromptText(LocalizationController.getInstance().getString("productNameorIDPromptText"));
 			grid.add(nameField, 0, 1, 2, 1);
+			nameField.setTooltip(new Tooltip(LocalizationController.getInstance().getString("tooltipSearchViewSearchField")));
 
-			final Label countSpinnerLabel = new Label(LocalizationController.getString("productCountSpinnerText"));
+			final Label countSpinnerLabel = new Label(LocalizationController.getInstance().getString("productCountSpinnerText"));
 			countSpinnerLabel.setAlignment(Pos.CENTER);
 			grid.add(countSpinnerLabel, 2, 1, 1, 1);
 
@@ -105,7 +106,7 @@ public class SearchView implements GenericView
 
 			final ComboBox<Object> brandbox = new ComboBox<Object>();
 			brandbox.getItems().add(null);
-			brandbox.setPromptText(LocalizationController.getString("productBrandComboboxPrompt"));
+			brandbox.setPromptText(LocalizationController.getInstance().getString("productBrandComboboxPrompt"));
 			brandbox.getItems().addAll(productBrands);
 			brandbox.setMaxWidth(Double.MAX_VALUE);
 			brandbox.getSelectionModel().selectFirst();
@@ -113,20 +114,20 @@ public class SearchView implements GenericView
 
 			final ComboBox<Object> categorybox = new ComboBox<Object>();
 			categorybox.getItems().add(null);
-			categorybox.setPromptText(LocalizationController.getString("productCategoryComboboxPrompt"));
+			categorybox.setPromptText(LocalizationController.getInstance().getString("productCategoryComboboxPrompt"));
 			categorybox.getItems().addAll(productCategories);
 			categorybox.getSelectionModel().selectFirst();
 			grid.add(categorybox, 4, 2, 1, 1);
 
 			final DatePicker dpStart = new DatePicker();
-			dpStart.setPromptText(LocalizationController.getString("expirationDateStartDTPrompt"));
+			dpStart.setPromptText(LocalizationController.getInstance().getString("expirationDateStartDTPrompt"));
 			grid.add(dpStart, 0, 2, 1, 1);
 
 			final DatePicker dpEnd = new DatePicker();
-			dpEnd.setPromptText(LocalizationController.getString("expirationDateEndDTPrompt"));
+			dpEnd.setPromptText(LocalizationController.getInstance().getString("expirationDateEndDTPrompt"));
 			grid.add(dpEnd, 1, 2, 1, 1);
 
-			Button searchButton = new Button(LocalizationController.getString("searchButton"));
+			Button searchButton = new Button(LocalizationController.getInstance().getString("searchButton"));
 			searchButton.setMaxWidth(Double.MAX_VALUE);
 			searchButton.setPrefHeight(60.0);
 			searchButton.setPrefWidth(120.0);
@@ -148,11 +149,11 @@ public class SearchView implements GenericView
 						// still numbers.
 					}
 
-					searchController.productBoxSearch(canBeInRemovalList, nameField.getText(), productCountField.getValue(), brandbox.getValue(),
+					SearchController.getInstance().productBoxSearch(canBeInRemovalList, nameField.getText(), productCountField.getValue(), brandbox.getValue(),
 							categorybox.getValue(), dpStart.getValue(), dpEnd.getValue());
 				}
 			});
-			UIController.recordView(this);
+			UIController.getInstance().recordView(this);
 		}
 
 		return grid;

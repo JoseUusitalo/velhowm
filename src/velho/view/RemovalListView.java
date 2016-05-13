@@ -13,11 +13,11 @@ import javafx.scene.control.Label;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Priority;
-import velho.controller.DatabaseController;
 import velho.controller.ListController;
 import velho.controller.LocalizationController;
 import velho.controller.RemovalListController;
 import velho.controller.UIController;
+import velho.controller.database.DatabaseController;
 import velho.model.RemovalList;
 import velho.model.RemovalListState;
 import velho.model.interfaces.GenericView;
@@ -40,11 +40,6 @@ public class RemovalListView implements GenericView
 	private BorderPane bpane;
 
 	/**
-	 * The {@link RemovalListController}.
-	 */
-	private RemovalListController removalListController;
-
-	/**
 	 * The new removal list view.
 	 */
 	private BorderPane thisList;
@@ -52,16 +47,14 @@ public class RemovalListView implements GenericView
 	/**
 	 * The {@link RemovalList} to display.
 	 */
-	private RemovalList removalList;
+	private final RemovalList removalList;
 
 	/**
 	 * @param removalList
-	 * @param removalListController
 	 */
-	public RemovalListView(final RemovalList removalList, final RemovalListController removalListController)
+	public RemovalListView(final RemovalList removalList)
 	{
 		this.removalList = removalList;
-		this.removalListController = removalListController;
 	}
 
 	/**
@@ -79,7 +72,7 @@ public class RemovalListView implements GenericView
 			final GridPane top = new GridPane();
 			top.getStyleClass().add("standard-padding");
 
-			final Button browseListsButton = new Button(LocalizationController.getString("browseRemovalListsButton"));
+			final Button browseListsButton = new Button(LocalizationController.getInstance().getString("browseRemovalListsButton"));
 			browseListsButton.setAlignment(Pos.CENTER_LEFT);
 
 			browseListsButton.setOnAction(new EventHandler<ActionEvent>()
@@ -87,18 +80,18 @@ public class RemovalListView implements GenericView
 				@Override
 				public void handle(final ActionEvent event)
 				{
-					removalListController.showBrowseRemovalListsView();
+					RemovalListController.getInstance().showBrowseRemovalListsView();
 				}
 			});
 
-			final Label removalListLabel = new Label((LocalizationController.getString("removalListLabel")) + removalList.getDatabaseID());
+			final Label removalListLabel = new Label(LocalizationController.getInstance().getString("removalListLabel") + removalList.getDatabaseID());
 			removalListLabel.getStyleClass().add("centered-title-small");
 			removalListLabel.setAlignment(Pos.CENTER);
 			removalListLabel.setMaxWidth(Double.MAX_VALUE);
 			GridPane.setHgrow(removalListLabel, Priority.ALWAYS);
 
 			final ComboBox<Object> removalListState = new ComboBox<Object>();
-			removalListState.getItems().addAll(DatabaseController.getAllRemovalListStates());
+			removalListState.getItems().addAll(DatabaseController.getInstance().getAllRemovalListStates());
 			removalListState.getSelectionModel().select(removalList.getState());
 
 			removalListState.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<Object>()
@@ -106,12 +99,12 @@ public class RemovalListView implements GenericView
 				@Override
 				public void changed(final ObservableValue<?> observableValue, final Object oldValue, final Object newValue)
 				{
-					removalListController.updateRemovalListState(removalList, (RemovalListState) newValue);
+					RemovalListController.getInstance().updateRemovalListState(removalList, (RemovalListState) newValue);
 				}
 			});
 
-			thisList = (BorderPane) ListController.getTableView(removalListController, DatabaseController.getProductSearchDataColumns(false, false),
-					removalList.getObservableBoxes());
+			thisList = (BorderPane) ListController.getTableView(RemovalListController.getInstance(),
+					DatabaseController.getInstance().getProductSearchDataColumns(false, false), removalList.getObservableBoxes());
 
 			// Make the list always take up the full vertical space.
 			GridPane.setVgrow(thisList, Priority.ALWAYS);
@@ -122,7 +115,7 @@ public class RemovalListView implements GenericView
 
 			bpane.setTop(top);
 			bpane.setCenter(thisList);
-			UIController.recordView(this);
+			UIController.getInstance().recordView(this);
 		}
 
 		return bpane;
@@ -146,7 +139,7 @@ public class RemovalListView implements GenericView
 	public void refresh()
 	{
 		SYSLOG.trace("Refreshing removal list viewing view.");
-		thisList = removalListController.getNewRemovalListView();
+		thisList = RemovalListController.getInstance().getNewRemovalListView();
 	}
 
 	@Override

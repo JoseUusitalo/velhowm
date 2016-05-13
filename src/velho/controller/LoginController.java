@@ -4,6 +4,7 @@ import org.apache.log4j.Logger;
 import org.apache.log4j.MDC;
 
 import javafx.scene.layout.VBox;
+import velho.controller.database.DatabaseController;
 import velho.model.User;
 import velho.model.enums.Position;
 import velho.model.enums.UserRole;
@@ -11,7 +12,7 @@ import velho.view.LoginView;
 import velho.view.MainWindow;
 
 /**
- * Controls logging users in and out.
+ * The singleton controller for managing users logging in and out.
  *
  * @author Jose Uusitalo &amp; Edward Puustinen
  */
@@ -30,41 +31,49 @@ public class LoginController
 	/**
 	 * User currently logged in.
 	 */
-	private static User currentUser;
+	private User currentUser;
 
 	/**
 	 * The {@link LoginView}.
 	 */
-	private static LoginView view;
+	private LoginView view;
 
 	/**
-	 * The {@link UIController}.
+	 * A private inner class holding the class instance.
+	 *
+	 * @author Jose Uusitalo
 	 */
-	private static UIController uiController;
+	private static class Holder
+	{
+		/**
+		 * The only instance of {@link LoginController}.
+		 */
+		private static final LoginController INSTANCE = new LoginController();
+	}
 
 	/**
-	 * The {@link DebugController}.
 	 */
-	private static DebugController debugController;
+	private LoginController()
+	{
+		// No need to instantiate this class.
+	}
+
+	/**
+	 * Gets the instance of the {@link LoginController}.
+	 *
+	 * @return the login controller
+	 */
+	public static synchronized LoginController getInstance()
+	{
+		return Holder.INSTANCE;
+	}
 
 	/**
 	 * Destroys the login view.
 	 */
-	private static void destroyView()
+	private void destroyView()
 	{
 		view.recreate();
-	}
-
-	/**
-	 * Attaches the controllers that the login controller uses.
-	 *
-	 * @param uiController the {@link UIController}
-	 * @param debugController the {@link DebugController}
-	 */
-	public static void setControllers(final UIController uiController, final DebugController debugController)
-	{
-		LoginController.uiController = uiController;
-		LoginController.debugController = debugController;
 	}
 
 	/**
@@ -72,15 +81,15 @@ public class LoginController
 	 *
 	 * @param badgeString use RFID badge identification number
 	 * @return <code>true</code> if login was successful, or <code>false</code>
-	 * if debug mode was disabled
+	 *         if debug mode was disabled
 	 */
-	public static boolean login(final String badgeString)
+	public boolean login(final String badgeString)
 	{
 		SYSLOG.info("Attempting to log in with: " + badgeString);
 
-		if (UserController.isValidBadgeID(badgeString))
+		if (UserController.getInstance().isValidBadgeID(badgeString))
 		{
-			currentUser = DatabaseController.authenticateBadgeID(badgeString);
+			currentUser = DatabaseController.getInstance().authenticateBadgeID(badgeString);
 
 			// Valid credentials.
 			if (currentUser != null)
@@ -89,22 +98,22 @@ public class LoginController
 				MDC.put("user_id", currentUser.getDatabaseID());
 
 				USRLOG.info(currentUser.toString() + " logged in with a badge.");
-				uiController.showMainMenu(currentUser.getRole());
+				UIController.getInstance().showMainMenu(currentUser.getRole());
 				destroyView();
 
 				if (MainWindow.DEBUG_MODE)
-					debugController.setLogInButtonVisiblity(false);
+					DebugController.getInstance().setLogInButtonVisiblity(false);
 
 				return true;
 			}
 
 			SYSLOG.debug("Incorrect Badge ID.");
-			PopupController.warning(LocalizationController.getString("logInFailurePopUp"));
+			PopupController.getInstance().warning(LocalizationController.getInstance().getString("logInFailurePopUp"));
 		}
 		else
 		{
 			SYSLOG.debug("Invalid Badge ID.");
-			PopupController.warning(LocalizationController.getString("logInFailurePopUp"));
+			PopupController.getInstance().warning(LocalizationController.getInstance().getString("logInFailurePopUp"));
 		}
 
 		return false;
@@ -118,16 +127,16 @@ public class LoginController
 	 * @param lastName the last name of the user
 	 * @param pin login PIN string
 	 */
-	public static boolean login(final String firstName, final String lastName, final String authenticationString)
+	public boolean login(final String firstName, final String lastName, final String authenticationString)
 	{
 		if (firstName.isEmpty() || lastName.isEmpty())
 			return login(authenticationString);
 
 		SYSLOG.info("Attempting to log in with: " + firstName + " " + lastName + " : " + authenticationString);
 
-		if (UserController.isValidPIN(authenticationString))
+		if (UserController.getInstance().isValidPIN(authenticationString))
 		{
-			currentUser = DatabaseController.authenticatePIN(firstName, lastName, authenticationString);
+			currentUser = DatabaseController.getInstance().authenticatePIN(firstName, lastName, authenticationString);
 
 			// Valid credentials.
 			if (currentUser != null)
@@ -136,22 +145,22 @@ public class LoginController
 				MDC.put("user_id", currentUser.getDatabaseID());
 
 				USRLOG.info(currentUser.toString() + " logged in with PIN.");
-				uiController.showMainMenu(currentUser.getRole());
+				UIController.getInstance().showMainMenu(currentUser.getRole());
 				destroyView();
 
 				if (MainWindow.DEBUG_MODE)
-					debugController.setLogInButtonVisiblity(false);
+					DebugController.getInstance().setLogInButtonVisiblity(false);
 
 				return true;
 			}
 
 			SYSLOG.info("Incorrect PIN or Names.");
-			PopupController.warning(LocalizationController.getString("logInPinOrNamesIncorrect"));
+			PopupController.getInstance().warning(LocalizationController.getInstance().getString("logInPinOrNamesIncorrect"));
 		}
 		else
 		{
 			SYSLOG.info("Invalid PIN.");
-			PopupController.warning(LocalizationController.getString("logInInvalidPin"));
+			PopupController.getInstance().warning(LocalizationController.getInstance().getString("logInInvalidPin"));
 		}
 
 		return false;
@@ -160,10 +169,10 @@ public class LoginController
 	/**
 	 * Logs out the current user.
 	 */
-	public static void logout()
+	public void logout()
 	{
 		if (MainWindow.DEBUG_MODE)
-			debugController.setLogInButtonVisiblity(true);
+			DebugController.getInstance().setLogInButtonVisiblity(true);
 
 		USRLOG.info(currentUser.toString() + " logged out.");
 
@@ -180,20 +189,20 @@ public class LoginController
 	 *
 	 * @param userRoleName name of the role
 	 * @return <code>true</code> if login was successful, or <code>false</code>
-	 * if debug mode was disabled
+	 *         if debug mode was disabled
 	 */
-	public static boolean debugLogin(final UserRole role)
+	public boolean debugLogin(final UserRole role)
 	{
 		if (MainWindow.DEBUG_MODE)
 		{
-			currentUser = UserController.getDebugUser(role);
+			currentUser = UserController.getInstance().getDebugUser(role);
 
 			// Put the user database ID into the MDC thing for log4j.
 			MDC.put("user_id", currentUser.getDatabaseID());
 
 			USRLOG.info(currentUser.toString() + " logged in via Debug Window.");
 
-			uiController.showMainMenu(currentUser.getRole());
+			UIController.getInstance().showMainMenu(currentUser.getRole());
 
 			return true;
 		}
@@ -206,7 +215,7 @@ public class LoginController
 	 *
 	 * @return <code>true</code> if a user is logged in
 	 */
-	public static boolean isLoggedIn()
+	public boolean isLoggedIn()
 	{
 		return currentUser != null;
 	}
@@ -216,7 +225,7 @@ public class LoginController
 	 *
 	 * @return the login view
 	 */
-	public static VBox getView()
+	public VBox getView()
 	{
 		if (view == null)
 			view = new LoginView();
@@ -229,13 +238,13 @@ public class LoginController
 	 *
 	 * @return <code>true</code> if the user is logged in
 	 */
-	public static boolean checkLogin()
+	public boolean checkLogin()
 	{
 		if (!isLoggedIn())
 		{
-			uiController.setView(Position.CENTER, getView());
-			uiController.setView(Position.BOTTOM, null);
-			UIController.destroyAllViews();
+			UIController.getInstance().setMainWindowView(Position.CENTER, getView());
+			UIController.getInstance().setMainWindowView(Position.BOTTOM, null);
+			UIController.getInstance().destroyAllViews();
 			SYSLOG.debug("Login check failed.");
 
 			return false;
@@ -251,7 +260,7 @@ public class LoginController
 	 *
 	 * @return the user currently logged in
 	 */
-	public static User getCurrentUser()
+	public User getCurrentUser()
 	{
 		return currentUser;
 	}
@@ -261,14 +270,14 @@ public class LoginController
 	 * the given role.
 	 *
 	 * @param role role to check against
-	 * @return <code>true</code> if logged in user's role is greater than or
-	 * equal to the given role, <code>false</code>
-	 * if user is not logged in
+	 * @return <code>true</code> if logged in user's role is greater than or equal to the given role, <code>false</code> if user is not logged in or role is
+	 *         less
 	 */
-	public static boolean userRoleIsGreaterOrEqualTo(final UserRole role)
+	public boolean userRoleIsGreaterOrEqualTo(final UserRole role)
 	{
 		if (isLoggedIn())
 			return currentUser.getRole().compareTo(role) >= 0;
+
 		return false;
 	}
 
@@ -277,12 +286,28 @@ public class LoginController
 	 *
 	 * @param role role to check against
 	 * @return <code>true</code> if logged in user's role is the given role,
-	 * <code>false</code> if user is not logged in
+	 *         <code>false</code> if user is not logged in
 	 */
-	public static boolean userRoleIs(final UserRole role)
+	public boolean userRoleIs(final UserRole role)
 	{
 		if (isLoggedIn())
 			return currentUser.getRole().compareTo(role) == 0;
+
+		return false;
+	}
+
+	/**
+	 * Checks if the currently logged in user's role is less than or equal to the given role.
+	 *
+	 * @param role role to check against
+	 * @return <code>true</code> if logged in user's role is less than or equal to the given role, <code>false</code> if user is not logged in or role is
+	 *         greater
+	 */
+	public boolean userRoleIsLessOrEqualTo(final UserRole role)
+	{
+		if (isLoggedIn())
+			return currentUser.getRole().compareTo(role) <= 0;
+
 		return false;
 	}
 }

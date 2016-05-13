@@ -19,12 +19,12 @@ public class TableCellDeleteButton extends TableCell<Object, String>
 	/**
 	 * The button itself.
 	 */
-	private Button button;
+	private final Button button;
 
 	/**
 	 * The controller to send information to when this button is pressed.
 	 */
-	private UIActionController controller;
+	private final UIActionController controller;
 
 	/**
 	 * @param text button text
@@ -41,7 +41,7 @@ public class TableCellDeleteButton extends TableCell<Object, String>
 		button.setOnAction(new EventHandler<ActionEvent>()
 		{
 			@Override
-			public void handle(final ActionEvent t)
+			public void handle(final ActionEvent event)
 			{
 				// Get selected object and send information to parent
 				// controller.
@@ -59,9 +59,13 @@ public class TableCellDeleteButton extends TableCell<Object, String>
 		super.updateItem(string, empty);
 
 		// Display button only if the row is not empty.
-		if (!empty)
+		if (empty)
 		{
-			final Object rowObject = TableCellDeleteButton.this.getTableView().getItems().get(TableCellDeleteButton.this.getIndex());
+			setGraphic(null);
+		}
+		else
+		{
+			final Object rowObject = getTableView().getItems().get(getIndex());
 
 			if (rowObject instanceof User)
 			{
@@ -69,7 +73,7 @@ public class TableCellDeleteButton extends TableCell<Object, String>
 
 				// Show delete button for users that have a lower or equal
 				// role than current user.
-				if (((User) rowObject).getRole().compareTo(LoginController.getCurrentUser().getRole()) <= 0)
+				if (((User) rowObject).getRole().compareTo(LoginController.getInstance().getCurrentUser().getRole()) <= 0)
 					setGraphic(button);
 			}
 			else
@@ -77,7 +81,5 @@ public class TableCellDeleteButton extends TableCell<Object, String>
 				setGraphic(button);
 			}
 		}
-		else
-			setGraphic(null);
 	}
 }

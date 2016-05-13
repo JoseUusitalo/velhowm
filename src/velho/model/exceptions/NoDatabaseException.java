@@ -11,6 +11,7 @@ public class NoDatabaseException extends Exception
 
 	public NoDatabaseException()
 	{
+		// Silencing PMD.
 	}
 
 	public NoDatabaseException(final String message)

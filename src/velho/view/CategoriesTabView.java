@@ -7,6 +7,8 @@ import javafx.event.ActionEvent;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
+import javafx.scene.control.ComboBox;
+import javafx.scene.control.Label;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableColumn.CellEditEvent;
@@ -17,24 +19,24 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.util.Callback;
-import velho.controller.DatabaseController;
+import velho.controller.LocalizationController;
 import velho.controller.ProductController;
+import velho.controller.UIController;
+import velho.controller.database.DatabaseController;
 import velho.model.ProductCategory;
 import velho.model.ProductType;
 import velho.model.interfaces.GenericView;
 import velho.view.components.TableCellDeleteButton;
 
+/**
+ * @author Edward Puustinen
+ */
 public class CategoriesTabView implements GenericView
 {
 	/**
-	 * ProductCntroller neeeded when saving to database
-	 */
-	private ProductController productController;
-
-	/**
 	 * Makes the Categories tab call for table and make it viewable
 	 */
-	private final TableView<Object> table = new TableView<Object>();
+	private final TableView<Object> table;
 
 	/**
 	 * this is a VBox we use like a grid
@@ -44,7 +46,7 @@ public class CategoriesTabView implements GenericView
 	/**
 	 * Makes the Categories and ObservableList
 	 */
-	private ObservableList<Object> data = DatabaseController.getAllProductCategories();
+	private final ObservableList<Object> categories;
 
 	/**
 	 * Adds info to Product Controller about brands
@@ -52,13 +54,16 @@ public class CategoriesTabView implements GenericView
 	 * @param productController Product Controller handles the database work
 	 * @param uiController links UIController to the productController
 	 */
-	public CategoriesTabView(final ProductController productController)
+	public CategoriesTabView(final ObservableList<Object> categories)
 	{
-		this.productController = productController;
+		this.table = new TableView<Object>();
+		this.categories = categories;
 	}
 
 	/**
 	 * VBox grid view make it visible
+	 *
+	 * @param productList
 	 *
 	 * @return the VBox
 	 */
@@ -66,36 +71,39 @@ public class CategoriesTabView implements GenericView
 	{
 		if (vbox == null)
 		{
-			HBox hb = new HBox();
+			table.getColumns().clear();
+
+			HBox hbox = new HBox();
 
 			table.setEditable(true);
-			table.setItems(data);
+			table.getItems().clear();
+			table.setItems(categories);
 
-			final Callback<TableColumn<Object, Object>, TableCell<Object, Object>> cellFactory = (final TableColumn<Object, Object> p) -> new EditingCell();
+			final Callback<TableColumn<Object, Object>, TableCell<Object, Object>> cellFactory = (final TableColumn<Object, Object> col) -> new EditingCell();
 			final TableColumn<Object, Object> nameColumn = new TableColumn<Object, Object>("Name");
 
 			nameColumn.setMinWidth(100);
 			nameColumn.setCellValueFactory(new PropertyValueFactory<>("name"));
 			nameColumn.setCellFactory(cellFactory);
 
-			nameColumn.setOnEditCommit((final CellEditEvent<Object, Object> t) ->
+			nameColumn.setOnEditCommit((final CellEditEvent<Object, Object> event) ->
 			{
-				final ProductCategory editCategory = ((ProductCategory) t.getTableView().getItems().get(t.getTablePosition().getRow()));
-				editCategory.setName(t.getNewValue().toString());
-				productController.saveProductCategory(editCategory);
+				final ProductCategory editCategory = ((ProductCategory) event.getTableView().getItems().get(event.getTablePosition().getRow()));
+				editCategory.setName(event.getNewValue().toString());
+				ProductController.getInstance().saveProductCategory(editCategory);
 			});
 			table.getColumns().add(nameColumn);
 
-			final ObservableList<Object> cbValues = DatabaseController.getAllProductTypes();
-			final TableColumn<Object, Object> comboBoxColumn = new TableColumn<>("Types Combobox");
+			final ObservableList<Object> cbValues = DatabaseController.getInstance().getAllProductTypes();
+			final TableColumn<Object, Object> comboBoxColumn = new TableColumn<>(LocalizationController.getInstance().getString("typesComboboxTabName"));
 			comboBoxColumn.setMinWidth(150);
 			comboBoxColumn.setCellValueFactory(new PropertyValueFactory<>("type"));
 			comboBoxColumn.setCellFactory(ComboBoxTableCell.forTableColumn(cbValues));
-			comboBoxColumn.setOnEditCommit((final CellEditEvent<Object, Object> t) ->
+			comboBoxColumn.setOnEditCommit((final CellEditEvent<Object, Object> event) ->
 			{
-				final ProductCategory editCategory = ((ProductCategory) t.getTableView().getItems().get(t.getTablePosition().getRow()));
-				editCategory.setType((ProductType) t.getNewValue());
-				productController.saveProductCategory(editCategory);
+				final ProductCategory editCategory = ((ProductCategory) event.getTableView().getItems().get(event.getTablePosition().getRow()));
+				editCategory.setType((ProductType) event.getNewValue());
+				ProductController.getInstance().saveProductCategory(editCategory);
 			});
 			table.getColumns().add(comboBoxColumn);
 
@@ -106,44 +114,53 @@ public class CategoriesTabView implements GenericView
 			deleteColumn.setCellValueFactory(new Callback<TableColumn.CellDataFeatures<Object, String>, ObservableValue<String>>()
 			{
 				@Override
-				public ObservableValue<String> call(final TableColumn.CellDataFeatures<Object, String> p)
+				public ObservableValue<String> call(final TableColumn.CellDataFeatures<Object, String> celldata)
 				{
-					return new SimpleStringProperty(p.getValue(), "Delete");
+					return new SimpleStringProperty(celldata.getValue(), "Delete");
 				}
 			});
 
 			deleteColumn.setCellFactory(new Callback<TableColumn<Object, String>, TableCell<Object, String>>()
 			{
 				@Override
-				public TableCell<Object, String> call(final TableColumn<Object, String> p)
+				public TableCell<Object, String> call(final TableColumn<Object, String> tcolumn)
 				{
-					final TableCellDeleteButton button = new TableCellDeleteButton(productController, "Delete");
+					final TableCellDeleteButton button = new TableCellDeleteButton(ProductController.getInstance(),
+							LocalizationController.getInstance().getString("buttonDelete"));
 					button.setAlignment(Pos.CENTER);
 					return button;
 				}
 			});
 			table.getColumns().add(deleteColumn);
 
+			final Label categoryLabel = new Label(LocalizationController.getInstance().getString("categoryNameLabel"));
 			final TextField categoryName = new TextField();
-			categoryName.setPromptText("Category Name");
+			categoryName.setPromptText(LocalizationController.getInstance().getString("categoryNamePromtText"));
 			categoryName.setMaxWidth(nameColumn.getPrefWidth());
-			final Button addButton = new Button("Create");
-			addButton.setOnAction((final ActionEvent e) ->
-			{
-				final ProductCategory saveCategory = new ProductCategory(categoryName.getText());
-				data.add(saveCategory);
-				categoryName.clear();
-				productController.saveProductCategory(saveCategory);
-			});
+			final Button addButton = new Button(LocalizationController.getInstance().getString("buttonCreate"));
 
-			hb.getChildren().addAll(categoryName, addButton);
-			hb.setSpacing(3);
+			final Label typeLabel = new Label(LocalizationController.getInstance().getString("categoryTypeLabel"));
+			final ComboBox<Object> categoryType = new ComboBox<Object>();
+			categoryType.getItems().addAll(cbValues);
+			categoryType.getSelectionModel().selectFirst();
+
+			hbox.getChildren().addAll(categoryLabel, categoryName, typeLabel, categoryType, addButton);
+			hbox.setSpacing(10);
+			hbox.setAlignment(Pos.CENTER_LEFT);
+
+			addButton.setOnAction((final ActionEvent event) ->
+			{
+				final ProductCategory saveCategory = new ProductCategory(categoryName.getText(), (ProductType) categoryType.getValue());
+				categoryName.clear();
+				ProductController.getInstance().saveProductCategory(saveCategory);
+			});
 
 			vbox = new VBox();
 			vbox.setSpacing(5);
 			vbox.setPadding(new Insets(10, 0, 0, 10));
-			vbox.getChildren().addAll(table, hb);
+			vbox.getChildren().addAll(table, hbox);
 
+			UIController.getInstance().recordView(this);
 		}
 		return vbox;
 	}
@@ -160,6 +177,7 @@ public class CategoriesTabView implements GenericView
 
 		public EditingCell()
 		{
+			// Silencing PMD.
 		}
 
 		@Override

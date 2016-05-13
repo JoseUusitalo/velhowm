@@ -3,14 +3,17 @@ package velho.controller;
 import org.apache.log4j.Logger;
 
 import javafx.scene.Node;
+import velho.controller.database.DatabaseController;
 import velho.controller.interfaces.UIActionController;
 import velho.model.User;
 import velho.model.enums.UserRole;
+import velho.model.strategies.UserValidationStrategy;
 import velho.view.AddUserView;
+import velho.view.ListView;
 import velho.view.MainWindow;
 
 /**
- * A controller for managing users.
+ * The singleton controller for managing {@link User} objects.
  *
  * @author Jose Uusitalo &amp; Joona Silvennoinen
  */
@@ -32,158 +35,34 @@ public class UserController implements UIActionController
 	 */
 	private AddUserView view;
 
-	public UserController()
-	{
-	}
-
 	/**
-	 * Attempts to add a new user to the database.
+	 * A private inner class holding the class instance.
 	 *
-	 * @param badgeID user's badge id number
-	 * @param userFirstName user's first name
-	 * @param userLastName user's last name
-	 * @param userRole user's role in the company
-	 * @param showPopup show popups?
-	 * @return the created user or <code>null</code> if data was invalid or user already existed in the database
+	 * @author Jose Uusitalo
 	 */
-	public User createUser(final String badgeID, final String userPIN, final String userFirstName, final String userLastName, final UserRole userRole,
-			final boolean showPopup)
+	private static class Holder
 	{
-		if (validateUserData(badgeID, userPIN, userFirstName, userLastName, userRole))
-		{
-			User newUser;
-
-			// If no pin is defined, use badge ID.
-			if (userPIN == null || userPIN.isEmpty())
-				newUser = new User(userFirstName, userLastName, null, badgeID, userRole);
-			else
-				newUser = new User(userFirstName, userLastName, userPIN, null, userRole);
-
-			if (DatabaseController.getAllUsers().contains(newUser))
-			{
-				SYSLOG.debug("User " + newUser + " already exists.");
-
-				if (showPopup)
-				{
-					PopupController.info("User already exists. Please make sure that the following criteria are met:\n" + "Every Badge ID must be unique.\n"
-							+ "People with the same first and last name are allowed if their roles are different.\n"
-							+ "The combination of the PIN, first name, and last name must be unique.");
-				}
-
-				return null;
-			}
-
-			DatabaseController.saveOrUpdate(newUser);
-
-			if (LoginController.getCurrentUser() != null)
-				USRLOG.debug("Created a user.");
-			// Else: running a JUnit test -> above line causes a null pointer error.
-
-			if (showPopup)
-				PopupController.info(LocalizationController.getString("userCreatedPopUpNotice"));
-
-			return newUser;
-		}
-
-		SYSLOG.debug("Invalid user data.");
-
-		if (showPopup)
-			PopupController.warning("Invalid user data.");
-
-		return null;
+		/**
+		 * The only instance of {@link UserController}.
+		 */
+		private static final UserController INSTANCE = new UserController();
 	}
 
 	/**
-	 * Attempts to add a new user to the database.
+	 */
+	private UserController()
+	{
+		// No need to instantiate this class.
+	}
+
+	/**
+	 * Gets the instance of the {@link UserController}.
 	 *
-	 * @param badgeID user's badge id number
-	 * @param userFirstName user's first name
-	 * @param userLastName user's last name
-	 * @param userRoleName user's role in the company
-	 * @return the created user or <code>null</code> if data was invalid
+	 * @return the user controller
 	 */
-	public User createUser(final String badgeID, final String userPIN, final String userFirstName, final String userLastName, final UserRole userRole)
+	public static synchronized UserController getInstance()
 	{
-		return createUser(badgeID, userPIN, userFirstName, userLastName, userRole, true);
-	}
-
-	/**
-	 * Attempts to remove the specified user from the database.
-	 *
-	 * @param user user to remove
-	 */
-	public boolean deleteUser(final User user)
-	{
-		USRLOG.debug("Attempting to delete: " + user.getFullDetails());
-
-		if (LoginController.getCurrentUser().getDatabaseID() == user.getDatabaseID())
-		{
-			if (PopupController.confirmation(
-					"Are you sure you wish the delete your own user account? You will be logged out and be unable to log in again as a result of this action."))
-			{
-				if (DatabaseController.deleteUser(user))
-				{
-					LoginController.logout();
-					USRLOG.debug("User deleted themselves: " + user.getFullDetails());
-					PopupController.info("Deleted user: " + user.getFullDetails());
-					return true;
-				}
-
-				USRLOG.debug("Failed to delete user: " + user.getFullDetails());
-				PopupController.info("Failed to delete user: " + user.getFullDetails());
-			}
-
-			USRLOG.trace("Cancelled self-deletion confirmation.");
-			return false;
-		}
-
-		if (DatabaseController.deleteUser(user))
-		{
-			USRLOG.debug("User removed: " + user.getFullDetails());
-			PopupController.info("User removed: " + user.getFullDetails());
-			return true;
-		}
-
-		USRLOG.debug("Failed to delete user: " + user.getFullDetails());
-		PopupController.info("Failed to delete user: " + user.getFullDetails());
-
-		return false;
-	}
-
-	/**
-	 * Gets the view for adding users.
-	 *
-	 * @return the {@link AddUserView}
-	 */
-	public Node getView()
-	{
-		if (view == null)
-			view = new AddUserView(this, DatabaseController.getAllUserRoles());
-		return view.getView();
-	}
-
-	/**
-	 * Destroys the add user view.
-	 */
-	public void destroyView()
-	{
-		view = null;
-		getView();
-	}
-
-	/**
-	 * Creates the temporary debug user for logging in through the debug window.
-	 *
-	 * @param role the role to create the user as
-	 * @return a {@link User} object or <code>null</code> if
-	 *         {@link MainWindow#DEBUG_MODE} is <code>false</code>
-	 */
-	public static User getDebugUser(final UserRole role)
-	{
-		if (MainWindow.DEBUG_MODE)
-			return new User(-1, "Debug", "Account", "000000", null, role);
-
-		return null;
+		return Holder.INSTANCE;
 	}
 
 	/**
@@ -193,7 +72,7 @@ public class UserController implements UIActionController
 	 * @return a {@link UserRole} object
 	 */
 	@Deprecated
-	public static UserRole stringToRole(final String userRoleName)
+	public UserRole stringToRole(final String userRoleName)
 	{
 		switch (userRoleName)
 		{
@@ -246,44 +125,172 @@ public class UserController implements UIActionController
 		throw new UnsupportedOperationException();
 	}
 
-	/**
-	 * Validates the user data against the database requirements.
-	 * Either a badge ID or a PIN must be defined.
-	 * Both cannot be null.
-	 * Both cannot be defined.
-	 *
-	 * @param badgeID RFID identification string of the user's RFID badge
-	 * @param pin the pin string used to log in to the system if no RFID badge
-	 *            ID is provided
-	 * @param firstName the first name of the user
-	 * @param lastName the last name of the user
-	 * @param roleName the name of the role of the user
-	 *
-	 * @return <code>true</code> if given information is valid
-	 * @throws NoDatabaseLinkException
-	 */
-	public static boolean validateUserData(final String badgeID, final String pin, final String firstName, final String lastName, final UserRole role)
+	@Override
+	public void recreateViews(final ListView listView)
 	{
-		final boolean hasBadgeID = isValidBadgeID(badgeID);
-		final boolean hasPIN = isValidPIN(pin);
+		// TODO refactor userlist into tabview
+	}
 
-		// Must have exactly one.
-		if ((hasBadgeID && hasPIN) || (!hasBadgeID && !hasPIN))
+	/**
+	 * Attempts to add a new user to the database.
+	 *
+	 * @param badgeID user's badge id number
+	 * @param userFirstName user's first name
+	 * @param userLastName user's last name
+	 * @param userRole user's role in the company
+	 * @param showPopup show popups?
+	 * @return the created user or <code>null</code> if data was invalid or user
+	 *         already existed in the database
+	 */
+	public User createUser(final String badgeID, final String userPIN, final String userFirstName, final String userLastName, final UserRole userRole,
+			final boolean showPopup)
+	{
+		try
+		{
+			final User newUser = new User(userFirstName, userLastName, userPIN, badgeID, userRole);
+
+			if (DatabaseController.getInstance().getAllUsers().contains(newUser))
+			{
+				SYSLOG.debug("User already exists.");
+
+				if (showPopup)
+					PopupController.getInstance().info(LocalizationController.getInstance().getString("userAlreadyExistInfoPopUp"));
+
+				return null;
+			}
+
+			DatabaseController.getInstance().saveOrUpdate(newUser);
+
+			if (LoginController.getInstance().getCurrentUser() != null)
+				USRLOG.debug("Created a user.");
+			// Else: running a JUnit test -> above line causes a null pointer
+			// error.
+
+			if (showPopup)
+				PopupController.getInstance().info(LocalizationController.getInstance().getString("userCreatedPopUpNotice"));
+
+			return newUser;
+		}
+		catch (IllegalArgumentException e)
+		{
+			SYSLOG.debug("Invalid user data.");
+
+			if (showPopup)
+				PopupController.getInstance().warning(LocalizationController.getInstance().getString("invalidUserDataPopUp"));
+
+			return null;
+		}
+	}
+
+	/**
+	 * Attempts to add a new user to the database.
+	 *
+	 * @param badgeID user's badge id number
+	 * @param userFirstName user's first name
+	 * @param userLastName user's last name
+	 * @param userRoleName user's role in the company
+	 * @return the created user or <code>null</code> if data was invalid
+	 */
+	public User createUser(final String badgeID, final String userPIN, final String userFirstName, final String userLastName, final UserRole userRole)
+	{
+		return createUser(badgeID, userPIN, userFirstName, userLastName, userRole, true);
+	}
+
+	/**
+	 * Attempts to remove the specified user from the database.
+	 *
+	 * @param user user to remove
+	 */
+	public boolean deleteUser(final User user)
+	{
+		USRLOG.debug("Attempting to delete: " + user.getFullDetails());
+
+		if (LoginController.getInstance().getCurrentUser().getDatabaseID() == user.getDatabaseID())
+		{
+			if (PopupController.getInstance().confirmation(LocalizationController.getInstance().getString("yourAccountDeletationConfirmationPopUp")))
+			{
+
+				if (DatabaseController.getInstance().deleteUser(user))
+				{
+					LoginController.getInstance().logout();
+					USRLOG.debug("User deleted themselves: " + user.getFullDetails());
+					PopupController.getInstance().info(LocalizationController.getInstance().getString("deletedUserInfoPopUp") + user.getFullDetails());
+					return true;
+				}
+
+				USRLOG.debug("Failed to delete user: " + user.getFullDetails());
+				PopupController.getInstance().info(LocalizationController.getInstance().getCompoundString("failedToDeleteUserNotice", user.getFullDetails()));
+			}
+
+			USRLOG.trace("Cancelled self-deletion confirmation.");
 			return false;
+		}
 
-		// Name cannot be null, empty, or longer than maximum and length.
-		if (firstName == null || firstName.isEmpty() || firstName.length() > User.MAX_NAME_LENGTH)
+		if (PopupController.getInstance().confirmation(LocalizationController.getInstance().getString("yourAccountDeletationConfirmationCheckPopUp")))
+		{
+			if (DatabaseController.getInstance().deleteUser(user))
+			{
+				USRLOG.debug("User removed: " + user.getFullDetails());
+				PopupController.getInstance().info(LocalizationController.getInstance().getString("userRemovedInfoPopUp") + user.getFullDetails());
+				return true;
+			}
+
+			USRLOG.debug("Failed to delete user: " + user.getFullDetails());
+			PopupController.getInstance().info(LocalizationController.getInstance().getCompoundString("failedToDeleteUserNotice", user.getFullDetails()));
+
 			return false;
+		}
 
-		// Name cannot be null, empty, or longer than maximum and length.
-		if (lastName == null || lastName.isEmpty() || lastName.length() > User.MAX_NAME_LENGTH)
-			return false;
+		USRLOG.trace("Cancelled deletion confirmation.");
+		return false;
+	}
 
-		// TODO: The role is not in the database at the moment.
-		if (role == null)
-			return false;
+	/**
+	 * Gets the view for adding users.
+	 *
+	 * @return the {@link AddUserView}
+	 */
+	public Node getView()
+	{
+		if (view == null)
+			view = new AddUserView(this, DatabaseController.getInstance().getAllUserRoles());
+		return view.getView();
+	}
 
-		return true;
+	/**
+	 * Destroys the add user view.
+	 */
+	public void destroyView()
+	{
+		view = null;
+		getView();
+	}
+
+	/**
+	 * Creates the temporary debug user for logging in through the debug window.
+	 *
+	 * @param role the role to create the user as
+	 * @return a {@link User} object or <code>null</code> if
+	 *         {@link MainWindow#DEBUG_MODE} is <code>false</code>
+	 */
+	public User getDebugUser(final UserRole role)
+	{
+		if (MainWindow.DEBUG_MODE)
+			return new User(-1, "Debug", "Account", "000000", null, role);
+
+		return null;
+	}
+
+	/**
+	 * Validates the user data against the contextual requirements.
+	 *
+	 * @param user the user to be validated
+	 *
+	 * @return <code>true</code> if the user properties are valid
+	 */
+	public boolean validateUser(final User user)
+	{
+		return new UserValidationStrategy().isValidUser(user);
 	}
 
 	/**
@@ -293,7 +300,7 @@ public class UserController implements UIActionController
 	 * @param pin PIN to check
 	 * @return <code>true</code> if the pin is valid
 	 */
-	public static boolean isValidPIN(final String pin)
+	public boolean isValidPIN(final String pin)
 	{
 		if (pin == null || pin.length() != User.PIN_LENGTH)
 			return false;
@@ -301,7 +308,7 @@ public class UserController implements UIActionController
 		try
 		{
 			int value = Integer.parseInt(pin);
-			return (value >= 0 && value <= User.MAX_PIN_VALUE);
+			return value >= 0 && value <= User.MAX_PIN_VALUE;
 		}
 		catch (NumberFormatException e)
 		{
@@ -316,7 +323,7 @@ public class UserController implements UIActionController
 	 * @param badgeID badge ID to check
 	 * @return <code>true</code> if the badge ID is valid
 	 */
-	public static boolean isValidBadgeID(final String badgeID)
+	public boolean isValidBadgeID(final String badgeID)
 	{
 		if (badgeID == null || badgeID.length() != User.BADGE_ID_LENGTH)
 			return false;
@@ -324,11 +331,35 @@ public class UserController implements UIActionController
 		try
 		{
 			int value = Integer.parseInt(badgeID);
-			return (value >= 0 && value <= User.MAX_BADGE_ID_VALUE);
+			return value >= 0 && value <= User.MAX_BADGE_ID_VALUE;
 		}
 		catch (NumberFormatException e)
 		{
 			return false;
 		}
+	}
+
+	public Node getUserListView(final UserRole currentUserRole)
+	{
+		// TODO refactor into tabview
+		/*
+		 * What is shown in the user list depends on your role.
+		 */
+		switch (currentUserRole)
+		{
+			case ADMINISTRATOR:
+			case MANAGER:
+				return ListController.getTableView(this, DatabaseController.getInstance().getPublicUserDataColumns(true),
+						DatabaseController.getInstance().getAllUsers());
+			case LOGISTICIAN:
+				return ListController.getTableView(this, DatabaseController.getInstance().getPublicUserDataColumns(false),
+						DatabaseController.getInstance().getAllUsers());
+			case GUEST:
+				break;
+			default:
+				SYSLOG.error("Unknown user role '" + currentUserRole.getName() + "'.");
+		}
+
+		return null;
 	}
 }

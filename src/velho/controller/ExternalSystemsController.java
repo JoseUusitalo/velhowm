@@ -9,6 +9,7 @@ import java.util.Set;
 
 import org.apache.log4j.Logger;
 
+import velho.controller.database.DatabaseController;
 import velho.model.BarcodeScanner;
 import velho.model.Printer;
 import velho.model.ProductBox;
@@ -17,11 +18,12 @@ import velho.model.Shelf;
 import velho.model.ShelfSlot;
 
 /**
- * Controller handling the communication with systems outside the VELHO
+ * The singleton controller handling the communication with systems outside the VELHO
  * Warehouse Management.
  *
  * @author Edward Puustinen &amp; Jose Uusitalo
  */
+@SuppressWarnings("static-method")
 public class ExternalSystemsController
 {
 	/**
@@ -30,16 +32,33 @@ public class ExternalSystemsController
 	private static final Logger SYSLOG = Logger.getLogger(ExternalSystemsController.class.getName());
 
 	/**
-	 * The {@link ManifestController}.
+	 * A private inner class holding the class instance.
+	 *
+	 * @author Jose Uusitalo
 	 */
-	private static ManifestController manifestController;
+	private static class Holder
+	{
+		/**
+		 * The only instance of {@link ExternalSystemsController}.
+		 */
+		private static final ExternalSystemsController INSTANCE = new ExternalSystemsController();
+	}
 
 	/**
-	 * @param manifestController
 	 */
-	public static void setControllers(final ManifestController manifestController)
+	private ExternalSystemsController()
 	{
-		ExternalSystemsController.manifestController = manifestController;
+		// No need to instantiate this class.
+	}
+
+	/**
+	 * Gets the instance of the {@link ExternalSystemsController}.
+	 *
+	 * @return the external systems controller
+	 */
+	public static synchronized ExternalSystemsController getInstance()
+	{
+		return Holder.INSTANCE;
 	}
 
 	/**
@@ -49,29 +68,29 @@ public class ExternalSystemsController
 	 * @param data data to print
 	 */
 	@SuppressWarnings("unchecked")
-	public static void sendDataToPrinter(final Object data)
+	public void sendDataToPrinter(final Object data)
 	{
 		if (data instanceof Collection)
 		{
 			final Collection<Object> dataList = (Collection<Object>) data;
-			Iterator<Object> it = dataList.iterator();
-			if (it.hasNext())
+			Iterator<Object> iterator = dataList.iterator();
+			if (iterator.hasNext())
 			{
 
 				if (dataList.iterator().next() instanceof ProductBoxSearchResultRow)
 				{
-					it = dataList.iterator();
+					iterator = dataList.iterator();
 					final List<ProductBox> boxProduct = new ArrayList<ProductBox>();
-					while (it.hasNext())
+					while (iterator.hasNext())
 					{
-						boxProduct.add(((ProductBoxSearchResultRow) it.next()).getBox());
+						boxProduct.add(((ProductBoxSearchResultRow) iterator.next()).getBox());
 					}
 					Printer.print(boxProduct);
 				}
 			}
 			else
 			{
-				PopupController.info("List is empty.");
+				PopupController.getInstance().info(LocalizationController.getInstance().getString("listIsEmptyPopUp"));
 			}
 		}
 		else
@@ -83,7 +102,7 @@ public class ExternalSystemsController
 	/**
 	 * Carries out initial order from DebugController to BarcodeScanner
 	 */
-	public static void scannerMoveValid()
+	public void scannerMoveValid()
 	{
 		BarcodeScanner.scannerMoveValid();
 	}
@@ -94,29 +113,29 @@ public class ExternalSystemsController
 	 * @param data data to send
 	 */
 	@SuppressWarnings("unchecked")
-	public static void sendDataToBarcodeScanner(final Object data)
+	public void sendDataToBarcodeScanner(final Object data)
 	{
 		if (data instanceof Collection)
 		{
 			final Collection<Object> dataList = (Collection<Object>) data;
-			Iterator<Object> it = dataList.iterator();
-			if (it.hasNext())
+			Iterator<Object> iterator = dataList.iterator();
+			if (iterator.hasNext())
 			{
 
 				if (dataList.iterator().next() instanceof ProductBoxSearchResultRow)
 				{
-					it = dataList.iterator();
+					iterator = dataList.iterator();
 					final List<ProductBox> boxProduct = new ArrayList<ProductBox>();
-					while (it.hasNext())
+					while (iterator.hasNext())
 					{
-						boxProduct.add(((ProductBoxSearchResultRow) it.next()).getBox());
+						boxProduct.add(((ProductBoxSearchResultRow) iterator.next()).getBox());
 					}
 					BarcodeScanner.deviceBarcode(boxProduct);
 				}
 			}
 			else
 			{
-				PopupController.info("List is empty.");
+				PopupController.getInstance().info(LocalizationController.getInstance().getString("listIsEmptyPopUp"));
 			}
 		}
 		else
@@ -133,16 +152,16 @@ public class ExternalSystemsController
 	 * @param showPopup show popup messages about failure/success?
 	 * @return <code>true</code> if the box was moved successfully
 	 */
-	public static boolean move(final int productBoxCode, final String newShelfSlotID, final boolean showPopup)
+	public boolean receiveMoveCommand(final int productBoxCode, final String newShelfSlotID, final boolean showPopup)
 	{
-		final ProductBox boxToMove = DatabaseController.getProductBoxByID(productBoxCode);
+		final ProductBox boxToMove = DatabaseController.getInstance().getProductBoxByID(productBoxCode);
 
 		if (boxToMove == null)
 		{
 			SYSLOG.warn("Attempted to move null product box to " + newShelfSlotID + ".");
 
 			if (showPopup)
-				PopupController.error("Attempted to move non-existent product box.");
+				PopupController.getInstance().error(LocalizationController.getInstance().getString("attemptToMoveNotExistingProductBoxPopUp"));
 
 			return false;
 		}
@@ -155,7 +174,7 @@ public class ExternalSystemsController
 
 		if (newShelfSlotID != null && !newShelfSlotID.isEmpty())
 		{
-			newShelfSlot = DatabaseController.getShelfSlotBySlotID(newShelfSlotID);
+			newShelfSlot = DatabaseController.getInstance().getShelfSlotBySlotID(newShelfSlotID);
 			newShelf = newShelfSlot.getParentShelfLevel().getParentShelf();
 		}
 
@@ -166,7 +185,8 @@ public class ExternalSystemsController
 				SYSLOG.debug("Product box " + boxToMove + " is already in the slot " + newShelfSlotID + ".");
 
 				if (showPopup)
-					PopupController.info("Unable to move product box back to the same slot '" + newShelfSlot + "'.");
+					PopupController.getInstance()
+							.info(LocalizationController.getInstance().getString("unableToMoveProductBoxToSameSlotPopUp") + newShelfSlot + "'.");
 
 				return false;
 			}
@@ -186,7 +206,7 @@ public class ExternalSystemsController
 			SYSLOG.error("Failed to remove product box " + boxToMove + " from shelf slot " + boxToMove.getShelfSlot());
 
 			if (showPopup)
-				PopupController.error("System error. Failure to remove product box from shelf slot.");
+				PopupController.getInstance().error(LocalizationController.getInstance().getString("failureToRemoveProductBoxErrorPopUp"));
 
 			return false;
 		}
@@ -200,23 +220,25 @@ public class ExternalSystemsController
 				oldShelfSlot.addBox(boxToMove);
 
 			if (showPopup)
-				PopupController.error("System error. Failure to add product box to new shelf slot '" + newShelfSlotID + "'.");
+				PopupController.getInstance()
+						.error(LocalizationController.getInstance().getString("failureToAddProductBoxToNewShelfSlotErrorPopUp") + newShelfSlotID + "'.");
 
 			return false;
 		}
 
-		DatabaseController.saveOrUpdate(boxToMove);
+		DatabaseController.getInstance().saveOrUpdate(boxToMove);
 
 		if (newShelfSlot != null)
-			DatabaseController.saveOrUpdate(newShelfSlot);
+			DatabaseController.getInstance().saveOrUpdate(newShelfSlot);
 
 		if (oldShelfSlot != null)
-			DatabaseController.saveOrUpdate(oldShelfSlot);
+			DatabaseController.getInstance().saveOrUpdate(oldShelfSlot);
 
 		SYSLOG.debug("Successfully moved " + boxToMove + " to " + newShelfSlot);
 
 		if (showPopup)
-			PopupController.info(LocalizationController.getCompoundString("productBoxTransferSuccessMessage", new Object[] { productBoxCode, newShelfSlot }));
+			PopupController.getInstance()
+					.info(LocalizationController.getInstance().getCompoundString("productBoxTransferSuccessMessage", productBoxCode, newShelfSlot));
 
 		return true;
 	}
@@ -228,23 +250,33 @@ public class ExternalSystemsController
 	 * @param orderDate the date the manifest was ordered
 	 * @param driverID the ID of the driver who delivered the boxes
 	 */
-	public static void receiveManifestBarcode(final Set<ProductBox> boxSet, final Date orderDate, final int driverID)
+	public void receiveManifestBarcode(final Set<ProductBox> boxSet, final Date orderDate, final int driverID)
 	{
 		SYSLOG.info("VELHOWM has received a manifest by driver " + driverID + " with " + boxSet.size() + " product boxes.");
-		manifestController.receiveShipment(boxSet, orderDate, driverID);
+		ManifestController.getInstance().receiveShipment(boxSet, orderDate, driverID);
 	}
 
 	/**
 	 * Receives a badge ID from the badge scanner.
 	 *
 	 * @param badgeID badge identification string
-	 * @return
 	 */
-	public static void receiveBadgeID(final String badgeID)
+	public void receiveBadgeID(final String badgeID)
 	{
-		// TODO: Observer model.
+		// TODO: Observer model?
 
 		SYSLOG.info("VELHOWM has received an RFID badge ID: " + badgeID);
-		LoginController.login(badgeID);
+		LoginController.getInstance().login(badgeID);
+	}
+
+	/**
+	 * Receive a new free space reading from a sensor of the specified {@link velho.model.RemovalPlatform}.
+	 *
+	 * @param removalPlatformID the ID of the removal platform the reading was received from
+	 * @param newFreeSpacePercent the amount of free space left on the platform as percentage
+	 */
+	public void receiveRemovalPlatformReading(final int removalPlatformID, final double newFreeSpacePercent)
+	{
+		RemovalPlatformController.getInstance().setFreeSpace(removalPlatformID, newFreeSpacePercent);
 	}
 }

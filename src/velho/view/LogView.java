@@ -37,16 +37,6 @@ public class LogView implements GenericView
 	private Text usrlog;
 
 	/**
-	 * The {@link LogController}
-	 */
-	private LogController logController;
-
-	public LogView(final LogController logController)
-	{
-		this.logController = logController;
-	}
-
-	/**
 	 * Gets the removal list viewing view.
 	 *
 	 * @return the removal list viewing BorderPane
@@ -56,22 +46,25 @@ public class LogView implements GenericView
 		if (bpane == null)
 		{
 			bpane = new BorderPane();
-			ScrollPane leftlog = new ScrollPane();
+
+			final ScrollPane leftlog = new ScrollPane();
 			leftlog.setFitToHeight(true);
-			leftlog.prefWidthProperty().bind(MainWindow.WIDTH_PROPERTY.divide(2.0));
-			syslog = new Text(logController.getSystemLog());
+			leftlog.prefWidthProperty().bind(MainWindow.widthProperty.divide(2.0));
+
+			syslog = new Text(LogController.getInstance().getSystemLog());
 			leftlog.setFitToWidth(true);
 			leftlog.setContent(syslog);
 
-			ScrollPane rightlog = new ScrollPane();
+			final ScrollPane rightlog = new ScrollPane();
 			rightlog.setFitToHeight(true);
-			usrlog = new Text(logController.getUserLog());
+
+			usrlog = new Text(LogController.getInstance().getUserLog());
 			rightlog.setFitToWidth(true);
 			rightlog.setContent(usrlog);
 
 			bpane.setLeft(leftlog);
 			bpane.setCenter(rightlog);
-			UIController.recordView(this);
+			UIController.getInstance().recordView(this);
 		}
 
 		return bpane;
@@ -90,8 +83,8 @@ public class LogView implements GenericView
 	public void refresh()
 	{
 		SYSLOG.trace("Refreshing logs view.");
-		syslog = new Text(logController.getSystemLog());
-		usrlog = new Text(logController.getUserLog());
+		syslog = new Text(LogController.getInstance().getSystemLog());
+		usrlog = new Text(LogController.getInstance().getUserLog());
 	}
 
 	@Override

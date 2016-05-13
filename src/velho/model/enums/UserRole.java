@@ -25,15 +25,6 @@ public enum UserRole
 	ADMINISTRATOR;
 
 	/**
-	 * Equivalent to {@link UserRole#getName()}.
-	 */
-	@Override
-	public String toString()
-	{
-		return getName();
-	}
-
-	/**
 	 * The name of this role with the first letter capitalized.
 	 *
 	 * @return the name of this role

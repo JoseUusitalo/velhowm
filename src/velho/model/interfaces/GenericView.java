@@ -1,8 +1,19 @@
 package velho.model.interfaces;
 
+/**
+ * A view in this application.
+ *
+ * @author Jose Uusitalo
+ */
 public interface GenericView
 {
-	public void recreate();
+	/**
+	 * Recreate this view.
+	 */
+	void recreate();
 
-	public void destroy();
+	/**
+	 * Destroy this view.
+	 */
+	void destroy();
 }

@@ -6,8 +6,8 @@ import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import velho.controller.DatabaseController;
-import velho.controller.LogDatabaseController;
+import velho.controller.database.DatabaseController;
+import velho.controller.database.LogDatabaseController;
 import velho.model.ProductCategory;
 import velho.model.ProductType;
 
@@ -30,9 +30,9 @@ public class ProductCategoryTest
 	@BeforeClass
 	public static final void init() throws Exception
 	{
-		LogDatabaseController.connectAndInitialize();
-		DatabaseController.link();
-		DatabaseController.loadSampleData();
+		LogDatabaseController.getInstance().connectAndInitialize();
+		DatabaseController.getInstance().link();
+		DatabaseController.getInstance().loadSampleData();
 	}
 
 	/**
@@ -41,8 +41,8 @@ public class ProductCategoryTest
 	@AfterClass
 	public static final void unlinkDatabases() throws Exception
 	{
-		DatabaseController.unlink();
-		LogDatabaseController.unlink();
+		DatabaseController.getInstance().unlink();
+		LogDatabaseController.getInstance().unlink();
 	}
 
 	@SuppressWarnings("unused")

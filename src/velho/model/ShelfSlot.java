@@ -7,6 +7,8 @@ import java.util.UUID;
 
 import org.apache.log4j.Logger;
 
+import velho.controller.database.DatabaseController;
+
 /**
  * A Shelf Slot represents an indexed area with {@link ProductBox} objects on a {@link ShelfLevel}.
  *
@@ -51,19 +53,20 @@ public class ShelfSlot extends AbstractDatabaseObject
 	 * @param levelPosition
 	 * @param maxBoxesInSlot
 	 */
+	@SuppressWarnings("unused")
 	public ShelfSlot(final int databaseID, final UUID uuid, final ShelfLevel parentShelfLevel, final int levelPosition, final int maxBoxesInSlot)
 	{
-		setDatabaseID(databaseID);
+		// Database ID left unused on purpose.
 		setUuid(uuid);
 		this.parentShelfLevel = parentShelfLevel;
 
 		if (maxBoxesInSlot < 1)
-			throw new IllegalArgumentException("[" + databaseID + "] Maxmimum ProductBox count must be greater than 0, was " + maxBoxesInSlot + ".");
+			throw new IllegalArgumentException("Maxmimum ProductBox count must be greater than 0, was " + maxBoxesInSlot + ".");
 
 		this.maxProductBoxes = maxBoxesInSlot;
 
 		if (levelPosition < 1)
-			throw new IllegalArgumentException("[" + databaseID + "] Level position must be greater than 0, was " + levelPosition + ".");
+			throw new IllegalArgumentException("Level position must be greater than 0, was " + levelPosition + ".");
 
 		this.levelPosition = levelPosition;
 
@@ -197,12 +200,12 @@ public class ShelfSlot extends AbstractDatabaseObject
 	 */
 	public int getProductCountInBoxes()
 	{
-		final Iterator<ProductBox> it = productBoxes.iterator();
+		final Iterator<ProductBox> iter = productBoxes.iterator();
 
 		int sum = 0;
 
-		while (it.hasNext())
-			sum += it.next().getProductCount();
+		while (iter.hasNext())
+			sum += iter.next().getProductCount();
 
 		return sum;
 	}
@@ -214,7 +217,7 @@ public class ShelfSlot extends AbstractDatabaseObject
 	 */
 	public boolean hasFreeSpace()
 	{
-		return (productBoxes.size() < maxProductBoxes);
+		return productBoxes.size() < maxProductBoxes;
 	}
 
 	/**
@@ -300,5 +303,20 @@ public class ShelfSlot extends AbstractDatabaseObject
 			this.parentShelfLevel.removeSlot(this);
 
 		this.parentShelfLevel = parentShelfLevel;
+	}
+
+	/**
+	 * Sets the new parent shelf level for this shelf slot by the database ID of the shelf level.
+	 * Intended for use with loading data from CSV files.
+	 *
+	 * @param parentShelfLevelID the database ID of the new parent shelf level of this shelf slot
+	 * @see DatabaseController#getShelfLevelByID(int)
+	 */
+	public void setParentShelfLevelID(final int parentShelfLevelID)
+	{
+		if (parentShelfLevelID < 1)
+			throw new IllegalArgumentException("Parent shelf level ID must be greater than 0, was '" + parentShelfLevelID + "'.");
+
+		this.parentShelfLevel = DatabaseController.getInstance().getShelfLevelByID(parentShelfLevelID);
 	}
 }

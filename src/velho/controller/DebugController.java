@@ -9,15 +9,17 @@ import java.util.Random;
 import org.apache.log4j.Logger;
 
 import javafx.stage.Stage;
+import velho.controller.database.DatabaseController;
 import velho.model.BarcodeScanner;
 import velho.model.enums.UserRole;
 import velho.view.DebugWindow;
 
 /**
- * Various debugging features.
+ * The singleton controller assisting developers in using and testing the application.
  *
- * @author Edward Puustinen &amp; Jose Uusitalo
+ * @author Jose Uusitalo
  */
+@SuppressWarnings("static-method")
 public class DebugController
 {
 	/**
@@ -28,25 +30,31 @@ public class DebugController
 	/**
 	 * The {@link DebugWindow}.
 	 */
-	private DebugWindow view;
-
-	/**
-	 * The {@link RemovalPlatformController}.
-	 */
-	private RemovalPlatformController removalPlatformController;
+	private final DebugWindow view;
 
 	/**
 	 * A pseudo-random number generator.
 	 */
-	private Random r = new Random();
+	private final Random random;
 
 	/**
-	 * @param removalPlatformController
-	 * @throws NoDatabaseLinkException
+	 * A private inner class holding the class instance.
+	 *
+	 * @author Jose Uusitalo
 	 */
-	public DebugController(final RemovalPlatformController removalPlatformController)
+	private static class Holder
 	{
-		this.removalPlatformController = removalPlatformController;
+		/**
+		 * The only instance of {@link DebugController}.
+		 */
+		private static final DebugController INSTANCE = new DebugController();
+	}
+
+	/**
+	 */
+	private DebugController()
+	{
+		this.random = new Random();
 		List<UserRole> roles = new ArrayList<UserRole>();
 		roles.addAll(Arrays.asList(UserRole.values()));
 
@@ -56,7 +64,17 @@ public class DebugController
 		 */
 		Collections.reverse(roles);
 
-		view = new DebugWindow(this, roles, DatabaseController.getAllBadgeIDS());
+		view = new DebugWindow(this, roles, DatabaseController.getInstance().getAllBadgeIDS());
+	}
+
+	/**
+	 * Gets the instance of the {@link DebugController}.
+	 *
+	 * @return the debug controller
+	 */
+	public static synchronized DebugController getInstance()
+	{
+		return Holder.INSTANCE;
 	}
 
 	/**
@@ -72,22 +90,22 @@ public class DebugController
 	/**
 	 * Forcibly logs the user in with the specified role.
 	 *
-	 * @param userRoleName role to log in as
+	 * @param role role to log in as
 	 */
 	public void login(final UserRole role)
 	{
-		if (LoginController.debugLogin(role))
+		if (LoginController.getInstance().debugLogin(role))
 			setLogInButtonVisiblity(false);
 	}
 
 	/**
 	 * Forcibly logs the user in with a badge number.
 	 *
-	 * @param userRoleName role to log in as
+	 * @param badgeString badgeString is an alternative way to log in as
 	 */
 	public void login(final String badgeString)
 	{
-		if (LoginController.login(badgeString))
+		if (LoginController.getInstance().login(badgeString))
 			setLogInButtonVisiblity(false);
 	}
 
@@ -97,8 +115,8 @@ public class DebugController
 	public void logout()
 	{
 		// Only log out if a user is logged in, otherwise just visually toggle the buttons.
-		if (LoginController.isLoggedIn())
-			LoginController.logout();
+		if (LoginController.getInstance().isLoggedIn())
+			LoginController.getInstance().logout();
 		setLogInButtonVisiblity(true);
 	}
 
@@ -117,10 +135,9 @@ public class DebugController
 	/**
 	 * Sends the order from DebugWindow to the external systems controller.
 	 */
-	@SuppressWarnings("static-method")
 	public void scannerMoveValid()
 	{
-		ExternalSystemsController.scannerMoveValid();
+		ExternalSystemsController.getInstance().scannerMoveValid();
 	}
 
 	/**
@@ -136,7 +153,10 @@ public class DebugController
 	 */
 	public void fillUpPlatform()
 	{
-		removalPlatformController.modifyFreeSpace(-1.0 * ((r.nextDouble() * 0.15 + 0.2) - 0.1));
+		final double oldPercentage = DatabaseController.getInstance().getRemovalPlatformByID(1).getFreeSpacePercent();
+		final double modPercentage = -1.0 * (random.nextDouble() * 0.15 + 0.2 - 0.1);
+
+		ExternalSystemsController.getInstance().receiveRemovalPlatformReading(1, oldPercentage + modPercentage);
 	}
 
 	/**
@@ -144,7 +164,7 @@ public class DebugController
 	 */
 	public void emptyPlatform()
 	{
-		removalPlatformController.emptyPlatform();
+		ExternalSystemsController.getInstance().receiveRemovalPlatformReading(1, 1.0d);
 	}
 
 	/**
@@ -155,6 +175,6 @@ public class DebugController
 	public static void scanBadge(final String badgeID)
 	{
 		SYSLOG.info("Badge scanned: " + badgeID);
-		ExternalSystemsController.receiveBadgeID(badgeID);
+		ExternalSystemsController.getInstance().receiveBadgeID(badgeID);
 	}
 }

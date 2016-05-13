@@ -6,8 +6,8 @@ import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import velho.controller.DatabaseController;
-import velho.controller.LogDatabaseController;
+import velho.controller.database.DatabaseController;
+import velho.controller.database.LogDatabaseController;
 import velho.model.ProductBox;
 import velho.model.ProductBoxSearchResultRow;
 
@@ -20,7 +20,7 @@ import velho.model.ProductBoxSearchResultRow;
 @SuppressWarnings("static-method")
 public class ProductBoxSearchResultRowTest
 {
-	private static ProductBox box = DatabaseController.getProductBoxByID(1);
+	private static ProductBox box = DatabaseController.getInstance().getProductBoxByID(1);
 	private static ProductBoxSearchResultRow row = new ProductBoxSearchResultRow(box);
 
 	/**
@@ -32,9 +32,9 @@ public class ProductBoxSearchResultRowTest
 	@BeforeClass
 	public static final void init() throws Exception
 	{
-		LogDatabaseController.connectAndInitialize();
-		DatabaseController.link();
-		DatabaseController.loadSampleData();
+		LogDatabaseController.getInstance().connectAndInitialize();
+		DatabaseController.getInstance().link();
+		DatabaseController.getInstance().loadSampleData();
 	}
 
 	/**
@@ -43,8 +43,8 @@ public class ProductBoxSearchResultRowTest
 	@AfterClass
 	public static final void unlinkDatabases() throws Exception
 	{
-		DatabaseController.unlink();
-		LogDatabaseController.unlink();
+		DatabaseController.getInstance().unlink();
+		LogDatabaseController.getInstance().unlink();
 	}
 
 	@Test
@@ -92,6 +92,6 @@ public class ProductBoxSearchResultRowTest
 	@Test
 	public final void testGetBoxID()
 	{
-		assertEquals(box.getDatabaseID(), row.getBoxID());
+		assertEquals(box.getDatabaseID(), row.getDatabaseID());
 	}
 }

@@ -12,7 +12,7 @@ import velho.model.interfaces.GenericView;
 import velho.view.MainWindow;
 
 /**
- * The controller for the {@link MainWindow}.
+ * The singleton controller for the {@link MainWindow}.
  *
  * @author Jose Uusitalo
  */
@@ -29,64 +29,48 @@ public class UIController
 	private MainWindow mainView;
 
 	/**
-	 * The {@link UserController}.
+	 * The main set of views in this application.
 	 */
-	private UserController userController;
-
-	/**
-	 * The {@link SearchController}.
-	 */
-	private SearchController searchController;
-
-	/**
-	 * The {@link RemovalListController}.
-	 */
-	private RemovalListController removalListController;
-
-	/**
-	 * The {@link ProductController}.
-	 */
-	private ProductController productController;
-
-	/**
-	 * The {@link LogController}.
-	 */
-	private LogController logController;
-
-	/**
-	 * The {@link ManifestController}.
-	 */
-	private ManifestController manifestController;
-
-	/**
-	 * The {@link RemovalPlatformController}.
-	 */
-	private RemovalPlatformController removalPlatformController;
-
 	private static Set<GenericView> viewSet = new HashSet<GenericView>();
 
 	/**
-	 * @param mainWindow
-	 * @param userController
-	 * @param removalListController
-	 * @param searchController
-	 * @param logController
-	 * @param manifestController
-	 * @param productController
-	 * @param removalPlatformController
+	 * A private inner class holding the class instance.
+	 *
+	 * @author Jose Uusitalo
 	 */
-	public void setControllers(final MainWindow mainWindow, final UserController userController, final RemovalListController removalListController,
-			final SearchController searchController, final LogController logController, final ManifestController manifestController,
-			final ProductController productController, final RemovalPlatformController removalPlatformController)
+	private static class Holder
+	{
+		/**
+		 * The only instance of {@link UIController}.
+		 */
+		private static final UIController INSTANCE = new UIController();
+	}
+
+	/**
+	 */
+	private UIController()
+	{
+		// No need to instantiate this class.
+	}
+
+	/**
+	 * Gets the instance of the {@link UIController}.
+	 *
+	 * @return the UI controller
+	 */
+	public static synchronized UIController getInstance()
+	{
+		return Holder.INSTANCE;
+	}
+
+	/**
+	 * Initializes this controller.
+	 *
+	 * @param mainWindow the {@link MainWindow}
+	 */
+	public void initialize(final MainWindow mainWindow)
 	{
 		this.mainView = mainWindow;
-		this.userController = userController;
-		this.removalListController = removalListController;
-		this.searchController = searchController;
-		this.productController = productController;
-		this.logController = logController;
-		this.manifestController = manifestController;
-		this.removalPlatformController = removalPlatformController;
 	}
 
 	/**
@@ -95,7 +79,7 @@ public class UIController
 	 * @param position {@link Position} to show the view in
 	 * @param view view to show
 	 */
-	public void setView(final Position position, final Node view)
+	public void setMainWindowView(final Position position, final Node view)
 	{
 		switch (position)
 		{
@@ -136,23 +120,25 @@ public class UIController
 		{
 			case ADMINISTRATOR:
 			case MANAGER:
-				mainView.addTab(LocalizationController.getString("addUserTab"), userController.getView());
-				mainView.addTab(LocalizationController.getString("addLogsTab"), logController.getView());
+				mainView.addTab(LocalizationController.getInstance().getString("addUserTab"), UserController.getInstance().getView());
+				mainView.addTab(LocalizationController.getInstance().getString("addLogsTab"), LogController.getInstance().getView());
 				//$FALL-THROUGH$
 			case LOGISTICIAN:
-				mainView.addTab(LocalizationController.getString("addSearchTab"), searchController.getSearchTabView());
-				mainView.addTab(LocalizationController.getString("addProductListSearchTab"), searchController.getProductListSearchView());
-				mainView.addTab(LocalizationController.getString("addManifestsTab"), manifestController.getView());
-				mainView.addTab(LocalizationController.getString("addRemovalListsTab"), removalListController.getView());
-				mainView.addTab(LocalizationController.getString("addProductTab"), productController.getAddProductView());
-				mainView.addTab(LocalizationController.getString("addProductListTab"), productController.getTabView());
-				mainView.addTab("Brands", productController.getBrandsTab());
-				mainView.addTab("Categories", productController.getCategoryTab());
-				mainView.addTab("Product Types", productController.getProductTypesTab());
-				mainView.addTab("Product Boxes", productController.getProductBoxesTab());
-				mainView.addTab(LocalizationController.getString("addUserListTab"), getUserListView(currentUserRole));
-				break;
+				mainView.addTab(LocalizationController.getInstance().getString("addUserListTab"),
+						UserController.getInstance().getUserListView(currentUserRole));
+				mainView.addTab(LocalizationController.getInstance().getString("csvTab"), CsvController.getInstance().getCSVView());
+				mainView.addTab(LocalizationController.getInstance().getString("addBrandsTab"), ProductController.getInstance().getBrandsTab());
+				mainView.addTab(LocalizationController.getInstance().getString("addProductTypesTab"), ProductController.getInstance().getProductTypesTab());
+				mainView.addTab(LocalizationController.getInstance().getString("addCategoriesTab"), ProductController.getInstance().getCategoryTab());
+				mainView.addTab(LocalizationController.getInstance().getString("addProductListTab"), ProductController.getInstance().getProductTabView());
+				mainView.addTab(LocalizationController.getInstance().getString("addProductBoxesTab"), ProductController.getInstance().getProductBoxesTab());
+				mainView.addTab(LocalizationController.getInstance().getString("addManifestsTab"), ManifestController.getInstance().getView());
+				mainView.addTab(LocalizationController.getInstance().getString("addRemovalListsTab"), RemovalListController.getInstance().getView());
+				//$FALL-THROUGH$
 			case GUEST:
+				mainView.addTab(LocalizationController.getInstance().getString("addSearchTab"), SearchController.getInstance().getSearchTabView());
+				mainView.addTab(LocalizationController.getInstance().getString("addProductListSearchTab"),
+						SearchController.getInstance().getProductListSearchView());
 				break;
 			default:
 				SYSLOG.error("Unknown user role '" + currentUserRole.getName() + "'.");
@@ -162,37 +148,7 @@ public class UIController
 		 * Check the state the of the removal platform when the main menu is
 		 * shown after user has logged in.
 		 */
-		removalPlatformController.checkWarning();
-	}
-
-	/**
-	 * Creates the user list view. The list contents change depending on who is
-	 * logged in.
-	 *
-	 * @param currentUserRole the role of the user who is currently logged in
-	 * @return the user list view
-	 */
-	private Node getUserListView(final UserRole currentUserRole)
-	{
-		/*
-		 * What is shown in the user list depends on your role.
-		 */
-		switch (currentUserRole)
-		{
-
-			case ADMINISTRATOR:
-			case MANAGER:
-				return ListController.getTableView(userController, DatabaseController.getPublicUserDataColumns(true), DatabaseController.getAllUsers());
-			case LOGISTICIAN:
-				return ListController.getTableView(userController, DatabaseController.getPublicUserDataColumns(false), DatabaseController.getAllUsers());
-			case GUEST:
-				break;
-			default:
-				SYSLOG.error("Unknown user role '" + currentUserRole.getName() + "'.");
-
-		}
-
-		return null;
+		RemovalPlatformController.getInstance().update();
 	}
 
 	/**
@@ -203,6 +159,9 @@ public class UIController
 		mainView.recreate();
 	}
 
+	/**
+	 * Recreates all views in the application.
+	 */
 	public void recreateAllViews()
 	{
 		SYSLOG.debug("recreating all views");
@@ -211,12 +170,13 @@ public class UIController
 		{
 			view.recreate();
 		}
-		showMainMenu(LoginController.getCurrentUser().getRole());
+		showMainMenu(LoginController.getInstance().getCurrentUser().getRole());
 	}
 
-	public static void destroyAllViews()
+	@SuppressWarnings("static-method")
+	public void destroyAllViews()
 	{
-		SYSLOG.debug("destroying all views");
+		SYSLOG.debug("Destroying all views.");
 		Set<GenericView> temp = new HashSet<GenericView>(viewSet);
 		for (GenericView view : temp)
 		{
@@ -235,9 +195,9 @@ public class UIController
 		mainView.selectTab(tabName);
 	}
 
-	public static void recordView(final GenericView view)
+	@SuppressWarnings("static-method")
+	public void recordView(final GenericView view)
 	{
 		viewSet.add(view);
 	}
-
 }

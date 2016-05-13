@@ -14,12 +14,12 @@ public interface DatabaseObject
 	 *
 	 * @return the database ID
 	 */
-	public int getDatabaseID();
+	int getDatabaseID();
 
 	/**
 	 * Gets the universally unique identifier of this database object.
 	 *
 	 * @return the {@link UUID}
 	 */
-	public UUID getUuid();
+	UUID getUuid();
 }

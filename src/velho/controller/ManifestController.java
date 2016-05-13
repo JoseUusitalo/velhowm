@@ -7,18 +7,20 @@ import java.util.Set;
 import org.apache.log4j.Logger;
 
 import javafx.scene.Node;
+import velho.controller.database.DatabaseController;
 import velho.controller.interfaces.UIActionController;
 import velho.model.Manifest;
 import velho.model.ManifestState;
 import velho.model.ProductBox;
 import velho.model.enums.UserRole;
 import velho.view.GenericTabView;
+import velho.view.ListView;
 import velho.view.MainWindow;
 import velho.view.ManifestManagementView;
 import velho.view.ManifestView;
 
 /**
- * A controller for handling {@link Manifest} objects.
+ * The singleton controller for handling {@link Manifest} objects.
  *
  * @author Jose Uusitalo
  */
@@ -37,7 +39,7 @@ public class ManifestController implements UIActionController
 	/**
 	 * The manifests tab.
 	 */
-	private GenericTabView tabView;
+	private final GenericTabView tabView;
 
 	/**
 	 * The panel in the manifest tab.
@@ -55,12 +57,41 @@ public class ManifestController implements UIActionController
 	private MainWindow mainWindow;
 
 	/**
+	 * A private inner class holding the class instance.
+	 *
+	 * @author Jose Uusitalo
+	 */
+	private static class Holder
+	{
+		/**
+		 * The only instance of {@link ManifestController}.
+		 */
+		private static final ManifestController INSTANCE = new ManifestController();
+	}
+
+	/**
+	 */
+	private ManifestController()
+	{
+		tabView = new GenericTabView();
+	}
+
+	/**
+	 * Gets the instance of the {@link ManifestController}.
+	 *
+	 * @return the manifest controller
+	 */
+	public static synchronized ManifestController getInstance()
+	{
+		return Holder.INSTANCE;
+	}
+
+	/**
 	 * @param mainWindow
 	 */
-	public ManifestController(final MainWindow mainWindow)
+	public void initialize(final MainWindow main)
 	{
-		this.mainWindow = mainWindow;
-		tabView = new GenericTabView();
+		this.mainWindow = main;
 	}
 
 	/**
@@ -70,7 +101,7 @@ public class ManifestController implements UIActionController
 	 */
 	public Node getBrowseManifestsView()
 	{
-		return ListController.getTableView(this, DatabaseController.getManifestDataColumns(), DatabaseController.getAllManifests());
+		return ListController.getTableView(this, DatabaseController.getInstance().getManifestDataColumns(), DatabaseController.getInstance().getAllManifests());
 	}
 
 	/**
@@ -93,7 +124,7 @@ public class ManifestController implements UIActionController
 	{
 		USRLOG.info("Viewing manifest: " + manifest);
 		currentManifest = manifest;
-		managementView.setContent(new ManifestView(manifest, this).getView());
+		managementView.setContent(new ManifestView(manifest).getView());
 		// The method showing the combo box state selector is called in the
 		// view.
 	}
@@ -125,7 +156,7 @@ public class ManifestController implements UIActionController
 		USRLOG.info(currentManifest + " state changed to " + newState + ".");
 		currentManifest.setState(newState);
 
-		if (DatabaseController.saveOrUpdate(currentManifest) > 0)
+		if (DatabaseController.getInstance().saveOrUpdate(currentManifest) > 0)
 			SYSLOG.info("Updated database: " + currentManifest);
 		else
 			SYSLOG.info("Database update failed: " + currentManifest);
@@ -152,20 +183,18 @@ public class ManifestController implements UIActionController
 	{
 		Manifest manifest;
 
-		manifest = new Manifest(driverID, DatabaseController.getManifestStateByID(3), orderDate, Date.from(Instant.now()));
+		manifest = new Manifest(driverID, DatabaseController.getInstance().getManifestStateByID(3), orderDate, Date.from(Instant.now()));
 		manifest.setBoxes(boxSet);
 
-		if (DatabaseController.saveOrUpdate(manifest) > 0)
+		if (DatabaseController.getInstance().saveOrUpdate(manifest) > 0)
 		{
 			// If the user is a Manager (but not an Administrator!) show a
 			// popup.
-			if (LoginController.userRoleIs(UserRole.MANAGER))
+			if (LoginController.getInstance().userRoleIs(UserRole.MANAGER)
+					&& PopupController.getInstance().confirmation(LocalizationController.getInstance().getString("manifestShipmentArrivalPopUp")))
 			{
-				if (PopupController.confirmation(LocalizationController.getString("manifestShipmentArrivalPopUp")))
-				{
-					showManifestView(manifest);
-					mainWindow.selectTab(LocalizationController.getString("addManifestsTab"));
-				}
+				showManifestView(manifest);
+				mainWindow.selectTab(LocalizationController.getInstance().getString("addManifestsTab"));
 			}
 		}
 	}
@@ -222,5 +251,11 @@ public class ManifestController implements UIActionController
 	public void viewAction(final Object data)
 	{
 		showManifestView((Manifest) data);
+	}
+
+	@Override
+	public void recreateViews(final ListView node)
+	{
+		showBrowseManifestsView();
 	}
 }

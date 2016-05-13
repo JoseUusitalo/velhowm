@@ -7,8 +7,8 @@ import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import velho.controller.DatabaseController;
-import velho.controller.LogDatabaseController;
+import velho.controller.database.DatabaseController;
+import velho.controller.database.LogDatabaseController;
 import velho.model.RemovalPlatform;
 
 /**
@@ -19,7 +19,7 @@ import velho.model.RemovalPlatform;
 @SuppressWarnings("static-method")
 public class RemovalPlatformTest
 {
-	private static RemovalPlatform existingPlatform = DatabaseController.getRemovalPlatformByID(1);
+	private static RemovalPlatform existingPlatform = DatabaseController.getInstance().getRemovalPlatformByID(1);
 
 	/**
 	 * Creates the log database if needed and connects to it.
@@ -30,9 +30,9 @@ public class RemovalPlatformTest
 	@BeforeClass
 	public static final void init() throws Exception
 	{
-		LogDatabaseController.connectAndInitialize();
-		DatabaseController.link();
-		DatabaseController.loadSampleData();
+		LogDatabaseController.getInstance().connectAndInitialize();
+		DatabaseController.getInstance().link();
+		DatabaseController.getInstance().loadSampleData();
 
 		// Testing in production environment is fun.
 		existingPlatform.setFreeSpacePercent(1.0);
@@ -44,8 +44,8 @@ public class RemovalPlatformTest
 	@AfterClass
 	public static final void unlinkDatabases() throws Exception
 	{
-		DatabaseController.unlink();
-		LogDatabaseController.unlink();
+		DatabaseController.getInstance().unlink();
+		LogDatabaseController.getInstance().unlink();
 	}
 
 	@Test
@@ -69,11 +69,11 @@ public class RemovalPlatformTest
 	@Test
 	public final void testModifyFreeSpace()
 	{
-		existingPlatform.modifyFreeSpace(-0.125);
+		existingPlatform.setFreeSpacePercent(existingPlatform.getFreeSpacePercent() - 0.125d);
 		assertTrue(Double.compare((1.0 - 0.125), existingPlatform.getFreeSpacePercent()) == 0);
 
 		// Rollback.
-		existingPlatform.modifyFreeSpace(0.125);
+		existingPlatform.setFreeSpacePercent(existingPlatform.getFreeSpacePercent() + 0.125d);
 	}
 
 	@Test
@@ -81,10 +81,10 @@ public class RemovalPlatformTest
 	{
 		final double old = existingPlatform.getFreeSpacePercent();
 
-		existingPlatform.modifyFreeSpace(-0.125);
+		existingPlatform.setFreeSpacePercent(existingPlatform.getFreeSpacePercent() - 0.125d);
 		assertTrue(Double.compare((1.0 - 0.125), existingPlatform.getFreeSpacePercent()) == 0);
 
-		existingPlatform.empty();
+		existingPlatform.setFreeSpacePercent(1.0d);
 
 		assertTrue(Double.compare((1.0), existingPlatform.getFreeSpacePercent()) == 0);
 
@@ -120,17 +120,18 @@ public class RemovalPlatformTest
 
 		assertTrue(Double.compare(1.0, oldPercent) == 0);
 
-		existingPlatform.modifyFreeSpace(modPercent);
+		existingPlatform.setFreeSpacePercent(existingPlatform.getFreeSpacePercent() + modPercent);
 
 		// Check that the method worked.
 		assertEquals(0, Double.compare(newPercent, existingPlatform.getFreeSpacePercent()));
-		DatabaseController.saveOrUpdate(existingPlatform);
+		DatabaseController.getInstance().saveOrUpdate(existingPlatform);
 
 		// Database was updated.
-		assertTrue(Double.compare(newPercent, DatabaseController.getRemovalPlatformByID(existingPlatform.getDatabaseID()).getFreeSpacePercent()) == 0);
+		assertTrue(Double.compare(newPercent,
+				DatabaseController.getInstance().getRemovalPlatformByID(existingPlatform.getDatabaseID()).getFreeSpacePercent()) == 0);
 
 		// Rollback.
 		existingPlatform.setFreeSpacePercent(oldPercent);
-		DatabaseController.saveOrUpdate(existingPlatform);
+		DatabaseController.getInstance().saveOrUpdate(existingPlatform);
 	}
 }

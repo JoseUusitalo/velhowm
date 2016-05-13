@@ -6,14 +6,15 @@ import java.util.Map;
 
 import javafx.scene.Node;
 import javafx.scene.layout.BorderPane;
+import velho.controller.database.DatabaseController;
 import velho.model.ProductBrand;
 import velho.model.ProductCategory;
-import velho.view.ProductListSearch;
+import velho.view.ProductListSearchView;
 import velho.view.SearchTabView;
 import velho.view.SearchView;
 
 /**
- * A class handling searching the database for data.
+ * The singleton controller handling searching the database for data.
  *
  * @author Jose Uusitalo &amp; Joona Silvennoinen
  */
@@ -22,20 +23,36 @@ public class SearchController
 	/**
 	 * The view in the tab itself.
 	 */
-	private SearchTabView searchTabView;
+	private final SearchTabView searchTabView;
 
 	/**
-	 * The {@link ProductController}.
+	 * A private inner class holding the class instance.
+	 *
+	 * @author Jose Uusitalo
 	 */
-	private ProductController productController;
-
-	/**
-	 * @param productController
-	 */
-	public SearchController(final ProductController productController)
+	private static class Holder
 	{
-		this.productController = productController;
-		this.searchTabView = new SearchTabView(this);
+		/**
+		 * The only instance of {@link SearchController}.
+		 */
+		private static final SearchController INSTANCE = new SearchController();
+	}
+
+	/**
+	 */
+	private SearchController()
+	{
+		this.searchTabView = new SearchTabView();
+	}
+
+	/**
+	 * Gets the instance of the {@link SearchController}.
+	 *
+	 * @return the search controller
+	 */
+	public static synchronized SearchController getInstance()
+	{
+		return Holder.INSTANCE;
 	}
 
 	/**
@@ -57,8 +74,8 @@ public class SearchController
 	{
 		try
 		{
-			DatabaseController.searchProductBox(identifier, productCount.intValue(), (ProductBrand) brand, (ProductCategory) category, expiresStart, expiresEnd,
-					canBeInRemovalList);
+			DatabaseController.getInstance().searchProductBox(identifier, productCount.intValue(), (ProductBrand) brand, (ProductCategory) category,
+					expiresStart, expiresEnd, canBeInRemovalList);
 		}
 		catch (Exception e)
 		{
@@ -71,9 +88,11 @@ public class SearchController
 	 *
 	 * @return the search view
 	 */
+	@SuppressWarnings("static-method")
 	public Node getSearchView()
 	{
-		return new SearchView(this, true, DatabaseController.getAllProductBrands(), DatabaseController.getAllProductCategories()).getView();
+		return new SearchView(true, DatabaseController.getInstance().getAllProductBrands(), DatabaseController.getInstance().getAllProductCategories())
+				.getView();
 	}
 
 	/**
@@ -82,9 +101,11 @@ public class SearchController
 	 * @param limits an internal string representing the type of search view to create
 	 * @return the search view
 	 */
+	@SuppressWarnings("static-method")
 	public Node getSearchView(final boolean canBeInRemovalList)
 	{
-		return new SearchView(this, canBeInRemovalList, DatabaseController.getAllProductBrands(), DatabaseController.getAllProductCategories()).getView();
+		return new SearchView(canBeInRemovalList, DatabaseController.getInstance().getAllProductBrands(),
+				DatabaseController.getInstance().getAllProductCategories()).getView();
 	}
 
 	/**
@@ -102,12 +123,13 @@ public class SearchController
 	 *
 	 * @return the search results view
 	 */
+	@SuppressWarnings("static-method")
 	public Node getResultsView()
 	{
 		//@formatter:off
-		return ListController.getTableView(productController,
-										   DatabaseController.getProductSearchDataColumns(false, false),
-										   DatabaseController.getObservableProductSearchResults());
+		return ListController.getTableView(ProductController.getInstance(),
+										   DatabaseController.getInstance().getProductSearchDataColumns(false, false),
+										   DatabaseController.getInstance().getObservableProductSearchResults());
 		//@formatter:on
 	}
 
@@ -116,13 +138,14 @@ public class SearchController
 	 *
 	 * @return product list search view
 	 */
+	@SuppressWarnings("static-method")
 	public Node getProductListSearchView()
 	{
-		final ProductListSearch searchView = new ProductListSearch(this);
+		final ProductListSearchView searchView = new ProductListSearchView();
 		//@formatter:off
-		return searchView.getView((BorderPane) ListController.getTableView(productController,
-										  								   DatabaseController.getProductSearchDataColumns(false, false),
-										  								   DatabaseController.getObservableProductSearchResults()));
+		return searchView.getView((BorderPane) ListController.getTableView(ProductController.getInstance(),
+										  								   DatabaseController.getInstance().getProductSearchDataColumns(false, false),
+										  								   DatabaseController.getInstance().getObservableProductSearchResults()));
 		//@formatter:on
 	}
 
@@ -154,7 +177,7 @@ public class SearchController
 				}
 				catch (final NumberFormatException e)
 				{
-					productID = DatabaseController.getProductByName((String) countName[1]).getDatabaseID();
+					productID = DatabaseController.getInstance().getProductByName((String) countName[1]).getDatabaseID();
 				}
 
 				// If the product already exists, add the new count to the
@@ -171,7 +194,7 @@ public class SearchController
 		}
 
 		// Search the database for the products.
-		DatabaseController.searchProductBoxByDataList(productID_BoxSize);
+		DatabaseController.getInstance().searchProductBoxByDataList(productID_BoxSize);
 
 		// Return the data for unit testing.
 		return productID_BoxSize;
@@ -231,7 +254,7 @@ public class SearchController
 			}
 
 			// Rebuild the product string.
-			final StringBuffer sb = new StringBuffer();
+			final StringBuilder strbuilder = new StringBuilder();
 			final int length = possibleProductAndCount.length;
 
 			for (int i = start; i < length; i++)
@@ -241,15 +264,15 @@ public class SearchController
 					// Left trim spaces from the first element.
 					// This assumes that no product name can begin with a space
 					// character.
-					sb.append(possibleProductAndCount[i].replaceAll("^\\s+", ""));
+					strbuilder.append(possibleProductAndCount[i].replaceAll("^\\s+", ""));
 				}
 				else
-					sb.append(possibleProductAndCount[i]);
+					strbuilder.append(possibleProductAndCount[i]);
 
 				if (i < length - 1)
-					sb.append(":");
+					strbuilder.append(':');
 			}
-			countName[1] = sb.toString();
+			countName[1] = strbuilder.toString();
 		}
 
 		return countName;

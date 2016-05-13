@@ -6,43 +6,79 @@ import java.util.ResourceBundle;
 
 import velho.model.enums.SupportedTranslation;
 
+/**
+ * The singleton controller for handling localization.
+ *
+ * @author Joona Silvennoinen
+ */
 public class LocalizationController
 {
-	private static ResourceBundle msgBundle;
-	private static Locale localeEnglish;
-	private static Locale localeGerman;
+	private ResourceBundle msgBundle;
+	private Locale localeEnglish;
+	private Locale localeGerman;
 
-	private final static String languageEnglish = "en";
-	private final static String countryEnglish = "US";
+	private final static String LANGUAGE_ENGLISH = "en";
+	private final static String COUNTRY_USA = "US";
 
-	private final static String languageGerman = "de";
-	private final static String countryGerman = "DE";
-	private static UIController uiController;
+	private final static String LANGUAGE_GERMAN = "de";
+	private final static String COUNTRY_GERMANY = "DE";
+	private SupportedTranslation currentTranslation;
 
-	public static void initializeBundle()
+	/**
+	 * A private inner class holding the class instance.
+	 *
+	 * @author Jose Uusitalo
+	 */
+	private static class Holder
 	{
+		/**
+		 * The only instance of {@link LocalizationController}.
+		 */
+		private static final LocalizationController INSTANCE = new LocalizationController();
+	}
 
-		localeEnglish = new Locale(languageEnglish, countryEnglish);
-		localeGerman = new Locale(languageGerman, countryGerman);
+	/**
+	 */
+	private LocalizationController()
+	{
+		// No need to instantiate this class.
+	}
+
+	/**
+	 * Gets the instance of the {@link LocalizationController}.
+	 *
+	 * @return the localization controller
+	 */
+	public static synchronized LocalizationController getInstance()
+	{
+		return Holder.INSTANCE;
+	}
+
+	public void initializeBundle()
+	{
+		currentTranslation = SupportedTranslation.ENGLISH;
+		localeEnglish = new Locale(LANGUAGE_ENGLISH, COUNTRY_USA);
+		localeGerman = new Locale(LANGUAGE_GERMAN, COUNTRY_GERMANY);
 
 		msgBundle = getResourceBundle(localeEnglish);
 	}
 
-	private static ResourceBundle getResourceBundle(final Locale locale)
+	private ResourceBundle getResourceBundle(final Locale locale)
 	{
 		if (locale.equals(localeEnglish))
 		{
-			return ResourceBundle.getBundle("res.en-US", locale);
+			return ResourceBundle.getBundle("translations.en-US", locale);
 		}
-		return ResourceBundle.getBundle("res.de-DE", locale);
+
+		return ResourceBundle.getBundle("translations.de-DE", locale);
 	}
 
-	public static void setLocale(final Locale locale)
+	public void setLocale(final Locale locale)
 	{
-		LocalizationController.localeEnglish = locale;
+		localeEnglish = locale;
 	}
 
-	public static String getCompoundString(final String key, final Object[] messageArguments)
+	public String getCompoundString(final String key, final Object... messageArguments)
 	{
 		MessageFormat formatter = new MessageFormat("");
 		formatter.setLocale(localeEnglish);
@@ -50,33 +86,33 @@ public class LocalizationController
 		return formatter.format(messageArguments);
 	}
 
-	public static String getString(final String key)
+	public String getString(final String key)
 	{
 		return msgBundle.getString(key);
 	}
 
-	public static Locale getLocale()
+	public Locale getLocale()
 	{
 		return localeEnglish;
 	}
 
-	public static void changeTranslation(final SupportedTranslation newTranslation)
+	public void changeTranslation(final SupportedTranslation newTranslation)
 	{
 		if (newTranslation.equals(SupportedTranslation.ENGLISH))
 		{
 			msgBundle = getResourceBundle(localeEnglish);
-			uiController.recreateAllViews();
 		}
 		else
 		{
 			msgBundle = getResourceBundle(localeGerman);
-			uiController.recreateAllViews();
+
 		}
+		currentTranslation = newTranslation;
+		UIController.getInstance().recreateAllViews();
 	}
 
-	public static void setControllers(final UIController uiController)
+	public SupportedTranslation getCurrentTranslation()
 	{
-		LocalizationController.uiController = uiController;
+		return currentTranslation;
 	}
-
 }

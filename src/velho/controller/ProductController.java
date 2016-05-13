@@ -3,23 +3,23 @@ package velho.controller;
 import org.apache.log4j.Logger;
 
 import javafx.scene.Node;
+import velho.controller.database.DatabaseController;
 import velho.controller.interfaces.UIActionController;
 import velho.model.Product;
 import velho.model.ProductBox;
 import velho.model.ProductBrand;
 import velho.model.ProductCategory;
 import velho.model.ProductType;
-import velho.view.AddProductView;
 import velho.view.BrandsTabView;
 import velho.view.CategoriesTabView;
-import velho.view.GenericTabView;
+import velho.view.ListView;
 import velho.view.ProductBoxesTabView;
-import velho.view.ProductDataView;
-import velho.view.ProductManagementView;
+import velho.view.ProductTabView;
 import velho.view.ProductTypesTabView;
+import velho.view.VerticalViewGroup;
 
 /**
- * Controller for handling {@link Product} objects
+ * The singleton controller for handling {@link Product} objects
  *
  * @author Jose Uusitalo &amp; Edward Puustinen
  */
@@ -31,67 +31,68 @@ public class ProductController implements UIActionController
 	private static final Logger SYSLOG = Logger.getLogger(ProductController.class.getName());
 
 	/**
-	 * Apache log4j logger: User.
-	 */
-	private static final Logger USRLOG = Logger.getLogger("userLogger");
-
-	/**
-	 * The {@link AddProductView}.
-	 */
-	private AddProductView addProductView;
-
-	/**
-	 * The tab view for the product list view.
-	 */
-	private GenericTabView listTab;
-
-	/**
-	 * The {@link UIController}.
-	 */
-	private UIController uiController;
-
-	/**
-	 * The tab view for creating new objects and saving them to the list view.
-	 */
-	private GenericTabView addTab;
-
-	/**
 	 * The tab for creating product management view
 	 */
-	private ProductManagementView productManagementView;
+	private final VerticalViewGroup productManagementView;
 
 	/**
 	 * The tab for creating product type view
 	 */
-	private ProductTypesTabView productsTypeTabView;
+	private final ProductTypesTabView productsTypeTabView;
 
 	/**
 	 * The tab for creating brands view
 	 */
-	private BrandsTabView brandsTabView;
+	private final BrandsTabView brandsTabView;
 
 	/**
 	 * The tab for creating categories view
 	 */
-	private CategoriesTabView categoryTabView;
-
-	private ProductBoxesTabView productBoxTabView;
+	private final CategoriesTabView categoryTabView;
 
 	/**
-	 * @param uiController
+	 * Product box viewing/editing/creation tab view.
 	 */
-	public ProductController(final UIController uiController)
+	private final ProductBoxesTabView productBoxTabView;
+
+	/**
+	 * A tab view for creating and editing products.
+	 */
+	private final ProductTabView productTabView;
+
+	/**
+	 * A private inner class holding the class instance.
+	 *
+	 * @author Jose Uusitalo
+	 */
+	private static class Holder
 	{
-		this.uiController = uiController;
-		this.productManagementView = new ProductManagementView();
-		this.productsTypeTabView = new ProductTypesTabView(this);
-		this.addProductView = new AddProductView(this, uiController);
-		this.brandsTabView = new BrandsTabView(this);
-		this.categoryTabView = new CategoriesTabView(this);
-		this.productBoxTabView = new ProductBoxesTabView(this);
-		listTab = new GenericTabView();
-		addTab = new GenericTabView();
-		showList();
+		/**
+		 * The only instance of {@link ProductController}.
+		 */
+		private static final ProductController INSTANCE = new ProductController();
+	}
+
+	/**
+	 */
+	private ProductController()
+	{
+		this.productManagementView = new VerticalViewGroup();
+		this.productsTypeTabView = new ProductTypesTabView(DatabaseController.getInstance().getAllProductTypes());
+		this.brandsTabView = new BrandsTabView(DatabaseController.getInstance().getAllProductBrands());
+		this.categoryTabView = new CategoriesTabView(DatabaseController.getInstance().getAllProductCategories());
+		this.productBoxTabView = new ProductBoxesTabView(DatabaseController.getInstance().getAllProductBoxes());
+		this.productTabView = new ProductTabView(DatabaseController.getInstance().getAllProducts());
+	}
+
+	/**
+	 * Gets the instance of the {@link ProductController}.
+	 *
+	 * @return the product controller
+	 */
+	public static synchronized ProductController getInstance()
+	{
+		return Holder.INSTANCE;
 	}
 
 	/**
@@ -99,19 +100,9 @@ public class ProductController implements UIActionController
 	 *
 	 * @return the product list tab view
 	 */
-	public Node getTabView()
+	public Node getProductTabView()
 	{
-		return listTab.getView();
-	}
-
-	/**
-	 * Gets the product editing view.
-	 *
-	 * @return the product editing view
-	 */
-	public Node getProductEditView()
-	{
-		return addProductView.getView(true);
+		return productTabView.getView(DatabaseController.getInstance().getAllProductBrands(), DatabaseController.getInstance().getAllProductCategories());
 	}
 
 	/**
@@ -119,7 +110,7 @@ public class ProductController implements UIActionController
 	 * object.
 	 *
 	 * @param databaseID database ID of the product (<code>-1</code> for a new
-	 * one)
+	 *            one)
 	 * @param name name of the of product
 	 * @param brand brand of the product
 	 * @param category category of the product
@@ -133,13 +124,14 @@ public class ProductController implements UIActionController
 		{
 			SYSLOG.trace("creating new brand from " + brand.toString());
 
-			bran = DatabaseController.getProductBrandByID(DatabaseController.saveOrUpdate(new ProductBrand((String) brand)));
+			bran = DatabaseController.getInstance().getProductBrandByID(DatabaseController.getInstance().saveOrUpdate(new ProductBrand((String) brand)));
 		}
 
 		if (category instanceof String)
 		{
 			SYSLOG.trace("creating new category from " + category.toString());
-			cat = DatabaseController.getProductCategoryByID(DatabaseController.saveOrUpdate(new ProductCategory((String) category)));
+			cat = DatabaseController.getInstance()
+					.getProductCategoryByID(DatabaseController.getInstance().saveOrUpdate(new ProductCategory((String) category)));
 		}
 
 		if (brand instanceof ProductBrand)
@@ -156,66 +148,15 @@ public class ProductController implements UIActionController
 
 		Product newProduct = new Product(databaseID, name, bran, cat);
 
-		final int dbID = DatabaseController.saveOrUpdate(newProduct);
+		final int dbID = DatabaseController.getInstance().saveOrUpdate(newProduct);
 
 		if (dbID < 0)
 		{
-			PopupController.error(LocalizationController.getString("failedToSaveProductDataPopUpWarning"));
+			PopupController.getInstance().error(LocalizationController.getInstance().getString("failedToSaveProductDataPopUpWarning"));
 			return null;
 		}
 
-		return DatabaseController.getProductByID(dbID);
-	}
-
-	/**
-	 * Changes the view in the product list tab to the edit view.
-	 *
-	 * @param product {@link Product} to edit
-	 */
-	public void editProduct(final Product product)
-	{
-		AddProductView editView = new AddProductView(this, uiController);
-		listTab.setView(editView.getView(true));
-		editView.setViewData(product);
-	}
-
-	/**
-	 * Gets the view for creating new products.
-	 *
-	 * @return the product creation view
-	 */
-	public Node getAddProductView()
-	{
-		return new AddProductView(this, uiController).getView(false);
-	}
-
-	/**
-	 * Changes the view in the product list tab to the list.
-	 */
-	public void showList()
-	{
-		listTab.setView(ListController.getTableView(this, DatabaseController.getProductDataColumns(false, false), DatabaseController.getAllProducts()));
-	}
-
-	/**
-	 * Changes the view in the product add/edit list tab to the list.
-	 */
-	public void showCreatingListView()
-	{
-
-		addTab.setView(ListController.getTableView(this, DatabaseController.getProductDataColumns(false, false), DatabaseController.getAllProducts()));
-
-	}
-
-	/**
-	 * Changes the view in the product list tab to display the data from the
-	 * given product.
-	 *
-	 * @param product product to display
-	 */
-	public void showProductView(final Product product)
-	{
-		listTab.setView(new ProductDataView(this).getView(product));
+		return DatabaseController.getInstance().getProductByID(dbID);
 	}
 
 	/**
@@ -226,7 +167,8 @@ public class ProductController implements UIActionController
 	public Node getProductSearchResultsView()
 	{
 		SYSLOG.trace("Getting search results for product list.");
-		return ListController.getTableView(this, DatabaseController.getProductDataColumns(true, false), DatabaseController.getObservableProductSearchResults());
+		return ListController.getTableView(this, DatabaseController.getInstance().getProductDataColumns(true, false),
+				DatabaseController.getInstance().getObservableProductSearchResults());
 	}
 
 	/**
@@ -271,26 +213,50 @@ public class ProductController implements UIActionController
 	@Override
 	public void deleteAction(final Object data)
 	{
+		// Helps with readability.
+		final PopupController popupController = PopupController.getInstance();
+		final DatabaseController dbController = DatabaseController.getInstance();
+		final LocalizationController localizationController = LocalizationController.getInstance();
+
 		if (data instanceof ProductBrand)
 		{
-			if (!DatabaseController.deleteProductBrand((ProductBrand) data))
-				PopupController.error("Unable to delete product brand " + ((ProductBrand) data).getName() + ", it is being used by one or more products.");
+			if (popupController.confirmation(localizationController.getString("productBrandDeletationConfirmation")))
+			{
+				if (!dbController.deleteProductBrand((ProductBrand) data))
+					popupController
+							.error(localizationController.getCompoundString("unableToDeleteBrandPopUp", new Object[] { ((ProductBrand) data).getName() }));
+			}
 		}
 		else if (data instanceof ProductCategory)
 		{
-			if (!DatabaseController.deleteProductCategory((ProductCategory) data))
-				PopupController
-						.error("Unable to delete product category " + ((ProductCategory) data).getName() + ", it is being used by one or more products.");
+			if (popupController.confirmation(localizationController.getString("productCategoryDeletationConfirmation")))
+			{
+				if (!dbController.deleteProductCategory((ProductCategory) data))
+					popupController
+							.error(localizationController.getCompoundString("unableToDeleteCategory", new Object[] { ((ProductCategory) data).getName() }));
+			}
 		}
 		else if (data instanceof ProductBox)
 		{
-			if (!DatabaseController.deleteProductBox((ProductBox) data))
-				PopupController.error("Unable to delete product box.");
+			if (popupController.confirmation(localizationController.getString("productBoxDeletationConfirmation")))
+			{
+				if (!dbController.deleteProductBox((ProductBox) data))
+					popupController.error(localizationController.getString("unableToDeleteProductBoxPopUp"));
+			}
+		}
+		else if (data instanceof Product)
+		{
+			if (!dbController.deleteProduct((Product) data))
+				popupController.error(localizationController.getCompoundString("unableToDeleteProductError", ((Product) data).getName()));
 		}
 		else if (data instanceof ProductType)
 		{
-			if (!DatabaseController.deleteProductType((ProductType) data))
-				PopupController.error("Unable to delete product type " + ((ProductType) data).getName() + ", it is being used by one or more categories.");
+			if (popupController.confirmation(localizationController.getString("productTypeDeletationConfirmation")))
+			{
+				if (!dbController.deleteProductType((ProductType) data))
+					popupController
+							.error(localizationController.getCompoundString("unableToDeleteProductTypePopUp", new Object[] { ((ProductType) data).getName() }));
+			}
 		}
 		else
 		{
@@ -304,8 +270,18 @@ public class ProductController implements UIActionController
 	@Override
 	public void viewAction(final Object data)
 	{
-		USRLOG.info("Viewing: " + ((Product) data).toString());
-		listTab.setView(new ProductDataView(this).getView(((Product) data)));
+		throw new UnsupportedOperationException();
+	}
+
+	@Override
+	public void recreateViews(final ListView node)
+	{
+		getBrandsTab();
+		getCategoryTab();
+		getProductBoxesTab();
+		getProductManagementView();
+		getProductTabView();
+		getProductTypesTab();
 	}
 
 	/**
@@ -313,12 +289,12 @@ public class ProductController implements UIActionController
 	 */
 	public Node getProductManagementView()
 	{
-		productManagementView.setContents(getProductEditView());
 		return productManagementView.getView();
 	}
 
 	/**
-	 * Saves the new or existing ProductBrand to database and returns the updated object.
+	 * Saves the new or existing ProductBrand to database and returns the
+	 * updated object.
 	 *
 	 * @param name placeholder for the brand
 	 * @return a product brand when called
@@ -327,15 +303,11 @@ public class ProductController implements UIActionController
 	public ProductBrand saveBrand(final String name)
 	{
 		ProductBrand productBrand = new ProductBrand(name);
-		DatabaseController.save(productBrand);
+		DatabaseController.getInstance().saveOrUpdate(productBrand);
 		return productBrand;
-
 	}
 
 	/**
-	 * Saves the category however since category is not observable system does not update on fly
-	 * Restart required to view new set category
-	 *
 	 * @param name the name of the new category
 	 * @param type the type of the new category
 	 * @return what ever is in the product category
@@ -344,13 +316,14 @@ public class ProductController implements UIActionController
 	public ProductCategory saveCategory(final String name, final ProductType type)
 	{
 		ProductCategory productCategory = new ProductCategory(name, type);
-		DatabaseController.save(productCategory);
+		DatabaseController.getInstance().saveOrUpdate(productCategory);
 		return productCategory;
 
 	}
 
 	/**
-	 * Saves the new ProductType into databasecontroller idea is that this should minimize the tasks that product
+	 * Saves the new ProductType into databasecontroller idea is that this
+	 * should minimize the tasks that product
 	 * controller already is running
 	 *
 	 * @param name The new name of the product
@@ -360,9 +333,8 @@ public class ProductController implements UIActionController
 	public ProductType saveProductType(final String name)
 	{
 		ProductType productType = new ProductType(name);
-		DatabaseController.save(productType);
+		DatabaseController.getInstance().saveOrUpdate(productType);
 		return productType;
-
 	}
 
 	/**
@@ -393,50 +365,63 @@ public class ProductController implements UIActionController
 	@SuppressWarnings("static-method")
 	public void saveBrand(final ProductBrand editBrand)
 	{
-		DatabaseController.save(editBrand);
-		// TODO Validate data
-
+		DatabaseController.getInstance().saveOrUpdate(editBrand);
 	}
 
 	/**
-	 * Controlls the action the new Product Type to Product Controller when action is performed
+	 * Controlls the action the new Product Type to Product Controller when
+	 * action is performed
 	 *
-	 * @param saveProductType saves the new Product Type written in the TextField
+	 * @param saveProductType saves the new Product Type written in the
+	 *            TextField
 	 */
 	@SuppressWarnings("static-method")
 	public void saveProductType(final ProductType saveProductType)
 	{
-		// TODO Validate data
-		DatabaseController.save(saveProductType);
+		DatabaseController.getInstance().saveOrUpdate(saveProductType);
 	}
 
 	/**
-	 * Controlls the action of a new Category to Product Controller when action is performed
+	 * Controlls the action of a new Category to Product Controller when action
+	 * is performed
 	 *
 	 * @param saveProductCategory saves the new data written in the TextField
 	 */
 	@SuppressWarnings("static-method")
 	public void saveProductCategory(final ProductCategory saveProductCategory)
 	{
-		// TODO Need validation
-		DatabaseController.save(saveProductCategory);
+		DatabaseController.getInstance().saveOrUpdate(saveProductCategory);
 	}
 
+	/**
+	 * Gets Category tab view.
+	 *
+	 * @return category tab view
+	 */
 	public Node getCategoryTab()
 	{
-		// TODO Auto-generated method stub
 		return categoryTabView.getView();
 	}
 
+	/**
+	 * Get product box view.
+	 *
+	 * @return product box view
+	 */
 	public Node getProductBoxesTab()
 	{
-		return productBoxTabView.getView(DatabaseController.getAllProducts());
+		return productBoxTabView.getView();
 	}
 
+	/**
+	 * Saves the creted product box.
+	 *
+	 * @param productBox uses the product box parameter to refer to the model of ProductBox
+	 */
 	@SuppressWarnings("static-method")
 	public void saveProductBox(final ProductBox productBox)
 	{
-		// TODO Need validation
-		DatabaseController.saveOrUpdate(productBox);
+		DatabaseController.getInstance().saveOrUpdate(productBox);
 	}
+
 }

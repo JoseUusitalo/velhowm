@@ -7,8 +7,8 @@ import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import velho.controller.DatabaseController;
-import velho.controller.LogDatabaseController;
+import velho.controller.database.DatabaseController;
+import velho.controller.database.LogDatabaseController;
 import velho.model.enums.UserRole;
 
 /**
@@ -32,9 +32,9 @@ public class UserRoleTest
 	@BeforeClass
 	public static final void init() throws Exception
 	{
-		LogDatabaseController.connectAndInitialize();
-		DatabaseController.link();
-		DatabaseController.loadSampleData();
+		LogDatabaseController.getInstance().connectAndInitialize();
+		DatabaseController.getInstance().link();
+		DatabaseController.getInstance().loadSampleData();
 	}
 
 	/**
@@ -43,8 +43,8 @@ public class UserRoleTest
 	@AfterClass
 	public static final void unlinkDatabases() throws Exception
 	{
-		DatabaseController.unlink();
-		LogDatabaseController.unlink();
+		DatabaseController.getInstance().unlink();
+		LogDatabaseController.getInstance().unlink();
 	}
 
 	@Test
@@ -83,10 +83,10 @@ public class UserRoleTest
 	@Test
 	public final void testToString()
 	{
-		assertEquals(administrator.getName(), administrator.toString());
-		assertEquals(manager.getName(), manager.toString());
-		assertEquals(logistician.getName(), logistician.toString());
-		assertEquals(guest.getName(), guest.toString());
+		assertEquals(administrator.getName().toUpperCase(), administrator.toString());
+		assertEquals(manager.getName().toUpperCase(), manager.toString());
+		assertEquals(logistician.getName().toUpperCase(), logistician.toString());
+		assertEquals(guest.getName().toUpperCase(), guest.toString());
 	}
 
 }

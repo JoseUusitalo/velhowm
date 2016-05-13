@@ -71,10 +71,12 @@ public class User extends AbstractDatabaseObject
 	 * @param pin
 	 * @param role
 	 */
+	@SuppressWarnings("unused")
 	public User(final int databaseID, final UUID uuid, final String firstName, final String lastName, final String pin, final String badgeID,
 			final UserRole role)
 	{
-		setDatabaseID(databaseID);
+		// Database ID left unused on purpose.
+		// TODO: Remove ID from constructor and fiddle with the CSV parser to allow for defining an ID and then ignoring it.
 		setUuid(uuid);
 		this.firstName = firstName;
 		this.lastName = lastName;
@@ -82,7 +84,7 @@ public class User extends AbstractDatabaseObject
 		this.pin = pin;
 		this.role = role;
 
-		if (!UserController.validateUserData(this.badgeID, this.pin, firstName, lastName, role))
+		if (!UserController.getInstance().validateUser(this))
 			throw new IllegalArgumentException("Invalid user data");
 	}
 
@@ -127,40 +129,48 @@ public class User extends AbstractDatabaseObject
 	@Override
 	public String toString()
 	{
-		return firstName + " " + lastName + " [" + role.toString() + " | " + getDatabaseID() + "]";
+		return firstName + " " + lastName + " [" + role.getName() + " | " + getDatabaseID() + "]";
 	}
 
 	@Override
-	public boolean equals(final Object o)
+	public boolean equals(final Object obj)
 	{
-		if (this == o)
+		if (this == obj)
 			return true;
 
-		if (o == null || !(o instanceof User))
+		if (obj == null || !(obj instanceof User))
 			return false;
 
-		final User u = (User) o;
+		final User user = (User) obj;
 
 		// Compare all details.
 
 		//@formatter:off
-		final boolean equalNames = this.getFirstName().equalsIgnoreCase(u.getFirstName()) &&
-									this.getLastName().equalsIgnoreCase(u.getLastName());
+		final boolean equalNames = this.getFirstName().equalsIgnoreCase(user.getFirstName()) &&
+									this.getLastName().equalsIgnoreCase(user.getLastName());
 		//@formatter:on
 
 		boolean equalPINs = false;
 
-		if (this.getPin() != null)
-			equalPINs = this.getPin().equals(u.getPin());
+		if (this.getPin() == null)
+		{
+			equalPINs = user.getPin() == null;
+		}
 		else
-			equalPINs = u.getPin() == null;
+		{
+			equalPINs = this.getPin().equals(user.getPin());
+		}
 
 		boolean equalBadgeIDs = false;
 
-		if (this.getBadgeID() != null)
-			equalBadgeIDs = this.getBadgeID().equals(u.getBadgeID());
+		if (this.getBadgeID() == null)
+		{
+			equalBadgeIDs = user.getBadgeID() == null || user.getBadgeID().isEmpty();
+		}
 		else
-			equalBadgeIDs = u.getBadgeID() == null;
+		{
+			equalBadgeIDs = this.getBadgeID().equals(user.getBadgeID());
+		}
 
 		return equalNames && equalPINs && equalBadgeIDs;
 	}
@@ -192,7 +202,7 @@ public class User extends AbstractDatabaseObject
 	 */
 	public String getFullDetails()
 	{
-		return firstName + " " + lastName + " (" + role.toString() + ")";
+		return firstName + " " + lastName + " (" + role.getName() + ")";
 	}
 
 	/**
@@ -262,6 +272,9 @@ public class User extends AbstractDatabaseObject
 	 */
 	public void setRole(final UserRole role)
 	{
+		if (role == null)
+			throw new IllegalArgumentException("User role can not be null.");
+
 		this.role = role;
 	}
 
@@ -282,7 +295,10 @@ public class User extends AbstractDatabaseObject
 	 */
 	public void setBadgeID(final String badgeID)
 	{
-		this.badgeID = badgeID;
+		if (badgeID != null && badgeID.trim().isEmpty())
+			this.badgeID = null;
+		else
+			this.badgeID = badgeID;
 	}
 
 	/**
@@ -302,6 +318,9 @@ public class User extends AbstractDatabaseObject
 	 */
 	public void setPin(final String pin)
 	{
-		this.pin = pin;
+		if (pin != null && pin.trim().isEmpty())
+			this.pin = null;
+		else
+			this.pin = pin;
 	}
 }

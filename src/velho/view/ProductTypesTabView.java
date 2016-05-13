@@ -7,6 +7,7 @@ import javafx.event.ActionEvent;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
+import javafx.scene.control.Label;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableColumn.CellEditEvent;
@@ -16,48 +17,68 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.util.Callback;
-import velho.controller.DatabaseController;
+import velho.controller.LocalizationController;
 import velho.controller.ProductController;
+import velho.controller.UIController;
 import velho.model.ProductType;
 import velho.model.interfaces.GenericView;
 import velho.view.components.TableCellDeleteButton;
 
+/**
+ * @author Edward Puustinen
+ */
 public class ProductTypesTabView implements GenericView
 {
-	private ProductController productController;
+	private final TableView<Object> table;
 
-	private final TableView<Object> table = new TableView<Object>();
-
+	/**
+	 * VBox is a vertical box where you can set up labels fields & buttons.
+	 */
 	private VBox vbox;
 
-	private ObservableList<Object> data = DatabaseController.getAllProductTypes();
+	/**
+	 * A list of {@link ProductType} objects in the database.
+	 */
+	private final ObservableList<Object> productTypes;
 
-	public ProductTypesTabView(final ProductController productController)
+	/**
+	 * @param productTypes
+	 */
+	public ProductTypesTabView(final ObservableList<Object> productTypes)
 	{
-		this.productController = productController;
+		this.productTypes = productTypes;
+		this.table = new TableView<Object>();
 	}
 
+	/**
+	 * VBox is inside the view to set up the text fields & labels.
+	 *
+	 * @return return the view
+	 */
 	public VBox getView()
 	{
 		if (vbox == null)
 		{
-			HBox hb = new HBox();
+			table.getColumns().clear();
+
+			HBox hbox = new HBox();
 
 			table.setEditable(true);
-			table.setItems(data);
+			table.getItems().clear();
+			table.setItems(productTypes);
 
-			final Callback<TableColumn<Object, String>, TableCell<Object, String>> cellFactory = (final TableColumn<Object, String> p) -> new EditingCell();
+			final Callback<TableColumn<Object, String>, TableCell<Object, String>> cellFactory = (final TableColumn<Object, String> col) -> new EditingCell();
 			final TableColumn<Object, String> nameColumn = new TableColumn<Object, String>("Name");
 
 			nameColumn.setMinWidth(100);
 			nameColumn.setCellValueFactory(new PropertyValueFactory<>("name"));
 			nameColumn.setCellFactory(cellFactory);
 
-			nameColumn.setOnEditCommit((final CellEditEvent<Object, String> t) ->
+			nameColumn.setOnEditCommit((final CellEditEvent<Object, String> event) ->
 			{
-				final ProductType editProductType = ((ProductType) t.getTableView().getItems().get(t.getTablePosition().getRow()));
-				editProductType.setName(t.getNewValue());
-				productController.saveProductType(editProductType);
+				final ProductType editProductType = ((ProductType) event.getTableView().getItems().get(event.getTablePosition().getRow()));
+				editProductType.setName(event.getNewValue());
+				ProductController.getInstance().saveProductType(editProductType);
 			});
 			table.getColumns().add(nameColumn);
 
@@ -68,9 +89,9 @@ public class ProductTypesTabView implements GenericView
 			deleteColumn.setCellValueFactory(new Callback<TableColumn.CellDataFeatures<Object, String>, ObservableValue<String>>()
 			{
 				@Override
-				public ObservableValue<String> call(final TableColumn.CellDataFeatures<Object, String> p)
+				public ObservableValue<String> call(final TableColumn.CellDataFeatures<Object, String> celldata)
 				{
-					return new SimpleStringProperty(p.getValue(), "Delete");
+					return new SimpleStringProperty(celldata.getValue(), "Delete");
 				}
 			});
 
@@ -78,35 +99,38 @@ public class ProductTypesTabView implements GenericView
 			deleteColumn.setCellFactory(new Callback<TableColumn<Object, String>, TableCell<Object, String>>()
 			{
 				@Override
-				public TableCell<Object, String> call(final TableColumn<Object, String> p)
+				public TableCell<Object, String> call(final TableColumn<Object, String> tcolumn)
 				{
-					final TableCellDeleteButton button = new TableCellDeleteButton(productController, "Delete");
+					final TableCellDeleteButton button = new TableCellDeleteButton(ProductController.getInstance(),
+							LocalizationController.getInstance().getString("buttonDelete"));
 					button.setAlignment(Pos.CENTER);
 					return button;
 				}
 			});
 			table.getColumns().add(deleteColumn);
 
+			final Label typeLabel = new Label(LocalizationController.getInstance().getString("productTypeNameLabel"));
 			final TextField productTypeName = new TextField();
-			productTypeName.setPromptText("Product Type Name");
+			productTypeName.setPromptText(LocalizationController.getInstance().getString("productTypeNamePromtText"));
 			productTypeName.setMaxWidth(nameColumn.getPrefWidth());
-			final Button addButton = new Button("Create");
-			addButton.setOnAction((final ActionEvent e) ->
+			final Button addButton = new Button(LocalizationController.getInstance().getString("buttonCreate"));
+			addButton.setOnAction((final ActionEvent event) ->
 			{
 				final ProductType saveProductType = new ProductType(productTypeName.getText());
-				data.add(saveProductType);
 				productTypeName.clear();
-				productController.saveProductType(saveProductType);
+				ProductController.getInstance().saveProductType(saveProductType);
 			});
 
-			hb.getChildren().addAll(productTypeName, addButton);
-			hb.setSpacing(3);
+			hbox.getChildren().addAll(typeLabel, productTypeName, addButton);
+			hbox.setSpacing(10);
+			hbox.setAlignment(Pos.CENTER_LEFT);
 
 			vbox = new VBox();
 			vbox.setSpacing(5);
 			vbox.setPadding(new Insets(10, 0, 0, 10));
-			vbox.getChildren().addAll(table, hb);
+			vbox.getChildren().addAll(table, hbox);
 
+			UIController.getInstance().recordView(this);
 		}
 		return vbox;
 	}
@@ -118,6 +142,7 @@ public class ProductTypesTabView implements GenericView
 
 		public EditingCell()
 		{
+			// Silencing PMD.
 		}
 
 		@Override

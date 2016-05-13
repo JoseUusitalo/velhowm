@@ -1,0 +1,5 @@
+databaseID,firstName,lastName,pin,badgeID,role
+1,Admin,Test,111111,,ADMINISTRATOR
+2,Boss,Test,222222,,MANAGER
+3,Worker,Test,333333,,LOGISTICIAN
+4,Badger,Testaccount,,12345678,LOGISTICIAN

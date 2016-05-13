@@ -14,8 +14,8 @@ import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import velho.controller.DatabaseController;
-import velho.controller.LogDatabaseController;
+import velho.controller.database.DatabaseController;
+import velho.controller.database.LogDatabaseController;
 import velho.model.Manifest;
 import velho.model.ManifestState;
 import velho.model.ProductBox;
@@ -29,7 +29,7 @@ import velho.model.ProductBox;
 public class ManifestTest
 {
 	private static Manifest newManifest = new Manifest();
-	private static Manifest existingManifest = DatabaseController.getManifestByID(2);
+	private static Manifest existingManifest = DatabaseController.getInstance().getManifestByID(2);
 
 	/**
 	 * Creates the log database if needed and connects to it.
@@ -40,9 +40,9 @@ public class ManifestTest
 	@BeforeClass
 	public static final void init() throws Exception
 	{
-		LogDatabaseController.connectAndInitialize();
-		DatabaseController.link();
-		DatabaseController.loadSampleData();
+		LogDatabaseController.getInstance().connectAndInitialize();
+		DatabaseController.getInstance().link();
+		DatabaseController.getInstance().loadSampleData();
 	}
 
 	/**
@@ -51,8 +51,8 @@ public class ManifestTest
 	@AfterClass
 	public static final void unlinkDatabases() throws Exception
 	{
-		DatabaseController.unlink();
-		LogDatabaseController.unlink();
+		DatabaseController.getInstance().unlink();
+		LogDatabaseController.getInstance().unlink();
 	}
 
 	@Test
@@ -61,8 +61,8 @@ public class ManifestTest
 		Date order = new Date(1234);
 		Date rec = new Date(12341234);
 		Manifest anotherManifest = new Manifest(123, new ManifestState(-1, "Whatever"), order, rec);
-		assertEquals("[0] State: Whatever Driver: 123 Ordered/Received: " + DatabaseController.getH2DateFormat(order) + "/"
-				+ DatabaseController.getH2DateFormat(rec) + " (0)", anotherManifest.toString());
+		assertEquals("[0] State: Whatever Driver: 123 Ordered/Received: " + DatabaseController.getInstance().getH2DateFormat(order) + "/"
+				+ DatabaseController.getInstance().getH2DateFormat(rec) + " (0)", anotherManifest.toString());
 	}
 
 	@Test
@@ -94,7 +94,7 @@ public class ManifestTest
 	@Test
 	public final void testGetState()
 	{
-		assertEquals(DatabaseController.getManifestStateByID(1).getDatabaseID(), existingManifest.getState().getDatabaseID());
+		assertEquals(DatabaseController.getInstance().getManifestStateByID(1).getDatabaseID(), existingManifest.getState().getDatabaseID());
 	}
 
 	@Test
@@ -108,7 +108,7 @@ public class ManifestTest
 	{
 		final int oldID = existingManifest.getDatabaseID();
 		final ManifestState oldState = existingManifest.getState();
-		final ManifestState newState = DatabaseController.getManifestStateByID(2);
+		final ManifestState newState = DatabaseController.getInstance().getManifestStateByID(2);
 
 		// The states are different.
 		assertNotEquals(oldState, newState);
@@ -118,24 +118,24 @@ public class ManifestTest
 		assertEquals(newState, existingManifest.getState());
 
 		// Save.
-		final int saveID = DatabaseController.saveOrUpdate(existingManifest);
+		final int saveID = DatabaseController.getInstance().saveOrUpdate(existingManifest);
 		assertTrue(saveID > 0);
 
 		// Check that that the object was updated, not inserted.
 		assertEquals(saveID, oldID);
 
 		// Database was updated.
-		assertEquals(newState, DatabaseController.getManifestByID(saveID).getState());
+		assertEquals(newState, DatabaseController.getInstance().getManifestByID(saveID).getState());
 
 		existingManifest.setState(oldState);
-		DatabaseController.saveOrUpdate(existingManifest);
+		DatabaseController.getInstance().saveOrUpdate(existingManifest);
 	}
 
 	@Test
 	public final void testGetBoxes()
 	{
 		final List<ProductBox> list = new ArrayList<ProductBox>(
-				Arrays.asList(DatabaseController.getProductBoxByID(35), DatabaseController.getProductBoxByID(36), DatabaseController.getProductBoxByID(37)));
+				Arrays.asList(DatabaseController.getInstance().getProductBoxByID(35), DatabaseController.getInstance().getProductBoxByID(36), DatabaseController.getInstance().getProductBoxByID(37)));
 
 		/*
 		 * TODO: This is not transitive and does not work when the list is a set.

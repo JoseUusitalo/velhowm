@@ -12,8 +12,8 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import velho.controller.DatabaseController;
-import velho.controller.LogDatabaseController;
+import velho.controller.database.DatabaseController;
+import velho.controller.database.LogDatabaseController;
 import velho.model.Product;
 import velho.model.ProductBox;
 import velho.model.ProductBrand;
@@ -39,13 +39,11 @@ public class ProductBoxTest
 	private Date date = new Date(1000);
 	private String name1 = "porkkana";
 	private String name2 = "peruna";
-	private int id1 = 1;
-	private int id2 = 2;
 	private int maxSize = 12;
 
-	private Product product1 = new Product(id1, name1, brand1, category);
-	private Product product2 = new Product(id2, name2, brand2, category2);
-	private Product product3 = new Product(id2, name2, brand2, category3);
+	private Product product1 = new Product(0, name1, brand1, category);
+	private Product product2 = new Product(0, name2, brand2, category2);
+	private Product product3 = new Product(0, name2, brand2, category3);
 
 	/**
 	 * Creates the log database if needed and connects to it.
@@ -56,9 +54,9 @@ public class ProductBoxTest
 	@BeforeClass
 	public static final void init() throws Exception
 	{
-		LogDatabaseController.connectAndInitialize();
-		DatabaseController.link();
-		DatabaseController.loadSampleData();
+		LogDatabaseController.getInstance().connectAndInitialize();
+		DatabaseController.getInstance().link();
+		DatabaseController.getInstance().loadSampleData();
 	}
 
 	/**
@@ -67,14 +65,14 @@ public class ProductBoxTest
 	@AfterClass
 	public static final void unlinkDatabases() throws Exception
 	{
-		DatabaseController.unlink();
-		LogDatabaseController.unlink();
+		DatabaseController.getInstance().unlink();
+		LogDatabaseController.getInstance().unlink();
 	}
 
 	@Before
 	public void createProductBox()
 	{
-		box = new ProductBox(id1, product1, maxSize, 0, date);
+		box = new ProductBox(0, product1, maxSize, 0, date);
 	}
 
 	@After
@@ -113,7 +111,7 @@ public class ProductBoxTest
 	@Test
 	public void testGetBoxID()
 	{
-		assertEquals(id1, box.getDatabaseID());
+		assertEquals(0, box.getDatabaseID());
 	}
 
 	@Test
@@ -137,7 +135,7 @@ public class ProductBoxTest
 	@Test
 	public void testGetProduct2()
 	{
-		ProductBox box2 = new ProductBox(id1, product2, maxSize, 0, date);
+		ProductBox box2 = new ProductBox(0, product2, maxSize, 0, date);
 		assertEquals(product2, box2.getProduct());
 	}
 
@@ -213,8 +211,8 @@ public class ProductBoxTest
 	@Test
 	public void testToString()
 	{
-		ProductBox box2 = new ProductBox(1, product2, 1, 0, date);
-		assertEquals("[1] Box: peruna (0)", box2.toString());
+		ProductBox box2 = new ProductBox(0, product2, 1, 0, date);
+		assertEquals("[0] Box: peruna (0)", box2.toString());
 	}
 
 	@Test

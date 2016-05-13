@@ -18,6 +18,7 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.text.Font;
 import javafx.util.Callback;
+import velho.controller.LocalizationController;
 import velho.controller.UIController;
 import velho.controller.interfaces.UIActionController;
 import velho.model.interfaces.GenericView;
@@ -38,17 +39,17 @@ public class ListView implements GenericView
 	/**
 	 * The list of data to show.
 	 */
-	private ObservableList<Object> datalist;
+	private final ObservableList<Object> datalist;
 
 	/**
 	 * Data columns.
 	 */
-	private Map<String, String> columnNames;
+	private final Map<String, String> columnNames;
 
 	/**
 	 * Parent controller.
 	 */
-	private UIActionController parentController;
+	private final UIActionController parentController;
 
 	/**
 	 * @param parentController
@@ -89,9 +90,9 @@ public class ListView implements GenericView
 					col.setCellValueFactory(new Callback<TableColumn.CellDataFeatures<Object, String>, ObservableValue<String>>()
 					{
 						@Override
-						public ObservableValue<String> call(final TableColumn.CellDataFeatures<Object, String> p)
+						public ObservableValue<String> call(final TableColumn.CellDataFeatures<Object, String> celldata)
 						{
-							return new SimpleStringProperty(p.getValue(), key);
+							return new SimpleStringProperty(celldata.getValue(), key);
 						}
 					});
 
@@ -99,9 +100,9 @@ public class ListView implements GenericView
 					col.setCellFactory(new Callback<TableColumn<Object, String>, TableCell<Object, String>>()
 					{
 						@Override
-						public TableCell<Object, String> call(final TableColumn<Object, String> p)
+						public TableCell<Object, String> call(final TableColumn<Object, String> celldata)
 						{
-							final TableCellDeleteButton button = new TableCellDeleteButton(parentController, "Delete");
+							final TableCellDeleteButton button = new TableCellDeleteButton(parentController, LocalizationController.getInstance().getString("buttonDelete"));
 							button.setAlignment(Pos.CENTER);
 							return button;
 						}
@@ -114,9 +115,9 @@ public class ListView implements GenericView
 					col.setCellValueFactory(new Callback<TableColumn.CellDataFeatures<Object, String>, ObservableValue<String>>()
 					{
 						@Override
-						public ObservableValue<String> call(final TableColumn.CellDataFeatures<Object, String> p)
+						public ObservableValue<String> call(final TableColumn.CellDataFeatures<Object, String> celldata)
 						{
-							return new SimpleStringProperty(p.getValue(), key);
+							return new SimpleStringProperty(celldata.getValue(), key);
 						}
 					});
 
@@ -124,7 +125,7 @@ public class ListView implements GenericView
 					col.setCellFactory(new Callback<TableColumn<Object, String>, TableCell<Object, String>>()
 					{
 						@Override
-						public TableCell<Object, String> call(final TableColumn<Object, String> p)
+						public TableCell<Object, String> call(final TableColumn<Object, String> celldata)
 						{
 							final TableCellAddButton button = new TableCellAddButton(parentController, "+");
 							button.setAlignment(Pos.CENTER);
@@ -139,9 +140,9 @@ public class ListView implements GenericView
 					col.setCellValueFactory(new Callback<TableColumn.CellDataFeatures<Object, String>, ObservableValue<String>>()
 					{
 						@Override
-						public ObservableValue<String> call(final TableColumn.CellDataFeatures<Object, String> p)
+						public ObservableValue<String> call(final TableColumn.CellDataFeatures<Object, String> celldata)
 						{
-							return new SimpleStringProperty(p.getValue(), key);
+							return new SimpleStringProperty(celldata.getValue(), key);
 						}
 					});
 
@@ -149,7 +150,7 @@ public class ListView implements GenericView
 					col.setCellFactory(new Callback<TableColumn<Object, String>, TableCell<Object, String>>()
 					{
 						@Override
-						public TableCell<Object, String> call(final TableColumn<Object, String> p)
+						public TableCell<Object, String> call(final TableColumn<Object, String> celldata)
 						{
 							final TableCellRemoveButton button = new TableCellRemoveButton(parentController, "-");
 							button.setAlignment(Pos.CENTER);
@@ -164,9 +165,9 @@ public class ListView implements GenericView
 					col.setCellValueFactory(new Callback<TableColumn.CellDataFeatures<Object, String>, ObservableValue<String>>()
 					{
 						@Override
-						public ObservableValue<String> call(final TableColumn.CellDataFeatures<Object, String> p)
+						public ObservableValue<String> call(final TableColumn.CellDataFeatures<Object, String> celldata)
 						{
-							return new SimpleStringProperty(p.getValue(), key);
+							return new SimpleStringProperty(celldata.getValue(), key);
 						}
 					});
 
@@ -175,9 +176,9 @@ public class ListView implements GenericView
 					{
 
 						@Override
-						public TableCell<Object, String> call(final TableColumn<Object, String> p)
+						public TableCell<Object, String> call(final TableColumn<Object, String> celldata)
 						{
-							final TableCellViewButton button = new TableCellViewButton(parentController, "View");
+							final TableCellViewButton button = new TableCellViewButton(parentController, LocalizationController.getInstance().getString("buttonView"));
 							button.setAlignment(Pos.CENTER);
 							return button;
 						}
@@ -191,7 +192,7 @@ public class ListView implements GenericView
 			tableView.getColumns().addAll(cols);
 			pane.setCenter(tableView);
 
-			UIController.recordView(this);
+			UIController.getInstance().recordView(this);
 		}
 		return pane;
 	}
@@ -206,7 +207,7 @@ public class ListView implements GenericView
 		/**
 		 * The button itself.
 		 */
-		private Button button;
+		private final Button button;
 
 		/**
 		 * The controller to send information to when this button is pressed.
@@ -225,7 +226,7 @@ public class ListView implements GenericView
 			button.setOnAction(new EventHandler<ActionEvent>()
 			{
 				@Override
-				public void handle(final ActionEvent t)
+				public void handle(final ActionEvent event)
 				{
 					// Send information to parent controller.
 					controller.addAction(TableCellAddButton.this.getTableView().getItems().get(TableCellAddButton.this.getIndex()));
@@ -239,10 +240,10 @@ public class ListView implements GenericView
 			super.updateItem(string, empty);
 
 			// Display button only if the row is not empty.
-			if (!empty)
-				setGraphic(button);
-			else
+			if (empty)
 				setGraphic(null);
+			else
+				setGraphic(button);
 		}
 	}
 
@@ -256,7 +257,7 @@ public class ListView implements GenericView
 		/**
 		 * The button itself.
 		 */
-		private Button button;
+		private final Button button;
 
 		/**
 		 * The controller to send information to when this button is pressed.
@@ -276,7 +277,7 @@ public class ListView implements GenericView
 			button.setOnAction(new EventHandler<ActionEvent>()
 			{
 				@Override
-				public void handle(final ActionEvent t)
+				public void handle(final ActionEvent event)
 				{
 					// Send information to parent controller.
 					controller.removeAction(TableCellRemoveButton.this.getTableView().getItems().get(TableCellRemoveButton.this.getIndex()));
@@ -290,10 +291,10 @@ public class ListView implements GenericView
 			super.updateItem(string, empty);
 
 			// Display button only if the row is not empty.
-			if (!empty)
-				setGraphic(button);
-			else
+			if (empty)
 				setGraphic(null);
+			else
+				setGraphic(button);
 		}
 	}
 
@@ -307,7 +308,7 @@ public class ListView implements GenericView
 		/**
 		 * The button itself.
 		 */
-		private Button button;
+		private final Button button;
 
 		/**
 		 * The controller to send information to when this button is pressed.
@@ -327,7 +328,7 @@ public class ListView implements GenericView
 			button.setOnAction(new EventHandler<ActionEvent>()
 			{
 				@Override
-				public void handle(final ActionEvent t)
+				public void handle(final ActionEvent event)
 				{
 					// Send information to parent controller.
 					controller.viewAction(TableCellViewButton.this.getTableView().getItems().get(TableCellViewButton.this.getIndex()));
@@ -341,10 +342,10 @@ public class ListView implements GenericView
 			super.updateItem(string, empty);
 
 			// Display button only if the row is not empty.
-			if (!empty)
-				setGraphic(button);
-			else
+			if (empty)
 				setGraphic(null);
+			else
+				setGraphic(button);
 		}
 	}
 
@@ -352,7 +353,7 @@ public class ListView implements GenericView
 	public void recreate()
 	{
 		pane = null;
-		getView();
+		parentController.recreateViews(this);
 	}
 
 	@Override

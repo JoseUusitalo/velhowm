@@ -10,11 +10,11 @@ import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
-import velho.controller.DatabaseController;
 import velho.controller.ExternalSystemsController;
 import velho.controller.LocalizationController;
 import velho.controller.SearchController;
 import velho.controller.UIController;
+import velho.controller.database.DatabaseController;
 import velho.model.interfaces.GenericView;
 
 /**
@@ -22,27 +22,12 @@ import velho.model.interfaces.GenericView;
  *
  * @author Jose Uusitalo
  */
-public class ProductListSearch implements GenericView
+public class ProductListSearchView implements GenericView
 {
 	/**
 	 * The root border pane.
 	 */
 	private BorderPane pane;
-
-	/**
-	 * The {@link SearchController}.
-	 */
-	private SearchController searchController;
-
-	/**
-	 * Searches the list of products
-	 *
-	 * @param searchController embodies SearchController
-	 */
-	public ProductListSearch(final SearchController searchController)
-	{
-		this.searchController = searchController;
-	}
 
 	/**
 	 * Gets the product list search view.
@@ -55,14 +40,12 @@ public class ProductListSearch implements GenericView
 		if (pane == null)
 		{
 			pane = new BorderPane();
-			VBox left = new VBox();
-			Button printButton = new Button(LocalizationController.getString("printButton"));
-			Button sendToScannerButton = new Button(LocalizationController.getString("sendToScannerButton"));
+			final VBox left = new VBox();
+			final Button printButton = new Button(LocalizationController.getInstance().getString("printButton"));
+			final Button sendToScannerButton = new Button(LocalizationController.getInstance().getString("sendToScannerButton"));
 
 			final TextArea textArea = new TextArea();
-			textArea.setPromptText((LocalizationController.getString("productSearchByNameOrCodeFirstRowText"))
-					+ (LocalizationController.getString("productSearchByNameOrCodeSecondRowText"))
-					+ (LocalizationController.getString("productSearchByNameOrCodeThirdRowText")));
+			textArea.setPromptText(LocalizationController.getInstance().getString("productListSearchPromptText"));
 			textArea.setPrefWidth(MainWindow.WINDOW_WIDTH / 5);
 			printButton.setMaxWidth(Double.MAX_VALUE);
 			printButton.setAlignment(Pos.CENTER);
@@ -74,7 +57,7 @@ public class ProductListSearch implements GenericView
 				@Override
 				public void handle(final ActionEvent event)
 				{
-					ExternalSystemsController.sendDataToPrinter(DatabaseController.getObservableProductSearchResults());
+					ExternalSystemsController.getInstance().sendDataToPrinter(DatabaseController.getInstance().getObservableProductSearchResults());
 				}
 			});
 
@@ -83,7 +66,7 @@ public class ProductListSearch implements GenericView
 				@Override
 				public void handle(final ActionEvent event)
 				{
-					ExternalSystemsController.sendDataToBarcodeScanner(DatabaseController.getObservableProductSearchResults());
+					ExternalSystemsController.getInstance().sendDataToBarcodeScanner(DatabaseController.getInstance().getObservableProductSearchResults());
 				}
 			});
 
@@ -98,14 +81,14 @@ public class ProductListSearch implements GenericView
 				{
 					if (event.getCode() == KeyCode.ENTER)
 					{
-						searchController.searchByProductList(textArea.getText());
+						SearchController.getInstance().searchByProductList(textArea.getText());
 					}
 				}
 			});
 
 			pane.setLeft(left);
 			pane.setCenter(list);
-			UIController.recordView(this);
+			UIController.getInstance().recordView(this);
 		}
 		return pane;
 	}

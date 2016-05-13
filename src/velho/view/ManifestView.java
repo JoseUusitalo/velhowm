@@ -7,11 +7,11 @@ import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
-import velho.controller.DatabaseController;
 import velho.controller.ListController;
 import velho.controller.LocalizationController;
 import velho.controller.ManifestController;
 import velho.controller.UIController;
+import velho.controller.database.DatabaseController;
 import velho.model.Manifest;
 import velho.model.ManifestState;
 import velho.model.interfaces.GenericView;
@@ -29,22 +29,16 @@ public class ManifestView implements GenericView
 	private BorderPane bpane;
 
 	/**
-	 * The {@link ManifestController}.
-	 */
-	private ManifestController manifestController;
-
-	/**
 	 * The {@link Manifest} to display in this view.
 	 */
-	private Manifest manifest;
+	private final Manifest manifest;
 
 	/**
 	 * @param manifest
 	 * @param manifestController
 	 */
-	public ManifestView(final Manifest manifest, final ManifestController manifestController)
+	public ManifestView(final Manifest manifest)
 	{
-		this.manifestController = manifestController;
 		this.manifest = manifest;
 	}
 
@@ -60,14 +54,14 @@ public class ManifestView implements GenericView
 		{
 			bpane = new BorderPane();
 
-			BorderPane boxlist = (BorderPane) ListController.getTableView(manifestController, DatabaseController.getProductSearchDataColumns(false, false),
-					manifest.getObservableBoxes());
+			final BorderPane boxlist = (BorderPane) ListController.getTableView(ManifestController.getInstance(),
+					DatabaseController.getInstance().getProductSearchDataColumns(false, false), manifest.getObservableBoxes());
 
-			HBox stateBox = new HBox(10);
-			Label stateLabel = new Label(LocalizationController.getString("manifestStateLabel"));
-			ComboBox<Object> manifestState = new ComboBox<Object>();
+			final HBox stateBox = new HBox(10);
+			final Label stateLabel = new Label(LocalizationController.getInstance().getString("manifestStateLabel"));
+			final ComboBox<Object> manifestState = new ComboBox<Object>();
 
-			manifestState.getItems().addAll(DatabaseController.getManifestStateChangeList(manifest.getState()));
+			manifestState.getItems().addAll(DatabaseController.getInstance().getManifestStateChangeList(manifest.getState()));
 			manifestState.getSelectionModel().select(manifest.getState());
 
 			stateBox.getChildren().addAll(stateLabel, manifestState);
@@ -78,13 +72,13 @@ public class ManifestView implements GenericView
 				@Override
 				public void changed(final ObservableValue<?> observableValue, final Object oldValue, final Object newValue)
 				{
-					manifestController.setCurrentManifestState((ManifestState) newValue);
+					ManifestController.getInstance().setCurrentManifestState((ManifestState) newValue);
 				}
 			});
 
-			manifestController.showStateSelector(stateBox);
+			ManifestController.getInstance().showStateSelector(stateBox);
 			bpane.setCenter(boxlist);
-			UIController.recordView(this);
+			UIController.getInstance().recordView(this);
 		}
 
 		return bpane;

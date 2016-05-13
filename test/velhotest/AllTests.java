@@ -6,8 +6,8 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 import org.junit.runners.Suite.SuiteClasses;
 
-import velho.controller.DatabaseController;
-import velho.controller.LogDatabaseController;
+import velho.controller.database.DatabaseController;
+import velho.controller.database.LogDatabaseController;
 import velhotest.controller.AllControllerTests;
 import velhotest.model.AllModelTests;
 
@@ -37,9 +37,9 @@ public class AllTests
 		System.out.println("All Tests Done.\n");
 
 		System.out.println("Close session factory");
-		DatabaseController.closeSessionFactory();
+		DatabaseController.getInstance().closeSessionFactory();
 
 		System.out.println("\n\nClose log database.");
-		LogDatabaseController.shutdown();
+		LogDatabaseController.getInstance().shutdown();
 	}
 }

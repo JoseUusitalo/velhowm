@@ -11,15 +11,15 @@ import java.util.Set;
 
 import org.apache.log4j.Logger;
 
-import velho.controller.DatabaseController;
 import velho.controller.ExternalSystemsController;
+import velho.controller.database.DatabaseController;
 
 /**
  * Created to scan newly arrived product boxes. This class creates product boxes into the system.
  *
  * @author Edward Puustinen
  */
-public class BarcodeScanner
+public abstract class BarcodeScanner
 {
 	/**
 	 * Apache log4j logger: System.
@@ -65,7 +65,7 @@ public class BarcodeScanner
 	{
 
 		List<Integer> numbers = new ArrayList<Integer>();
-		numbers = DatabaseController.getProductCodeList();
+		numbers = DatabaseController.getInstance().getProductCodeList();
 
 		final int maximSize = (int) (Math.random() * (numbers.size() + 1));
 
@@ -92,10 +92,10 @@ public class BarcodeScanner
 
 		do
 		{
-			list = DatabaseController.getProductCodeList();
+			list = DatabaseController.getInstance().getProductCodeList();
 			Collections.shuffle(list);
 
-			List<Object> allSlots = DatabaseController.getAllShelfSlots();
+			List<Object> allSlots = DatabaseController.getInstance().getAllShelfSlots();
 			Collections.shuffle(allSlots);
 
 			randomShelfSlot = (ShelfSlot) allSlots.get(0);
@@ -105,7 +105,7 @@ public class BarcodeScanner
 		}
 		while (!randomShelfSlot.hasFreeSpace());
 
-		if (ExternalSystemsController.move(list.get(0), randomShelfSlot.getSlotID(), true))
+		if (ExternalSystemsController.getInstance().receiveMoveCommand(list.get(0), randomShelfSlot.getSlotID(), true))
 		{
 			SYSLOG.debug("Move successful.");
 			return true;
@@ -121,36 +121,36 @@ public class BarcodeScanner
 	public static void sendRandomShipment()
 	{
 		final Set<ProductBox> boxSet = new HashSet<ProductBox>();
-		final Random r = new Random();
+		final Random rand = new Random();
 		List<Integer> productIDs;
-		int driverID = r.nextInt(10000);
+		int driverID = rand.nextInt(10000);
 		long now = Instant.now().toEpochMilli();
 
 		// 1 day is about 86400000 milliseconds.
 		// 1 month is about 2628000000 milliseconds.
 		// Range: [1 month ago, yesterday]
-		Date orderDate = new Date((now - 2628000000L) + (long) (r.nextDouble() * ((now - 86400000L) - (now - 2628000000L))));
+		Date orderDate = new Date((now - 2628000000L) + (long) (rand.nextDouble() * ((now - 86400000L) - (now - 2628000000L))));
 
-		productIDs = DatabaseController.getProductCodeList();
+		productIDs = DatabaseController.getInstance().getProductCodeList();
 		Collections.shuffle(productIDs);
 
 		int uniqueProducts = productIDs.size();
-		int randomBoxes = r.nextInt(29) + 1; // Range: [1, 30]
+		int randomBoxes = rand.nextInt(29) + 1; // Range: [1, 30]
 		int maxSize;
 		int productCount;
 		Date randomDate;
 
 		for (int i = 0; i < randomBoxes; i++)
 		{
-			maxSize = r.nextInt(499) + 1; // Range: [1, 500]
-			productCount = r.nextInt(maxSize) + 1; // Range: [1, maxSize]
+			maxSize = rand.nextInt(499) + 1; // Range: [1, 500]
+			productCount = rand.nextInt(maxSize) + 1; // Range: [1, maxSize]
 
 			// 10 years is about 315400000000 milliseconds.
 			// Exact rounding is irrelevant so cast is fine.
-			randomDate = new Date(now + (long) (r.nextDouble() * 315400000000L));
+			randomDate = new Date(now + (long) (rand.nextDouble() * 315400000000L));
 
 			// @formatter:off
-				boxSet.add(new ProductBox(	DatabaseController.getProductByID(productIDs.get(i % uniqueProducts)), // Make sure that the index doesn't go over the number of unique products in the database.
+				boxSet.add(new ProductBox(	DatabaseController.getInstance().getProductByID(productIDs.get(i % uniqueProducts)), // Make sure that the index doesn't go over the number of unique products in the database.
 											maxSize,
 											productCount,
 											randomDate));
@@ -159,6 +159,6 @@ public class BarcodeScanner
 
 		SYSLOG.debug("Generated " + boxSet.size() + " random product boxes.");
 
-		ExternalSystemsController.receiveManifestBarcode(boxSet, orderDate, driverID);
+		ExternalSystemsController.getInstance().receiveManifestBarcode(boxSet, orderDate, driverID);
 	}
 }

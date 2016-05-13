@@ -19,9 +19,10 @@ public class RemovalListState extends AbstractDatabaseObject
 	 * @param uuid
 	 * @param name
 	 */
+	@SuppressWarnings("unused")
 	public RemovalListState(final int databaseID, final UUID uuid, final String name)
 	{
-		setDatabaseID(databaseID);
+		// Database ID left unused on purpose.
 		setUuid(uuid);
 		this.name = name;
 	}

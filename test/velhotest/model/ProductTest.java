@@ -8,8 +8,8 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import velho.controller.DatabaseController;
-import velho.controller.LogDatabaseController;
+import velho.controller.database.DatabaseController;
+import velho.controller.database.LogDatabaseController;
 import velho.model.Product;
 import velho.model.ProductBrand;
 import velho.model.ProductCategory;
@@ -21,11 +21,10 @@ import velho.model.ProductCategory;
  */
 public class ProductTest
 {
-	private ProductBrand brand = DatabaseController.getProductBrandByID(1);
-	private ProductCategory category = DatabaseController.getProductCategoryByID(3);
+	private ProductBrand brand = DatabaseController.getInstance().getProductBrandByID(1);
+	private ProductCategory category = DatabaseController.getInstance().getProductCategoryByID(3);
 	private Product product;
 	private String name = "porkkana";
-	private int id = 20;
 
 	/**
 	 * Creates the log database if needed and connects to it.
@@ -36,9 +35,9 @@ public class ProductTest
 	@BeforeClass
 	public static final void init() throws Exception
 	{
-		LogDatabaseController.connectAndInitialize();
-		DatabaseController.link();
-		DatabaseController.loadSampleData();
+		LogDatabaseController.getInstance().connectAndInitialize();
+		DatabaseController.getInstance().link();
+		DatabaseController.getInstance().loadSampleData();
 	}
 
 	/**
@@ -47,14 +46,14 @@ public class ProductTest
 	@AfterClass
 	public static final void unlinkDatabases() throws Exception
 	{
-		DatabaseController.unlink();
-		LogDatabaseController.unlink();
+		DatabaseController.getInstance().unlink();
+		LogDatabaseController.getInstance().unlink();
 	}
 
 	@Before
 	public void createProduct()
 	{
-		product = new Product(id, name, brand, category);
+		product = new Product(0, name, brand, category);
 	}
 
 	@After
@@ -72,7 +71,7 @@ public class ProductTest
 	@Test
 	public void testGetProductID()
 	{
-		assertEquals(id, product.getDatabaseID());
+		assertEquals(0, product.getDatabaseID());
 	}
 
 	@Test
@@ -114,6 +113,6 @@ public class ProductTest
 	@Test
 	public final void testToString()
 	{
-		assertEquals("[20] porkkana (Test Brand #1 / Frozen Things (Frozen))", product.toString());
+		assertEquals("[0] porkkana (Test Brand #1 / Frozen Things (Frozen))", product.toString());
 	}
 }

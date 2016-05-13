@@ -8,7 +8,7 @@ import org.apache.log4j.Logger;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import velho.controller.DatabaseController;
+import velho.controller.database.DatabaseController;
 
 /**
  * A list of product boxes to be thrown away.
@@ -42,9 +42,10 @@ public class RemovalList extends AbstractDatabaseObject
 	 * @param uuid
 	 * @param state
 	 */
+	@SuppressWarnings("unused")
 	public RemovalList(final int databaseID, final UUID uuid, final RemovalListState state)
 	{
-		setDatabaseID(databaseID);
+		// Database ID left unused on purpose.
 		setUuid(uuid);
 		this.state = state;
 		this.boxes = new LinkedHashSet<ProductBox>();
@@ -70,16 +71,15 @@ public class RemovalList extends AbstractDatabaseObject
 
 	/**
 	 */
-	@SuppressWarnings("unused")
-	private RemovalList()
+	public RemovalList()
 	{
-		// I'm hoping Hibernate still uses this.
-
 		/*
 		 * I have to create a new object here because attempting to get one from the database causes a weird null
 		 * pointer exception.
 		 */
-		// this.state = DatabaseController.getRemovalListStateByID(1);
+		// this.state = DatabaseController.getInstance().getRemovalListStateByID(1);
+
+		this.state = null;
 		setUuid(UUID.randomUUID());
 		this.boxes = new LinkedHashSet<ProductBox>();
 		this.observableBoxes = FXCollections.observableArrayList();
@@ -193,15 +193,12 @@ public class RemovalList extends AbstractDatabaseObject
 	 */
 	public boolean addProductBox(final ProductBox productBox)
 	{
-		if (productBox != null)
+		if (productBox != null && boxes.add(productBox))
 		{
-			if (boxes.add(productBox))
-			{
-				productBox.setRemovalList(this);
-				SYSLOG.trace(productBox + " added to removal list " + this);
+			productBox.setRemovalList(this);
+			SYSLOG.trace(productBox + " added to removal list " + this);
 
-				return observableBoxes.add(new ProductBoxSearchResultRow(productBox));
-			}
+			return observableBoxes.add(new ProductBoxSearchResultRow(productBox));
 		}
 
 		SYSLOG.error("Failed to add " + productBox + " to removal list " + this);
@@ -245,7 +242,7 @@ public class RemovalList extends AbstractDatabaseObject
 	 */
 	public void reset()
 	{
-		state = DatabaseController.getRemovalListStateByID(1);
+		state = DatabaseController.getInstance().getRemovalListStateByID(1);
 		clear();
 	}
 
@@ -269,9 +266,24 @@ public class RemovalList extends AbstractDatabaseObject
 			 * Saving collections only works when saving the children and not the parents.
 			 */
 
-			DatabaseController.saveOrUpdate(box);
+			DatabaseController.getInstance().saveOrUpdate(box);
 		}
 
 		boxes.clear();
+	}
+
+	/**
+	 * Sets a new removal list state for this removal list by the database ID of the removal list state.
+	 * Intended for use with loading data from CSV files.
+	 *
+	 * @param removalListStateID the database ID of the new removal list state of this removal list
+	 * @see DatabaseController#getRemovalListStateByID(int)
+	 */
+	public void setRemovalListStateID(final int removalListStateID)
+	{
+		if (removalListStateID < 1)
+			throw new IllegalArgumentException("Removal List State ID must be greater than 0, was '" + removalListStateID + "'.");
+
+		this.state = DatabaseController.getInstance().getRemovalListStateByID(removalListStateID);
 	}
 }

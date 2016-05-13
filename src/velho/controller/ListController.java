@@ -15,8 +15,15 @@ import velho.view.ListView;
  *
  * @author Jose Uusitalo
  */
-public class ListController
+public abstract class ListController
 {
+	/**
+	 */
+	protected ListController()
+	{
+		// No need to instantiate this class.
+	}
+
 	/**
 	 * Gets a view for displaying tabular data with the specified columns and data.
 	 *

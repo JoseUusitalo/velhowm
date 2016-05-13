@@ -1,7 +1,11 @@
 package velho.model;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.UUID;
+
+import velho.controller.database.DatabaseController;
 
 /**
  * An abstract container that can hold any number of {@link Product} objects.
@@ -53,6 +57,7 @@ public abstract class ProductContainer extends AbstractDatabaseObject
 	 * @param productCount
 	 * @param expirationDate
 	 */
+	@SuppressWarnings("unused")
 	public ProductContainer(final int databaseID, final UUID uuid, final Manifest manifest, final RemovalList removalList, final ShelfSlot shelfSlot,
 			final Product product, final int maxSize, final int productCount, final Date expirationDate)
 	{
@@ -61,7 +66,7 @@ public abstract class ProductContainer extends AbstractDatabaseObject
 			throw new IllegalArgumentException();
 		}
 
-		setDatabaseID(databaseID);
+		// Database ID left unused on purpose.
 		setUuid(uuid);
 		this.manifest = manifest;
 		this.removalList = removalList;
@@ -77,6 +82,7 @@ public abstract class ProductContainer extends AbstractDatabaseObject
 	public ProductContainer()
 	{
 		setUuid(UUID.randomUUID());
+		setDatabaseID(0);
 	}
 
 	/**
@@ -253,5 +259,71 @@ public abstract class ProductContainer extends AbstractDatabaseObject
 	public void setExpirationDate(final Date date)
 	{
 		expirationDate = date;
+	}
+
+	/**
+	 * Sets a new removal list for this product container by the database ID of the removal list.
+	 * Intended for use with loading data from CSV files.
+	 *
+	 * @param removalListID the database ID of the new removal list of this product container
+	 * @see DatabaseController#getRemovalListByID(int)
+	 */
+	public void setRemovalListID(final int removalListID)
+	{
+		if (removalListID > 0)
+			this.removalList = DatabaseController.getInstance().getRemovalListByID(removalListID);
+	}
+
+	/**
+	 * Sets a new manifest for this product container by the database ID of the manifest.
+	 * Intended for use with loading data from CSV files.
+	 *
+	 * @param manifestID the database ID of the new manifest of this product container
+	 * @see DatabaseController#getManifestByID(int)
+	 */
+	public void setManifestID(final int manifestID)
+	{
+		if (manifestID > 0)
+			this.manifest = DatabaseController.getInstance().getManifestByID(manifestID);
+	}
+
+	/**
+	 * Sets a new shelf slot for this product container by the database ID of the shelf slot.
+	 * Intended for use with loading data from CSV files.
+	 *
+	 * @param shelfSlotID the database ID of the new shelf slot of this product container
+	 * @see DatabaseController#getShelfSlotByID(int)
+	 */
+	public void setShelfSlotID(final int shelfSlotID)
+	{
+		if (shelfSlotID > 0)
+			this.shelfSlot = DatabaseController.getInstance().getShelfSlotByID(shelfSlotID);
+	}
+
+	/**
+	 * Sets a new product for this product container by the database ID of the product.
+	 * Intended for use with loading data from CSV files.
+	 *
+	 * @param productID the database ID of the new product of this product container
+	 * @see DatabaseController#getProductByID(int)
+	 */
+	public void setProductID(final int productID)
+	{
+		if (productID > 0)
+			this.product = DatabaseController.getInstance().getProductByID(productID);
+	}
+
+	/**
+	 * Sets the expiration date of the products in this product container.
+	 * <blockquote>
+	 * The string must be formatted as follows: <code>yyyy-MM-dd</code>
+	 * </blockquote>
+	 *
+	 * @param dateString the new expiration date as a string
+	 */
+	public void setExpirationDateString(final String dateString) throws ParseException
+	{
+		if (dateString != null && !dateString.trim().isEmpty())
+			this.expirationDate = new SimpleDateFormat("yyyy-MM-dd").parse(dateString);
 	}
 }

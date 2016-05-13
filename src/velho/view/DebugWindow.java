@@ -40,22 +40,22 @@ public class DebugWindow
 	 * Button has been tagged scannerMoveValid and named as "Scanner Move Valid"
 	 * on the scene.
 	 */
-	public Button scannerMoveValid = new Button("Scanner Move Valid");
+	public Button scannerMoveValid;
 
 	/**
 	 * The DebugController has been tagged as controller.
 	 */
-	private DebugController debugController;
+	private final DebugController debugController;
 
 	/**
 	 * A list of for the unique roles in the database.
 	 */
-	private List<UserRole> roles;
+	private final List<UserRole> roles;
 
 	/**
 	 * A list of unique badge numbers in the database.
 	 */
-	private List<String> badgeNumbers;
+	private final List<String> badgeNumbers;
 
 	/**
 	 * @param debugController
@@ -107,7 +107,7 @@ public class DebugWindow
 	{
 		primaryStage.setTitle("VELHO WM DEBUG");
 		final Group root = new Group();
-		final Scene scene = new Scene(root, 300, 150);
+		final Scene scene = new Scene(root, 300, 200);
 		scene.getStylesheets().add(getClass().getResource("velho.css").toExternalForm());
 
 		final BorderPane rootBorderPane = new BorderPane();
@@ -138,6 +138,8 @@ public class DebugWindow
 
 		final Button fillUpPlatformButton = new Button("Fill Up Removal Platform");
 		final Button emptyPlatformButton = new Button("Empty");
+
+		scannerMoveValid = new Button("Scanner Move Valid");
 
 		logInButton.setOnAction(new EventHandler<ActionEvent>()
 		{

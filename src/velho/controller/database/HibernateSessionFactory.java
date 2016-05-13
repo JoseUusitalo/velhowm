@@ -1,4 +1,4 @@
-package velho.model;
+package velho.controller.database;
 
 import org.hibernate.SessionFactory;
 import org.hibernate.cfg.Configuration;
@@ -8,7 +8,7 @@ import org.hibernate.cfg.Configuration;
  *
  * @author Jose Uusitalo
  */
-public class HibernateSessionFactory
+public abstract class HibernateSessionFactory
 {
 	/**
 	 * A private inner class holding the session factory instance.
@@ -25,8 +25,9 @@ public class HibernateSessionFactory
 
 	/**
 	 */
-	public HibernateSessionFactory()
+	private HibernateSessionFactory()
 	{
+		// No need to instantiate this class.
 	}
 
 	/**
