@@ -92,14 +92,14 @@ public class ProductTabView implements GenericView
 			this.brandList = brandsList;
 			this.categoryList = categoriesList;
 
-			HBox hb = new HBox();
+			final HBox hbox = new HBox();
 
 			table.setEditable(true);
 
 			table.setItems(productList);
 			table.getColumns().clear();
 
-			final Callback<TableColumn<Object, Object>, TableCell<Object, Object>> cellFactory = (final TableColumn<Object, Object> p) -> new EditingCell();
+			final Callback<TableColumn<Object, Object>, TableCell<Object, Object>> cellFactory = (final TableColumn<Object, Object> col) -> new EditingCell();
 			final TableColumn<Object, Object> nameColumn = new TableColumn<Object, Object>("Name");
 
 			nameColumn.setMinWidth(100);
@@ -120,12 +120,14 @@ public class ProductTabView implements GenericView
 
 			brand.setCellValueFactory(new PropertyValueFactory<>("brand"));
 			brand.setCellFactory(ComboBoxTableCell.forTableColumn(cbValues));
-			brand.setOnEditCommit((final CellEditEvent<Object, Object> t) ->
+
+			brand.setOnEditCommit((final CellEditEvent<Object, Object> event) ->
 			{
-				final Product editProduct = ((Product) t.getTableView().getItems().get(t.getTablePosition().getRow()));
-				editProduct.setBrand((ProductBrand) t.getNewValue());
+				final Product editProduct = ((Product) event.getTableView().getItems().get(event.getTablePosition().getRow()));
+				editProduct.setBrand((ProductBrand) event.getNewValue());
 				DatabaseController.getInstance().saveOrUpdate(editProduct);
 			});
+
 			table.getColumns().add(brand);
 
 			ObservableList<Object> cbCategoryValues = DatabaseController.getInstance().getAllProductCategories();
@@ -134,10 +136,10 @@ public class ProductTabView implements GenericView
 
 			category.setCellValueFactory(new PropertyValueFactory<>("category"));
 			category.setCellFactory(ComboBoxTableCell.forTableColumn(cbCategoryValues));
-			category.setOnEditCommit((final CellEditEvent<Object, Object> t) ->
+			category.setOnEditCommit((final CellEditEvent<Object, Object> event) ->
 			{
-				final Product editProduct = ((Product) t.getTableView().getItems().get(t.getTablePosition().getRow()));
-				editProduct.setCategory((ProductCategory) t.getNewValue());
+				final Product editProduct = ((Product) event.getTableView().getItems().get(event.getTablePosition().getRow()));
+				editProduct.setCategory((ProductCategory) event.getNewValue());
 				DatabaseController.getInstance().saveOrUpdate(editProduct);
 			});
 			table.getColumns().add(category);
@@ -149,19 +151,19 @@ public class ProductTabView implements GenericView
 			deleteColumn.setCellValueFactory(new Callback<TableColumn.CellDataFeatures<Object, String>, ObservableValue<String>>()
 			{
 				@Override
-				public ObservableValue<String> call(final TableColumn.CellDataFeatures<Object, String> p)
+				public ObservableValue<String> call(final TableColumn.CellDataFeatures<Object, String> celldata)
 				{
-					return new SimpleStringProperty(p.getValue(), "Delete");
+					return new SimpleStringProperty(celldata.getValue(), "Delete");
 				}
 			});
 
 			deleteColumn.setCellFactory(new Callback<TableColumn<Object, String>, TableCell<Object, String>>()
 			{
 				@Override
-				public TableCell<Object, String> call(final TableColumn<Object, String> p)
+				public TableCell<Object, String> call(final TableColumn<Object, String> col)
 				{
 					final TableCellDeleteButton button = new TableCellDeleteButton(ProductController.getInstance(),
-							(LocalizationController.getInstance().getString("publicProductTableDeleteButton")));
+							LocalizationController.getInstance().getString("publicProductTableDeleteButton"));
 					button.setAlignment(Pos.CENTER);
 					return button;
 				}
@@ -182,21 +184,21 @@ public class ProductTabView implements GenericView
 			categoryItem.getSelectionModel().selectFirst();
 
 			final Button addButton = new Button(LocalizationController.getInstance().getString("buttonCreate"));
-			addButton.setOnAction((final ActionEvent e) ->
+			addButton.setOnAction((final ActionEvent event) ->
 			{
 				final Product saveProduct = new Product(productTextField.getText(), (ProductBrand) brandItem.getValue(),
 						(ProductCategory) categoryItem.getValue());
 				DatabaseController.getInstance().saveOrUpdate(saveProduct);
 			});
 
-			hb.getChildren().addAll(productLabel, productTextField, brandLabel, brandItem, categoryLabel, categoryItem, addButton);
-			hb.setSpacing(10);
-			hb.setAlignment(Pos.CENTER_LEFT);
+			hbox.getChildren().addAll(productLabel, productTextField, brandLabel, brandItem, categoryLabel, categoryItem, addButton);
+			hbox.setSpacing(10);
+			hbox.setAlignment(Pos.CENTER_LEFT);
 
 			vbox = new VBox();
 			vbox.setSpacing(5);
 			vbox.setPadding(new Insets(10, 0, 0, 10));
-			vbox.getChildren().addAll(table, hb);
+			vbox.getChildren().addAll(table, hbox);
 
 			UIController.getInstance().recordView(this);
 		}
@@ -210,12 +212,7 @@ public class ProductTabView implements GenericView
 	 */
 	class EditingCell extends TableCell<Object, Object>
 	{
-
 		private TextField textField;
-
-		public EditingCell()
-		{
-		}
 
 		@Override
 		public void startEdit()
@@ -289,12 +286,7 @@ public class ProductTabView implements GenericView
 
 	class SpinnerCell extends TableCell<Object, Object>
 	{
-
 		private Spinner<Integer> spinner;
-
-		public SpinnerCell()
-		{
-		}
 
 		@Override
 		public void startEdit()
@@ -378,12 +370,7 @@ public class ProductTabView implements GenericView
 
 	class DatePickerCell extends TableCell<Object, Object>
 	{
-
 		private DatePicker datePicker;
-
-		public DatePickerCell()
-		{
-		}
 
 		@Override
 		public void startEdit()
@@ -465,11 +452,10 @@ public class ProductTabView implements GenericView
 			if (getItem() instanceof LocalDate)
 				return (LocalDate) getItem();
 
-			Date aDate = ((Date) getItem());
-			SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd");
-			DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-			LocalDate date = LocalDate.parse(df.format(aDate), formatter);
-			return date;
+			final Date aDate = ((Date) getItem());
+			final SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+			final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+			return LocalDate.parse(dateFormat.format(aDate), formatter);
 		}
 	}
 

@@ -78,7 +78,7 @@ public class CSVLoadView implements GenericView
 			loadButton.setOnAction(new EventHandler<ActionEvent>()
 			{
 				@Override
-				public void handle(final ActionEvent e)
+				public void handle(final ActionEvent event)
 				{
 					CSVController.getInstance().loadCSVFileToDatabase(fileNameField.getText(), typeSelector.getValue());
 					fileNameField.clear();
@@ -93,7 +93,7 @@ public class CSVLoadView implements GenericView
 			selectButton.setOnAction(new EventHandler<ActionEvent>()
 			{
 				@Override
-				public void handle(final ActionEvent e)
+				public void handle(final ActionEvent event)
 				{
 					final File csvFile = fileChooser.showOpenDialog(primaryStage);
 

@@ -421,12 +421,12 @@ public class DatabaseController
 		{
 			strbuilder.append(" SET ");
 
-			final Iterator<String> it = columnValues.keySet().iterator();
+			final Iterator<String> iter = columnValues.keySet().iterator();
 			String key = null;
 
-			while (it.hasNext())
+			while (iter.hasNext())
 			{
-				key = it.next();
+				key = iter.next();
 
 				strbuilder.append(key);
 				strbuilder.append("=");
@@ -446,7 +446,7 @@ public class DatabaseController
 
 				}
 
-				if (it.hasNext())
+				if (iter.hasNext())
 					strbuilder.append(", ");
 			}
 		}

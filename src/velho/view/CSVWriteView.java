@@ -77,7 +77,7 @@ public class CSVWriteView implements GenericView
 			writeButton.setOnAction(new EventHandler<ActionEvent>()
 			{
 				@Override
-				public void handle(final ActionEvent e)
+				public void handle(final ActionEvent event)
 				{
 					CSVController.getInstance().writeDatabaseTableToCSVFile(fileNameField.getText(), typeSelector.getValue());
 					fileNameField.clear();
@@ -90,7 +90,7 @@ public class CSVWriteView implements GenericView
 			selectButton.setOnAction(new EventHandler<ActionEvent>()
 			{
 				@Override
-				public void handle(final ActionEvent e)
+				public void handle(final ActionEvent event)
 				{
 					final File csvFile = fileChooser.showSaveDialog(primaryStage);
 					fileNameField.setText(csvFile.getAbsolutePath());
