@@ -410,7 +410,7 @@ public class ProductController implements UIActionController
 	 */
 	public Node getProductBoxesTab()
 	{
-		return productBoxTabView.getView(DatabaseController.getInstance().getAllProducts());
+		return productBoxTabView.getView();
 	}
 
 	/**

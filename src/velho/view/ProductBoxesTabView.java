@@ -74,13 +74,12 @@ public class ProductBoxesTabView implements GenericView
 	 *
 	 * @return the VBox
 	 */
-	public VBox getView(final ObservableList<Object> productList)
+	public VBox getView()
 	{
 		if (vbox == null)
 		{
 			table.getColumns().clear();
 
-			products = productList;
 			HBox hb = new HBox();
 
 			table.setEditable(true);
@@ -503,7 +502,7 @@ public class ProductBoxesTabView implements GenericView
 	public void recreate()
 	{
 		vbox = null;
-		getView(products);
+		getView();
 	}
 
 	@Override
