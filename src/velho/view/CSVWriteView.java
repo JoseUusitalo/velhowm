@@ -29,11 +29,6 @@ public class CSVWriteView implements GenericView
 	private GridPane root;
 
 	/**
-	 * This view's controller.
-	 */
-	private CSVController csvController;
-
-	/**
 	 * The primary stage of the main window.
 	 */
 	private Stage primaryStage;
@@ -44,13 +39,10 @@ public class CSVWriteView implements GenericView
 	private ObservableList<Class<? extends DatabaseObject>> validDatabaseClasses;
 
 	/**
-	 * @param csvController
 	 * @param validDatabaseClasses
 	 */
-	public CSVWriteView(final CSVController csvController, final ObservableList<Class<? extends DatabaseObject>> validDatabaseClasses)
+	public CSVWriteView(final ObservableList<Class<? extends DatabaseObject>> validDatabaseClasses)
 	{
-		this.csvController = csvController;
-		this.root = null;
 		this.validDatabaseClasses = validDatabaseClasses;
 	}
 
@@ -87,7 +79,7 @@ public class CSVWriteView implements GenericView
 				@Override
 				public void handle(final ActionEvent e)
 				{
-					csvController.writeDatabaseTableToCSVFile(fileNameField.getText(), typeSelector.getValue());
+					CSVController.getInstance().writeDatabaseTableToCSVFile(fileNameField.getText(), typeSelector.getValue());
 					fileNameField.clear();
 					writeButton.setDisable(true);
 				}

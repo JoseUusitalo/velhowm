@@ -34,11 +34,6 @@ public class UIController
 	private ManifestController manifestController;
 
 	/**
-	 * The {@link CSVController}.
-	 */
-	private CSVController csvController;
-
-	/**
 	 * The main set of views in this application.
 	 */
 	private static Set<GenericView> viewSet = new HashSet<GenericView>();
@@ -83,11 +78,10 @@ public class UIController
 		this.mainView = mainWindow;
 	}
 
-	public void setControllers(final ManifestController manifestController, final CSVController csvController)
+	public void setControllers(final ManifestController manifestController)
 	{
 		// TODO: remove
 		this.manifestController = manifestController;
-		this.csvController = csvController;
 	}
 
 	/**
@@ -143,7 +137,7 @@ public class UIController
 			case LOGISTICIAN:
 				mainView.addTab(LocalizationController.getInstance().getString("addUserListTab"),
 						UserController.getInstance().getUserListView(currentUserRole));
-				mainView.addTab(LocalizationController.getInstance().getString("csvTab"), csvController.getCSVView());
+				mainView.addTab(LocalizationController.getInstance().getString("csvTab"), CSVController.getInstance().getCSVView());
 				mainView.addTab(LocalizationController.getInstance().getString("addBrandsTab"), ProductController.getInstance().getBrandsTab());
 				mainView.addTab(LocalizationController.getInstance().getString("addProductTypesTab"), ProductController.getInstance().getProductTypesTab());
 				mainView.addTab(LocalizationController.getInstance().getString("addCategoriesTab"), ProductController.getInstance().getCategoryTab());

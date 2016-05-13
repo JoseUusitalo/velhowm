@@ -138,11 +138,6 @@ public class MainWindow extends Application implements GenericView
 	private Label removalPlatformStatus;
 
 	/**
-	 * The {@link CSVController}.
-	 */
-	private CSVController csvController;
-
-	/**
 	 * The primary stage where the window is.
 	 */
 	private Stage primaryStage;
@@ -237,14 +232,14 @@ public class MainWindow extends Application implements GenericView
 	{
 		SYSLOG.debug("Initializing all controllers...");
 
-		csvController = new CSVController(this);
 		manifestController = new ManifestController(this);
 
+		CSVController.getInstance().initialize(this);
 		RemovalPlatformController.getInstance().initialize(this);
 		UIController.getInstance().initialize(this);
 
 		ExternalSystemsController.getInstance().setControllers(manifestController);
-		UIController.getInstance().setControllers(manifestController, csvController);
+		UIController.getInstance().setControllers(manifestController);
 
 		SYSLOG.debug("All controllers initialized.");
 	}

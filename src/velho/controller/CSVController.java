@@ -16,13 +16,11 @@ import com.opencsv.bean.ColumnPositionMappingStrategy;
 import javafx.geometry.Insets;
 import javafx.scene.Node;
 import velho.controller.database.DatabaseController;
-import velho.controller.interfaces.UIActionController;
 import velho.model.CSVLoader;
 import velho.model.User;
 import velho.model.interfaces.DatabaseObject;
 import velho.view.CSVLoadView;
 import velho.view.CSVWriteView;
-import velho.view.ListView;
 import velho.view.MainWindow;
 import velho.view.VerticalViewGroup;
 
@@ -31,7 +29,8 @@ import velho.view.VerticalViewGroup;
  *
  * @author Jose Uusitalo
  */
-public class CSVController implements UIActionController
+@SuppressWarnings("static-method")
+public class CSVController
 {
 	/**
 	 * Apache log4j logger: System.
@@ -54,12 +53,44 @@ public class CSVController implements UIActionController
 	private MainWindow mainWindow;
 
 	/**
+	 * A private inner class holding the class instance.
+	 *
+	 * @author Jose Uusitalo
 	 */
-	public CSVController(final MainWindow mainWindow)
+	private static class Holder
 	{
-		this.mainWindow = mainWindow;
-		loadCSVView = new CSVLoadView(this, DatabaseController.getInstance().getValidDatabaseTypes());
-		writeCSVView = new CSVWriteView(this, DatabaseController.getInstance().getValidDatabaseTypes());
+		/**
+		 * The only instance of {@link CSVController}.
+		 */
+		private static final CSVController INSTANCE = new CSVController();
+	}
+
+	/**
+	 */
+	private CSVController()
+	{
+		loadCSVView = new CSVLoadView(DatabaseController.getInstance().getValidDatabaseTypes());
+		writeCSVView = new CSVWriteView(DatabaseController.getInstance().getValidDatabaseTypes());
+	}
+
+	/**
+	 * Gets the instance of the {@link CSVController}.
+	 *
+	 * @return the CSV controller
+	 */
+	public static synchronized CSVController getInstance()
+	{
+		return Holder.INSTANCE;
+	}
+
+	/**
+	 * Initializes this controller.
+	 *
+	 * @param main the {@link MainWindow}
+	 */
+	public void initialize(final MainWindow main)
+	{
+		this.mainWindow = main;
 	}
 
 	/**
@@ -69,7 +100,7 @@ public class CSVController implements UIActionController
 	 * @param filePath path to the CSV to be written
 	 * @param lines a list of a string arrays containing the data
 	 */
-	public static void writeArraysToCSV(final String filePath, final List<String[]> lines)
+	public void writeArraysToCSV(final String filePath, final List<String[]> lines)
 	{
 		String path = filePath;
 
@@ -98,7 +129,7 @@ public class CSVController implements UIActionController
 	 * @param filePath path to the CSV to be written
 	 * @param lines a list of lists containing the data as strings
 	 */
-	public static void writeCollectionsToCSV(final String filePath, final List<Collection<String>> lines)
+	public void writeCollectionsToCSV(final String filePath, final List<Collection<String>> lines)
 	{
 		final List<String[]> arrays = new ArrayList<String[]>();
 
@@ -111,11 +142,10 @@ public class CSVController implements UIActionController
 	/**
 	 * Gets the CSV file header for the specified {@link DatabaseObject} class.
 	 *
-	 * @param <T> a class implementing {@link DatabaseObject}
 	 * @param type the type to get the header for
 	 * @return the CSV data header line
 	 */
-	public static <T extends DatabaseObject> String[] getCSVDataHeader(final Class<T> type)
+	public String[] getCSVDataHeader(final Class<? extends DatabaseObject> type)
 	{
 		switch (type.getSimpleName())
 		{
@@ -146,7 +176,7 @@ public class CSVController implements UIActionController
 			case "User":
 				return new String[] { "databaseID", "firstName", "lastName", "pin", "badgeID", "role" };
 			default:
-				throw new IllegalArgumentException("Unsupported data type.");
+				throw new IllegalArgumentException("Unsupported data type: " + type.getSimpleName());
 		}
 	}
 
@@ -156,11 +186,10 @@ public class CSVController implements UIActionController
 	 * @param filePath file path to the CSV file
 	 * @param csvType the type of data to load from the CSV file
 	 */
-	@SuppressWarnings({ "static-method", "rawtypes" })
-	public void loadCSVFileToDatabase(final String filePath, final Class csvType)
+	public void loadCSVFileToDatabase(final String filePath, final Class<? extends DatabaseObject> csvType)
 	{
-		@SuppressWarnings("unchecked")
-		final CSVLoader<DatabaseObject> loader = new CSVLoader<DatabaseObject>(csvType);
+		@SuppressWarnings({ "rawtypes", "unchecked" })
+		final CSVLoader loader = new CSVLoader(csvType);
 		final int loaded = loader.load(filePath);
 		final int saved = loader.save();
 
@@ -186,54 +215,24 @@ public class CSVController implements UIActionController
 		return vvg.getView();
 	}
 
-	@Override
-	public void createAction(final Object data)
-	{
-		throw new UnsupportedOperationException();
-	}
-
-	@Override
-	public void updateAction(final Object data)
-	{
-		throw new UnsupportedOperationException();
-	}
-
-	@Override
-	public void addAction(final Object data)
-	{
-		throw new UnsupportedOperationException();
-	}
-
-	@Override
-	public void removeAction(final Object data)
-	{
-		throw new UnsupportedOperationException();
-	}
-
-	@Override
-	public void deleteAction(final Object data)
-	{
-		throw new UnsupportedOperationException();
-	}
-
-	@Override
-	public void viewAction(final Object data)
-	{
-		throw new UnsupportedOperationException();
-	}
-
-	@Override
-	public void recreateViews(final ListView listView)
-	{
-		throw new UnsupportedOperationException();
-	}
-
-	public static boolean isValidCSVFile(final File file)
+	/**
+	 * Checks if the specified {@link File} is a file that exists and has the CSV extension.
+	 *
+	 * @param file file to be checked
+	 * @return <code>true</code> of the specified file as a CSV file
+	 */
+	public boolean isValidCSVFile(final File file)
 	{
 		return file != null && file.exists() && file.isFile() && file.getName().toLowerCase().endsWith(".csv");
 	}
 
-	@SuppressWarnings({ "unchecked", "static-method" })
+	/**
+	 * Writes the contents of a database table to a CSV file.
+	 *
+	 * @param filePath path to a CSV file
+	 * @param classToWrite the {@link velho.model} class whose database table to write to a file
+	 */
+	@SuppressWarnings("unchecked")
 	public void writeDatabaseTableToCSVFile(final String filePath, final Class<? extends DatabaseObject> classToWrite)
 	{
 		@SuppressWarnings("rawtypes")
@@ -266,9 +265,9 @@ public class CSVController implements UIActionController
 	 *
 	 * @param user database object whose data to convert into a string array
 	 * @return an array of strings representing the specified object in a CSV
-	 * file
+	 *         file
 	 */
-	public static String[] objectToCSVDataArray(final User user)
+	public String[] objectToCSVDataArray(final User user)
 	{
 		// databaseID,firstName,lastName,pin,badgeID,role
 		//@formatter:off

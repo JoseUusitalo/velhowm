@@ -30,11 +30,6 @@ public class CSVLoadView implements GenericView
 	private GridPane root;
 
 	/**
-	 * This view's controller.
-	 */
-	private CSVController csvController;
-
-	/**
 	 * The primary stage of the main window.
 	 */
 	private Stage primaryStage;
@@ -45,13 +40,10 @@ public class CSVLoadView implements GenericView
 	private ObservableList<Class<? extends DatabaseObject>> validDatabaseClasses;
 
 	/**
-	 * @param csvController
 	 * @param validDatabaseClasses
 	 */
-	public CSVLoadView(final CSVController csvController, final ObservableList<Class<? extends DatabaseObject>> validDatabaseClasses)
+	public CSVLoadView(final ObservableList<Class<? extends DatabaseObject>> validDatabaseClasses)
 	{
-		this.csvController = csvController;
-		this.root = null;
 		this.validDatabaseClasses = validDatabaseClasses;
 	}
 
@@ -88,7 +80,7 @@ public class CSVLoadView implements GenericView
 				@Override
 				public void handle(final ActionEvent e)
 				{
-					csvController.loadCSVFileToDatabase(fileNameField.getText(), typeSelector.getValue());
+					CSVController.getInstance().loadCSVFileToDatabase(fileNameField.getText(), typeSelector.getValue());
 					fileNameField.clear();
 					loadButton.setDisable(true);
 				}
@@ -105,7 +97,7 @@ public class CSVLoadView implements GenericView
 				{
 					final File csvFile = fileChooser.showOpenDialog(primaryStage);
 
-					if (CSVController.isValidCSVFile(csvFile))
+					if (CSVController.getInstance().isValidCSVFile(csvFile))
 					{
 						fileNameField.setText(csvFile.getAbsolutePath());
 
