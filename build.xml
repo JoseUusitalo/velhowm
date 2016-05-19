@@ -25,7 +25,7 @@
 	<property name="build.dist.report.dir" location="bin/dist/report" />
 
 	<path id="velho.classpath">
-		<fileset dir="${lib.dir}" includes="h2-1.4.191.jar" />
+		<fileset dir="${lib.dir}" includes="h2/h2-1.4.191.jar" />
 		<fileset dir="${lib.dir}" includes="apache-log4j-1.2.17/*.jar" />
 		<fileset dir="${lib.dir}" includes="eclipse/*.jar" />
 		<fileset dir="${lib.dir}" includes="hibernate/java8/*.jar" />
