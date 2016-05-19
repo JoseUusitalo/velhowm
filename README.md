@@ -1,20 +1,17 @@
 # VELHO Warehouse Management #
-## Key Goals ##
-### How will the product benefit the company creating it? ###
-Although technical support is provided for the product for a period of time after deployment, the aim is to create software that is stable and simple enough to use so that no additional support is required. Instead the goal is to reinforce their position as a developer of powerful and high quality software in the global market.
-### What specific company strategies does the product support? ###
-We promote streamlined user-friendly design without sacrificing features and flexibility.
-## Customer ##
-### Who will use the product? ###
-The features of the software are designed specifically for use in grocery stores but the system is generic enough to be used in any warehouse environment.
-## Need ##
-### Why does the customer need the product? ###
-Digital warehouse management is far superior in keeping track of thousands of products than comparable analog systems. Our software creates the carefree warehouse management experience every customer deserves.
-### What features are critical to the customer? ###
-Accessibility, flexibility, and stability.
-## Competition ##
-### How does the product compare with similar products? ###
-Our software contains all existing features of competing products without extraneous properties to complicate the user experience.
-## Primary Differentiation ###
-### What makes this product different from the status quo, or the competition, or both? ###
-The product features are streamlined with a focus on ease of use and a clear user interface so the software may be used by anyone with minimal training.
+A software engineering project developed by a group of 2nd year students (Edward Puustinen, Joona Silvennoinen & me) of Metropolia University of Applied Sciences during 2016-01-19—2016-05-15.
+The goals of the project were to practice:
+* agile software development using the Scrum framework (we also acted as product owners),
+* project management,
+* the [git flow](http://nvie.com/posts/a-successful-git-branching-model/) branching model,
+* unit testing,
+* internationalization and localization of an existing software product,
+* and improving the usability of an existing user interface.
+
+In the first 8 weeks of the project we developed a warehouse management system from scratch for tracking warehouse inventory with searching features, basic user accounts, and logging.
+In the last 8 weeks we implemented the following new features:
+* German localization with dynamic translation switching,
+* various user interface usability improvements,
+* in situ editing of data in tables to eliminate the need for a database administrator to use the product,
+* comma-separated value (CSV) file import and export for mass data transfer,
+* and replaced direct SQL queries with the Hibernate ORM framework.
